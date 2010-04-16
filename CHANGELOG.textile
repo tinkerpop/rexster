@@ -1,4 +1,4 @@
-Rexster: A Graph-Based Recommender Engine
+Rexster: A Graph-Based Ranking Engine
 "http://rexster.tinkerpop.com":http://rexster.tinkerpop.com
 
 bc. <repository>
@@ -17,4 +17,4 @@ bc. <dependency>
   <version>0.1-SNAPSHOT</version>
 </dependency>
 
-* Initial release
+* Initial release of the RESTful shell and rank and score support
