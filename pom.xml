@@ -8,8 +8,8 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <url>http://rexster.tinkerpop.com</url>
-    <name>Rexster: A Graph-Based Recommender Engine</name>
-    <description>A recommender engine that makes use of graph traversal to rank and score vertices in a graph.
+    <name>Rexster: A Graph-Based Ranking Engine</name>
+    <description>This graph-based engine makes use of graph traversal to rank and score elements in a graph.
     </description>
     <developers>
         <developer>

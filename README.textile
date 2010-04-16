@@ -1,5 +1,5 @@
 !http://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-logo.png!
 
-Rexster is a graph-based recommender engine. This engine makes use of graph traversal to rank and score elements in a graph. A REST-ful interface is provided into to allow Rexster to work as a standalone server.
+Rexster is a graph-based ranking engine. This engine makes use of graph traversals to rank and score elements in a graph. A RESTful interface is provided into to allow Rexster to work as a standalone server.
 
 The documentation for Rexster can be found at this "location":http://rexster.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.
