@@ -1,4 +1,4 @@
-!http://github.com/tinkerpop/rexter/raw/master/doc/images/rexster-logo.png!
+!http://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-logo.png!
 
 Rexster is a graph-based recommender engine. This engine makes use of graph traversal to rank and score elements in a graph. A REST-ful interface is provided into to allow Rexster to work as a standalone server.
 
