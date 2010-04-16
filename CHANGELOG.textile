@@ -1,0 +1,20 @@
+Rexster: A Graph-Based Recommender Engine
+"http://rexster.tinkerpop.com":http://rexster.tinkerpop.com
+
+bc. <repository>
+  <id>tinkerpop-repository</id>
+  <name>TinkerPop Maven2 Repository</name>
+  <url>http://tinkerpop.com/maven2</url>
+</repository>
+
+==<hr/>==
+
+h3. Version 0.1 (Fetch -- NOT OFFICIALLY RELEASED YET)
+
+bc. <dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>rexster</artifactId>
+  <version>0.1-SNAPSHOT</version>
+</dependency>
+
+* Initial release

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.tinkerpop</groupId>
+    <artifactId>rexster</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <url>http://rexster.tinkerpop.com</url>
+    <name>Rexster: A Graph-Based Recommender Engine</name>
+    <description>A recommender engine that makes use of graph traversal to rank and score vertices in a graph.
+    </description>
+    <developers>
+        <developer>
+            <name>Marko A. Rodriguez</name>
+            <email>marko@markorodriguez.com</email>
+            <url>http://markorodriguez.com</url>
+        </developer>
+    </developers>
+    <inceptionYear>2009</inceptionYear>
+  <dependencies>
+        <!-- PROPERTY GRAPH MODEL SUPPORT -->
+  	<dependency>
+            <groupId>com.tinkerpop</groupId>
+            <artifactId>blueprints</artifactId>
+            <version>0.1.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tinkerpop</groupId>
+            <artifactId>pipes</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tinkerpop</groupId>
+            <artifactId>gremlin</artifactId>
+            <version>0.2.2</version>
+        </dependency>
+        <!-- JSON SUPPORT -->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
+        </dependency>            
+        <!-- REST SUPPORT -->
+        <dependency>
+            <groupId>org.restlet</groupId>
+            <artifactId>org.restlet</artifactId>
+            <version>2.0-M3</version>
+        </dependency>
+        <!-- TESTING -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.5</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <repositories>
+        <repository>
+            <id>maven repository</id>
+            <url>http://mvnrepository.com</url>
+        </repository>
+        <repository>
+            <id>tinkerpop-repository</id>
+            <name>TinkerPop Maven2 Repository</name>
+            <url>http://tinkerpop.com/maven2</url>
+        </repository>
+    </repositories>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <build>
+        <directory>${basedir}/target</directory>
+        <finalName>${artifactId}-${version}
+        </finalName>
+        <sourceDirectory>${basedir}/src/main/java
+        </sourceDirectory>
+        <testSourceDirectory>${basedir}/src/test/java
+        </testSourceDirectory>
+        <outputDirectory>${basedir}/target/classes
+        </outputDirectory>
+        <testOutputDirectory>${basedir}/target/test-classes
+        </testOutputDirectory>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources
+                </directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>${basedir}/src/test/resources
+                </directory>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/standalone.xml</descriptor>
+                        <descriptor>src/assembly/distribution.xml</descriptor>
+                    </descriptors>
+                    <finalName>rexster-${project.version}</finalName>
+                    <outputDirectory>target</outputDirectory>
+                    <workDirectory>target/assembly/work</workDirectory>
+                    <tarLongFileMode>warn</tarLongFileMode>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
