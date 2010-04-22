@@ -19,9 +19,9 @@
         </developer>
     </developers>
     <inceptionYear>2009</inceptionYear>
-  <dependencies>
+    <dependencies>
         <!-- PROPERTY GRAPH MODEL SUPPORT -->
-  	<dependency>
+        <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>blueprints</artifactId>
             <version>0.1.2-SNAPSHOT</version>
@@ -41,11 +41,22 @@
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1</version>
-        </dependency>            
+        </dependency>
         <!-- REST SUPPORT -->
         <dependency>
             <groupId>org.restlet</groupId>
+            <artifactId>org.restlet.parent</artifactId>
+            <version>2.0-M3</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet</groupId>
             <artifactId>org.restlet</artifactId>
+            <version>2.0-M3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet</groupId>
+            <artifactId>org.restlet.ext.servlet</artifactId>
             <version>2.0-M3</version>
         </dependency>
         <!-- TESTING -->
@@ -60,6 +71,11 @@
         <repository>
             <id>maven repository</id>
             <url>http://mvnrepository.com</url>
+        </repository>
+        <repository>
+            <id>maven-restlet</id>
+            <name>Public online Restlet repository</name>
+            <url>http://maven.restlet.org</url>
         </repository>
         <repository>
             <id>tinkerpop-repository</id>

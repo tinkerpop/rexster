@@ -13,10 +13,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.restlet.data.MediaType;
+import org.restlet.data.Parameter;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
+import org.restlet.util.Series;
 
 import java.util.*;
 
@@ -52,9 +54,17 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
         sh.stopWatch();
     }
 
+    private static Map<String,String> createQueryMap(Series<Parameter> series) {
+        Map<String,String> map = new HashMap<String,String>();
+        for(Parameter parameter : series) {
+            map.put(parameter.getName(), parameter.getValue());
+        }
+        return map;
+    }
+
     @Get
     public Representation evaluate() {
-        Map<String, String> queryParameters = this.getRequest().getResourceRef().getQueryAsForm().getValuesMap();
+        Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());
         this.buildRequestObject(queryParameters);
         this.preQuery();
         if (!usingCachedResult)
@@ -107,7 +117,7 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
     }
 
     private String createCacheRequestURI() {
-        Map<String, String> queryParameters = this.getRequest().getResourceRef().getQueryAsForm().getValuesMap();
+        Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());
         queryParameters.remove("offset.start");
         queryParameters.remove("offset.end");
         queryParameters.remove(ALLOW_CACHED);

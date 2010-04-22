@@ -23,7 +23,7 @@ public class CoFollowsRank extends AbstractRankTraversal {
 
     public void traverse() {
 
-        Vertex song = this.getVertex("song");
+        Vertex song = this.getVertex(GratefulDeadTokens.SONG);
 
         if (song != null) {
             Pipe pipe1 = new FollowsPipeline();
