@@ -24,7 +24,7 @@ public class ResultObjectCache {
     static {
         try {
             Properties properties = new Properties();
-            properties.load(RexsterApplication.class.getResourceAsStream(RexsterTokens.REXSTER_PROPERTIES_FILE));
+            properties.load(RexsterApplication.class.getResourceAsStream("rexster.properties"));
             ResultObjectCache.maxSize = new Integer(properties.getProperty(RexsterTokens.REXSTER_CACHE_MAXSIZE));
             logger.info("Cache constructed with a maximum size of " + ResultObjectCache.maxSize);
         } catch (IOException e) {

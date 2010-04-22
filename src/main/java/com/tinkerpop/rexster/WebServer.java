@@ -6,6 +6,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.restlet.Component;
 import org.restlet.data.Protocol;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -21,22 +22,17 @@ public class WebServer {
 
     static {
         PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
-        try {
-        rexsterProperties.load(RexsterApplication.class.getResourceAsStream(RexsterTokens.REXSTER_PROPERTIES_FILE));
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
     }
 
-    public WebServer(final Graph graph) throws Exception {
+    public WebServer(Graph graph) throws Exception {
         logger.info(".:Welcome to Rexster:.");
-        GraphHolder.putGraph(graph);
         logger.info("Graph " + graph + " loaded");
+        GraphHolder.putGraph(graph);
         this.runWebServer();
     }
 
     public WebServer() throws Exception {
-        logger.info(".:Welcome to the Rexster:.");
+        logger.info(".:Welcome to Rexster:.");
         this.runWebServer();
     }
 
@@ -56,6 +52,16 @@ public class WebServer {
     }
 
     public static void main(final String[] args) throws Exception {
-        new WebServer();
+        if (args.length == 1) {
+            try {
+                rexsterProperties.load(new FileReader(args[0]));
+            } catch (IOException e) {
+                throw new Exception("Could not locate " + args[0] + " properties file.");
+            }
+        } else {
+            rexsterProperties.load(RexsterApplication.class.getResourceAsStream("rexster.properties"));
+        }
+
+        new WebServer(GraphHolder.loadGraphFromProperties(rexsterProperties));
     }
 }

@@ -6,6 +6,7 @@ import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
 
+import java.util.Properties;
 import java.util.ServiceLoader;
 
 /**
