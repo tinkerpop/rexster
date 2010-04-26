@@ -9,7 +9,7 @@ bc. <repository>
 
 ==<hr/>==
 
-h3. Version 0.1 (Fetch -- NOT OFFICIALLY RELEASED YET)
+h3. Version 0.1 (Fluffy -- NOT OFFICIALLY RELEASED YET)
 
 bc. <dependency>
   <groupId>com.tinkerpop</groupId>
@@ -17,4 +17,4 @@ bc. <dependency>
   <version>0.1-SNAPSHOT</version>
 </dependency>
 
-* Initial release of the RESTful shell and rank and score support
+* Initial release of the web service shell and rank and score support

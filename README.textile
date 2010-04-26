@@ -1,6 +1,6 @@
 !http://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-logo.png!
 
-Rexster is a graph-based ranking engine that makes use of graph traversals to rank and score elements in a graph. A RESTful interface provides language agnostic connectivity and the ability to run Rexster as a standalone server. Rexster makes extensive use of "Blueprints":http://blueprints.tinkerpop.com and "Pipes":http://pipes.tinkerpop.com. In this way its possible to run Rexster over various graph systems including:
+Rexster is a graph-based ranking engine that makes use of graph traversals to rank and score elements in a graph. An HTTP-based web service interface provides language agnostic connectivity and the ability to run Rexster as a standalone server. Rexster makes extensive use of "Blueprints":http://blueprints.tinkerpop.com and "Pipes":http://pipes.tinkerpop.com. In this way its possible to run Rexster over various graph systems including:
 
 * "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory property graph
 * "Neo4j":http://neo4j.org/ graph database
