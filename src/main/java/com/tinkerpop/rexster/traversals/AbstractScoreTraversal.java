@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.traversals;
 
-import com.tinkerpop.rexster.ResultObjectCache;
 import org.json.simple.JSONObject;
 
 /**

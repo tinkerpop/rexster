@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster.traversals;
 
 import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.rexster.ResultObjectCache;
 import org.json.simple.JSONObject;
 
 import java.util.*;
@@ -139,5 +138,15 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
             }
         }
         super.postQuery();
+    }
+
+    protected Map<String, String> getBaseApi() {
+        Map<String, String> rankParameters = new HashMap<String, String>();
+        rankParameters.put("allow_cached", "allow a previously cached result to be provided (default is true)");
+        rankParameters.put("offset.start", "the start integer of a page of results (default is 0)");
+        rankParameters.put("offset.end", "the end integer of a page of results (default is infinity)");
+        rankParameters.put("sort", "regular, reverse, or none sort the ranked results (default is none)");
+        rankParameters.put("return_key", "the element property key to return (default is id)");
+        return rankParameters;
     }
 }

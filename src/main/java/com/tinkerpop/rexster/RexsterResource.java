@@ -8,7 +8,7 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
-import java.util.*;
+import java.util.ServiceLoader;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -28,11 +28,6 @@ public class RexsterResource extends ServerResource {
         }
         resultObject.put("traversals", queriesObject);
         resultObject.put("query_time", sh.stopWatch());
-
-        try {
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
         return new StringRepresentation(resultObject.toJSONString(), MediaType.APPLICATION_JSON);
     }
 }

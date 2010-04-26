@@ -4,7 +4,10 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
-import com.tinkerpop.rexster.*;
+import com.tinkerpop.rexster.RestTokens;
+import com.tinkerpop.rexster.ResultObjectCache;
+import com.tinkerpop.rexster.RexsterApplication;
+import com.tinkerpop.rexster.StatisticsHelper;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -50,15 +53,15 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
 
     public AbstractTraversal() {
         sh.stopWatch();
-        if(null != this.getApplication()) {
-            this.graph = ((RexsterApplication)this.getApplication()).getGraph();
-            this.resultObjectCache = ((RexsterApplication)this.getApplication()).getResultObjectCache();
+        if (null != this.getApplication()) {
+            this.graph = ((RexsterApplication) this.getApplication()).getGraph();
+            this.resultObjectCache = ((RexsterApplication) this.getApplication()).getResultObjectCache();
         }
     }
 
-    private static Map<String,String> createQueryMap(Series<Parameter> series) {
-        Map<String,String> map = new HashMap<String,String>();
-        for(Parameter parameter : series) {
+    private static Map<String, String> createQueryMap(Series<Parameter> series) {
+        Map<String, String> map = new HashMap<String, String>();
+        for (Parameter parameter : series) {
             map.put(parameter.getName(), parameter.getValue());
         }
         return map;
@@ -160,6 +163,14 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
         return null;
     }
 
+    protected String getRequestValue(final String requestObjectKey) {
+        return (String) this.requestObject.get(requestObjectKey);
+    }
+
+    public void addApiToResultObject() {
+
+    }
+
     protected void preQuery() {
         if (graph instanceof Neo4jGraph) {
             ((Neo4jGraph) graph).startTransaction();
@@ -177,6 +188,9 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
             ((Neo4jGraph) graph).stopTransaction(true);
         }
         this.resultObject.put(SUCCESS, this.success);
+        if (!this.success) {
+            this.addApiToResultObject();
+        }
         if (null != message) {
             this.resultObject.put(MESSAGE, this.message);
         }
