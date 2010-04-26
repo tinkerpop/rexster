@@ -4,10 +4,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
-import com.tinkerpop.rexster.GraphHolder;
-import com.tinkerpop.rexster.RestTokens;
-import com.tinkerpop.rexster.ResultObjectCache;
-import com.tinkerpop.rexster.StatisticsHelper;
+import com.tinkerpop.rexster.*;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -27,7 +24,8 @@ import java.util.*;
  */
 public abstract class AbstractTraversal extends ServerResource implements Traversal {
 
-    protected static Graph graph = GraphHolder.getGraph();
+    protected Graph graph;
+    protected ResultObjectCache resultObjectCache;
     protected static Logger logger = Logger.getLogger(AbstractTraversal.class);
 
     protected final JSONParser parser = new JSONParser();
@@ -52,6 +50,10 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
 
     public AbstractTraversal() {
         sh.stopWatch();
+        if(null != this.getApplication()) {
+            this.graph = ((RexsterApplication)this.getApplication()).getGraph();
+            this.resultObjectCache = ((RexsterApplication)this.getApplication()).getResultObjectCache();
+        }
     }
 
     private static Map<String,String> createQueryMap(Series<Parameter> series) {
@@ -185,6 +187,6 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
     protected void cacheCurrentResultObjectState() {
         JSONObject tempResultObject = new JSONObject();
         tempResultObject.putAll(this.resultObject);
-        ResultObjectCache.addCachedResult(this.cacheRequestURI, tempResultObject);
+        this.resultObjectCache.putCachedResult(this.cacheRequestURI, tempResultObject);
     }
 }

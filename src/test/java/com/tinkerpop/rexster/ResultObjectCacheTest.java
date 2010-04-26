@@ -13,28 +13,28 @@ import java.util.UUID;
 public class ResultObjectCacheTest extends TestCase {
 
     public void testElderModel() {
-        ResultObjectCache.maxSize = 1000;
+        ResultObjectCache resultObjectCache = new ResultObjectCache();
         List<String> uuids = new ArrayList<String>();
         for (int i = 0; i < 1000; i++) {
             JSONObject temp = new JSONObject();
             temp.put("value", i);
             UUID uuid = UUID.randomUUID();
-            ResultObjectCache.addCachedResult(uuid.toString(), temp);
+            resultObjectCache.putCachedResult(uuid.toString(), temp);
             uuids.add(uuid.toString());
         }
         int counter = 0;
         for (String uuid : uuids) {
-            assertTrue(ResultObjectCache.getCachedResult(uuid) != null);
-            assertEquals(ResultObjectCache.getCachedResult(uuid).get("value"), counter);
+            assertTrue(resultObjectCache.getCachedResult(uuid) != null);
+            assertEquals(resultObjectCache.getCachedResult(uuid).get("value"), counter);
             counter++;
         }
-        assertEquals(ResultObjectCache.getCacheSize(), 1000);
-        assertEquals(ResultObjectCache.getCachedResult(uuids.get(0)).get("value"), 0);
-        ResultObjectCache.addCachedResult(UUID.randomUUID().toString(), new JSONObject());
-        assertNull(ResultObjectCache.getCachedResult(uuids.get(0)));
-        assertEquals(ResultObjectCache.getCachedResult(uuids.get(1)).get("value"), 1);
-        assertEquals(ResultObjectCache.getCachedResult(uuids.get(1)).get("value"), 1);
-        ResultObjectCache.addCachedResult(UUID.randomUUID().toString(), new JSONObject());
-        assertNull(ResultObjectCache.getCachedResult(uuids.get(1)));
+        assertEquals(resultObjectCache.getCacheSize(), 1000);
+        assertEquals(resultObjectCache.getCachedResult(uuids.get(0)).get("value"), 0);
+        resultObjectCache.putCachedResult(UUID.randomUUID().toString(), new JSONObject());
+        assertNull(resultObjectCache.getCachedResult(uuids.get(0)));
+        assertEquals(resultObjectCache.getCachedResult(uuids.get(1)).get("value"), 1);
+        assertEquals(resultObjectCache.getCachedResult(uuids.get(1)).get("value"), 1);
+        resultObjectCache.putCachedResult(UUID.randomUUID().toString(), new JSONObject());
+        assertNull(resultObjectCache.getCachedResult(uuids.get(1)));
     }
 }

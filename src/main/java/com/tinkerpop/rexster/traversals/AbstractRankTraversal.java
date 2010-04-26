@@ -110,7 +110,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         this.returnKey = (String) this.requestObject.get(RETURN_KEY);
 
         if (this.allowCached) {
-            JSONObject tempResultObject = ResultObjectCache.getCachedResult(this.cacheRequestURI);
+            JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
             if (tempResultObject != null) {
                 this.ranks = (Map<Object, Float>) tempResultObject.get(RANKS);
                 this.totalRank = (Float) tempResultObject.get(TOTAL_RANK);

@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.Graph;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.restlet.Component;
@@ -16,7 +15,6 @@ import java.util.Properties;
 public class WebServer {
 
     private static final String DEFAULT_HOST = "";
-    private static Properties rexsterProperties = new Properties();
 
     protected static Logger logger = Logger.getLogger(WebServer.class);
 
@@ -24,44 +22,40 @@ public class WebServer {
         PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
     }
 
-    public WebServer(Graph graph) throws Exception {
+    public WebServer(Properties properties) throws Exception {
         logger.info(".:Welcome to Rexster:.");
-        logger.info("Graph " + graph + " loaded");
-        GraphHolder.putGraph(graph);
-        this.runWebServer();
+        this.runWebServer(properties);
     }
 
-    public WebServer() throws Exception {
-        logger.info(".:Welcome to Rexster:.");
-        this.runWebServer();
-    }
+    protected void runWebServer(Properties properties) throws Exception {
+        RexsterApplication rexster = new RexsterApplication(properties);
 
-    protected void runWebServer() throws Exception {
         Component component = new Component();
-        component.getServers().add(Protocol.HTTP, new Integer(rexsterProperties.getProperty("rexster.webserver.port")));
-        component.getDefaultHost().attach(DEFAULT_HOST, new RexsterApplication());
+        component.getServers().add(Protocol.HTTP, new Integer(properties.getProperty("rexster.webserver.port")));
+        component.getDefaultHost().attach(DEFAULT_HOST, rexster);
         component.start();
 
-        // user interaction to shutdown thread
+        // user interaction to shutdown server thread
         logger.info("Hit <enter> to shutdown Rexster");
         System.in.read();
-        GraphHolder.getGraph().shutdown();
         logger.info("Shutting down Rexster");
         component.stop();
         System.exit(0);
     }
 
+
     public static void main(final String[] args) throws Exception {
+        Properties properties = new Properties();
         if (args.length == 1) {
             try {
-                rexsterProperties.load(new FileReader(args[0]));
+                properties.load(new FileReader(args[0]));
             } catch (IOException e) {
                 throw new Exception("Could not locate " + args[0] + " properties file.");
             }
         } else {
-            rexsterProperties.load(RexsterApplication.class.getResourceAsStream("rexster.properties"));
+            properties.load(RexsterApplication.class.getResourceAsStream("rexster.properties"));
         }
 
-        new WebServer(GraphHolder.loadGraphFromProperties(rexsterProperties));
+        new WebServer(properties);
     }
 }

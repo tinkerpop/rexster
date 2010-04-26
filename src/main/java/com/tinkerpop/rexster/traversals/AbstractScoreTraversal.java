@@ -15,7 +15,7 @@ public abstract class AbstractScoreTraversal extends AbstractTraversal {
     protected void preQuery() {
         super.preQuery();
         if (this.allowCached) {
-            JSONObject tempResultObject = ResultObjectCache.getCachedResult(this.cacheRequestURI);
+            JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
             if (null != tempResultObject) {
                 this.score = (Float) tempResultObject.get(SCORE);
                 this.success = true;
