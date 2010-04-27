@@ -1,12 +1,17 @@
 package com.tinkerpop.rexster.traversals;
 
 import com.tinkerpop.blueprints.pgm.Vertex;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,7 +43,11 @@ public class GremlinTraversal extends AbstractTraversal {
 
             engine.getBindings(ScriptContext.ENGINE_SCOPE).put(GRAPH_VARIABLE, graph);
 
-            this.resultObject.put(RETURN, engine.eval(script));
+            JSONArray results = new JSONArray();
+            for(Object object : (List)engine.eval(script)) {
+                results.add(JSONObject.escape(object.toString()));
+            }
+            this.resultObject.put(RETURN, results);
             this.success = true;
         } catch (ScriptException e) {
             this.success = false;
