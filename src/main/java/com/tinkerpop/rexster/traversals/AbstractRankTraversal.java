@@ -140,13 +140,12 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         super.postQuery();
     }
 
-    protected Map<String, String> getBaseApi() {
-        Map<String, String> rankParameters = new HashMap<String, String>();
-        rankParameters.put("allow_cached", "allow a previously cached result to be provided (default is true)");
-        rankParameters.put("offset.start", "the start integer of a page of results (default is 0)");
-        rankParameters.put("offset.end", "the end integer of a page of results (default is infinity)");
-        rankParameters.put("sort", "regular, reverse, or none sort the ranked results (default is none)");
-        rankParameters.put("return_key", "the element property key to return (default is id)");
-        return rankParameters;
+    protected Map<String, Object> getParameters() {
+        Map<String, Object> parameters = super.getParameters();
+        parameters.put("offset.start", "the start integer of a page of results (default is 0)");
+        parameters.put("offset.end", "the end integer of a page of results (default is infinity)");
+        parameters.put(SORT, "regular, reverse, or none sort the ranked results (default is none)");
+        parameters.put(RETURN_KEY, "the element property key to return (default is id)");
+        return parameters;
     }
 }

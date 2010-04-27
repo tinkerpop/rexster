@@ -5,8 +5,12 @@ package com.tinkerpop.rexster;
  */
 public class RexsterTokens {
 
-    public static String REXSTER_GRAPH_TYPE = "rexster.graph.type";
-    public static String REXSTER_GRAPH_FILE = "rexster.graph.file";
-    public static String REXSTER_CACHE_MAXSIZE = "rexster.cache.maxsize";
+    public static final String REXSTER_GRAPH_TYPE = "rexster.graph.type";
+    public static final String REXSTER_GRAPH_FILE = "rexster.graph.file";
+    public static final String REXSTER_CACHE_MAXSIZE = "rexster.cache.maxsize";
+
+    public static final String DESCRIPTION = "description";
+    public static final String PARAMETERS = "parameters";
+    public static final String API = "api";
 
 }

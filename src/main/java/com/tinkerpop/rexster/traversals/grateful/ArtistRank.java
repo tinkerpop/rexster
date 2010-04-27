@@ -7,6 +7,7 @@ import com.tinkerpop.pipes.serial.Pipeline;
 import com.tinkerpop.pipes.serial.pgm.EdgeVertexPipe;
 import com.tinkerpop.pipes.serial.pgm.LabelFilterPipe;
 import com.tinkerpop.pipes.serial.pgm.VertexEdgePipe;
+import com.tinkerpop.rexster.RexsterTokens;
 import com.tinkerpop.rexster.traversals.AbstractRankTraversal;
 
 import java.util.Arrays;
@@ -29,9 +30,9 @@ public class ArtistRank extends AbstractRankTraversal {
         String type = this.getRequestValue(GratefulDeadTokens.ARTIST_TYPE);
 
         if (null != type && type.equals("writer"))
-            type = "written_by";
+            type = GratefulDeadTokens.WRITTEN_BY;
         else if (null != type && type.equals("singer"))
-            type = "sung_by";
+            type = GratefulDeadTokens.SUNG_BY;
 
         if (type != null) {
             this.totalRank = 0.0f;
@@ -53,10 +54,10 @@ public class ArtistRank extends AbstractRankTraversal {
 
     public void addApiToResultObject() {
         Map<String, Object> api = new HashMap<String, Object>();
-        Map<String, String> parameters = this.getBaseApi();
-        parameters.put("artist_type", "must be writer or singer");
-        api.put("description", "rank all writers (or singers) based on the number of songs they have written (or sung)");
-        api.put("parameters", parameters);
-        this.resultObject.put("api", api);
+        Map<String, Object> parameters = this.getParameters();
+        parameters.put(GratefulDeadTokens.ARTIST_TYPE, "must be writer or singer");
+        api.put(RexsterTokens.DESCRIPTION, "rank all writers (or singers) based on the number of songs they have written (or sung)");
+        api.put(RexsterTokens.PARAMETERS, parameters);
+        this.resultObject.put(RexsterTokens.API, api);
     }
 }

@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.pipes.serial.Pipe;
 import com.tinkerpop.pipes.serial.Pipeline;
 import com.tinkerpop.pipes.serial.filter.ObjectFilterPipe;
+import com.tinkerpop.rexster.RexsterTokens;
 import com.tinkerpop.rexster.traversals.AbstractRankTraversal;
 import com.tinkerpop.rexster.traversals.grateful.pipes.FollowsInversePipeline;
 import com.tinkerpop.rexster.traversals.grateful.pipes.FollowsPipeline;
@@ -44,10 +45,10 @@ public class CoFollowsRank extends AbstractRankTraversal {
 
     public void addApiToResultObject() {
         Map<String, Object> api = new HashMap<String, Object>();
-        Map<String, String> parameters = this.getBaseApi();
+        Map<String, Object> parameters = this.getParameters();
         parameters.put("song.<key>", "the source song, where <key> is the song vertex property key");
-        api.put("description", "rank all songs relative to the source song by the number of times they co-follow the source song");
-        api.put("parameters", parameters);
-        this.resultObject.put("api", api);
+        api.put(RexsterTokens.DESCRIPTION, "rank all songs relative to the source song by the number of times they co-follow the source song");
+        api.put(RexsterTokens.PARAMETERS, parameters);
+        this.resultObject.put(RexsterTokens.API, api);
     }
 }
