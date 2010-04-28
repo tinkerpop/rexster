@@ -23,7 +23,7 @@ import java.util.ServiceLoader;
  */
 public class RexsterApplication extends Application {
 
-    protected static Logger logger = Logger.getLogger(RexsterApplication.class);
+    protected static final Logger logger = Logger.getLogger(RexsterApplication.class);
     private Graph graph;
     private ResultObjectCache resultObjectCache;
 
@@ -31,13 +31,13 @@ public class RexsterApplication extends Application {
         PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
     }
 
-    public RexsterApplication(Graph graph) {
+    public RexsterApplication(final Graph graph) {
         this.graph = graph;
         logger.info("Graph " + this.graph + " loaded");
         this.resultObjectCache = new ResultObjectCache();
     }
 
-    public RexsterApplication(Properties properties) {
+    public RexsterApplication(final Properties properties) {
         try {
             this.graph = createGraphFromProperties(properties);
             logger.info("Graph " + this.graph + " loaded");
@@ -72,7 +72,7 @@ public class RexsterApplication extends Application {
         this.graph.shutdown();
     }
 
-    private static Graph createGraphFromProperties(Properties properties) throws Exception {
+    private static Graph createGraphFromProperties(final Properties properties) throws Exception {
         String graphType = properties.getProperty(RexsterTokens.REXSTER_GRAPH_TYPE);
         String graphFile = properties.getProperty(RexsterTokens.REXSTER_GRAPH_FILE);
         Graph graph;

@@ -75,7 +75,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         }
     }
 
-    protected float incrRank(Iterator<? extends Element> iterator, final Float incr) {
+    protected float incrRank(final Iterator<? extends Element> iterator, final Float incr) {
         float totalRank = 0.0f;
         while (iterator.hasNext()) {
             if (null == this.returnKey)

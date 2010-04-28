@@ -5,12 +5,23 @@ import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class ResultObjectCacheTest extends TestCase {
+
+    private static final List<String> uuids = new ArrayList<String>();
+    private static final Random random = new Random();
+    private static int counter = 0;
+    private static final int totalThreads = 100;
+    static {
+        for(int i=0; i<1000; i++) {
+            uuids.add(UUID.randomUUID().toString());
+        }
+    }
 
     public void testElderModel() {
         ResultObjectCache resultObjectCache = new ResultObjectCache();
@@ -36,5 +47,36 @@ public class ResultObjectCacheTest extends TestCase {
         assertEquals(resultObjectCache.getCachedResult(uuids.get(1)).get("value"), 1);
         resultObjectCache.putCachedResult(UUID.randomUUID().toString(), new JSONObject());
         assertNull(resultObjectCache.getCachedResult(uuids.get(1)));
+    }
+
+    public void testThreadSafety() {
+        ResultObjectCache resultObjectCache = new ResultObjectCache();
+        for(int i=0; i<totalThreads;i++) {
+            new Thread(new CacheTester(resultObjectCache)).start();
+        }
+        while(counter < totalThreads) {
+            Thread.yield();
+        }
+
+    }
+
+    private class CacheTester implements Runnable {
+
+        private ResultObjectCache cache;
+        private static final int totalRuns = 1000;
+
+        public CacheTester(ResultObjectCache cache) {
+            this.cache = cache;
+        }
+
+        public void run() {
+            for(int i=0; i<totalRuns; i++) {
+                JSONObject object = new JSONObject();
+                object.put("thread", Thread.currentThread().getName());
+                cache.putCachedResult(uuids.get(random.nextInt(uuids.size())), object);
+                cache.getCachedResult(uuids.get(random.nextInt(uuids.size())));
+            }
+            counter++;
+        }
     }
 }

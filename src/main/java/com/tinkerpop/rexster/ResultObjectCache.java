@@ -12,7 +12,7 @@ import java.util.Properties;
  */
 public class ResultObjectCache {
 
-    protected static Logger logger = Logger.getLogger(RexsterApplication.class);
+    private static final Logger logger = Logger.getLogger(RexsterApplication.class);
     public static int maxSize = 1000;
     private static final Map<String, JSONObject> requestToResultMap = new LinkedHashMap<String, JSONObject>() {
         protected boolean removeEldestEntry(Map.Entry eldest) {
@@ -24,16 +24,16 @@ public class ResultObjectCache {
         logger.info("Cache constructed with a maximum size of " + ResultObjectCache.maxSize);
     }
 
-    public ResultObjectCache(Properties properties) {
+    public ResultObjectCache(final Properties properties) {
         ResultObjectCache.maxSize = new Integer(properties.getProperty(RexsterTokens.REXSTER_CACHE_MAXSIZE));
         logger.info("Cache constructed with a maximum size of " + ResultObjectCache.maxSize);
     }
 
-    public synchronized JSONObject getCachedResult(String uriRequest) {
+    public synchronized JSONObject getCachedResult(final String uriRequest) {
         return requestToResultMap.get(uriRequest);
     }
 
-    public synchronized void putCachedResult(String uriRequest, JSONObject resultObject) {
+    public synchronized void putCachedResult(final String uriRequest, final JSONObject resultObject) {
         requestToResultMap.put(uriRequest, resultObject);
     }
 

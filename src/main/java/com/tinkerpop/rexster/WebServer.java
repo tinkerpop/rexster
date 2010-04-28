@@ -22,12 +22,12 @@ public class WebServer {
         PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
     }
 
-    public WebServer(Properties properties) throws Exception {
+    public WebServer(final Properties properties) throws Exception {
         logger.info(".:Welcome to Rexster:.");
         this.runWebServer(properties);
     }
 
-    protected void runWebServer(Properties properties) throws Exception {
+    protected void runWebServer(final Properties properties) throws Exception {
         RexsterApplication rexster = new RexsterApplication(properties);
 
         Component component = new Component();

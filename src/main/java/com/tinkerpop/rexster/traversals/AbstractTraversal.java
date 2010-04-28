@@ -59,7 +59,7 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
         }
     }
 
-    private static Map<String, String> createQueryMap(Series<Parameter> series) {
+    private static Map<String, String> createQueryMap(final Series<Parameter> series) {
         Map<String, String> map = new HashMap<String, String>();
         for (Parameter parameter : series) {
             map.put(parameter.getName(), parameter.getValue());

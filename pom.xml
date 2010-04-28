@@ -9,7 +9,10 @@
     <packaging>jar</packaging>
     <url>http://rexster.tinkerpop.com</url>
     <name>Rexster: A Graph-Based Ranking Engine</name>
-    <description>This graph-based engine makes use of graph traversal to rank and score elements in a graph.
+    <description>
+        Rexster is a graph-based ranking engine that makes use of graph traversals to
+        rank and score elements in a graph. An HTTP-based web service interface provides
+        language agnostic connectivity and the ability to run Rexster as a standalone server.
     </description>
     <developers>
         <developer>

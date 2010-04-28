@@ -6,7 +6,7 @@ import org.restlet.representation.Representation;
  * author: Marko A. Rodriguez (http://markorodriguez.com)
  */
 public interface Traversal {
-    public Representation evaluate(String jsonString);
+    public Representation evaluate(final String jsonString);
 
     public Representation evaluate();
 
