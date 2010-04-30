@@ -28,6 +28,28 @@ public class RexsterResource extends ServerResource {
         }
         resultObject.put("traversals", queriesObject);
         resultObject.put("query_time", sh.stopWatch());
+        resultObject.put("up_time", this.getTimeAlive());
         return new StringRepresentation(resultObject.toJSONString(), MediaType.APPLICATION_JSON);
+    }
+
+    private String getTimeAlive() {
+        long timeMillis = System.currentTimeMillis() - ((RexsterApplication) this.getApplication()).getStartTime();
+        long time = timeMillis / 1000;
+        String seconds = Integer.toString((int) (time % 60));
+        String minutes = Integer.toString((int) ((time % 3600) / 60));
+        String hours = Integer.toString((int) (time / 3600));
+        String days = Integer.toString((int) (time / 86400));
+        for (int i = 0; i < 2; i++) {
+            if (seconds.length() < 2) {
+                seconds = "0" + seconds;
+            }
+            if (minutes.length() < 2) {
+                minutes = "0" + minutes;
+            }
+            if (hours.length() < 2) {
+                hours = "0" + hours;
+            }
+        }
+        return days + "[d]:" + hours + "[h]:" + minutes + "[m]:" + seconds + "[s]";
     }
 }

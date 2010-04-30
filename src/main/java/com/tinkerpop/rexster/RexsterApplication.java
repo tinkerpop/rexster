@@ -23,6 +23,7 @@ import java.util.ServiceLoader;
  */
 public class RexsterApplication extends Application {
 
+    private final long startTime = System.currentTimeMillis();
     protected static final Logger logger = Logger.getLogger(RexsterApplication.class);
     private Graph graph;
     private ResultObjectCache resultObjectCache;
@@ -66,13 +67,17 @@ public class RexsterApplication extends Application {
         return this.resultObjectCache;
     }
 
+    public long getStartTime() {
+        return this.startTime;
+    }
+
     public void stop() throws Exception {
         super.stop();
         logger.info("Shutting down " + this.graph);
         this.graph.shutdown();
     }
 
-    private static Graph createGraphFromProperties(final Properties properties) throws Exception {
+    protected static Graph createGraphFromProperties(final Properties properties) throws Exception {
         String graphType = properties.getProperty(RexsterTokens.REXSTER_GRAPH_TYPE);
         String graphFile = properties.getProperty(RexsterTokens.REXSTER_GRAPH_FILE);
         Graph graph;
