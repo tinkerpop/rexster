@@ -8,6 +8,7 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
+import java.util.Map;
 import java.util.ServiceLoader;
 
 /**
@@ -22,9 +23,10 @@ public class RexsterResource extends ServerResource {
         JSONObject resultObject = new JSONObject();
         resultObject.put("name", "Rexster: A Graph-Based Ranking Engine");
         JSONObject queriesObject = new JSONObject();
-        ServiceLoader<Traversal> queryResources = ServiceLoader.load(Traversal.class);
-        for (Traversal traversalResource : queryResources) {
-            queriesObject.put(traversalResource.getResourceName(), traversalResource.getClass().getName());
+
+
+        for (Map.Entry<String,Class> traversal : ((RexsterApplication)this.getApplication()).getLoadedTraversalServices().entrySet()) {
+            queriesObject.put(traversal.getKey(), traversal.getValue().getName());
         }
         resultObject.put("traversals", queriesObject);
         resultObject.put("query_time", sh.stopWatch());

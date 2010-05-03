@@ -25,6 +25,7 @@ public class RexsterApplication extends Application {
     private Graph graph;
     private ResultObjectCache resultObjectCache;
     private Properties properties;
+    private Map<String,Class> loadedTraversals = new HashMap<String,Class>();
 
     static {
         PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
@@ -47,6 +48,7 @@ public class RexsterApplication extends Application {
         }
     }
 
+    // todo: clean up
     public Restlet createRoot() {
         Router router = new Router(getContext());
         router.attachDefault(RexsterResource.class);
@@ -60,11 +62,13 @@ public class RexsterApplication extends Application {
                     if (packageNames.contains("")) {
                         logger.info("loading traversal: /" + traversalService.getResourceName() + " [" + traversalService.getClass().getName() + "]");
                         router.attach("/" + traversalService.getResourceName(), traversalService.getClass());
+                        this.loadedTraversals.put(traversalService.getResourceName(), traversalService.getClass());
                     }
                 } else {
                     if (packageNames.contains(traversalService.getResourceName().substring(0, traversalService.getResourceName().indexOf("/")))) {
                         logger.info("loading traversal: /" + traversalService.getResourceName() + " [" + traversalService.getClass().getName() + "]");
                         router.attach("/" + traversalService.getResourceName(), traversalService.getClass());
+                        this.loadedTraversals.put(traversalService.getResourceName(), traversalService.getClass());
                     }
                 }
             }
@@ -72,9 +76,14 @@ public class RexsterApplication extends Application {
             for (Traversal traversalService : traversalServices) {
                 logger.info("loading traversal: /" + traversalService.getResourceName() + " [" + traversalService.getClass().getName() + "]");
                 router.attach("/" + traversalService.getResourceName(), traversalService.getClass());
+                this.loadedTraversals.put(traversalService.getResourceName(), traversalService.getClass());
             }
         }
         return router;
+    }
+
+    public Map<String,Class> getLoadedTraversalServices() {
+        return this.loadedTraversals;
     }
 
     public Graph getGraph() {
