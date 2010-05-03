@@ -13,10 +13,7 @@ import org.restlet.routing.Router;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ServiceLoader;
+import java.util.*;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -27,6 +24,7 @@ public class RexsterApplication extends Application {
     protected static final Logger logger = Logger.getLogger(RexsterApplication.class);
     private Graph graph;
     private ResultObjectCache resultObjectCache;
+    private Properties properties;
 
     static {
         PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
@@ -40,9 +38,10 @@ public class RexsterApplication extends Application {
 
     public RexsterApplication(final Properties properties) {
         try {
-            this.graph = createGraphFromProperties(properties);
+            this.properties = properties;
+            this.graph = createGraphFromProperties(this.properties);
             logger.info("Graph " + this.graph + " loaded");
-            this.resultObjectCache = new ResultObjectCache(properties);
+            this.resultObjectCache = new ResultObjectCache(this.properties);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -52,9 +51,28 @@ public class RexsterApplication extends Application {
         Router router = new Router(getContext());
         router.attachDefault(RexsterResource.class);
         ServiceLoader<Traversal> traversalServices = ServiceLoader.load(Traversal.class);
-        for (Traversal traversalService : traversalServices) {
-            logger.info("loading traversal: /" + traversalService.getResourceName() + " [" + traversalService.getClass().getName() + "]");
-            router.attach("/" + traversalService.getResourceName(), traversalService.getClass());
+        String packages = this.properties.getProperty(RexsterTokens.REXSTER_PACKAGES_ALLOWED);
+        if (null != packages) {
+            Set<String> packageNames = new HashSet<String>(Arrays.asList(packages.substring(1, packages.length() - 1).split(",")));
+            //System.out.println(packageNames);
+            for (Traversal traversalService : traversalServices) {
+                if (-1 == traversalService.getResourceName().indexOf("/")) {
+                    if (packageNames.contains("")) {
+                        logger.info("loading traversal: /" + traversalService.getResourceName() + " [" + traversalService.getClass().getName() + "]");
+                        router.attach("/" + traversalService.getResourceName(), traversalService.getClass());
+                    }
+                } else {
+                    if (packageNames.contains(traversalService.getResourceName().substring(0, traversalService.getResourceName().indexOf("/")))) {
+                        logger.info("loading traversal: /" + traversalService.getResourceName() + " [" + traversalService.getClass().getName() + "]");
+                        router.attach("/" + traversalService.getResourceName(), traversalService.getClass());
+                    }
+                }
+            }
+        } else {
+            for (Traversal traversalService : traversalServices) {
+                logger.info("loading traversal: /" + traversalService.getResourceName() + " [" + traversalService.getClass().getName() + "]");
+                router.attach("/" + traversalService.getResourceName(), traversalService.getClass());
+            }
         }
         return router;
     }
