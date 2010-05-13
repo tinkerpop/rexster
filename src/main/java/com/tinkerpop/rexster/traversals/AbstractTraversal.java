@@ -204,8 +204,8 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
         this.resultObjectCache.putCachedResult(this.cacheRequestURI, tempResultObject);
     }
 
-    protected Map<String,Object> getParameters() {
-        Map<String,Object> parameters = new HashMap<String,Object>();
+    protected Map<String, Object> getParameters() {
+        Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put(ALLOW_CACHED, "allow a previously cached result to be provided (default is true)");
         return parameters;
     }

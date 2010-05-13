@@ -17,8 +17,9 @@ public class ResultObjectCacheTest extends TestCase {
     private static final Random random = new Random();
     private static int counter = 0;
     private static final int totalThreads = 100;
+
     static {
-        for(int i=0; i<1000; i++) {
+        for (int i = 0; i < 1000; i++) {
             uuids.add(UUID.randomUUID().toString());
         }
     }
@@ -51,10 +52,10 @@ public class ResultObjectCacheTest extends TestCase {
 
     public void testThreadSafety() {
         ResultObjectCache resultObjectCache = new ResultObjectCache();
-        for(int i=0; i<totalThreads;i++) {
+        for (int i = 0; i < totalThreads; i++) {
             new Thread(new CacheTester(resultObjectCache)).start();
         }
-        while(counter < totalThreads) {
+        while (counter < totalThreads) {
             Thread.yield();
         }
 
@@ -70,7 +71,7 @@ public class ResultObjectCacheTest extends TestCase {
         }
 
         public void run() {
-            for(int i=0; i<totalRuns; i++) {
+            for (int i = 0; i < totalRuns; i++) {
                 JSONObject object = new JSONObject();
                 object.put("thread", Thread.currentThread().getName());
                 cache.putCachedResult(uuids.get(random.nextInt(uuids.size())), object);

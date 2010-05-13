@@ -75,7 +75,7 @@ public class GremlinTraversal extends AbstractTraversal {
     }
 
     public void addApiToResultObject() {
-        Map<String, Object> api = new HashMap<String,Object>();
+        Map<String, Object> api = new HashMap<String, Object>();
         Map<String, Object> parameters = super.getParameters();
         parameters.put(SCRIPT, "the Gremlin script to be evaluated");
         parameters.put(ROOT + ".<key>", "the elements to set $_ to, where <key> is the element property key");

@@ -25,7 +25,7 @@ public class RexsterApplication extends Application {
     private Graph graph;
     private ResultObjectCache resultObjectCache;
     private Properties properties;
-    private Map<String,Class> loadedTraversals = new HashMap<String,Class>();
+    private Map<String, Class> loadedTraversals = new HashMap<String, Class>();
 
     static {
         PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
@@ -49,6 +49,7 @@ public class RexsterApplication extends Application {
     }
 
     // todo: clean up
+
     public Restlet createRoot() {
         Router router = new Router(getContext());
         router.attachDefault(RexsterResource.class);
@@ -82,7 +83,7 @@ public class RexsterApplication extends Application {
         return router;
     }
 
-    public Map<String,Class> getLoadedTraversalServices() {
+    public Map<String, Class> getLoadedTraversalServices() {
         return this.loadedTraversals;
     }
 

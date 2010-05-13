@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.rexster.traversals.Traversal;
 import org.json.simple.JSONObject;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
@@ -9,7 +8,6 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 import java.util.Map;
-import java.util.ServiceLoader;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -25,7 +23,7 @@ public class RexsterResource extends ServerResource {
         JSONObject queriesObject = new JSONObject();
 
 
-        for (Map.Entry<String,Class> traversal : ((RexsterApplication)this.getApplication()).getLoadedTraversalServices().entrySet()) {
+        for (Map.Entry<String, Class> traversal : ((RexsterApplication) this.getApplication()).getLoadedTraversalServices().entrySet()) {
             queriesObject.put(traversal.getKey(), traversal.getValue().getName());
         }
         resultObject.put("traversals", queriesObject);
