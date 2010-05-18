@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.traversals.grateful;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.pipes.serial.Pipe;
 import com.tinkerpop.pipes.serial.Pipeline;
+import com.tinkerpop.pipes.serial.filter.ComparisonFilterPipe;
 import com.tinkerpop.pipes.serial.filter.ObjectFilterPipe;
 import com.tinkerpop.rexster.RexsterTokens;
 import com.tinkerpop.rexster.traversals.AbstractRankTraversal;
@@ -31,7 +32,7 @@ public class CoFollowsRank extends AbstractRankTraversal {
         if (song != null) {
             Pipe pipe1 = new FollowsPipeline();
             Pipe pipe2 = new FollowsInversePipeline();
-            Pipe pipe3 = new ObjectFilterPipe<Vertex>(Arrays.asList(song), true);
+            Pipe pipe3 = new ObjectFilterPipe<Vertex>(song, ComparisonFilterPipe.Filter.DISALLOW);
 
             Pipeline<Vertex, Vertex> pipeline = new Pipeline<Vertex, Vertex>(Arrays.asList(pipe1, pipe2, pipe3));
             pipeline.setStarts(Arrays.asList(song).iterator());

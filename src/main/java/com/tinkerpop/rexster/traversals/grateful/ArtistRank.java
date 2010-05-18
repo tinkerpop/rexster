@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.pipes.serial.Pipe;
 import com.tinkerpop.pipes.serial.Pipeline;
+import com.tinkerpop.pipes.serial.filter.ComparisonFilterPipe;
 import com.tinkerpop.pipes.serial.pgm.EdgeVertexPipe;
 import com.tinkerpop.pipes.serial.pgm.LabelFilterPipe;
 import com.tinkerpop.pipes.serial.pgm.VertexEdgePipe;
@@ -39,7 +40,7 @@ public class ArtistRank extends AbstractRankTraversal {
             for (Element element : this.graph.getIndex().get(GratefulDeadTokens.TYPE, GratefulDeadTokens.SONG)) {
                 Vertex song = (Vertex) element;
                 Pipe pipe1 = new VertexEdgePipe(VertexEdgePipe.Step.OUT_EDGES);
-                Pipe pipe2 = new LabelFilterPipe(Arrays.asList(type), false);
+                Pipe pipe2 = new LabelFilterPipe(type, ComparisonFilterPipe.Filter.ALLOW);
                 Pipe pipe3 = new EdgeVertexPipe(EdgeVertexPipe.Step.IN_VERTEX);
                 Pipeline<Vertex, Vertex> pipeline = new Pipeline<Vertex, Vertex>(Arrays.asList(pipe1, pipe2, pipe3));
                 pipeline.setStarts(Arrays.asList(song).iterator());
