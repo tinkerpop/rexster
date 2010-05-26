@@ -23,7 +23,7 @@
     </developers>
     <inceptionYear>2009</inceptionYear>
     <dependencies>
-        <!-- PROPERTY GRAPH MODEL SUPPORT -->
+    	<!-- PROPERTY GRAPH MODEL SUPPORT -->
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>blueprints</artifactId>

@@ -7,6 +7,10 @@ import junit.framework.TestCase;
  */
 public class AbstractRankTraversalTest extends TestCase {
 
+    public void testTrue() {
+        assertTrue(true);
+    }
+
     /*public void testRankSorting() {
         TestTraversal tt = new TestTraversal();
         tt.ranks.put("a", 1.0f);
