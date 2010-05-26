@@ -35,31 +35,10 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         NONE, REGULAR, REVERSE
     }
 
-    /*protected void sortRanksByValue() {
-        final String traversalName = getTraversalName();
-        List<Map.Entry<Object, ElementJSONObject>> list = new ArrayList<Map.Entry<Object, ElementJSONObject>>(this.idToElement.entrySet());
-        java.util.Collections.sort(list, new Comparator<Map.Entry<Object, ElementJSONObject>>() {
-            public int compare(Map.Entry<Object, ElementJSONObject> e1, Map.Entry<Object, ElementJSONObject> e2) {
-                if ((Float) e1.getValue().get(traversalName) > (Float) e2.getValue().get(traversalName))
-                    return 1;
-                else
-                    return -1;
-            }
-        });
-        if (this.sortType == Sort.REVERSE)
-            Collections.reverse(list);
-
-        this.idToElement = new LinkedHashMap<Object, ElementJSONObject>();
-        for (Map.Entry<Object, ElementJSONObject> entry : list) {
-            this.idToElement.put(entry.getKey(), entry.getValue());
-        }
-    }*/
-
-    protected List<ElementJSONObject> sortRanksByValue(List<ElementJSONObject> elementList) {
-        final String traversalName = getTraversalName();
+    protected List<ElementJSONObject> sortRanksByValue(final List<ElementJSONObject> elementList, final String key) {
         java.util.Collections.sort(elementList, new Comparator<ElementJSONObject>() {
             public int compare(ElementJSONObject e1, ElementJSONObject e2) {
-                if ((Float) e1.get(traversalName) > (Float) e2.get(traversalName))
+                if ((Float) e1.get(key) > (Float) e2.get(key))
                     return 1;
                 else
                     return -1;
@@ -70,19 +49,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         return elementList;
     }
 
-    /*protected void offsetRanks() {
-        List<Map.Entry<Object, ElementJSONObject>> list = new ArrayList<Map.Entry<Object, ElementJSONObject>>(this.idToElement.entrySet());
-        this.idToElement = new LinkedHashMap<Object, ElementJSONObject>();
-        int counter = 0;
-        for (Map.Entry<Object, ElementJSONObject> entry : list) {
-            if ((startOffset == -1 || counter >= startOffset) && (endOffset == -1 || counter < endOffset)) {
-                this.idToElement.put(entry.getKey(), entry.getValue());
-            }
-            counter++;
-        }
-    }*/
-
-    protected List<ElementJSONObject> offsetRanks(List<ElementJSONObject> elementList) {
+    protected List<ElementJSONObject> offsetRanks(final List<ElementJSONObject> elementList) {
         List<ElementJSONObject> tempList = new ArrayList<ElementJSONObject>();
         int counter = 0;
         for (ElementJSONObject element : elementList) {
@@ -165,7 +132,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
             if(null == ranks)
                 ranks = new ArrayList<ElementJSONObject>(this.idToElement.values());
             if (this.sortType != Sort.NONE && !this.usingCachedResult) {
-                this.ranks = sortRanksByValue(this.ranks);
+                this.ranks = sortRanksByValue(this.ranks, getTraversalName());
             }
             if (this.totalRank != Float.NaN) {
                 this.resultObject.put(TOTAL_RANK, this.totalRank);
