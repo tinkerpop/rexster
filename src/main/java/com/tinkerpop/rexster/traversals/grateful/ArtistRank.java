@@ -22,7 +22,7 @@ public class ArtistRank extends AbstractRankTraversal {
 
     private static final String ARTIST_RANK = "grateful/artist-rank";
 
-    public String getResourceName() {
+    public String getTraversalName() {
         return ARTIST_RANK;
     }
 

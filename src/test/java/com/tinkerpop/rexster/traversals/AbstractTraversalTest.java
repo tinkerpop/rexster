@@ -1,7 +1,9 @@
 package com.tinkerpop.rexster.traversals;
 
 import junit.framework.TestCase;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,8 +33,13 @@ public class AbstractTraversalTest extends TestCase {
         //System.out.println(tt.resultObject);
     }
 
+    public void testParsing() throws Exception {
+       JSONParser parser = new JSONParser();
+       assertEquals(JSONArray.class, parser.parse("[\"a\",\"b\"]").getClass());
+    }
+
     private class TestTraversal extends AbstractTraversal {
-        public String getResourceName() {
+        public String getTraversalName() {
             return "test-traversal";
         }
 

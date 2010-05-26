@@ -59,25 +59,25 @@ public class RexsterApplication extends Application {
             Set<String> packageNames = new HashSet<String>(Arrays.asList(packages.substring(1, packages.length() - 1).split(",")));
             //System.out.println(packageNames);
             for (Traversal traversalService : traversalServices) {
-                if (-1 == traversalService.getResourceName().indexOf("/")) {
+                if (-1 == traversalService.getTraversalName().indexOf("/")) {
                     if (packageNames.contains("")) {
-                        logger.info("loading traversal: /" + traversalService.getResourceName() + " [" + traversalService.getClass().getName() + "]");
-                        router.attach("/" + traversalService.getResourceName(), traversalService.getClass());
-                        this.loadedTraversals.put(traversalService.getResourceName(), traversalService.getClass());
+                        logger.info("loading traversal: /" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
+                        router.attach("/" + traversalService.getTraversalName(), traversalService.getClass());
+                        this.loadedTraversals.put(traversalService.getTraversalName(), traversalService.getClass());
                     }
                 } else {
-                    if (packageNames.contains(traversalService.getResourceName().substring(0, traversalService.getResourceName().indexOf("/")))) {
-                        logger.info("loading traversal: /" + traversalService.getResourceName() + " [" + traversalService.getClass().getName() + "]");
-                        router.attach("/" + traversalService.getResourceName(), traversalService.getClass());
-                        this.loadedTraversals.put(traversalService.getResourceName(), traversalService.getClass());
+                    if (packageNames.contains(traversalService.getTraversalName().substring(0, traversalService.getTraversalName().indexOf("/")))) {
+                        logger.info("loading traversal: /" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
+                        router.attach("/" + traversalService.getTraversalName(), traversalService.getClass());
+                        this.loadedTraversals.put(traversalService.getTraversalName(), traversalService.getClass());
                     }
                 }
             }
         } else {
             for (Traversal traversalService : traversalServices) {
-                logger.info("loading traversal: /" + traversalService.getResourceName() + " [" + traversalService.getClass().getName() + "]");
-                router.attach("/" + traversalService.getResourceName(), traversalService.getClass());
-                this.loadedTraversals.put(traversalService.getResourceName(), traversalService.getClass());
+                logger.info("loading traversal: /" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
+                router.attach("/" + traversalService.getTraversalName(), traversalService.getClass());
+                this.loadedTraversals.put(traversalService.getTraversalName(), traversalService.getClass());
             }
         }
         return router;

@@ -14,6 +14,6 @@ public interface Traversal {
 
     public void addApiToResultObject();
 
-    public String getResourceName();
+    public String getTraversalName();
 }
 

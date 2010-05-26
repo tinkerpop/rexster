@@ -9,6 +9,7 @@ import com.tinkerpop.rexster.ResultObjectCache;
 import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.StatisticsHelper;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -104,8 +105,17 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
             }
             String rawValue = (String) queryParameters.get(key);
             try {
-                Object parsedValue = parser.parse(rawValue);
-                embeddedObject.put(keys[keys.length - 1], parsedValue);
+                if (rawValue.startsWith("[") && rawValue.endsWith("]")) {
+                    rawValue = rawValue.substring(1,rawValue.length()-1);
+                    JSONArray array = new JSONArray();
+                    for(String value : rawValue.split(",")) {
+                        array.add(value.trim());
+                    }
+                    embeddedObject.put(keys[keys.length - 1], array);
+                } else {
+                    Object parsedValue = parser.parse(rawValue);
+                    embeddedObject.put(keys[keys.length - 1], parsedValue);
+                }
             } catch (ParseException e) {
                 embeddedObject.put(keys[keys.length - 1], rawValue);
             }

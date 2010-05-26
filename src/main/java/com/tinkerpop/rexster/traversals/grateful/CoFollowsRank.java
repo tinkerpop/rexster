@@ -21,7 +21,7 @@ public class CoFollowsRank extends AbstractRankTraversal {
 
     private static final String CO_FOLLOWS_RANK = "grateful/co-follows-rank";
 
-    public String getResourceName() {
+    public String getTraversalName() {
         return CO_FOLLOWS_RANK;
     }
 

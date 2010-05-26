@@ -29,7 +29,7 @@ public class GremlinTraversal extends AbstractTraversal {
     private static final String SCRIPT = "script";
     private static final String RESULTS = "results";
 
-    public String getResourceName() {
+    public String getTraversalName() {
         return GREMLIN;
     }
 

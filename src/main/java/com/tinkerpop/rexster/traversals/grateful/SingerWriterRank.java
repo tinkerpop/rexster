@@ -19,7 +19,7 @@ public class SingerWriterRank extends AbstractRankTraversal {
 
     private static final String SINGER_WRITER_RANK = "grateful/singer-writer-rank";
 
-    public String getResourceName() {
+    public String getTraversalName() {
         return SINGER_WRITER_RANK;
     }
 
