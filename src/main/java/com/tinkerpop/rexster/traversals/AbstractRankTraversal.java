@@ -11,6 +11,7 @@ import java.util.*;
 public abstract class AbstractRankTraversal extends AbstractTraversal {
 
     protected Map<Object, ElementJSONObject> idToElement = new HashMap<Object, ElementJSONObject>();
+    protected List<ElementJSONObject> ranks = null;
     protected Sort sortType = Sort.NONE;
     protected List returnKeys = null;
     protected long startOffset = -1;
@@ -34,7 +35,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         NONE, REGULAR, REVERSE
     }
 
-    protected void sortRanksByValue() {
+    /*protected void sortRanksByValue() {
         final String traversalName = getTraversalName();
         List<Map.Entry<Object, ElementJSONObject>> list = new ArrayList<Map.Entry<Object, ElementJSONObject>>(this.idToElement.entrySet());
         java.util.Collections.sort(list, new Comparator<Map.Entry<Object, ElementJSONObject>>() {
@@ -52,7 +53,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         for (Map.Entry<Object, ElementJSONObject> entry : list) {
             this.idToElement.put(entry.getKey(), entry.getValue());
         }
-    }
+    }*/
 
     protected List<ElementJSONObject> sortRanksByValue(List<ElementJSONObject> elementList) {
         final String traversalName = getTraversalName();
@@ -69,7 +70,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         return elementList;
     }
 
-    protected void offsetRanks() {
+    /*protected void offsetRanks() {
         List<Map.Entry<Object, ElementJSONObject>> list = new ArrayList<Map.Entry<Object, ElementJSONObject>>(this.idToElement.entrySet());
         this.idToElement = new LinkedHashMap<Object, ElementJSONObject>();
         int counter = 0;
@@ -79,7 +80,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
             }
             counter++;
         }
-    }
+    }*/
 
     protected List<ElementJSONObject> offsetRanks(List<ElementJSONObject> elementList) {
         List<ElementJSONObject> tempList = new ArrayList<ElementJSONObject>();
@@ -151,7 +152,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         if (this.allowCached) {
             JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
             if (tempResultObject != null) {
-                this.idToElement = (Map<Object, ElementJSONObject>) tempResultObject.get(RANKS);
+                this.ranks = (List) tempResultObject.get(RANKS);
                 this.totalRank = (Float) tempResultObject.get(TOTAL_RANK);
                 this.success = true;
                 this.usingCachedResult = true;
@@ -161,19 +162,21 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
 
     protected void postQuery() {
         if (this.success) {
+            if(null == ranks)
+                ranks = new ArrayList<ElementJSONObject>(this.idToElement.values());
             if (this.sortType != Sort.NONE && !this.usingCachedResult) {
-                sortRanksByValue();
+                this.ranks = sortRanksByValue(this.ranks);
             }
             if (this.totalRank != Float.NaN) {
                 this.resultObject.put(TOTAL_RANK, this.totalRank);
             }
-            this.resultObject.put(RANKS, idToElement);
-            this.resultObject.put(SIZE, this.idToElement.size());
+            this.resultObject.put(RANKS, this.ranks);
+            this.resultObject.put(SIZE, this.ranks.size());
 
             this.cacheCurrentResultObjectState();
             if (this.startOffset != -1 || this.endOffset != -1) {
-                offsetRanks();
-                this.resultObject.put(RANKS, this.idToElement.values());
+                this.ranks = offsetRanks(this.ranks);
+                this.resultObject.put(RANKS, this.ranks);
                 this.resultObject.put(SIZE, this.idToElement.size());
             }
         }
