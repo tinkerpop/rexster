@@ -22,6 +22,7 @@ public class AbstractTraversalTest extends TestCase {
         qp.put("c.b", "\"marko\"");
         qp.put("c.c", "peter");
         qp.put("c.d.a.b", "true");
+        qp.put("d", "[marko,rodriguez,10]");
         tt.buildRequestObject(qp);
         assertTrue((Boolean) tt.requestObject.get("a"));
         assertFalse((Boolean) tt.requestObject.get("b"));
@@ -29,8 +30,10 @@ public class AbstractTraversalTest extends TestCase {
         assertEquals(((JSONObject) tt.requestObject.get("c")).get("b"), "marko");
         assertEquals(((JSONObject) tt.requestObject.get("c")).get("c"), "peter");
         assertTrue((Boolean) ((JSONObject) ((JSONObject) ((JSONObject) tt.requestObject.get("c")).get("d")).get("a")).get("b"));
-        //tt.postQuery();
-        //System.out.println(tt.resultObject);
+        assertEquals(((JSONArray)tt.requestObject.get("d")).get(0), "marko");
+        assertEquals(((JSONArray)tt.requestObject.get("d")).get(1), "rodriguez");
+        // TODO: make this not a string but a number?
+        assertEquals(((JSONArray)tt.requestObject.get("d")).get(2), "10");
     }
 
     public void testParsing() throws Exception {

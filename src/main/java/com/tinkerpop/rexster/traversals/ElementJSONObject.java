@@ -11,9 +11,11 @@ import java.util.List;
 public class ElementJSONObject extends JSONObject {
 
     private final Object id;
+    private static final String ID = "_id";
 
     public ElementJSONObject(Element element) {
         this.id = element.getId();
+        this.put(ID, id);
         for (String key : element.getPropertyKeys()) {
             this.put(key, element.getProperty(key));
         }
@@ -22,9 +24,13 @@ public class ElementJSONObject extends JSONObject {
     public ElementJSONObject(Element element, List<String> propertyKeys) {
         this.id = element.getId();
         for (String key : propertyKeys) {
-            Object temp = element.getProperty(key);
-            if (null != temp) {
-                this.put(key, temp);
+            if (key.equals(ID)) {
+                this.put(ID, id);
+            } else {
+                Object temp = element.getProperty(key);
+                if (null != temp) {
+                    this.put(key, temp);
+                }
             }
         }
     }

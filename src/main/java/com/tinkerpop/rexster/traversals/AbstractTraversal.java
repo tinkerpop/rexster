@@ -39,9 +39,14 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
     protected static final String MESSAGE = "message";
     protected static final String QUERY_TIME = "query_time";
     protected static final String ALLOW_CACHED = "allow_cached";
+    protected static final String OFFSET_END = "offset.end";
+    protected static final String OFFSET_START = "offset.start";
     protected static final String ID = "id";
 
     private static final String PERIOD_REGEX = "\\.";
+    private static final String COMMA = ",";
+    private static final String LEFT_BRACKET = "[";
+    private static final String RIGHT_BRACKET = "]";
 
     protected JSONObject requestObject;
     protected JSONObject resultObject = new JSONObject();
@@ -105,10 +110,10 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
             }
             String rawValue = (String) queryParameters.get(key);
             try {
-                if (rawValue.startsWith("[") && rawValue.endsWith("]")) {
+                if (rawValue.startsWith(LEFT_BRACKET) && rawValue.endsWith(RIGHT_BRACKET)) {
                     rawValue = rawValue.substring(1,rawValue.length()-1);
                     JSONArray array = new JSONArray();
-                    for(String value : rawValue.split(",")) {
+                    for(String value : rawValue.split(COMMA)) {
                         array.add(value.trim());
                     }
                     embeddedObject.put(keys[keys.length - 1], array);
@@ -133,8 +138,8 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
 
     private String createCacheRequestURI() {
         Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());
-        queryParameters.remove("offset.start");
-        queryParameters.remove("offset.end");
+        queryParameters.remove(OFFSET_START);
+        queryParameters.remove(OFFSET_END);
         queryParameters.remove(ALLOW_CACHED);
         List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>(queryParameters.entrySet());
         java.util.Collections.sort(list, new Comparator<Map.Entry<String, String>>() {

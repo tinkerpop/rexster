@@ -34,15 +34,12 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         NONE, REGULAR, REVERSE
     }
 
-
     protected void sortRanksByValue() {
-        final String shortName = getTraversalName();
+        final String traversalName = getTraversalName();
         List<Map.Entry<Object, ElementJSONObject>> list = new ArrayList<Map.Entry<Object, ElementJSONObject>>(this.idToElement.entrySet());
         java.util.Collections.sort(list, new Comparator<Map.Entry<Object, ElementJSONObject>>() {
             public int compare(Map.Entry<Object, ElementJSONObject> e1, Map.Entry<Object, ElementJSONObject> e2) {
-                if (e1.getValue().get(shortName).equals(e2.getValue().get(shortName)))
-                    return (e1.toString().compareTo(e2.toString()));
-                else if ((Float) e1.getValue().get(shortName) > (Float) e2.getValue().get(shortName))
+                if ((Float) e1.getValue().get(traversalName) > (Float) e2.getValue().get(traversalName))
                     return 1;
                 else
                     return -1;
@@ -57,6 +54,21 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         }
     }
 
+    protected List<ElementJSONObject> sortRanksByValue(List<ElementJSONObject> elementList) {
+        final String traversalName = getTraversalName();
+        java.util.Collections.sort(elementList, new Comparator<ElementJSONObject>() {
+            public int compare(ElementJSONObject e1, ElementJSONObject e2) {
+                if ((Float) e1.get(traversalName) > (Float) e2.get(traversalName))
+                    return 1;
+                else
+                    return -1;
+            }
+        });
+        if (this.sortType == Sort.REVERSE)
+            Collections.reverse(elementList);
+        return elementList;
+    }
+
     protected void offsetRanks() {
         List<Map.Entry<Object, ElementJSONObject>> list = new ArrayList<Map.Entry<Object, ElementJSONObject>>(this.idToElement.entrySet());
         this.idToElement = new LinkedHashMap<Object, ElementJSONObject>();
@@ -69,12 +81,25 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         }
     }
 
+    protected List<ElementJSONObject> offsetRanks(List<ElementJSONObject> elementList) {
+        List<ElementJSONObject> tempList = new ArrayList<ElementJSONObject>();
+        int counter = 0;
+        for (ElementJSONObject element : elementList) {
+            if ((startOffset == -1 || counter >= startOffset) && (endOffset == -1 || counter < endOffset)) {
+                tempList.add(element);
+            }
+            counter++;
+        }
+        return tempList;
+    }
+
+
     protected void incrRank(final Element element, final Float incr) {
         Object elementId = element.getId();
         final String shortName = getTraversalName();
         ElementJSONObject elementObject = this.idToElement.get(elementId);
         if (null == elementObject) {
-            if(null == this.returnKeys)
+            if (null == this.returnKeys)
                 elementObject = new ElementJSONObject(element);
             else
                 elementObject = new ElementJSONObject(element, this.returnKeys);
@@ -121,7 +146,6 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
             this.returnKeys = (List) this.requestObject.get(RETURN_KEYS);
             if (this.returnKeys.size() == 1 && this.returnKeys.get(0).equals(WILDCARD))
                 this.returnKeys = null;
-            //System.out.println(this.returnKeys);
         }
 
         if (this.allowCached) {
@@ -149,7 +173,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
             this.cacheCurrentResultObjectState();
             if (this.startOffset != -1 || this.endOffset != -1) {
                 offsetRanks();
-                this.resultObject.put(RANKS, this.idToElement);
+                this.resultObject.put(RANKS, this.idToElement.values());
                 this.resultObject.put(SIZE, this.idToElement.size());
             }
         }

@@ -20,6 +20,7 @@ import java.util.*;
  */
 public class RexsterApplication extends Application {
 
+    //private static final String version = "0.1-SNAPSHOT";
     private final long startTime = System.currentTimeMillis();
     protected static final Logger logger = Logger.getLogger(RexsterApplication.class);
     private Graph graph;
