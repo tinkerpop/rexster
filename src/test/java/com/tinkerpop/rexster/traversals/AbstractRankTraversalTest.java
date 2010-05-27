@@ -18,7 +18,7 @@ public class AbstractRankTraversalTest extends TestCase {
         tt.ranks.put("c", 3.0f);
         tt.ranks.put("d", 4.0f);
         assertEquals(tt.ranks.size(), 4);
-        tt.sortRanksByValue();
+        tt.sortRanks();
         float counter = 1.0f;
         for (Map.Entry<Object, Float> entry : tt.ranks.entrySet()) {
             assertEquals(entry.getValue(), counter);
@@ -35,8 +35,8 @@ public class AbstractRankTraversalTest extends TestCase {
             }
             counter++;
         }
-        tt.sortType = AbstractRankTraversal.Sort.REVERSE;
-        tt.sortRanksByValue();
+        tt.sort = AbstractRankTraversal.Sort.REVERSE;
+        tt.sortRanks();
         counter = 4.0f;
         for (Map.Entry<Object, Float> entry : tt.ranks.entrySet()) {
             assertEquals(entry.getValue(), counter);
@@ -66,7 +66,7 @@ public class AbstractRankTraversalTest extends TestCase {
 
         buildTestRanks(tt.ranks);
         assertEquals(tt.ranks.size(), 5);
-        tt.sortRanksByValue();
+        tt.sortRanks();
         tt.startOffset = 0;
         tt.endOffset = 3;
         tt.offsetRanks();
@@ -81,7 +81,7 @@ public class AbstractRankTraversalTest extends TestCase {
 
         buildTestRanks(tt.ranks);
         assertEquals(tt.ranks.size(), 5);
-        tt.sortRanksByValue();
+        tt.sortRanks();
         tt.startOffset = 1;
         tt.endOffset = 3;
         tt.offsetRanks();
@@ -96,7 +96,7 @@ public class AbstractRankTraversalTest extends TestCase {
 
         buildTestRanks(tt.ranks);
         assertEquals(tt.ranks.size(), 5);
-        tt.sortRanksByValue();
+        tt.sortRanks();
         tt.startOffset = 4;
         tt.endOffset = -1;
         tt.offsetRanks();
@@ -112,7 +112,7 @@ public class AbstractRankTraversalTest extends TestCase {
 
         buildTestRanks(tt.ranks);
         assertEquals(tt.ranks.size(), 5);
-        tt.sortRanksByValue();
+        tt.sortRanks();
         tt.startOffset = 3;
         tt.endOffset = 4;
         tt.offsetRanks();
@@ -127,7 +127,7 @@ public class AbstractRankTraversalTest extends TestCase {
 
         buildTestRanks(tt.ranks);
         assertEquals(tt.ranks.size(), 5);
-        tt.sortRanksByValue();
+        tt.sortRanks();
         tt.startOffset = 4;
         tt.endOffset = 3;
         tt.offsetRanks();

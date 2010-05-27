@@ -12,15 +12,17 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
 
     protected Map<Object, ElementJSONObject> idToElement = new HashMap<Object, ElementJSONObject>();
     protected List<ElementJSONObject> ranks = null;
-    protected Sort sortType = Sort.NONE;
-    protected List returnKeys = null;
-    protected long startOffset = -1;
-    protected long endOffset = -1;
+    protected Sort sort = Sort.NONE;
+    protected String sortKey = null;
+    protected List<String> returnKeys = null;
+    protected int startOffset = -1;
+    protected int endOffset = -1;
     protected float totalRank = Float.NaN;
 
     private static final String RANKS = "ranks";
     private static final String SIZE = "size";
     private static final String SORT = "sort";
+    private static final String SORT_KEY = "sort_key";
     private static final String OFFSET = "offset";
     private static final String START = "start";
     private static final String END = "end";
@@ -35,36 +37,35 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         NONE, REGULAR, REVERSE
     }
 
-    protected List<ElementJSONObject> sortRanksByValue(final List<ElementJSONObject> elementList, final String key) {
-        java.util.Collections.sort(elementList, new Comparator<ElementJSONObject>() {
+    protected void sortRanks(final String key) {
+        java.util.Collections.sort(this.ranks, new Comparator<ElementJSONObject>() {
             public int compare(ElementJSONObject e1, ElementJSONObject e2) {
-                if ((Float) e1.get(key) > (Float) e2.get(key))
-                    return 1;
-                else
-                    return -1;
+                return -1 * ((Comparable) e1.get(key)).compareTo(e2.get(key));
             }
         });
-        if (this.sortType == Sort.REVERSE)
-            Collections.reverse(elementList);
-        return elementList;
+        if (this.sort == Sort.REGULAR)
+            Collections.reverse(this.ranks);
     }
 
-    protected List<ElementJSONObject> offsetRanks(final List<ElementJSONObject> elementList) {
-        List<ElementJSONObject> tempList = new ArrayList<ElementJSONObject>();
-        int counter = 0;
-        for (ElementJSONObject element : elementList) {
-            if ((startOffset == -1 || counter >= startOffset) && (endOffset == -1 || counter < endOffset)) {
-                tempList.add(element);
-            }
-            counter++;
-        }
-        return tempList;
+    protected void offsetRanks() {
+        int s;
+        int e;
+        if (this.startOffset == -1)
+            s = 0;
+        else
+            s = this.startOffset;
+        if (this.endOffset == -1)
+            e = this.ranks.size();
+        else
+            e = this.endOffset;
+        
+        this.ranks = this.ranks.subList(s,e);
     }
 
 
     protected void incrRank(final Element element, final Float incr) {
         Object elementId = element.getId();
-        final String shortName = getTraversalName();
+        final String traversalName = getTraversalName();
         ElementJSONObject elementObject = this.idToElement.get(elementId);
         if (null == elementObject) {
             if (null == this.returnKeys)
@@ -74,11 +75,11 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
             this.idToElement.put(elementId, elementObject);
         }
 
-        Float value = (Float) elementObject.get(shortName);
+        Float value = (Float) elementObject.get(traversalName);
         if (null != value) {
-            elementObject.put(shortName, incr + value);
+            elementObject.put(traversalName, incr + value);
         } else {
-            elementObject.put(shortName, incr);
+            elementObject.put(traversalName, incr);
         }
     }
 
@@ -96,22 +97,28 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         String sort = (String) this.requestObject.get(SORT);
         if (null != sort) {
             if (sort.equals(REGULAR))
-                this.sortType = Sort.REGULAR;
+                this.sort = Sort.REGULAR;
             else if (sort.equals(REVERSE))
-                this.sortType = Sort.REVERSE;
+                this.sort = Sort.REVERSE;
         }
+        if (this.requestObject.containsKey(SORT_KEY)) {
+            this.sortKey = (String) this.requestObject.get(SORT_KEY);
+        } else {
+            sortKey = getTraversalName();
+        }
+
         JSONObject offset = (JSONObject) this.requestObject.get(OFFSET);
         if (null != offset) {
-            Long start = (Long) offset.get(START);
-            Long end = (Long) offset.get(END);
+            Long start = (Long)offset.get(START);
+            Long end = (Long)offset.get(END);
             if (null != start)
-                this.startOffset = start;
+                this.startOffset = start.intValue();
             if (null != end)
-                this.endOffset = end;
+                this.endOffset = end.intValue();
         }
 
         if (this.requestObject.containsKey(RETURN_KEYS)) {
-            this.returnKeys = (List) this.requestObject.get(RETURN_KEYS);
+            this.returnKeys = (List<String>) this.requestObject.get(RETURN_KEYS);
             if (this.returnKeys.size() == 1 && this.returnKeys.get(0).equals(WILDCARD))
                 this.returnKeys = null;
         }
@@ -119,7 +126,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         if (this.allowCached) {
             JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
             if (tempResultObject != null) {
-                this.ranks = (List) tempResultObject.get(RANKS);
+                this.ranks = (List<ElementJSONObject>) tempResultObject.get(RANKS);
                 this.totalRank = (Float) tempResultObject.get(TOTAL_RANK);
                 this.success = true;
                 this.usingCachedResult = true;
@@ -129,10 +136,11 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
 
     protected void postQuery() {
         if (this.success) {
-            if(null == ranks)
-                ranks = new ArrayList<ElementJSONObject>(this.idToElement.values());
-            if (this.sortType != Sort.NONE && !this.usingCachedResult) {
-                this.ranks = sortRanksByValue(this.ranks, getTraversalName());
+            if (null == this.ranks)
+                this.ranks = new ArrayList<ElementJSONObject>(this.idToElement.values());
+
+            if (this.sort != Sort.NONE && !this.usingCachedResult) {
+                sortRanks(this.sortKey);
             }
             if (this.totalRank != Float.NaN) {
                 this.resultObject.put(TOTAL_RANK, this.totalRank);
@@ -142,9 +150,9 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
 
             this.cacheCurrentResultObjectState();
             if (this.startOffset != -1 || this.endOffset != -1) {
-                this.ranks = offsetRanks(this.ranks);
+                offsetRanks();
                 this.resultObject.put(RANKS, this.ranks);
-                this.resultObject.put(SIZE, this.idToElement.size());
+                this.resultObject.put(SIZE, this.ranks.size());
             }
         }
         super.postQuery();
