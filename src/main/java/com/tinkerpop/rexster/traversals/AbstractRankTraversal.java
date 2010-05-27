@@ -163,6 +163,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         parameters.put("offset.start", "the start integer of a page of results (default is 0)");
         parameters.put("offset.end", "the end integer of a page of results (default is infinity)");
         parameters.put(SORT, "regular, reverse, or none sort the ranked results (default is none)");
+        parameters.put(SORT_KEY, "the name of the element key to use in the sorting (default is the rank value)");
         parameters.put(RETURN_KEYS, "the element property keys to return (default is to return all element properties)");
         return parameters;
     }
