@@ -18,7 +18,7 @@ public class FollowsPipeline extends Pipeline<Vertex, Vertex> {
 
     public FollowsPipeline() {
         Pipe pipe1 = new VertexEdgePipe(VertexEdgePipe.Step.OUT_EDGES);
-        Pipe pipe2 = new LabelFilterPipe(GratefulDeadTokens.FOLLOWED_BY, ComparisonFilterPipe.Filter.ALLOW);
+        Pipe pipe2 = new LabelFilterPipe(GratefulDeadTokens.FOLLOWED_BY, ComparisonFilterPipe.Filter.EQUALS);
         Pipe pipe3 = new EdgeVertexPipe(EdgeVertexPipe.Step.IN_VERTEX);
         this.setPipes(Arrays.asList(pipe1, pipe2, pipe3));
     }

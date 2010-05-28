@@ -18,7 +18,7 @@ public class FollowsInversePipeline extends Pipeline<Vertex, Vertex> {
 
     public FollowsInversePipeline() {
         Pipe pipe1 = new VertexEdgePipe(VertexEdgePipe.Step.IN_EDGES);
-        Pipe pipe2 = new LabelFilterPipe(GratefulDeadTokens.FOLLOWED_BY, ComparisonFilterPipe.Filter.ALLOW);
+        Pipe pipe2 = new LabelFilterPipe(GratefulDeadTokens.FOLLOWED_BY, ComparisonFilterPipe.Filter.EQUALS);
         Pipe pipe3 = new EdgeVertexPipe(EdgeVertexPipe.Step.OUT_VERTEX);
         this.setPipes(Arrays.asList(pipe1, pipe2, pipe3));
     }

@@ -40,7 +40,7 @@ public class ArtistRank extends AbstractRankTraversal {
             for (Element element : this.graph.getIndex().get(GratefulDeadTokens.TYPE, GratefulDeadTokens.SONG)) {
                 Vertex song = (Vertex) element;
                 Pipe pipe1 = new VertexEdgePipe(VertexEdgePipe.Step.OUT_EDGES);
-                Pipe pipe2 = new LabelFilterPipe(type, ComparisonFilterPipe.Filter.ALLOW);
+                Pipe pipe2 = new LabelFilterPipe(type, ComparisonFilterPipe.Filter.EQUALS);
                 Pipe pipe3 = new EdgeVertexPipe(EdgeVertexPipe.Step.IN_VERTEX);
                 Pipeline<Vertex, Vertex> pipeline = new Pipeline<Vertex, Vertex>(Arrays.asList(pipe1, pipe2, pipe3));
                 pipeline.setStarts(Arrays.asList(song));
