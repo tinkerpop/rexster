@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
@@ -20,13 +21,13 @@ public class RexsterResource extends ServerResource {
         sh.stopWatch();
         JSONObject resultObject = new JSONObject();
         resultObject.put("name", "Rexster: A Graph-Based Ranking Engine");
-        JSONObject queriesObject = new JSONObject();
+        JSONArray queriesArray = new JSONArray();
 
 
         for (Map.Entry<String, Class> traversal : ((RexsterApplication) this.getApplication()).getLoadedTraversalServices().entrySet()) {
-            queriesObject.put(traversal.getKey(), traversal.getValue().getName());
+            queriesArray.add(traversal.getKey());
         }
-        resultObject.put("traversals", queriesObject);
+        resultObject.put("traversals", queriesArray);
         resultObject.put("query_time", sh.stopWatch());
         resultObject.put("up_time", this.getTimeAlive());
         return new StringRepresentation(resultObject.toJSONString(), MediaType.APPLICATION_JSON);
