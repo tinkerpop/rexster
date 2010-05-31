@@ -2,12 +2,12 @@ package com.tinkerpop.rexster.traversals.grateful;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.pipes.serial.Pipe;
-import com.tinkerpop.pipes.serial.Pipeline;
-import com.tinkerpop.pipes.serial.filter.ComparisonFilterPipe;
-import com.tinkerpop.pipes.serial.pgm.EdgeVertexPipe;
-import com.tinkerpop.pipes.serial.pgm.LabelFilterPipe;
-import com.tinkerpop.pipes.serial.pgm.VertexEdgePipe;
+import com.tinkerpop.pipes.Pipe;
+import com.tinkerpop.pipes.Pipeline;
+import com.tinkerpop.pipes.filter.ComparisonFilterPipe;
+import com.tinkerpop.pipes.pgm.EdgeVertexPipe;
+import com.tinkerpop.pipes.pgm.LabelFilterPipe;
+import com.tinkerpop.pipes.pgm.VertexEdgePipe;
 import com.tinkerpop.rexster.RexsterTokens;
 import com.tinkerpop.rexster.traversals.AbstractRankTraversal;
 

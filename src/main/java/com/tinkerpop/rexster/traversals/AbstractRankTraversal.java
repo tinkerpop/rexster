@@ -58,8 +58,8 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
             e = this.ranks.size();
         else
             e = this.endOffset;
-        
-        this.ranks = this.ranks.subList(s,e);
+
+        this.ranks = this.ranks.subList(s, e);
     }
 
 
@@ -109,8 +109,8 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
 
         JSONObject offset = (JSONObject) this.requestObject.get(OFFSET);
         if (null != offset) {
-            Long start = (Long)offset.get(START);
-            Long end = (Long)offset.get(END);
+            Long start = (Long) offset.get(START);
+            Long end = (Long) offset.get(END);
             if (null != start)
                 this.startOffset = start.intValue();
             if (null != end)

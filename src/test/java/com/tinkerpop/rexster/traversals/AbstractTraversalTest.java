@@ -30,15 +30,15 @@ public class AbstractTraversalTest extends TestCase {
         assertEquals(((JSONObject) tt.requestObject.get("c")).get("b"), "marko");
         assertEquals(((JSONObject) tt.requestObject.get("c")).get("c"), "peter");
         assertTrue((Boolean) ((JSONObject) ((JSONObject) ((JSONObject) tt.requestObject.get("c")).get("d")).get("a")).get("b"));
-        assertEquals(((JSONArray)tt.requestObject.get("d")).get(0), "marko");
-        assertEquals(((JSONArray)tt.requestObject.get("d")).get(1), "rodriguez");
+        assertEquals(((JSONArray) tt.requestObject.get("d")).get(0), "marko");
+        assertEquals(((JSONArray) tt.requestObject.get("d")).get(1), "rodriguez");
         // TODO: make this not a string but a number?
-        assertEquals(((JSONArray)tt.requestObject.get("d")).get(2), "10");
+        assertEquals(((JSONArray) tt.requestObject.get("d")).get(2), "10");
     }
 
     public void testParsing() throws Exception {
-       JSONParser parser = new JSONParser();
-       assertEquals(JSONArray.class, parser.parse("[\"a\",\"b\"]").getClass());
+        JSONParser parser = new JSONParser();
+        assertEquals(JSONArray.class, parser.parse("[\"a\",\"b\"]").getClass());
     }
 
     private class TestTraversal extends AbstractTraversal {

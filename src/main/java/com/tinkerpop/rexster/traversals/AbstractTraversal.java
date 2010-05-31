@@ -111,9 +111,9 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
             String rawValue = (String) queryParameters.get(key);
             try {
                 if (rawValue.startsWith(LEFT_BRACKET) && rawValue.endsWith(RIGHT_BRACKET)) {
-                    rawValue = rawValue.substring(1,rawValue.length()-1);
+                    rawValue = rawValue.substring(1, rawValue.length() - 1);
                     JSONArray array = new JSONArray();
-                    for(String value : rawValue.split(COMMA)) {
+                    for (String value : rawValue.split(COMMA)) {
                         array.add(value.trim());
                     }
                     embeddedObject.put(keys[keys.length - 1], array);

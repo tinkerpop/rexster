@@ -1,14 +1,11 @@
 package com.tinkerpop.rexster.traversals.grateful;
 
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.pipes.serial.Pipe;
-import com.tinkerpop.pipes.serial.PipeHelper;
-import com.tinkerpop.pipes.serial.Pipeline;
+import com.tinkerpop.pipes.Pipe;
+import com.tinkerpop.pipes.PipeHelper;
 import com.tinkerpop.rexster.RexsterTokens;
 import com.tinkerpop.rexster.traversals.AbstractScoreTraversal;
 import com.tinkerpop.rexster.traversals.grateful.pipes.FollowsPipeline;
-import com.tinkerpop.rexster.traversals.grateful.pipes.SungByInversePipeline;
-import com.tinkerpop.rexster.traversals.grateful.pipes.WrittenByPipeline;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,7 +22,7 @@ public class FollowsScore extends AbstractScoreTraversal {
         return FOLLOWS_SCORE;
     }
 
-     public void traverse() {
+    public void traverse() {
         Vertex song = this.getVertex(GratefulDeadTokens.SONG);
         if (song != null) {
             Pipe pipe1 = new FollowsPipeline();

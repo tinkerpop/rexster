@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster.traversals.grateful;
 
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.pipes.serial.Pipe;
-import com.tinkerpop.pipes.serial.Pipeline;
+import com.tinkerpop.pipes.Pipe;
+import com.tinkerpop.pipes.Pipeline;
 import com.tinkerpop.rexster.RexsterTokens;
 import com.tinkerpop.rexster.traversals.AbstractRankTraversal;
 import com.tinkerpop.rexster.traversals.grateful.pipes.SungByInversePipeline;
