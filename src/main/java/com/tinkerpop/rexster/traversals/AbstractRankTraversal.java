@@ -59,7 +59,16 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         else
             e = this.endOffset;
 
+        if(this.ranks.size() < e)
+            e = this.ranks.size();
+        if(this.ranks.size() < s)
+            s = this.ranks.size();
+
         this.ranks = this.ranks.subList(s, e);
+    }
+
+    protected void generateRankList() {
+        this.ranks = new ArrayList<ElementJSONObject>(this.idToElement.values());    
     }
 
 
@@ -137,10 +146,10 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
     protected void postQuery() {
         if (this.success) {
             if (null == this.ranks)
-                this.ranks = new ArrayList<ElementJSONObject>(this.idToElement.values());
+                this.generateRankList();
 
             if (this.sort != Sort.NONE && !this.usingCachedResult) {
-                sortRanks(this.sortKey);
+                this.sortRanks(this.sortKey);
             }
             if (this.totalRank != Float.NaN) {
                 this.resultObject.put(TOTAL_RANK, this.totalRank);
@@ -150,7 +159,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
 
             this.cacheCurrentResultObjectState();
             if (this.startOffset != -1 || this.endOffset != -1) {
-                offsetRanks();
+                this.offsetRanks();
                 this.resultObject.put(RANKS, this.ranks);
                 this.resultObject.put(SIZE, this.ranks.size());
             }
@@ -160,8 +169,8 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
 
     protected Map<String, Object> getParameters() {
         Map<String, Object> parameters = super.getParameters();
-        parameters.put("offset.start", "the start integer of a page of results (default is 0)");
-        parameters.put("offset.end", "the end integer of a page of results (default is infinity)");
+        parameters.put(OFFSET_START, "the start integer of a page of results (default is 0)");
+        parameters.put(OFFSET_END, "the end integer of a page of results (default is infinity)");
         parameters.put(SORT, "regular, reverse, or none sort the ranked results (default is none)");
         parameters.put(SORT_KEY, "the name of the element key to use in the sorting (default is the rank value)");
         parameters.put(RETURN_KEYS, "the element property keys to return (default is to return all element properties)");

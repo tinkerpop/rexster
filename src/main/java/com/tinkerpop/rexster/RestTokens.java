@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster;
 
 /**
- * @author: Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class RestTokens {
 

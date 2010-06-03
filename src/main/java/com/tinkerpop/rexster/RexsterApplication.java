@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * @author: Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class RexsterApplication extends Application {
 

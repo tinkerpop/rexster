@@ -24,7 +24,7 @@ import org.restlet.util.Series;
 import java.util.*;
 
 /**
- * author: Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public abstract class AbstractTraversal extends ServerResource implements Traversal {
 

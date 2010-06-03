@@ -3,7 +3,7 @@ package com.tinkerpop.rexster.traversals;
 import org.json.simple.JSONObject;
 
 /**
- * @author: Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public abstract class AbstractScoreTraversal extends AbstractTraversal {
 

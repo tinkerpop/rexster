@@ -1,9 +1,14 @@
 package com.tinkerpop.rexster.traversals;
 
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import junit.framework.TestCase;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 /**
- * @author: Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class AbstractRankTraversalTest extends TestCase {
 
@@ -53,101 +58,110 @@ public class AbstractRankTraversalTest extends TestCase {
             }
             counter--;
         }
-    }
+    }*/
 
     public void testRankOffsets() {
         TestTraversal tt = new TestTraversal();
-        buildTestRanks(tt.ranks);
+        buildTestRanks(tt.idToElement);
+        tt.generateRankList();
+        tt.sortRanks("rank");
         assertEquals(tt.ranks.size(), 5);
         tt.offsetRanks();
         assertEquals(tt.ranks.size(), 5);
         tt.ranks.clear();
         assertEquals(tt.ranks.size(), 0);
 
-        buildTestRanks(tt.ranks);
+        buildTestRanks(tt.idToElement);
+        tt.generateRankList();
         assertEquals(tt.ranks.size(), 5);
-        tt.sortRanks();
+        tt.sort = AbstractRankTraversal.Sort.REVERSE;
+        tt.sortRanks("rank");
         tt.startOffset = 0;
         tt.endOffset = 3;
         tt.offsetRanks();
         assertEquals(tt.ranks.size(), 3);
-        assertTrue(tt.ranks.containsKey("a"));
-        assertTrue(tt.ranks.containsKey("b"));
-        assertTrue(tt.ranks.containsKey("c"));
-        assertFalse(tt.ranks.containsKey("d"));
-        assertFalse(tt.ranks.containsKey("e"));
+        assertEquals(tt.ranks.get(0).getId(), "e");
+        assertEquals(tt.ranks.get(1).getId(), "d");
+        assertEquals(tt.ranks.get(2).getId(), "c");
         tt.ranks.clear();
         assertEquals(tt.ranks.size(), 0);
 
-        buildTestRanks(tt.ranks);
+        buildTestRanks(tt.idToElement);
+        tt.generateRankList();
         assertEquals(tt.ranks.size(), 5);
-        tt.sortRanks();
-        tt.startOffset = 1;
+        tt.sort = AbstractRankTraversal.Sort.REGULAR;
+        tt.sortRanks("rank");
+        tt.startOffset = 0;
         tt.endOffset = 3;
         tt.offsetRanks();
-        assertEquals(tt.ranks.size(), 2);
-        assertFalse(tt.ranks.containsKey("a"));
-        assertTrue(tt.ranks.containsKey("b"));
-        assertTrue(tt.ranks.containsKey("c"));
-        assertFalse(tt.ranks.containsKey("d"));
-        assertFalse(tt.ranks.containsKey("e"));
+        assertEquals(tt.ranks.size(), 3);
+        assertEquals(tt.ranks.get(0).getId(), "a");
+        assertEquals(tt.ranks.get(1).getId(), "b");
+        assertEquals(tt.ranks.get(2).getId(), "c");
         tt.ranks.clear();
         assertEquals(tt.ranks.size(), 0);
 
-        buildTestRanks(tt.ranks);
+        buildTestRanks(tt.idToElement);
+        tt.generateRankList();
         assertEquals(tt.ranks.size(), 5);
-        tt.sortRanks();
+        tt.sort = AbstractRankTraversal.Sort.REGULAR;
+        tt.sortRanks("rank");
+        tt.startOffset = 0;
+        tt.endOffset = 3;
+        tt.offsetRanks();
+        assertEquals(tt.ranks.size(), 3);
+        assertEquals(tt.ranks.get(0).getId(), "a");
+        assertEquals(tt.ranks.get(1).getId(), "b");
+        assertEquals(tt.ranks.get(2).getId(), "c");
+        tt.ranks.clear();
+        assertEquals(tt.ranks.size(), 0);
+
+        buildTestRanks(tt.idToElement);
+        tt.generateRankList();
+        assertEquals(tt.ranks.size(), 5);
+        tt.sort = AbstractRankTraversal.Sort.REVERSE;
+        tt.sortRanks("rank");
         tt.startOffset = 4;
         tt.endOffset = -1;
         tt.offsetRanks();
         assertEquals(tt.ranks.size(), 1);
-        assertFalse(tt.ranks.containsKey("a"));
-        assertFalse(tt.ranks.containsKey("b"));
-        assertFalse(tt.ranks.containsKey("c"));
-        assertFalse(tt.ranks.containsKey("d"));
-        assertTrue(tt.ranks.containsKey("e"));
+        assertEquals(tt.ranks.get(0).getId(), "a");
         tt.ranks.clear();
         assertEquals(tt.ranks.size(), 0);
 
 
-        buildTestRanks(tt.ranks);
+        buildTestRanks(tt.idToElement);
+        tt.generateRankList();
         assertEquals(tt.ranks.size(), 5);
-        tt.sortRanks();
+        tt.sort = AbstractRankTraversal.Sort.REVERSE;
+        tt.sortRanks("rank");
         tt.startOffset = 3;
         tt.endOffset = 4;
         tt.offsetRanks();
         assertEquals(tt.ranks.size(), 1);
-        assertFalse(tt.ranks.containsKey("a"));
-        assertFalse(tt.ranks.containsKey("b"));
-        assertFalse(tt.ranks.containsKey("c"));
-        assertTrue(tt.ranks.containsKey("d"));
-        assertFalse(tt.ranks.containsKey("e"));
-        tt.ranks.clear();
-        assertEquals(tt.ranks.size(), 0);
-
-        buildTestRanks(tt.ranks);
-        assertEquals(tt.ranks.size(), 5);
-        tt.sortRanks();
-        tt.startOffset = 4;
-        tt.endOffset = 3;
-        tt.offsetRanks();
-        assertEquals(tt.ranks.size(), 0);
-        assertFalse(tt.ranks.containsKey("a"));
-        assertFalse(tt.ranks.containsKey("b"));
-        assertFalse(tt.ranks.containsKey("c"));
-        assertFalse(tt.ranks.containsKey("d"));
-        assertFalse(tt.ranks.containsKey("e"));
+        assertEquals(tt.ranks.get(0).getId(), "b");
         tt.ranks.clear();
         assertEquals(tt.ranks.size(), 0);
 
     }
 
-    private static void buildTestRanks(Map<Object, Float> testRanks) {
-        testRanks.put("a", 1.0f);
-        testRanks.put("b", 2.0f);
-        testRanks.put("c", 3.0f);
-        testRanks.put("d", 4.0f);
-        testRanks.put("e", 5.0f);
+    private static void buildTestRanks(Map<Object, ElementJSONObject> testRanks) {
+        Graph graph = new TinkerGraph();
+        ElementJSONObject temp = new ElementJSONObject(graph.addVertex("a"));
+        temp.put("rank", 1.0f);
+        testRanks.put("a", temp);
+        temp = new ElementJSONObject(graph.addVertex("b"));
+        temp.put("rank", 2.0f);
+        testRanks.put("b", temp);
+        temp = new ElementJSONObject(graph.addVertex("c"));
+        temp.put("rank", 3.0f);
+        testRanks.put("c", temp);
+        temp = new ElementJSONObject(graph.addVertex("d"));
+        temp.put("rank", 4.0f);
+        testRanks.put("d", temp);
+        temp = new ElementJSONObject(graph.addVertex("e"));
+        temp.put("rank", 5.0f);
+        testRanks.put("e", temp);
     }
 
     private class TestTraversal extends AbstractRankTraversal {
@@ -158,6 +172,6 @@ public class AbstractRankTraversalTest extends TestCase {
         public void traverse() {
 
         }
-    }*/
+    }
 
 }

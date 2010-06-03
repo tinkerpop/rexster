@@ -11,7 +11,7 @@ import org.restlet.resource.ServerResource;
 import java.util.Map;
 
 /**
- * @author: Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class RexsterResource extends ServerResource {
 
