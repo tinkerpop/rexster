@@ -59,16 +59,16 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         else
             e = this.endOffset;
 
-        if(this.ranks.size() < e)
+        if (this.ranks.size() < e)
             e = this.ranks.size();
-        if(this.ranks.size() < s)
+        if (this.ranks.size() < s)
             s = this.ranks.size();
 
         this.ranks = this.ranks.subList(s, e);
     }
 
     protected void generateRankList() {
-        this.ranks = new ArrayList<ElementJSONObject>(this.idToElement.values());    
+        this.ranks = new ArrayList<ElementJSONObject>(this.idToElement.values());
     }
 
 

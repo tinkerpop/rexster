@@ -4,7 +4,6 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import junit.framework.TestCase;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 /**
