@@ -50,7 +50,6 @@ public class RexsterApplication extends Application {
     }
 
     // todo: clean up
-
     public Restlet createRoot() {
         Router router = new Router(getContext());
         router.attachDefault(RexsterResource.class);

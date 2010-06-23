@@ -61,7 +61,7 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
         sh.stopWatch();
         if (null != this.getApplication()) {
             this.graph = ((RexsterApplication) this.getApplication()).getGraph();
-            this.resultObjectCache = ((RexsterApplication) this.getApplication()).getResultObjectCache();
+            this.resultObjectCache = this.getRexsterApplication().getResultObjectCache();
         }
     }
 
@@ -223,5 +223,9 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put(ALLOW_CACHED, "allow a previously cached result to be provided (default is true)");
         return parameters;
+    }
+
+    protected RexsterApplication getRexsterApplication() {
+        return (RexsterApplication) this.getApplication();
     }
 }

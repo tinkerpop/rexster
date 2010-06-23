@@ -21,20 +21,21 @@ public class RexsterResource extends ServerResource {
         sh.stopWatch();
         JSONObject resultObject = new JSONObject();
         resultObject.put("name", "Rexster: A Graph-Based Ranking Engine");
+        resultObject.put("graph", this.getRexsterApplication().getGraph().toString());
+
         JSONArray queriesArray = new JSONArray();
-
-
-        for (Map.Entry<String, Class> traversal : ((RexsterApplication) this.getApplication()).getLoadedTraversalServices().entrySet()) {
+        for (Map.Entry<String, Class> traversal : this.getRexsterApplication().getLoadedTraversalServices().entrySet()) {
             queriesArray.add(traversal.getKey());
         }
         resultObject.put("traversals", queriesArray);
+
         resultObject.put("query_time", sh.stopWatch());
         resultObject.put("up_time", this.getTimeAlive());
         return new StringRepresentation(resultObject.toJSONString(), MediaType.APPLICATION_JSON);
     }
 
     private String getTimeAlive() {
-        long timeMillis = System.currentTimeMillis() - ((RexsterApplication) this.getApplication()).getStartTime();
+        long timeMillis = System.currentTimeMillis() - this.getRexsterApplication().getStartTime();
         long time = timeMillis / 1000;
         String seconds = Integer.toString((int) (time % 60));
         String minutes = Integer.toString((int) ((time % 3600) / 60));
@@ -52,5 +53,9 @@ public class RexsterResource extends ServerResource {
             }
         }
         return days + "[d]:" + hours + "[h]:" + minutes + "[m]:" + seconds + "[s]";
+    }
+
+    protected RexsterApplication getRexsterApplication() {
+        return (RexsterApplication) this.getApplication();
     }
 }

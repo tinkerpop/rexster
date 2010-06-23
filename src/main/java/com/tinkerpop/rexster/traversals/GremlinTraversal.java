@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.traversals;
 
+import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.RexsterTokens;
 import org.json.simple.JSONArray;
@@ -25,9 +26,13 @@ public class GremlinTraversal extends AbstractTraversal {
     private static final String GREMLIN = "gremlin";
     private static final String ROOT_VARIABLE = "$_";
     private static final String GRAPH_VARIABLE = "$_g";
+    private static final String WILDCARD = "*";
     private static final String ROOT = "root";
     private static final String SCRIPT = "script";
     private static final String RESULTS = "results";
+    private static final String RETURN_KEYS = "return_keys";
+    protected List<String> returnKeys = null;
+
 
     public String getTraversalName() {
         return GREMLIN;
@@ -47,7 +52,16 @@ public class GremlinTraversal extends AbstractTraversal {
 
                 JSONArray results = new JSONArray();
                 for (Object object : (List) engine.eval(script)) {
-                    results.add(JSONValue.escape(object.toString()));
+                    if (object instanceof Element) {
+                        if (null == this.returnKeys)
+                            results.add(new ElementJSONObject((Element) object));
+                        else
+                            results.add(new ElementJSONObject((Element) object, this.returnKeys));
+                    } else if (object instanceof Number || object instanceof Boolean) {
+                        results.add(object);
+                    } else {
+                        results.add(JSONValue.escape(object.toString()));
+                    }
                 }
                 this.resultObject.put(RESULTS, results);
                 this.success = true;
@@ -64,6 +78,13 @@ public class GremlinTraversal extends AbstractTraversal {
 
     public void preQuery() {
         super.preQuery();
+
+        if (this.requestObject.containsKey(RETURN_KEYS)) {
+            this.returnKeys = (List<String>) this.requestObject.get(RETURN_KEYS);
+            if (this.returnKeys.size() == 1 && this.returnKeys.get(0).equals(WILDCARD))
+                this.returnKeys = null;
+        }
+
         if (this.allowCached) {
             JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
             if (tempResultObject != null) {
@@ -78,6 +99,7 @@ public class GremlinTraversal extends AbstractTraversal {
         Map<String, Object> api = new HashMap<String, Object>();
         Map<String, Object> parameters = super.getParameters();
         parameters.put(SCRIPT, "the Gremlin script to be evaluated");
+        parameters.put(RETURN_KEYS, "the element property keys to return (default is to return all element properties)");
         parameters.put(ROOT + ".<key>", "the elements to set $_ to, where <key> is the element property key");
         api.put(RexsterTokens.DESCRIPTION, "evaluate an ad-hoc Gremlin script");
         api.put(RexsterTokens.PARAMETERS, parameters);
