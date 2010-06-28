@@ -5,15 +5,15 @@ package com.tinkerpop.rexster;
  */
 public class StatisticsHelper {
 
-    private long time = -1l;
+    private double time = -1.0d;
 
-    public long stopWatch() {
-        if (time == -1l) {
-            time = System.currentTimeMillis();
+    public double stopWatch() {
+        if (time == -1.0d) {
+            time = System.nanoTime();
             return time;
         } else {
-            long temp = System.currentTimeMillis() - time;
-            time = -1l;
+            double temp = (System.nanoTime() - time) / 1000000d;
+            time = -1.0d;
             return temp;
         }
     }

@@ -5,6 +5,8 @@ import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.parser.GraphMLReader;
 import com.tinkerpop.rexster.traversals.Traversal;
+import com.tinkerpop.rexster.util.EdgeResource;
+import com.tinkerpop.rexster.util.VertexResource;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.restlet.Application;
@@ -80,6 +82,10 @@ public class RexsterApplication extends Application {
                 this.loadedTraversals.put(traversalService.getTraversalName(), traversalService.getClass());
             }
         }
+        router.attach("/vertices/{id}", VertexResource.class);
+        router.attach("/vertices", VertexResource.class);
+        router.attach("/edges", EdgeResource.class);
+        router.attach("/vertices/{id}/{direction}", VertexResource.class);
         return router;
     }
 

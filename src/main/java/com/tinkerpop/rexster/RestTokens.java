@@ -6,4 +6,5 @@ package com.tinkerpop.rexster;
 public class RestTokens {
 
     public static final String JSON_APPLICATION = "json/application";
+    
 }

@@ -8,6 +8,7 @@ import com.tinkerpop.rexster.RestTokens;
 import com.tinkerpop.rexster.ResultObjectCache;
 import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.StatisticsHelper;
+import com.tinkerpop.rexster.util.BaseResource;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -26,30 +27,17 @@ import java.util.*;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public abstract class AbstractTraversal extends ServerResource implements Traversal {
+public abstract class AbstractTraversal extends BaseResource implements Traversal {
 
     protected Graph graph;
     protected ResultObjectCache resultObjectCache;
     protected static Logger logger = Logger.getLogger(AbstractTraversal.class);
 
-    protected final JSONParser parser = new JSONParser();
-    protected final StatisticsHelper sh = new StatisticsHelper();
-
     protected static final String SUCCESS = "success";
-    protected static final String MESSAGE = "message";
-    protected static final String QUERY_TIME = "query_time";
     protected static final String ALLOW_CACHED = "allow_cached";
     protected static final String OFFSET_END = "offset.end";
     protected static final String OFFSET_START = "offset.start";
     protected static final String ID = "id";
-
-    private static final String PERIOD_REGEX = "\\.";
-    private static final String COMMA = ",";
-    private static final String LEFT_BRACKET = "[";
-    private static final String RIGHT_BRACKET = "]";
-
-    protected JSONObject requestObject;
-    protected JSONObject resultObject = new JSONObject();
 
     protected boolean success = true;
     protected String message = null;
@@ -58,19 +46,10 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
     protected boolean allowCached = true;
 
     public AbstractTraversal() {
-        sh.stopWatch();
         if (null != this.getApplication()) {
             this.graph = ((RexsterApplication) this.getApplication()).getGraph();
             this.resultObjectCache = this.getRexsterApplication().getResultObjectCache();
         }
-    }
-
-    private static Map<String, String> createQueryMap(final Series<Parameter> series) {
-        Map<String, String> map = new HashMap<String, String>();
-        for (Parameter parameter : series) {
-            map.put(parameter.getName(), parameter.getValue());
-        }
-        return map;
     }
 
     @Get
@@ -94,47 +73,7 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
         return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
     }
 
-    protected void buildRequestObject(final Map queryParameters) {
-        this.requestObject = new JSONObject();
 
-        for (String key : (Set<String>) queryParameters.keySet()) {
-            String[] keys = key.split(PERIOD_REGEX);
-            JSONObject embeddedObject = this.requestObject;
-            for (int i = 0; i < keys.length - 1; i++) {
-                JSONObject tempEmbeddedObject = (JSONObject) embeddedObject.get(keys[i]);
-                if (null == tempEmbeddedObject) {
-                    tempEmbeddedObject = new JSONObject();
-                    embeddedObject.put(keys[i], tempEmbeddedObject);
-                }
-                embeddedObject = tempEmbeddedObject;
-            }
-            String rawValue = (String) queryParameters.get(key);
-            try {
-                if (rawValue.startsWith(LEFT_BRACKET) && rawValue.endsWith(RIGHT_BRACKET)) {
-                    rawValue = rawValue.substring(1, rawValue.length() - 1);
-                    JSONArray array = new JSONArray();
-                    for (String value : rawValue.split(COMMA)) {
-                        array.add(value.trim());
-                    }
-                    embeddedObject.put(keys[keys.length - 1], array);
-                } else {
-                    Object parsedValue = parser.parse(rawValue);
-                    embeddedObject.put(keys[keys.length - 1], parsedValue);
-                }
-            } catch (ParseException e) {
-                embeddedObject.put(keys[keys.length - 1], rawValue);
-            }
-        }
-    }
-
-    protected void buildRequestObject(final String jsonString) {
-        this.requestObject = new JSONObject();
-        try {
-            this.requestObject = (JSONObject) parser.parse(jsonString);
-        } catch (ParseException e) {
-            logger.error(e.getMessage());
-        }
-    }
 
     private String createCacheRequestURI() {
         Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());
@@ -223,9 +162,5 @@ public abstract class AbstractTraversal extends ServerResource implements Traver
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put(ALLOW_CACHED, "allow a previously cached result to be provided (default is true)");
         return parameters;
-    }
-
-    protected RexsterApplication getRexsterApplication() {
-        return (RexsterApplication) this.getApplication();
     }
 }

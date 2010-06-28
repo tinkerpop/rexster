@@ -23,12 +23,8 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
     private static final String SIZE = "size";
     private static final String SORT = "sort";
     private static final String SORT_KEY = "sort_key";
-    private static final String OFFSET = "offset";
-    private static final String START = "start";
-    private static final String END = "end";
     private static final String REVERSE = "reverse";
     private static final String REGULAR = "regular";
-    private static final String RETURN_KEYS = "return_keys";
     private static final String WILDCARD = "*";
     protected static final String TOTAL_RANK = "total_rank";
 
