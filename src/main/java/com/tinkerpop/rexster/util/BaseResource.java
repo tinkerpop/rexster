@@ -101,14 +101,6 @@ public abstract class BaseResource extends ServerResource {
         }
     }
 
-    /*protected void offsetResult() {
-        JSONArray results = (JSONArray) this.resultObject.get(RESULT);
-
-        this.resultObject.put(RESULT, results.subList(new Integer(start.toString()), new Integer(end.toString())));
-
-
-    }*/
-
     protected Integer getStartOffset() {
         if (this.requestObject.containsKey(OFFSET)) {
             Long start = ((Long) ((JSONObject) this.requestObject.get(OFFSET)).get(START));

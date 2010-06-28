@@ -34,7 +34,7 @@ public class ElementJSONObject extends JSONObject {
             this.put(TYPE, EDGE);
         }
         if (null == propertyKeys || (propertyKeys.size() == 1 && propertyKeys.get(0).equals(WILDCARD))) {
-            this.put(ID, id);
+            this.put(ID, this.id);
             for (String key : element.getPropertyKeys()) {
                 this.put(key, element.getProperty(key));
             }
@@ -47,7 +47,7 @@ public class ElementJSONObject extends JSONObject {
         } else {
             for (String key : propertyKeys) {
                 if (key.equals(ID)) {
-                    this.put(ID, id);
+                    this.put(ID, this.id);
                 } else if (element instanceof Edge && key.equals(LABEL)) {
                     Edge edge = (Edge) element;
                     this.put(LABEL, edge.getLabel());

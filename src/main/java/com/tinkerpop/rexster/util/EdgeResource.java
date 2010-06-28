@@ -17,15 +17,10 @@ import java.util.Map;
 public class EdgeResource extends BaseResource {
 
     @Get
-    public Representation process() {
+    public Representation getResource() {
         Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());
         this.buildRequestObject(queryParameters);
-        String vertexId = (String) getRequest().getAttributes().get("vertexId");
-        if (null == vertexId) {
-            getAllEdges();
-        } else {
-            //getSingleVertex(vertexId);
-        }
+        getAllEdges();
         return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
     }
 
