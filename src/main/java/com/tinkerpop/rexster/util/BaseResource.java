@@ -37,11 +37,12 @@ public abstract class BaseResource extends ServerResource {
     protected static final String MESSAGE = "message";
     protected static final String QUERY_TIME = "query_time";
     protected static final String RESULT = "result";
+    protected static final String UNDERSCORE = "_";
+    protected static final String PERIOD_REGEX = "\\.";
+    protected static final String COMMA = ",";
+    protected static final String LEFT_BRACKET = "[";
+    protected static final String RIGHT_BRACKET = "]";
 
-    private static final String PERIOD_REGEX = "\\.";
-    private static final String COMMA = ",";
-    private static final String LEFT_BRACKET = "[";
-    private static final String RIGHT_BRACKET = "]";
 
     public BaseResource() {
         sh.stopWatch();

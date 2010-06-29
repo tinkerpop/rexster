@@ -52,6 +52,7 @@ public class RexsterApplication extends Application {
     }
 
     // todo: clean up
+
     public Restlet createRoot() {
         Router router = new Router(getContext());
         router.attachDefault(RexsterResource.class);
@@ -86,6 +87,7 @@ public class RexsterApplication extends Application {
         router.attach("/vertices", VertexResource.class);
         router.attach("/edges", EdgeResource.class);
         router.attach("/vertices/{id}/{direction}", VertexResource.class);
+        router.attach("/vertices/{id}/{direction}/{id2}", VertexResource.class);
         return router;
     }
 
