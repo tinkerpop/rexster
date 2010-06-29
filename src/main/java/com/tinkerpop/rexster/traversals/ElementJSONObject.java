@@ -13,14 +13,13 @@ import java.util.List;
 public class ElementJSONObject extends JSONObject {
 
     private final Object id;
-    private static final String ID = "_id";
-    private static final String TYPE = "_type";
-    private static final String LABEL = "_label";
-    private static final String VERTEX = "vertex";
-    private static final String EDGE = "edge";
-    private static final String OUT_V = "_outV";
-    private static final String IN_V = "_inV";
-    private static final String WILDCARD = "*";
+    public static final String ID = "_id";
+    public static final String TYPE = "_type";
+    public static final String LABEL = "_label";
+    public static final String VERTEX = "vertex";
+    public static final String EDGE = "edge";
+    public static final String OUT_V = "_outV";
+    public static final String IN_V = "_inV";
 
     public ElementJSONObject(Element element) {
         this(element, null);
@@ -33,7 +32,7 @@ public class ElementJSONObject extends JSONObject {
         } else {
             this.put(TYPE, EDGE);
         }
-        if (null == propertyKeys || (propertyKeys.size() == 1 && propertyKeys.get(0).equals(WILDCARD))) {
+        if (null == propertyKeys) {
             this.put(ID, this.id);
             for (String key : element.getPropertyKeys()) {
                 this.put(key, element.getProperty(key));

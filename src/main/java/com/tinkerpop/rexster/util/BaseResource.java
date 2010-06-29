@@ -1,7 +1,11 @@
 package com.tinkerpop.rexster.util;
 
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.StatisticsHelper;
+import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -12,6 +16,7 @@ import org.restlet.resource.ServerResource;
 import org.restlet.util.Series;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,9 +26,9 @@ import java.util.Set;
 public abstract class BaseResource extends ServerResource {
 
     protected final JSONParser parser = new JSONParser();
-    protected JSONObject requestObject;
-    protected JSONObject resultObject = new JSONObject();
-    protected static Logger logger = Logger.getLogger(BaseResource.class);
+    protected JSONObject requestObject = new JSONObject();
+    protected final JSONObject resultObject = new JSONObject();
+    protected final static Logger logger = Logger.getLogger(BaseResource.class);
     protected final StatisticsHelper sh = new StatisticsHelper();
 
     protected static final String RETURN_KEYS = "return_keys";
@@ -61,8 +66,6 @@ public abstract class BaseResource extends ServerResource {
     }
 
     protected void buildRequestObject(final Map queryParameters) {
-        this.requestObject = new JSONObject();
-
         for (String key : (Set<String>) queryParameters.keySet()) {
             String[] keys = key.split(PERIOD_REGEX);
             JSONObject embeddedObject = this.requestObject;
@@ -91,10 +94,10 @@ public abstract class BaseResource extends ServerResource {
                 embeddedObject.put(keys[keys.length - 1], rawValue);
             }
         }
+        System.out.println(this.requestObject);
     }
 
     protected void buildRequestObject(final String jsonString) {
-        this.requestObject = new JSONObject();
         try {
             this.requestObject = (JSONObject) parser.parse(jsonString);
         } catch (ParseException e) {
@@ -102,25 +105,63 @@ public abstract class BaseResource extends ServerResource {
         }
     }
 
-    protected Integer getStartOffset() {
+    protected Long getStartOffset() {
         if (this.requestObject.containsKey(OFFSET)) {
             Long start = ((Long) ((JSONObject) this.requestObject.get(OFFSET)).get(START));
             if (null != start)
-                return start.intValue();
+                return start;
             else
                 return null;
         } else
             return null;
     }
 
-    protected Integer getEndOffset() {
+    protected List<String> getReturnKeys() {
+        return (List<String>) this.requestObject.get(RETURN_KEYS);
+    }
+
+    protected Long getEndOffset() {
         if (this.requestObject.containsKey(OFFSET)) {
             Long end = ((Long) ((JSONObject) this.requestObject.get(OFFSET)).get(END));
             if (null != end)
-                return end.intValue();
+                return end;
             else
                 return null;
         } else
             return null;
+    }
+
+    protected JSONObject getNonRexsterRequestObject() {
+        JSONObject object = new JSONObject();
+        for (Map.Entry entry : (Set<Map.Entry>) this.requestObject.entrySet()) {
+            if (!entry.getKey().equals(OFFSET) && !entry.getKey().equals(RETURN_KEYS)) {
+                object.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return object;
+    }
+
+    protected boolean hasPropertyValues(Element element, JSONObject properties) {
+        for (Map.Entry entry : (Set<Map.Entry>) properties.entrySet()) {
+            Object temp;
+            if (entry.getKey().equals(ElementJSONObject.ID))
+                temp = element.getId();
+            else if (entry.getKey().equals(ElementJSONObject.LABEL))
+                temp = ((Edge) element).getLabel();
+            else if (entry.getKey().equals(ElementJSONObject.IN_V))
+                temp = ((Edge) element).getInVertex().getId();
+            else if (entry.getKey().equals(ElementJSONObject.OUT_V))
+                temp = ((Edge) element).getOutVertex().getId();
+            else if (entry.getKey().equals(ElementJSONObject.TYPE)) {
+                if (element instanceof Vertex)
+                    temp = ElementJSONObject.VERTEX;
+                else
+                    temp = ElementJSONObject.EDGE;
+            } else
+                temp = element.getProperty((String) entry.getKey());
+            if (null == temp || !temp.equals(entry.getValue()))
+                return false;
+        }
+        return true;
     }
 }

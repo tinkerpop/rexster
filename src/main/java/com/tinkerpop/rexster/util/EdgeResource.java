@@ -8,7 +8,6 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,18 +24,18 @@ public class EdgeResource extends BaseResource {
     }
 
     public void getAllEdges() {
-        Integer start = this.getStartOffset();
+        Long start = this.getStartOffset();
         if (null == start)
-            start = 0;
-        Integer end = this.getEndOffset();
+            start = 0l;
+        Long end = this.getEndOffset();
         if (null == end)
-            end = Integer.MAX_VALUE;
+            end = Long.MAX_VALUE;
 
-        int counter = 0;
+        long counter = 0l;
         JSONArray edgeArray = new JSONArray();
         for (Edge edge : this.getRexsterApplication().getGraph().getEdges()) {
             if (counter >= start && counter < end) {
-                edgeArray.add(new ElementJSONObject(edge, (List) this.requestObject.get(RETURN_KEYS)));
+                edgeArray.add(new ElementJSONObject(edge, this.getReturnKeys()));
             }
             counter++;
         }

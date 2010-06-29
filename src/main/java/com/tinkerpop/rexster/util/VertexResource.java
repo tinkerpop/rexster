@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -13,7 +14,6 @@ import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,12 +22,17 @@ import java.util.Set;
  */
 public class VertexResource extends BaseResource {
 
+    protected static final String ID = "id";
+    protected static final String ID2 = "id2";
+    protected static final String DIRECTION = "direction";
+    protected static final String TARGET = "_target";
+
     @Get
     public Representation getResource() {
         Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());
         this.buildRequestObject(queryParameters);
-        String id = (String) getRequest().getAttributes().get("id");
-        String direction = (String) getRequest().getAttributes().get("direction");
+        String id = (String) getRequest().getAttributes().get(ID);
+        String direction = (String) getRequest().getAttributes().get(DIRECTION);
 
         if (null == direction && null == id)
             getVertices();
@@ -46,9 +51,9 @@ public class VertexResource extends BaseResource {
         this.buildRequestObject(queryParameters);
 
         Graph graph = this.getRexsterApplication().getGraph();
-        Object id = getRequest().getAttributes().get("id");
-        String direction = (String) getRequest().getAttributes().get("direction");
-        String id2 = (String) getRequest().getAttributes().get("id2");
+        Object id = getRequest().getAttributes().get(ID);
+        String direction = (String) getRequest().getAttributes().get(DIRECTION);
+        String id2 = (String) getRequest().getAttributes().get(ID2);
 
         if (null == direction) {
             Vertex vertex = graph.getVertex(id);
@@ -59,11 +64,11 @@ public class VertexResource extends BaseResource {
                 if (!key.startsWith(UNDERSCORE))
                     vertex.setProperty(key, this.requestObject.get(key));
             }
-            this.resultObject.put(RESULT, new ElementJSONObject(vertex, (List) this.requestObject.get(RETURN_KEYS)));
+            this.resultObject.put(RESULT, new ElementJSONObject(vertex, this.getReturnKeys()));
         } else if (null != id && null == id2) {
             Vertex vertexA = graph.getVertex(id);
-            Vertex vertexB = graph.getVertex(this.requestObject.get("_target"));
-            String label = (String) this.requestObject.get("_label");
+            Vertex vertexB = graph.getVertex(this.requestObject.get(TARGET));
+            String label = (String) this.requestObject.get(ElementJSONObject.LABEL);
             Edge edge;
             if (direction.equals(OUT_E)) {
                 edge = graph.addEdge(null, vertexA, vertexB, label);
@@ -74,7 +79,7 @@ public class VertexResource extends BaseResource {
                 if (!key.startsWith(UNDERSCORE))
                     edge.setProperty(key, this.requestObject.get(key));
             }
-            this.resultObject.put(RESULT, new ElementJSONObject(edge, (List) this.requestObject.get(RETURN_KEYS)));
+            this.resultObject.put(RESULT, new ElementJSONObject(edge, this.getReturnKeys()));
 
         } else {
             Edge edge = this.getVertexEdge(id, direction, id2);
@@ -83,7 +88,7 @@ public class VertexResource extends BaseResource {
                     if (!key.startsWith(UNDERSCORE))
                         edge.setProperty(key, this.requestObject.get(key));
                 }
-                this.resultObject.put(RESULT, new ElementJSONObject(edge, (List) this.requestObject.get(RETURN_KEYS)));
+                this.resultObject.put(RESULT, new ElementJSONObject(edge, this.getReturnKeys()));
             }
         }
         this.resultObject.put(QUERY_TIME, sh.stopWatch());
@@ -93,9 +98,9 @@ public class VertexResource extends BaseResource {
     @Delete
     public Representation deleteResource() {
 
-        String id = (String) getRequest().getAttributes().get("id");
-        String direction = (String) getRequest().getAttributes().get("direction");
-        String id2 = (String) getRequest().getAttributes().get("id2");
+        String id = (String) getRequest().getAttributes().get(ID);
+        String direction = (String) getRequest().getAttributes().get(DIRECTION);
+        String id2 = (String) getRequest().getAttributes().get(ID2);
 
         Graph graph = this.getRexsterApplication().getGraph();
         if (null == direction) {
@@ -134,65 +139,63 @@ public class VertexResource extends BaseResource {
         return null;
     }
 
-    protected void getVertexEdges(Object id, String direction) {
-        Integer start = this.getStartOffset();
-        if (null == start)
-            start = 0;
-        Integer end = this.getEndOffset();
-        if (null == end)
-            end = Integer.MAX_VALUE;
+    protected void getVertexEdges(Object vertexId, String direction) {
+        try {
+            Long start = this.getStartOffset();
+            if (null == start)
+                start = 0l;
+            Long end = this.getEndOffset();
+            if (null == end)
+                end = Long.MAX_VALUE;
 
-        int counter = 0;
-        Vertex vertex = this.getRexsterApplication().getGraph().getVertex(id);
-        JSONArray edgeArray = new JSONArray();
-        if (direction.equals(OUT_E)) {
-            for (Edge edge : vertex.getOutEdges()) {
-                if (counter >= start && counter < end) {
-                    edgeArray.add(new ElementJSONObject(edge, (List) this.requestObject.get(RETURN_KEYS)));
+            long counter = 0l;
+            Vertex vertex = this.getRexsterApplication().getGraph().getVertex(vertexId);
+            JSONArray edgeArray = new JSONArray();
+            JSONObject tempRequest = this.getNonRexsterRequestObject();
+
+            if (direction.equals(OUT_E) || direction.equals(BOTH_E)) {
+                for (Edge edge : vertex.getOutEdges()) {
+                    if (this.hasPropertyValues(edge, tempRequest)) {
+                        if (counter >= start && counter < end) {
+                            edgeArray.add(new ElementJSONObject(edge, this.getReturnKeys()));
+                        }
+                        counter++;
+                    }
                 }
-                counter++;
             }
-        } else if (direction.equals(IN_E)) {
-            for (Edge edge : vertex.getInEdges()) {
-                if (counter >= start && counter < end) {
-                    edgeArray.add(new ElementJSONObject(edge, (List) this.requestObject.get(RETURN_KEYS)));
+            if (direction.equals(IN_E) || direction.equals(BOTH_E)) {
+                for (Edge edge : vertex.getInEdges()) {
+                    if (this.hasPropertyValues(edge, tempRequest)) {
+                        if (counter >= start && counter < end) {
+                            edgeArray.add(new ElementJSONObject(edge, this.getReturnKeys()));
+                        }
+                        counter++;
+                    }
                 }
-                counter++;
             }
-        } else {
-            for (Edge edge : vertex.getInEdges()) {
-                if (counter >= start && counter < end) {
-                    edgeArray.add(new ElementJSONObject(edge, (List) this.requestObject.get(RETURN_KEYS)));
-                }
-                counter++;
-            }
-            for (Edge edge : vertex.getOutEdges()) {
-                if (counter >= start && counter < end) {
-                    edgeArray.add(new ElementJSONObject(edge, (List) this.requestObject.get(RETURN_KEYS)));
-                }
-                counter++;
-            }
+
+            this.resultObject.put(RESULT, edgeArray);
+            this.resultObject.put(TOTAL_SIZE, counter);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        this.resultObject.put(RESULT, edgeArray);
-        this.resultObject.put(TOTAL_SIZE, counter);
     }
 
     protected void getSingleVertex(Object id) {
         Vertex vertex = this.getRexsterApplication().getGraph().getVertex(id);
-        this.resultObject.put(RESULT, new ElementJSONObject(vertex, (List) this.requestObject.get(RETURN_KEYS)));
+        this.resultObject.put(RESULT, new ElementJSONObject(vertex, this.getReturnKeys()));
     }
 
 
     protected void getVertices() {
-        Integer start = this.getStartOffset();
+        Long start = this.getStartOffset();
         if (null == start)
-            start = 0;
-        Integer end = this.getEndOffset();
+            start = 0l;
+        Long end = this.getEndOffset();
         if (null == end)
-            end = Integer.MAX_VALUE;
+            end = Long.MAX_VALUE;
 
-        int counter = 0;
+        long counter = 0l;
         JSONArray vertexArray = new JSONArray();
         String key = null;
         for (String tempKey : (Set<String>) this.requestObject.keySet()) {
@@ -211,7 +214,7 @@ public class VertexResource extends BaseResource {
         if (null != itty) {
             for (Element element : itty) {
                 if (counter >= start && counter < end) {
-                    vertexArray.add(new ElementJSONObject(element, (List) this.requestObject.get(RETURN_KEYS)));
+                    vertexArray.add(new ElementJSONObject(element, this.getReturnKeys()));
                 }
                 counter++;
             }
@@ -219,4 +222,5 @@ public class VertexResource extends BaseResource {
         this.resultObject.put(RESULT, vertexArray);
         this.resultObject.put(TOTAL_SIZE, counter);
     }
+
 }
