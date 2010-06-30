@@ -31,6 +31,7 @@ public class RexsterResource extends ServerResource {
 
         resultObject.put("query_time", sh.stopWatch());
         resultObject.put("up_time", this.getTimeAlive());
+        resultObject.put("version", RexsterApplication.getVersion());
         return new StringRepresentation(resultObject.toJSONString(), MediaType.APPLICATION_JSON);
     }
 

@@ -108,10 +108,10 @@ public class VertexResource extends BaseResource {
         Graph graph = this.getRexsterApplication().getGraph();
         if (null == direction) {
             Vertex vertex = graph.getVertex(id);
-            graph.removeVertex(vertex);
+            if (null != vertex)
+                graph.removeVertex(vertex);
         } else {
             Edge edge = getVertexEdge(id, direction, id2);
-
             if (null != edge)
                 graph.removeEdge(edge);
         }
@@ -125,16 +125,18 @@ public class VertexResource extends BaseResource {
     protected Edge getVertexEdge(Object vertexId, String direction, Object edgeId) {
         Graph graph = this.getRexsterApplication().getGraph();
         Vertex vertex = graph.getVertex(vertexId);
-        if (direction.equals(OUT_E)) {
-            for (Edge temp : vertex.getOutEdges()) {
-                if (temp.getId().toString().equals(edgeId)) {
-                    return temp;
+        if (null != vertex) {
+            if (direction.equals(OUT_E)) {
+                for (Edge temp : vertex.getOutEdges()) {
+                    if (temp.getId().toString().equals(edgeId)) {
+                        return temp;
+                    }
                 }
-            }
-        } else {
-            for (Edge temp : vertex.getInEdges()) {
-                if (temp.getId().toString().equals(edgeId)) {
-                    return temp;
+            } else {
+                for (Edge temp : vertex.getInEdges()) {
+                    if (temp.getId().toString().equals(edgeId)) {
+                        return temp;
+                    }
                 }
             }
         }
@@ -187,7 +189,11 @@ public class VertexResource extends BaseResource {
 
     protected void getSingleVertex(Object id) {
         Vertex vertex = this.getRexsterApplication().getGraph().getVertex(id);
-        this.resultObject.put(RESULT, new ElementJSONObject(vertex, this.getReturnKeys()));
+        if (null != vertex) {
+            this.resultObject.put(RESULT, new ElementJSONObject(vertex, this.getReturnKeys()));
+        } else {
+            this.resultObject.put(RESULT, null);
+        }
     }
 
 
