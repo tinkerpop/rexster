@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster.util;
+package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.rexster.traversals.ElementJSONObject;

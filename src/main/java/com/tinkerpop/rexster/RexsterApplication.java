@@ -5,8 +5,6 @@ import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.parser.GraphMLReader;
 import com.tinkerpop.rexster.traversals.Traversal;
-import com.tinkerpop.rexster.util.EdgeResource;
-import com.tinkerpop.rexster.util.VertexResource;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.restlet.Application;
@@ -22,7 +20,7 @@ import java.util.*;
  */
 public class RexsterApplication extends Application {
 
-    //private static final String version = "0.1-SNAPSHOT";
+    private static final String version = "0.1-SNAPSHOT";
     private final long startTime = System.currentTimeMillis();
     protected static final Logger logger = Logger.getLogger(RexsterApplication.class);
     private Graph graph;
@@ -93,6 +91,10 @@ public class RexsterApplication extends Application {
 
     public Map<String, Class> getLoadedTraversalServices() {
         return this.loadedTraversals;
+    }
+
+    public static String getVersion() {
+        return version;
     }
 
     public Graph getGraph() {

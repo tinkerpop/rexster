@@ -15,6 +15,8 @@ import java.util.Properties;
 public class WebServer {
 
     private static final String DEFAULT_HOST = "";
+    private Component component;
+
 
     protected static Logger logger = Logger.getLogger(WebServer.class);
 
@@ -22,27 +24,35 @@ public class WebServer {
         PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
     }
 
-    public WebServer(final Properties properties) throws Exception {
+    public WebServer(final Properties properties, boolean user) throws Exception {
         logger.info(".:Welcome to Rexster:.");
-        this.runWebServer(properties);
+        if (user)
+            this.startUser(properties);
+        else
+            this.start(properties);
     }
 
-    protected void runWebServer(final Properties properties) throws Exception {
-        RexsterApplication rexster = new RexsterApplication(properties);
-
-        Component component = new Component();
-        component.getServers().add(Protocol.HTTP, new Integer(properties.getProperty("rexster.webserver.port")));
-        component.getDefaultHost().attach(DEFAULT_HOST, rexster);
-        component.start();
-
+    protected void startUser(final Properties properties) throws Exception {
+        this.start(properties);
         // user interaction to shutdown server thread
         logger.info("Hit <enter> to shutdown Rexster");
         System.in.read();
         logger.info("Shutting down Rexster");
-        component.stop();
+        this.stop();
         System.exit(0);
     }
 
+    protected void start(final Properties properties) throws Exception {
+        RexsterApplication rexster = new RexsterApplication(properties);
+        component = new Component();
+        component.getServers().add(Protocol.HTTP, new Integer(properties.getProperty("rexster.webserver.port")));
+        component.getDefaultHost().attach(DEFAULT_HOST, rexster);
+        component.start();
+    }
+
+    protected void stop() throws Exception {
+        component.stop();
+    }
 
     public static void main(final String[] args) throws Exception {
         Properties properties = new Properties();
@@ -56,6 +66,6 @@ public class WebServer {
             properties.load(RexsterApplication.class.getResourceAsStream("rexster.properties"));
         }
 
-        new WebServer(properties);
+        new WebServer(properties, true);
     }
 }

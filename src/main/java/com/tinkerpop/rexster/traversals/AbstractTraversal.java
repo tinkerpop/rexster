@@ -7,20 +7,13 @@ import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.rexster.RestTokens;
 import com.tinkerpop.rexster.ResultObjectCache;
 import com.tinkerpop.rexster.RexsterApplication;
-import com.tinkerpop.rexster.StatisticsHelper;
-import com.tinkerpop.rexster.util.BaseResource;
+import com.tinkerpop.rexster.BaseResource;
 import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.restlet.data.MediaType;
-import org.restlet.data.Parameter;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
-import org.restlet.util.Series;
 
 import java.util.*;
 

@@ -1,10 +1,8 @@
-package com.tinkerpop.rexster.util;
+package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.rexster.RexsterApplication;
-import com.tinkerpop.rexster.StatisticsHelper;
 import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
@@ -35,6 +33,7 @@ public abstract class BaseResource extends ServerResource {
     protected static final String OFFSET = "offset";
     protected static final String START = "start";
     protected static final String END = "end";
+
     protected static final String OUT_E = "outE";
     protected static final String IN_E = "inE";
     protected static final String BOTH_E = "bothE";
@@ -42,6 +41,7 @@ public abstract class BaseResource extends ServerResource {
     protected static final String MESSAGE = "message";
     protected static final String QUERY_TIME = "query_time";
     protected static final String RESULT = "result";
+    protected static final String VERSION = "version";
     protected static final String UNDERSCORE = "_";
     protected static final String PERIOD_REGEX = "\\.";
     protected static final String COMMA = ",";
@@ -51,6 +51,7 @@ public abstract class BaseResource extends ServerResource {
 
     public BaseResource() {
         sh.stopWatch();
+        this.resultObject.put(VERSION, RexsterApplication.getVersion());
     }
 
     protected RexsterApplication getRexsterApplication() {
@@ -65,7 +66,7 @@ public abstract class BaseResource extends ServerResource {
         return map;
     }
 
-    protected void buildRequestObject(final Map queryParameters) {
+    public void buildRequestObject(final Map queryParameters) {
         for (String key : (Set<String>) queryParameters.keySet()) {
             String[] keys = key.split(PERIOD_REGEX);
             JSONObject embeddedObject = this.requestObject;
@@ -94,10 +95,9 @@ public abstract class BaseResource extends ServerResource {
                 embeddedObject.put(keys[keys.length - 1], rawValue);
             }
         }
-        System.out.println(this.requestObject);
     }
 
-    protected void buildRequestObject(final String jsonString) {
+    public void buildRequestObject(final String jsonString) {
         try {
             this.requestObject = (JSONObject) parser.parse(jsonString);
         } catch (ParseException e) {
@@ -105,7 +105,11 @@ public abstract class BaseResource extends ServerResource {
         }
     }
 
-    protected Long getStartOffset() {
+    public List<String> getReturnKeys() {
+        return (List<String>) this.requestObject.get(RETURN_KEYS);
+    }
+
+    public Long getStartOffset() {
         if (this.requestObject.containsKey(OFFSET)) {
             Long start = ((Long) ((JSONObject) this.requestObject.get(OFFSET)).get(START));
             if (null != start)
@@ -116,11 +120,7 @@ public abstract class BaseResource extends ServerResource {
             return null;
     }
 
-    protected List<String> getReturnKeys() {
-        return (List<String>) this.requestObject.get(RETURN_KEYS);
-    }
-
-    protected Long getEndOffset() {
+    public Long getEndOffset() {
         if (this.requestObject.containsKey(OFFSET)) {
             Long end = ((Long) ((JSONObject) this.requestObject.get(OFFSET)).get(END));
             if (null != end)
@@ -163,5 +163,13 @@ public abstract class BaseResource extends ServerResource {
                 return false;
         }
         return true;
+    }
+
+    public JSONObject getRequestObject() {
+        return this.requestObject;
+    }
+
+    public JSONObject getResultObject() {
+        return this.resultObject;
     }
 }

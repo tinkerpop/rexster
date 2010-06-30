@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster.util;
+package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
@@ -151,25 +151,27 @@ public class VertexResource extends BaseResource {
             long counter = 0l;
             Vertex vertex = this.getRexsterApplication().getGraph().getVertex(vertexId);
             JSONArray edgeArray = new JSONArray();
-            JSONObject tempRequest = this.getNonRexsterRequestObject();
 
-            if (direction.equals(OUT_E) || direction.equals(BOTH_E)) {
-                for (Edge edge : vertex.getOutEdges()) {
-                    if (this.hasPropertyValues(edge, tempRequest)) {
-                        if (counter >= start && counter < end) {
-                            edgeArray.add(new ElementJSONObject(edge, this.getReturnKeys()));
+            if (null != vertex) {
+                JSONObject tempRequest = this.getNonRexsterRequestObject();
+                if (direction.equals(OUT_E) || direction.equals(BOTH_E)) {
+                    for (Edge edge : vertex.getOutEdges()) {
+                        if (this.hasPropertyValues(edge, tempRequest)) {
+                            if (counter >= start && counter < end) {
+                                edgeArray.add(new ElementJSONObject(edge, this.getReturnKeys()));
+                            }
+                            counter++;
                         }
-                        counter++;
                     }
                 }
-            }
-            if (direction.equals(IN_E) || direction.equals(BOTH_E)) {
-                for (Edge edge : vertex.getInEdges()) {
-                    if (this.hasPropertyValues(edge, tempRequest)) {
-                        if (counter >= start && counter < end) {
-                            edgeArray.add(new ElementJSONObject(edge, this.getReturnKeys()));
+                if (direction.equals(IN_E) || direction.equals(BOTH_E)) {
+                    for (Edge edge : vertex.getInEdges()) {
+                        if (this.hasPropertyValues(edge, tempRequest)) {
+                            if (counter >= start && counter < end) {
+                                edgeArray.add(new ElementJSONObject(edge, this.getReturnKeys()));
+                            }
+                            counter++;
                         }
-                        counter++;
                     }
                 }
             }
