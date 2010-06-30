@@ -3,6 +3,7 @@ package com.tinkerpop.rexster;
 import junit.framework.TestCase;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.restlet.resource.ClientResource;
 
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -44,6 +45,10 @@ public class BaseTest extends TestCase {
 
     public static JSONObject getResource(String uri) throws Exception {
         return (JSONObject) parser.parse(new InputStreamReader(new URL(uri).openStream()));
+    }
+
+    public static JSONObject postResource(String uri) throws Exception {
+        return (JSONObject) parser.parse(new InputStreamReader(new ClientResource(uri).post(null).getStream()));
     }
 
     public static String createURI(String extension) {
