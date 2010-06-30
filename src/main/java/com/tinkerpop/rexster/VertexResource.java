@@ -56,6 +56,7 @@ public class VertexResource extends BaseResource {
         String id2 = (String) getRequest().getAttributes().get(ID2);
 
         if (null == direction) {
+            // UPDATE VERTEX PROPERTIES OR CREATE NEW VERTEX
             Vertex vertex = graph.getVertex(id);
             if (null == vertex) {
                 vertex = graph.addVertex(id);
@@ -66,6 +67,7 @@ public class VertexResource extends BaseResource {
             }
             this.resultObject.put(RESULT, new ElementJSONObject(vertex, this.getReturnKeys()));
         } else if (null != id && null == id2) {
+            // CREATE A NEW EDGE BETWEEN TWO VERTICES
             Vertex vertexA = graph.getVertex(id);
             Vertex vertexB = graph.getVertex(this.requestObject.get(TARGET));
             String label = (String) this.requestObject.get(ElementJSONObject.LABEL);
@@ -82,6 +84,7 @@ public class VertexResource extends BaseResource {
             this.resultObject.put(RESULT, new ElementJSONObject(edge, this.getReturnKeys()));
 
         } else {
+            // UPDATE THE PROPERTIES OF AN EDGE
             Edge edge = this.getVertexEdge(id, direction, id2);
             if (null != edge) {
                 for (String key : (Set<String>) this.requestObject.keySet()) {
@@ -97,7 +100,7 @@ public class VertexResource extends BaseResource {
 
     @Delete
     public Representation deleteResource() {
-
+        // TODO: delete individual properties
         String id = (String) getRequest().getAttributes().get(ID);
         String direction = (String) getRequest().getAttributes().get(DIRECTION);
         String id2 = (String) getRequest().getAttributes().get(ID2);
@@ -124,7 +127,6 @@ public class VertexResource extends BaseResource {
         Vertex vertex = graph.getVertex(vertexId);
         if (direction.equals(OUT_E)) {
             for (Edge temp : vertex.getOutEdges()) {
-                System.out.println(temp.getId());
                 if (temp.getId().toString().equals(edgeId)) {
                     return temp;
                 }
