@@ -29,6 +29,7 @@ public abstract class BaseResource extends ServerResource {
     protected final static Logger logger = Logger.getLogger(BaseResource.class);
     protected final StatisticsHelper sh = new StatisticsHelper();
 
+    protected static final String REXSTER = "rexster";
     protected static final String RETURN_KEYS = "return_keys";
     protected static final String OFFSET = "offset";
     protected static final String START = "start";
@@ -105,41 +106,62 @@ public abstract class BaseResource extends ServerResource {
         }
     }
 
-    public List<String> getReturnKeys() {
-        return (List<String>) this.requestObject.get(RETURN_KEYS);
+    public JSONObject getRexsterRequest() {
+        return (JSONObject) this.requestObject.get(REXSTER);
     }
 
-    public Long getStartOffset() {
-        if (this.requestObject.containsKey(OFFSET)) {
-            Long start = ((Long) ((JSONObject) this.requestObject.get(OFFSET)).get(START));
-            if (null != start)
-                return start;
-            else
-                return null;
-        } else
-            return null;
-    }
-
-    public Long getEndOffset() {
-        if (this.requestObject.containsKey(OFFSET)) {
-            Long end = ((Long) ((JSONObject) this.requestObject.get(OFFSET)).get(END));
-            if (null != end)
-                return end;
-            else
-                return null;
-        } else
-            return null;
-    }
-
-    protected JSONObject getNonRexsterRequestObject() {
+    protected JSONObject getNonRexsterRequest() {
         JSONObject object = new JSONObject();
         for (Map.Entry entry : (Set<Map.Entry>) this.requestObject.entrySet()) {
-            if (!entry.getKey().equals(OFFSET) && !entry.getKey().equals(RETURN_KEYS)) {
+            if (!entry.getKey().equals(REXSTER)) {
                 object.put(entry.getKey(), entry.getValue());
             }
         }
         return object;
     }
+
+    public Long getStartOffset() {
+        JSONObject rexster = this.getRexsterRequest();
+        if (null != rexster) {
+            if (rexster.containsKey(OFFSET)) {
+                Long start = ((Long) ((JSONObject) rexster.get(OFFSET)).get(START));
+                if (null != start)
+                    return start;
+                else
+                    return null;
+            } else
+                return null;
+        } else {
+            return null;
+        }
+    }
+
+
+    public Long getEndOffset() {
+        JSONObject rexster = this.getRexsterRequest();
+        if (null != rexster) {
+            if (rexster.containsKey(OFFSET)) {
+                Long end = ((Long) ((JSONObject) rexster.get(OFFSET)).get(END));
+                if (null != end)
+                    return end;
+                else
+                    return null;
+            } else
+                return null;
+        } else {
+            return null;
+        }
+
+    }
+
+    public List<String> getReturnKeys() {
+        JSONObject rexster = this.getRexsterRequest();
+        if (null != rexster)
+            return (List<String>) rexster.get(RETURN_KEYS);
+        else
+            return null;
+    }
+
 
     protected boolean hasPropertyValues(Element element, JSONObject properties) {
         for (Map.Entry entry : (Set<Map.Entry>) properties.entrySet()) {

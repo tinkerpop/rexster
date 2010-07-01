@@ -157,7 +157,7 @@ public class VertexResource extends BaseResource {
             JSONArray edgeArray = new JSONArray();
 
             if (null != vertex) {
-                JSONObject tempRequest = this.getNonRexsterRequestObject();
+                JSONObject tempRequest = this.getNonRexsterRequest();
                 if (direction.equals(OUT_E) || direction.equals(BOTH_E)) {
                     for (Edge edge : vertex.getOutEdges()) {
                         if (this.hasPropertyValues(edge, tempRequest)) {
@@ -208,11 +208,9 @@ public class VertexResource extends BaseResource {
         long counter = 0l;
         JSONArray vertexArray = new JSONArray();
         String key = null;
-        for (String tempKey : (Set<String>) this.requestObject.keySet()) {
-            if (!tempKey.equals(OFFSET) && !tempKey.equals(RETURN_KEYS)) {
-                key = tempKey;
-                break;
-            }
+        for (String tempKey : (Set<String>) this.getNonRexsterRequest().keySet()) {
+            key = tempKey;
+            break;
         }
         Iterable<? extends Element> itty;
         if (null != key) {

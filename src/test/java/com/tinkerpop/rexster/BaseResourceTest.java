@@ -37,19 +37,19 @@ public class BaseResourceTest extends TestCase {
         assertEquals(((JSONArray) tt.getRequestObject().get("d")).get(2), "10");
     }
 
-    public void testParsing() throws Exception {
+    public void testArrayParsing() throws Exception {
         JSONParser parser = new JSONParser();
         assertEquals(JSONArray.class, parser.parse("[\"a\",\"b\"]").getClass());
     }
 
     public void testOffsetParsing() {
         BaseResource tt = new VertexResource();
-        tt.buildRequestObject("{ \"offset\": { \"start\":10, \"end\":100 }}");
+        tt.buildRequestObject("{\"rexster\": { \"offset\": { \"start\":10, \"end\":100 }}}");
         assertEquals((long)tt.getStartOffset(), 10l);
         assertEquals((long)tt.getEndOffset(), 100l);
 
         tt = new VertexResource();
-        tt.buildRequestObject("{ \"offset\": { \"start\":-10, \"end\":10001 }}");
+        tt.buildRequestObject("{\"rexster\": { \"offset\": { \"start\":-10, \"end\":10001 }}}");
         assertEquals((long)tt.getStartOffset(), -10l);
         assertEquals((long)tt.getEndOffset(), 10001l);
     }

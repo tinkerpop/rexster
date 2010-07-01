@@ -39,6 +39,18 @@ public class VertexResourceTest extends BaseTest {
         assertEquals((long) ((JSONArray) object.get("result")).size(), object.get("total_size"));
     }
 
+    public void testGetAllVerticesWithOffset() throws Exception {
+        sh.stopWatch();
+        String uri = createURI("vertices?rexster.offset.start=10&rexster.offset.end=20");
+        JSONObject object = getResource(uri);
+        printPerformance("GET vertices 10-20", null, uri, sh.stopWatch());
+        assertEquals(object.get("total_size"), 809l);
+        for (Object vertex : (JSONArray) object.get("result")) {
+            assertEquals(((JSONObject) vertex).get("_type"), "vertex");
+        }
+        assertEquals((long) ((JSONArray) object.get("result")).size(), 10);
+    }
+
     public void testGetVertexIndex() throws Exception {
         sh.stopWatch();
         String uri = createURI("vertices?name=Garcia");
@@ -255,7 +267,7 @@ public class VertexResourceTest extends BaseTest {
 
     public void testDeleteEdge() throws Exception {
         sh.stopWatch();
-        String uri = createURI("vertices/1/outE?return_keys=[_id]");
+        String uri = createURI("vertices/1/outE?rexster.return_keys=[_id]");
         JSONObject object =getResource(uri);
         printPerformance("GET vertex out edges ids", null, uri, sh.stopWatch());
         List<String> edgeIds = new ArrayList<String>();
