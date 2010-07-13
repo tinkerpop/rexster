@@ -8,11 +8,11 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <url>http://rexster.tinkerpop.com</url>
-    <name>Rexster: A Graph-Based Ranking Engine</name>
+    <name>Rexster: A RESTful Graph Shell</name>
     <description>
-        Rexster is a graph-based ranking engine that makes use of graph traversals to
-        rank and score elements in a graph. An HTTP-based web service interface provides
-        language agnostic connectivity and the ability to run Rexster as a standalone server.
+        Rexster is a RESTful graph shell for Blueprints-enabled graphs. An HTTP-based interface provides
+        language agnostic connectivity. Support exists for graph traversals aimed at searching, 
+	scoring, ranking, and, in concert, recommending.
     </description>
     <developers>
         <developer>

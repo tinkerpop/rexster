@@ -20,7 +20,7 @@ public class RexsterResource extends ServerResource {
         StatisticsHelper sh = new StatisticsHelper();
         sh.stopWatch();
         JSONObject resultObject = new JSONObject();
-        resultObject.put("name", "Rexster: A Graph-Based Ranking Engine");
+        resultObject.put("name", "Rexster: A RESTful Graph Shell");
         resultObject.put("graph", this.getRexsterApplication().getGraph().toString());
 
         JSONArray queriesArray = new JSONArray();
