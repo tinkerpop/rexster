@@ -249,6 +249,8 @@
 			<dict>
 				<key>fill</key>
 				<dict>
+					<key>Draws</key>
+					<string>NO</string>
 					<key>GradientColor</key>
 					<dict>
 						<key>w</key>
@@ -844,7 +846,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2010-07-12 13:08:59 -0600</string>
+	<string>2010-07-15 00:55:32 -0600</string>
 	<key>Modifier</key>
 	<string>Marko Rodriguez</string>
 	<key>NotesVisible</key>
