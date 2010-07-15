@@ -55,7 +55,7 @@ public class RexsterApplication extends Application {
         Router router = new Router(getContext());
         router.attachDefault(RexsterResource.class);
         ServiceLoader<Traversal> traversalServices = ServiceLoader.load(Traversal.class);
-        String packages = this.properties.getProperty(RexsterTokens.REXSTER_PACKAGES_ALLOWED);
+        String packages = this.properties.getProperty(Tokens.REXSTER_PACKAGES_ALLOWED);
         if (null != packages) {
             Set<String> packageNames = new HashSet<String>(Arrays.asList(packages.substring(1, packages.length() - 1).split(",")));
             //System.out.println(packageNames);
@@ -81,11 +81,13 @@ public class RexsterApplication extends Application {
                 this.loadedTraversals.put(traversalService.getTraversalName(), traversalService.getClass());
             }
         }
-        router.attach("/vertices/{id}", VertexResource.class);
+
         router.attach("/vertices", VertexResource.class);
-        router.attach("/edges", EdgeResource.class);
+        router.attach("/vertices/{id}", VertexResource.class);
         router.attach("/vertices/{id}/{direction}", VertexResource.class);
-        router.attach("/vertices/{id}/{direction}/{id2}", VertexResource.class);
+        
+        router.attach("/edges", EdgeResource.class);
+        router.attach("/edges/{id}", EdgeResource.class);
         return router;
     }
 
@@ -116,8 +118,8 @@ public class RexsterApplication extends Application {
     }
 
     protected static Graph createGraphFromProperties(final Properties properties) throws Exception {
-        String graphType = properties.getProperty(RexsterTokens.REXSTER_GRAPH_TYPE);
-        String graphFile = properties.getProperty(RexsterTokens.REXSTER_GRAPH_FILE);
+        String graphType = properties.getProperty(Tokens.REXSTER_GRAPH_TYPE);
+        String graphFile = properties.getProperty(Tokens.REXSTER_GRAPH_FILE);
         Graph graph;
         if (graphType.equals("neo4j")) {
             try {

@@ -3,7 +3,7 @@ package com.tinkerpop.rexster.traversals.grateful;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.pipes.Pipe;
 import com.tinkerpop.pipes.Pipeline;
-import com.tinkerpop.rexster.RexsterTokens;
+import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.traversals.AbstractRankTraversal;
 import com.tinkerpop.rexster.traversals.grateful.pipes.SungByInversePipeline;
 import com.tinkerpop.rexster.traversals.grateful.pipes.WrittenByPipeline;
@@ -44,8 +44,8 @@ public class SingerWriterRank extends AbstractRankTraversal {
         Map<String, Object> api = new HashMap<String, Object>();
         Map<String, Object> parameters = this.getParameters();
         parameters.put("singer.<key>", "the source singer artist, where <key> is the singer vertex property key");
-        api.put(RexsterTokens.DESCRIPTION, "rank all writers relative to a single singer. the ranking is based on the number of songs that the writter has written that are sung by the singer.");
-        api.put(RexsterTokens.PARAMETERS, parameters);
-        this.resultObject.put(RexsterTokens.API, api);
+        api.put(Tokens.DESCRIPTION, "rank all writers relative to a single singer. the ranking is based on the number of songs that the writter has written that are sung by the singer.");
+        api.put(Tokens.PARAMETERS, parameters);
+        this.resultObject.put(Tokens.API, api);
     }
 }

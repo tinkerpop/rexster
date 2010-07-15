@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
-import com.tinkerpop.rexster.RestTokens;
+import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.ResultObjectCache;
 import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.BaseResource;
@@ -56,7 +56,7 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
         return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
     }
 
-    @Get(RestTokens.JSON_APPLICATION)
+    @Get(Tokens.JSON_APPLICATION)
     public Representation evaluate(final String json) {
         this.buildRequestObject(json);
         this.preQuery();

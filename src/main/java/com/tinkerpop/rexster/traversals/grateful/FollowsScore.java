@@ -3,7 +3,7 @@ package com.tinkerpop.rexster.traversals.grateful;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.pipes.Pipe;
 import com.tinkerpop.pipes.PipeHelper;
-import com.tinkerpop.rexster.RexsterTokens;
+import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.traversals.AbstractScoreTraversal;
 import com.tinkerpop.rexster.traversals.grateful.pipes.FollowsPipeline;
 
@@ -39,8 +39,8 @@ public class FollowsScore extends AbstractScoreTraversal {
         Map<String, Object> api = new HashMap<String, Object>();
         Map<String, Object> parameters = this.getParameters();
         parameters.put("song.<key>", "the source song, where <key> is the song vertex property key");
-        api.put(RexsterTokens.DESCRIPTION, "scores a song by how many songs follow it.");
-        api.put(RexsterTokens.PARAMETERS, parameters);
-        this.resultObject.put(RexsterTokens.API, api);
+        api.put(Tokens.DESCRIPTION, "scores a song by how many songs follow it.");
+        api.put(Tokens.PARAMETERS, parameters);
+        this.resultObject.put(Tokens.API, api);
     }
 }

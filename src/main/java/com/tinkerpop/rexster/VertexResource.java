@@ -22,17 +22,12 @@ import java.util.Set;
  */
 public class VertexResource extends BaseResource {
 
-    protected static final String ID = "id";
-    protected static final String ID2 = "id2";
-    protected static final String DIRECTION = "direction";
-    protected static final String TARGET = "_target";
-
     @Get
     public Representation getResource() {
         Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());
         this.buildRequestObject(queryParameters);
-        String id = (String) getRequest().getAttributes().get(ID);
-        String direction = (String) getRequest().getAttributes().get(DIRECTION);
+        String id = (String) getRequest().getAttributes().get(Tokens.ID);
+        String direction = (String) getRequest().getAttributes().get(Tokens.DIRECTION);
 
         if (null == direction && null == id)
             getVertices();
@@ -47,53 +42,20 @@ public class VertexResource extends BaseResource {
 
     @Post
     public Representation postResource() {
-        Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());
-        this.buildRequestObject(queryParameters);
+        this.buildRequestObject(createQueryMap(this.getRequest().getResourceRef().getQueryAsForm()));
 
-        Graph graph = this.getRexsterApplication().getGraph();
-        Object id = getRequest().getAttributes().get(ID);
-        String direction = (String) getRequest().getAttributes().get(DIRECTION);
-        String id2 = (String) getRequest().getAttributes().get(ID2);
+        final Graph graph = this.getRexsterApplication().getGraph();
+        final Object id = getRequest().getAttributes().get(Tokens.ID);
 
-        if (null == direction) {
-            // UPDATE VERTEX PROPERTIES OR CREATE NEW VERTEX
-            Vertex vertex = graph.getVertex(id);
-            if (null == vertex) {
-                vertex = graph.addVertex(id);
-            }
-            for (String key : (Set<String>) this.requestObject.keySet()) {
-                if (!key.startsWith(UNDERSCORE))
-                    vertex.setProperty(key, this.requestObject.get(key));
-            }
-            this.resultObject.put(RESULT, new ElementJSONObject(vertex, this.getReturnKeys()));
-        } else if (null != id && null == id2) {
-            // CREATE A NEW EDGE BETWEEN TWO VERTICES
-            Vertex vertexA = graph.getVertex(id);
-            Vertex vertexB = graph.getVertex(this.requestObject.get(TARGET));
-            String label = (String) this.requestObject.get(ElementJSONObject.LABEL);
-            Edge edge;
-            if (direction.equals(OUT_E)) {
-                edge = graph.addEdge(null, vertexA, vertexB, label);
-            } else {
-                edge = graph.addEdge(null, vertexB, vertexA, label);
-            }
-            for (String key : (Set<String>) this.requestObject.keySet()) {
-                if (!key.startsWith(UNDERSCORE))
-                    edge.setProperty(key, this.requestObject.get(key));
-            }
-            this.resultObject.put(RESULT, new ElementJSONObject(edge, this.getReturnKeys()));
-
-        } else {
-            // UPDATE THE PROPERTIES OF AN EDGE
-            Edge edge = this.getVertexEdge(id, direction, id2);
-            if (null != edge) {
-                for (String key : (Set<String>) this.requestObject.keySet()) {
-                    if (!key.startsWith(UNDERSCORE))
-                        edge.setProperty(key, this.requestObject.get(key));
-                }
-                this.resultObject.put(RESULT, new ElementJSONObject(edge, this.getReturnKeys()));
-            }
+        Vertex vertex = graph.getVertex(id);
+        if (null == vertex) {
+            vertex = graph.addVertex(id);
         }
+        for (String key : (Set<String>) this.requestObject.keySet()) {
+            if (!key.startsWith(UNDERSCORE))
+                vertex.setProperty(key, this.requestObject.get(key));
+        }
+        this.resultObject.put(RESULT, new ElementJSONObject(vertex, this.getReturnKeys()));
         this.resultObject.put(QUERY_TIME, sh.stopWatch());
         return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
     }
@@ -101,47 +63,18 @@ public class VertexResource extends BaseResource {
     @Delete
     public Representation deleteResource() {
         // TODO: delete individual properties
-        String id = (String) getRequest().getAttributes().get(ID);
-        String direction = (String) getRequest().getAttributes().get(DIRECTION);
-        String id2 = (String) getRequest().getAttributes().get(ID2);
+        final String id = (String) getRequest().getAttributes().get(Tokens.ID);
+        final Graph graph = this.getRexsterApplication().getGraph();
+        final Vertex vertex = graph.getVertex(id);
+        if (null != vertex)
+            graph.removeVertex(vertex);
 
-        Graph graph = this.getRexsterApplication().getGraph();
-        if (null == direction) {
-            Vertex vertex = graph.getVertex(id);
-            if (null != vertex)
-                graph.removeVertex(vertex);
-        } else {
-            Edge edge = getVertexEdge(id, direction, id2);
-            if (null != edge)
-                graph.removeEdge(edge);
-        }
         this.resultObject.put(QUERY_TIME, sh.stopWatch());
         return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
 
     }
 
     ///////////////////////
-
-    protected Edge getVertexEdge(Object vertexId, String direction, Object edgeId) {
-        Graph graph = this.getRexsterApplication().getGraph();
-        Vertex vertex = graph.getVertex(vertexId);
-        if (null != vertex) {
-            if (direction.equals(OUT_E)) {
-                for (Edge temp : vertex.getOutEdges()) {
-                    if (temp.getId().toString().equals(edgeId)) {
-                        return temp;
-                    }
-                }
-            } else {
-                for (Edge temp : vertex.getInEdges()) {
-                    if (temp.getId().toString().equals(edgeId)) {
-                        return temp;
-                    }
-                }
-            }
-        }
-        return null;
-    }
 
     protected void getVertexEdges(Object vertexId, String direction) {
         try {

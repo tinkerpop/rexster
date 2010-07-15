@@ -8,7 +8,7 @@ import com.tinkerpop.pipes.filter.ComparisonFilterPipe;
 import com.tinkerpop.pipes.pgm.EdgeVertexPipe;
 import com.tinkerpop.pipes.pgm.LabelFilterPipe;
 import com.tinkerpop.pipes.pgm.VertexEdgePipe;
-import com.tinkerpop.rexster.RexsterTokens;
+import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.traversals.AbstractRankTraversal;
 
 import java.util.Arrays;
@@ -57,8 +57,8 @@ public class ArtistRank extends AbstractRankTraversal {
         Map<String, Object> api = new HashMap<String, Object>();
         Map<String, Object> parameters = this.getParameters();
         parameters.put(GratefulDeadTokens.ARTIST_TYPE, "must be writer or singer");
-        api.put(RexsterTokens.DESCRIPTION, "rank all writers (or singers) based on the number of songs they have written (or sung)");
-        api.put(RexsterTokens.PARAMETERS, parameters);
-        this.resultObject.put(RexsterTokens.API, api);
+        api.put(Tokens.DESCRIPTION, "rank all writers (or singers) based on the number of songs they have written (or sung)");
+        api.put(Tokens.PARAMETERS, parameters);
+        this.resultObject.put(Tokens.API, api);
     }
 }

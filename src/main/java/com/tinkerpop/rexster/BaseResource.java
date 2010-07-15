@@ -3,7 +3,6 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -166,19 +165,19 @@ public abstract class BaseResource extends ServerResource {
     protected boolean hasPropertyValues(Element element, JSONObject properties) {
         for (Map.Entry entry : (Set<Map.Entry>) properties.entrySet()) {
             Object temp;
-            if (entry.getKey().equals(ElementJSONObject.ID))
+            if (entry.getKey().equals(Tokens._ID))
                 temp = element.getId();
-            else if (entry.getKey().equals(ElementJSONObject.LABEL))
+            else if (entry.getKey().equals(Tokens._LABEL))
                 temp = ((Edge) element).getLabel();
-            else if (entry.getKey().equals(ElementJSONObject.IN_V))
+            else if (entry.getKey().equals(Tokens._IN_V))
                 temp = ((Edge) element).getInVertex().getId();
-            else if (entry.getKey().equals(ElementJSONObject.OUT_V))
+            else if (entry.getKey().equals(Tokens._OUT_V))
                 temp = ((Edge) element).getOutVertex().getId();
-            else if (entry.getKey().equals(ElementJSONObject.TYPE)) {
+            else if (entry.getKey().equals(Tokens._TYPE)) {
                 if (element instanceof Vertex)
-                    temp = ElementJSONObject.VERTEX;
+                    temp = Tokens.VERTEX;
                 else
-                    temp = ElementJSONObject.EDGE;
+                    temp = Tokens.EDGE;
             } else
                 temp = element.getProperty((String) entry.getKey());
             if (null == temp || !temp.equals(entry.getValue()))

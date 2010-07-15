@@ -25,7 +25,7 @@ public class ResultObjectCache {
     }
 
     public ResultObjectCache(final Properties properties) {
-        ResultObjectCache.maxSize = new Integer(properties.getProperty(RexsterTokens.REXSTER_CACHE_MAXSIZE));
+        ResultObjectCache.maxSize = new Integer(properties.getProperty(Tokens.REXSTER_CACHE_MAXSIZE));
         logger.info("Cache constructed with a maximum size of " + ResultObjectCache.maxSize);
     }
 

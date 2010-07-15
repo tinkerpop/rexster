@@ -2,7 +2,7 @@ package com.tinkerpop.rexster.traversals;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.rexster.RexsterTokens;
+import com.tinkerpop.rexster.Tokens;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -101,9 +101,9 @@ public class GremlinTraversal extends AbstractTraversal {
         parameters.put(SCRIPT, "the Gremlin script to be evaluated");
         parameters.put(RETURN_KEYS, "the element property keys to return (default is to return all element properties)");
         parameters.put(ROOT + ".<key>", "the elements to set $_ to, where <key> is the element property key");
-        api.put(RexsterTokens.DESCRIPTION, "evaluate an ad-hoc Gremlin script");
-        api.put(RexsterTokens.PARAMETERS, parameters);
-        this.resultObject.put(RexsterTokens.API, api);
+        api.put(Tokens.DESCRIPTION, "evaluate an ad-hoc Gremlin script");
+        api.put(Tokens.PARAMETERS, parameters);
+        this.resultObject.put(Tokens.API, api);
     }
 }
 

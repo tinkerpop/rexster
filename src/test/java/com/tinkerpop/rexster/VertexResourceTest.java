@@ -189,55 +189,7 @@ public class VertexResourceTest extends BaseTest {
         assertEquals(object.get("name"), "REXSTER");
     }
 
-    public void testPostEdge() throws Exception {
-        sh.stopWatch();
-        String uri = createURI("vertices/1/outE?_label=test&_target=2&key1=value1");
-        JSONObject object = postResource(uri);
-        printPerformance("POST vertex edge", null, uri, sh.stopWatch());
-        object = (JSONObject) object.get("result");
-        assertEquals(object.get("_type"), "edge");
-        assertEquals(object.get("_label"), "test");
-        assertEquals(object.get("key1"), "value1");
-        assertEquals(object.get("_outV"), "1");
-        assertEquals(object.get("_inV"), "2");
-        uri = createURI("vertices/1/outE?_label=test");
-        object = getResource(uri);
-        object = (JSONObject) ((JSONArray) object.get("result")).get(0);
-        printPerformance("GET vertex edge by label filter", null, uri, sh.stopWatch());
-        assertEquals(object.get("_type"), "edge");
-        assertEquals(object.get("_label"), "test");
-        assertEquals(object.get("key1"), "value1");
-        assertEquals(object.get("_outV"), "1");
-        assertEquals(object.get("_inV"), "2");
 
-    }
-
-    public void testPostEdgeProperties() throws Exception {
-        sh.stopWatch();
-        String uri = createURI("vertices/1/outE?_label=test&_target=2&key1=value1");
-        JSONObject object = postResource(uri);
-        printPerformance("POST vertex edge", null, uri, sh.stopWatch());
-        object = (JSONObject) object.get("result");
-        assertEquals(object.get("_type"), "edge");
-        assertEquals(object.get("_label"), "test");
-        assertEquals(object.get("key1"), "value1");
-        assertEquals(object.get("_outV"), "1");
-        assertEquals(object.get("_inV"), "2");
-        String id = (String) object.get("_id");
-
-        uri = createURI("vertices/1/outE/" + id + "?key2=value2&key3=value3&key1=asdf");
-        object = postResource(uri);
-        printPerformance("POST vertex edge properties", null, uri, sh.stopWatch());
-        object = (JSONObject) object.get("result");
-        assertEquals(object.get("_type"), "edge");
-        assertEquals(object.get("_label"), "test");
-        assertEquals(object.get("key1"), "asdf");
-        assertEquals(object.get("key2"), "value2");
-        assertEquals(object.get("key3"), "value3");
-        assertEquals(object.get("_outV"), "1");
-        assertEquals(object.get("_inV"), "2");
-
-    }
 
     public void testDeleteVertex() throws Exception {
         sh.stopWatch();
@@ -262,30 +214,6 @@ public class VertexResourceTest extends BaseTest {
         uri = createURI("vertices");
         object = getResource(uri);
         printPerformance("GET vertices", null, uri, sh.stopWatch());
-        assertEquals(((JSONArray)object.get("result")).size(), 0);
-    }
-
-    public void testDeleteEdge() throws Exception {
-        sh.stopWatch();
-        String uri = createURI("vertices/1/outE?rexster.return_keys=[_id]");
-        JSONObject object =getResource(uri);
-        printPerformance("GET vertex out edges ids", null, uri, sh.stopWatch());
-        List<String> edgeIds = new ArrayList<String>();
-        for(Object edge : (JSONArray)object.get("result")) {
-            edgeIds.add((String)((JSONObject)edge).get("_id"));
-        }
-
-        sh.stopWatch();
-        for (String edgeId : edgeIds) {
-            uri = createURI("vertices/1/outE/" + edgeId);
-            deleteResource(uri);
-        }
-        printPerformance("DELETE edges", edgeIds.size(), uri, sh.stopWatch());
-
-        sh.stopWatch();
-        uri = createURI("vertices/1/outE");
-        object = getResource(uri);
-        printPerformance("GET vertice out edges", null, uri, sh.stopWatch());
         assertEquals(((JSONArray)object.get("result")).size(), 0);
     }
 }

@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.traversals;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.rexster.Tokens;
 import org.json.simple.JSONObject;
 
 import java.util.List;
@@ -13,13 +14,6 @@ import java.util.List;
 public class ElementJSONObject extends JSONObject {
 
     private final Object id;
-    public static final String ID = "_id";
-    public static final String TYPE = "_type";
-    public static final String LABEL = "_label";
-    public static final String VERTEX = "vertex";
-    public static final String EDGE = "edge";
-    public static final String OUT_V = "_outV";
-    public static final String IN_V = "_inV";
 
     public ElementJSONObject(Element element) {
         this(element, null);
@@ -28,34 +22,34 @@ public class ElementJSONObject extends JSONObject {
     public ElementJSONObject(Element element, List<String> propertyKeys) {
         this.id = element.getId();
         if (element instanceof Vertex) {
-            this.put(TYPE, VERTEX);
+            this.put(Tokens._TYPE, Tokens.VERTEX);
         } else {
-            this.put(TYPE, EDGE);
+            this.put(Tokens._TYPE, Tokens.EDGE);
         }
         if (null == propertyKeys) {
-            this.put(ID, this.id);
+            this.put(Tokens._ID, this.id);
             for (String key : element.getPropertyKeys()) {
                 this.put(key, element.getProperty(key));
             }
             if (element instanceof Edge) {
                 Edge edge = (Edge) element;
-                this.put(LABEL, edge.getLabel());
-                this.put(IN_V, edge.getInVertex().getId());
-                this.put(OUT_V, edge.getOutVertex().getId());
+                this.put(Tokens._LABEL, edge.getLabel());
+                this.put(Tokens._IN_V, edge.getInVertex().getId());
+                this.put(Tokens._OUT_V, edge.getOutVertex().getId());
             }
         } else {
             for (String key : propertyKeys) {
-                if (key.equals(ID)) {
-                    this.put(ID, this.id);
-                } else if (element instanceof Edge && key.equals(LABEL)) {
+                if (key.equals(Tokens._ID)) {
+                    this.put(Tokens._ID, this.id);
+                } else if (element instanceof Edge && key.equals(Tokens._LABEL)) {
                     Edge edge = (Edge) element;
-                    this.put(LABEL, edge.getLabel());
-                } else if (element instanceof Edge && key.equals(IN_V)) {
+                    this.put(Tokens._LABEL, edge.getLabel());
+                } else if (element instanceof Edge && key.equals(Tokens._IN_V)) {
                     Edge edge = (Edge) element;
-                    this.put(IN_V, edge.getInVertex().getId());
-                } else if (element instanceof Edge && key.equals(OUT_V)) {
+                    this.put(Tokens._IN_V, edge.getInVertex().getId());
+                } else if (element instanceof Edge && key.equals(Tokens._OUT_V)) {
                     Edge edge = (Edge) element;
-                    this.put(IN_V, edge.getOutVertex().getId());
+                    this.put(Tokens._IN_V, edge.getOutVertex().getId());
                 } else {
                     Object temp = element.getProperty(key);
                     if (null != temp) {
