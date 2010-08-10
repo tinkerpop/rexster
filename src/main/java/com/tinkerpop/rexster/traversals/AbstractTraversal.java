@@ -44,7 +44,7 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
         }
     }
 
-    @Get
+    //@Get
     public Representation evaluate() {
         Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());
         this.buildRequestObject(queryParameters);
@@ -57,7 +57,7 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
 
     @Get
     public Representation evaluate(final String json) {
-        if (json.length() == 0)
+        if (null == json || json.length() == 0)
             return this.evaluate();
         else {
             this.buildRequestObject(json);
