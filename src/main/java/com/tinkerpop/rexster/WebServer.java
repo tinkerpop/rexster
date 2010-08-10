@@ -44,8 +44,11 @@ public class WebServer {
 
     protected void start(final Properties properties) throws Exception {
         RexsterApplication rexster = new RexsterApplication(properties);
+        Integer port = new Integer(properties.getProperty("rexster.webserver.port"));
+
         component = new Component();
-        component.getServers().add(Protocol.HTTP, new Integer(properties.getProperty("rexster.webserver.port")));
+        logger.info("Server running on http://localhost:" + port);
+        component.getServers().add(Protocol.HTTP, port);
         component.getDefaultHost().attach(DEFAULT_HOST, rexster);
         component.start();
     }

@@ -4,10 +4,10 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
-import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.BaseResource;
 import com.tinkerpop.rexster.ResultObjectCache;
 import com.tinkerpop.rexster.RexsterApplication;
-import com.tinkerpop.rexster.BaseResource;
+import com.tinkerpop.rexster.Tokens;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.restlet.data.MediaType;
@@ -56,17 +56,16 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
         return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
     }
 
-    @Get(Tokens.JSON_APPLICATION)
+    @Get
     public Representation evaluate(final String json) {
         this.buildRequestObject(json);
+        System.out.println(this.requestObject);
         this.preQuery();
         if (!usingCachedResult)
             this.traverse();
         this.postQuery();
         return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
     }
-
-
 
     private String createCacheRequestURI() {
         Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());

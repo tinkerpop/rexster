@@ -37,11 +37,16 @@ public class RexsterResource extends ServerResource {
 
     private String getTimeAlive() {
         long timeMillis = System.currentTimeMillis() - this.getRexsterApplication().getStartTime();
-        long time = timeMillis / 1000;
-        String seconds = Integer.toString((int) (time % 60));
-        String minutes = Integer.toString((int) ((time % 3600) / 60));
-        String hours = Integer.toString((int) (time / 3600));
-        String days = Integer.toString((int) (time / 86400));
+        long timeSeconds = timeMillis / 1000;
+        long timeMinutes = timeSeconds / 60;
+        long timeHours = timeMinutes / 60;
+        long timeDays = timeHours / 24;
+
+        String seconds = Integer.toString((int) (timeSeconds % 60));
+        String minutes = Integer.toString((int) (timeMinutes % 60));
+        String hours = Integer.toString((int) timeHours % 24);
+        String days = Integer.toString((int) timeDays);
+
         for (int i = 0; i < 2; i++) {
             if (seconds.length() < 2) {
                 seconds = "0" + seconds;

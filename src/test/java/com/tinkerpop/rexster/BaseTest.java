@@ -12,18 +12,13 @@ import java.util.logging.Logger;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class BaseTest extends TestCase {
+public abstract class BaseTest extends TestCase {
 
     private WebServer webServer;
     protected StatisticsHelper sh = new StatisticsHelper();
     private static JSONParser parser = new JSONParser();
     private static Logger logger = Logger.getLogger(BaseTest.class.getName());
     public static final String baseURI = "http://localhost:8182/";
-
-
-    public void testTrue() {
-        assertTrue(true);
-    }
 
     public void startWebServer() throws Exception {
         Thread thread = new Thread() {
