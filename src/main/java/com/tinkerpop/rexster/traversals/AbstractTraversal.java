@@ -7,7 +7,6 @@ import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.rexster.BaseResource;
 import com.tinkerpop.rexster.ResultObjectCache;
 import com.tinkerpop.rexster.RexsterApplication;
-import com.tinkerpop.rexster.Tokens;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.restlet.data.MediaType;
@@ -58,13 +57,16 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
 
     @Get
     public Representation evaluate(final String json) {
-        this.buildRequestObject(json);
-        System.out.println(this.requestObject);
-        this.preQuery();
-        if (!usingCachedResult)
-            this.traverse();
-        this.postQuery();
-        return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
+        if (json.length() == 0)
+            return this.evaluate();
+        else {
+            this.buildRequestObject(json);
+            this.preQuery();
+            if (!usingCachedResult)
+                this.traverse();
+            this.postQuery();
+            return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
+        }
     }
 
     private String createCacheRequestURI() {
