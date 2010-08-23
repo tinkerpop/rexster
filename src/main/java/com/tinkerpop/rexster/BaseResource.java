@@ -28,30 +28,10 @@ public abstract class BaseResource extends ServerResource {
     protected final static Logger logger = Logger.getLogger(BaseResource.class);
     protected final StatisticsHelper sh = new StatisticsHelper();
 
-    protected static final String REXSTER = "rexster";
-    protected static final String RETURN_KEYS = "return_keys";
-    protected static final String OFFSET = "offset";
-    protected static final String START = "start";
-    protected static final String END = "end";
-
-    protected static final String OUT_E = "outE";
-    protected static final String IN_E = "inE";
-    protected static final String BOTH_E = "bothE";
-    protected static final String TOTAL_SIZE = "total_size";
-    protected static final String MESSAGE = "message";
-    protected static final String QUERY_TIME = "query_time";
-    protected static final String RESULT = "result";
-    protected static final String VERSION = "version";
-    protected static final String UNDERSCORE = "_";
-    protected static final String PERIOD_REGEX = "\\.";
-    protected static final String COMMA = ",";
-    protected static final String LEFT_BRACKET = "[";
-    protected static final String RIGHT_BRACKET = "]";
-
 
     public BaseResource() {
         sh.stopWatch();
-        this.resultObject.put(VERSION, RexsterApplication.getVersion());
+        this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
     }
 
     protected RexsterApplication getRexsterApplication() {
@@ -68,7 +48,7 @@ public abstract class BaseResource extends ServerResource {
 
     public void buildRequestObject(final Map queryParameters) {
         for (String key : (Set<String>) queryParameters.keySet()) {
-            String[] keys = key.split(PERIOD_REGEX);
+            String[] keys = key.split(Tokens.PERIOD_REGEX);
             JSONObject embeddedObject = this.requestObject;
             for (int i = 0; i < keys.length - 1; i++) {
                 JSONObject tempEmbeddedObject = (JSONObject) embeddedObject.get(keys[i]);
@@ -80,10 +60,10 @@ public abstract class BaseResource extends ServerResource {
             }
             String rawValue = (String) queryParameters.get(key);
             try {
-                if (rawValue.startsWith(LEFT_BRACKET) && rawValue.endsWith(RIGHT_BRACKET)) {
+                if (rawValue.startsWith(Tokens.LEFT_BRACKET) && rawValue.endsWith(Tokens.RIGHT_BRACKET)) {
                     rawValue = rawValue.substring(1, rawValue.length() - 1);
                     JSONArray array = new JSONArray();
-                    for (String value : rawValue.split(COMMA)) {
+                    for (String value : rawValue.split(Tokens.COMMA)) {
                         array.add(value.trim());
                     }
                     embeddedObject.put(keys[keys.length - 1], array);
@@ -106,13 +86,13 @@ public abstract class BaseResource extends ServerResource {
     }
 
     public JSONObject getRexsterRequest() {
-        return (JSONObject) this.requestObject.get(REXSTER);
+        return (JSONObject) this.requestObject.get(Tokens.REXSTER);
     }
 
     protected JSONObject getNonRexsterRequest() {
         JSONObject object = new JSONObject();
         for (Map.Entry entry : (Set<Map.Entry>) this.requestObject.entrySet()) {
-            if (!entry.getKey().equals(REXSTER)) {
+            if (!entry.getKey().equals(Tokens.REXSTER)) {
                 object.put(entry.getKey(), entry.getValue());
             }
         }
@@ -122,8 +102,8 @@ public abstract class BaseResource extends ServerResource {
     public Long getStartOffset() {
         JSONObject rexster = this.getRexsterRequest();
         if (null != rexster) {
-            if (rexster.containsKey(OFFSET)) {
-                Long start = ((Long) ((JSONObject) rexster.get(OFFSET)).get(START));
+            if (rexster.containsKey(Tokens.OFFSET)) {
+                Long start = ((Long) ((JSONObject) rexster.get(Tokens.OFFSET)).get(Tokens.START));
                 if (null != start)
                     return start;
                 else
@@ -139,8 +119,8 @@ public abstract class BaseResource extends ServerResource {
     public Long getEndOffset() {
         JSONObject rexster = this.getRexsterRequest();
         if (null != rexster) {
-            if (rexster.containsKey(OFFSET)) {
-                Long end = ((Long) ((JSONObject) rexster.get(OFFSET)).get(END));
+            if (rexster.containsKey(Tokens.OFFSET)) {
+                Long end = ((Long) ((JSONObject) rexster.get(Tokens.OFFSET)).get(Tokens.END));
                 if (null != end)
                     return end;
                 else
@@ -156,7 +136,7 @@ public abstract class BaseResource extends ServerResource {
     public List<String> getReturnKeys() {
         JSONObject rexster = this.getRexsterRequest();
         if (null != rexster)
-            return (List<String>) rexster.get(RETURN_KEYS);
+            return (List<String>) rexster.get(Tokens.RETURN_KEYS);
         else
             return null;
     }

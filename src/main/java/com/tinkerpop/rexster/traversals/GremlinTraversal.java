@@ -29,7 +29,6 @@ public class GremlinTraversal extends AbstractTraversal {
     private static final String WILDCARD = "*";
     private static final String ROOT = "root";
     private static final String SCRIPT = "script";
-    private static final String RESULTS = "results";
     private static final String RETURN_KEYS = "return_keys";
     protected List<String> returnKeys = null;
 
@@ -63,7 +62,7 @@ public class GremlinTraversal extends AbstractTraversal {
                         results.add(JSONValue.escape(object.toString()));
                     }
                 }
-                this.resultObject.put(RESULTS, results);
+                this.resultObject.put(Tokens.RESULTS, results);
                 this.success = true;
                 this.cacheCurrentResultObjectState();
             } else {
@@ -88,7 +87,7 @@ public class GremlinTraversal extends AbstractTraversal {
         if (this.allowCached) {
             JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
             if (tempResultObject != null) {
-                this.resultObject.put(RESULTS, tempResultObject.get(RESULTS));
+                this.resultObject.put(Tokens.RESULTS, tempResultObject.get(Tokens.RESULTS));
                 this.success = true;
                 this.usingCachedResult = true;
             }

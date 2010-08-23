@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.rexster.BaseResource;
 import com.tinkerpop.rexster.ResultObjectCache;
 import com.tinkerpop.rexster.RexsterApplication;
+import com.tinkerpop.rexster.Tokens;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.restlet.data.MediaType;
@@ -24,12 +25,6 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
     protected Graph graph;
     protected ResultObjectCache resultObjectCache;
     protected static Logger logger = Logger.getLogger(AbstractTraversal.class);
-
-    protected static final String SUCCESS = "success";
-    protected static final String ALLOW_CACHED = "allow_cached";
-    protected static final String OFFSET_END = "offset.end";
-    protected static final String OFFSET_START = "offset.start";
-    protected static final String ID = "id";
 
     protected boolean success = true;
     protected String message = null;
@@ -71,9 +66,9 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
 
     private String createCacheRequestURI() {
         Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());
-        queryParameters.remove(OFFSET_START);
-        queryParameters.remove(OFFSET_END);
-        queryParameters.remove(ALLOW_CACHED);
+        queryParameters.remove(Tokens.OFFSET_START);
+        queryParameters.remove(Tokens.OFFSET_END);
+        queryParameters.remove(Tokens.ALLOW_CACHED);
         List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>(queryParameters.entrySet());
         java.util.Collections.sort(list, new Comparator<Map.Entry<String, String>>() {
             public int compare(Map.Entry<String, String> e, Map.Entry<String, String> e1) {
@@ -86,7 +81,7 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
     protected static List<Vertex> getVertices(final Graph graph, final Map<String, Object> propertyMap) {
         List<Vertex> vertices = new ArrayList<Vertex>();
         for (String key : propertyMap.keySet()) {
-            if (key.equals(ID)) {
+            if (key.equals(Tokens.ID)) {
                 vertices.add(graph.getVertex(propertyMap.get(key)));
             } else {
                 Iterable<Element> elements = graph.getIndex().get(key, propertyMap.get(key));
@@ -124,7 +119,7 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
             ((Neo4jGraph) graph).startTransaction();
         }
         this.cacheRequestURI = this.createCacheRequestURI();
-        Boolean temp = (Boolean) this.requestObject.get(ALLOW_CACHED);
+        Boolean temp = (Boolean) this.requestObject.get(Tokens.ALLOW_CACHED);
         if (null != temp) {
             this.allowCached = temp;
         }
@@ -135,14 +130,14 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
         if (graph instanceof Neo4jGraph) {
             ((Neo4jGraph) graph).stopTransaction(true);
         }
-        this.resultObject.put(SUCCESS, this.success);
+        this.resultObject.put(Tokens.SUCCESS, this.success);
         if (!this.success) {
             this.addApiToResultObject();
         }
         if (null != message) {
-            this.resultObject.put(MESSAGE, this.message);
+            this.resultObject.put(Tokens.MESSAGE, this.message);
         }
-        this.resultObject.put(QUERY_TIME, sh.stopWatch());
+        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         logger.debug("Raw result object: " + this.resultObject.toJSONString());
     }
 
@@ -154,7 +149,7 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
 
     protected Map<String, Object> getParameters() {
         Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put(ALLOW_CACHED, "allow a previously cached result to be provided (default is true)");
+        parameters.put(Tokens.ALLOW_CACHED, "allow a previously cached result to be provided (default is true)");
         return parameters;
     }
 }

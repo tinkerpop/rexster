@@ -35,7 +35,7 @@ public class EdgeResource extends BaseResource {
             getSingleEdge(id);
 
 
-        this.resultObject.put(QUERY_TIME, sh.stopWatch());
+        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
     }
 
@@ -68,13 +68,13 @@ public class EdgeResource extends BaseResource {
         }
         if (null != edge) {
             for (final String key : (Set<String>) this.requestObject.keySet()) {
-                if (!key.startsWith(UNDERSCORE))
+                if (!key.startsWith(Tokens.UNDERSCORE))
                     edge.setProperty(key, this.requestObject.get(key));
             }
-            this.resultObject.put(RESULT, new ElementJSONObject(edge, this.getReturnKeys()));
+            this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys()));
         }
 
-        this.resultObject.put(QUERY_TIME, sh.stopWatch());
+        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
 
         return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
     }
@@ -88,7 +88,7 @@ public class EdgeResource extends BaseResource {
         if (null != edge)
             graph.removeEdge(edge);
 
-        this.resultObject.put(QUERY_TIME, sh.stopWatch());
+        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
 
     }
@@ -109,18 +109,18 @@ public class EdgeResource extends BaseResource {
             }
             counter++;
         }
-        this.resultObject.put(RESULT, edgeArray);
-        this.resultObject.put(TOTAL_SIZE, counter);
-        this.resultObject.put(QUERY_TIME, sh.stopWatch());
+        this.resultObject.put(Tokens.RESULTS, edgeArray);
+        this.resultObject.put(Tokens.TOTAL_SIZE, counter);
+        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
 
     }
 
     public void getSingleEdge(final Object id) {
         final Edge edge = this.getRexsterApplication().getGraph().getEdge(id);
         if (null != edge) {
-            this.resultObject.put(RESULT, new ElementJSONObject(edge, this.getReturnKeys()));
+            this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys()));
         } else {
-            this.resultObject.put(RESULT, null);
+            this.resultObject.put(Tokens.RESULTS, null);
         }
     }
 }

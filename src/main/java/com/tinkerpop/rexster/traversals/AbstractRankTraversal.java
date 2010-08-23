@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.traversals;
 
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.rexster.Tokens;
 import org.json.simple.JSONObject;
 
 import java.util.*;
@@ -18,15 +19,6 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
     protected int startOffset = -1;
     protected int endOffset = -1;
     protected float totalRank = Float.NaN;
-
-    private static final String RANKS = "ranks";
-    private static final String SIZE = "size";
-    private static final String SORT = "sort";
-    private static final String SORT_KEY = "sort_key";
-    private static final String REVERSE = "reverse";
-    private static final String REGULAR = "regular";
-    private static final String WILDCARD = "*";
-    protected static final String TOTAL_RANK = "total_rank";
 
 
     protected enum Sort {
@@ -99,40 +91,40 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
 
     protected void preQuery() {
         super.preQuery();
-        String sort = (String) this.requestObject.get(SORT);
+        String sort = (String) this.requestObject.get(Tokens.SORT);
         if (null != sort) {
-            if (sort.equals(REGULAR))
+            if (sort.equals(Tokens.REGULAR))
                 this.sort = Sort.REGULAR;
-            else if (sort.equals(REVERSE))
+            else if (sort.equals(Tokens.REVERSE))
                 this.sort = Sort.REVERSE;
         }
-        if (this.requestObject.containsKey(SORT_KEY)) {
-            this.sortKey = (String) this.requestObject.get(SORT_KEY);
+        if (this.requestObject.containsKey(Tokens.SORT_KEY)) {
+            this.sortKey = (String) this.requestObject.get(Tokens.SORT_KEY);
         } else {
             sortKey = getTraversalName();
         }
 
-        JSONObject offset = (JSONObject) this.requestObject.get(OFFSET);
+        JSONObject offset = (JSONObject) this.requestObject.get(Tokens.OFFSET);
         if (null != offset) {
-            Long start = (Long) offset.get(START);
-            Long end = (Long) offset.get(END);
+            Long start = (Long) offset.get(Tokens.START);
+            Long end = (Long) offset.get(Tokens.END);
             if (null != start)
                 this.startOffset = start.intValue();
             if (null != end)
                 this.endOffset = end.intValue();
         }
 
-        if (this.requestObject.containsKey(RETURN_KEYS)) {
-            this.returnKeys = (List<String>) this.requestObject.get(RETURN_KEYS);
-            if (this.returnKeys.size() == 1 && this.returnKeys.get(0).equals(WILDCARD))
+        if (this.requestObject.containsKey(Tokens.RETURN_KEYS)) {
+            this.returnKeys = (List<String>) this.requestObject.get(Tokens.RETURN_KEYS);
+            if (this.returnKeys.size() == 1 && this.returnKeys.get(0).equals(Tokens.WILDCARD))
                 this.returnKeys = null;
         }
 
         if (this.allowCached) {
             JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
             if (tempResultObject != null) {
-                this.ranks = (List<ElementJSONObject>) tempResultObject.get(RANKS);
-                this.totalRank = (Float) tempResultObject.get(TOTAL_RANK);
+                this.ranks = (List<ElementJSONObject>) tempResultObject.get(Tokens.RANKS);
+                this.totalRank = (Float) tempResultObject.get(Tokens.TOTAL_RANK);
                 this.success = true;
                 this.usingCachedResult = true;
             }
@@ -148,16 +140,16 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
                 this.sortRanks(this.sortKey);
             }
             if (this.totalRank != Float.NaN) {
-                this.resultObject.put(TOTAL_RANK, this.totalRank);
+                this.resultObject.put(Tokens.TOTAL_RANK, this.totalRank);
             }
-            this.resultObject.put(RANKS, this.ranks);
-            this.resultObject.put(SIZE, this.ranks.size());
+            this.resultObject.put(Tokens.RANKS, this.ranks);
+            this.resultObject.put(Tokens.SIZE, this.ranks.size());
 
             this.cacheCurrentResultObjectState();
             if (this.startOffset != -1 || this.endOffset != -1) {
                 this.offsetRanks();
-                this.resultObject.put(RANKS, this.ranks);
-                this.resultObject.put(SIZE, this.ranks.size());
+                this.resultObject.put(Tokens.RANKS, this.ranks);
+                this.resultObject.put(Tokens.SIZE, this.ranks.size());
             }
         }
         super.postQuery();
@@ -165,11 +157,11 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
 
     protected Map<String, Object> getParameters() {
         Map<String, Object> parameters = super.getParameters();
-        parameters.put(OFFSET_START, "the start integer of a page of results (default is 0)");
-        parameters.put(OFFSET_END, "the end integer of a page of results (default is infinity)");
-        parameters.put(SORT, "regular, reverse, or none sort the ranked results (default is none)");
-        parameters.put(SORT_KEY, "the name of the element key to use in the sorting (default is the rank value)");
-        parameters.put(RETURN_KEYS, "the element property keys to return (default is to return all element properties)");
+        parameters.put(Tokens.OFFSET_START, "the start integer of a page of results (default is 0)");
+        parameters.put(Tokens.OFFSET_END, "the end integer of a page of results (default is infinity)");
+        parameters.put(Tokens.SORT, "regular, reverse, or none sort the ranked results (default is none)");
+        parameters.put(Tokens.SORT_KEY, "the name of the element key to use in the sorting (default is the rank value)");
+        parameters.put(Tokens.RETURN_KEYS, "the element property keys to return (default is to return all element properties)");
         return parameters;
     }
 

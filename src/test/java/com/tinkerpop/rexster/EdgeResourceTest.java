@@ -32,10 +32,10 @@ public class EdgeResourceTest extends BaseTest {
         String uri = createURI("edges");
         JSONObject object = getResource(uri);
         printPerformance("GET all edges", null, uri, sh.stopWatch());
-        for (Object vertex : (JSONArray) object.get("result")) {
+        for (Object vertex : (JSONArray) object.get("results")) {
             assertEquals(((JSONObject) vertex).get("_type"), "edge");
         }
-        assertEquals((long) ((JSONArray) object.get("result")).size(), object.get("total_size"));
+        assertEquals((long) ((JSONArray) object.get("results")).size(), object.get("total_size"));
     }
 
     public void testGetEdge() throws Exception {
@@ -43,10 +43,10 @@ public class EdgeResourceTest extends BaseTest {
         String uri = createURI("edges/6872");
         JSONObject object = getResource(uri);
         printPerformance("GET edge", null, uri, sh.stopWatch());
-        assertEquals(((JSONObject) object.get("result")).get("_type"), "edge");
-        assertEquals(((JSONObject) object.get("result")).get("_outV"), "64");
-        assertEquals(((JSONObject) object.get("result")).get("_label"), "followed_by");
-        assertEquals(((JSONObject) object.get("result")).get("_inV"), "30");
+        assertEquals(((JSONObject) object.get("results")).get("_type"), "edge");
+        assertEquals(((JSONObject) object.get("results")).get("_outV"), "64");
+        assertEquals(((JSONObject) object.get("results")).get("_label"), "followed_by");
+        assertEquals(((JSONObject) object.get("results")).get("_inV"), "30");
     }
 
     public void testPostEdge() throws Exception {
@@ -54,7 +54,7 @@ public class EdgeResourceTest extends BaseTest {
         String uri = createURI("edges/999999?_outV=1&_inV=2&_label=test&key1=value1");
         JSONObject object = postResource(uri);
         printPerformance("POST edge", null, uri, sh.stopWatch());
-        object = (JSONObject) object.get("result");
+        object = (JSONObject) object.get("results");
         assertEquals(object.get("_type"), "edge");
         assertEquals(object.get("_label"), "test");
         assertEquals(object.get("key1"), "value1");
@@ -67,7 +67,7 @@ public class EdgeResourceTest extends BaseTest {
         String uri = createURI("edges/6872?key1=value1");
         JSONObject object = postResource(uri);
         printPerformance("POST edge properties", null, uri, sh.stopWatch());
-        object = (JSONObject) object.get("result");
+        object = (JSONObject) object.get("results");
         assertEquals(object.get("_type"), "edge");
         assertEquals(object.get("_label"), "followed_by");
         assertEquals(object.get("key1"), "value1");
@@ -78,7 +78,7 @@ public class EdgeResourceTest extends BaseTest {
         uri = createURI("edges/6872?key2=value2&key3=value3&key1=asdf");
         object = postResource(uri);
         printPerformance("POST edge properties", null, uri, sh.stopWatch());
-        object = (JSONObject) object.get("result");
+        object = (JSONObject) object.get("results");
         assertEquals(object.get("_type"), "edge");
         assertEquals(object.get("_label"), "followed_by");
         assertEquals(object.get("key1"), "asdf");
@@ -95,7 +95,7 @@ public class EdgeResourceTest extends BaseTest {
         JSONObject object = getResource(uri);
         printPerformance("GET vertex out edges ids", null, uri, sh.stopWatch());
         List<String> edgeIds = new ArrayList<String>();
-        for (Object edge : (JSONArray) object.get("result")) {
+        for (Object edge : (JSONArray) object.get("results")) {
             edgeIds.add((String) ((JSONObject) edge).get("_id"));
         }
 
@@ -110,6 +110,6 @@ public class EdgeResourceTest extends BaseTest {
         uri = createURI("vertices/1/outE");
         object = getResource(uri);
         printPerformance("GET vertice out edges", null, uri, sh.stopWatch());
-        assertEquals(((JSONArray) object.get("result")).size(), 0);
+        assertEquals(((JSONArray) object.get("results")).size(), 0);
     }
 }

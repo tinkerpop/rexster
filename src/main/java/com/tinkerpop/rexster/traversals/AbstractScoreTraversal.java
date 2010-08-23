@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.traversals;
 
+import com.tinkerpop.rexster.Tokens;
 import org.json.simple.JSONObject;
 
 /**
@@ -9,14 +10,12 @@ public abstract class AbstractScoreTraversal extends AbstractTraversal {
 
     protected Float score = Float.NaN;
 
-    private static final String SCORE = "score";
-
     protected void preQuery() {
         super.preQuery();
         if (this.allowCached) {
             JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
             if (null != tempResultObject) {
-                this.score = (Float) tempResultObject.get(SCORE);
+                this.score = (Float) tempResultObject.get(Tokens.SCORE);
                 this.success = true;
                 this.usingCachedResult = true;
             }
@@ -25,7 +24,7 @@ public abstract class AbstractScoreTraversal extends AbstractTraversal {
 
     protected void postQuery() {
         if (this.success) {
-            this.resultObject.put(SCORE, this.score);
+            this.resultObject.put(Tokens.SCORE, this.score);
         }
         this.cacheCurrentResultObjectState();
         super.postQuery();

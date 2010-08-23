@@ -36,7 +36,7 @@ public class VertexResource extends BaseResource {
         else
             getVertexEdges(id, direction);
 
-        this.resultObject.put(QUERY_TIME, sh.stopWatch());
+        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
     }
 
@@ -52,11 +52,11 @@ public class VertexResource extends BaseResource {
             vertex = graph.addVertex(id);
         }
         for (String key : (Set<String>) this.requestObject.keySet()) {
-            if (!key.startsWith(UNDERSCORE))
+            if (!key.startsWith(Tokens.UNDERSCORE))
                 vertex.setProperty(key, this.requestObject.get(key));
         }
-        this.resultObject.put(RESULT, new ElementJSONObject(vertex, this.getReturnKeys()));
-        this.resultObject.put(QUERY_TIME, sh.stopWatch());
+        this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys()));
+        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
     }
 
@@ -69,7 +69,7 @@ public class VertexResource extends BaseResource {
         if (null != vertex)
             graph.removeVertex(vertex);
 
-        this.resultObject.put(QUERY_TIME, sh.stopWatch());
+        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
 
     }
@@ -91,7 +91,7 @@ public class VertexResource extends BaseResource {
 
             if (null != vertex) {
                 JSONObject tempRequest = this.getNonRexsterRequest();
-                if (direction.equals(OUT_E) || direction.equals(BOTH_E)) {
+                if (direction.equals(Tokens.OUT_E) || direction.equals(Tokens.BOTH_E)) {
                     for (Edge edge : vertex.getOutEdges()) {
                         if (this.hasPropertyValues(edge, tempRequest)) {
                             if (counter >= start && counter < end) {
@@ -101,7 +101,7 @@ public class VertexResource extends BaseResource {
                         }
                     }
                 }
-                if (direction.equals(IN_E) || direction.equals(BOTH_E)) {
+                if (direction.equals(Tokens.IN_E) || direction.equals(Tokens.BOTH_E)) {
                     for (Edge edge : vertex.getInEdges()) {
                         if (this.hasPropertyValues(edge, tempRequest)) {
                             if (counter >= start && counter < end) {
@@ -113,8 +113,8 @@ public class VertexResource extends BaseResource {
                 }
             }
 
-            this.resultObject.put(RESULT, edgeArray);
-            this.resultObject.put(TOTAL_SIZE, counter);
+            this.resultObject.put(Tokens.RESULTS, edgeArray);
+            this.resultObject.put(Tokens.TOTAL_SIZE, counter);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -123,9 +123,9 @@ public class VertexResource extends BaseResource {
     protected void getSingleVertex(Object id) {
         Vertex vertex = this.getRexsterApplication().getGraph().getVertex(id);
         if (null != vertex) {
-            this.resultObject.put(RESULT, new ElementJSONObject(vertex, this.getReturnKeys()));
+            this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys()));
         } else {
-            this.resultObject.put(RESULT, null);
+            this.resultObject.put(Tokens.RESULTS, null);
         }
     }
 
@@ -160,8 +160,8 @@ public class VertexResource extends BaseResource {
                 counter++;
             }
         }
-        this.resultObject.put(RESULT, vertexArray);
-        this.resultObject.put(TOTAL_SIZE, counter);
+        this.resultObject.put(Tokens.RESULTS, vertexArray);
+        this.resultObject.put(Tokens.TOTAL_SIZE, counter);
     }
 
 }
