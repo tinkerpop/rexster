@@ -2,6 +2,7 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
+import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.parser.GraphMLReader;
 import com.tinkerpop.rexster.traversals.Traversal;
@@ -114,7 +115,12 @@ public class RexsterApplication extends Application {
     public void stop() throws Exception {
         super.stop();
         logger.info("Shutting down " + this.graph);
-        this.graph.shutdown();
+        
+        // graph may not have been initialized properly if an exception gets tossed in
+        // on graph creation
+        if (this.graph != null){
+        	this.graph.shutdown();
+        }
     }
 
     protected static Graph createGraphFromProperties(final Properties properties) throws Exception {
@@ -131,6 +137,23 @@ public class RexsterApplication extends Application {
                 graph = new Neo4jGraph(graphFile);
             }
             ((Neo4jGraph) graph).setAutoTransactions(false);
+        } else if (graphType.equals("orientdb")) {
+        	Properties orientDbProperties = new Properties();
+            orientDbProperties.load(RexsterApplication.class.getResourceAsStream("orientdb.properties"));
+
+            // can't call the open method on orientdb if these two properties aren't
+            // established.
+            if (!orientDbProperties.containsKey("username") || !orientDbProperties.containsKey("password")) {
+            	throw new Exception("Properties for orientdb configuration must include a username and password property.");
+            }
+            
+            String username = orientDbProperties.getProperty("username");
+            String password = orientDbProperties.getProperty("password");
+            
+            // calling the open method opens the connection to graphdb.  looks like the 
+            // implementation of shutdown will call the orientdb close method.
+            graph = new OrientGraph(graphFile).open(username, password);
+        	
         } else if (graphType.equals("tinkergraph")) {
             graph = new TinkerGraph();
             GraphMLReader.inputGraph(graph, new FileInputStream(graphFile));
