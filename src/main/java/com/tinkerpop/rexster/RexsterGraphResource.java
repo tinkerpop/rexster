@@ -8,12 +8,14 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
+import com.tinkerpop.blueprints.pgm.Graph;
+
 import java.util.Map;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterResource extends ServerResource {
+public class RexsterGraphResource extends ServerResource {
 
     @Get
     public Representation evaluate() {
@@ -21,7 +23,17 @@ public class RexsterResource extends ServerResource {
         sh.stopWatch();
         JSONObject resultObject = new JSONObject();
         resultObject.put("name", "Rexster: A RESTful Graph Shell");
-        resultObject.put("graph_count", this.getRexsterApplication().getGraphCount());
+        
+        String graphName = this.getRequest().getResourceRef().getSegments().get(0);
+        Graph graph = this.getRexsterApplication().getGraph(graphName);
+        resultObject.put("graph", graph.toString());
+
+        JSONArray queriesArray = new JSONArray();
+        for (Map.Entry<String, Class> traversal : this.getRexsterApplication().getLoadedTraversalServices(graphName).entrySet()) {
+            queriesArray.add(traversal.getKey());
+        }
+        resultObject.put("traversals", queriesArray);
+        
         resultObject.put("query_time", sh.stopWatch());
         resultObject.put("up_time", this.getTimeAlive());
         resultObject.put("version", RexsterApplication.getVersion());

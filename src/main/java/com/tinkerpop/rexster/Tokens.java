@@ -18,11 +18,11 @@ public class Tokens {
     public static final String EDGE = "edge";
     public static final String RESULTS = "results";
 
-
-    public static final String REXSTER_GRAPH_TYPE = "rexster.graph.type";
-    public static final String REXSTER_GRAPH_FILE = "rexster.graph.file";
-    public static final String REXSTER_CACHE_MAXSIZE = "rexster.cache.maxsize";
-    public static final String REXSTER_PACKAGES_ALLOWED = "rexster.packages.allowed";
+    public static final String REXSTER_GRAPH_NAME = "graph-name";
+    public static final String REXSTER_GRAPH_TYPE = "graph-type";
+    public static final String REXSTER_GRAPH_FILE = "graph-file";
+    public static final String REXSTER_CACHE_MAXSIZE = "rexster.cache-maxsize";
+    public static final String REXSTER_PACKAGES_ALLOWED = "packages-allowed";
 
     public static final String DESCRIPTION = "description";
     public static final String PARAMETERS = "parameters";

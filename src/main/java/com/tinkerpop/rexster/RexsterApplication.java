@@ -6,6 +6,10 @@ import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.parser.GraphMLReader;
 import com.tinkerpop.rexster.traversals.Traversal;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.restlet.Application;
@@ -24,27 +28,46 @@ public class RexsterApplication extends Application {
     private static final String version = "0.1-SNAPSHOT";
     private final long startTime = System.currentTimeMillis();
     protected static final Logger logger = Logger.getLogger(RexsterApplication.class);
-    private Graph graph;
     private ResultObjectCache resultObjectCache;
-    private Properties properties;
-    private Map<String, Class> loadedTraversals = new HashMap<String, Class>();
-
+    private Configuration properties;
+    private Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+    
     static {
         PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
     }
 
-    public RexsterApplication(final Graph graph) {
-        this.graph = graph;
-        logger.info("Graph " + this.graph + " loaded");
+    public RexsterApplication(final String graphName, final Graph graph) {
+    	RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName); 
+        this.graphs.put(graphName, rag);
+        logger.info("Graph " + rag.getGraph() + " loaded");
         this.resultObjectCache = new ResultObjectCache();
     }
 
-    public RexsterApplication(final Properties properties) {
+    public RexsterApplication(final XMLConfiguration properties) {
         try {
             this.properties = properties;
-            this.graph = createGraphFromProperties(this.properties);
-            logger.info("Graph " + this.graph + " loaded");
-            this.resultObjectCache = new ResultObjectCache(this.properties);
+            
+            // get the graph configurations from the XML config file
+            List graphConfigs = properties.configurationsAt("graphs.graph");
+            
+            // create one graph for each configuration (each <graph> element)
+        	for(Iterator it = graphConfigs.iterator(); it.hasNext();)
+        	{
+        		HierarchicalConfiguration graphConfig = (HierarchicalConfiguration) it.next();
+        	    
+        		Graph graph = createGraphFromProperties(graphConfig);
+        		
+        		RexsterApplicationGraph rag = new RexsterApplicationGraph(graphConfig.getString(Tokens.REXSTER_GRAPH_NAME));
+        		rag.setGraph(graph);
+        		rag.loadPackageNames(graphConfig.getString(Tokens.REXSTER_PACKAGES_ALLOWED));
+        		
+        		this.graphs.put(rag.getGraphName(), rag);
+        		
+	            logger.info("Graph " + graph + " loaded");
+        	}
+        	
+        	this.resultObjectCache = new ResultObjectCache();
+        	
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -54,54 +77,66 @@ public class RexsterApplication extends Application {
 
     public Restlet createRoot() {
         Router router = new Router(getContext());
-        router.attachDefault(RexsterResource.class);
-        ServiceLoader<Traversal> traversalServices = ServiceLoader.load(Traversal.class);
-        String packages = this.properties.getProperty(Tokens.REXSTER_PACKAGES_ALLOWED);
-        if (null != packages) {
-            Set<String> packageNames = new HashSet<String>(Arrays.asList(packages.substring(1, packages.length() - 1).split(",")));
-            //System.out.println(packageNames);
-            for (Traversal traversalService : traversalServices) {
-                if (-1 == traversalService.getTraversalName().indexOf("/")) {
-                    if (packageNames.contains("")) {
-                        logger.info("loading traversal: /" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
-                        router.attach("/" + traversalService.getTraversalName(), traversalService.getClass());
-                        this.loadedTraversals.put(traversalService.getTraversalName(), traversalService.getClass());
-                    }
-                } else {
-                    if (packageNames.contains(traversalService.getTraversalName().substring(0, traversalService.getTraversalName().indexOf("/")))) {
-                        logger.info("loading traversal: /" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
-                        router.attach("/" + traversalService.getTraversalName(), traversalService.getClass());
-                        this.loadedTraversals.put(traversalService.getTraversalName(), traversalService.getClass());
-                    }
-                }
-            }
-        } else {
-            for (Traversal traversalService : traversalServices) {
-                logger.info("loading traversal: /" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
-                router.attach("/" + traversalService.getTraversalName(), traversalService.getClass());
-                this.loadedTraversals.put(traversalService.getTraversalName(), traversalService.getClass());
-            }
-        }
-
-        router.attach("/vertices", VertexResource.class);
-        router.attach("/vertices/{id}", VertexResource.class);
-        router.attach("/vertices/{id}/{direction}", VertexResource.class);
         
-        router.attach("/edges", EdgeResource.class);
-        router.attach("/edges/{id}", EdgeResource.class);
+        // return Rexster information
+        router.attachDefault(RexsterResource.class);
+        
+        ServiceLoader<Traversal> traversalServices = ServiceLoader.load(Traversal.class);
+        
+        for (RexsterApplicationGraph rag : this.graphs.values()){
+        	        
+        	// return specific graph information
+	        router.attach("/" + rag.getGraphName(), RexsterGraphResource.class);
+	        
+	        if (rag.hasPackages()) {
+	        	for (Traversal traversalService : traversalServices) {
+	                if (-1 == traversalService.getTraversalName().indexOf("/")) {
+	                    if (rag.getPackageNames().contains("")) {
+	                        logger.info("loading traversal: /" + rag.getGraphName() + "/" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
+	                        router.attach("/" + rag.getGraphName() + "/" + traversalService.getTraversalName(), traversalService.getClass());
+	                        rag.getLoadedTraversals().put(traversalService.getTraversalName(), traversalService.getClass());
+	                    }
+	                } else {
+	                    if (rag.getPackageNames().contains(traversalService.getTraversalName().substring(0, traversalService.getTraversalName().indexOf("/")))) {
+	                        logger.info("loading traversal: /" + rag.getGraphName() + "/" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
+	                        router.attach("/" + rag.getGraphName() + "/" + traversalService.getTraversalName(), traversalService.getClass());
+	                        rag.getLoadedTraversals().put(traversalService.getTraversalName(), traversalService.getClass());
+	                    }
+	                }
+	            }
+	        } else {
+	            for (Traversal traversalService : traversalServices) {
+	                logger.info("loading traversal: /" + rag.getGraphName() + "/" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
+	                router.attach("/" + rag.getGraphName() + "/" + traversalService.getTraversalName(), traversalService.getClass());
+	                rag.getLoadedTraversals().put(traversalService.getTraversalName(), traversalService.getClass());
+	            }
+	        }
+	
+	        router.attach("/" + rag.getGraphName() + "/vertices", VertexResource.class);
+	        router.attach("/" + rag.getGraphName() + "/vertices/{id}", VertexResource.class);
+	        router.attach("/" + rag.getGraphName() + "/vertices/{id}/{direction}", VertexResource.class);
+	        
+	        router.attach("/" + rag.getGraphName() + "/edges", EdgeResource.class);
+	        router.attach("/" + rag.getGraphName() + "/edges/{id}", EdgeResource.class);
+        
+        }
         return router;
     }
 
-    public Map<String, Class> getLoadedTraversalServices() {
-        return this.loadedTraversals;
+    public Map<String, Class> getLoadedTraversalServices(String graphName) {
+        return this.graphs.get(graphName).getLoadedTraversals();
     }
 
     public static String getVersion() {
         return version;
     }
 
-    public Graph getGraph() {
-        return this.graph;
+    public Graph getGraph(String graphName) {
+        return this.graphs.get(graphName).getGraph();
+    }
+    
+    public int getGraphCount() {
+        return this.graphs.size();
     }
 
     public ResultObjectCache getResultObjectCache() {
@@ -114,18 +149,25 @@ public class RexsterApplication extends Application {
 
     public void stop() throws Exception {
         super.stop();
-        logger.info("Shutting down " + this.graph);
         
         // graph may not have been initialized properly if an exception gets tossed in
         // on graph creation
-        if (this.graph != null){
-        	this.graph.shutdown();
+        for (RexsterApplicationGraph rag : this.graphs.values()){
+
+        	Graph graph = rag.getGraph();
+            logger.info("Shutting down " + graph);
+        	if (graph != null){
+            	graph.shutdown();
+            }
         }
+        
     }
 
-    protected static Graph createGraphFromProperties(final Properties properties) throws Exception {
-        String graphType = properties.getProperty(Tokens.REXSTER_GRAPH_TYPE);
-        String graphFile = properties.getProperty(Tokens.REXSTER_GRAPH_FILE);
+    protected static Graph createGraphFromProperties(final Configuration properties) throws Exception {
+        
+	    String graphType = properties.getString(Tokens.REXSTER_GRAPH_TYPE);
+        String graphFile = properties.getString(Tokens.REXSTER_GRAPH_FILE);
+	
         Graph graph;
         if (graphType.equals("neo4j")) {
             try {
@@ -157,7 +199,6 @@ public class RexsterApplication extends Application {
         } else if (graphType.equals("tinkergraph")) {
             graph = new TinkerGraph();
             GraphMLReader.inputGraph(graph, new FileInputStream(graphFile));
-
         } else {
             throw new Exception(graphType + " is not a supported graph type");
         }

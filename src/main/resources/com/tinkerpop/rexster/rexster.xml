@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rexster>
+	<cache-maxsize>1000</cache-maxsize>
+  	<webserver-port>8182</webserver-port>
+    <graphs>
+      <graph>
+        <graph-name>gratefulgraph</graph-name>
+	    <graph-type>tinkergraph</graph-type>
+        <graph-file>data/grateful/grateful-concerts.xml</graph-file>
+        <packages-allowed>;grateful</packages-allowed>
+      </graph>
+      <graph>
+        <graph-name>gratefulgraphagain</graph-name>
+	    <graph-type>tinkergraph</graph-type>
+        <graph-file>data/grateful/grateful-concerts.xml</graph-file>
+        <packages-allowed>;grateful</packages-allowed>
+      </graph>
+    </graphs>
+</rexster>

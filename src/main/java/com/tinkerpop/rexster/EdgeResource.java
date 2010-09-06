@@ -28,11 +28,11 @@ public class EdgeResource extends BaseResource {
         this.buildRequestObject(queryParameters);
 
         String id = (String) getRequest().getAttributes().get(Tokens.ID);
-
+        String graphName = this.getRequest().getResourceRef().getSegments().get(0);
         if (null == id)
-            getAllEdges();
+            getAllEdges(graphName);
         else
-            getSingleEdge(id);
+            getSingleEdge(graphName, id);
 
 
         this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
@@ -43,8 +43,9 @@ public class EdgeResource extends BaseResource {
     public Representation postResource() {
 
         this.buildRequestObject(createQueryMap(this.getRequest().getResourceRef().getQueryAsForm()));
-
-        final Graph graph = this.getRexsterApplication().getGraph();
+        
+        String graphName = this.getRequest().getResourceRef().getSegments().get(0);
+        final Graph graph = this.getRexsterApplication().getGraph(graphName);
         final String id = (String) getRequest().getAttributes().get(Tokens.ID);
         String inV = null;
         Object temp = this.requestObject.get(Tokens._IN_V);
@@ -83,7 +84,9 @@ public class EdgeResource extends BaseResource {
     public Representation deleteResource() {
         // TODO: delete individual properties
         final String id = (String) getRequest().getAttributes().get(Tokens.ID);
-        final Graph graph = this.getRexsterApplication().getGraph();
+        
+        String graphName = this.getRequest().getResourceRef().getSegments().get(0);
+        final Graph graph = this.getRexsterApplication().getGraph(graphName);
         final Edge edge = graph.getEdge(id);
         if (null != edge)
             graph.removeEdge(edge);
@@ -93,7 +96,7 @@ public class EdgeResource extends BaseResource {
 
     }
 
-    public void getAllEdges() {
+    public void getAllEdges(String graphName) {
         Long start = this.getStartOffset();
         if (null == start)
             start = 0l;
@@ -103,7 +106,7 @@ public class EdgeResource extends BaseResource {
 
         long counter = 0l;
         JSONArray edgeArray = new JSONArray();
-        for (Edge edge : this.getRexsterApplication().getGraph().getEdges()) {
+        for (Edge edge : this.getRexsterApplication().getGraph(graphName).getEdges()) {
             if (counter >= start && counter < end) {
                 edgeArray.add(new ElementJSONObject(edge, this.getReturnKeys()));
             }
@@ -115,8 +118,8 @@ public class EdgeResource extends BaseResource {
 
     }
 
-    public void getSingleEdge(final Object id) {
-        final Edge edge = this.getRexsterApplication().getGraph().getEdge(id);
+    public void getSingleEdge(String graphName, final Object id) {
+        final Edge edge = this.getRexsterApplication().getGraph(graphName).getEdge(id);
         if (null != edge) {
             this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys()));
         } else {

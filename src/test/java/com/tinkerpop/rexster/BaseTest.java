@@ -1,6 +1,8 @@
 package com.tinkerpop.rexster;
 
 import junit.framework.TestCase;
+
+import org.apache.commons.configuration.XMLConfiguration;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.restlet.resource.ClientResource;
@@ -19,13 +21,22 @@ public abstract class BaseTest extends TestCase {
     private static JSONParser parser = new JSONParser();
     private static Logger logger = Logger.getLogger(BaseTest.class.getName());
     public static final String baseURI = "http://localhost:8182/";
+    
+    public void BaseTest() {
+    	try {
+    		XMLConfiguration properties = new XMLConfiguration();
+            properties.load(RexsterApplication.class.getResourceAsStream("rexster.xml"));
+    	} catch (Exception e){
+    		e.printStackTrace();
+    	}
+    }
 
     public void startWebServer() throws Exception {
         Thread thread = new Thread() {
             public void run() {
                 try {
-                    Properties properties = new Properties();
-                    properties.load(RexsterApplication.class.getResourceAsStream("rexster.properties"));
+                	XMLConfiguration properties = new XMLConfiguration();
+                    properties.load(RexsterApplication.class.getResourceAsStream("rexster.xml"));                   
                     webServer = new WebServer(properties, false);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -51,9 +62,13 @@ public abstract class BaseTest extends TestCase {
     public static void deleteResource(String uri) throws Exception {
         new ClientResource(uri).delete().getStream();
     }
+    
+    public static String createURI(String extension){
+    	return createURI("gratefulgraph", extension);
+    }
 
-    public static String createURI(String extension) {
-        return baseURI + extension;
+    public static String createURI(String graphName, String extension) {
+        return baseURI + graphName + "/" + extension;
     }
 
     public static void printPerformance(String name, Integer events, String eventName, double timeInMilliseconds) {

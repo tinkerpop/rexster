@@ -10,7 +10,9 @@ import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
+import org.restlet.data.Form;
 import org.restlet.data.MediaType;
+import org.restlet.data.Reference;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
@@ -34,7 +36,6 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
 
     public AbstractTraversal() {
         if (null != this.getApplication()) {
-            this.graph = ((RexsterApplication) this.getApplication()).getGraph();
             this.resultObjectCache = this.getRexsterApplication().getResultObjectCache();
         }
     }
@@ -42,6 +43,10 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
     //@Get
     public Representation evaluate() {
         Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());
+        
+        String graphName = this.getRequest().getResourceRef().getSegments().get(0);
+        this.graph = ((RexsterApplication) this.getApplication()).getGraph(graphName);
+        
         this.buildRequestObject(queryParameters);
         this.preQuery();
         if (!usingCachedResult)
@@ -52,6 +57,10 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
 
     @Get
     public Representation evaluate(final String json) {
+    	
+    	String graphName = this.getRequest().getResourceRef().getSegments().get(0);
+        this.graph = ((RexsterApplication) this.getApplication()).getGraph(graphName);
+    	
         if (null == json || json.length() == 0)
             return this.evaluate();
         else {

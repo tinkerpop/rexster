@@ -41,9 +41,9 @@
         </dependency>
         <!-- JSON SUPPORT -->
         <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1</version>
+            <groupId>local.org.json.simple</groupId>
+        	<artifactId>org.json.simple</artifactId>
+        	<version>1.1</version>
         </dependency>
         <!-- REST SUPPORT -->
         <dependency>
@@ -68,6 +68,12 @@
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
         </dependency>
+        <!-- CONFIGURATION -->
+        <dependency>
+		    <groupId>commons-configuration</groupId>
+		    <artifactId>commons-configuration</artifactId>
+		    <version>1.6</version>
+		</dependency>
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>

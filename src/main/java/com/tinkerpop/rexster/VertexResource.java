@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -28,13 +29,15 @@ public class VertexResource extends BaseResource {
         this.buildRequestObject(queryParameters);
         String id = (String) getRequest().getAttributes().get(Tokens.ID);
         String direction = (String) getRequest().getAttributes().get(Tokens.DIRECTION);
-
+        
+    	String graphName = this.getRequest().getResourceRef().getSegments().get(0);
+        
         if (null == direction && null == id)
-            getVertices();
+            getVertices(graphName);
         else if (null == direction)
-            getSingleVertex(id);
+            getSingleVertex(graphName, id);
         else
-            getVertexEdges(id, direction);
+            getVertexEdges(graphName, id, direction);
 
         this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
@@ -43,8 +46,9 @@ public class VertexResource extends BaseResource {
     @Post
     public Representation postResource() {
         this.buildRequestObject(createQueryMap(this.getRequest().getResourceRef().getQueryAsForm()));
-
-        final Graph graph = this.getRexsterApplication().getGraph();
+        
+        String graphName = this.getRequest().getResourceRef().getSegments().get(0);
+        final Graph graph = this.getRexsterApplication().getGraph(graphName);
         final Object id = getRequest().getAttributes().get(Tokens.ID);
 
         Vertex vertex = graph.getVertex(id);
@@ -64,7 +68,9 @@ public class VertexResource extends BaseResource {
     public Representation deleteResource() {
         // TODO: delete individual properties
         final String id = (String) getRequest().getAttributes().get(Tokens.ID);
-        final Graph graph = this.getRexsterApplication().getGraph();
+        
+        String graphName = this.getRequest().getResourceRef().getSegments().get(0);
+        final Graph graph = this.getRexsterApplication().getGraph(graphName);
         final Vertex vertex = graph.getVertex(id);
         if (null != vertex)
             graph.removeVertex(vertex);
@@ -76,7 +82,7 @@ public class VertexResource extends BaseResource {
 
     ///////////////////////
 
-    protected void getVertexEdges(Object vertexId, String direction) {
+    protected void getVertexEdges(String graphName, Object vertexId, String direction) {
         try {
             Long start = this.getStartOffset();
             if (null == start)
@@ -86,7 +92,7 @@ public class VertexResource extends BaseResource {
                 end = Long.MAX_VALUE;
 
             long counter = 0l;
-            Vertex vertex = this.getRexsterApplication().getGraph().getVertex(vertexId);
+            Vertex vertex = this.getRexsterApplication().getGraph(graphName).getVertex(vertexId);
             JSONArray edgeArray = new JSONArray();
 
             if (null != vertex) {
@@ -120,8 +126,8 @@ public class VertexResource extends BaseResource {
         }
     }
 
-    protected void getSingleVertex(Object id) {
-        Vertex vertex = this.getRexsterApplication().getGraph().getVertex(id);
+    protected void getSingleVertex(String graphName, Object id) {
+        Vertex vertex = this.getRexsterApplication().getGraph(graphName).getVertex(id);
         if (null != vertex) {
             this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys()));
         } else {
@@ -130,7 +136,7 @@ public class VertexResource extends BaseResource {
     }
 
 
-    protected void getVertices() {
+    protected void getVertices(String graphName) {
         Long start = this.getStartOffset();
         if (null == start)
             start = 0l;
@@ -147,9 +153,9 @@ public class VertexResource extends BaseResource {
         }
         Iterable<? extends Element> itty;
         if (null != key) {
-            itty = this.getRexsterApplication().getGraph().getIndex().get(key, this.requestObject.get(key));
+            itty = this.getRexsterApplication().getGraph(graphName).getIndex().get(key, this.requestObject.get(key));
         } else {
-            itty = this.getRexsterApplication().getGraph().getVertices();
+            itty = this.getRexsterApplication().getGraph(graphName).getVertices();
         }
 
         if (null != itty) {
