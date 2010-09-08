@@ -9,6 +9,7 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.rexster.traversals.Traversal;
 
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class RexsterGraphResource extends ServerResource {
         resultObject.put("graph", graph.toString());
 
         JSONArray queriesArray = new JSONArray();
-        for (Map.Entry<String, Class> traversal : this.getRexsterApplication().getLoadedTraversalServices(graphName).entrySet()) {
+        for (Map.Entry<String, Class<? extends Traversal>> traversal : this.getRexsterApplication().getLoadedTraversalServices(graphName).entrySet()) {
             queriesArray.add(traversal.getKey());
         }
         resultObject.put("traversals", queriesArray);

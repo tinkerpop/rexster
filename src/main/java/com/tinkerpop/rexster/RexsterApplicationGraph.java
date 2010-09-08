@@ -7,50 +7,28 @@ import java.util.Map;
 import java.util.Set;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.rexster.traversals.Traversal;
 
 /**
  * Holds a graph, its assigned traversals and packages.
  */
 public class RexsterApplicationGraph {
-	/**
-	 * The graph that is loaded to Rexster. 
-	 */
+	
 	private Graph graph;
-	
-	/**
-	 * The list of traversals loaded for this graph.
-	 */
-	private Map<String, Class> loadedTraversals = new HashMap<String, Class>();
-	
-	/**
-	 * The name of the graph, which should be unique for the Rexster instance.
-	 */
+	private Map<String, Class<? extends Traversal>> loadedTraversals = new HashMap<String, Class<? extends Traversal>>();
 	private String graphName;
-	
 	private Set<String> packageNames;
 
-	/**
-	 * Create a new object.
-	 * @param graphName The name of the graph.
-	 */
-	public RexsterApplicationGraph(String graphName) {
+	public RexsterApplicationGraph(String graphName, Graph graph) {
 		this.graphName = graphName;
+		this.graph = graph;
 	}
 	
-	/**
-	 * Create a new object.
-	 * @param graphName The name of the graph.
-	 * @param packageNames The package names in comma delimited format.
-	 */
-	public RexsterApplicationGraph(String graphName, String packageNames) {
+	public RexsterApplicationGraph(String graphName, Graph graph, String packageNames) {
 		this.graphName = graphName;
 		this.loadPackageNames(packageNames);
 	}
 	
-	/**
-	 * Determines if there are any package names configured for this graph.
-	 * @return True if there are packages and false otherwise.
-	 */
 	public boolean hasPackages(){
 		return this.packageNames != null && this.packageNames.size() > 0;
 	}
@@ -59,15 +37,11 @@ public class RexsterApplicationGraph {
 		return graphName;
 	}
 
-	public void setGraphName(String graphName) {
-		this.graphName = graphName;
-	}
-
-	public Map<String, Class> getLoadedTraversals() {
+	public Map<String, Class<? extends Traversal>> getLoadedTraversals() {
 		return loadedTraversals;
 	}
 
-	public void setLoadedTraversals(Map<String, Class> loadedTraversals) {
+	public void setLoadedTraversals(Map<String, Class<? extends Traversal>> loadedTraversals) {
 		this.loadedTraversals = loadedTraversals;
 	}
 
@@ -75,19 +49,11 @@ public class RexsterApplicationGraph {
 		return graph;
 	}
 
-	public void setGraph(Graph graph) {
-		this.graph = graph;
-	}
-
 	public Set<String> getPackageNames() {
 		return packageNames;
 	}
-
-	public void setPackageNames(Set<String> packageNames) {
-		this.packageNames = packageNames;
-	}
 	
-	public void loadPackageNames(String packageNameString) {
+    public void loadPackageNames(String packageNameString) {
 		this.packageNames = new HashSet<String>(Arrays.asList(packageNameString.split(";")));
 	}
 }

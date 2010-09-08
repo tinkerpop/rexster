@@ -9,6 +9,7 @@ import com.tinkerpop.rexster.traversals.Traversal;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -17,19 +18,23 @@ import org.restlet.Restlet;
 import org.restlet.routing.Router;
 
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class RexsterApplication extends Application {
 
+    protected static final Logger logger = Logger.getLogger(RexsterApplication.class);
+    
     private static final String version = "0.1-SNAPSHOT";
     private final long startTime = System.currentTimeMillis();
-    protected static final Logger logger = Logger.getLogger(RexsterApplication.class);
     private ResultObjectCache resultObjectCache;
-    private Configuration properties;
+    
     private Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
     
     static {
@@ -37,51 +42,51 @@ public class RexsterApplication extends Application {
     }
 
     public RexsterApplication(final String graphName, final Graph graph) {
-    	RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName); 
+    	RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph); 
         this.graphs.put(graphName, rag);
         logger.info("Graph " + rag.getGraph() + " loaded");
         this.resultObjectCache = new ResultObjectCache();
     }
 
     public RexsterApplication(final XMLConfiguration properties) {
-        try {
-            this.properties = properties;
-            
-            // get the graph configurations from the XML config file
-            List graphConfigs = properties.configurationsAt("graphs.graph");
-            
-            // create one graph for each configuration (each <graph> element)
-        	for(Iterator it = graphConfigs.iterator(); it.hasNext();)
-        	{
-        		HierarchicalConfiguration graphConfig = (HierarchicalConfiguration) it.next();
-        	    
+        
+        // get the graph configurations from the XML config file
+        List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
+        
+        // create one graph for each configuration for each <graph> element
+        Iterator<HierarchicalConfiguration> it = graphConfigs.iterator();
+    	while (it.hasNext())
+    	{
+    		HierarchicalConfiguration graphConfig = it.next();
+    		String graphName = graphConfig.getString(Tokens.REXSTER_GRAPH_NAME);
+    		
+    		// one graph failing initialization will not prevent the rest in 
+    		// their attempt to be created
+    		try {
         		Graph graph = createGraphFromProperties(graphConfig);
-        		
-        		RexsterApplicationGraph rag = new RexsterApplicationGraph(graphConfig.getString(Tokens.REXSTER_GRAPH_NAME));
-        		rag.setGraph(graph);
+        		RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph);
         		rag.loadPackageNames(graphConfig.getString(Tokens.REXSTER_PACKAGES_ALLOWED));
         		
         		this.graphs.put(rag.getGraphName(), rag);
         		
-	            logger.info("Graph " + graph + " loaded");
-        	}
+	            logger.info("Graph " + graphName + " - " + graph + " loaded");
+    		} catch (Exception e) {
+                logger.warn("Could not load graph " + graphName + ". Please check the XML configuration.", e);
+            }
+    	}
+    	
+    	this.resultObjectCache = new ResultObjectCache();
         	
-        	this.resultObjectCache = new ResultObjectCache();
-        	
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
-
-    // todo: clean up
 
     public Restlet createRoot() {
         Router router = new Router(getContext());
         
-        // return Rexster information
+        // provides Rexster server information
         router.attachDefault(RexsterResource.class);
         
-        ServiceLoader<Traversal> traversalServices = ServiceLoader.load(Traversal.class);
+        // get a list of all traversal implementations.
+        ServiceLoader<? extends Traversal> traversalServices = ServiceLoader.load(Traversal.class);
         
         for (RexsterApplicationGraph rag : this.graphs.values()){
         	        
@@ -123,7 +128,7 @@ public class RexsterApplication extends Application {
         return router;
     }
 
-    public Map<String, Class> getLoadedTraversalServices(String graphName) {
+    public Map<String, Class<? extends Traversal>> getLoadedTraversalServices(String graphName) {
         return this.graphs.get(graphName).getLoadedTraversals();
     }
 
@@ -150,12 +155,14 @@ public class RexsterApplication extends Application {
     public void stop() throws Exception {
         super.stop();
         
-        // graph may not have been initialized properly if an exception gets tossed in
-        // on graph creation
+        // need to shutdown all the graphs that were started with the web server
         for (RexsterApplicationGraph rag : this.graphs.values()){
 
         	Graph graph = rag.getGraph();
             logger.info("Shutting down " + graph);
+            
+            // graph may not have been initialized properly if an exception gets tossed in
+            // on graph creation
         	if (graph != null){
             	graph.shutdown();
             }
@@ -170,27 +177,35 @@ public class RexsterApplication extends Application {
 	
         Graph graph;
         if (graphType.equals("neo4j")) {
-            try {
-                Properties neo4jProperties = new Properties();
-                neo4jProperties.load(RexsterApplication.class.getResourceAsStream("neo4j.properties"));
-                //logger.info("Loading Neo4j properties: " + neo4jProperties.toString());
-                graph = new Neo4jGraph(graphFile, new HashMap<String, String>((Map) neo4jProperties));
-            } catch (IOException e) {
-                graph = new Neo4jGraph(graphFile);
+        	
+        	// get the <properties> section of the xml configuration
+            HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) properties;
+        	SubnodeConfiguration neo4jSpecificConfiguration = graphSectionConfig.configurationAt(
+        			Tokens.REXSTER_GRAPH_PROPERTIES);
+        	
+        	// properties to initialize the neo4j instance.
+        	HashMap<String, String> neo4jProperties = new HashMap<String, String>();
+
+            // read the properties from the xml file and convert them to properties
+            // to be injected into neo4j.
+            Iterator<String> neo4jSpecificConfigurationKeys = neo4jSpecificConfiguration.getKeys();
+            while (neo4jSpecificConfigurationKeys.hasNext()){
+            	String key = neo4jSpecificConfigurationKeys.next();
+            	neo4jProperties.put(key, neo4jSpecificConfiguration.getString(key));
             }
+
+            graph = new Neo4jGraph(graphFile, neo4jProperties);
+
             ((Neo4jGraph) graph).setAutoTransactions(false);
         } else if (graphType.equals("orientdb")) {
-        	Properties orientDbProperties = new Properties();
-            orientDbProperties.load(RexsterApplication.class.getResourceAsStream("orientdb.properties"));
-
-            // can't call the open method on orientdb if these two properties aren't
-            // established.
-            if (!orientDbProperties.containsKey("username") || !orientDbProperties.containsKey("password")) {
-            	throw new Exception("Properties for orientdb configuration must include a username and password property.");
-            }
-            
-            String username = orientDbProperties.getProperty("username");
-            String password = orientDbProperties.getProperty("password");
+        	
+        	// get the <properties> section of the xml configuration
+            HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) properties;
+         	SubnodeConfiguration orientDbSpecificConfiguration = graphSectionConfig.configurationAt(
+         			Tokens.REXSTER_GRAPH_PROPERTIES);
+        	
+        	String username = orientDbSpecificConfiguration.getString("username");
+            String password = orientDbSpecificConfiguration.getString("password");
             
             // calling the open method opens the connection to graphdb.  looks like the 
             // implementation of shutdown will call the orientdb close method.

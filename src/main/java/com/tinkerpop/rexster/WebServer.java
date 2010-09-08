@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -9,7 +8,6 @@ import org.restlet.data.Protocol;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Properties;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
