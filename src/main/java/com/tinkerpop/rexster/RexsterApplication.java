@@ -59,20 +59,25 @@ public class RexsterApplication extends Application {
     	{
     		HierarchicalConfiguration graphConfig = it.next();
     		String graphName = graphConfig.getString(Tokens.REXSTER_GRAPH_NAME);
+    		boolean enabled = graphConfig.getBoolean(Tokens.REXSTER_GRAPH_ENABLED, true);
     		
-    		// one graph failing initialization will not prevent the rest in 
-    		// their attempt to be created
-    		try {
-        		Graph graph = createGraphFromProperties(graphConfig);
-        		RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph);
-        		rag.loadPackageNames(graphConfig.getString(Tokens.REXSTER_PACKAGES_ALLOWED));
-        		
-        		this.graphs.put(rag.getGraphName(), rag);
-        		
-	            logger.info("Graph " + graphName + " - " + graph + " loaded");
-    		} catch (Exception e) {
-                logger.warn("Could not load graph " + graphName + ". Please check the XML configuration.", e);
-            }
+    		if (enabled) {
+	    		// one graph failing initialization will not prevent the rest in 
+	    		// their attempt to be created
+	    		try {
+	        		Graph graph = createGraphFromProperties(graphConfig);
+	        		RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph);
+	        		rag.loadPackageNames(graphConfig.getString(Tokens.REXSTER_PACKAGES_ALLOWED));
+	        		
+	        		this.graphs.put(rag.getGraphName(), rag);
+	        		
+		            logger.info("Graph " + graphName + " - " + graph + " loaded");
+	    		} catch (Exception e) {
+	                logger.warn("Could not load graph " + graphName + ". Please check the XML configuration.", e);
+	            }
+    		} else {
+    			logger.info("Graph " + graphName + " - " + " not enabled and not loaded.");
+    		}
     	}
     	
     	this.resultObjectCache = new ResultObjectCache();

@@ -10,6 +10,7 @@
         <packages-allowed>;grateful</packages-allowed>
       </graph>
       <graph>
+        <graph-enabled>false</graph-enabled>
         <graph-name>orientdbsample</graph-name>
 	    <graph-type>orientdb</graph-type>
         <graph-file>local:C:/data/graph/graph</graph-file>
@@ -20,6 +21,7 @@
         </properties>
       </graph>
       <graph>
+        <graph-enabled>false</graph-enabled>
         <graph-name>neo4jsample</graph-name>
 	    <graph-type>neo4j</graph-type>
         <graph-file>/tmp/rexster-graph</graph-file>
