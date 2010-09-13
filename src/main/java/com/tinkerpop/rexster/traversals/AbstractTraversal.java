@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.traversals;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.rexster.BaseResource;
@@ -137,7 +138,7 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
 
     protected void postQuery() {
         if (graph instanceof Neo4jGraph) {
-            ((Neo4jGraph) graph).stopTransaction(true);
+            ((Neo4jGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         }
         this.resultObject.put(Tokens.SUCCESS, this.success);
         if (!this.success) {

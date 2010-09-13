@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
@@ -201,7 +202,7 @@ public class RexsterApplication extends Application {
 
             graph = new Neo4jGraph(graphFile, neo4jProperties);
 
-            ((Neo4jGraph) graph).setAutoTransactions(false);
+            ((Neo4jGraph) graph).setTransactionMode(TransactionalGraph.Mode.MANUAL);
         } else if (graphType.equals("orientdb")) {
         	
         	// get the <properties> section of the xml configuration
