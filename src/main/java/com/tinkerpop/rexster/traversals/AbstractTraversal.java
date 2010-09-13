@@ -125,9 +125,6 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
     }
 
     protected void preQuery() {
-        if (graph instanceof Neo4jGraph) {
-            ((Neo4jGraph) graph).startTransaction();
-        }
         this.cacheRequestURI = this.createCacheRequestURI();
         Boolean temp = (Boolean) this.requestObject.get(Tokens.ALLOW_CACHED);
         if (null != temp) {
@@ -137,9 +134,6 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
     }
 
     protected void postQuery() {
-        if (graph instanceof Neo4jGraph) {
-            ((Neo4jGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-        }
         this.resultObject.put(Tokens.SUCCESS, this.success);
         if (!this.success) {
             this.addApiToResultObject();
