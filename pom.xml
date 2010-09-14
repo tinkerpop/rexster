@@ -11,8 +11,8 @@
     <name>Rexster: A RESTful Graph Shell</name>
     <description>
         Rexster is a RESTful graph shell for Blueprints-enabled graphs. An HTTP-based interface provides
-        language agnostic connectivity. Support exists for graph traversals aimed at searching, 
-	scoring, ranking, and, in concert, recommending.
+        language agnostic connectivity. Support exists for graph traversals aimed at searching,
+        scoring, ranking, and, in concert, recommending.
     </description>
     <developers>
         <developer>
@@ -24,6 +24,13 @@
     <inceptionYear>2009</inceptionYear>
     <dependencies>
         <!-- PROPERTY GRAPH MODEL SUPPORT -->
+        <dependency>
+            <groupId>com.tinkerpop</groupId>
+            <artifactId>graphdb-deps</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <type>pom</type>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>blueprints</artifactId>
@@ -70,10 +77,10 @@
         </dependency>
         <!-- CONFIGURATION -->
         <dependency>
-		    <groupId>commons-configuration</groupId>
-		    <artifactId>commons-configuration</artifactId>
-		    <version>1.6</version>
-		</dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>1.6</version>
+        </dependency>
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>
@@ -84,10 +91,6 @@
     </dependencies>
     <repositories>
         <repository>
-            <id>maven repository</id>
-            <url>http://mvnrepository.com</url>
-        </repository>
-        <repository>
             <id>maven-restlet</id>
             <name>Public online Restlet repository</name>
             <url>http://maven.restlet.org</url>
@@ -96,6 +99,10 @@
             <id>tinkerpop-repository</id>
             <name>TinkerPop Maven2 Repository</name>
             <url>http://tinkerpop.com/maven2</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
         </repository>
     </repositories>
     <properties>
