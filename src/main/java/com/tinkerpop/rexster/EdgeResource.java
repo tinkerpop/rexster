@@ -36,7 +36,7 @@ public class EdgeResource extends BaseResource {
 
 
         this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-        return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
+        return getStringRepresentation();
     }
 
     @Post
@@ -77,7 +77,7 @@ public class EdgeResource extends BaseResource {
 
         this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
 
-        return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
+        return getStringRepresentation();
     }
 
     @Delete
@@ -92,7 +92,7 @@ public class EdgeResource extends BaseResource {
             graph.removeEdge(edge);
 
         this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-        return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
+        return getStringRepresentation();
 
     }
 

@@ -13,19 +13,20 @@ import java.util.Map;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterResource extends ServerResource {
+public class RexsterResource extends BaseResource {
 
     @Get
     public Representation evaluate() {
         StatisticsHelper sh = new StatisticsHelper();
         sh.stopWatch();
-        JSONObject resultObject = new JSONObject();
-        resultObject.put("name", "Rexster: A RESTful Graph Shell");
-        resultObject.put("graph_count", this.getRexsterApplication().getGraphCount());
-        resultObject.put("query_time", sh.stopWatch());
-        resultObject.put("up_time", this.getTimeAlive());
-        resultObject.put("version", RexsterApplication.getVersion());
-        return new StringRepresentation(resultObject.toJSONString(), MediaType.APPLICATION_JSON);
+
+
+        this.resultObject.put("name", "Rexster: A RESTful Graph Shell");
+        this.resultObject.put("graph_count", this.getRexsterApplication().getGraphCount());
+        this.resultObject.put("query_time", sh.stopWatch());
+        this.resultObject.put("up_time", this.getTimeAlive());
+        this.resultObject.put("version", RexsterApplication.getVersion());
+        return getStringRepresentation();
     }
 
     private String getTimeAlive() {

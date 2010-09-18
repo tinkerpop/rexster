@@ -40,7 +40,7 @@ public class VertexResource extends BaseResource {
             getVertexEdges(graphName, id, direction);
 
         this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-        return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
+        return getStringRepresentation();
     }
 
     @Post
@@ -61,7 +61,7 @@ public class VertexResource extends BaseResource {
         }
         this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys()));
         this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-        return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
+        return getStringRepresentation();
     }
 
     @Delete
@@ -76,7 +76,7 @@ public class VertexResource extends BaseResource {
             graph.removeVertex(vertex);
 
         this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-        return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
+        return getStringRepresentation();
 
     }
 

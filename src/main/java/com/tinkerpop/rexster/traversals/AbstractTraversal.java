@@ -53,7 +53,7 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
         if (!usingCachedResult)
             this.traverse();
         this.postQuery();
-        return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
+        return getStringRepresentation();
     }
 
     @Get
@@ -70,7 +70,7 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
             if (!usingCachedResult)
                 this.traverse();
             this.postQuery();
-            return new StringRepresentation(this.resultObject.toJSONString(), MediaType.APPLICATION_JSON);
+            return getStringRepresentation();
         }
     }
 

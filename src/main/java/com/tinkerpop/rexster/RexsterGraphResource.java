@@ -16,29 +16,29 @@ import java.util.Map;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterGraphResource extends ServerResource {
+public class RexsterGraphResource extends BaseResource {
 
     @Get
     public Representation evaluate() {
         StatisticsHelper sh = new StatisticsHelper();
         sh.stopWatch();
-        JSONObject resultObject = new JSONObject();
-        resultObject.put("name", "Rexster: A RESTful Graph Shell");
+
+        this.resultObject.put("name", "Rexster: A RESTful Graph Shell");
         
         String graphName = this.getRequest().getResourceRef().getSegments().get(0);
         Graph graph = this.getRexsterApplication().getGraph(graphName);
-        resultObject.put("graph", graph.toString());
+        this.resultObject.put("graph", graph.toString());
 
         JSONArray queriesArray = new JSONArray();
         for (Map.Entry<String, Class<? extends Traversal>> traversal : this.getRexsterApplication().getLoadedTraversalServices(graphName).entrySet()) {
             queriesArray.add(traversal.getKey());
         }
-        resultObject.put("traversals", queriesArray);
+        this.resultObject.put("traversals", queriesArray);
         
-        resultObject.put("query_time", sh.stopWatch());
-        resultObject.put("up_time", this.getTimeAlive());
-        resultObject.put("version", RexsterApplication.getVersion());
-        return new StringRepresentation(resultObject.toJSONString(), MediaType.APPLICATION_JSON);
+        this.resultObject.put("query_time", sh.stopWatch());
+        this.resultObject.put("up_time", this.getTimeAlive());
+        this.resultObject.put("version", RexsterApplication.getVersion());
+        return getStringRepresentation();
     }
 
     private String getTimeAlive() {
