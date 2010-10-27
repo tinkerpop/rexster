@@ -1,21 +1,15 @@
 package com.tinkerpop.rexster.traversals;
 
-import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.rexster.BaseResource;
 import com.tinkerpop.rexster.ResultObjectCache;
 import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
-import org.restlet.data.Form;
-import org.restlet.data.MediaType;
-import org.restlet.data.Reference;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 
 import java.util.*;
@@ -42,12 +36,13 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
     }
 
     //@Get
+
     public Representation evaluate() {
         Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());
-        
+
         String graphName = this.getRequest().getResourceRef().getSegments().get(0);
         this.graph = ((RexsterApplication) this.getApplication()).getGraph(graphName);
-        
+
         this.buildRequestObject(queryParameters);
         this.preQuery();
         if (!usingCachedResult)
@@ -58,10 +53,10 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
 
     @Get
     public Representation evaluate(final String json) {
-    	
-    	String graphName = this.getRequest().getResourceRef().getSegments().get(0);
+
+        String graphName = this.getRequest().getResourceRef().getSegments().get(0);
         this.graph = ((RexsterApplication) this.getApplication()).getGraph(graphName);
-    	
+
         if (null == json || json.length() == 0)
             return this.evaluate();
         else {
@@ -94,15 +89,12 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
             if (key.equals(Tokens.ID)) {
                 vertices.add(graph.getVertex(propertyMap.get(key)));
             } else {
-                Iterable<Element> elements = graph.getIndex().get(key, propertyMap.get(key));
-                if (null != elements) {
-                    for (Element element : elements) {
-                        if (element instanceof Vertex) {
-                            vertices.add((Vertex) element);
-                        }
-                    }
+                Iterable<Vertex> verticesIterable = ((IndexableGraph) graph).getIndex(IndexableGraph.VERTICES, Vertex.class).get(key, propertyMap.get(key));
+                for (Vertex vertex : verticesIterable) {
+                    vertices.add(vertex);
                 }
             }
+
         }
         return vertices;
     }
