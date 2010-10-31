@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.traversals.grateful;
 
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.pipes.Pipe;
@@ -38,7 +39,7 @@ public class ArtistRank extends AbstractRankTraversal {
 
         if (type != null) {
             this.totalRank = 0.0f;
-            for (Element element : ((IndexableGraph)this.graph).getIndex(IndexableGraph.VERTICES, Element.class).get(GratefulDeadTokens.TYPE, GratefulDeadTokens.SONG)) {
+            for (Element element : ((IndexableGraph)this.graph).getIndex(Index.VERTICES, Element.class).get(GratefulDeadTokens.TYPE, GratefulDeadTokens.SONG)) {
                 Vertex song = (Vertex) element;
                 Pipe pipe1 = new VertexEdgePipe(VertexEdgePipe.Step.OUT_EDGES);
                 Pipe pipe2 = new LabelFilterPipe(type, ComparisonFilterPipe.Filter.NOT_EQUAL);

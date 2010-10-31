@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.traversals;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.BaseResource;
@@ -89,7 +90,7 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
             if (key.equals(Tokens.ID)) {
                 vertices.add(graph.getVertex(propertyMap.get(key)));
             } else {
-                Iterable<Vertex> verticesIterable = ((IndexableGraph) graph).getIndex(IndexableGraph.VERTICES, Vertex.class).get(key, propertyMap.get(key));
+                Iterable<Vertex> verticesIterable = ((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get(key, propertyMap.get(key));
                 for (Vertex vertex : verticesIterable) {
                     vertices.add(vertex);
                 }

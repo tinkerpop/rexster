@@ -4,10 +4,7 @@ import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.restlet.data.Form;
-import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
@@ -150,7 +147,7 @@ public class VertexResource extends BaseResource {
         }
         Iterable<? extends Element> itty;
         if (null != key) {
-            itty = ((IndexableGraph)this.getRexsterApplication().getGraph(graphName)).getIndex(IndexableGraph.VERTICES, Vertex.class).get(key, this.requestObject.get(key));
+            itty = ((IndexableGraph)this.getRexsterApplication().getGraph(graphName)).getIndex(Index.VERTICES, Vertex.class).get(key, this.requestObject.get(key));
         } else {
             itty = this.getRexsterApplication().getGraph(graphName).getVertices();
         }
