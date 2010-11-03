@@ -1,10 +1,10 @@
 package com.tinkerpop.rexster;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -32,10 +32,13 @@ public class EdgeResourceTest extends BaseTest {
         String uri = createURI("edges");
         JSONObject object = getResource(uri);
         printPerformance("GET all edges", null, uri, sh.stopWatch());
-        for (Object vertex : (JSONArray) object.get("results")) {
-            assertEquals(((JSONObject) vertex).get("_type"), "edge");
+        JSONArray arr = object.getJSONArray("results");
+        
+        for (int ix = 0; ix < arr.length(); ix ++) {
+        	JSONObject vertex = arr.getJSONObject(ix);
+            assertEquals(vertex.get("_type"), "edge");
         }
-        assertEquals((long) ((JSONArray) object.get("results")).size(), object.get("total_size"));
+        assertEquals((long) (object.getJSONArray("results")).length(), object.getLong("total_size"));
     }
 
     public void testGetEdge() throws Exception {
@@ -43,10 +46,10 @@ public class EdgeResourceTest extends BaseTest {
         String uri = createURI("edges/6872");
         JSONObject object = getResource(uri);
         printPerformance("GET edge", null, uri, sh.stopWatch());
-        assertEquals(((JSONObject) object.get("results")).get("_type"), "edge");
-        assertEquals(((JSONObject) object.get("results")).get("_outV"), "64");
-        assertEquals(((JSONObject) object.get("results")).get("_label"), "followed_by");
-        assertEquals(((JSONObject) object.get("results")).get("_inV"), "30");
+        assertEquals(((JSONObject) object.get("results")).getString("_type"), "edge");
+        assertEquals(((JSONObject) object.get("results")).getString("_outV"), "64");
+        assertEquals(((JSONObject) object.get("results")).getString("_label"), "followed_by");
+        assertEquals(((JSONObject) object.get("results")).getString("_inV"), "30");
     }
 
     public void testPostEdge() throws Exception {
@@ -55,11 +58,11 @@ public class EdgeResourceTest extends BaseTest {
         JSONObject object = postResource(uri);
         printPerformance("POST edge", null, uri, sh.stopWatch());
         object = (JSONObject) object.get("results");
-        assertEquals(object.get("_type"), "edge");
-        assertEquals(object.get("_label"), "test");
-        assertEquals(object.get("key1"), "value1");
-        assertEquals(object.get("_outV"), "1");
-        assertEquals(object.get("_inV"), "2");
+        assertEquals(object.getString("_type"), "edge");
+        assertEquals(object.getString("_label"), "test");
+        assertEquals(object.getString("key1"), "value1");
+        assertEquals(object.getString("_outV"), "1");
+        assertEquals(object.getString("_inV"), "2");
     }
 
     public void testPostEdgeProperties() throws Exception {
@@ -67,25 +70,25 @@ public class EdgeResourceTest extends BaseTest {
         String uri = createURI("edges/6872?key1=value1");
         JSONObject object = postResource(uri);
         printPerformance("POST edge properties", null, uri, sh.stopWatch());
-        object = (JSONObject) object.get("results");
-        assertEquals(object.get("_type"), "edge");
-        assertEquals(object.get("_label"), "followed_by");
-        assertEquals(object.get("key1"), "value1");
-        assertEquals(object.get("_outV"), "64");
-        assertEquals(object.get("_inV"), "30");
-        String id = (String) object.get("_id");
+        object = object.getJSONObject("results");
+        assertEquals(object.getString("_type"), "edge");
+        assertEquals(object.getString("_label"), "followed_by");
+        assertEquals(object.getString("key1"), "value1");
+        assertEquals(object.getString("_outV"), "64");
+        assertEquals(object.getString("_inV"), "30");
+        String id = object.getString("_id");
 
         uri = createURI("edges/6872?key2=value2&key3=value3&key1=asdf");
         object = postResource(uri);
         printPerformance("POST edge properties", null, uri, sh.stopWatch());
-        object = (JSONObject) object.get("results");
-        assertEquals(object.get("_type"), "edge");
-        assertEquals(object.get("_label"), "followed_by");
-        assertEquals(object.get("key1"), "asdf");
-        assertEquals(object.get("key2"), "value2");
-        assertEquals(object.get("key3"), "value3");
-        assertEquals(object.get("_outV"), "64");
-        assertEquals(object.get("_inV"), "30");
+        object = object.getJSONObject("results");
+        assertEquals(object.getString("_type"), "edge");
+        assertEquals(object.getString("_label"), "followed_by");
+        assertEquals(object.getString("key1"), "asdf");
+        assertEquals(object.getString("key2"), "value2");
+        assertEquals(object.getString("key3"), "value3");
+        assertEquals(object.getString("_outV"), "64");
+        assertEquals(object.getString("_inV"), "30");
 
     }
 
@@ -95,8 +98,11 @@ public class EdgeResourceTest extends BaseTest {
         JSONObject object = getResource(uri);
         printPerformance("GET vertex out edges ids", null, uri, sh.stopWatch());
         List<String> edgeIds = new ArrayList<String>();
-        for (Object edge : (JSONArray) object.get("results")) {
-            edgeIds.add((String) ((JSONObject) edge).get("_id"));
+        JSONArray arr = object.getJSONArray("results");
+        
+        for (int ix = 0; ix < arr.length(); ix ++) {
+        	JSONObject edge = arr.getJSONObject(ix);
+            edgeIds.add(edge.getString("_id"));
         }
 
         sh.stopWatch();
@@ -110,6 +116,6 @@ public class EdgeResourceTest extends BaseTest {
         uri = createURI("vertices/1/outE");
         object = getResource(uri);
         printPerformance("GET vertice out edges", null, uri, sh.stopWatch());
-        assertEquals(((JSONArray) object.get("results")).size(), 0);
+        assertEquals(object.getJSONArray("results").length(), 0);
     }
 }

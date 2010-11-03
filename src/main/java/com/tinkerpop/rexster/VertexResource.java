@@ -5,15 +5,6 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.traversals.ElementJSONObject;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.restlet.data.Form;
-import org.restlet.data.MediaType;
-import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
-import org.restlet.resource.Delete;
-import org.restlet.resource.Get;
-import org.restlet.resource.Post;
 
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +13,7 @@ import java.util.Set;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class VertexResource extends BaseResource {
-
+/*
     @Get
     public Representation getResource() {
         Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());
@@ -169,5 +160,5 @@ public class VertexResource extends BaseResource {
         this.resultObject.put(Tokens.RESULTS, vertexArray);
         this.resultObject.put(Tokens.TOTAL_SIZE, counter);
     }
-
+*/
 }

@@ -6,6 +6,8 @@ import junit.framework.TestCase;
 
 import java.util.Map;
 
+import org.codehaus.jettison.json.JSONException;
+
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -59,7 +61,7 @@ public class AbstractRankTraversalTest extends TestCase {
         }
     }*/
 
-    public void testRankOffsets() {
+    public void testRankOffsets() throws JSONException{
         TestTraversal tt = new TestTraversal();
         buildTestRanks(tt.idToElement);
         tt.generateRankList();
@@ -144,7 +146,7 @@ public class AbstractRankTraversalTest extends TestCase {
 
     }
 
-    private static void buildTestRanks(Map<Object, ElementJSONObject> testRanks) {
+    private static void buildTestRanks(Map<Object, ElementJSONObject> testRanks) throws JSONException{
         Graph graph = new TinkerGraph();
         ElementJSONObject temp = new ElementJSONObject(graph.addVertex("a"));
         temp.put("rank", 1.0f);

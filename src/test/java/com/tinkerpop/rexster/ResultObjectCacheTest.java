@@ -1,12 +1,14 @@
 package com.tinkerpop.rexster;
 
 import junit.framework.TestCase;
-import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -24,7 +26,7 @@ public class ResultObjectCacheTest extends TestCase {
         }
     }
 
-    public void testElderModel() {
+    public void testElderModel() throws JSONException {
         ResultObjectCache resultObjectCache = new ResultObjectCache();
         List<String> uuids = new ArrayList<String>();
         for (int i = 0; i < 1000; i++) {
@@ -73,7 +75,9 @@ public class ResultObjectCacheTest extends TestCase {
         public void run() {
             for (int i = 0; i < totalRuns; i++) {
                 JSONObject object = new JSONObject();
-                object.put("thread", Thread.currentThread().getName());
+                try{
+                	object.put("thread", Thread.currentThread().getName());
+                } catch (JSONException e) {}
                 cache.putCachedResult(uuids.get(random.nextInt(uuids.size())), object);
                 cache.getCachedResult(uuids.get(random.nextInt(uuids.size())));
             }

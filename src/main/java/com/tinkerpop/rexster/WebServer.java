@@ -1,30 +1,34 @@
 package com.tinkerpop.rexster;
 
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.restlet.Component;
-import org.restlet.data.Protocol;
+
+import com.sun.grizzly.http.SelectorThread;
+import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class WebServer {
 
-    private static final String DEFAULT_HOST = "";
-    private Component component;
-
-
-    protected static Logger logger = Logger.getLogger(WebServer.class);
-
-    static {
+	protected static Logger logger = Logger.getLogger(WebServer.class);
+	private static RexsterApplication rexster;
+	
+	static {
         PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
     }
-
-    public WebServer(final XMLConfiguration properties, boolean user) throws Exception {
+	
+	protected SelectorThread threadSelector;
+	
+	public WebServer(final XMLConfiguration properties, boolean user) throws Exception {
         logger.info(".:Welcome to Rexster:.");
         if (user)
             this.startUser(properties);
@@ -43,18 +47,43 @@ public class WebServer {
     }
 
     protected void start(final XMLConfiguration properties) throws Exception {
-        RexsterApplication rexster = new RexsterApplication(properties);
+        rexster = new RexsterApplication(properties);
         Integer port = properties.getInteger("rexster.webserver-port", new Integer(8182));
+        String baseUri = properties.getString("rexster.base-uri", "http://localhost");
         
-        component = new Component();
-        logger.info("Server running on http://localhost:" + port);
-        component.getServers().add(Protocol.HTTP, port);
-        component.getDefaultHost().attach(DEFAULT_HOST, rexster);
-        component.start();
+        String baseUriWithPort = baseUri + ":" + port.toString() + "/";
+        
+        HierarchicalConfiguration webServerConfig = properties.configurationAt("web-server-configuration");
+        
+        final Map<String, String> initParams = new HashMap<String, String>();
+        Iterator keys = webServerConfig.getKeys();
+        while (keys.hasNext()){
+        	String key = keys.next().toString();
+        	
+        	// commons config double dots keys with just one period in it.  
+        	// as that represents a path statement for that lib.  need to remove
+        	// the double dot so that it can pass directly to grizzly.  hopefully
+        	// there are no cases where this will cause a problem and a double dot
+        	// is expected
+        	String grizzlyKey = key.replace("..", ".");
+        	String configValue = webServerConfig.getString(key);
+        	initParams.put(grizzlyKey, configValue);
+        	
+        	logger.info("Web Server configured with " + key + ": " + configValue);
+        }
+        
+        this.threadSelector = GrizzlyWebContainerFactory.create(baseUriWithPort, initParams);
+        
+        logger.info("Server running on " + baseUri + ":" + port);
+        
     }
 
     protected void stop() throws Exception {
-        component.stop();
+        this.threadSelector.stopEndpoint();
+    }
+    
+    public static RexsterApplication GetRexsterApplication(){
+    	return rexster;
     }
 
     public static void main(final String[] args) throws Exception {

@@ -2,9 +2,11 @@ package com.tinkerpop.rexster.traversals;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.rexster.Tokens;
-import org.json.simple.JSONObject;
 
 import java.util.*;
+
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -28,7 +30,12 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
     protected void sortRanks(final String key) {
         java.util.Collections.sort(this.ranks, new Comparator<ElementJSONObject>() {
             public int compare(ElementJSONObject e1, ElementJSONObject e2) {
-                return -1 * ((Comparable) e1.get(key)).compareTo(e2.get(key));
+            	try {
+            		return -1 * ((Comparable) e1.get(key)).compareTo(e2.get(key));
+            	} catch (JSONException ex) {
+            		// TODO: bah!
+            		return - 1;
+            	}
             }
         });
         if (this.sort == Sort.REGULAR)
@@ -60,7 +67,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
     }
 
 
-    protected void incrRank(final Element element, final Float incr) {
+    protected void incrRank(final Element element, final Float incr) throws JSONException {
         Object elementId = element.getId();
         final String traversalName = getTraversalName();
         ElementJSONObject elementObject = this.idToElement.get(elementId);
@@ -80,7 +87,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         }
     }
 
-    protected float incrRank(final Iterator<? extends Element> iterator, final Float incr) {
+    protected float incrRank(final Iterator<? extends Element> iterator, final Float incr) throws JSONException {
         float totalRank = 0.0f;
         while (iterator.hasNext()) {
             incrRank(iterator.next(), incr);
@@ -91,31 +98,31 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
 
     protected void preQuery() {
         super.preQuery();
-        String sort = (String) this.requestObject.get(Tokens.SORT);
+        String sort = (String) this.requestObject.opt(Tokens.SORT);
         if (null != sort) {
             if (sort.equals(Tokens.REGULAR))
                 this.sort = Sort.REGULAR;
             else if (sort.equals(Tokens.REVERSE))
                 this.sort = Sort.REVERSE;
         }
-        if (this.requestObject.containsKey(Tokens.SORT_KEY)) {
-            this.sortKey = (String) this.requestObject.get(Tokens.SORT_KEY);
+        if (this.requestObject.has(Tokens.SORT_KEY)) {
+            this.sortKey = (String) this.requestObject.opt(Tokens.SORT_KEY);
         } else {
             sortKey = getTraversalName();
         }
 
-        JSONObject offset = (JSONObject) this.requestObject.get(Tokens.OFFSET);
+        JSONObject offset = (JSONObject) this.requestObject.opt(Tokens.OFFSET);
         if (null != offset) {
-            Long start = (Long) offset.get(Tokens.START);
-            Long end = (Long) offset.get(Tokens.END);
+            Long start = offset.optLong(Tokens.START);
+            Long end = offset.optLong(Tokens.END);
             if (null != start)
                 this.startOffset = start.intValue();
             if (null != end)
                 this.endOffset = end.intValue();
         }
 
-        if (this.requestObject.containsKey(Tokens.RETURN_KEYS)) {
-            this.returnKeys = (List<String>) this.requestObject.get(Tokens.RETURN_KEYS);
+        if (this.requestObject.has(Tokens.RETURN_KEYS)) {
+            this.returnKeys = (List<String>) this.requestObject.opt(Tokens.RETURN_KEYS);
             if (this.returnKeys.size() == 1 && this.returnKeys.get(0).equals(Tokens.WILDCARD))
                 this.returnKeys = null;
         }
@@ -123,15 +130,15 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         if (this.allowCached) {
             JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
             if (tempResultObject != null) {
-                this.ranks = (List<ElementJSONObject>) tempResultObject.get(Tokens.RANKS);
-                this.totalRank = (Float) tempResultObject.get(Tokens.TOTAL_RANK);
+                this.ranks = (List<ElementJSONObject>) tempResultObject.opt(Tokens.RANKS);
+                this.totalRank = (Float) tempResultObject.opt(Tokens.TOTAL_RANK);
                 this.success = true;
                 this.usingCachedResult = true;
             }
         }
     }
 
-    protected void postQuery() {
+    protected void postQuery()  throws JSONException {
         if (this.success) {
             if (null == this.ranks)
                 this.generateRankList();

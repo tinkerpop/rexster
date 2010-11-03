@@ -2,15 +2,18 @@ package com.tinkerpop.rexster.traversals;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -38,11 +41,12 @@ public class GremlinTraversal extends AbstractTraversal {
     }
 
     public void traverse() {
+    	
         try {
-            if (this.requestObject.containsKey(SCRIPT)) {
-                String script = this.requestObject.get(SCRIPT).toString();
-                if (this.requestObject.containsKey(ROOT)) {
-                    Collection<Vertex> roots = getVertices(graph, (Map) this.requestObject.get(ROOT));
+            if (this.requestObject.has(SCRIPT)) {
+                String script = this.requestObject.opt(SCRIPT).toString();
+                if (this.requestObject.has(ROOT)) {
+                    Collection<Vertex> roots = getVertices(graph, (JSONObject) this.requestObject.opt(ROOT));
                     if (null != roots)
                         engine.getBindings(ScriptContext.ENGINE_SCOPE).put(ROOT_VARIABLE, roots);
                 }
@@ -53,16 +57,20 @@ public class GremlinTraversal extends AbstractTraversal {
                 for (Object object : (List) engine.eval(script)) {
                     if (object instanceof Element) {
                         if (null == this.returnKeys)
-                            results.add(new ElementJSONObject((Element) object));
+                            results.put(new ElementJSONObject((Element) object));
                         else
-                            results.add(new ElementJSONObject((Element) object, this.returnKeys));
+                            results.put(new ElementJSONObject((Element) object, this.returnKeys));
                     } else if (object instanceof Number || object instanceof Boolean) {
-                        results.add(object);
+                        results.put(object);
                     } else {
-                        results.add(JSONValue.escape(object.toString()));
+                        results.put(object.toString());
                     }
                 }
-                this.resultObject.put(Tokens.RESULTS, results);
+                
+                try {
+                	this.resultObject.put(Tokens.RESULTS, results);
+                } catch (Exception ex) {}
+                
                 this.success = true;
                 this.cacheCurrentResultObjectState();
             } else {
@@ -72,14 +80,17 @@ public class GremlinTraversal extends AbstractTraversal {
         } catch (ScriptException e) {
             this.success = false;
             this.message = e.getMessage();
+        } catch (JSONException ex) {
+            this.success = false;
+            this.message = ex.getMessage();
         }
     }
 
     public void preQuery() {
         super.preQuery();
 
-        if (this.requestObject.containsKey(RETURN_KEYS)) {
-            this.returnKeys = (List<String>) this.requestObject.get(RETURN_KEYS);
+        if (this.requestObject.has(RETURN_KEYS)) {
+            this.returnKeys = (List<String>) this.requestObject.opt(RETURN_KEYS);
             if (this.returnKeys.size() == 1 && this.returnKeys.get(0).equals(WILDCARD))
                 this.returnKeys = null;
         }
@@ -87,7 +98,9 @@ public class GremlinTraversal extends AbstractTraversal {
         if (this.allowCached) {
             JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
             if (tempResultObject != null) {
-                this.resultObject.put(Tokens.RESULTS, tempResultObject.get(Tokens.RESULTS));
+            	try {
+            		this.resultObject.putOpt(Tokens.RESULTS, tempResultObject.opt(Tokens.RESULTS));
+            	} catch (Exception ex) {}
                 this.success = true;
                 this.usingCachedResult = true;
             }
@@ -102,7 +115,10 @@ public class GremlinTraversal extends AbstractTraversal {
         parameters.put(ROOT + ".<key>", "the elements to set $_ to, where <key> is the element property key");
         api.put(Tokens.DESCRIPTION, "evaluate an ad-hoc Gremlin script");
         api.put(Tokens.PARAMETERS, parameters);
-        this.resultObject.put(Tokens.API, api);
+        
+        try {
+        	this.resultObject.put(Tokens.API, api);
+        } catch (Exception ex) {}
     }
 }
 

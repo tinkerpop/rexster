@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.codehaus.jettison.json.JSONException;
+
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -23,7 +25,7 @@ public class SingerWriterRank extends AbstractRankTraversal {
         return SINGER_WRITER_RANK;
     }
 
-    public void traverse() {
+    public void traverse() throws JSONException{
 
         Vertex singer = this.getVertex(GratefulDeadTokens.SINGER);
         if (singer != null) {
@@ -46,6 +48,9 @@ public class SingerWriterRank extends AbstractRankTraversal {
         parameters.put("singer.<key>", "the source singer artist, where <key> is the singer vertex property key");
         api.put(Tokens.DESCRIPTION, "rank all writers relative to a single singer. the ranking is based on the number of songs that the writter has written that are sung by the singer.");
         api.put(Tokens.PARAMETERS, parameters);
-        this.resultObject.put(Tokens.API, api);
+        
+        try {
+        	this.resultObject.put(Tokens.API, api);
+        } catch (JSONException e) {}
     }
 }

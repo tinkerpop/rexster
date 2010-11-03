@@ -1,16 +1,19 @@
 package com.tinkerpop.rexster.traversals;
 
-import org.restlet.representation.Representation;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
+import com.tinkerpop.rexster.RexsterResourceContext;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public interface Traversal {
-    public Representation evaluate(final String jsonString);
+    //public JSONObject evaluate(final String jsonString);
 
-    public Representation evaluate();
+    public JSONObject evaluate(RexsterResourceContext ctx) throws JSONException;
 
-    public void traverse();
+    public void traverse()throws JSONException;
 
     public void addApiToResultObject();
 

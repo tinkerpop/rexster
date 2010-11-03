@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rexster>
-	<cache-maxsize>1000</cache-maxsize>
+    <base-uri>http://localhost</base-uri>
   	<webserver-port>8182</webserver-port>
+	<cache-maxsize>1000</cache-maxsize>
+	<web-server-configuration>
+	  <com.sun.jersey.config.property.packages>com.tinkerpop.rexster</com.sun.jersey.config.property.packages>
+	</web-server-configuration>
     <graphs>
       <graph>
         <graph-name>gratefulgraph</graph-name>

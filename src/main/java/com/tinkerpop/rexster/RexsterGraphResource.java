@@ -1,13 +1,5 @@
 package com.tinkerpop.rexster;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.restlet.data.MediaType;
-import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
-import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
-
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.rexster.traversals.Traversal;
 
@@ -17,7 +9,7 @@ import java.util.Map;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class RexsterGraphResource extends BaseResource {
-
+/*
     @Get
     public Representation evaluate() {
         StatisticsHelper sh = new StatisticsHelper();
@@ -70,4 +62,5 @@ public class RexsterGraphResource extends BaseResource {
     protected RexsterApplication getRexsterApplication() {
         return (RexsterApplication) this.getApplication();
     }
+    */
 }

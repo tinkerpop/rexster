@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster;
 
 import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

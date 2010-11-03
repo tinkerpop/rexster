@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.codehaus.jettison.json.JSONException;
+
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -41,6 +43,9 @@ public class FollowsScore extends AbstractScoreTraversal {
         parameters.put("song.<key>", "the source song, where <key> is the song vertex property key");
         api.put(Tokens.DESCRIPTION, "scores a song by how many songs follow it.");
         api.put(Tokens.PARAMETERS, parameters);
-        this.resultObject.put(Tokens.API, api);
+        
+        try {
+        	this.resultObject.put(Tokens.API, api);
+        } catch (JSONException e) {}
     }
 }

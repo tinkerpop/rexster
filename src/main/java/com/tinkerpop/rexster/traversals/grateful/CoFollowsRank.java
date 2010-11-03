@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.codehaus.jettison.json.JSONException;
+
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -25,7 +27,7 @@ public class CoFollowsRank extends AbstractRankTraversal {
         return CO_FOLLOWS_RANK;
     }
 
-    public void traverse() {
+    public void traverse() throws JSONException{
 
         Vertex song = this.getVertex(GratefulDeadTokens.SONG);
 
@@ -50,6 +52,9 @@ public class CoFollowsRank extends AbstractRankTraversal {
         parameters.put("song.<key>", "the source song, where <key> is the song vertex property key");
         api.put(Tokens.DESCRIPTION, "rank all songs relative to the source song by the number of times they co-follow the source song");
         api.put(Tokens.PARAMETERS, parameters);
-        this.resultObject.put(Tokens.API, api);
+        
+        try {
+        	this.resultObject.put(Tokens.API, api);
+        } catch (JSONException e) {}
     }
 }

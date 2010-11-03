@@ -6,27 +6,27 @@ import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.rexster.BaseResource;
+import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.ResultObjectCache;
 import com.tinkerpop.rexster.RexsterApplication;
+import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.WebServer;
+
 import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
-import org.restlet.data.Form;
-import org.restlet.data.MediaType;
-import org.restlet.data.Reference;
-import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
-import org.restlet.resource.Get;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.*;
+
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public abstract class AbstractTraversal extends BaseResource implements Traversal {
+public abstract class AbstractTraversal implements Traversal {
 
     protected Graph graph;
-    protected ResultObjectCache resultObjectCache;
     protected static Logger logger = Logger.getLogger(AbstractTraversal.class);
 
     protected boolean success = true;
@@ -34,30 +34,37 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
     protected boolean usingCachedResult = false;
     protected String cacheRequestURI = null;
     protected boolean allowCached = true;
+    protected ResultObjectCache resultObjectCache;
+    
+    protected RexsterResourceContext ctx;
+    
+    protected JSONObject resultObject = new JSONObject();
+    protected JSONObject requestObject = new JSONObject();
 
     public AbstractTraversal() {
-        if (null != this.getApplication()) {
-            this.resultObjectCache = this.getRexsterApplication().getResultObjectCache();
-        }
+    	
+    	if (WebServer.GetRexsterApplication() != null) {
+    		this.resultObjectCache = WebServer.GetRexsterApplication().getResultObjectCache();
+    	}
     }
 
-    //@Get
-    public Representation evaluate() {
-        Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());
+    public JSONObject evaluate(RexsterResourceContext ctx) throws JSONException {
         
-        String graphName = this.getRequest().getResourceRef().getSegments().get(0);
-        this.graph = ((RexsterApplication) this.getApplication()).getGraph(graphName);
-        
-        this.buildRequestObject(queryParameters);
-        this.preQuery();
+    	this.ctx = ctx;
+    	this.graph = ctx.getRexsterApplicationGraph().getGraph();
+    	this.requestObject = ctx.getRequestObject();
+    	this.resultObject = ctx.getResultObject();
+    	
+    	this.preQuery();
         if (!usingCachedResult)
             this.traverse();
         this.postQuery();
-        return getStringRepresentation();
+        return this.resultObject;
     }
 
+    /*
     @Get
-    public Representation evaluate(final String json) {
+    public JSONObject evaluate(final String json) {
     	
     	String graphName = this.getRequest().getResourceRef().getSegments().get(0);
         this.graph = ((RexsterApplication) this.getApplication()).getGraph(graphName);
@@ -70,46 +77,61 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
             if (!usingCachedResult)
                 this.traverse();
             this.postQuery();
-            return getStringRepresentation();
+            return this.resultObject;
         }
     }
-
+     */
+    
     private String createCacheRequestURI() {
-        Map<String, String> queryParameters = createQueryMap(this.getRequest().getResourceRef().getQueryAsForm());
-        queryParameters.remove(Tokens.OFFSET_START);
-        queryParameters.remove(Tokens.OFFSET_END);
-        queryParameters.remove(Tokens.ALLOW_CACHED);
+        Map<String, String> queryParameters = this.ctx.getRequest().getParameterMap();
+        
         List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>(queryParameters.entrySet());
+        for (Map.Entry<String, String> entry : queryParameters.entrySet()){
+        	if (entry.getKey() != Tokens.OFFSET_START
+        		&& entry.getKey() != Tokens.OFFSET_END
+        		&& entry.getKey() != Tokens.ALLOW_CACHED) {
+        		list.add(entry);
+        	}
+        }
+        
         java.util.Collections.sort(list, new Comparator<Map.Entry<String, String>>() {
             public int compare(Map.Entry<String, String> e, Map.Entry<String, String> e1) {
                 return e.getKey().compareTo(e1.getKey());
             }
         });
-        return this.getRequest().getResourceRef().getBaseRef().toString() + list.toString();
+        return this.ctx.getUriInfo().getBaseUri().toString() + list.toString();
+        //return this.getRequest().getResourceRef().getBaseRef().toString() + list.toString();
     }
 
-    protected static List<Vertex> getVertices(final Graph graph, final Map<String, Object> propertyMap) {
+    protected static List<Vertex> getVertices(final Graph graph, final JSONObject propertyMap) {
         List<Vertex> vertices = new ArrayList<Vertex>();
-        for (String key : propertyMap.keySet()) {
+        Iterator keys = propertyMap.keys();
+        while (keys.hasNext()) {
+        	String key = (String) keys.next();
             if (key.equals(Tokens.ID)) {
-                vertices.add(graph.getVertex(propertyMap.get(key)));
+            	try {
+            		vertices.add(graph.getVertex(propertyMap.get(key)));
+            	} catch (JSONException ex) {}
             } else {
-                Iterable<Element> elements = graph.getIndex().get(key, propertyMap.get(key));
-                if (null != elements) {
-                    for (Element element : elements) {
-                        if (element instanceof Vertex) {
-                            vertices.add((Vertex) element);
-                        }
-                    }
-                }
+            	try {
+	                Iterable<Element> elements = graph.getIndex().get(key, propertyMap.get(key));
+	                if (null != elements) {
+	                    for (Element element : elements) {
+	                        if (element instanceof Vertex) {
+	                            vertices.add((Vertex) element);
+	                        }
+	                    }
+	                }
+            	} catch (JSONException ex) {}
             }
         }
         return vertices;
     }
 
     protected Vertex getVertex(final String requestObjectKey) {
-        if (this.requestObject.containsKey(requestObjectKey)) {
-            List<Vertex> temp = getVertices(graph, (Map) requestObject.get(requestObjectKey));
+        if (this.ctx.getRequestObject().has(requestObjectKey)) {
+        	JSONObject jsonObject = (JSONObject) this.ctx.getRequestObject().opt(requestObjectKey);
+        	List<Vertex> temp = getVertices(graph, jsonObject);
             if (null != temp && temp.size() > 0)
                 return temp.get(0);
         }
@@ -117,7 +139,7 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
     }
 
     protected String getRequestValue(final String requestObjectKey) {
-        return (String) this.requestObject.get(requestObjectKey);
+        return (String) this.ctx.getRequestObject().opt(requestObjectKey);
     }
 
     public void addApiToResultObject() {
@@ -126,29 +148,28 @@ public abstract class AbstractTraversal extends BaseResource implements Traversa
 
     protected void preQuery() {
         this.cacheRequestURI = this.createCacheRequestURI();
-        Boolean temp = (Boolean) this.requestObject.get(Tokens.ALLOW_CACHED);
+        Boolean temp = (Boolean) this.ctx.getRequestObject().opt(Tokens.ALLOW_CACHED);
         if (null != temp) {
             this.allowCached = temp;
         }
-        logger.debug("Raw request object: " + this.requestObject.toString());
+        logger.debug("Raw request object: " + this.ctx.getRequestObject().toString());
     }
 
-    protected void postQuery() {
-        this.resultObject.put(Tokens.SUCCESS, this.success);
+    protected void postQuery() throws JSONException {
+        this.ctx.getResultObject().put(Tokens.SUCCESS, this.success);
         if (!this.success) {
             this.addApiToResultObject();
         }
         if (null != message) {
-            this.resultObject.put(Tokens.MESSAGE, this.message);
+            this.ctx.getResultObject().put(Tokens.MESSAGE, this.message);
         }
-        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-        logger.debug("Raw result object: " + this.resultObject.toJSONString());
+        logger.debug("Raw result object: " + this.resultObject.toString());
     }
 
     protected void cacheCurrentResultObjectState() {
-        JSONObject tempResultObject = new JSONObject();
-        tempResultObject.putAll(this.resultObject);
-        this.resultObjectCache.putCachedResult(this.cacheRequestURI, tempResultObject);
+        //JSONObject tempResultObject = new JSONObject();
+        //tempResultObject.putAll(this.resultObject);
+        this.resultObjectCache.putCachedResult(this.cacheRequestURI, this.resultObject);
     }
 
     protected Map<String, Object> getParameters() {
