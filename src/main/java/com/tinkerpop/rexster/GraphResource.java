@@ -24,6 +24,8 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import com.tinkerpop.rexster.traversals.Traversal;
 
@@ -287,7 +289,8 @@ public class GraphResource extends BaseResource {
         }
         Iterable<? extends Element> itty;
         if (null != key) {
-            itty = this.rag.getGraph().getIndex().get(key, this.requestObject.get(key));
+            //itty = this.rag.getGraph().getIndex().get(key, this.requestObject.get(key));
+        	itty = ((IndexableGraph)this.rag.getGraph()).getIndex(Index.VERTICES, Vertex.class).get(key, this.requestObject.get(key));
         } else {
             itty = this.rag.getGraph().getVertices();
         }

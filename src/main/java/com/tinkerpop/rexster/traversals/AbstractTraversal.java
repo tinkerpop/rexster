@@ -5,6 +5,8 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.rexster.BaseResource;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.ResultObjectCache;
@@ -114,13 +116,10 @@ public abstract class AbstractTraversal implements Traversal {
             	} catch (JSONException ex) {}
             } else {
             	try {
-	                Iterable<Element> elements = graph.getIndex().get(key, propertyMap.get(key));
-	                if (null != elements) {
-	                    for (Element element : elements) {
-	                        if (element instanceof Vertex) {
-	                            vertices.add((Vertex) element);
-	                        }
-	                    }
+	                //Iterable<Element> elements = graph.getIndex().get(key, propertyMap.get(key));
+	                Iterable<Vertex> verticesIterable = ((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get(key, propertyMap.get(key));
+	                for (Vertex vertex : verticesIterable) {
+	                    vertices.add(vertex);
 	                }
             	} catch (JSONException ex) {}
             }

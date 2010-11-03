@@ -1,9 +1,6 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.rexster.traversals.ElementJSONObject;
 
 import java.util.Map;
@@ -144,7 +141,7 @@ public class VertexResource extends BaseResource {
         }
         Iterable<? extends Element> itty;
         if (null != key) {
-            itty = this.getRexsterApplication().getGraph(graphName).getIndex().get(key, this.requestObject.get(key));
+            itty = ((IndexableGraph)this.getRexsterApplication().getGraph(graphName)).getIndex(Index.VERTICES, Vertex.class).get(key, this.requestObject.get(key));
         } else {
             itty = this.getRexsterApplication().getGraph(graphName).getVertices();
         }

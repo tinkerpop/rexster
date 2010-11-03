@@ -194,7 +194,7 @@ public class RexsterApplication {
 
             // calling the open method opens the connection to graphdb.  looks like the 
             // implementation of shutdown will call the orientdb close method.
-            graph = new OrientGraph(graphFile).open(username, password);
+            graph = new OrientGraph(graphFile, username, password);
 
         } else if (graphType.equals("tinkergraph")) {
             graph = new TinkerGraph();

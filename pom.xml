@@ -20,6 +20,11 @@
             <email>marko@markorodriguez.com</email>
             <url>http://markorodriguez.com</url>
         </developer>
+        <developer>
+            <name>Stephen Mallette</name>
+            <email>spmva@genoprime.com</email>
+            <url>http://twitter.com/spmallette</url>
+        </developer>
     </developers>
     <inceptionYear>2009</inceptionYear>
     <dependencies>
@@ -34,17 +39,17 @@
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>blueprints</artifactId>
-            <version>0.1.2-SNAPSHOT</version>
+            <version>0.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>pipes</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>gremlin</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>0.6-SNAPSHOT</version>
         </dependency>
         <!-- JSON SUPPORT -->
         <dependency>
