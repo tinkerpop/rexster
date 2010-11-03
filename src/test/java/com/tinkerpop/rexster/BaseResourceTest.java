@@ -13,7 +13,7 @@ import java.util.Map;
 public class BaseResourceTest extends TestCase {
 
     public void testQueryParametersToJson()  throws JSONException {
-        BaseResource tt = new VertexResource();
+        BaseResource tt = new MockResource();
         Map<String, String> qp = new HashMap<String, String>();
         qp.put("a", "true");
         qp.put("b", "false");
@@ -37,16 +37,19 @@ public class BaseResourceTest extends TestCase {
     }
 
     public void testOffsetParsing() throws JSONException {
-        BaseResource tt = new VertexResource();
+        BaseResource tt = new MockResource();
         tt.buildRequestObject("{\"rexster\": { \"offset\": { \"start\":10, \"end\":100 }}}");
         assertEquals((long)tt.getStartOffset(), 10l);
         assertEquals((long)tt.getEndOffset(), 100l);
 
-        tt = new VertexResource();
+        tt = new MockResource();
         tt.buildRequestObject("{\"rexster\": { \"offset\": { \"start\":-10, \"end\":10001 }}}");
         assertEquals((long)tt.getStartOffset(), -10l);
         assertEquals((long)tt.getEndOffset(), 10001l);
     }
 
-
+    protected class MockResource extends BaseResource {
+    }
+    
 }
+
