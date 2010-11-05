@@ -1,27 +1,24 @@
 package com.tinkerpop.rexster.traversals;
 
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.rexster.BaseResource;
-import com.tinkerpop.rexster.RexsterResourceContext;
-import com.tinkerpop.rexster.ResultObjectCache;
-import com.tinkerpop.rexster.RexsterApplication;
-import com.tinkerpop.rexster.RexsterApplicationGraph;
-import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.WebServer;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.*;
-
-import javax.ws.rs.core.MultivaluedMap;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.rexster.ResultObjectCache;
+import com.tinkerpop.rexster.RexsterResourceContext;
+import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.WebServer;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -101,8 +98,8 @@ public abstract class AbstractTraversal implements Traversal {
                 return e.getKey().compareTo(e1.getKey());
             }
         });
+        
         return this.ctx.getUriInfo().getBaseUri().toString() + list.toString();
-        //return this.getRequest().getResourceRef().getBaseRef().toString() + list.toString();
     }
 
     protected static List<Vertex> getVertices(final Graph graph, final JSONObject propertyMap) {
@@ -116,7 +113,6 @@ public abstract class AbstractTraversal implements Traversal {
             	} catch (JSONException ex) {}
             } else {
             	try {
-	                //Iterable<Element> elements = graph.getIndex().get(key, propertyMap.get(key));
 	                Iterable<Vertex> verticesIterable = ((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get(key, propertyMap.get(key));
 	                for (Vertex vertex : verticesIterable) {
 	                    vertices.add(vertex);
@@ -166,9 +162,22 @@ public abstract class AbstractTraversal implements Traversal {
     }
 
     protected void cacheCurrentResultObjectState() {
-        //JSONObject tempResultObject = new JSONObject();
-        //tempResultObject.putAll(this.resultObject);
-        this.resultObjectCache.putCachedResult(this.cacheRequestURI, this.resultObject);
+    	ArrayList<String> keysToCopy = new ArrayList<String>();
+    	Iterator<String> keys = this.resultObject.keys();
+    	while (keys.hasNext()) {
+    		keysToCopy.add(keys.next());
+    	}
+    	
+    	String[] toCopy = new String[keysToCopy.size()];
+    	toCopy = keysToCopy.toArray(toCopy);
+    	
+    	try {
+    		JSONObject tempResultObject = new JSONObject(this.resultObject, toCopy);
+            this.resultObjectCache.putCachedResult(this.cacheRequestURI, tempResultObject);	
+    	} catch (JSONException ex) {
+    		// can't cache
+    	}
+        
     }
 
     protected Map<String, Object> getParameters() {

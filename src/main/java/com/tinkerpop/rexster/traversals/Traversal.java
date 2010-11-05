@@ -9,8 +9,7 @@ import com.tinkerpop.rexster.RexsterResourceContext;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public interface Traversal {
-    //public JSONObject evaluate(final String jsonString);
-
+   
     public JSONObject evaluate(RexsterResourceContext ctx) throws JSONException;
 
     public void traverse()throws JSONException;

@@ -36,7 +36,7 @@ public class GraphResource extends BaseResource {
 	
 	public GraphResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) throws JSONException {
         this.sh.stopWatch();
-        this.resultObject.put(Tokens.VERSION, WebServer.GetRexsterApplication().getVersion());
+        this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
 		this.rag = WebServer.GetRexsterApplication().getApplicationGraph(graphName);
 		Map<String, String> queryParameters = req.getParameterMap();
 		this.buildRequestObject(queryParameters);
@@ -79,16 +79,21 @@ public class GraphResource extends BaseResource {
 		List<PathSegment> pathSegments = this.uriInfo.getPathSegments();
 		String pattern = "";
 		
+		// ignore the first two parts of the path as they are "graphname/traversal".
+		// everything after that point represents the name of the traversal specified
+		// by the getTraversalName() method on the Traversal interface
 		for (int ix = 2; ix < pathSegments.size(); ix++) {
 			pattern = pattern + "/" + pathSegments.get(ix).getPath();
 		}
 	
-        Class traversalClass = this.rag.getLoadedTraversals().get(pattern.substring(1));
+		// get the traversal class based on the pattern of the URI. strip the first
+		// character of the pattern as the variable is initialized that way in the loop
+        Class<? extends Traversal> traversalClass = this.rag.getLoadedTraversals().get(pattern.substring(1));
         
         if (traversalClass != null){
         	Traversal traversal = (Traversal) traversalClass.newInstance();
             
-            RexsterResourceContext ctx = new RexsterResourceContext();
+        	RexsterResourceContext ctx = new RexsterResourceContext();
             ctx.setRequest(this.request);
             ctx.setResultObject(this.resultObject);
             ctx.setUriInfo(this.uriInfo);

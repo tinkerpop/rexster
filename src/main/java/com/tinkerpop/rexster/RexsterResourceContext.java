@@ -5,6 +5,9 @@ import javax.ws.rs.core.UriInfo;
 
 import org.codehaus.jettison.json.JSONObject;
 
+/**
+ * Context for a resource request.  Provides request information to a traversal.
+ */
 public class RexsterResourceContext {
 	private RexsterApplicationGraph rag;
 	

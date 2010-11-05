@@ -1,12 +1,18 @@
 package com.tinkerpop.rexster.traversals;
 
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.rexster.Tokens;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.rexster.Tokens;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)

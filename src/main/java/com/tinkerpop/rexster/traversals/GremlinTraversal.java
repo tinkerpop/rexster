@@ -2,7 +2,6 @@ package com.tinkerpop.rexster.traversals;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
 
 import javax.script.ScriptContext;
