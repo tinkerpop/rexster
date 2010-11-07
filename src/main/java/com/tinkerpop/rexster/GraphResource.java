@@ -35,8 +35,8 @@ public class GraphResource extends BaseResource {
 	private static Logger logger = Logger.getLogger(GraphResource.class);
 	
 	public GraphResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) throws JSONException {
-        this.sh.stopWatch();
-        this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
+        super();
+		this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
 		this.rag = WebServer.GetRexsterApplication().getApplicationGraph(graphName);
 		Map<String, String> queryParameters = req.getParameterMap();
 		this.buildRequestObject(queryParameters);
