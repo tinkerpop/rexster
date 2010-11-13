@@ -12,6 +12,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
 
@@ -30,6 +31,7 @@ import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import com.tinkerpop.rexster.traversals.Traversal;
 
 @Path("/{graphname}")
+@Produces(MediaType.APPLICATION_JSON)
 public class GraphResource extends BaseResource {
 
 	private static Logger logger = Logger.getLogger(GraphResource.class);
@@ -46,7 +48,6 @@ public class GraphResource extends BaseResource {
 	}
 	
 	@GET
-    @Produces("application/json")
 	public JSONObject getGraph() throws JSONException, Exception {
 		
 		if (this.rag != null) {
@@ -73,7 +74,6 @@ public class GraphResource extends BaseResource {
 	}
 	
 	@GET @Path("/traversal/{path: .+}")
-	@Produces("application/json")
 	public JSONObject getTraversal() throws JSONException, Exception {
 		
 		List<PathSegment> pathSegments = this.uriInfo.getPathSegments();
@@ -110,7 +110,6 @@ public class GraphResource extends BaseResource {
 	}
 	
 	@GET @Path("/edges")
-	@Produces("application/json")
 	public JSONObject getAllEdges() throws JSONException, Exception {
 		
 		Long start = this.getStartOffset();
@@ -138,7 +137,6 @@ public class GraphResource extends BaseResource {
     }
 	
 	@GET @Path("/edges/{id}")
-	@Produces("application/json")
 	public JSONObject getSingleEdge(@PathParam("id") String id) throws JSONException {
         final Edge edge = this.rag.getGraph().getEdge(id);
         
@@ -154,7 +152,6 @@ public class GraphResource extends BaseResource {
     }
 	
 	@POST @Path("/edges/{id}")
-	@Produces("application/json")
     public JSONObject postEdge(@PathParam("id") String id) throws JSONException {
 
         final Graph graph = this.rag.getGraph();
@@ -194,7 +191,6 @@ public class GraphResource extends BaseResource {
     }
 
     @DELETE  @Path("/edges/{id}")
-	@Produces("application/json")
     public JSONObject deleteEdge(@PathParam("id") String id) throws JSONException {
         // TODO: delete individual properties
         
@@ -209,7 +205,6 @@ public class GraphResource extends BaseResource {
     }
 
 	@GET @Path("/vertices/{id}/{direction}")
-	@Produces("application/json")
 	public JSONObject getVertexEdges(@PathParam("id") String vertexId, @PathParam("direction") String direction) {
         try {
             Long start = this.getStartOffset();
@@ -259,7 +254,6 @@ public class GraphResource extends BaseResource {
     }
 
 	@GET @Path("/vertices/{id}")
-	@Produces("application/json")
 	public JSONObject getSingleVertex(@PathParam("id") String id) throws JSONException {
         Vertex vertex = this.rag.getGraph().getVertex(id);
         if (null != vertex) {
@@ -275,7 +269,6 @@ public class GraphResource extends BaseResource {
 
 
     @GET @Path("/vertices")
-	@Produces("application/json")
 	public JSONObject getVertices()throws JSONException {
         Long start = this.getStartOffset();
         if (null == start)
@@ -317,7 +310,6 @@ public class GraphResource extends BaseResource {
     }
     
     @POST @Path("/vertices/{id}")
-	@Produces("application/json")
     public JSONObject postVertex(@PathParam("id") String id) throws JSONException {
         
     	Graph graph = this.rag.getGraph();
@@ -339,7 +331,6 @@ public class GraphResource extends BaseResource {
     }
 
     @DELETE @Path("/vertices/{id}")
-	@Produces("application/json")
     public JSONObject deleteVertex(@PathParam("id") String id) throws JSONException {
         // TODO: delete individual properties
         
