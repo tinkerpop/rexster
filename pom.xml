@@ -11,8 +11,8 @@
     <name>Rexster: A RESTful Graph Shell</name>
     <description>
         Rexster is a RESTful graph shell for Blueprints-enabled graphs. An HTTP-based interface provides
-        language agnostic connectivity. Support exists for graph traversals aimed at searching,
-        scoring, ranking, and, in concert, recommending.
+        language agnostic connectivity. There is support for graph traversals aimed at searching,
+        scoring, ranking, and, in concert, recommending. 
     </description>
     <developers>
         <developer>
