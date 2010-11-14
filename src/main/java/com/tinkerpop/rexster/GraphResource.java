@@ -11,10 +11,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -36,26 +39,46 @@ public class GraphResource extends BaseResource {
 
 	private static Logger logger = Logger.getLogger(GraphResource.class);
 	
-	public GraphResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) throws JSONException {
-        super();
-		this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
-		this.rag = WebServer.GetRexsterApplication().getApplicationGraph(graphName);
-		Map<String, String> queryParameters = req.getParameterMap();
-		this.buildRequestObject(queryParameters);
+	public GraphResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
+		super();
 		
-		this.request = req;
-		this.uriInfo = ui;
+        this.rag = WebServer.GetRexsterApplication().getApplicationGraph(graphName);
+		if (this.rag == null) {
+			
+			logger.info("Request for a non-configured graph [" + graphName + "]");
+			
+			JSONObject error = generateErrorObject("Graph [" + graphName + "] could not be found.");
+			throw new WebApplicationException(
+					Response.status(Status.NOT_FOUND).entity(error).build());
+		}
+        
+		try {
+	        this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
+			Map<String, String> queryParameters = req.getParameterMap();
+			this.buildRequestObject(queryParameters);
+			
+			this.request = req;
+			this.uriInfo = ui;
+		} catch (JSONException ex) {
+			
+			logger.error(ex);
+			
+			JSONObject error = generateErrorObjectJsonFail(ex);
+			throw new WebApplicationException(
+					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+		}
 	}
 	
 	@GET
-	public JSONObject getGraph() throws JSONException, Exception {
+	public Response getGraph() {
 		
-		if (this.rag != null) {
+		try {
         
+			// graph should be ready to go at this point.  checks in the 
+			// constructor ensure that the rag is not null.
 	        Graph graph = this.rag.getGraph();
 	
 	        this.resultObject.put("name", "Rexster: A RESTful Graph Shell");
-	        
 	        this.resultObject.put("graph", graph.toString());
 	
 	        JSONArray queriesArray = new JSONArray();
@@ -68,49 +91,87 @@ public class GraphResource extends BaseResource {
 	        this.resultObject.put("query_time", this.sh.stopWatch());
 	        this.resultObject.put("up_time", this.getTimeAlive());
 	        this.resultObject.put("version", RexsterApplication.getVersion());
+	        
+        } catch (JSONException ex) {
+        	logger.error(ex);
+			
+			JSONObject error = generateErrorObjectJsonFail(ex);
+			throw new WebApplicationException(
+					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
         
-        return this.resultObject;
+        return Response.ok(this.resultObject).build();
 	}
 	
 	@GET @Path("/traversal/{path: .+}")
-	public JSONObject getTraversal() throws JSONException, Exception {
+	public Response getTraversal() {
 		
-		List<PathSegment> pathSegments = this.uriInfo.getPathSegments();
+		Class<? extends Traversal> traversalClass = null;
 		String pattern = "";
 		
-		// ignore the first two parts of the path as they are "graphname/traversal".
-		// everything after that point represents the name of the traversal specified
-		// by the getTraversalName() method on the Traversal interface
-		for (int ix = 2; ix < pathSegments.size(); ix++) {
-			pattern = pattern + "/" + pathSegments.get(ix).getPath();
-		}
-	
-		// get the traversal class based on the pattern of the URI. strip the first
-		// character of the pattern as the variable is initialized that way in the loop
-        Class<? extends Traversal> traversalClass = this.rag.getLoadedTraversals().get(pattern.substring(1));
-        
-        if (traversalClass != null){
-        	Traversal traversal = (Traversal) traversalClass.newInstance();
-            
-        	RexsterResourceContext ctx = new RexsterResourceContext();
-            ctx.setRequest(this.request);
-            ctx.setResultObject(this.resultObject);
-            ctx.setUriInfo(this.uriInfo);
-            ctx.setRexsterApplicationGraph(this.rag);
-            ctx.setRequestObject(this.requestObject);
-            
-            traversal.evaluate(ctx);
-        	
+		try {
+			
+			List<PathSegment> pathSegments = this.uriInfo.getPathSegments();
+			
+			// ignore the first two parts of the path as they are "graphname/traversal".
+			// everything after that point represents the name of the traversal specified
+			// by the getTraversalName() method on the Traversal interface
+			for (int ix = 2; ix < pathSegments.size(); ix++) {
+				pattern = pattern + "/" + pathSegments.get(ix).getPath();
+			}
+		
+			// get the traversal class based on the pattern of the URI. strip the first
+			// character of the pattern as the variable is initialized that way in the loop
+	        traversalClass = this.rag.getLoadedTraversals().get(pattern.substring(1));
+	        
+	        if (traversalClass != null){
+	        	Traversal traversal = (Traversal) traversalClass.newInstance();
+	            
+	        	RexsterResourceContext ctx = new RexsterResourceContext();
+	            ctx.setRequest(this.request);
+	            ctx.setResultObject(this.resultObject);
+	            ctx.setUriInfo(this.uriInfo);
+	            ctx.setRexsterApplicationGraph(this.rag);
+	            ctx.setRequestObject(this.requestObject);
+	            
+	            traversal.evaluate(ctx);
+	        } else {
+	        	logger.info("Request for a non-configured traversal [" + pattern + "]");
+				
+				JSONObject error = generateErrorObject("Graph [" + pattern + "] could not be found.");
+				throw new WebApplicationException(
+						Response.status(Status.NOT_FOUND).entity(error).build());
+	        }
+	        
+	        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
+		} catch (JSONException ex) {
+        	logger.error(ex);
+			
+			JSONObject error = generateErrorObjectJsonFail(ex);
+			throw new WebApplicationException(
+					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } catch (IllegalAccessException iae) {
+        	logger.error(iae);
+
+			JSONObject error = generateErrorObject(
+					"Failed to instantiate the Traversal for [" + pattern + "].  No access to [" + traversalClass.getName() + "]", iae);
+			throw new WebApplicationException(
+					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+			
+        } catch (InstantiationException ie) {
+        	logger.error(ie);
+
+			JSONObject error = generateErrorObject(
+					"Failed to instantiate the Traversal for [" + pattern + "].  Expected a concrete class definition for [" + traversalClass.getName() + "]", ie);
+			throw new WebApplicationException(
+					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
-        
-        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-        
-		return this.resultObject;
+		
+		return Response.ok(this.resultObject).build();
 	}
 	
 	@GET @Path("/edges")
-	public JSONObject getAllEdges() throws JSONException, Exception {
+	public Response getAllEdges() {
 		
 		Long start = this.getStartOffset();
         if (null == start)
@@ -120,39 +181,61 @@ public class GraphResource extends BaseResource {
             end = Long.MAX_VALUE;
 
         long counter = 0l;
-        JSONArray edgeArray = new JSONArray();
-        for (Edge edge : this.rag.getGraph().getEdges()) {
-            if (counter >= start && counter < end) {
-                edgeArray.put(new ElementJSONObject(edge, this.getReturnKeys()));
-            }
-            counter++;
+        
+        try {
+	        JSONArray edgeArray = new JSONArray();
+	        for (Edge edge : this.rag.getGraph().getEdges()) {
+	            if (counter >= start && counter < end) {
+	                edgeArray.put(new ElementJSONObject(edge, this.getReturnKeys()));
+	            }
+	            counter++;
+	        }
+	        
+	        this.resultObject.put(Tokens.RESULTS, edgeArray);
+	        this.resultObject.put(Tokens.TOTAL_SIZE, counter);
+	        this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
+
+		} catch (JSONException ex) {
+        	logger.error(ex);
+			
+			JSONObject error = generateErrorObjectJsonFail(ex);
+			throw new WebApplicationException(
+					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
         
-        this.resultObject.put(Tokens.RESULTS, edgeArray);
-        this.resultObject.put(Tokens.TOTAL_SIZE, counter);
-        this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-        
-        return this.resultObject;
+        return Response.ok(this.resultObject).build();
 
     }
 	
 	@GET @Path("/edges/{id}")
-	public JSONObject getSingleEdge(@PathParam("id") String id) throws JSONException {
+	public Response getSingleEdge(@PathParam("id") String id) {
         final Edge edge = this.rag.getGraph().getEdge(id);
         
         if (null != edge) {
-        	this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys()));
+        	try {
+        		this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys()));
+        		this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
+    		} catch (JSONException ex) {
+            	logger.error(ex);
+    			
+    			JSONObject error = generateErrorObjectJsonFail(ex);
+    			throw new WebApplicationException(
+    					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            }
         } else {
-        	this.resultObject.put(Tokens.RESULTS, (Object) null);
+        	String msg = "Could not find edge [" + id + "] on graph [" + this.rag.getGraphName() + "]";
+        	logger.info(msg);
+			
+			JSONObject error = generateErrorObject(msg);
+			throw new WebApplicationException(
+					Response.status(Status.NOT_FOUND).entity(error).build());
         }
         
-        this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-        
-        return this.resultObject;
+        return Response.ok(this.resultObject).build();
     }
 	
 	@POST @Path("/edges/{id}")
-    public JSONObject postEdge(@PathParam("id") String id) throws JSONException {
+    public Response postEdge(@PathParam("id") String id) {
 
         final Graph graph = this.rag.getGraph();
         String inV = null;
@@ -175,37 +258,63 @@ public class GraphResource extends BaseResource {
             if (null != out && null != in)
                 edge = graph.addEdge(id, out, in, label);
         }
-        if (null != edge) {
-        	Iterator keys = this.requestObject.keys();
-            while (keys.hasNext()){
-            	String key = keys.next().toString();
-                if (!key.startsWith(Tokens.UNDERSCORE))
-                    edge.setProperty(key, this.requestObject.get(key));
-            }
-            this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys()));
+        
+        try {
+	        if (edge != null) {
+	        	Iterator keys = this.requestObject.keys();
+	            while (keys.hasNext()){
+	            	String key = keys.next().toString();
+	                if (!key.startsWith(Tokens.UNDERSCORE))
+	                    edge.setProperty(key, this.requestObject.get(key));
+	            }
+	            this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys()));
+	        }
+	
+	        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
+        } catch (JSONException ex) {
+        	logger.error(ex);
+			
+			JSONObject error = generateErrorObjectJsonFail(ex);
+			throw new WebApplicationException(
+					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
-
-        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-
-        return this.resultObject;
+        
+        return Response.ok(this.resultObject).build();
     }
 
     @DELETE  @Path("/edges/{id}")
-    public JSONObject deleteEdge(@PathParam("id") String id) throws JSONException {
+    public Response deleteEdge(@PathParam("id") String id) {
         // TODO: delete individual properties
         
         final Graph graph = this.rag.getGraph();
         final Edge edge = graph.getEdge(id);
-        if (null != edge)
+        if (null != edge) {
             graph.removeEdge(edge);
-
-        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-        return this.resultObject;
+        } else {
+        	String msg = "Could not find edge [" + id + "] on graph [" + this.rag.getGraphName() + "] for deletion.";
+        	logger.info(msg);
+			
+			JSONObject error = generateErrorObject(msg);
+			throw new WebApplicationException(
+					Response.status(Status.NOT_FOUND).entity(error).build());
+        }
+        
+        try {
+        	this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
+        } catch (JSONException ex) {
+        	logger.error(ex);
+			
+			JSONObject error = generateErrorObjectJsonFail(ex);
+			throw new WebApplicationException(
+					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        }
+        
+        return Response.ok(this.resultObject).build();
 
     }
 
 	@GET @Path("/vertices/{id}/{direction}")
-	public JSONObject getVertexEdges(@PathParam("id") String vertexId, @PathParam("direction") String direction) {
+	public Response getVertexEdges(@PathParam("id") String vertexId, @PathParam("direction") String direction) {
         try {
             Long start = this.getStartOffset();
             if (null == start)
@@ -240,36 +349,60 @@ public class GraphResource extends BaseResource {
                         }
                     }
                 }
+            } else {
+            	String msg = "Could not find vertex [" + vertexId + "] on graph [" + this.rag.getGraphName() + "].";
+            	logger.info(msg);
+    			
+    			JSONObject error = generateErrorObject(msg);
+    			throw new WebApplicationException(
+    					Response.status(Status.NOT_FOUND).entity(error).build());
             }
 
             this.resultObject.put(Tokens.RESULTS, edgeArray);
             this.resultObject.put(Tokens.TOTAL_SIZE, counter);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (JSONException ex) {
+        	logger.error(ex);
+			
+			JSONObject error = generateErrorObjectJsonFail(ex);
+			throw new WebApplicationException(
+					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
         
-        return this.resultObject;
+        return Response.ok(this.resultObject).build();
     }
 
 	@GET @Path("/vertices/{id}")
-	public JSONObject getSingleVertex(@PathParam("id") String id) throws JSONException {
+	public Response getSingleVertex(@PathParam("id") String id) {
         Vertex vertex = this.rag.getGraph().getVertex(id);
         if (null != vertex) {
-            this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys()));
+        	try {
+	            this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys()));
+	            this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch()); 
+        	} catch (JSONException ex) {
+            	logger.error(ex);
+    			
+    			JSONObject error = generateErrorObjectJsonFail(ex);
+    			throw new WebApplicationException(
+    					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            }
         } else {
-            this.resultObject.put(Tokens.RESULTS, (Object) null);
+        	String msg = "Could not find vertex [" + id + "] on graph [" + this.rag.getGraphName() + "].";
+        	logger.info(msg);
+			
+			JSONObject error = generateErrorObject(msg);
+			throw new WebApplicationException(
+					Response.status(Status.NOT_FOUND).entity(error).build());
         }
         
-        this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
         
-        return this.resultObject;
+        return Response.ok(this.resultObject).build();
     }
 
 
     @GET @Path("/vertices")
-	public JSONObject getVertices()throws JSONException {
+	public Response getVertices() {
         Long start = this.getStartOffset();
         if (null == start)
             start = 0l;
@@ -277,40 +410,48 @@ public class GraphResource extends BaseResource {
         if (null == end)
             end = Long.MAX_VALUE;
 
-        long counter = 0l;
-        JSONArray vertexArray = new JSONArray();
-        String key = null;
-        Iterator keys = this.getNonRexsterRequest().keys();
-        while (keys.hasNext()) {
-            key = keys.next().toString();
-            break;
-        }
-        Iterable<? extends Element> itty;
-        if (null != key) {
-            //itty = this.rag.getGraph().getIndex().get(key, this.requestObject.get(key));
-        	itty = ((IndexableGraph)this.rag.getGraph()).getIndex(Index.VERTICES, Vertex.class).get(key, this.requestObject.get(key));
-        } else {
-            itty = this.rag.getGraph().getVertices();
-        }
-
-        if (null != itty) {
-            for (Element element : itty) {
-                if (counter >= start && counter < end) {
-                    vertexArray.put(new ElementJSONObject(element, this.getReturnKeys()));
-                }
-                counter++;
-            }
+        try {
+	        long counter = 0l;
+	        JSONArray vertexArray = new JSONArray();
+	        String key = null;
+	        Iterator keys = this.getNonRexsterRequest().keys();
+	        while (keys.hasNext()) {
+	            key = keys.next().toString();
+	            break;
+	        }
+	        Iterable<? extends Element> itty;
+	        if (null != key) {
+	            itty = ((IndexableGraph)this.rag.getGraph()).getIndex(Index.VERTICES, Vertex.class).get(key, this.requestObject.get(key));
+	        } else {
+	            itty = this.rag.getGraph().getVertices();
+	        }
+	
+	        if (null != itty) {
+	            for (Element element : itty) {
+	                if (counter >= start && counter < end) {
+	                    vertexArray.put(new ElementJSONObject(element, this.getReturnKeys()));
+	                }
+	                counter++;
+	            }
+	        }
+	        
+	        this.resultObject.put(Tokens.RESULTS, vertexArray);
+	        this.resultObject.put(Tokens.TOTAL_SIZE, counter);
+	        this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
+	        
+        } catch (JSONException ex) {
+        	logger.error(ex);
+			
+			JSONObject error = generateErrorObjectJsonFail(ex);
+			throw new WebApplicationException(
+					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
         
-        this.resultObject.put(Tokens.RESULTS, vertexArray);
-        this.resultObject.put(Tokens.TOTAL_SIZE, counter);
-        this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-        
-        return this.resultObject;
+        return Response.ok(this.resultObject).build();
     }
     
     @POST @Path("/vertices/{id}")
-    public JSONObject postVertex(@PathParam("id") String id) throws JSONException {
+    public Response postVertex(@PathParam("id") String id) {
         
     	Graph graph = this.rag.getGraph();
         Vertex vertex = graph.getVertex(id);
@@ -318,29 +459,56 @@ public class GraphResource extends BaseResource {
             vertex = graph.addVertex(id);
         }
         
-        Iterator keys = this.requestObject.keys();
-        while(keys.hasNext()) {
-        	String key = keys.next().toString();
-            if (!key.startsWith(Tokens.UNDERSCORE))
-                vertex.setProperty(key, this.requestObject.get(key));
+        try {
+	        Iterator keys = this.requestObject.keys();
+	        while(keys.hasNext()) {
+	        	String key = keys.next().toString();
+	            if (!key.startsWith(Tokens.UNDERSCORE)){
+	                vertex.setProperty(key, this.requestObject.get(key));
+	            }
+	        }
+	        
+	        this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys()));
+	        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
+        } catch (JSONException ex) {
+        	logger.error(ex);
+			
+			JSONObject error = generateErrorObjectJsonFail(ex);
+			throw new WebApplicationException(
+					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
         
-        this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys()));
-        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-        return this.resultObject;
+        return Response.ok(this.resultObject).build();
     }
 
     @DELETE @Path("/vertices/{id}")
-    public JSONObject deleteVertex(@PathParam("id") String id) throws JSONException {
+    public Response deleteVertex(@PathParam("id") String id) {
         // TODO: delete individual properties
         
         final Graph graph = this.rag.getGraph();
         final Vertex vertex = graph.getVertex(id);
-        if (null != vertex)
+        if (null != vertex) {
             graph.removeVertex(vertex);
+        } else {
+        	String msg = "Could not find vertex [" + id + "] on graph [" + this.rag.getGraphName() + "] for deletion.";
+        	logger.info(msg);
+			
+			JSONObject error = generateErrorObject(msg);
+			throw new WebApplicationException(
+					Response.status(Status.NOT_FOUND).entity(error).build());
+        }
 
-        this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-        return this.resultObject;
+        try {
+        	this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
+        } catch (JSONException ex) {
+        	logger.error(ex);
+			
+			JSONObject error = generateErrorObjectJsonFail(ex);
+			throw new WebApplicationException(
+					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        }
+        
+        return Response.ok(this.resultObject).build();
 
     }	
 }

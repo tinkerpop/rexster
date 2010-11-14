@@ -1,13 +1,17 @@
 package com.tinkerpop.rexster;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -40,7 +44,32 @@ public abstract class BaseResource {
         
         try {
         	this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
-        } catch (Exception ex) {}
+		} catch (JSONException ex) {
+			JSONObject error = generateErrorObject(ex.getMessage());
+			throw new WebApplicationException(
+					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+		}
+    }
+    
+    public JSONObject generateErrorObject(String message){
+    	return generateErrorObject(message, null);
+    }
+    
+    public JSONObject generateErrorObjectJsonFail(Exception source){
+    	return generateErrorObject("An error occurred while generating the response object.", source);
+    }
+    
+    public JSONObject generateErrorObject(String message, Exception source){
+    	Map<String, String> m = new HashMap<String, String>();
+		m.put("message", message);
+		
+		if (source != null) {
+			m.put("error", source.getMessage());
+		}
+		
+		// use a hashmap with the constructor so that a JSONException 
+		// will not be thrown
+		return new JSONObject(m);
     }
     
     public JSONObject getRequestObject() {

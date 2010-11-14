@@ -210,7 +210,9 @@ public class VertexResourceTest extends BaseTest {
         uri = createURI("vertices/1");
         JSONObject object = getResource(uri);
         printPerformance("GET vertex", null, uri, sh.stopWatch());
-        assertNull(object.opt("results"));
+        
+        // this is a not found 404 error so should return a JSON error message
+        assertTrue(object.has("message"));
 
         sh.stopWatch();
         for (int i = 0; i < 900; i++) {
@@ -223,6 +225,6 @@ public class VertexResourceTest extends BaseTest {
         uri = createURI("vertices");
         object = getResource(uri);
         printPerformance("GET vertices", null, uri, sh.stopWatch());
-        assertEquals(object.getJSONArray("results").length(), 0);
+        assertEquals(0, object.getJSONArray("results").length());
     }
 }

@@ -73,7 +73,7 @@ public class RexsterApplication {
 
         try {
         	initTraversals();
-        	logger.info("Traversal initializatoin completed.");
+        	logger.info("Traversal initialization completed.");
         } catch (Exception e) {
         	logger.error("Traversal initialization failed.", e);
         }

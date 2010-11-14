@@ -29,10 +29,7 @@ public class RexsterResource extends BaseResource {
 	        this.resultObject.put("up_time", this.getTimeAlive());
 	        return Response.ok(this.resultObject).build();
 		} catch (JSONException ex) {
-			Map<String, String> m = new HashMap<String, String>();
-			m.put("message", ex.getMessage());
-			JSONObject error = new JSONObject(m);
-			
+			JSONObject error = generateErrorObject(ex.getMessage());
 			throw new WebApplicationException(
 					Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
 		}
