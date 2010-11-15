@@ -212,12 +212,14 @@ public class VertexResourceTest extends BaseTest {
         printPerformance("GET vertex", null, uri, sh.stopWatch());
         assertNull(object.opt("results"));
 
+        int vertexAmount = 809;
+
         sh.stopWatch();
-        for (int i = 0; i < 900; i++) {
+        for (int i = 0; i < vertexAmount; i++) {
             uri = createURI("vertices/" + i);
             deleteResource(uri);
         }
-        printPerformance("DELETE vertices", 900, uri, sh.stopWatch());
+        printPerformance("DELETE vertices", vertexAmount, uri, sh.stopWatch());
 
         sh.stopWatch();
         uri = createURI("vertices");
