@@ -87,15 +87,7 @@ public abstract class BaseTest extends TestCase {
     public static void deleteResource(String uri) throws Exception {
     	Client c = Client.create();
     	WebResource r = c.resource(uri);
-    	
-    	try {
-    		r.delete();
-    	} catch (Exception ure) {
-    		// swallows 404 errors from deleting resources that aren't found
-    		// maybe should return a different status. for purposes of tests
-    		// probably can just ignore this exception.  Test probably need to 
-    		// be refactored a bit.
-    	}
+    	r.delete();
     }
     
     public static String createURI(String extension){

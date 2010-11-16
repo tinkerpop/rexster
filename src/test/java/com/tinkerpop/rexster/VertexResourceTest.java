@@ -218,8 +218,11 @@ public class VertexResourceTest extends BaseTest {
 
         sh.stopWatch();
         for (int i = 0; i < vertexAmount; i++) {
-            uri = createURI("vertices/" + i);
-            deleteResource(uri);
+        	// the first vertex was delete as the first part of the test
+        	if (i != 1) {
+	            uri = createURI("vertices/" + i);
+	            deleteResource(uri);
+        	}
         }
         printPerformance("DELETE vertices", vertexAmount, uri, sh.stopWatch());
 
