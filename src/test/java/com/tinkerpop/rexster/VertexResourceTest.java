@@ -214,12 +214,14 @@ public class VertexResourceTest extends BaseTest {
         // this is a not found 404 error so should return a JSON error message
         assertTrue(object.has("message"));
 
+        int vertexAmount = 809;
+
         sh.stopWatch();
-        for (int i = 0; i < 900; i++) {
+        for (int i = 0; i < vertexAmount; i++) {
             uri = createURI("vertices/" + i);
             deleteResource(uri);
         }
-        printPerformance("DELETE vertices", 900, uri, sh.stopWatch());
+        printPerformance("DELETE vertices", vertexAmount, uri, sh.stopWatch());
 
         sh.stopWatch();
         uri = createURI("vertices");
