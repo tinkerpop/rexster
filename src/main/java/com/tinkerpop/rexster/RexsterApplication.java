@@ -21,9 +21,9 @@ import java.util.*;
  */
 public class RexsterApplication {
 
-	protected static final Logger logger = Logger.getLogger(RexsterApplication.class);
+    protected static final Logger logger = Logger.getLogger(RexsterApplication.class);
 
-    private static final String version = "0.1-SNAPSHOT";
+    private static final String version = Tokens.REXSTER_VERSION;
     private final long startTime = System.currentTimeMillis();
     private ResultObjectCache resultObjectCache;
 
@@ -72,23 +72,23 @@ public class RexsterApplication {
         }
 
         try {
-        	initTraversals();
-        	logger.info("Traversal initialization completed.");
+            initTraversals();
+            logger.info("Traversal initialization completed.");
         } catch (Exception e) {
-        	logger.error("Traversal initialization failed.", e);
+            logger.error("Traversal initialization failed.", e);
         }
-        
+
         this.resultObjectCache = new ResultObjectCache();
 
     }
 
-    private void initTraversals(){
-    	// get a list of all traversal implementations.
+    private void initTraversals() {
+        // get a list of all traversal implementations.
         ServiceLoader<? extends Traversal> traversalServices = ServiceLoader.load(Traversal.class);
 
         for (RexsterApplicationGraph rag : this.graphs.values()) {
 
-           if (rag.hasPackages()) {
+            if (rag.hasPackages()) {
                 for (Traversal traversalService : traversalServices) {
                     if (-1 == traversalService.getTraversalName().indexOf("/")) {
                         if (rag.getPackageNames().contains("")) {
@@ -111,7 +111,7 @@ public class RexsterApplication {
 
         }
     }
-    
+
     public Map<String, Class<? extends Traversal>> getLoadedTraversalServices(String graphName) {
         return this.graphs.get(graphName).getLoadedTraversals();
     }
@@ -123,9 +123,9 @@ public class RexsterApplication {
     public Graph getGraph(String graphName) {
         return this.graphs.get(graphName).getGraph();
     }
-    
+
     public RexsterApplicationGraph getApplicationGraph(String graphName) {
-    	return this.graphs.get(graphName);
+        return this.graphs.get(graphName);
     }
 
     public int getGraphCount() {
@@ -141,7 +141,7 @@ public class RexsterApplication {
     }
 
     public void stop() throws Exception {
-        
+
         // need to shutdown all the graphs that were started with the web server
         for (RexsterApplicationGraph rag : this.graphs.values()) {
 
@@ -167,8 +167,7 @@ public class RexsterApplication {
 
             // get the <properties> section of the xml configuration
             HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) properties;
-            SubnodeConfiguration neo4jSpecificConfiguration = graphSectionConfig.configurationAt(
-                    Tokens.REXSTER_GRAPH_PROPERTIES);
+            SubnodeConfiguration neo4jSpecificConfiguration = graphSectionConfig.configurationAt(Tokens.REXSTER_GRAPH_PROPERTIES);
 
             // properties to initialize the neo4j instance.
             HashMap<String, String> neo4jProperties = new HashMap<String, String>();
@@ -186,8 +185,7 @@ public class RexsterApplication {
 
             // get the <properties> section of the xml configuration
             HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) properties;
-            SubnodeConfiguration orientDbSpecificConfiguration = graphSectionConfig.configurationAt(
-                    Tokens.REXSTER_GRAPH_PROPERTIES);
+            SubnodeConfiguration orientDbSpecificConfiguration = graphSectionConfig.configurationAt(Tokens.REXSTER_GRAPH_PROPERTIES);
 
             String username = orientDbSpecificConfiguration.getString("username");
             String password = orientDbSpecificConfiguration.getString("password");
@@ -198,7 +196,8 @@ public class RexsterApplication {
 
         } else if (graphType.equals("tinkergraph")) {
             graph = new TinkerGraph();
-            GraphMLReader.inputGraph(graph, new FileInputStream(graphFile));
+            if (null != graphFile)
+                GraphMLReader.inputGraph(graph, new FileInputStream(graphFile));
         } else {
             throw new Exception(graphType + " is not a supported graph type");
         }

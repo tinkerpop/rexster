@@ -61,7 +61,7 @@ public abstract class BaseResource {
     
     public JSONObject generateErrorObject(String message, Exception source){
     	Map<String, String> m = new HashMap<String, String>();
-		m.put("message", message);
+		m.put(Tokens.MESSAGE, message);
 		
 		if (source != null) {
 			m.put("error", source.getMessage());

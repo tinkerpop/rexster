@@ -4,11 +4,10 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.Tokens;
-
-import java.util.List;
-
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+
+import java.util.List;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -17,11 +16,11 @@ public class ElementJSONObject extends JSONObject {
 
     private final Object id;
 
-    public ElementJSONObject(Element element) throws JSONException {
+    public ElementJSONObject(final Element element) throws JSONException {
         this(element, null);
     }
 
-    public ElementJSONObject(Element element, List<String> propertyKeys) throws JSONException {
+    public ElementJSONObject(final Element element, final List<String> propertyKeys) throws JSONException {
         this.id = element.getId();
         if (element instanceof Vertex) {
             this.put(Tokens._TYPE, Tokens.VERTEX);

@@ -22,7 +22,7 @@ public abstract class BaseTest extends TestCase {
     private static Logger logger = Logger.getLogger(BaseTest.class.getName());
     public static final String baseURI = "http://localhost:8182/";
 
-    public void BaseTest() {
+    public BaseTest() {
         try {
             XMLConfiguration properties = new XMLConfiguration();
             properties.load(RexsterApplication.class.getResourceAsStream("rexster.xml"));

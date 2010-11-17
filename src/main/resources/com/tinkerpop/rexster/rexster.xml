@@ -8,6 +8,11 @@
     </web-server-configuration>
     <graphs>
         <graph>
+            <graph-name>emptygraph</graph-name>
+            <graph-type>tinkergraph</graph-type>
+            <packages-allowed></packages-allowed>
+        </graph>
+        <graph>
             <graph-name>tinkergraph</graph-name>
             <graph-type>tinkergraph</graph-type>
             <graph-file>data/graph-example-1.xml</graph-file>
