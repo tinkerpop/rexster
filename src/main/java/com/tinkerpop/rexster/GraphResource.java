@@ -59,7 +59,7 @@ public class GraphResource extends BaseResource {
             // constructor ensure that the rag is not null.
             Graph graph = this.rag.getGraph();
 
-            this.resultObject.put("name", "Rexster: A RESTful Graph Shell");
+            this.resultObject.put("name", rag.getGraphName());
             this.resultObject.put("graph", graph.toString());
 
             JSONArray queriesArray = new JSONArray();
