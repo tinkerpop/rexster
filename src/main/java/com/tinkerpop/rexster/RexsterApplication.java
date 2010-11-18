@@ -102,13 +102,7 @@ public class RexsterApplication {
                         }
                     }
                 }
-            } else {
-                for (Traversal traversalService : traversalServices) {
-                    logger.info("loading traversal: /" + rag.getGraphName() + "/" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
-                    rag.getLoadedTraversals().put(traversalService.getTraversalName(), traversalService.getClass());
-                }
             }
-
         }
     }
 

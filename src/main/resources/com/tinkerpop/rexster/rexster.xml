@@ -16,7 +16,7 @@
             <graph-name>tinkergraph</graph-name>
             <graph-type>tinkergraph</graph-type>
             <graph-file>data/graph-example-1.xml</graph-file>
-            <packages-allowed></packages-allowed>
+            <packages-allowed>;</packages-allowed>
         </graph>
         <graph>
             <graph-name>gratefulgraph</graph-name>

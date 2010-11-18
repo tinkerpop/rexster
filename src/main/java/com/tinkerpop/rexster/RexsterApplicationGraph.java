@@ -54,6 +54,18 @@ public class RexsterApplicationGraph {
 	}
 	
     public void loadPackageNames(String packageNameString) {
-		this.packageNames = new HashSet<String>(Arrays.asList(packageNameString.split(";")));
+    	if (packageNameString != null && packageNameString.length() > 0) {
+    		if (packageNameString.trim().equals(";")) {
+    			// allows configuration of the root package only (ie. gremlin)
+    			this.packageNames = new HashSet<String>();
+    			this.packageNames.add("");
+    		} else {
+    			// allows configuration of the root package plus anything else
+    			this.packageNames = new HashSet<String>(Arrays.asList(packageNameString.split(";")));
+    		}
+    	} else {
+    		// no packages when empty
+    		this.packageNames = new HashSet<String>();
+    	}
 	}
 }
