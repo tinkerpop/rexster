@@ -127,9 +127,9 @@ public class RexsterApplication {
     public RexsterApplicationGraph getApplicationGraph(String graphName) {
         return this.graphs.get(graphName);
     }
-
-    public int getGraphCount() {
-        return this.graphs.size();
+    
+    public Set<String> getGraphsNames(){
+    	return this.graphs.keySet();
     }
 
     public ResultObjectCache getResultObjectCache() {
