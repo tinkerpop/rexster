@@ -34,7 +34,7 @@ public class SingerWriterRank extends AbstractRankTraversal {
 
             Pipeline<Vertex, Vertex> pipeline = new Pipeline<Vertex, Vertex>(Arrays.asList(pipe1, pipe2));
             pipeline.setStarts(Arrays.asList(singer));
-            this.totalRank = incrRank(pipeline, 1.0f);
+            this.totalRank = incrRank(pipeline, 1.0);
             this.success = true;
         } else {
             this.success = false;

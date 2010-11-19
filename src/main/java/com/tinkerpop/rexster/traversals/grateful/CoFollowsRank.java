@@ -38,7 +38,7 @@ public class CoFollowsRank extends AbstractRankTraversal {
 
             Pipeline<Vertex, Vertex> pipeline = new Pipeline<Vertex, Vertex>(Arrays.asList(pipe1, pipe2, pipe3));
             pipeline.setStarts(Arrays.asList(song));
-            this.totalRank = incrRank(pipeline, 1.0f);
+            this.totalRank = incrRank(pipeline, 1.0);
             this.success = true;
         } else {
             this.success = false;

@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -26,7 +27,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
     protected List<String> returnKeys = null;
     protected int startOffset = -1;
     protected int endOffset = -1;
-    protected float totalRank = Float.NaN;
+    protected double totalRank = Double.NaN;
 
 
     protected enum Sort {
@@ -73,7 +74,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
     }
 
 
-    protected void incrRank(final Element element, final Float incr) throws JSONException {
+    protected void incrRank(final Element element, final Double incr) throws JSONException {
         Object elementId = element.getId();
         final String traversalName = getTraversalName();
         ElementJSONObject elementObject = this.idToElement.get(elementId);
@@ -85,16 +86,16 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
             this.idToElement.put(elementId, elementObject);
         }
 
-        Float value = (Float) elementObject.get(traversalName);
-        if (null != value) {
-            elementObject.put(traversalName, incr + value);
+        Double value = elementObject.optDouble(traversalName);
+        if (!value.equals(Double.NaN)) {
+        	elementObject.put(traversalName, incr + value);
         } else {
             elementObject.put(traversalName, incr);
         }
     }
 
-    protected float incrRank(final Iterator<? extends Element> iterator, final Float incr) throws JSONException {
-        float totalRank = 0.0f;
+    protected double incrRank(final Iterator<? extends Element> iterator, final Double incr) throws JSONException {
+        double totalRank = 0.0f;
         while (iterator.hasNext()) {
             incrRank(iterator.next(), incr);
             totalRank = totalRank + incr;
@@ -128,16 +129,33 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         }
 
         if (this.requestObject.has(Tokens.RETURN_KEYS)) {
-            this.returnKeys = (List<String>) this.requestObject.opt(Tokens.RETURN_KEYS);
-            if (this.returnKeys.size() == 1 && this.returnKeys.get(0).equals(Tokens.WILDCARD))
+        	
+        	this.returnKeys = new ArrayList<String>();
+        	
+        	// return keys may come in as a string value if there is only one
+        	String returnKeyString = this.requestObject.optString(Tokens.RETURN_KEYS);
+        	if (returnKeyString == null || returnKeyString.length() == 0){
+	        	JSONArray returnKeyArray = this.requestObject.optJSONArray(Tokens.RETURN_KEYS);
+	
+	        	if (returnKeyArray != null && returnKeyArray.length() > 0){
+		        	for (int ix = 0; ix < returnKeyArray.length(); ix++){
+		        		this.returnKeys.add(returnKeyArray.optString(ix));
+		        	}
+	        	}
+        	} else {
+        		this.returnKeys.add(returnKeyString);
+        	}
+        	
+            if (this.returnKeys.size() == 1 && this.returnKeys.get(0).equals(Tokens.WILDCARD)){
                 this.returnKeys = null;
+            }
         }
 
         if (this.allowCached) {
             JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
             if (tempResultObject != null) {
                 this.ranks = (List<ElementJSONObject>) tempResultObject.opt(Tokens.RANKS);
-                this.totalRank = (Float) tempResultObject.opt(Tokens.TOTAL_RANK);
+                this.totalRank = (Double) tempResultObject.opt(Tokens.TOTAL_RANK);
                 this.success = true;
                 this.usingCachedResult = true;
             }
@@ -152,7 +170,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
             if (this.sort != Sort.NONE && !this.usingCachedResult) {
                 this.sortRanks(this.sortKey);
             }
-            if (this.totalRank != Float.NaN) {
+            if (this.totalRank != Double.NaN) {
                 this.resultObject.put(Tokens.TOTAL_RANK, this.totalRank);
             }
             this.resultObject.put(Tokens.RANKS, this.ranks);
