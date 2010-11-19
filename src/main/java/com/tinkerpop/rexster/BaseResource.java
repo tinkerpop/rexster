@@ -254,6 +254,17 @@ public abstract class BaseResource {
         return true;
     }
 	
+    protected boolean hasElementProperties(JSONObject requestObject) {
+        Iterator keys = requestObject.keys();
+        while (keys.hasNext()) {
+            String key = keys.next().toString();
+            if (!key.startsWith(Tokens.UNDERSCORE)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
 	protected String getTimeAlive() {
         long timeMillis = System.currentTimeMillis() - WebServer.GetRexsterApplication().getStartTime();
         long timeSeconds = timeMillis / 1000;
