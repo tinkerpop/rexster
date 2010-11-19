@@ -89,17 +89,25 @@ public class RexsterApplication {
         for (RexsterApplicationGraph rag : this.graphs.values()) {
 
             if (rag.hasPackages()) {
+            	
+            	// packages are explicitly configured
                 for (Traversal traversalService : traversalServices) {
-                    if (-1 == traversalService.getTraversalName().indexOf("/")) {
-                        if (rag.getPackageNames().contains("")) {
-                            logger.info("loading traversal: /" + rag.getGraphName() + "/" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
-                            rag.getLoadedTraversals().put(traversalService.getTraversalName(), traversalService.getClass());
-                        }
+                    
+                	String traversalPackage;
+                	
+                	// the traversal is defined as a forward-slash separated set of path segments.
+                	// the first path segment is the package. if there is no forward slash then
+                	// the entire string is the package
+                	if (traversalService.getTraversalName().indexOf("/") == -1) {
+                        traversalPackage = traversalService.getTraversalName();
                     } else {
-                        if (rag.getPackageNames().contains(traversalService.getTraversalName().substring(0, traversalService.getTraversalName().indexOf("/")))) {
-                            logger.info("loading traversal: /" + rag.getGraphName() + "/" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
-                            rag.getLoadedTraversals().put(traversalService.getTraversalName(), traversalService.getClass());
-                        }
+                        traversalPackage = traversalService.getTraversalName()
+                        	.substring(0, traversalService.getTraversalName().indexOf("/"));
+                    }
+                	
+                	if (rag.getPackageNames().contains(traversalPackage)) {
+                        logger.info("loading traversal: /" + rag.getGraphName() + "/" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
+                        rag.getLoadedTraversals().put(traversalService.getTraversalName(), traversalService.getClass());
                     }
                 }
             }

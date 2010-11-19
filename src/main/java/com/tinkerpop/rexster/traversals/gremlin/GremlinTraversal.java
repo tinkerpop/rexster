@@ -1,8 +1,11 @@
-package com.tinkerpop.rexster.traversals;
+package com.tinkerpop.rexster.traversals.gremlin;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.traversals.AbstractTraversal;
+import com.tinkerpop.rexster.traversals.ElementJSONObject;
+
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;

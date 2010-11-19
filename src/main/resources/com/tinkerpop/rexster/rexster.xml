@@ -16,13 +16,13 @@
             <graph-name>tinkergraph</graph-name>
             <graph-type>tinkergraph</graph-type>
             <graph-file>data/graph-example-1.xml</graph-file>
-            <packages-allowed>;</packages-allowed>
+            <packages-allowed>gremlin</packages-allowed>
         </graph>
         <graph>
             <graph-name>gratefulgraph</graph-name>
             <graph-type>tinkergraph</graph-type>
             <graph-file>data/graph-example-2.xml</graph-file>
-            <packages-allowed>;grateful</packages-allowed>
+            <packages-allowed>gremlin;grateful</packages-allowed>
         </graph>
         <graph>
             <graph-enabled>false</graph-enabled>
