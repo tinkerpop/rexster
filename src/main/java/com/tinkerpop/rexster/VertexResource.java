@@ -32,36 +32,12 @@ import com.tinkerpop.rexster.traversals.ElementJSONObject;
 
 @Path("/{graphname}/vertices")
 @Produces(MediaType.APPLICATION_JSON)
-public class VertexResource extends BaseResource {
+public class VertexResource extends AbstractSubResource {
 	
 	private static Logger logger = Logger.getLogger(VertexResource.class);
 
     public VertexResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
-    	super();
-
-        this.rag = WebServer.GetRexsterApplication().getApplicationGraph(graphName);
-        if (this.rag == null) {
-
-            logger.info("Request for a non-configured graph [" + graphName + "]");
-
-            JSONObject error = generateErrorObject("Graph [" + graphName + "] could not be found.");
-            throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
-        }
-
-        try {
-            this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
-            Map<String, String> queryParameters = req.getParameterMap();
-            this.buildRequestObject(queryParameters);
-
-            this.request = req;
-            this.uriInfo = ui;
-        } catch (JSONException ex) {
-
-            logger.error(ex);
-
-            JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
-        }
+    	super(graphName, ui, req);
     }
     
     @GET
