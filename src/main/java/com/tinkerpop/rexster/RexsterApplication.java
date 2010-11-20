@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.parser.GraphMLReader;
+import com.tinkerpop.rexster.config.GraphConfigurationContainer;
 import com.tinkerpop.rexster.traversals.Traversal;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -45,31 +46,8 @@ public class RexsterApplication {
         // get the graph configurations from the XML config file
         List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
 
-        // create one graph for each configuration for each <graph> element
-        Iterator<HierarchicalConfiguration> it = graphConfigs.iterator();
-        while (it.hasNext()) {
-            HierarchicalConfiguration graphConfig = it.next();
-            String graphName = graphConfig.getString(Tokens.REXSTER_GRAPH_NAME);
-            boolean enabled = graphConfig.getBoolean(Tokens.REXSTER_GRAPH_ENABLED, true);
-
-            if (enabled) {
-                // one graph failing initialization will not prevent the rest in
-                // their attempt to be created
-                try {
-                    Graph graph = createGraphFromProperties(graphConfig);
-                    RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph);
-                    rag.loadPackageNames(graphConfig.getString(Tokens.REXSTER_PACKAGES_ALLOWED));
-
-                    this.graphs.put(rag.getGraphName(), rag);
-
-                    logger.info("Graph " + graphName + " - " + graph + " loaded");
-                } catch (Exception e) {
-                    logger.warn("Could not load graph " + graphName + ". Please check the XML configuration.", e);
-                }
-            } else {
-                logger.info("Graph " + graphName + " - " + " not enabled and not loaded.");
-            }
-        }
+        GraphConfigurationContainer container = new GraphConfigurationContainer(graphConfigs);
+        this.graphs = container.getApplicationGraphs();
 
         try {
             initTraversals();
@@ -157,52 +135,5 @@ public class RexsterApplication {
             }
         }
 
-    }
-
-    protected static Graph createGraphFromProperties(final Configuration properties) throws Exception {
-
-        String graphType = properties.getString(Tokens.REXSTER_GRAPH_TYPE);
-        String graphFile = properties.getString(Tokens.REXSTER_GRAPH_FILE);
-
-        Graph graph;
-        if (graphType.equals("neo4j")) {
-
-            // get the <properties> section of the xml configuration
-            HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) properties;
-            SubnodeConfiguration neo4jSpecificConfiguration = graphSectionConfig.configurationAt(Tokens.REXSTER_GRAPH_PROPERTIES);
-
-            // properties to initialize the neo4j instance.
-            HashMap<String, String> neo4jProperties = new HashMap<String, String>();
-
-            // read the properties from the xml file and convert them to properties
-            // to be injected into neo4j.
-            Iterator<String> neo4jSpecificConfigurationKeys = neo4jSpecificConfiguration.getKeys();
-            while (neo4jSpecificConfigurationKeys.hasNext()) {
-                String key = neo4jSpecificConfigurationKeys.next();
-                neo4jProperties.put(key, neo4jSpecificConfiguration.getString(key));
-            }
-
-            graph = new Neo4jGraph(graphFile, neo4jProperties);
-        } else if (graphType.equals("orientdb")) {
-
-            // get the <properties> section of the xml configuration
-            HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) properties;
-            SubnodeConfiguration orientDbSpecificConfiguration = graphSectionConfig.configurationAt(Tokens.REXSTER_GRAPH_PROPERTIES);
-
-            String username = orientDbSpecificConfiguration.getString("username");
-            String password = orientDbSpecificConfiguration.getString("password");
-
-            // calling the open method opens the connection to graphdb.  looks like the 
-            // implementation of shutdown will call the orientdb close method.
-            graph = new OrientGraph(graphFile, username, password);
-
-        } else if (graphType.equals("tinkergraph")) {
-            graph = new TinkerGraph();
-            if (null != graphFile)
-                GraphMLReader.inputGraph(graph, new FileInputStream(graphFile));
-        } else {
-            throw new Exception(graphType + " is not a supported graph type");
-        }
-        return graph;
     }
 }

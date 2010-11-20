@@ -20,7 +20,7 @@
         </graph>
         <graph>
             <graph-name>gratefulgraph</graph-name>
-            <graph-type>tinkergraph</graph-type>
+            <graph-type>com.tinkerpop.rexster.config.TinkerGraphGraphConfiguration</graph-type>
             <graph-file>data/graph-example-2.xml</graph-file>
             <packages-allowed>gremlin;grateful</packages-allowed>
         </graph>
