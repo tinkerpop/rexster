@@ -1,6 +1,11 @@
 package com.tinkerpop.rexster.config;
 
 public class GraphConfigurationException extends Exception {
+	
+	public GraphConfigurationException(String msg){
+		super(msg);
+	}
+	
 	public GraphConfigurationException(Throwable inner){
 		super(inner);
 	}

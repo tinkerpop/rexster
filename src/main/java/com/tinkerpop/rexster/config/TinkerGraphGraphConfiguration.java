@@ -13,14 +13,17 @@ public class TinkerGraphGraphConfiguration implements GraphConfiguration {
 
 	@Override
 	public Graph configureGraphInstance(Configuration properties) throws GraphConfigurationException{
+		
+		String graphFile = properties.getString(Tokens.REXSTER_GRAPH_FILE);
+		
+		if (graphFile == null || graphFile.length() == 0) {
+			throw new GraphConfigurationException(
+					"Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_FILE);
+		}
+		
 		try {
-	        String graphFile = properties.getString(Tokens.REXSTER_GRAPH_FILE);
-	        
-			TinkerGraph graph = new TinkerGraph();
-	        if (null != graphFile){
-	            GraphMLReader.inputGraph(graph, new FileInputStream(graphFile));
-	        }
-	        
+	        TinkerGraph graph = new TinkerGraph();
+	        GraphMLReader.inputGraph(graph, new FileInputStream(graphFile));
 	        return graph;
 		} catch (Exception ex){
 			throw new GraphConfigurationException(ex);

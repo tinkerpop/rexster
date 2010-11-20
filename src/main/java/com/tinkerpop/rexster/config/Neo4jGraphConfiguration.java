@@ -16,13 +16,27 @@ public class Neo4jGraphConfiguration implements GraphConfiguration {
 	@Override
 	public Graph configureGraphInstance(Configuration properties) throws GraphConfigurationException {
 		
+		String graphFile = properties.getString(Tokens.REXSTER_GRAPH_FILE);
+		
+		if (graphFile == null || graphFile.length() == 0) {
+			throw new GraphConfigurationException(
+					"Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_FILE);
+		}
+
+		// get the <properties> section of the xml configuration
+        HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) properties;
+        SubnodeConfiguration neo4jSpecificConfiguration;
+        
+        try {
+        	neo4jSpecificConfiguration = graphSectionConfig.configurationAt(
+        			Tokens.REXSTER_GRAPH_PROPERTIES);
+        } catch (IllegalArgumentException iae) {
+        	throw new GraphConfigurationException(
+        			"Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_PROPERTIES);
+		}
+        
 		try {
-	        String graphFile = properties.getString(Tokens.REXSTER_GRAPH_FILE);
 	        
-	        // get the <properties> section of the xml configuration
-	        HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) properties;
-	        SubnodeConfiguration neo4jSpecificConfiguration = graphSectionConfig.configurationAt(Tokens.REXSTER_GRAPH_PROPERTIES);
-	
 	        // properties to initialize the neo4j instance.
 	        HashMap<String, String> neo4jProperties = new HashMap<String, String>();
 	
