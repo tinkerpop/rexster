@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.parser.GraphMLReader;
 import com.tinkerpop.rexster.config.GraphConfigurationContainer;
+import com.tinkerpop.rexster.config.GraphConfigurationException;
 import com.tinkerpop.rexster.traversals.Traversal;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -46,17 +47,25 @@ public class RexsterApplication {
         // get the graph configurations from the XML config file
         List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
 
-        GraphConfigurationContainer container = new GraphConfigurationContainer(graphConfigs);
-        this.graphs = container.getApplicationGraphs();
-
         try {
-            initTraversals();
-            logger.info("Traversal initialization completed.");
-        } catch (Exception e) {
-            logger.error("Traversal initialization failed.", e);
+	        GraphConfigurationContainer container = new GraphConfigurationContainer(graphConfigs);
+	        this.graphs = container.getApplicationGraphs();
+        } catch (GraphConfigurationException gce) {
+        	logger.error("Graph initialization failed. Check the graph configuration in rexster.xml.");
         }
 
-        this.resultObjectCache = new ResultObjectCache();
+        if (this.graphs != null && this.graphs.size() > 0) {
+        	
+        	// only worth initializing if there are some graphs to deal with.
+	        try {
+	            initTraversals();
+	            logger.info("Traversal initialization completed.");
+	        } catch (Exception e) {
+	            logger.error("Traversal initialization failed.", e);
+	        }
+	
+	        this.resultObjectCache = new ResultObjectCache();
+        }
 
     }
 

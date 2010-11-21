@@ -11,15 +11,10 @@ public class TinkerGraphGraphConfigurationTest {
 	private GraphConfiguration configuration = new TinkerGraphGraphConfiguration(); 
 	
 	@Test(expected= GraphConfigurationException.class)
-	public void configureGraphInstanceNoGraphFile() throws GraphConfigurationException {
+	public void configureGraphInstanceMissingGraphFileConfig() throws GraphConfigurationException {
 		Configuration graphConfig = new HierarchicalConfiguration();
+		graphConfig.addProperty(Tokens.REXSTER_GRAPH_FILE, "some-file-that-does-not-exist");
 		configuration.configureGraphInstance(graphConfig);
 	}
 	
-	@Test(expected= GraphConfigurationException.class)
-	public void configureGraphInstanceNoOrientConfig() throws GraphConfigurationException {
-		Configuration graphConfig = new HierarchicalConfiguration();
-		graphConfig.addProperty(Tokens.REXSTER_GRAPH_FILE, "some-file");
-		configuration.configureGraphInstance(graphConfig);
-	}
 }
