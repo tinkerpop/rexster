@@ -172,38 +172,34 @@ public abstract class BaseResource {
     }
 
     public Long getStartOffset() {
-        JSONObject rexster = this.getRexsterRequest();
-        if (null != rexster) {
-            if (rexster.has(Tokens.OFFSET)) {
-                Long start = rexster.optJSONObject(Tokens.OFFSET).optLong(Tokens.START);
-                if (null != start)
-                    return start;
-                else
-                    return null;
-            } else
-                return null;
-        } else {
-            return null;
-        }
+        return getOffset(Tokens.START);
     }
 
 
     public Long getEndOffset() {
-        JSONObject rexster = this.getRexsterRequest();
+        return getOffset(Tokens.END);
+    }
+
+	private Long getOffset(String offsetToken) {
+		JSONObject rexster = this.getRexsterRequest();
         if (null != rexster) {
             if (rexster.has(Tokens.OFFSET)) {
-                Long end = rexster.optJSONObject(Tokens.OFFSET).optLong(Tokens.END);
-                if (null != end)
-                    return end;
-                else
+            	
+            	// returns zero if the value identified by the offsetToken is 
+            	// not a number and the key is just present.
+                Long offset = rexster.optJSONObject(Tokens.OFFSET).optLong(offsetToken);
+                if (offset != null){
+                    return offset;
+                } else {
                     return null;
-            } else
+                }
+            } else {
                 return null;
+            }
         } else {
             return null;
         }
-
-    }
+	}
 
     public List<String> getReturnKeys() {
         JSONObject rexster = this.getRexsterRequest();

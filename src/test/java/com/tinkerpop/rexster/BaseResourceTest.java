@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster;
 
-import junit.framework.TestCase;
-
 import org.codehaus.jettison.json.JSONException;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,8 +10,9 @@ import java.util.Map;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class BaseResourceTest extends TestCase {
+public class BaseResourceTest {
 
+	@Test
     public void testQueryParametersToJson()  throws JSONException {
         BaseResource tt = new MockResource();
         Map<String, String> qp = new HashMap<String, String>();
@@ -24,29 +25,109 @@ public class BaseResourceTest extends TestCase {
         qp.put("d", "[marko,rodriguez,10]");
         
         tt.buildRequestObject(qp);
-        assertTrue(tt.getRequestObject().optBoolean("a"));
-        assertFalse(tt.getRequestObject().optBoolean("b"));
-        assertEquals(tt.getRequestObject().optJSONObject("c").optDouble("a"), 12.0);
-        assertEquals(tt.getRequestObject().optJSONObject("c").optString("b"), "\"marko\"");
-        assertEquals(tt.getRequestObject().optJSONObject("c").optString("c"), "peter");
-        assertTrue(tt.getRequestObject().optJSONObject("c").optJSONObject("d").optJSONObject("a").optBoolean("b"));
-        assertEquals(tt.getRequestObject().optJSONArray("d").optString(0), "marko");
-        assertEquals(tt.getRequestObject().optJSONArray("d").optString(1), "rodriguez");
+        Assert.assertTrue(tt.getRequestObject().optBoolean("a"));
+        Assert.assertFalse(tt.getRequestObject().optBoolean("b"));
+        Assert.assertEquals(12.0, tt.getRequestObject().optJSONObject("c").optDouble("a"), 0);
+        Assert.assertEquals("\"marko\"", tt.getRequestObject().optJSONObject("c").optString("b"));
+        Assert.assertEquals("peter", tt.getRequestObject().optJSONObject("c").optString("c"));
+        Assert.assertTrue(tt.getRequestObject().optJSONObject("c").optJSONObject("d").optJSONObject("a").optBoolean("b"));
+        Assert.assertEquals("marko", tt.getRequestObject().optJSONArray("d").optString(0));
+        Assert.assertEquals("rodriguez", tt.getRequestObject().optJSONArray("d").optString(1));
         // TODO: make this not a string but a number?
-        assertEquals(tt.getRequestObject().optJSONArray("d").optString(2), "10");
+        Assert.assertEquals("10", tt.getRequestObject().optJSONArray("d").optString(2));
     }
-
-    public void testOffsetParsing() throws JSONException {
-        BaseResource tt = new MockResource();
+	
+	@Test 
+	public void getStartOffsetEmptyRequest(){
+		BaseResource tt = new MockResource();
+        Assert.assertNull(tt.getStartOffset());
+	}
+	
+	@Test 
+	public void getStartOffsetNoOffset(){
+		BaseResource tt = new MockResource();
+		tt.buildRequestObject("{\"rexster\": { \"anyotherproperty\": { \"start\":\"ten\", \"end\":100 }}}");
+        Assert.assertNull(tt.getStartOffset());
+	}
+	
+	@Test 
+	public void getStartOffsetInvalidOffset(){
+		BaseResource tt = new MockResource();
+		tt.buildRequestObject("{\"rexster\": { \"offset\": { \"start\":\"ten\", \"end\":100 }}}");
+		Assert.assertEquals(0l, (long) tt.getStartOffset());
+	}
+	
+	@Test 
+	public void getStartOffsetValid(){
+		BaseResource tt = new MockResource();
         tt.buildRequestObject("{\"rexster\": { \"offset\": { \"start\":10, \"end\":100 }}}");
-        assertEquals((long)tt.getStartOffset(), 10l);
-        assertEquals((long)tt.getEndOffset(), 100l);
+        Assert.assertEquals(10l, (long)tt.getStartOffset());
 
         tt = new MockResource();
         tt.buildRequestObject("{\"rexster\": { \"offset\": { \"start\":-10, \"end\":10001 }}}");
-        assertEquals((long)tt.getStartOffset(), -10l);
-        assertEquals((long)tt.getEndOffset(), 10001l);
-    }
+        Assert.assertEquals(-10l, (long)tt.getStartOffset());
+	}
+	
+	@Test 
+	public void getEndOffsetEmptyRequest(){
+		BaseResource tt = new MockResource();
+        Assert.assertNull(tt.getEndOffset());
+	}
+	
+	@Test 
+	public void getEndOffsetNoOffset(){
+		BaseResource tt = new MockResource();
+		tt.buildRequestObject("{\"rexster\": { \"anyotherproperty\": { \"start\":10, \"end\":100 }}}");
+        Assert.assertNull(tt.getEndOffset());
+	}
+	
+	@Test 
+	public void getEndOffsetInvalidOffset(){
+		BaseResource tt = new MockResource();
+		tt.buildRequestObject("{\"rexster\": { \"offset\": { \"start\":10, \"end\":\"onehundred\" }}}");
+        Assert.assertEquals(0l, (long) tt.getEndOffset());
+	}
+	
+	@Test 
+	public void getEndOffsetValid(){
+		BaseResource tt = new MockResource();
+        tt.buildRequestObject("{\"rexster\": { \"offset\": { \"start\":10, \"end\":100 }}}");
+        Assert.assertEquals(100l, (long)tt.getEndOffset());
+
+        tt = new MockResource();
+        tt.buildRequestObject("{\"rexster\": { \"offset\": { \"start\":-10, \"end\":10001 }}}");
+        Assert.assertEquals(10001l, (long)tt.getEndOffset());
+	}
+	
+	@Test 
+	public void getReturnKeysEmptyRequest(){
+		BaseResource tt = new MockResource();
+        Assert.assertNull(tt.getEndOffset());
+	}
+	
+	@Test 
+	public void getReturnKeysNoKeys(){
+		BaseResource tt = new MockResource();
+		tt.buildRequestObject("{\"rexster\": { \"someproperty\": [ \"key\" ]}}");
+        Assert.assertNull(tt.getReturnKeys());
+	}
+	
+	@Test 
+	public void getReturnKeysValid(){
+		BaseResource tt = new MockResource();
+		tt.buildRequestObject("{\"rexster\": { \"return_keys\": [ \"key1\" ]}}");
+		Assert.assertNotNull(tt.getReturnKeys());
+        Assert.assertEquals(1, tt.getReturnKeys().size());
+        Assert.assertEquals("key1", tt.getReturnKeys().get(0));
+
+        tt = new MockResource();
+		tt.buildRequestObject("{\"rexster\": { \"return_keys\": [ \"key1\", \"key2\", \"key3\" ]}}");
+		Assert.assertNotNull(tt.getReturnKeys());
+        Assert.assertEquals(3, tt.getReturnKeys().size());
+        Assert.assertEquals("key1", tt.getReturnKeys().get(0));
+        Assert.assertEquals("key2", tt.getReturnKeys().get(1));
+        Assert.assertEquals("key3", tt.getReturnKeys().get(2));
+	}
 
     protected class MockResource extends BaseResource {
     }

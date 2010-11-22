@@ -2,20 +2,17 @@ package com.tinkerpop.rexster.traversals;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
-import junit.framework.TestCase;
 
 import java.util.Map;
 
 import org.codehaus.jettison.json.JSONException;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class AbstractRankTraversalTest extends TestCase {
-
-    public void testTrue() {
-        assertTrue(true);
-    }
+public class AbstractRankTraversalTest {
 
     /*public void testRankSorting() {
         TestTraversal tt = new TestTraversal();
@@ -61,88 +58,89 @@ public class AbstractRankTraversalTest extends TestCase {
         }
     }*/
 
+    @Test
     public void testRankOffsets() throws JSONException{
         TestTraversal tt = new TestTraversal();
         buildTestRanks(tt.idToElement);
         tt.generateRankList();
         tt.sortRanks("rank");
-        assertEquals(tt.ranks.size(), 5);
+        Assert.assertEquals(5, tt.ranks.size());
         tt.offsetRanks();
-        assertEquals(tt.ranks.size(), 5);
+        Assert.assertEquals(5, tt.ranks.size());
         tt.ranks.clear();
-        assertEquals(tt.ranks.size(), 0);
+        Assert.assertEquals(0, tt.ranks.size());
 
         buildTestRanks(tt.idToElement);
         tt.generateRankList();
-        assertEquals(tt.ranks.size(), 5);
+        Assert.assertEquals(5, tt.ranks.size());
         tt.sort = AbstractRankTraversal.Sort.REVERSE;
         tt.sortRanks("rank");
         tt.startOffset = 0;
         tt.endOffset = 3;
         tt.offsetRanks();
-        assertEquals(tt.ranks.size(), 3);
-        assertEquals(tt.ranks.get(0).getId(), "e");
-        assertEquals(tt.ranks.get(1).getId(), "d");
-        assertEquals(tt.ranks.get(2).getId(), "c");
+        Assert.assertEquals(3, tt.ranks.size());
+        Assert.assertEquals("e", tt.ranks.get(0).getId());
+        Assert.assertEquals("d", tt.ranks.get(1).getId());
+        Assert.assertEquals("c", tt.ranks.get(2).getId());
         tt.ranks.clear();
-        assertEquals(tt.ranks.size(), 0);
+        Assert.assertEquals(0, tt.ranks.size());
 
         buildTestRanks(tt.idToElement);
         tt.generateRankList();
-        assertEquals(tt.ranks.size(), 5);
+        Assert.assertEquals(5, tt.ranks.size());
         tt.sort = AbstractRankTraversal.Sort.REGULAR;
         tt.sortRanks("rank");
         tt.startOffset = 0;
         tt.endOffset = 3;
         tt.offsetRanks();
-        assertEquals(tt.ranks.size(), 3);
-        assertEquals(tt.ranks.get(0).getId(), "a");
-        assertEquals(tt.ranks.get(1).getId(), "b");
-        assertEquals(tt.ranks.get(2).getId(), "c");
+        Assert.assertEquals(3, tt.ranks.size());
+        Assert.assertEquals("a", tt.ranks.get(0).getId());
+        Assert.assertEquals("b", tt.ranks.get(1).getId());
+        Assert.assertEquals("c", tt.ranks.get(2).getId());
         tt.ranks.clear();
-        assertEquals(tt.ranks.size(), 0);
+        Assert.assertEquals(0, tt.ranks.size());
 
         buildTestRanks(tt.idToElement);
         tt.generateRankList();
-        assertEquals(tt.ranks.size(), 5);
+        Assert.assertEquals(5, tt.ranks.size());
         tt.sort = AbstractRankTraversal.Sort.REGULAR;
         tt.sortRanks("rank");
         tt.startOffset = 0;
         tt.endOffset = 3;
         tt.offsetRanks();
-        assertEquals(tt.ranks.size(), 3);
-        assertEquals(tt.ranks.get(0).getId(), "a");
-        assertEquals(tt.ranks.get(1).getId(), "b");
-        assertEquals(tt.ranks.get(2).getId(), "c");
+        Assert.assertEquals(3, tt.ranks.size());
+        Assert.assertEquals("a", tt.ranks.get(0).getId());
+        Assert.assertEquals("b", tt.ranks.get(1).getId());
+        Assert.assertEquals("c", tt.ranks.get(2).getId());
         tt.ranks.clear();
-        assertEquals(tt.ranks.size(), 0);
+        Assert.assertEquals(0, tt.ranks.size());
 
         buildTestRanks(tt.idToElement);
         tt.generateRankList();
-        assertEquals(tt.ranks.size(), 5);
+        Assert.assertEquals(5, tt.ranks.size());
         tt.sort = AbstractRankTraversal.Sort.REVERSE;
         tt.sortRanks("rank");
         tt.startOffset = 4;
         tt.endOffset = -1;
         tt.offsetRanks();
-        assertEquals(tt.ranks.size(), 1);
-        assertEquals(tt.ranks.get(0).getId(), "a");
+        Assert.assertEquals(1, tt.ranks.size());
+        Assert.assertEquals("a", tt.ranks.get(0).getId());
         tt.ranks.clear();
-        assertEquals(tt.ranks.size(), 0);
+        Assert.assertEquals(0, tt.ranks.size());
 
 
         buildTestRanks(tt.idToElement);
         tt.generateRankList();
-        assertEquals(tt.ranks.size(), 5);
+        Assert.assertEquals(5, tt.ranks.size());
         tt.sort = AbstractRankTraversal.Sort.REVERSE;
         tt.sortRanks("rank");
         tt.startOffset = 3;
         tt.endOffset = 4;
         tt.offsetRanks();
-        assertEquals(tt.ranks.size(), 1);
-        assertEquals(tt.ranks.get(0).getId(), "b");
+        Assert.assertEquals(1, tt.ranks.size());
+        Assert.assertEquals("b", tt.ranks.get(0).getId());
         tt.ranks.clear();
-        assertEquals(tt.ranks.size(), 0);
+        Assert.assertEquals(0, tt.ranks.size());
 
     }
 

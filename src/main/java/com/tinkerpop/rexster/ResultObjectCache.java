@@ -25,7 +25,16 @@ public class ResultObjectCache {
     }
 
     public ResultObjectCache(final Properties properties) {
-        ResultObjectCache.maxSize = new Integer(properties.getProperty(Tokens.REXSTER_CACHE_MAXSIZE_PATH));
+    	
+    	Object configuredMaxSizeString = properties.get(Tokens.REXSTER_CACHE_MAXSIZE_PATH);
+    	try {
+    		if (configuredMaxSizeString != null) {
+    			ResultObjectCache.maxSize = Integer.parseInt(configuredMaxSizeString.toString());
+    		}
+    	} catch (NumberFormatException nfe) {
+    		logger.warn("Cache configuration for " + Tokens.REXSTER_CACHE_MAXSIZE_PATH + " does not contain a valid integer value.", nfe);
+    	}
+    	
         logger.info("Cache constructed with a maximum size of " + ResultObjectCache.maxSize);
     }
 

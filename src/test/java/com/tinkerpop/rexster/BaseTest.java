@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public abstract class BaseTest extends TestCase {
+public abstract class BaseTest {
 
     private WebServer webServer;
     protected StatisticsHelper sh = new StatisticsHelper();

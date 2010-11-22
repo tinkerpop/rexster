@@ -1,19 +1,21 @@
 package com.tinkerpop.rexster;
 
-import junit.framework.TestCase;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
 import java.util.UUID;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class ResultObjectCacheTest extends TestCase {
+public class ResultObjectCacheTest {
 
     private static final List<String> uuids = new ArrayList<String>();
     private static final Random random = new Random();
@@ -25,7 +27,52 @@ public class ResultObjectCacheTest extends TestCase {
             uuids.add(UUID.randomUUID().toString());
         }
     }
+    
+    @Before
+    public void setUp(){
+    	ResultObjectCache.maxSize = 1000;
+    }
+    
+    @Test
+    public void constructorNoConfiguredCacheSize(){
+    	
+    	Properties props = new Properties();
+    	
+    	int defaultSize = ResultObjectCache.maxSize;
+    	Assert.assertEquals(defaultSize, new ResultObjectCache(props).maxSize);
+    }
+    
+    @Test
+    public void constructorConfiguredEmptyCacheSize(){
+    	
+    	Properties props = new Properties();
+    	props.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, "");
+    	
+    	int defaultSize = ResultObjectCache.maxSize;
+    	Assert.assertEquals(defaultSize, new ResultObjectCache(props).maxSize);
+    }
+    
+    @Test
+    public void constructorConfigureInvalidCacheSize(){
+    	
+    	Properties props = new Properties();
+    	props.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, "one hundred");
+    	
+    	int defaultSize = ResultObjectCache.maxSize;
+    	Assert.assertEquals(defaultSize, new ResultObjectCache(props).maxSize);
+    }
+    
+    @Test
+    public void constructorConfigureCacheSize(){
+    	
+    	int expectedCacheSize = 100;
+    	Properties props = new Properties();
+    	props.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, expectedCacheSize);
+    	
+    	Assert.assertEquals(expectedCacheSize, new ResultObjectCache(props).maxSize);
+    }
 
+    @Test
     public void testElderModel() throws JSONException {
         ResultObjectCache resultObjectCache = new ResultObjectCache();
         List<String> uuids = new ArrayList<String>();
@@ -36,22 +83,25 @@ public class ResultObjectCacheTest extends TestCase {
             resultObjectCache.putCachedResult(uuid.toString(), temp);
             uuids.add(uuid.toString());
         }
+        
         int counter = 0;
         for (String uuid : uuids) {
-            assertTrue(resultObjectCache.getCachedResult(uuid) != null);
-            assertEquals(resultObjectCache.getCachedResult(uuid).get("value"), counter);
+        	Assert.assertTrue(resultObjectCache.getCachedResult(uuid) != null);
+        	Assert.assertEquals(resultObjectCache.getCachedResult(uuid).get("value"), counter);
             counter++;
         }
-        assertEquals(resultObjectCache.getCacheSize(), 1000);
-        assertEquals(resultObjectCache.getCachedResult(uuids.get(0)).get("value"), 0);
+        
+        Assert.assertEquals(resultObjectCache.getCacheSize(), 1000);
+        Assert.assertEquals(resultObjectCache.getCachedResult(uuids.get(0)).get("value"), 0);
         resultObjectCache.putCachedResult(UUID.randomUUID().toString(), new JSONObject());
-        assertNull(resultObjectCache.getCachedResult(uuids.get(0)));
-        assertEquals(resultObjectCache.getCachedResult(uuids.get(1)).get("value"), 1);
-        assertEquals(resultObjectCache.getCachedResult(uuids.get(1)).get("value"), 1);
+        Assert.assertNull(resultObjectCache.getCachedResult(uuids.get(0)));
+        Assert.assertEquals(resultObjectCache.getCachedResult(uuids.get(1)).get("value"), 1);
+        Assert.assertEquals(resultObjectCache.getCachedResult(uuids.get(1)).get("value"), 1);
         resultObjectCache.putCachedResult(UUID.randomUUID().toString(), new JSONObject());
-        assertNull(resultObjectCache.getCachedResult(uuids.get(1)));
+        Assert.assertNull(resultObjectCache.getCachedResult(uuids.get(1)));
     }
 
+    @Test
     public void testThreadSafety() {
         ResultObjectCache resultObjectCache = new ResultObjectCache();
         for (int i = 0; i < totalThreads; i++) {

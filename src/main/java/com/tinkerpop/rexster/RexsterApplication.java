@@ -46,7 +46,8 @@ public class RexsterApplication {
 
         // get the graph configurations from the XML config file
         List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
-
+        int cacheMaxSize = properties.getInt(Tokens.REXSTER_CACHE_MAXSIZE_PATH, ResultObjectCache.maxSize);
+        
         try {
 	        GraphConfigurationContainer container = new GraphConfigurationContainer(graphConfigs);
 	        this.graphs = container.getApplicationGraphs();
@@ -63,9 +64,11 @@ public class RexsterApplication {
 	        } catch (Exception e) {
 	            logger.error("Traversal initialization failed.", e);
 	        }
-	
-	        this.resultObjectCache = new ResultObjectCache();
         }
+        
+        Properties cacheProperties = new Properties();
+        cacheProperties.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, cacheMaxSize);
+        this.resultObjectCache = new ResultObjectCache(cacheProperties);
 
     }
 

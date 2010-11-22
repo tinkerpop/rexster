@@ -1,16 +1,18 @@
 package com.tinkerpop.rexster;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class VertexResourceTest extends BaseTest {
 
+	@Before
     public void setUp() {
         try {
             this.startWebServer();
@@ -19,6 +21,7 @@ public class VertexResourceTest extends BaseTest {
         }
     }
 
+	@After
     public void tearDown() {
         try {
             this.stopWebServer();
@@ -27,108 +30,114 @@ public class VertexResourceTest extends BaseTest {
         }
     }
 
-    public void testGetAllVertices() throws Exception {
+	@Test
+    public void getAllVertices() throws Exception {
         sh.stopWatch();
         String uri = createURI("vertices");
         JSONObject object = getResource(uri);
         printPerformance("GET all vertices", null, uri, sh.stopWatch());
-        assertEquals(object.getLong("total_size"), 809l);
+        Assert.assertEquals(809l, object.getLong("total_size"));
         
         JSONArray arr = object.getJSONArray("results");
         
         for (int ix = 0; ix < arr.length(); ix ++) {
         	JSONObject vertex = arr.getJSONObject(ix);
-            assertEquals(vertex.getString("_type"), "vertex");
+        	Assert.assertEquals("vertex", vertex.getString("_type"));
         }
-        assertEquals((long) ((JSONArray) object.get("results")).length(), object.getLong("total_size"));
+        Assert.assertEquals(object.getLong("total_size"), (long) ((JSONArray) object.get("results")).length());
     }
 
-    public void testGetAllVerticesWithOffset() throws Exception {
+	@Test
+    public void getAllVerticesWithOffset() throws Exception {
         sh.stopWatch();
         String uri = createURI("vertices?rexster.offset.start=10&rexster.offset.end=20");
         JSONObject object = getResource(uri);
         printPerformance("GET vertices 10-20", null, uri, sh.stopWatch());
-        assertEquals(object.getLong("total_size"), 809l);
+        Assert.assertEquals(809l, object.getLong("total_size"));
         
         JSONArray arr = object.getJSONArray("results");
         
         for (int ix = 0; ix < arr.length(); ix ++) {
         	JSONObject vertex = arr.getJSONObject(ix);
 
-            assertEquals(vertex.getString("_type"), "vertex");
+        	Assert.assertEquals("vertex", vertex.getString("_type"));
         }
-        assertEquals((long) ((JSONArray) object.get("results")).length(), 10);
+        Assert.assertEquals(10, (long) ((JSONArray) object.get("results")).length());
     }
 
-    public void testGetVertexIndex() throws Exception {
+	@Test
+    public void getVertexIndex() throws Exception {
         sh.stopWatch();
         String uri = createURI("vertices?name=Garcia");
         JSONObject object = getResource(uri);
         printPerformance("GET single vertex through index", null, uri, sh.stopWatch());
-        assertEquals(object.getLong("total_size"), 1l);
-        assertEquals((long) ((JSONArray) object.get("results")).length(), object.getLong("total_size"));
+        Assert.assertEquals(1l, object.getLong("total_size"));
+        Assert.assertEquals(object.getLong("total_size"), (long) ((JSONArray) object.get("results")).length());
     }
 
-    public void testGetVertexEdges() throws Exception {
+	@Test
+    public void getVertexEdges() throws Exception {
         long total = 0l;
         sh.stopWatch();
         String uri = createURI("vertices/1/outE");
         JSONObject object = getResource(uri);
         printPerformance("GET vertex out edges", null, uri, sh.stopWatch());
         total = total + object.getLong("total_size");
-        assertEquals((long) ((JSONArray) object.get("results")).length(), object.getLong("total_size"));
+        Assert.assertEquals(object.getLong("total_size"), (long) ((JSONArray) object.get("results")).length());
 
         sh.stopWatch();
         uri = createURI("vertices/1/inE");
         object = getResource(uri);
         printPerformance("GET vertex in edges", null, uri, sh.stopWatch());
         total = total + object.getLong("total_size");
-        assertEquals((long) ((JSONArray) object.get("results")).length(), object.getLong("total_size"));
+        Assert.assertEquals(object.getLong("total_size"), (long) ((JSONArray) object.get("results")).length());
 
         sh.stopWatch();
         uri = createURI("vertices/1/bothE");
         object = getResource(uri);
         printPerformance("GET vertex both edges", null, uri, sh.stopWatch());
-        assertEquals(total, object.getLong("total_size"));
-        assertEquals(object.getLong("total_size"), total);
-        assertEquals((long) ((JSONArray) object.get("results")).length(), object.getLong("total_size"));
+        Assert.assertEquals(total, object.getLong("total_size"));
+        Assert.assertEquals(object.getLong("total_size"), (long) ((JSONArray) object.get("results")).length());
 
     }
 
-    public void testGetVertexEdgesLabelFilter() throws Exception {
+	@Test
+    public void getVertexEdgesLabelFilter() throws Exception {
         sh.stopWatch();
         String uri = createURI("vertices/1/outE?_label=sung_by");
         JSONObject object = getResource(uri);
         printPerformance("GET vertex out edges label filter", null, uri, sh.stopWatch());
-        assertEquals(object.getLong("total_size"), 1l);
-        assertEquals((long) ((JSONArray) object.get("results")).length(), object.getLong("total_size"));
+        Assert.assertEquals(1l, object.getLong("total_size"));
+        Assert.assertEquals(object.getLong("total_size"), (long) ((JSONArray) object.get("results")).length());
 
         sh.stopWatch();
         uri = createURI("vertices/1/outE?_label=written_by");
         object = getResource(uri);
         printPerformance("GET vertex out edges label filter", null, uri, sh.stopWatch());
-        assertEquals(object.getLong("total_size"), 1l);
-        assertEquals((long) ((JSONArray) object.get("results")).length(), object.getLong("total_size"));
+        Assert.assertEquals(1l, object.getLong("total_size"));
+        Assert.assertEquals(object.getLong("total_size"), (long) ((JSONArray) object.get("results")).length());
     }
 
-    public void testPostVertex() throws Exception {
+	@Test
+    public void postVertex() throws Exception {
         sh.stopWatch();
         String uri = createURI("vertices/9999");
         JSONObject object = postResource(uri);
         printPerformance("POST vertex", null, uri, sh.stopWatch());
         object = object.getJSONObject("results");
-        assertEquals(object.getString("_id"), "9999");
-        assertEquals(object.getString("_type"), "vertex");
-        assertEquals(object.opt("_outE"), null);
+        Assert.assertEquals("9999", object.getString("_id"));
+        Assert.assertEquals("vertex", object.getString("_type"));
+        Assert.assertNull(object.opt("_outE"));
         uri = createURI("vertices/9999/");
         object = getResource(uri);
         object = object.getJSONObject("results");
-        assertEquals(object.getString("_id"), "9999");
-        assertEquals(object.getString("_type"), "vertex");
-        assertEquals(object.opt("_outE"), null);
+        Assert.assertEquals("9999", object.getString("_id"));
+        Assert.assertEquals("vertex", object.getString("_type"));
+        Assert.assertNull(object.opt("_outE"));
     }
 
-    public void testPostManyVertices() throws Exception {
+	@Test
+    public void postManyVertices() throws Exception {
         sh.stopWatch();
         int startVertexId = 9999;
         int total = 250;
@@ -136,9 +145,9 @@ public class VertexResourceTest extends BaseTest {
             String uri = createURI("vertices/" + i);
             JSONObject object = postResource(uri);
             object = object.getJSONObject("results");
-            assertEquals(object.getString("_id"), "" + i);
-            assertEquals(object.getString("_type"), "vertex");
-            assertEquals(object.opt("_outE"), null);
+            Assert.assertEquals("" + i, object.getString("_id"));
+            Assert.assertEquals("vertex", object.getString("_type"));
+            Assert.assertNull(object.opt("_outE"));
         }
         printPerformance("POST vertices", total, "vertices/xxxx", sh.stopWatch());
 
@@ -147,34 +156,35 @@ public class VertexResourceTest extends BaseTest {
             String uri = createURI("vertices/" + i);
             JSONObject object = getResource(uri);
             object = object.getJSONObject("results");
-            assertEquals(object.getString("_id"), "" + i);
-            assertEquals(object.getString("_type"), "vertex");
-            assertEquals(object.opt("_outE"), null);
+            Assert.assertEquals("" + i, object.getString("_id"));
+            Assert.assertEquals("vertex", object.getString("_type"));
+            Assert.assertNull(object.opt("_outE"));
         }
         printPerformance("GET vertices", total, "vertices/xxxx", sh.stopWatch());
     }
 
-    public void testPostVertexProperties() throws Exception {
+	@Test
+    public void postVertexProperties() throws Exception {
         // to existing vertex
         sh.stopWatch();
         String uri = createURI("vertices/1?key1=value1&key2=value2&name=REXSTER");
         JSONObject object = postResource(uri);
         printPerformance("POST vertex", null, uri, sh.stopWatch());
         object = object.getJSONObject("results");
-        assertEquals(object.getString("_id"), "1");
-        assertEquals(object.getString("_type"), "vertex");
-        assertEquals(object.getString("key1"), "value1");
-        assertEquals(object.getString("key2"), "value2");
-        assertEquals(object.getString("name"), "REXSTER");
+        Assert.assertEquals("1", object.getString("_id"));
+        Assert.assertEquals("vertex", object.getString("_type"));
+        Assert.assertEquals("value1", object.getString("key1"));
+        Assert.assertEquals("value2", object.getString("key2"));
+        Assert.assertEquals("REXSTER", object.getString("name"));
         uri = createURI("vertices/1");
         object = getResource(uri);
         object = object.getJSONObject("results");
         printPerformance("GET vertex", null, uri, sh.stopWatch());
-        assertEquals(object.getString("_id"), "1");
-        assertEquals(object.getString("_type"), "vertex");
-        assertEquals(object.getString("key1"), "value1");
-        assertEquals(object.getString("key2"), "value2");
-        assertEquals(object.getString("name"), "REXSTER");
+        Assert.assertEquals("1", object.getString("_id"));
+        Assert.assertEquals("vertex", object.getString("_type"));
+        Assert.assertEquals("value1", object.getString("key1"));
+        Assert.assertEquals("value2", object.getString("key2"));
+        Assert.assertEquals("REXSTER", object.getString("name"));
 
         // to new vertex
         sh.stopWatch();
@@ -182,25 +192,24 @@ public class VertexResourceTest extends BaseTest {
         object = postResource(uri);
         printPerformance("POST vertex", null, uri, sh.stopWatch());
         object = object.getJSONObject("results");
-        assertEquals(object.getString("_id"), "9999");
-        assertEquals(object.getString("_type"), "vertex");
-        assertEquals(object.getString("key1"), "value1");
-        assertEquals(object.getString("key2"), "value2");
-        assertEquals(object.getString("name"), "REXSTER");
+        Assert.assertEquals("9999", object.getString("_id"));
+        Assert.assertEquals("vertex", object.getString("_type"));
+        Assert.assertEquals("value1", object.getString("key1"));
+        Assert.assertEquals("value2", object.getString("key2"));
+        Assert.assertEquals("REXSTER", object.getString("name"));
         uri = createURI("vertices/9999");
         object = getResource(uri);
         object = object.getJSONObject("results");
         printPerformance("GET vertex", null, uri, sh.stopWatch());
-        assertEquals(object.getString("_id"), "9999");
-        assertEquals(object.getString("_type"), "vertex");
-        assertEquals(object.getString("key1"), "value1");
-        assertEquals(object.getString("key2"), "value2");
-        assertEquals(object.getString("name"), "REXSTER");
+        Assert.assertEquals("9999", object.getString("_id"));
+        Assert.assertEquals("vertex", object.getString("_type"));
+        Assert.assertEquals("value1", object.getString("key1"));
+        Assert.assertEquals("value2", object.getString("key2"));
+        Assert.assertEquals("REXSTER", object.getString("name"));
     }
 
-
-
-    public void testDeleteVertex() throws Exception {
+	@Test
+    public void deleteVertex() throws Exception {
         sh.stopWatch();
         String uri = createURI("vertices/1");
         deleteResource(uri);
@@ -212,7 +221,7 @@ public class VertexResourceTest extends BaseTest {
         printPerformance("GET vertex", null, uri, sh.stopWatch());
         
         // this is a not found 404 error so should return a JSON error message
-        assertTrue(object.has("message"));
+        Assert.assertTrue(object.has("message"));
 
         int vertexAmount = 809;
 
@@ -230,6 +239,6 @@ public class VertexResourceTest extends BaseTest {
         uri = createURI("vertices");
         object = getResource(uri);
         printPerformance("GET vertices", null, uri, sh.stopWatch());
-        assertEquals(0, object.getJSONArray("results").length());
+        Assert.assertEquals(0, object.getJSONArray("results").length());
     }
 }

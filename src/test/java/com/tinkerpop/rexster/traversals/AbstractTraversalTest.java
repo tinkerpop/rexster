@@ -1,13 +1,15 @@
 package com.tinkerpop.rexster.traversals;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class AbstractTraversalTest extends TestCase {
+public class AbstractTraversalTest {
 
+	@Test
     public void testTrue() {
-        assertTrue(true);
+        Assert.assertTrue(true);
     }
 }
