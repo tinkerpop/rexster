@@ -143,7 +143,7 @@ public abstract class AbstractTraversal implements Traversal {
 
     protected void preQuery() {
         this.cacheRequestURI = this.createCacheRequestURI();
-        Boolean temp = (Boolean) this.ctx.getRequestObject().opt(Tokens.ALLOW_CACHED);
+        Boolean temp = this.ctx.getRequestObject().optBoolean(Tokens.ALLOW_CACHED);
         if (null != temp) {
             this.allowCached = temp;
         }
