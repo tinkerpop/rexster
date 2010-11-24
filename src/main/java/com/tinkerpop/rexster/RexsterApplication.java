@@ -1,22 +1,21 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
-import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
-import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
-import com.tinkerpop.blueprints.pgm.parser.GraphMLReader;
-import com.tinkerpop.rexster.config.GraphConfigurationContainer;
-import com.tinkerpop.rexster.config.GraphConfigurationException;
-import com.tinkerpop.rexster.traversals.Traversal;
-import org.apache.commons.configuration.Configuration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.ServiceLoader;
+import java.util.Set;
+
 import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import java.io.FileInputStream;
-import java.util.*;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.rexster.config.GraphConfigurationContainer;
+import com.tinkerpop.rexster.config.GraphConfigurationException;
+import com.tinkerpop.rexster.traversals.Traversal;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
