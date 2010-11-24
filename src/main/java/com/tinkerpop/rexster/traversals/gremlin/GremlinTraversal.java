@@ -118,17 +118,22 @@ public class GremlinTraversal extends AbstractTraversal {
     }
 
     public void addApiToResultObject() {
-        Map<String, Object> api = new HashMap<String, Object>();
-        Map<String, Object> parameters = super.getParameters();
-        parameters.put(SCRIPT, "the Gremlin script to be evaluated");
-        parameters.put(RETURN_KEYS, "the element property keys to return (default is to return all element properties)");
-        parameters.put(ROOT + ".<key>", "the elements to set $_ to, where <key> is the element property key");
-        api.put(Tokens.DESCRIPTION, "evaluate an ad-hoc Gremlin script");
-        api.put(Tokens.PARAMETERS, parameters);
+    	
+    	try {
+	        Map<String, Object> api = new HashMap<String, Object>();
+	        JSONObject parameters = new JSONObject(super.getParameters());
+        
+	        parameters.put(SCRIPT, "the Gremlin script to be evaluated");
+	        parameters.put(RETURN_KEYS, "the element property keys to return (default is to return all element properties)");
+	        parameters.put(ROOT + ".<key>", "the elements to set $_ to, where <key> is the element property key");
+                
+	        api.put(Tokens.DESCRIPTION, "evaluate an ad-hoc Gremlin script");
+	        api.put(Tokens.PARAMETERS, parameters);
 
-        try {
             this.resultObject.put(Tokens.API, api);
-        } catch (Exception ex) {
+            
+        } catch (JSONException ex) {
+        	// can't really happen given the hardcoded values
         }
     }
 }
