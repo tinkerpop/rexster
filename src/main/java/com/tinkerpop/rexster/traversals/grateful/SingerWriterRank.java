@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -43,13 +44,14 @@ public class SingerWriterRank extends AbstractRankTraversal {
     }
 
     public void addApiToResultObject() {
-        Map<String, Object> api = new HashMap<String, Object>();
-        Map<String, Object> parameters = this.getParameters();
-        parameters.put("singer.<key>", "the source singer artist, where <key> is the singer vertex property key");
-        api.put(Tokens.DESCRIPTION, "rank all writers relative to a single singer. the ranking is based on the number of songs that the writter has written that are sung by the singer.");
-        api.put(Tokens.PARAMETERS, parameters);
+    	try {
+	        Map<String, Object> api = new HashMap<String, Object>();
+	        JSONObject parameters = new JSONObject(super.getParameters());
         
-        try {
+	        parameters.put("singer.<key>", "the source singer artist, where <key> is the singer vertex property key");
+	        api.put(Tokens.DESCRIPTION, "rank all writers relative to a single singer. the ranking is based on the number of songs that the writter has written that are sung by the singer.");
+	        api.put(Tokens.PARAMETERS, parameters);
+        
         	this.resultObject.put(Tokens.API, api);
         } catch (JSONException e) {}
     }

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -47,13 +48,14 @@ public class CoFollowsRank extends AbstractRankTraversal {
     }
 
     public void addApiToResultObject() {
-        Map<String, Object> api = new HashMap<String, Object>();
-        Map<String, Object> parameters = this.getParameters();
-        parameters.put("song.<key>", "the source song, where <key> is the song vertex property key");
-        api.put(Tokens.DESCRIPTION, "rank all songs relative to the source song by the number of times they co-follow the source song");
-        api.put(Tokens.PARAMETERS, parameters);
+    	try {
+	        Map<String, Object> api = new HashMap<String, Object>();
+	        JSONObject parameters = new JSONObject(super.getParameters());
+	        
+	        parameters.put("song.<key>", "the source song, where <key> is the song vertex property key");
+	        api.put(Tokens.DESCRIPTION, "rank all songs relative to the source song by the number of times they co-follow the source song");
+	        api.put(Tokens.PARAMETERS, parameters);
         
-        try {
         	this.resultObject.put(Tokens.API, api);
         } catch (JSONException e) {}
     }

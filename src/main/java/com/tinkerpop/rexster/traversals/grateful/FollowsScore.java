@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -38,13 +39,14 @@ public class FollowsScore extends AbstractScoreTraversal {
     }
 
     public void addApiToResultObject() {
-        Map<String, Object> api = new HashMap<String, Object>();
-        Map<String, Object> parameters = this.getParameters();
-        parameters.put("song.<key>", "the source song, where <key> is the song vertex property key");
-        api.put(Tokens.DESCRIPTION, "scores a song by how many songs follow it.");
-        api.put(Tokens.PARAMETERS, parameters);
+    	try {
+	        Map<String, Object> api = new HashMap<String, Object>();
+	        JSONObject parameters = new JSONObject(super.getParameters());
+	        
+	        parameters.put("song.<key>", "the source song, where <key> is the song vertex property key");
+	        api.put(Tokens.DESCRIPTION, "scores a song by how many songs follow it.");
+	        api.put(Tokens.PARAMETERS, parameters);
         
-        try {
         	this.resultObject.put(Tokens.API, api);
         } catch (JSONException e) {}
     }

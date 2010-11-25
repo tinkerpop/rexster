@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -58,13 +59,14 @@ public class ArtistRank extends AbstractRankTraversal {
     }
 
     public void addApiToResultObject() {
-        Map<String, Object> api = new HashMap<String, Object>();
-        Map<String, Object> parameters = this.getParameters();
-        parameters.put(GratefulDeadTokens.ARTIST_TYPE, "must be writer or singer");
-        api.put(Tokens.DESCRIPTION, "rank all writers (or singers) based on the number of songs they have written (or sung)");
-        api.put(Tokens.PARAMETERS, parameters);
+    	try {
+	        Map<String, Object> api = new HashMap<String, Object>();
+	        JSONObject parameters = new JSONObject(super.getParameters());
+	        
+	        parameters.put(GratefulDeadTokens.ARTIST_TYPE, "must be writer or singer");
+	        api.put(Tokens.DESCRIPTION, "rank all writers (or singers) based on the number of songs they have written (or sung)");
+	        api.put(Tokens.PARAMETERS, parameters);
         
-        try {
         	this.resultObject.put(Tokens.API, api);
         } catch (JSONException e) {}
     }
