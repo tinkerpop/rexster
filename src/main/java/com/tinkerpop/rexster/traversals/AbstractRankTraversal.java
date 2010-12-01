@@ -150,24 +150,27 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
                 this.returnKeys = null;
             }
         }
-
-        if (this.allowCached) {
-            JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
-            if (tempResultObject != null) {
-                this.ranks = (List<ElementJSONObject>) tempResultObject.opt(Tokens.RANKS);
-                this.totalRank = (Double) tempResultObject.opt(Tokens.TOTAL_RANK);
-                this.success = true;
-                this.usingCachedResult = true;
-            }
+    }
+    
+    protected boolean isResultInCache() {
+    	boolean inCache = false;
+    	JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
+        if (tempResultObject != null) {
+            this.ranks = (List<ElementJSONObject>) tempResultObject.opt(Tokens.RANKS);
+            this.totalRank = (Double) tempResultObject.opt(Tokens.TOTAL_RANK);
+            this.success = true;
+            inCache = true;
         }
+        
+        return inCache;
     }
 
-    protected void postQuery()  throws JSONException {
+    protected void postQuery(boolean resultInCache)  throws JSONException {
         if (this.success) {
             if (null == this.ranks)
                 this.generateRankList();
 
-            if (this.sort != Sort.NONE && !this.usingCachedResult) {
+            if (this.sort != Sort.NONE && !resultInCache) {
                 this.sortRanks(this.sortKey);
             }
             if (this.totalRank != Double.NaN) {
@@ -183,7 +186,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
                 this.resultObject.put(Tokens.SIZE, this.ranks.size());
             }
         }
-        super.postQuery();
+        super.postQuery(resultInCache);
     }
 
     protected Map<String, Object> getParameters() {

@@ -10,11 +10,7 @@ import com.tinkerpop.rexster.RexsterResourceContext;
  */
 public interface Traversal {
    
-    public JSONObject evaluate(RexsterResourceContext ctx) throws JSONException;
-
-    public void traverse()throws JSONException;
-
-    public void addApiToResultObject();
+    public JSONObject evaluate(RexsterResourceContext ctx) throws TraversalException;
 
     public String getTraversalName();
 }

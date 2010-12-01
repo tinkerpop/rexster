@@ -104,17 +104,20 @@ public class GremlinTraversal extends AbstractTraversal {
                 this.returnKeys = null;
         }
 
-        if (this.allowCached) {
-            JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
-            if (tempResultObject != null) {
-                try {
-                    this.resultObject.putOpt(Tokens.RESULTS, tempResultObject.opt(Tokens.RESULTS));
-                } catch (Exception ex) {
-                }
-                this.success = true;
-                this.usingCachedResult = true;
+    }
+    
+    protected boolean isResultInCache() {
+    	boolean inCache = false;
+    	JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
+        if (tempResultObject != null) {
+            try {
+                this.resultObject.putOpt(Tokens.RESULTS, tempResultObject.opt(Tokens.RESULTS));
+            } catch (Exception ex) {
             }
+            this.success = true;
         }
+        
+        return inCache;
     }
 
     public void addApiToResultObject() {

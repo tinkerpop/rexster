@@ -15,7 +15,7 @@ import org.junit.Test;
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class ResultObjectCacheTest {
+public class MapResultObjectCacheTest {
 
     private static final List<String> uuids = new ArrayList<String>();
     private static final Random random = new Random();
@@ -30,7 +30,7 @@ public class ResultObjectCacheTest {
     
     @Before
     public void setUp(){
-    	ResultObjectCache.maxSize = 1000;
+    	MapResultObjectCache.maxSize = 1000;
     }
     
     @Test
@@ -38,8 +38,8 @@ public class ResultObjectCacheTest {
     	
     	Properties props = new Properties();
     	
-    	int defaultSize = ResultObjectCache.maxSize;
-    	Assert.assertEquals(defaultSize, new ResultObjectCache(props).maxSize);
+    	int defaultSize = MapResultObjectCache.maxSize;
+    	Assert.assertEquals(defaultSize, new MapResultObjectCache(props).maxSize);
     }
     
     @Test
@@ -48,8 +48,8 @@ public class ResultObjectCacheTest {
     	Properties props = new Properties();
     	props.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, "");
     	
-    	int defaultSize = ResultObjectCache.maxSize;
-    	Assert.assertEquals(defaultSize, new ResultObjectCache(props).maxSize);
+    	int defaultSize = MapResultObjectCache.maxSize;
+    	Assert.assertEquals(defaultSize, new MapResultObjectCache(props).maxSize);
     }
     
     @Test
@@ -58,8 +58,8 @@ public class ResultObjectCacheTest {
     	Properties props = new Properties();
     	props.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, "one hundred");
     	
-    	int defaultSize = ResultObjectCache.maxSize;
-    	Assert.assertEquals(defaultSize, new ResultObjectCache(props).maxSize);
+    	int defaultSize = MapResultObjectCache.maxSize;
+    	Assert.assertEquals(defaultSize, new MapResultObjectCache(props).maxSize);
     }
     
     @Test
@@ -69,12 +69,12 @@ public class ResultObjectCacheTest {
     	Properties props = new Properties();
     	props.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, expectedCacheSize);
     	
-    	Assert.assertEquals(expectedCacheSize, new ResultObjectCache(props).maxSize);
+    	Assert.assertEquals(expectedCacheSize, new MapResultObjectCache(props).maxSize);
     }
 
     @Test
     public void testElderModel() throws JSONException {
-        ResultObjectCache resultObjectCache = new ResultObjectCache();
+        ResultObjectCache resultObjectCache = new MapResultObjectCache();
         List<String> uuids = new ArrayList<String>();
         for (int i = 0; i < 1000; i++) {
             JSONObject temp = new JSONObject();
@@ -103,7 +103,7 @@ public class ResultObjectCacheTest {
 
     @Test
     public void testThreadSafety() {
-        ResultObjectCache resultObjectCache = new ResultObjectCache();
+        ResultObjectCache resultObjectCache = new MapResultObjectCache();
         for (int i = 0; i < totalThreads; i++) {
             new Thread(new CacheTester(resultObjectCache)).start();
         }

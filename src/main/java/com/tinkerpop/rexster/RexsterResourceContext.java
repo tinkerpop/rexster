@@ -13,8 +13,9 @@ public class RexsterResourceContext {
 	
 	private UriInfo uriInfo;
 	private HttpServletRequest request;
-    protected JSONObject resultObject;
-    protected JSONObject requestObject;
+	private JSONObject resultObject;
+	private JSONObject requestObject;
+    private ResultObjectCache cache;
 	
 	public JSONObject getRequestObject() {
 		return requestObject;
@@ -54,6 +55,14 @@ public class RexsterResourceContext {
 
 	public void setRexsterApplicationGraph(RexsterApplicationGraph rag) {
 		this.rag = rag;
+	}
+
+	public ResultObjectCache getCache() {
+		return cache;
+	}
+
+	public void setCache(ResultObjectCache cache) {
+		this.cache = cache;
 	}
 
 }

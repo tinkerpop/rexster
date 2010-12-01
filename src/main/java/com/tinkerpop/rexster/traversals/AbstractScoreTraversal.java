@@ -11,24 +11,23 @@ import org.codehaus.jettison.json.JSONObject;
 public abstract class AbstractScoreTraversal extends AbstractTraversal {
 
     protected Float score = Float.NaN;
-
-    protected void preQuery() {
-        super.preQuery();
-        if (this.allowCached) {
-            JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
-            if (null != tempResultObject) {
-                this.score = (Float) tempResultObject.opt(Tokens.SCORE);
-                this.success = true;
-                this.usingCachedResult = true;
-            }
+    
+    protected boolean isResultInCache() {
+    	boolean inCache = false;
+    	JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
+        if (null != tempResultObject) {
+            this.score = (Float) tempResultObject.opt(Tokens.SCORE);
+            this.success = true;
         }
+        
+        return inCache;
     }
 
-    protected void postQuery() throws JSONException {
+    protected void postQuery(boolean resultInCache) throws JSONException {
         if (this.success) {
             this.resultObject.put(Tokens.SCORE, this.score);
         }
         this.cacheCurrentResultObjectState();
-        super.postQuery();
+        super.postQuery(resultInCache);
     }
 }

@@ -23,6 +23,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import com.tinkerpop.rexster.traversals.Traversal;
+import com.tinkerpop.rexster.traversals.TraversalException;
 
 @Path("/{graphname}/traversals")
 @Produces(MediaType.APPLICATION_JSON)
@@ -76,6 +77,7 @@ public class TraversalResource extends AbstractSubResource {
                 ctx.setUriInfo(this.uriInfo);
                 ctx.setRexsterApplicationGraph(this.rag);
                 ctx.setRequestObject(this.requestObject);
+                ctx.setCache(WebServer.GetRexsterApplication().getResultObjectCache());
 
                 traversal.evaluate(ctx);
             } else {
@@ -86,7 +88,12 @@ public class TraversalResource extends AbstractSubResource {
             }
 
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-        } catch (JSONException ex) {
+        } catch (JSONException jsonEx) {
+            logger.error(jsonEx);
+
+            JSONObject error = generateErrorObjectJsonFail(jsonEx);
+            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } catch (TraversalException ex) {
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);

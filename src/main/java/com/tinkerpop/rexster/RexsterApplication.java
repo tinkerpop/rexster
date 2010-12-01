@@ -35,17 +35,21 @@ public class RexsterApplication {
     }
 
     public RexsterApplication(final String graphName, final Graph graph) {
+        this(graphName, graph, new MapResultObjectCache());
+    }
+    
+    public RexsterApplication(final String graphName, final Graph graph, final ResultObjectCache cache) {
         RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph);
         this.graphs.put(graphName, rag);
         logger.info("Graph " + rag.getGraph() + " loaded");
-        this.resultObjectCache = new ResultObjectCache();
+        this.resultObjectCache = cache;
     }
 
     public RexsterApplication(final XMLConfiguration properties) {
 
         // get the graph configurations from the XML config file
         List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
-        int cacheMaxSize = properties.getInt(Tokens.REXSTER_CACHE_MAXSIZE_PATH, ResultObjectCache.maxSize);
+        int cacheMaxSize = properties.getInt(Tokens.REXSTER_CACHE_MAXSIZE_PATH, MapResultObjectCache.maxSize);
         
         try {
 	        GraphConfigurationContainer container = new GraphConfigurationContainer(graphConfigs);
@@ -67,7 +71,7 @@ public class RexsterApplication {
         
         Properties cacheProperties = new Properties();
         cacheProperties.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, cacheMaxSize);
-        this.resultObjectCache = new ResultObjectCache(cacheProperties);
+        this.resultObjectCache = new MapResultObjectCache(cacheProperties);
 
     }
 

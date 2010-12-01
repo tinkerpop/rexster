@@ -30,7 +30,6 @@ public abstract class AbstractTraversal implements Traversal {
 
     protected boolean success = true;
     protected String message = null;
-    protected boolean usingCachedResult = false;
     protected String cacheRequestURI = null;
     protected boolean allowCached = true;
     protected ResultObjectCache resultObjectCache;
@@ -40,46 +39,56 @@ public abstract class AbstractTraversal implements Traversal {
     protected JSONObject resultObject = new JSONObject();
     protected JSONObject requestObject = new JSONObject();
 
-    public AbstractTraversal() {
-    	
-    	if (WebServer.GetRexsterApplication() != null) {
-    		this.resultObjectCache = WebServer.GetRexsterApplication().getResultObjectCache();
-    	}
-    }
-
-    public JSONObject evaluate(RexsterResourceContext ctx) throws JSONException {
+    public JSONObject evaluate(RexsterResourceContext ctx) throws TraversalException {
         
+    	if (ctx == null) {
+    		throw new TraversalException("The resource context cannot be null.");
+    	}
+    	
+    	if (ctx.getRexsterApplicationGraph() == null){
+    		throw new TraversalException("The application graph from the resource context cannot be null.");
+    	}
+    	
     	this.ctx = ctx;
     	this.graph = ctx.getRexsterApplicationGraph().getGraph();
     	this.requestObject = ctx.getRequestObject();
     	this.resultObject = ctx.getResultObject();
+    	this.resultObjectCache = ctx.getCache();
     	
-    	this.preQuery();
-        if (!usingCachedResult)
-            this.traverse();
-        this.postQuery();
+    	if (this.graph == null){
+    		throw new TraversalException("The graph from the resource context cannot be null.");
+    	}
+    	
+    	if (this.requestObject == null){
+    		throw new TraversalException("The request object from the resource context cannot be null.");
+    	}
+    	
+    	if (this.resultObject == null){
+    		throw new TraversalException("The result object from the resource context cannot be null.");
+    	}
+    	
+    	try {
+	    	this.preQuery();
+	    	
+	    	boolean resultInCache = false;
+	    	
+	    	// if the request does not want cached or the result is not in the cache
+	    	// then go ahead and traverse
+	        if (!this.allowCached || !(resultInCache = this.isResultInCache())) {
+	            this.traverse();
+	        }
+	        
+	        this.postQuery(resultInCache);
+    	} catch (JSONException jsonException)  {
+    		throw new TraversalException(jsonException);
+    	}
+    	
         return this.resultObject;
     }
-
-    /*
-    @Get
-    public JSONObject evaluate(final String json) {
-    	
-    	String graphName = this.getRequest().getResourceRef().getSegments().get(0);
-        this.graph = ((RexsterApplication) this.getApplication()).getGraph(graphName);
-    	
-        if (null == json || json.length() == 0)
-            return this.evaluate();
-        else {
-            this.buildRequestObject(json);
-            this.preQuery();
-            if (!usingCachedResult)
-                this.traverse();
-            this.postQuery();
-            return this.resultObject;
-        }
-    }
-     */
+    
+    protected abstract void traverse() throws JSONException;
+    protected abstract void addApiToResultObject();
+    protected abstract boolean isResultInCache();
     
     private String createCacheRequestURI() {
         Map<String, String> queryParameters = this.ctx.getRequest().getParameterMap();
@@ -137,10 +146,6 @@ public abstract class AbstractTraversal implements Traversal {
         return (String) this.ctx.getRequestObject().opt(requestObjectKey);
     }
 
-    public void addApiToResultObject() {
-
-    }
-
     protected void preQuery() {
         this.cacheRequestURI = this.createCacheRequestURI();
         Boolean temp = this.ctx.getRequestObject().optBoolean(Tokens.ALLOW_CACHED);
@@ -150,7 +155,7 @@ public abstract class AbstractTraversal implements Traversal {
         logger.debug("Raw request object: " + this.ctx.getRequestObject().toString());
     }
 
-    protected void postQuery() throws JSONException {
+    protected void postQuery(boolean resultInCache) throws JSONException {
         this.ctx.getResultObject().put(Tokens.SUCCESS, this.success);
         if (!this.success) {
             this.addApiToResultObject();

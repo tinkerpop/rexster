@@ -47,7 +47,7 @@ public class CoFollowsRank extends AbstractRankTraversal {
         }
     }
 
-    public void addApiToResultObject() {
+    protected void addApiToResultObject() {
     	try {
 	        Map<String, Object> api = new HashMap<String, Object>();
 	        JSONObject parameters = new JSONObject(super.getParameters());

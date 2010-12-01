@@ -43,7 +43,8 @@ public class SingerWriterRank extends AbstractRankTraversal {
         }
     }
 
-    public void addApiToResultObject() {
+    @Override 
+    protected void addApiToResultObject() {
     	try {
 	        Map<String, Object> api = new HashMap<String, Object>();
 	        JSONObject parameters = new JSONObject(super.getParameters());

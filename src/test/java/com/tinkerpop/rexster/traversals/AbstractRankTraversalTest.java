@@ -168,9 +168,17 @@ public class AbstractRankTraversalTest {
             return "test-traversal";
         }
 
-        public void traverse() {
+
+		@Override
+		protected void traverse() {
 
         }
+
+		@Override
+		protected void addApiToResultObject() {
+			// TODO Auto-generated method stub
+			
+		}
     }
 
 }
