@@ -27,11 +27,13 @@ public class ElementJSONObject extends JSONObject {
         } else {
             this.put(Tokens._TYPE, Tokens.EDGE);
         }
-        if (null == propertyKeys) {
+        
+        if (propertyKeys == null) {
             this.put(Tokens._ID, this.id);
             for (String key : element.getPropertyKeys()) {
                 this.put(key, element.getProperty(key));
             }
+            
             if (element instanceof Edge) {
                 Edge edge = (Edge) element;
                 this.put(Tokens._LABEL, edge.getLabel());
