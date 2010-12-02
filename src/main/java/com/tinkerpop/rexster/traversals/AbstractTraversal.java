@@ -141,9 +141,10 @@ public abstract class AbstractTraversal implements Traversal {
         while (keys.hasNext()) {
         	String key = (String) keys.next();
             if (key.equals(Tokens.ID)) {
-            	try {
-            		vertices.add(graph.getVertex(propertyMap.get(key)));
-            	} catch (JSONException ex) {}
+            	Vertex v = graph.getVertex(propertyMap.optString(key));
+            	if (v != null) {
+            		vertices.add(v);
+            	}
             } else {
             	try {
 	                Iterable<Vertex> verticesIterable = ((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get(key, propertyMap.get(key));

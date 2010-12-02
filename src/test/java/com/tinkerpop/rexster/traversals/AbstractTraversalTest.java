@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.traversals;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,9 +15,11 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.MapResultObjectCache;
 import com.tinkerpop.rexster.ResultObjectCache;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
@@ -30,6 +33,11 @@ public class AbstractTraversalTest {
 	
 	private Mockery mockery = new JUnit4Mockery(); 
 	private final String baseUri = "http://localhost/mock";
+	
+	@Before
+	public void init() {
+		this.mockery = new JUnit4Mockery();
+	}
 
 	@Test(expected = TraversalException.class)
     public void evaluateNullContext() throws TraversalException {
@@ -291,6 +299,46 @@ public class AbstractTraversalTest {
 		Assert.assertNotNull(cache.getCachedResult(this.baseUri + "[here=h, there=t]"));
 	}
 	
+	@Test
+	public void getVerticesEmptyPropertyMap(){
+		Graph g = this.mockery.mock(Graph.class);
+		JSONObject map = new JSONObject();
+		
+		MockAbstractTraversal mock = new MockAbstractTraversal();
+		
+		List<Vertex> vertices = mock.getVerticesExposed(g, map);
+		Assert.assertNotNull(vertices);
+		Assert.assertEquals(0, vertices.size());
+	}
+	
+	@Test
+	public void getVerticesSingleIDPropertyMap(){
+		final Graph g = this.mockery.mock(Graph.class);
+		final Vertex v = this.mockery.mock(Vertex.class); 
+		
+		// no need to truly add the vertex to the graph. don't really
+		// care about testing the underlying find of the vertex
+		this.mockery.checking(new Expectations() {{
+			allowing(g).getVertex("123");
+				will(returnValue(v));
+	    }});
+		
+		JSONObject map = new JSONObject();
+		
+		try {
+			map.put(Tokens.ID, "123");
+		} catch (JSONException ex) {
+			ex.printStackTrace();
+			Assert.fail(ex.getMessage());
+		}
+		
+		MockAbstractTraversal mock = new MockAbstractTraversal();
+		
+		List<Vertex> vertices = mock.getVerticesExposed(g, map);
+		Assert.assertNotNull(vertices);
+		Assert.assertEquals(1, vertices.size());
+	}
+	
 	private void assertSuccessResultObject(JSONObject resultObject, boolean expectedSuccess) {
 		Assert.assertNotNull(resultObject);
 		
@@ -399,6 +447,14 @@ public class AbstractTraversalTest {
 		
 		public void cacheCurrentResultObjectState(){
 			super.cacheCurrentResultObjectState();
+		}
+		
+		public List<Vertex> getVerticesExposed(final Graph graph, final JSONObject propertyMap) {
+			return AbstractTraversal.getVertices(graph, propertyMap);
+		}
+		
+		public Vertex getVertex(final String requestObjectKey) {
+			return super.getVertex(requestObjectKey);
 		}
 	}
 }
