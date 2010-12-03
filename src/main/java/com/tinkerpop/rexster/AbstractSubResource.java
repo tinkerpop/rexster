@@ -14,7 +14,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 public abstract class AbstractSubResource extends BaseResource {
 	
-	private static Logger logger = Logger.getLogger(AbstractSubResource.class);
+	private static final Logger logger = Logger.getLogger(AbstractSubResource.class);
 	
 	protected AbstractSubResource(String graphName, UriInfo ui, HttpServletRequest req) {
     	super();

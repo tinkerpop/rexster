@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster;
 
 import java.util.Iterator;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;

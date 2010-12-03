@@ -18,7 +18,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.ResultObjectCache;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.WebServer;
 
 /**
  * This is a base implementation of the Traversal interface.  

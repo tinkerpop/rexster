@@ -20,7 +20,7 @@ import com.tinkerpop.rexster.ResultObjectCache;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
 
-public class TraversalBaseTest {
+public abstract class TraversalBaseTest {
 
 	protected Mockery mockery = new JUnit4Mockery(); 
 	protected final String baseUri = "http://localhost/mock";

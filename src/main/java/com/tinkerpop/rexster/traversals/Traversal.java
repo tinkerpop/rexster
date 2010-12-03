@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.traversals;
 
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import com.tinkerpop.rexster.RexsterResourceContext;

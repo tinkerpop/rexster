@@ -26,6 +26,7 @@ public class RexsterApplicationGraph {
 	
 	public RexsterApplicationGraph(String graphName, Graph graph, String packageNames) {
 		this.graphName = graphName;
+		this.graph = graph;
 		this.loadPackageNames(packageNames);
 	}
 	
