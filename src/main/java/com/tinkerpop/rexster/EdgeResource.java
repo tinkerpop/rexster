@@ -97,6 +97,11 @@ public class EdgeResource extends AbstractSubResource {
 
         return Response.ok(this.resultObject).build();
     }
+    
+    @POST
+    public Response postNull(){
+    	return this.postEdge(null);
+    }
 
     @POST
     @Path("/{id}")

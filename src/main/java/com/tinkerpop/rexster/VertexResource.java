@@ -172,6 +172,11 @@ public class VertexResource extends AbstractSubResource {
 
         return Response.ok(this.resultObject).build();
     }
+    
+    @POST
+    public Response postNull(){
+    	return this.postVertex(null);
+    }
 
     @POST
     @Path("/{id}")
