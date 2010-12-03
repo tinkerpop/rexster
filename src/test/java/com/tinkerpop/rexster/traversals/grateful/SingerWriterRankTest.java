@@ -9,15 +9,15 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.traversals.TraversalBaseTest;
 import com.tinkerpop.rexster.traversals.TraversalException;
 
-public class ArtistRankTest extends TraversalBaseTest {
-	
+public class SingerWriterRankTest extends TraversalBaseTest {
+
 	@Test
 	public void evaluateApiIsJson(){
-		ArtistRank artistRank = new ArtistRank();
+		SingerWriterRank singerWriterRank = new SingerWriterRank();
 		RexsterResourceContext ctx = this.createStandardContext();
 		
 		try {
-			JSONObject result = artistRank.evaluate(ctx);
+			JSONObject result = singerWriterRank.evaluate(ctx);
 			Assert.assertNotNull(result);
 			Assert.assertTrue(result.has(Tokens.API));
 			Assert.assertTrue(result.optJSONObject(Tokens.API) instanceof JSONObject);

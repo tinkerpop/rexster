@@ -31,7 +31,7 @@ public class ArtistRank extends AbstractRankTraversal {
         return ARTIST_RANK;
     }
 
-    public void traverse()throws JSONException {
+    protected void traverse()throws JSONException {
 
         String type = this.getRequestValue(GratefulDeadTokens.ARTIST_TYPE);
 

@@ -29,15 +29,8 @@ import com.tinkerpop.rexster.Tokens;
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class AbstractTraversalTest {
+public class AbstractTraversalTest extends TraversalBaseTest {
 	
-	private Mockery mockery = new JUnit4Mockery(); 
-	private final String baseUri = "http://localhost/mock";
-	
-	@Before
-	public void init() {
-		this.mockery = new JUnit4Mockery();
-	}
 
 	@Test(expected = TraversalException.class)
     public void evaluateNullContext() throws TraversalException {
@@ -339,6 +332,16 @@ public class AbstractTraversalTest {
 		Assert.assertEquals(1, vertices.size());
 	}
 	
+	@Test
+	public void getParametersCheckCachedInstruction() {
+
+		MockAbstractTraversal mock = new MockAbstractTraversal();
+		Map<String, Object> m = mock.getParameters();
+		
+		Assert.assertNotNull(m);
+		Assert.assertTrue(m.containsKey(Tokens.ALLOW_CACHED));
+	}
+	
 	private void assertSuccessResultObject(JSONObject resultObject, boolean expectedSuccess) {
 		Assert.assertNotNull(resultObject);
 		
@@ -349,50 +352,7 @@ public class AbstractTraversalTest {
 		}
 	}
 	
-	private RexsterResourceContext createStandardContext() {
-		return this.createStandardContext(new HashMap<String, String>());
-	}
-	
-	private RexsterResourceContext createStandardContext(final Map<String, String> parameterMap){
-		Graph mockGraph = this.mockery.mock(Graph.class);
-		ResultObjectCache mockCache = this.mockery.mock(ResultObjectCache.class);
-		final HttpServletRequest request = this.mockery.mock(HttpServletRequest.class);
-		final UriInfo uriInfo = this.mockery.mock(UriInfo.class);
-		
-		try {
-			final URI uri = new URI(this.baseUri);
-			
-			this.mockery.checking(new Expectations() {{
-				allowing (request).getParameterMap();
-					will(returnValue(parameterMap));
-				allowing (uriInfo).getBaseUri();
-					will(returnValue(uri));
-		    }});
-			
-		} catch (URISyntaxException ex) {
-			Assert.fail(ex.getMessage());
-		}
-		
-		return createContext(
-        		new RexsterApplicationGraph("mock", mockGraph), new JSONObject(), 
-        			new JSONObject(), mockCache, request, uriInfo);
-	}
-	
-	private RexsterResourceContext createContext(RexsterApplicationGraph appGraph, 
-			JSONObject requestObject, JSONObject resultObject, ResultObjectCache cache,
-			HttpServletRequest request, UriInfo uriInfo){
-		RexsterResourceContext ctx = new RexsterResourceContext();
-		ctx.setCache(cache);
-		ctx.setRequestObject(requestObject);
-		ctx.setResultObject(resultObject);
-		ctx.setRexsterApplicationGraph(appGraph);
-		ctx.setRequest(request);
-		ctx.setUriInfo(uriInfo);
-		
-		return ctx;
-	}
-	
-	protected class MockAbstractTraversal extends AbstractTraversal {
+	private class MockAbstractTraversal extends AbstractTraversal {
 
 		private boolean traverseCalled = false;
 		private boolean resultInCache = false;

@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.traversals;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
+import com.tinkerpop.rexster.Tokens;
 
 import java.util.Map;
 
@@ -171,13 +172,10 @@ public class AbstractRankTraversalTest {
 
 		@Override
 		protected void traverse() {
-
         }
 
 		@Override
 		protected void addApiToResultObject() {
-			// TODO Auto-generated method stub
-			
 		}
     }
 

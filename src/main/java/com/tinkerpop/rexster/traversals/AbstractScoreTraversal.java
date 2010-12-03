@@ -26,8 +26,8 @@ public abstract class AbstractScoreTraversal extends AbstractTraversal {
     protected void postQuery(boolean resultInCache) throws JSONException {
         if (this.success) {
             this.resultObject.put(Tokens.SCORE, this.score);
+            this.cacheCurrentResultObjectState();
         }
-        this.cacheCurrentResultObjectState();
         super.postQuery(resultInCache);
     }
 }
