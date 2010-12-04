@@ -21,7 +21,22 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.WebServer;
 
 /**
- * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * This is a base implementation of the Traversal interface.  
+ * 
+ * The AbstractTraversal provides for a simple pipeline of request processing and 
+ * caching support.  When a request is accepted by Rexster, the evaluate method is 
+ * called and the context of the request is passed in.  The following methods are 
+ * called in the following order to process the request:
+ * 
+ * <ul>
+ * 	<li>preQuery</li>
+ *  <li>isResultInCache</li>
+ *  <li>traverse</li>
+ *  <li>postQuery</li>
+ * </ul>
+ * 
+ * The traverse method is only called if caching is not allowed or if the 
+ * isResultInCache method returns false.   
  */
 public abstract class AbstractTraversal implements Traversal {
 
@@ -88,12 +103,21 @@ public abstract class AbstractTraversal implements Traversal {
     
     protected abstract void traverse() throws JSONException;
     protected abstract void addApiToResultObject();
+    
+    /**
+     * Determine if the requested object is already in the cache.
+     * 
+     * Implementing classes should store cached values for use in the postQuery
+     * method.  If the object is found, return a true value and false otherwise.
+     *  
+     * @return true if the object is in the cache and false otherwise.
+     */
     protected abstract boolean isResultInCache();
     
     private String createCacheRequestURI() {
         Map<String, String> queryParameters = this.ctx.getRequest().getParameterMap();
         
-        List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>(queryParameters.entrySet());
+        List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>();
         for (Map.Entry<String, String> entry : queryParameters.entrySet()){
         	if (entry.getKey() != Tokens.OFFSET_START
         		&& entry.getKey() != Tokens.OFFSET_END
@@ -134,21 +158,31 @@ public abstract class AbstractTraversal implements Traversal {
 
     protected Vertex getVertex(final String requestObjectKey) {
         if (this.ctx.getRequestObject().has(requestObjectKey)) {
-        	JSONObject jsonObject = (JSONObject) this.ctx.getRequestObject().opt(requestObjectKey);
+        	JSONObject jsonObject = this.ctx.getRequestObject().optJSONObject(requestObjectKey);
         	List<Vertex> temp = getVertices(graph, jsonObject);
-            if (null != temp && temp.size() > 0)
+            if (null != temp && temp.size() > 0){
                 return temp.get(0);
+            }
         }
         return null;
     }
 
     protected String getRequestValue(final String requestObjectKey) {
-        return (String) this.ctx.getRequestObject().opt(requestObjectKey);
+    	return this.ctx.getRequestObject().optString(requestObjectKey, null);
     }
 
+    /**
+     * First method executed in the pipeline of request processing. 
+     * 
+     * The base implementation of this method gets the key to the cache based on the 
+     * URI and determines if the allow_cached parameter was passed.
+     * 
+     * Implementing classes should call super.preQuery or implement this functionality
+     * themselves to ensure caching works within the workflow of AbstractTraversal. 
+     */
     protected void preQuery() {
         this.cacheRequestURI = this.createCacheRequestURI();
-        Boolean temp = this.ctx.getRequestObject().optBoolean(Tokens.ALLOW_CACHED);
+        Boolean temp = this.ctx.getRequestObject().optBoolean(Tokens.ALLOW_CACHED, false);
         if (null != temp) {
             this.allowCached = temp;
         }
@@ -181,6 +215,7 @@ public abstract class AbstractTraversal implements Traversal {
             this.resultObjectCache.putCachedResult(this.cacheRequestURI, tempResultObject);	
     	} catch (JSONException ex) {
     		// can't cache
+    		logger.warn("Could not cache result for: " + this.cacheRequestURI, ex);
     	}
         
     }
