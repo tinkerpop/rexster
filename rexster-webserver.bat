@@ -1,1 +1,0 @@
-java -cp target/rexster-0.1-SNAPSHOT-standalone.jar com.tinkerpop.rexster.WebServer

@@ -1,0 +1,1 @@
+ECHO "No support for Windows through script loader yet."
