@@ -55,8 +55,12 @@ public class GraphConfigurationContainer {
 		                    this.graphs.put(rag.getGraphName(), rag);
 		
 		                    logger.info("Graph " + graphName + " - " + graph + " loaded");
+		                } catch (GraphConfigurationException gce) {
+		                	logger.warn("Could not load graph " + graphName + ". Please check the XML configuration.");
+		                    
+		                    failedConfigurations.add(graphConfig);
 		                } catch (Exception e) {
-		                    logger.warn("Could not load graph " + graphName + ". Please check the XML configuration.", e);
+		                    logger.warn("Could not load graph " + graphName + ".", e);
 		                    
 		                    failedConfigurations.add(graphConfig);
 		                }
