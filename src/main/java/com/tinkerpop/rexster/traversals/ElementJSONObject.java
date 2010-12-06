@@ -21,6 +21,10 @@ public class ElementJSONObject extends JSONObject {
     }
 
     public ElementJSONObject(final Element element, final List<String> propertyKeys) throws JSONException {
+    	this(element, propertyKeys, false);
+    }
+    
+    public ElementJSONObject(final Element element, final List<String> propertyKeys, boolean includeDataType) throws JSONException {
         this.id = element.getId();
         if (element instanceof Vertex) {
             this.put(Tokens._TYPE, Tokens.VERTEX);

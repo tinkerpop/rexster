@@ -99,7 +99,7 @@ public class RexsterApplication {
                     }
                 	
                 	if (rag.getPackageNames().contains(traversalPackage)) {
-                        logger.info("loading traversal: /" + rag.getGraphName() + "/" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
+                        logger.info("loading traversal: /" + rag.getGraphName() + "/traversal/" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
                         rag.getLoadedTraversals().put(traversalService.getTraversalName(), traversalService.getClass());
                     }
                 }
