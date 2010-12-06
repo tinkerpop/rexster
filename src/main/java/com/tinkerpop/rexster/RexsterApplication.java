@@ -141,7 +141,7 @@ public class RexsterApplication {
         for (RexsterApplicationGraph rag : this.graphs.values()) {
 
             Graph graph = rag.getGraph();
-            logger.info("Shutting down " + graph);
+            logger.info("Shutting down " + rag.getGraphName() + " - " + graph);
 
             // graph may not have been initialized properly if an exception gets tossed in
             // on graph creation

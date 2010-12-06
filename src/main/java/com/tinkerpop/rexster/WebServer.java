@@ -79,7 +79,8 @@ public class WebServer {
     }
 
     protected void stop() throws Exception {
-        this.threadSelector.stopEndpoint();
+    	this.threadSelector.stopEndpoint();
+    	rexster.stop();
     }
     
     public static RexsterApplication GetRexsterApplication(){
