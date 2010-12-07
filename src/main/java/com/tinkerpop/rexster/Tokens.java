@@ -32,6 +32,7 @@ public class Tokens {
     public static final String API = "api";
     public static final String SUCCESS = "success";
     public static final String ALLOW_CACHED = "allow_cached";
+    public static final String INCLUDE_TYPES = "include_types";
     public static final String OFFSET_END = "offset.end";
     public static final String OFFSET_START = "offset.start";
     public static final String SCORE = "score";
