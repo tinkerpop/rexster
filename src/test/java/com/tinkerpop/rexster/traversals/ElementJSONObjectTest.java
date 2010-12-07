@@ -256,6 +256,42 @@ public class ElementJSONObjectTest {
 		}
 	}
 	
+	/*
+	@Test
+	public void constructorVertexElementNoPropertyKeysSimpleObject(){
+		final Vertex v = this.mockery.mock(Vertex.class);	
+		final Set<String> keys = new HashSet<String>();
+		keys.add("some-simple-key");
+		
+		this.mockery.checking(new Expectations() {{
+			
+			SimpleObject simple = new SimpleObject();
+			simple.setSomeString("one");
+			simple.setSomeInt(2);
+			simple.setSomeFloat(200.5f);
+			
+			allowing(v).getId();
+				will(returnValue("123"));
+			allowing(v).getPropertyKeys();
+				will(returnValue(keys));
+			oneOf(v).getProperty("some-simple-key");
+				will(returnValue(simple));
+	    }});
+		
+		try {
+			ElementJSONObject jo = new ElementJSONObject(v, null, false);
+			
+			JSONObject jsonObject = jo.getJSONObject("some-simple-key");
+			Assert.assertNotNull(jsonObject);
+			
+			
+		} catch (JSONException ex) {
+			ex.printStackTrace();
+			Assert.fail(ex.getMessage());
+		}
+	}
+	*/
+	
 	@Test
 	public void constructorVertexElementNoPropertyKeysShowDataTypeMap(){
 		final Vertex v = this.mockery.mock(Vertex.class);	
@@ -396,5 +432,31 @@ public class ElementJSONObjectTest {
 			ex.printStackTrace();
 			Assert.fail(ex.getMessage());
 		}
+	}
+	
+	private class SimpleObject {
+		private String someString;
+		private int someInt;
+		private float someFloat;
+		
+		public String getSomeString() {
+			return someString;
+		}
+		public void setSomeString(String someString) {
+			this.someString = someString;
+		}
+		public int getSomeInt() {
+			return someInt;
+		}
+		public void setSomeInt(int someInt) {
+			this.someInt = someInt;
+		}
+		public float getSomeFloat() {
+			return someFloat;
+		}
+		public void setSomeFloat(float someFloat) {
+			this.someFloat = someFloat;
+		}
+		
 	}
 }
