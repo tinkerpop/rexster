@@ -202,7 +202,7 @@ public class VertexResource extends AbstractSubResource {
             while (keys.hasNext()) {
                 String key = keys.next().toString();
                 if (!key.startsWith(Tokens.UNDERSCORE)) {
-                    vertex.setProperty(key, this.requestObject.get(key));
+                    vertex.setProperty(key, this.getTypedPropertyValue(this.requestObject.getString(key)));
                 }
             }
 

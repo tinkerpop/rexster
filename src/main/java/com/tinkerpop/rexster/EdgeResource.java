@@ -141,8 +141,9 @@ public class EdgeResource extends AbstractSubResource {
                 Iterator keys = this.requestObject.keys();
                 while (keys.hasNext()) {
                     String key = keys.next().toString();
-                    if (!key.startsWith(Tokens.UNDERSCORE))
-                        edge.setProperty(key, this.requestObject.get(key));
+                    if (!key.startsWith(Tokens.UNDERSCORE)) {
+                        edge.setProperty(key, this.getTypedPropertyValue(this.requestObject.getString(key)));
+                    }
                 }
                 this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
             }
