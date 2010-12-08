@@ -109,7 +109,7 @@ public class ElementJSONObject extends JSONObject {
     			valueAndType.put("value", convertedMap);
     		} else {
     			
-    			// this must be a primitive value or a complex object.  if a complext 
+    			// this must be a primitive value or a complex object.  if a complex 
     			// object it will be handled by a call to toString and stored as a 
     			// string value
     			valueAndType.put("value", value);

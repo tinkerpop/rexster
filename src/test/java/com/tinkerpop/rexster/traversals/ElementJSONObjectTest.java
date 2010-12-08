@@ -256,7 +256,6 @@ public class ElementJSONObjectTest {
 		}
 	}
 	
-	/*
 	@Test
 	public void constructorVertexElementNoPropertyKeysSimpleObject(){
 		final Vertex v = this.mockery.mock(Vertex.class);	
@@ -280,17 +279,12 @@ public class ElementJSONObjectTest {
 		
 		try {
 			ElementJSONObject jo = new ElementJSONObject(v, null, false);
-			
-			JSONObject jsonObject = jo.getJSONObject("some-simple-key");
-			Assert.assertNotNull(jsonObject);
-			
-			
+			Assert.assertNotNull("one,200.5,2", jo.get("some-simple-key"));
 		} catch (JSONException ex) {
 			ex.printStackTrace();
 			Assert.fail(ex.getMessage());
 		}
 	}
-	*/
 	
 	@Test
 	public void constructorVertexElementNoPropertyKeysShowDataTypeMap(){
@@ -456,6 +450,11 @@ public class ElementJSONObjectTest {
 		}
 		public void setSomeFloat(float someFloat) {
 			this.someFloat = someFloat;
+		}
+		
+		@Override
+		public String toString() {
+			return this.someString + "," + this.someFloat + "," + this.someInt;
 		}
 		
 	}
