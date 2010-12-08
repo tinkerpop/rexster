@@ -200,6 +200,27 @@ public abstract class BaseResource {
             return null;
         }
 	}
+	
+	/**
+	 * Determines if the data types should be shown in the results.
+	 * 
+	 * Checks the request for the show_types parameter which must be set
+	 * to a boolean value. Types are not shown by default or if the value
+	 * cannot be parsed from the request.
+	 * 
+	 * @return true if show_types is set to "true" and false otherwise.
+	 */
+	protected boolean hasShowTypes(){
+		boolean showTypes = false;
+		JSONObject rexster = this.getRexsterRequest();
+		if (rexster != null) {
+			if (rexster.has(Tokens.SHOW_TYPES)) {
+				showTypes = rexster.optBoolean(Tokens.SHOW_TYPES, false);
+			}
+		}
+		
+		return showTypes;
+	}
 
     public List<String> getReturnKeys() {
         JSONObject rexster = this.getRexsterRequest();

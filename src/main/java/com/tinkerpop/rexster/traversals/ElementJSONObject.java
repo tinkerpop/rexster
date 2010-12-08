@@ -24,12 +24,16 @@ public class ElementJSONObject extends JSONObject {
     public ElementJSONObject(final Element element) throws JSONException {
         this(element, null);
     }
+    
+    public ElementJSONObject(final Element element, boolean showTypes) throws JSONException {
+        this(element, null, showTypes);
+    }
 
     public ElementJSONObject(final Element element, final List<String> propertyKeys) throws JSONException {
     	this(element, propertyKeys, false);
     }
     
-    public ElementJSONObject(final Element element, final List<String> propertyKeys, boolean includeType) throws JSONException {
+    public ElementJSONObject(final Element element, final List<String> propertyKeys, boolean showTypes) throws JSONException {
         this.id = element.getId();
         if (element instanceof Vertex) {
             this.put(Tokens._TYPE, Tokens.VERTEX);
@@ -38,32 +42,32 @@ public class ElementJSONObject extends JSONObject {
         }
         
         if (propertyKeys == null) {
-            this.put(Tokens._ID, this.getValue(this.id, includeType));
+            this.put(Tokens._ID, this.getValue(this.id, showTypes));
             for (String key : element.getPropertyKeys()) {
-                this.put(key, this.getValue(element.getProperty(key), includeType));
+                this.put(key, this.getValue(element.getProperty(key), showTypes));
             }
             
             if (element instanceof Edge) {
                 Edge edge = (Edge) element;
                 this.put(Tokens._LABEL, edge.getLabel());
-                this.put(Tokens._IN_V, this.getValue(edge.getInVertex().getId(), includeType));
-                this.put(Tokens._OUT_V, this.getValue(edge.getOutVertex().getId(), includeType));
+                this.put(Tokens._IN_V, this.getValue(edge.getInVertex().getId(), showTypes));
+                this.put(Tokens._OUT_V, this.getValue(edge.getOutVertex().getId(), showTypes));
             }
         } else {
             for (String key : propertyKeys) {
                 if (key.equals(Tokens._ID)) {
-                    this.put(Tokens._ID, this.getValue(this.id, includeType));
+                    this.put(Tokens._ID, this.getValue(this.id, showTypes));
                 } else if (element instanceof Edge && key.equals(Tokens._LABEL)) {
                     Edge edge = (Edge) element;
                     this.put(Tokens._LABEL, edge.getLabel());
                 } else if (element instanceof Edge && key.equals(Tokens._IN_V)) {
                     Edge edge = (Edge) element;
-                    this.put(Tokens._IN_V, this.getValue(edge.getInVertex().getId(), includeType));
+                    this.put(Tokens._IN_V, this.getValue(edge.getInVertex().getId(), showTypes));
                 } else if (element instanceof Edge && key.equals(Tokens._OUT_V)) {
                     Edge edge = (Edge) element;
-                    this.put(Tokens._IN_V, this.getValue(edge.getOutVertex().getId(), includeType));
+                    this.put(Tokens._IN_V, this.getValue(edge.getOutVertex().getId(), showTypes));
                 } else {
-                    Object temp = this.getValue(element.getProperty(key), includeType);
+                    Object temp = this.getValue(element.getProperty(key), showTypes);
                     if (null != temp) {
                         this.put(key, temp);
                     }

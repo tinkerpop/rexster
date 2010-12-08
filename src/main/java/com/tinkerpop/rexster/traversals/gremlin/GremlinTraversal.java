@@ -85,9 +85,9 @@ public class GremlinTraversal extends AbstractTraversal {
     private Object prepareOutput(Object object) throws JSONException {
         if (object instanceof Element) {
             if (null == this.returnKeys)
-                return new ElementJSONObject((Element) object);
+                return new ElementJSONObject((Element) object, this.showTypes);
             else
-                return new ElementJSONObject((Element) object, this.returnKeys);
+                return new ElementJSONObject((Element) object, this.returnKeys, this.showTypes);
         } else if (object instanceof Number || object instanceof Boolean) {
             return object;
         } else {

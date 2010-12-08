@@ -60,7 +60,8 @@ public class VertexResource extends AbstractSubResource {
                     for (Edge edge : vertex.getOutEdges()) {
                         if (this.hasPropertyValues(edge, tempRequest)) {
                             if (counter >= start && counter < end) {
-                                edgeArray.put(new ElementJSONObject(edge, this.getReturnKeys()));
+                                edgeArray.put(new ElementJSONObject(
+                                		edge, this.getReturnKeys(), this.hasShowTypes()));
                             }
                             counter++;
                         }
@@ -70,7 +71,8 @@ public class VertexResource extends AbstractSubResource {
                     for (Edge edge : vertex.getInEdges()) {
                         if (this.hasPropertyValues(edge, tempRequest)) {
                             if (counter >= start && counter < end) {
-                                edgeArray.put(new ElementJSONObject(edge, this.getReturnKeys()));
+                                edgeArray.put(new ElementJSONObject(
+                                		edge, this.getReturnKeys(), this.hasShowTypes()));
                             }
                             counter++;
                         }
@@ -104,7 +106,8 @@ public class VertexResource extends AbstractSubResource {
         Vertex vertex = this.rag.getGraph().getVertex(id);
         if (null != vertex) {
             try {
-                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys()));
+                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(
+                		vertex, this.getReturnKeys(), this.hasShowTypes()));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             } catch (JSONException ex) {
                 logger.error(ex);
@@ -153,7 +156,8 @@ public class VertexResource extends AbstractSubResource {
             if (null != itty) {
                 for (Element element : itty) {
                     if (counter >= start && counter < end) {
-                        vertexArray.put(new ElementJSONObject(element, this.getReturnKeys()));
+                        vertexArray.put(new ElementJSONObject(
+                        		element, this.getReturnKeys(), this.hasShowTypes()));
                     }
                     counter++;
                 }
@@ -202,7 +206,8 @@ public class VertexResource extends AbstractSubResource {
                 }
             }
 
-            this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys()));
+            this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(
+            		vertex, this.getReturnKeys(), this.hasShowTypes()));
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);

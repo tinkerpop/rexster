@@ -36,7 +36,7 @@ public abstract class TraversalBaseTest {
 	
 	protected RexsterResourceContext createStandardContext(final Map<String, String> parameterMap){
 		Graph mockGraph = this.mockery.mock(Graph.class);
-		ResultObjectCache mockCache = this.mockery.mock(ResultObjectCache.class);
+		final ResultObjectCache mockCache = this.mockery.mock(ResultObjectCache.class);
 		final HttpServletRequest request = this.mockery.mock(HttpServletRequest.class);
 		final UriInfo uriInfo = this.mockery.mock(UriInfo.class);
 		
@@ -44,6 +44,8 @@ public abstract class TraversalBaseTest {
 			final URI uri = new URI(this.baseUri);
 			
 			this.mockery.checking(new Expectations() {{
+				allowing (mockCache).getCachedResult("http://localhost/mock[]");
+					will(returnValue(null));
 				allowing (request).getParameterMap();
 					will(returnValue(parameterMap));
 				allowing (uriInfo).getBaseUri();

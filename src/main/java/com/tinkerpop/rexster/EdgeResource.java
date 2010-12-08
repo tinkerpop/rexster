@@ -52,7 +52,8 @@ public class EdgeResource extends AbstractSubResource {
             JSONArray edgeArray = new JSONArray();
             for (Edge edge : this.rag.getGraph().getEdges()) {
                 if (counter >= start && counter < end) {
-                    edgeArray.put(new ElementJSONObject(edge, this.getReturnKeys()));
+                    edgeArray.put(new ElementJSONObject(
+                    		edge, this.getReturnKeys(), this.hasShowTypes()));
                 }
                 counter++;
             }
@@ -79,7 +80,8 @@ public class EdgeResource extends AbstractSubResource {
 
         if (null != edge) {
             try {
-                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys()));
+                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(
+                		edge, this.getReturnKeys(), this.hasShowTypes()));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             } catch (JSONException ex) {
                 logger.error(ex);
@@ -142,7 +144,7 @@ public class EdgeResource extends AbstractSubResource {
                     if (!key.startsWith(Tokens.UNDERSCORE))
                         edge.setProperty(key, this.requestObject.get(key));
                 }
-                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys()));
+                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
             }
 
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());

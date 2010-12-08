@@ -46,6 +46,7 @@ public abstract class AbstractTraversal implements Traversal {
     protected String message = null;
     protected String cacheRequestURI = null;
     protected boolean allowCached = true;
+    protected boolean showTypes = false;
     protected ResultObjectCache resultObjectCache;
     
     protected RexsterResourceContext ctx;
@@ -120,7 +121,8 @@ public abstract class AbstractTraversal implements Traversal {
         for (Map.Entry<String, String> entry : queryParameters.entrySet()){
         	if (entry.getKey() != Tokens.OFFSET_START
         		&& entry.getKey() != Tokens.OFFSET_END
-        		&& entry.getKey() != Tokens.ALLOW_CACHED) {
+        		&& entry.getKey() != Tokens.ALLOW_CACHED
+        		&& entry.getKey() != Tokens.SHOW_TYPES) {
         		list.add(entry);
         	}
         }
@@ -175,17 +177,17 @@ public abstract class AbstractTraversal implements Traversal {
      * First method executed in the pipeline of request processing. 
      * 
      * The base implementation of this method gets the key to the cache based on the 
-     * URI and determines if the allow_cached parameter was passed.
+     * URI and determines if the allow_cached parameter was passed.  It also determines
+     * if the show_types parameter was set to a true value (defaulted to false).
      * 
      * Implementing classes should call super.preQuery or implement this functionality
      * themselves to ensure caching works within the workflow of AbstractTraversal. 
      */
     protected void preQuery() {
         this.cacheRequestURI = this.createCacheRequestURI();
-        Boolean temp = this.ctx.getRequestObject().optBoolean(Tokens.ALLOW_CACHED, false);
-        if (null != temp) {
-            this.allowCached = temp;
-        }
+        this.allowCached = this.ctx.getRequestObject().optBoolean(Tokens.ALLOW_CACHED, true);
+        this.showTypes = this.ctx.getRequestObject().optBoolean(Tokens.SHOW_TYPES, false);
+
         logger.debug("Raw request object: " + this.ctx.getRequestObject().toString());
     }
 
@@ -223,6 +225,7 @@ public abstract class AbstractTraversal implements Traversal {
     protected Map<String, Object> getParameters() {
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put(Tokens.ALLOW_CACHED, "allow a previously cached result to be provided (default is true)");
+        parameters.put(Tokens.SHOW_TYPES, "displays the properties of the elements with their native data type (default is false)");
         return parameters;
     }
 }

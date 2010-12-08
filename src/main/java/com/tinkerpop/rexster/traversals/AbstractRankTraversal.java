@@ -80,9 +80,9 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         ElementJSONObject elementObject = this.idToElement.get(elementId);
         if (null == elementObject) {
             if (null == this.returnKeys)
-                elementObject = new ElementJSONObject(element);
+                elementObject = new ElementJSONObject(element, this.showTypes);
             else
-                elementObject = new ElementJSONObject(element, this.returnKeys);
+                elementObject = new ElementJSONObject(element, this.returnKeys, this.showTypes);
             this.idToElement.put(elementId, elementObject);
         }
 
