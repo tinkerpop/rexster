@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -106,11 +107,56 @@ public abstract class AbstractSubResource extends BaseResource {
 				
 				typedPropertyValue = typedItems;
 			} else if (dataType.equals("map")) {
+				HashMap<String, String> stringProperties = this.tryParseMap(theValue);
+				HashMap<String, Object> properties = new HashMap<String, Object>();
 				
+				for(Map.Entry<String, String> entry : stringProperties.entrySet()){
+					properties.put(entry.getKey(), this.getTypedPropertyValue(entry.getValue()));
+				}
+				
+				typedPropertyValue = properties;
 			}
 		}
 		
 		return typedPropertyValue;
+	}
+	
+	private HashMap<String,String> tryParseMap(String mapValue) {
+		// parens on the ends have been validated already...they must be
+		// here to have gotten this far.
+		String stripped = mapValue.substring(1, mapValue.length() - 1);
+
+		HashMap<String,String> pairs = new HashMap<String,String>();
+		
+		ArrayList<Integer> delimiterPlaces = new ArrayList<Integer>();
+		int parensOpened = 0;
+		
+		for (int ix = 0; ix < stripped.length(); ix++) {
+			char c = stripped.charAt(ix);
+			if (c == ',') {
+				if (parensOpened == 0) {
+					delimiterPlaces.add(ix);
+				}
+			} else if (c == '(') {
+				parensOpened++;
+			} else if (c == ')') {
+				parensOpened--;
+			}
+		}
+		
+		int lastPlace = 0;
+		for (Integer place : delimiterPlaces) {
+			String property = stripped.substring(lastPlace, place);
+			String [] nameValuePair = property.split("[=]");
+			pairs.put(nameValuePair[0], nameValuePair[1]);
+			lastPlace = place + 1;
+		}
+		
+		String property = stripped.substring(lastPlace);
+		String [] nameValuePair = property.split("[=]");
+		pairs.put(nameValuePair[0], nameValuePair[1]);
+		
+		return pairs;
 	}
 	
 	private ArrayList<String> tryParseList(String listValue){
@@ -217,6 +263,7 @@ public abstract class AbstractSubResource extends BaseResource {
 		} else if (inner.startsWith("l") || inner.startsWith("long")) {
 			dataType = "long";
 		} else if (inner.startsWith("map")) {
+			// TODO: need to validate format...outer parens plus name value pairs
 			dataType = "map";
 		} 
 		
