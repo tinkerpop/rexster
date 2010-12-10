@@ -132,4 +132,26 @@ public class IndexResource extends AbstractSubResource {
 
         return Response.ok(this.resultObject).build();
     }
+
+    @DELETE
+    @Path("/{name}")
+    public Response deleteEdge(@PathParam("name") String name) {
+        // TODO: delete individual properties
+
+        final IndexableGraph graph = (IndexableGraph) this.rag.getGraph();
+        graph.dropIndex(name);
+
+        try {
+            this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
+        } catch (JSONException ex) {
+            logger.error(ex);
+
+            JSONObject error = generateErrorObjectJsonFail(ex);
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        }
+
+        return Response.ok(this.resultObject).build();
+
+    }
+
 }
