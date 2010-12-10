@@ -61,6 +61,8 @@ public class Tokens {
     public static final String COMMA = ",";
     public static final String LEFT_BRACKET = "[";
     public static final String RIGHT_BRACKET = "]";
+    public static final String KEY = "key";
+    public static final String VALUE = "value";
 
     public static final String REXSTER_VERSION = "0.1-SNAPSHOT";
 }
