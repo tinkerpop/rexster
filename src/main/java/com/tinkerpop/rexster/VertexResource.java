@@ -14,7 +14,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 @Path("/{graphname}/vertices")
 @Produces(MediaType.APPLICATION_JSON)
@@ -204,14 +206,32 @@ public class VertexResource extends AbstractSubResource {
     @DELETE
     @Path("/{id}")
     public Response deleteVertex(@PathParam("id") String id) {
-        // TODO: delete individual properties
+        final List<String> keys = new ArrayList<String>();
+        try {
+            final JSONObject request = this.getNonRexsterRequest();
+            if (request.length() > 0) {
+                final Iterator itty = request.keys();
+                while (itty.hasNext()) {
+                    keys.add((String) itty.next());
+                }
+            }
+        } catch (JSONException e) {
+        }
 
         final Graph graph = this.rag.getGraph();
         final Vertex vertex = graph.getVertex(id);
         if (null != vertex) {
-            graph.removeVertex(vertex);
+            if (keys.size() > 0) {
+                // delete vertex properites
+                for (final String key : keys) {
+                    vertex.removeProperty(key);
+                }
+            } else {
+                // delete vertex
+                graph.removeVertex(vertex);
+            }
         } else {
-            String msg = "Could not find vertex [" + id + "] on graph [" + this.rag.getGraphName() + "] for deletion.";
+            final String msg = "Could not find vertex [" + id + "] on graph [" + this.rag.getGraphName() + "] for deletion.";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);

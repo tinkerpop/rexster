@@ -16,7 +16,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 @Path("/{graphname}/edges")
 @Produces(MediaType.APPLICATION_JSON)
@@ -152,12 +154,31 @@ public class EdgeResource extends AbstractSubResource {
     @DELETE
     @Path("/{id}")
     public Response deleteEdge(@PathParam("id") String id) {
-        // TODO: delete individual properties
+        final List<String> keys = new ArrayList<String>();
+        try {
+            final JSONObject request = this.getNonRexsterRequest();
+            if (request.length() > 0) {
+                final Iterator itty = request.keys();
+                while (itty.hasNext()) {
+                    keys.add((String) itty.next());
+                }
+            }
+        } catch (JSONException e) {
+        }
+
 
         final Graph graph = this.rag.getGraph();
         final Edge edge = graph.getEdge(id);
         if (null != edge) {
-            graph.removeEdge(edge);
+            if (keys.size() > 0) {
+                // delete edge properites
+                for (final String key : keys) {
+                    edge.removeProperty(key);
+                }
+            } else {
+                // delete edge
+                graph.removeEdge(edge);
+            }
         } else {
             String msg = "Could not find edge [" + id + "] on graph [" + this.rag.getGraphName() + "] for deletion.";
             logger.info(msg);
