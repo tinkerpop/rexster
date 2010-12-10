@@ -1,41 +1,33 @@
 package com.tinkerpop.rexster;
 
-import java.util.Iterator;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.Status;
-
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.rexster.traversals.ElementJSONObject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+import java.util.Iterator;
 
 @Path("/{graphname}/edges")
 @Produces(MediaType.APPLICATION_JSON)
 public class EdgeResource extends AbstractSubResource {
-	
-	private static Logger logger = Logger.getLogger(EdgeResource.class);
+
+    private static Logger logger = Logger.getLogger(EdgeResource.class);
 
     public EdgeResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
-    	super(graphName, ui, req);
+        super(graphName, ui, req);
     }
-    
+
     @GET
     public Response getAllEdges() {
 
@@ -52,8 +44,7 @@ public class EdgeResource extends AbstractSubResource {
             JSONArray edgeArray = new JSONArray();
             for (Edge edge : this.rag.getGraph().getEdges()) {
                 if (counter >= start && counter < end) {
-                    edgeArray.put(new ElementJSONObject(
-                    		edge, this.getReturnKeys(), this.hasShowTypes()));
+                    edgeArray.put(new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
                 }
                 counter++;
             }
@@ -80,8 +71,7 @@ public class EdgeResource extends AbstractSubResource {
 
         if (null != edge) {
             try {
-                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(
-                		edge, this.getReturnKeys(), this.hasShowTypes()));
+                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             } catch (JSONException ex) {
                 logger.error(ex);
@@ -99,10 +89,10 @@ public class EdgeResource extends AbstractSubResource {
 
         return Response.ok(this.resultObject).build();
     }
-    
+
     @POST
-    public Response postNull(){
-    	return this.postEdge(null);
+    public Response postNull() {
+        return this.postEdge(null);
     }
 
     @POST
@@ -188,4 +178,26 @@ public class EdgeResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
 
     }
+
+    /*@DELETE
+    TODO: WITHOUT CONCURRNT MODIFICATION ERRORS
+    public Response deleteAllEdges() {
+
+        final Graph graph = this.rag.getGraph();
+        for (Edge edge : graph.getEdges()) {
+            graph.removeEdge(edge);
+        }
+
+        try {
+            this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
+        } catch (JSONException ex) {
+            logger.error(ex);
+
+            JSONObject error = generateErrorObjectJsonFail(ex);
+            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        }
+
+        return Response.ok(this.resultObject).build();
+
+    }*/
 }

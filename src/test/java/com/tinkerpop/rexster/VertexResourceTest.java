@@ -241,4 +241,17 @@ public class VertexResourceTest extends BaseTest {
         printPerformance("GET vertices", null, uri, sh.stopWatch());
         Assert.assertEquals(0, object.getJSONArray("results").length());
     }
+
+    /*@Test
+    public void deleteAllVertices() throws Exception {
+        sh.stopWatch();
+        String uri = createURI("vertices");
+        System.out.println(uri);
+        deleteResource(uri);
+        printPerformance("DELETE all vertices", null, uri, sh.stopWatch());
+
+        uri = createURI("vertices");
+        JSONObject object = getResource(uri);
+        System.out.println(object);
+    }*/
 }

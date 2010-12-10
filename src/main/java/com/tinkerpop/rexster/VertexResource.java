@@ -1,44 +1,31 @@
 package com.tinkerpop.rexster;
 
-import java.util.Iterator;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.Status;
-
+import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.rexster.traversals.ElementJSONObject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+import java.util.Iterator;
 
 @Path("/{graphname}/vertices")
 @Produces(MediaType.APPLICATION_JSON)
 public class VertexResource extends AbstractSubResource {
-	
-	private static Logger logger = Logger.getLogger(VertexResource.class);
+
+    private static Logger logger = Logger.getLogger(VertexResource.class);
 
     public VertexResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
-    	super(graphName, ui, req);
+        super(graphName, ui, req);
     }
-    
+
     @GET
     @Path("/{id}/{direction}")
     public Response getVertexEdges(@PathParam("id") String vertexId, @PathParam("direction") String direction) {
@@ -60,8 +47,7 @@ public class VertexResource extends AbstractSubResource {
                     for (Edge edge : vertex.getOutEdges()) {
                         if (this.hasPropertyValues(edge, tempRequest)) {
                             if (counter >= start && counter < end) {
-                                edgeArray.put(new ElementJSONObject(
-                                		edge, this.getReturnKeys(), this.hasShowTypes()));
+                                edgeArray.put(new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
                             }
                             counter++;
                         }
@@ -71,8 +57,7 @@ public class VertexResource extends AbstractSubResource {
                     for (Edge edge : vertex.getInEdges()) {
                         if (this.hasPropertyValues(edge, tempRequest)) {
                             if (counter >= start && counter < end) {
-                                edgeArray.put(new ElementJSONObject(
-                                		edge, this.getReturnKeys(), this.hasShowTypes()));
+                                edgeArray.put(new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
                             }
                             counter++;
                         }
@@ -106,8 +91,7 @@ public class VertexResource extends AbstractSubResource {
         Vertex vertex = this.rag.getGraph().getVertex(id);
         if (null != vertex) {
             try {
-                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(
-                		vertex, this.getReturnKeys(), this.hasShowTypes()));
+                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             } catch (JSONException ex) {
                 logger.error(ex);
@@ -156,8 +140,7 @@ public class VertexResource extends AbstractSubResource {
             if (null != itty) {
                 for (Element element : itty) {
                     if (counter >= start && counter < end) {
-                        vertexArray.put(new ElementJSONObject(
-                        		element, this.getReturnKeys(), this.hasShowTypes()));
+                        vertexArray.put(new ElementJSONObject(element, this.getReturnKeys(), this.hasShowTypes()));
                     }
                     counter++;
                 }
@@ -176,10 +159,10 @@ public class VertexResource extends AbstractSubResource {
 
         return Response.ok(this.resultObject).build();
     }
-    
+
     @POST
-    public Response postNull(){
-    	return this.postVertex(null);
+    public Response postNull() {
+        return this.postVertex(null);
     }
 
     @POST
@@ -206,8 +189,7 @@ public class VertexResource extends AbstractSubResource {
                 }
             }
 
-            this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(
-            		vertex, this.getReturnKeys(), this.hasShowTypes()));
+            this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);
@@ -248,4 +230,26 @@ public class VertexResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
 
     }
+
+    /* TODO: WITHOUT CONCURRENT MODIFICATION ERRORS
+    @DELETE
+    public Response deleteAllVertices() {
+        final Graph graph = this.rag.getGraph();
+        Iterator<Vertex> itty = graph.getVertices().iterator();
+        while(itty.hasNext()) {
+            graph.removeVertex(itty.next());
+        }
+
+        try {
+            this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
+        } catch (JSONException ex) {
+            logger.error(ex);
+
+            JSONObject error = generateErrorObjectJsonFail(ex);
+            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        }
+
+        return Response.ok(this.resultObject).build();
+
+    }*/
 }
