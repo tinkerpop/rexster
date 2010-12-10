@@ -68,7 +68,7 @@ public class IndexResource extends AbstractSubResource {
 
     @GET
     @Path("/{name}")
-    public Response getSingleEdge(@PathParam("name") String name) {
+    public Response getElementsFromIndex(@PathParam("name") String name) {
         Index index = null;
         for (Index i : ((IndexableGraph) this.rag.getGraph()).getIndices()) {
             if (i.getIndexName().equals(name))
@@ -100,7 +100,7 @@ public class IndexResource extends AbstractSubResource {
                 JSONArray elementArray = new JSONArray();
                 for (Element element : (Iterable<Element>) index.get(key, value)) {
                     if (counter >= start && counter < end) {
-                        elementArray.put(new ElementJSONObject(element));
+                        elementArray.put(new ElementJSONObject(element, this.getReturnKeys(), this.hasShowTypes()));
                     }
                     counter++;
                 }
@@ -135,7 +135,7 @@ public class IndexResource extends AbstractSubResource {
 
     @DELETE
     @Path("/{name}")
-    public Response deleteEdge(@PathParam("name") String name) {
+    public Response deleteIndex(@PathParam("name") String name) {
         // TODO: delete individual properties
 
         final IndexableGraph graph = (IndexableGraph) this.rag.getGraph();
