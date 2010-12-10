@@ -1,6 +1,8 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -126,26 +128,12 @@ public class VertexResource extends AbstractSubResource {
         try {
             long counter = 0l;
             JSONArray vertexArray = new JSONArray();
-            String key = null;
-            Iterator keys = this.getNonRexsterRequest().keys();
-            while (keys.hasNext()) {
-                key = keys.next().toString();
-                break;
-            }
-            Iterable<? extends Element> itty;
-            if (null != key) {
-                itty = ((IndexableGraph) this.rag.getGraph()).getIndex(Index.VERTICES, Vertex.class).get(key, this.requestObject.get(key));
-            } else {
-                itty = this.rag.getGraph().getVertices();
-            }
 
-            if (null != itty) {
-                for (Element element : itty) {
-                    if (counter >= start && counter < end) {
-                        vertexArray.put(new ElementJSONObject(element, this.getReturnKeys(), this.hasShowTypes()));
-                    }
-                    counter++;
+            for (Vertex vertex : this.rag.getGraph().getVertices()) {
+                if (counter >= start && counter < end) {
+                    vertexArray.put(new ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
                 }
+                counter++;
             }
 
             this.resultObject.put(Tokens.RESULTS, vertexArray);

@@ -65,7 +65,7 @@ public class VertexResourceTest extends BaseTest {
         Assert.assertEquals(10, (long) ((JSONArray) object.get("results")).length());
     }
 
-	@Test
+	/*@Test
     public void getVertexIndex() throws Exception {
         sh.stopWatch();
         String uri = createURI("vertices?name=Garcia");
@@ -73,7 +73,7 @@ public class VertexResourceTest extends BaseTest {
         printPerformance("GET single vertex through index", null, uri, sh.stopWatch());
         Assert.assertEquals(1l, object.getLong("total_size"));
         Assert.assertEquals(object.getLong("total_size"), (long) ((JSONArray) object.get("results")).length());
-    }
+    }*/
 
 	@Test
     public void getVertexEdges() throws Exception {
