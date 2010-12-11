@@ -46,6 +46,34 @@ public abstract class AbstractSubResource extends BaseResource {
         }
     }
 	
+	protected AbstractSubResource(RexsterApplicationGraph rag, UriInfo ui, HttpServletRequest req) {
+    	super();
+
+        this.rag = rag;
+        if (this.rag == null) {
+
+            logger.info("Request for a non-configured graph.");
+
+            JSONObject error = generateErrorObject("Graph could not be found.");
+            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        }
+
+        try {
+            this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
+            Map<String, String> queryParameters = req.getParameterMap();
+            this.buildRequestObject(queryParameters);
+
+            this.request = req;
+            this.uriInfo = ui;
+        } catch (JSONException ex) {
+
+            logger.error(ex);
+
+            JSONObject error = generateErrorObjectJsonFail(ex);
+            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        }
+    }
+	
 	/**
 	 * Takes a property value string from the URI and attempts to parse it 
 	 * to its defined data type.
@@ -86,7 +114,7 @@ public abstract class AbstractSubResource extends BaseResource {
 		}
 		
 		// determine if the property is typed, otherwise assume it is a string
-		if (propertyValue.startsWith("(") && propertyValue.endsWith(")")) {
+		if (propertyValue != null && propertyValue.startsWith("(") && propertyValue.endsWith(")")) {
 			String dataType = this.getDataTypeSegment(propertyValue);
 			String theValue = this.getValueSegment(propertyValue);
 			
@@ -145,16 +173,17 @@ public abstract class AbstractSubResource extends BaseResource {
 		}
 		
 		int lastPlace = 0;
+		int equalPlace = 0;
 		for (Integer place : delimiterPlaces) {
 			String property = stripped.substring(lastPlace, place);
-			String [] nameValuePair = property.split("[=]");
-			pairs.put(nameValuePair[0], nameValuePair[1]);
+			equalPlace = property.indexOf("=");
+			pairs.put(property.substring(0, equalPlace), property.substring(equalPlace + 1));
 			lastPlace = place + 1;
 		}
 		
 		String property = stripped.substring(lastPlace);
-		String [] nameValuePair = property.split("[=]");
-		pairs.put(nameValuePair[0], nameValuePair[1]);
+		equalPlace = property.indexOf("=");
+		pairs.put(property.substring(0, equalPlace), property.substring(equalPlace + 1));
 		
 		return pairs;
 	}
@@ -245,24 +274,23 @@ public abstract class AbstractSubResource extends BaseResource {
 		// assumes that the propertyValue has open and closed parens
 		String dataType = "string";
 		
-		// strip the initial parens to make the IF statements
-		// easier to read. no need to check for string as that is the
-		// default
-		String inner = propertyValue.substring(1).trim();
-		if (inner.startsWith("i") || inner.startsWith("integer")) {
+		// strip the initial parens and read up to the comman. 
+		// no need to check for string as that is the default
+		int place = propertyValue.indexOf(',');
+		String inner = propertyValue.substring(1, place).trim();
+		
+		if (inner.equals("i") || inner.equals("integer")) {
 			dataType = "integer";
-		} else if (inner.startsWith("d") || inner.startsWith("double")) {
+		} else if (inner.equals("d") || inner.equals("double")) {
 			dataType = "double";
-		} else if (inner.startsWith("f") || inner.startsWith("float")) {
+		} else if (inner.equals("f") || inner.equals("float")) {
 			dataType = "float";
-		} else if (inner.startsWith("list")) {
-			// this check needs to be above the check for "long" because both
-			// start with the letter "L"
+		} else if (inner.equals("list")) {
 			// TODO: need to ensure square brackets enclose the array 
 			dataType = "list";
-		} else if (inner.startsWith("l") || inner.startsWith("long")) {
+		} else if (inner.equals("l") || inner.equals("long")) {
 			dataType = "long";
-		} else if (inner.startsWith("map")) {
+		} else if (inner.equals("map")) {
 			// TODO: need to validate format...outer parens plus name value pairs
 			dataType = "map";
 		} 
