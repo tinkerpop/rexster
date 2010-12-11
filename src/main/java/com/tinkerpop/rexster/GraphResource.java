@@ -37,15 +37,7 @@ public class GraphResource extends AbstractSubResource {
 
             this.resultObject.put("name", rag.getGraphName());
             this.resultObject.put("graph", graph.toString());
-
-            JSONArray queriesArray = new JSONArray();
-            for (Map.Entry<String, Class<? extends Traversal>> traversal : this.rag.getLoadedTraversals().entrySet()) {
-                queriesArray.put(traversal.getKey());
-            }
-
-            this.resultObject.put("traversals", queriesArray);
-
-            this.resultObject.put("query_time", this.sh.stopWatch());
+            this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             this.resultObject.put("up_time", this.getTimeAlive());
             this.resultObject.put("version", RexsterApplication.getVersion());
 

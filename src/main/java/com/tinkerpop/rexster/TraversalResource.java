@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -18,6 +19,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -32,6 +34,33 @@ public class TraversalResource extends AbstractSubResource {
 
     public TraversalResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
     	super(graphName, ui, req);
+    }
+    
+    @GET
+    public Response getTraversals() {
+
+    	try {
+    		int counter = 0;
+	        JSONArray queriesArray = new JSONArray();
+	        for (Map.Entry<String, Class<? extends Traversal>> traversal : this.rag.getLoadedTraversals().entrySet()) {
+	        	JSONObject traversalItem = new JSONObject();
+	        	traversalItem.put("path", traversal.getKey());
+	        	traversalItem.put("traversal", traversal.getValue().getName());
+	            queriesArray.put(traversalItem);
+	            counter++;
+	        }
+
+	        this.resultObject.put(Tokens.RESULTS, queriesArray);
+            this.resultObject.put(Tokens.TOTAL_SIZE, counter);
+            this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
+    	} catch (JSONException ex) {
+            logger.error(ex);
+
+            JSONObject error = generateErrorObjectJsonFail(ex);
+            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        }
+
+        return Response.ok(this.resultObject).build();
     }
 
 	@GET
