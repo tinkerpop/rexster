@@ -87,9 +87,9 @@ public class GraphConfigurationContainer {
 	private Graph getGraphFromConfiguration(HierarchicalConfiguration graphConfiguration) throws GraphConfigurationException {
 		String graphConfigurationType = graphConfiguration.getString(Tokens.REXSTER_GRAPH_TYPE);
 
-        if (graphConfigurationType.equals("neo4j")) {
+        if (graphConfigurationType.equals("neo4jgraph")) {
         	graphConfigurationType = Neo4jGraphConfiguration.class.getName();
-        } else if (graphConfigurationType.equals("orientdb")) {
+        } else if (graphConfigurationType.equals("orientgraph")) {
         	graphConfigurationType = OrientGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("tinkergraph")) {
             graphConfigurationType = TinkerGraphGraphConfiguration.class.getName();
