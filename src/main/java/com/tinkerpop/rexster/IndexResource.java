@@ -30,9 +30,12 @@ public class IndexResource extends AbstractSubResource {
         super(graphName, ui, req);
     }
 
+    /**
+     * GET http://host/graph/indices
+     * get.getIndices();
+     */
     @GET
     public Response getAllIndices() {
-
         Long start = this.getStartOffset();
         Long end = this.getEndOffset();
 
@@ -62,10 +65,15 @@ public class IndexResource extends AbstractSubResource {
 
     }
 
+    /**
+     * GET http://host/graph/indices/indexName?key=key1&value=value1
+     * Index index = graph.getIndex(indexName,...);
+     * index.get(key,value);
+     */
     @GET
     @Path("/{indexName}")
     public Response getElementsFromIndex(@PathParam("indexName") String indexName) {
-        Index index = this.getIndexFromGraph(indexName);
+        final Index index = this.getIndexFromGraph(indexName);
 
         String key = null;
         Object value = null;
@@ -123,6 +131,11 @@ public class IndexResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
     }
 
+    /**
+     * GET http://host/graph/indices/indexName/keys
+     * AutomaticIndex index = (AutomaticIndex) graph.getIndex(indexName,...);
+     * index.getAutoIndexKeys();
+     */
     @GET
     @Path("/{indexName}/keys")
     public Response getAutomaticIndexKeys(@PathParam("indexName") String indexName) {
@@ -163,17 +176,24 @@ public class IndexResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
     }
 
-
+    /**
+     * DELETE http://host/graph/indices/indexName
+     * graph.dropIndex(indexName);
+     * <p/>
+     * DELETE http://host/graph/indices/indexName?key=key1&value=value1&class=vertex&id=id1
+     * Index index = graph.getIndex(indexName,...)
+     * index.remove(key, value, graph.getVertex(id1));
+     */
     @DELETE
     @Path("/{indexName}")
     public Response deleteIndex(@PathParam("indexName") String indexName) {
-        Index index = this.getIndexFromGraph(indexName);
-        IndexableGraph graph = (IndexableGraph) this.rag.getGraph();
+        final Index index = this.getIndexFromGraph(indexName);
+        final IndexableGraph graph = (IndexableGraph) this.rag.getGraph();
 
         String key = null;
         Object value = null;
         String id = null;
-        String type = null;
+        String clazz = null;
 
         Object temp = this.requestObject.opt(Tokens.KEY);
         if (null != temp)
@@ -184,15 +204,15 @@ public class IndexResource extends AbstractSubResource {
         temp = this.requestObject.opt(Tokens.ID);
         if (null != temp)
             id = temp.toString();
-        temp = this.requestObject.opt(Tokens.TYPE);
+        temp = this.requestObject.opt(Tokens.CLASS);
         if (null != temp)
-            type = temp.toString();
+            clazz = temp.toString();
 
-        if (key == null && value == null && id == null && type == null)
+        if (key == null && value == null && id == null && clazz == null) {
             graph.dropIndex(indexName);
-        else if (null != index & key != null && value != null && type != null && id != null) {
+        } else if (null != index & key != null && value != null && clazz != null && id != null) {
             try {
-                if (type.equals("vertex"))
+                if (clazz.equals(Tokens.VERTEX))
                     index.remove(key, value, graph.getVertex(id));
                 else
                     index.remove(key, value, graph.getEdge(id));
@@ -224,13 +244,19 @@ public class IndexResource extends AbstractSubResource {
 
     }
 
+    /**
+     * DELETE http://host/graph/indices/indexName/keys?key1&key2
+     * AutomaticIndex index = (AutomaticIndex) graph.getIndex(indexName,...);
+     * index.removeAutoIndexKey(key1);
+     * index.removeAutoIndexKey(key2);
+     */
     @DELETE
     @Path("/{indexName}/keys")
     public Response deleteIndexKeys(@PathParam("indexName") String indexName) {
 
         try {
-            Index index = this.getIndexFromGraph(indexName);
-            List<String> keys = this.getNonRexsterRequestKeys();
+            final Index index = this.getIndexFromGraph(indexName);
+            final List<String> keys = this.getNonRexsterRequestKeys();
 
             if (null != index && index.getIndexType().equals(Index.Type.AUTOMATIC)) {
                 AutomaticIndex autoIndex = (AutomaticIndex) index;
@@ -261,16 +287,24 @@ public class IndexResource extends AbstractSubResource {
 
     }
 
+    /**
+     * POST http://host/graph/indices/indexName?key=key1&value=value1&class=vertex&id=id1
+     * Index index = graph.getIndex(indexName,...);
+     * index.put(key,value,graph.getVertex(id1));
+     * <p/>
+     * POST http://host/graph/indices/indexName?class=vertex&type=automatic
+     * graph.createIndex(indexName,Vertex.class,AUTOMATIC)
+     */
     @POST
     @Path("/{indexName}")
     public Response putElementInIndexOrCreateIndex(@PathParam("indexName") String indexName) {
-        Index index = this.getIndexFromGraph(indexName);
-        IndexableGraph graph = (IndexableGraph) this.rag.getGraph();
+        final Index index = this.getIndexFromGraph(indexName);
+        final IndexableGraph graph = (IndexableGraph) this.rag.getGraph();
 
         String key = null;
         Object value = null;
         String id = null;
-        String type = null;
+        String clazz = null;
 
         Object temp = this.requestObject.opt(Tokens.KEY);
         if (null != temp)
@@ -281,14 +315,14 @@ public class IndexResource extends AbstractSubResource {
         temp = this.requestObject.opt(Tokens.ID);
         if (null != temp)
             id = temp.toString();
-        temp = this.requestObject.opt(Tokens.TYPE);
+        temp = this.requestObject.opt(Tokens.CLASS);
         if (null != temp)
-            type = temp.toString();
+            clazz = temp.toString();
 
 
-        if (null != index & key != null && value != null && type != null && id != null) {
+        if (null != index & key != null && value != null && clazz != null && id != null) {
             try {
-                if (type.equals("vertex"))
+                if (clazz.equals(Tokens.VERTEX))
                     index.put(key, value, graph.getVertex(id));
                 else
                     index.put(key, value, graph.getEdge(id));
@@ -355,12 +389,19 @@ public class IndexResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
     }
 
+    /**
+     * POST http://host/graph/indices/indexName?key1&key2
+     * AutomaticIndex index = (AutomaticIndex) graph.getIndex(indexName,...);
+     * index.addAutoIndexKey(key1);
+     * index.addAutoIndexKey(key2);
+     * --if any key is 'null' then index.addAutoIndexKey(null) (for wildcard)
+     */
     @POST
     @Path("/{indexName}/keys")
     public Response addIndexKeys(@PathParam("indexName") String indexName) {
         try {
-            Index index = this.getIndexFromGraph(indexName);
-            List<String> keys = this.getNonRexsterRequestKeys();
+            final Index index = this.getIndexFromGraph(indexName);
+            final List<String> keys = this.getNonRexsterRequestKeys();
 
             if (null != index && index.getIndexType().equals(Index.Type.AUTOMATIC)) {
                 AutomaticIndex autoIndex = (AutomaticIndex) index;

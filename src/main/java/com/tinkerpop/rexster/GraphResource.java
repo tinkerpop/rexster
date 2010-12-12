@@ -23,9 +23,12 @@ public class GraphResource extends AbstractSubResource {
         super(graphName, ui, req);
     }
 
+    /**
+     * GET http://host/graph
+     * graph.toString();
+     */
     @GET
     public Response getGraph() {
-
         try {
 
             // graph should be ready to go at this point.  checks in the
@@ -47,6 +50,12 @@ public class GraphResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
     }
 
+    /**
+     * DELETE http://host/graph
+     * graph.clear()
+     *
+     * @return Query time
+     */
     @DELETE
     public Response deleteGraph() {
         Graph graph = this.rag.getGraph();

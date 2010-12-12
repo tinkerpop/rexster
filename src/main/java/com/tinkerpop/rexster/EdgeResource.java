@@ -29,6 +29,10 @@ public class EdgeResource extends AbstractSubResource {
         super(graphName, ui, req);
     }
 
+    /**
+     * GET http://host/graph/edges
+     * graph.getEdges();
+     */
     @GET
     public Response getAllEdges() {
 
@@ -61,6 +65,10 @@ public class EdgeResource extends AbstractSubResource {
 
     }
 
+    /**
+     * GET http://host/graph/edges/id
+     * graph.getEdge(id);
+     */
     @GET
     @Path("/{id}")
     public Response getSingleEdge(@PathParam("id") String id) {
@@ -87,11 +95,21 @@ public class EdgeResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
     }
 
+    /**
+     * POST http://host/graph/edge?_inV=id1&_outV=id2&label=string&key=value
+     * Edge e = graph.addEdge(null,graph.getVertex(id1),graph.getVertex(id2),label);
+     * e.setProperty(key,value);
+     */
     @POST
     public Response postNull() {
         return this.postEdge(null);
     }
 
+    /**
+     * POST http://host/graph/edge/id?_inV=id1&_outV=id2&label=string&key=value
+     * Edge e = graph.addEdge(id,graph.getVertex(id1),graph.getVertex(id2),label);
+     * e.setProperty(key,value);
+     */
     @POST
     @Path("/{id}")
     public Response postEdge(@PathParam("id") String id) {
@@ -146,6 +164,15 @@ public class EdgeResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
     }
 
+    /**
+     * DELETE http://host/graph/edge/id
+     * graph.removeEdge(graph.getEdge(id));
+     * <p/>
+     * DELETE http://host/graph/edge/id?key1&key2
+     * Edge e = graph.getEdge(id);
+     * e.removeProperty(key1);
+     * e.removeProperty(key2);
+     */
     @DELETE
     @Path("/{id}")
     public Response deleteEdge(@PathParam("id") String id) {

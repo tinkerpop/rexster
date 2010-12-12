@@ -29,6 +29,73 @@ public class VertexResource extends AbstractSubResource {
         super(graphName, ui, req);
     }
 
+    /**
+     * GET http://host/graph/vertices
+     * graph.getVertices();
+     */
+    @GET
+    public Response getVertices() {
+        Long start = this.getStartOffset();
+        Long end = this.getEndOffset();
+
+        try {
+            long counter = 0l;
+            final JSONArray vertexArray = new JSONArray();
+
+            for (Vertex vertex : this.rag.getGraph().getVertices()) {
+                if (counter >= start && counter < end) {
+                    vertexArray.put(new ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
+                }
+                counter++;
+            }
+
+            this.resultObject.put(Tokens.RESULTS, vertexArray);
+            this.resultObject.put(Tokens.TOTAL_SIZE, counter);
+            this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
+
+        } catch (JSONException ex) {
+            logger.error(ex);
+            JSONObject error = generateErrorObjectJsonFail(ex);
+            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        }
+
+        return Response.ok(this.resultObject).build();
+    }
+
+    /**
+     * GET http://host/graph/vertices/id
+     * graph.getVertex(id);
+     */
+    @GET
+    @Path("/{id}")
+    public Response getSingleVertex(@PathParam("id") String id) {
+        Vertex vertex = this.rag.getGraph().getVertex(id);
+        if (null != vertex) {
+            try {
+                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
+                this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
+            } catch (JSONException ex) {
+                logger.error(ex);
+
+                JSONObject error = generateErrorObjectJsonFail(ex);
+                throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            }
+        } else {
+            String msg = "Could not find vertex [" + id + "] on graph [" + this.rag.getGraphName() + "].";
+            logger.info(msg);
+
+            JSONObject error = generateErrorObject(msg);
+            throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
+        }
+
+
+        return Response.ok(this.resultObject).build();
+    }
+
+    /**
+     * GET http://host/graph/vertices/id/direction
+     * graph.getVertex(id).get{Direction}Edges();
+     */
     @GET
     @Path("/{id}/{direction}")
     public Response getVertexEdges(@PathParam("id") String vertexId, @PathParam("direction") String direction) {
@@ -84,67 +151,20 @@ public class VertexResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
     }
 
-    @GET
-    @Path("/{id}")
-    public Response getSingleVertex(@PathParam("id") String id) {
-        Vertex vertex = this.rag.getGraph().getVertex(id);
-        if (null != vertex) {
-            try {
-                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
-                this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-            } catch (JSONException ex) {
-                logger.error(ex);
-
-                JSONObject error = generateErrorObjectJsonFail(ex);
-                throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
-            }
-        } else {
-            String msg = "Could not find vertex [" + id + "] on graph [" + this.rag.getGraphName() + "].";
-            logger.info(msg);
-
-            JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
-        }
-
-
-        return Response.ok(this.resultObject).build();
-    }
-
-
-    @GET
-    public Response getVertices() {
-        Long start = this.getStartOffset();
-        Long end = this.getEndOffset();
-
-        try {
-            long counter = 0l;
-            JSONArray vertexArray = new JSONArray();
-
-            for (Vertex vertex : this.rag.getGraph().getVertices()) {
-                if (counter >= start && counter < end) {
-                    vertexArray.put(new ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
-                }
-                counter++;
-            }
-
-            this.resultObject.put(Tokens.RESULTS, vertexArray);
-            this.resultObject.put(Tokens.TOTAL_SIZE, counter);
-            this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-
-        } catch (JSONException ex) {
-            logger.error(ex);
-            JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
-        }
-
-        return Response.ok(this.resultObject).build();
-    }
-
+    /**
+     * POST http://host/graph/vertices
+     * graph.addVertex(null);
+     */
     @POST
     public Response postNull() {
         return this.postVertex(null);
     }
 
+    /**
+     * POST http://host/graph/vertices/id?key=value
+     * Vertex v = graph.addVertex(id);
+     * v.setProperty(key,value);
+     */
     @POST
     @Path("/{id}")
     public Response postVertex(@PathParam("id") String id) {
@@ -181,6 +201,15 @@ public class VertexResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
     }
 
+    /**
+     * DELETE http://host/graph/vertices/id
+     * graph.removeVertex(graph.getVertex(id));
+     * <p/>
+     * DELETE http://host/graph/vertices/id?key1&key2
+     * Vertex v = graph.getVertex(id);
+     * v.removeProperty(key1);
+     * v.removeProperty(key2);
+     */
     @DELETE
     @Path("/{id}")
     public Response deleteVertex(@PathParam("id") String id) {
