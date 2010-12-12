@@ -16,7 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -35,11 +34,7 @@ public class VertexResource extends AbstractSubResource {
     public Response getVertexEdges(@PathParam("id") String vertexId, @PathParam("direction") String direction) {
         try {
             Long start = this.getStartOffset();
-            if (null == start)
-                start = 0l;
             Long end = this.getEndOffset();
-            if (null == end)
-                end = Long.MAX_VALUE;
 
             long counter = 0l;
             Vertex vertex = this.rag.getGraph().getVertex(vertexId);
@@ -119,11 +114,7 @@ public class VertexResource extends AbstractSubResource {
     @GET
     public Response getVertices() {
         Long start = this.getStartOffset();
-        if (null == start)
-            start = 0l;
         Long end = this.getEndOffset();
-        if (null == end)
-            end = Long.MAX_VALUE;
 
         try {
             long counter = 0l;
@@ -142,7 +133,6 @@ public class VertexResource extends AbstractSubResource {
 
         } catch (JSONException ex) {
             logger.error(ex);
-
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
@@ -194,39 +184,27 @@ public class VertexResource extends AbstractSubResource {
     @DELETE
     @Path("/{id}")
     public Response deleteVertex(@PathParam("id") String id) {
-        final List<String> keys = new ArrayList<String>();
         try {
-            final JSONObject request = this.getNonRexsterRequest();
-            if (request.length() > 0) {
-                final Iterator itty = request.keys();
-                while (itty.hasNext()) {
-                    keys.add((String) itty.next());
-                }
-            }
-        } catch (JSONException e) {
-        }
-
-        final Graph graph = this.rag.getGraph();
-        final Vertex vertex = graph.getVertex(id);
-        if (null != vertex) {
-            if (keys.size() > 0) {
-                // delete vertex properites
-                for (final String key : keys) {
-                    vertex.removeProperty(key);
+            final List<String> keys = this.getNonRexsterRequestKeys();
+            final Graph graph = this.rag.getGraph();
+            final Vertex vertex = graph.getVertex(id);
+            if (null != vertex) {
+                if (keys.size() > 0) {
+                    // delete vertex properites
+                    for (final String key : keys) {
+                        vertex.removeProperty(key);
+                    }
+                } else {
+                    // delete vertex
+                    graph.removeVertex(vertex);
                 }
             } else {
-                // delete vertex
-                graph.removeVertex(vertex);
+                final String msg = "Could not find vertex [" + id + "] on graph [" + this.rag.getGraphName() + "]";
+                logger.info(msg);
+
+                JSONObject error = generateErrorObject(msg);
+                throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
             }
-        } else {
-            final String msg = "Could not find vertex [" + id + "] on graph [" + this.rag.getGraphName() + "] for deletion.";
-            logger.info(msg);
-
-            JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
-        }
-
-        try {
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);

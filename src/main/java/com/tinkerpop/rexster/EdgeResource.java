@@ -16,7 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,11 +33,7 @@ public class EdgeResource extends AbstractSubResource {
     public Response getAllEdges() {
 
         Long start = this.getStartOffset();
-        if (null == start)
-            start = 0l;
         Long end = this.getEndOffset();
-        if (null == end)
-            end = Long.MAX_VALUE;
 
         long counter = 0l;
 
@@ -154,44 +149,32 @@ public class EdgeResource extends AbstractSubResource {
     @DELETE
     @Path("/{id}")
     public Response deleteEdge(@PathParam("id") String id) {
-        final List<String> keys = new ArrayList<String>();
+
         try {
-            final JSONObject request = this.getNonRexsterRequest();
-            if (request.length() > 0) {
-                final Iterator itty = request.keys();
-                while (itty.hasNext()) {
-                    keys.add((String) itty.next());
-                }
-            }
-        } catch (JSONException e) {
-        }
-
-
-        final Graph graph = this.rag.getGraph();
-        final Edge edge = graph.getEdge(id);
-        if (null != edge) {
-            if (keys.size() > 0) {
-                // delete edge properites
-                for (final String key : keys) {
-                    edge.removeProperty(key);
+            final List<String> keys = this.getNonRexsterRequestKeys();
+            final Graph graph = this.rag.getGraph();
+            final Edge edge = graph.getEdge(id);
+            if (null != edge) {
+                if (keys.size() > 0) {
+                    // delete edge properites
+                    for (final String key : keys) {
+                        edge.removeProperty(key);
+                    }
+                } else {
+                    // delete edge
+                    graph.removeEdge(edge);
                 }
             } else {
-                // delete edge
-                graph.removeEdge(edge);
+                String msg = "Could not find edge [" + id + "] on graph [" + this.rag.getGraphName() + "]";
+                logger.info(msg);
+                JSONObject error = generateErrorObject(msg);
+                throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
             }
-        } else {
-            String msg = "Could not find edge [" + id + "] on graph [" + this.rag.getGraphName() + "] for deletion.";
-            logger.info(msg);
 
-            JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
-        }
 
-        try {
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);
-
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }

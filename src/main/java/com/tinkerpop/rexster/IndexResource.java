@@ -1,9 +1,6 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import com.tinkerpop.rexster.traversals.IndexJSONObject;
 import org.apache.log4j.Logger;
@@ -17,6 +14,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -36,11 +34,7 @@ public class IndexResource extends AbstractSubResource {
     public Response getAllIndices() {
 
         Long start = this.getStartOffset();
-        if (null == start)
-            start = 0l;
         Long end = this.getEndOffset();
-        if (null == end)
-            end = Long.MAX_VALUE;
 
         long counter = 0l;
 
@@ -86,11 +80,7 @@ public class IndexResource extends AbstractSubResource {
 
 
         Long start = this.getStartOffset();
-        if (null == start)
-            start = 0l;
         Long end = this.getEndOffset();
-        if (null == end)
-            end = Long.MAX_VALUE;
 
         long counter = 0l;
 
@@ -163,7 +153,7 @@ public class IndexResource extends AbstractSubResource {
             JSONObject error = generateErrorObject(msg);
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
         } else {
-            String msg = "A key and value must be provided to lookup elements in an index";
+            String msg = "Only automatic indices have user provided keys";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
@@ -234,9 +224,46 @@ public class IndexResource extends AbstractSubResource {
 
     }
 
+    @DELETE
+    @Path("/{indexName}/keys")
+    public Response deleteIndexKeys(@PathParam("indexName") String indexName) {
+
+        try {
+            Index index = this.getIndexFromGraph(indexName);
+            List<String> keys = this.getNonRexsterRequestKeys();
+
+            if (null != index && index.getIndexType().equals(Index.Type.AUTOMATIC)) {
+                AutomaticIndex autoIndex = (AutomaticIndex) index;
+                for (String key : keys) {
+                    autoIndex.removeAutoIndexKey(key);
+                }
+            } else if (null == index) {
+                String msg = "Could not find index [" + indexName + "] on graph [" + this.rag.getGraphName() + "]";
+                logger.info(msg);
+
+                JSONObject error = generateErrorObject(msg);
+                throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
+            } else {
+                String msg = "Only automatic indices have user provided keys";
+                logger.info(msg);
+
+                JSONObject error = generateErrorObject(msg);
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
+            }
+        } catch (JSONException ex) {
+            logger.error(ex);
+
+            JSONObject error = generateErrorObjectJsonFail(ex);
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        }
+
+        return Response.ok(this.resultObject).build();
+
+    }
+
     @POST
     @Path("/{indexName}")
-    public Response putElementInIndex(@PathParam("indexName") String indexName) {
+    public Response putElementInIndexOrCreateIndex(@PathParam("indexName") String indexName) {
         Index index = this.getIndexFromGraph(indexName);
         IndexableGraph graph = (IndexableGraph) this.rag.getGraph();
 
@@ -276,13 +303,49 @@ public class IndexResource extends AbstractSubResource {
                 throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
         } else if (null == index) {
-            String msg = "Could not find index [" + indexName + "] on graph [" + this.rag.getGraphName() + "]";
-            logger.info(msg);
 
-            JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
+            String indexType = null;
+            String indexClass = null;
+            temp = this.requestObject.opt(Tokens.TYPE);
+            if (null != temp)
+                indexType = temp.toString();
+            temp = this.requestObject.opt(Tokens.CLASS);
+            if (null != temp)
+                indexClass = temp.toString();
+
+            if (null != indexType && null != indexClass) {
+                Index.Type t;
+                Class c;
+                if (indexType.equals("automatic"))
+                    t = Index.Type.AUTOMATIC;
+                else
+                    t = Index.Type.MANUAL;
+                if (indexClass.equals("vertex"))
+                    c = Vertex.class;
+                else
+                    c = Edge.class;
+
+                try {
+                    Index i = graph.createIndex(indexName, c, t);
+                    this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
+                    this.resultObject.put(Tokens.RESULTS, new IndexJSONObject(i));
+                } catch (JSONException ex) {
+                    logger.error(ex);
+
+                    JSONObject error = generateErrorObjectJsonFail(ex);
+                    throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
+                }
+
+
+            } else {
+                String msg = "Could not find index [" + indexName + "] on graph [" + this.rag.getGraphName() + "]";
+                logger.info(msg);
+
+                JSONObject error = generateErrorObject(msg);
+                throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
+            }
         } else {
-            String msg = "A key, value, id, and type (vertex/edge) must be provided to lookup elements in an index";
+            String msg = "A key, value, id, and type (vertex/edge) must be provided to add elements to an index";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
@@ -292,9 +355,46 @@ public class IndexResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
     }
 
-    private Index getIndexFromGraph(String name) {
-        IndexableGraph graph = (IndexableGraph) this.rag.getGraph();
-        for (Index index : graph.getIndices()) {
+    @POST
+    @Path("/{indexName}/keys")
+    public Response addIndexKeys(@PathParam("indexName") String indexName) {
+        try {
+            Index index = this.getIndexFromGraph(indexName);
+            List<String> keys = this.getNonRexsterRequestKeys();
+
+            if (null != index && index.getIndexType().equals(Index.Type.AUTOMATIC)) {
+                AutomaticIndex autoIndex = (AutomaticIndex) index;
+                for (String key : keys) {
+                    if (key.equals("null"))
+                        autoIndex.addAutoIndexKey(null);
+                    else
+                        autoIndex.addAutoIndexKey(key);
+                }
+            } else if (null == index) {
+                String msg = "Could not find index [" + indexName + "] on graph [" + this.rag.getGraphName() + "]";
+                logger.info(msg);
+
+                JSONObject error = generateErrorObject(msg);
+                throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
+            } else {
+                String msg = "Only automatic indices have user provided keys";
+                logger.info(msg);
+
+                JSONObject error = generateErrorObject(msg);
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
+            }
+        } catch (JSONException ex) {
+            logger.error(ex);
+            JSONObject error = generateErrorObjectJsonFail(ex);
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        }
+
+        return Response.ok(this.resultObject).build();
+    }
+
+    private Index getIndexFromGraph(final String name) {
+        final IndexableGraph graph = (IndexableGraph) this.rag.getGraph();
+        for (final Index index : graph.getIndices()) {
             if (index.getIndexName().equals(name))
                 return index;
         }

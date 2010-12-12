@@ -1,9 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.rexster.traversals.Traversal;
 import org.apache.log4j.Logger;
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -14,7 +12,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-import java.util.Map;
 
 @Path("/{graphname}")
 @Produces(MediaType.APPLICATION_JSON)
@@ -35,7 +32,7 @@ public class GraphResource extends AbstractSubResource {
             // constructor ensure that the rag is not null.
             Graph graph = this.rag.getGraph();
 
-            this.resultObject.put("name", rag.getGraphName());
+            this.resultObject.put("name", this.rag.getGraphName());
             this.resultObject.put("graph", graph.toString());
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             this.resultObject.put("up_time", this.getTimeAlive());
@@ -43,7 +40,6 @@ public class GraphResource extends AbstractSubResource {
 
         } catch (JSONException ex) {
             logger.error(ex);
-
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
@@ -53,8 +49,6 @@ public class GraphResource extends AbstractSubResource {
 
     @DELETE
     public Response deleteGraph() {
-        // TODO: delete individual properties
-
         Graph graph = this.rag.getGraph();
         graph.clear();
 
@@ -62,7 +56,6 @@ public class GraphResource extends AbstractSubResource {
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);
-
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
