@@ -324,8 +324,13 @@ public class IndexResource extends AbstractSubResource {
             try {
                 if (clazz.equals(Tokens.VERTEX))
                     index.put(key, value, graph.getVertex(id));
-                else
+                else if (clazz.equals(Tokens.EDGE))
                     index.put(key, value, graph.getEdge(id));
+                else {
+                    JSONObject error = generateErrorObject("Index class must be either vertex or edge");
+                    throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
+                }
+
 
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
@@ -350,17 +355,33 @@ public class IndexResource extends AbstractSubResource {
             if (null != indexType && null != indexClass) {
                 Index.Type t;
                 Class c;
-                if (indexType.equals("automatic"))
+                if (indexType.equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
                     t = Index.Type.AUTOMATIC;
-                else
+                else if (indexType.equals(Index.Type.MANUAL.toString().toLowerCase()))
                     t = Index.Type.MANUAL;
-                if (indexClass.equals("vertex"))
-                    c = Vertex.class;
-                else
-                    c = Edge.class;
+                else {
+                    JSONObject error = generateErrorObject("Index type must be either automatic or manual");
+                    throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
+                }
 
+                if (indexClass.equals(Tokens.VERTEX))
+                    c = Vertex.class;
+                else if (indexClass.equals(Tokens.EDGE))
+                    c = Edge.class;
+                else {
+                    JSONObject error = generateErrorObject("Index class must be either vertex or edge");
+                    throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
+                }
+
+                Index i;
                 try {
-                    Index i = graph.createIndex(indexName, c, t);
+                    i = graph.createIndex(indexName, c, t);
+                } catch (Exception e) {
+                    logger.info(e.getMessage());
+                    JSONObject error = generateErrorObject(e.getMessage());
+                    throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
+                }
+                try {
                     this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
                     this.resultObject.put(Tokens.RESULTS, new IndexJSONObject(i));
                 } catch (JSONException ex) {

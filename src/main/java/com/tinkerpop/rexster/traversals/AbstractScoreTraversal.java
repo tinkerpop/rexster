@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster.traversals;
 
 import com.tinkerpop.rexster.Tokens;
-
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -11,15 +10,15 @@ import org.codehaus.jettison.json.JSONObject;
 public abstract class AbstractScoreTraversal extends AbstractTraversal {
 
     protected Float score = Float.NaN;
-    
+
     protected boolean isResultInCache() {
-    	boolean inCache = false;
-    	JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
+        boolean inCache = false;
+        JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
         if (null != tempResultObject) {
             this.score = (Float) tempResultObject.opt(Tokens.SCORE);
             this.success = true;
         }
-        
+
         return inCache;
     }
 

@@ -1,19 +1,12 @@
 package com.tinkerpop.rexster.traversals;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.rexster.Tokens;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.rexster.Tokens;
+import java.util.*;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -37,12 +30,12 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
     protected void sortRanks(final String key) {
         java.util.Collections.sort(this.ranks, new Comparator<ElementJSONObject>() {
             public int compare(ElementJSONObject e1, ElementJSONObject e2) {
-            	try {
-            		return -1 * ((Comparable) e1.get(key)).compareTo(e2.get(key));
-            	} catch (JSONException ex) {
-            		// TODO: bah!
-            		return - 1;
-            	}
+                try {
+                    return -1 * ((Comparable) e1.get(key)).compareTo(e2.get(key));
+                } catch (JSONException ex) {
+                    // TODO: bah!
+                    return -1;
+                }
             }
         });
         if (this.sort == Sort.REGULAR)
@@ -88,7 +81,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
 
         Double value = elementObject.optDouble(traversalName);
         if (!value.equals(Double.NaN)) {
-        	elementObject.put(traversalName, incr + value);
+            elementObject.put(traversalName, incr + value);
         } else {
             elementObject.put(traversalName, incr);
         }
@@ -129,43 +122,43 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         }
 
         if (this.requestObject.has(Tokens.RETURN_KEYS)) {
-        	
-        	this.returnKeys = new ArrayList<String>();
-        	
-        	// return keys may come in as a string value if there is only one
-        	String returnKeyString = this.requestObject.optString(Tokens.RETURN_KEYS);
-        	if (returnKeyString == null || returnKeyString.length() == 0){
-	        	JSONArray returnKeyArray = this.requestObject.optJSONArray(Tokens.RETURN_KEYS);
-	
-	        	if (returnKeyArray != null && returnKeyArray.length() > 0){
-		        	for (int ix = 0; ix < returnKeyArray.length(); ix++){
-		        		this.returnKeys.add(returnKeyArray.optString(ix));
-		        	}
-	        	}
-        	} else {
-        		this.returnKeys.add(returnKeyString);
-        	}
-        	
-            if (this.returnKeys.size() == 1 && this.returnKeys.get(0).equals(Tokens.WILDCARD)){
+
+            this.returnKeys = new ArrayList<String>();
+
+            // return keys may come in as a string value if there is only one
+            String returnKeyString = this.requestObject.optString(Tokens.RETURN_KEYS);
+            if (returnKeyString == null || returnKeyString.length() == 0) {
+                JSONArray returnKeyArray = this.requestObject.optJSONArray(Tokens.RETURN_KEYS);
+
+                if (returnKeyArray != null && returnKeyArray.length() > 0) {
+                    for (int ix = 0; ix < returnKeyArray.length(); ix++) {
+                        this.returnKeys.add(returnKeyArray.optString(ix));
+                    }
+                }
+            } else {
+                this.returnKeys.add(returnKeyString);
+            }
+
+            if (this.returnKeys.size() == 1 && this.returnKeys.get(0).equals(Tokens.WILDCARD)) {
                 this.returnKeys = null;
             }
         }
     }
-    
+
     protected boolean isResultInCache() {
-    	boolean inCache = false;
-    	JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
+        boolean inCache = false;
+        JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
         if (tempResultObject != null) {
             this.ranks = (List<ElementJSONObject>) tempResultObject.opt(Tokens.RANKS);
             this.totalRank = (Double) tempResultObject.opt(Tokens.TOTAL_RANK);
             this.success = true;
             inCache = true;
         }
-        
+
         return inCache;
     }
 
-    protected void postQuery(boolean resultInCache)  throws JSONException {
+    protected void postQuery(boolean resultInCache) throws JSONException {
         if (this.success) {
             if (null == this.ranks)
                 this.generateRankList();

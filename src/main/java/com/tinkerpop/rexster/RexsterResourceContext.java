@@ -1,68 +1,68 @@
 package com.tinkerpop.rexster;
 
+import org.codehaus.jettison.json.JSONObject;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.UriInfo;
-
-import org.codehaus.jettison.json.JSONObject;
 
 /**
  * Context for a resource request.  Provides request information to a traversal.
  */
 public class RexsterResourceContext {
-	private RexsterApplicationGraph rag;
-	
-	private UriInfo uriInfo;
-	private HttpServletRequest request;
-	private JSONObject resultObject;
-	private JSONObject requestObject;
+    private RexsterApplicationGraph rag;
+
+    private UriInfo uriInfo;
+    private HttpServletRequest request;
+    private JSONObject resultObject;
+    private JSONObject requestObject;
     private ResultObjectCache cache;
-	
-	public JSONObject getRequestObject() {
-		return requestObject;
-	}
 
-	public void setRequestObject(JSONObject requestObject) {
-		this.requestObject = requestObject;
-	}
+    public JSONObject getRequestObject() {
+        return requestObject;
+    }
 
-	public JSONObject getResultObject() {
-		return this.resultObject;
-	}
+    public void setRequestObject(JSONObject requestObject) {
+        this.requestObject = requestObject;
+    }
 
-	public void setResultObject(JSONObject resultObjectCache) {
-		this.resultObject = resultObjectCache;
-	}
+    public JSONObject getResultObject() {
+        return this.resultObject;
+    }
 
-	public UriInfo getUriInfo() {
-		return uriInfo;
-	}
+    public void setResultObject(JSONObject resultObjectCache) {
+        this.resultObject = resultObjectCache;
+    }
 
-	public void setUriInfo(UriInfo uriInfo) {
-		this.uriInfo = uriInfo;
-	}
+    public UriInfo getUriInfo() {
+        return uriInfo;
+    }
 
-	public HttpServletRequest getRequest() {
-		return request;
-	}
+    public void setUriInfo(UriInfo uriInfo) {
+        this.uriInfo = uriInfo;
+    }
 
-	public void setRequest(HttpServletRequest request) {
-		this.request = request;
-	}
+    public HttpServletRequest getRequest() {
+        return request;
+    }
 
-	public RexsterApplicationGraph getRexsterApplicationGraph() {
-		return rag;
-	}
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
+    }
 
-	public void setRexsterApplicationGraph(RexsterApplicationGraph rag) {
-		this.rag = rag;
-	}
+    public RexsterApplicationGraph getRexsterApplicationGraph() {
+        return rag;
+    }
 
-	public ResultObjectCache getCache() {
-		return cache;
-	}
+    public void setRexsterApplicationGraph(RexsterApplicationGraph rag) {
+        this.rag = rag;
+    }
 
-	public void setCache(ResultObjectCache cache) {
-		this.cache = cache;
-	}
+    public ResultObjectCache getCache() {
+        return cache;
+    }
+
+    public void setCache(ResultObjectCache cache) {
+        this.cache = cache;
+    }
 
 }

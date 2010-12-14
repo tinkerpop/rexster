@@ -5,7 +5,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.traversals.AbstractTraversal;
 import com.tinkerpop.rexster.traversals.ElementJSONObject;
-
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -105,10 +104,10 @@ public class GremlinTraversal extends AbstractTraversal {
         }
 
     }
-    
+
     protected boolean isResultInCache() {
-    	boolean inCache = false;
-    	JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
+        boolean inCache = false;
+        JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
         if (tempResultObject != null) {
             try {
                 this.resultObject.putOpt(Tokens.RESULTS, tempResultObject.opt(Tokens.RESULTS));
@@ -116,27 +115,27 @@ public class GremlinTraversal extends AbstractTraversal {
             }
             this.success = true;
         }
-        
+
         return inCache;
     }
 
     public void addApiToResultObject() {
-    	
-    	try {
-	        Map<String, Object> api = new HashMap<String, Object>();
-	        JSONObject parameters = new JSONObject(super.getParameters());
-        
-	        parameters.put(SCRIPT, "the Gremlin script to be evaluated");
-	        parameters.put(RETURN_KEYS, "the element property keys to return (default is to return all element properties)");
-	        parameters.put(ROOT + ".<key>", "the elements to set $_ to, where <key> is the element property key");
-                
-	        api.put(Tokens.DESCRIPTION, "evaluate an ad-hoc Gremlin script");
-	        api.put(Tokens.PARAMETERS, parameters);
+
+        try {
+            Map<String, Object> api = new HashMap<String, Object>();
+            JSONObject parameters = new JSONObject(super.getParameters());
+
+            parameters.put(SCRIPT, "the Gremlin script to be evaluated");
+            parameters.put(RETURN_KEYS, "the element property keys to return (default is to return all element properties)");
+            parameters.put(ROOT + ".<key>", "the elements to set $_ to, where <key> is the element property key");
+
+            api.put(Tokens.DESCRIPTION, "evaluate an ad-hoc Gremlin script");
+            api.put(Tokens.PARAMETERS, parameters);
 
             this.resultObject.put(Tokens.API, api);
-            
+
         } catch (JSONException ex) {
-        	// can't really happen given the hardcoded values
+            // can't really happen given the hardcoded values
         }
     }
 }

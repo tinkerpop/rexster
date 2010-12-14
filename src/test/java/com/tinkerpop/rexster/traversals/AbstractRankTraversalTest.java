@@ -2,13 +2,11 @@ package com.tinkerpop.rexster.traversals;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
-import com.tinkerpop.rexster.Tokens;
-
-import java.util.Map;
-
 import org.codehaus.jettison.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Map;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -60,7 +58,7 @@ public class AbstractRankTraversalTest {
     }*/
 
     @Test
-    public void testRankOffsets() throws JSONException{
+    public void testRankOffsets() throws JSONException {
         TestTraversal tt = new TestTraversal();
         buildTestRanks(tt.idToElement);
         tt.generateRankList();
@@ -145,7 +143,7 @@ public class AbstractRankTraversalTest {
 
     }
 
-    private static void buildTestRanks(Map<Object, ElementJSONObject> testRanks) throws JSONException{
+    private static void buildTestRanks(Map<Object, ElementJSONObject> testRanks) throws JSONException {
         Graph graph = new TinkerGraph();
         ElementJSONObject temp = new ElementJSONObject(graph.addVertex("a"));
         temp.put("rank", 1.0f);
@@ -170,13 +168,13 @@ public class AbstractRankTraversalTest {
         }
 
 
-		@Override
-		protected void traverse() {
+        @Override
+        protected void traverse() {
         }
 
-		@Override
-		protected void addApiToResultObject() {
-		}
+        @Override
+        protected void addApiToResultObject() {
+        }
     }
 
 }

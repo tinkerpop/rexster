@@ -1,16 +1,12 @@
 package com.tinkerpop.rexster;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Random;
-import java.util.UUID;
-
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.*;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -27,49 +23,49 @@ public class MapResultObjectCacheTest {
             uuids.add(UUID.randomUUID().toString());
         }
     }
-    
+
     @Before
-    public void setUp(){
-    	MapResultObjectCache.maxSize = 1000;
+    public void setUp() {
+        MapResultObjectCache.maxSize = 1000;
     }
-    
+
     @Test
-    public void constructorNoConfiguredCacheSize(){
-    	
-    	Properties props = new Properties();
-    	
-    	int defaultSize = MapResultObjectCache.maxSize;
-    	Assert.assertEquals(defaultSize, new MapResultObjectCache(props).maxSize);
+    public void constructorNoConfiguredCacheSize() {
+
+        Properties props = new Properties();
+
+        int defaultSize = MapResultObjectCache.maxSize;
+        Assert.assertEquals(defaultSize, new MapResultObjectCache(props).maxSize);
     }
-    
+
     @Test
-    public void constructorConfiguredEmptyCacheSize(){
-    	
-    	Properties props = new Properties();
-    	props.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, "");
-    	
-    	int defaultSize = MapResultObjectCache.maxSize;
-    	Assert.assertEquals(defaultSize, new MapResultObjectCache(props).maxSize);
+    public void constructorConfiguredEmptyCacheSize() {
+
+        Properties props = new Properties();
+        props.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, "");
+
+        int defaultSize = MapResultObjectCache.maxSize;
+        Assert.assertEquals(defaultSize, new MapResultObjectCache(props).maxSize);
     }
-    
+
     @Test
-    public void constructorConfigureInvalidCacheSize(){
-    	
-    	Properties props = new Properties();
-    	props.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, "one hundred");
-    	
-    	int defaultSize = MapResultObjectCache.maxSize;
-    	Assert.assertEquals(defaultSize, new MapResultObjectCache(props).maxSize);
+    public void constructorConfigureInvalidCacheSize() {
+
+        Properties props = new Properties();
+        props.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, "one hundred");
+
+        int defaultSize = MapResultObjectCache.maxSize;
+        Assert.assertEquals(defaultSize, new MapResultObjectCache(props).maxSize);
     }
-    
+
     @Test
-    public void constructorConfigureCacheSize(){
-    	
-    	int expectedCacheSize = 100;
-    	Properties props = new Properties();
-    	props.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, expectedCacheSize);
-    	
-    	Assert.assertEquals(expectedCacheSize, new MapResultObjectCache(props).maxSize);
+    public void constructorConfigureCacheSize() {
+
+        int expectedCacheSize = 100;
+        Properties props = new Properties();
+        props.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, expectedCacheSize);
+
+        Assert.assertEquals(expectedCacheSize, new MapResultObjectCache(props).maxSize);
     }
 
     @Test
@@ -83,14 +79,14 @@ public class MapResultObjectCacheTest {
             resultObjectCache.putCachedResult(uuid.toString(), temp);
             uuids.add(uuid.toString());
         }
-        
+
         int counter = 0;
         for (String uuid : uuids) {
-        	Assert.assertTrue(resultObjectCache.getCachedResult(uuid) != null);
-        	Assert.assertEquals(resultObjectCache.getCachedResult(uuid).get("value"), counter);
+            Assert.assertTrue(resultObjectCache.getCachedResult(uuid) != null);
+            Assert.assertEquals(resultObjectCache.getCachedResult(uuid).get("value"), counter);
             counter++;
         }
-        
+
         Assert.assertEquals(resultObjectCache.getCacheSize(), 1000);
         Assert.assertEquals(resultObjectCache.getCachedResult(uuids.get(0)).get("value"), 0);
         resultObjectCache.putCachedResult(UUID.randomUUID().toString(), new JSONObject());
@@ -125,9 +121,10 @@ public class MapResultObjectCacheTest {
         public void run() {
             for (int i = 0; i < totalRuns; i++) {
                 JSONObject object = new JSONObject();
-                try{
-                	object.put("thread", Thread.currentThread().getName());
-                } catch (JSONException e) {}
+                try {
+                    object.put("thread", Thread.currentThread().getName());
+                } catch (JSONException e) {
+                }
                 cache.putCachedResult(uuids.get(random.nextInt(uuids.size())), object);
                 cache.getCachedResult(uuids.get(random.nextInt(uuids.size())));
             }

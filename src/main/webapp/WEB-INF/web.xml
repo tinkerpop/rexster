@@ -3,18 +3,22 @@
         "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
         "http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
-    <display-name>Rexster: A Graph-Based Ranking Engine</display-name>
+    <display-name>Rexster: A RESTful Graph Shell</display-name>
     <servlet>
-        <servlet-name>RestletServlet</servlet-name>
-        <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
+        <servlet-name>Jersey Web Application</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
-            <param-name>org.restlet.application</param-name>
-            <param-value>com.tinkerpop.rexster.RexsterApplication</param-value>
+            <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
+            <param-value>com.sun.jersey.api.core.PackagesResourceConfig</param-value>
+        </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>com.tinkerpop.rexster</param-value>
         </init-param>
     </servlet>
     <!-- Catch all requests -->
     <servlet-mapping>
-        <servlet-name>RestletServlet</servlet-name>
+        <servlet-name>Jersey Web Application</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
 </web-app>

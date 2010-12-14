@@ -48,7 +48,7 @@ public abstract class BaseResource {
     }
 
     public JSONObject generateErrorObjectJsonFail(Exception source) {
-        return generateErrorObject("An error occurred while generating the response object.", source);
+        return generateErrorObject("An error occurred while generating the response object", source);
     }
 
     public JSONObject generateErrorObject(String message, Exception source) {

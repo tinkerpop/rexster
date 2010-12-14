@@ -7,13 +7,12 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.traversals.AbstractRankTraversal;
 import com.tinkerpop.rexster.traversals.grateful.pipes.SungByInversePipeline;
 import com.tinkerpop.rexster.traversals.grateful.pipes.WrittenByPipeline;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -26,7 +25,7 @@ public class SingerWriterRank extends AbstractRankTraversal {
         return SINGER_WRITER_RANK;
     }
 
-    public void traverse() throws JSONException{
+    public void traverse() throws JSONException {
 
         Vertex singer = this.getVertex(GratefulDeadTokens.SINGER);
         if (singer != null) {
@@ -43,17 +42,18 @@ public class SingerWriterRank extends AbstractRankTraversal {
         }
     }
 
-    @Override 
+    @Override
     protected void addApiToResultObject() {
-    	try {
-	        Map<String, Object> api = new HashMap<String, Object>();
-	        JSONObject parameters = new JSONObject(super.getParameters());
-        
-	        parameters.put("singer.<key>", "the source singer artist, where <key> is the singer vertex property key");
-	        api.put(Tokens.DESCRIPTION, "rank all writers relative to a single singer. the ranking is based on the number of songs that the writter has written that are sung by the singer.");
-	        api.put(Tokens.PARAMETERS, parameters);
-        
-        	this.resultObject.put(Tokens.API, api);
-        } catch (JSONException e) {}
+        try {
+            Map<String, Object> api = new HashMap<String, Object>();
+            JSONObject parameters = new JSONObject(super.getParameters());
+
+            parameters.put("singer.<key>", "the source singer artist, where <key> is the singer vertex property key");
+            api.put(Tokens.DESCRIPTION, "rank all writers relative to a single singer. the ranking is based on the number of songs that the writter has written that are sung by the singer.");
+            api.put(Tokens.PARAMETERS, parameters);
+
+            this.resultObject.put(Tokens.API, api);
+        } catch (JSONException e) {
+        }
     }
 }

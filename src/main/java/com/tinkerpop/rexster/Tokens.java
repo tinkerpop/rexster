@@ -66,5 +66,5 @@ public class Tokens {
     public static final String TYPE = "type";
     public static final String CLASS = "class";
 
-    public static final String REXSTER_VERSION = "0.1-SNAPSHOT";
+    public static final String REXSTER_VERSION = "0.1";
 }

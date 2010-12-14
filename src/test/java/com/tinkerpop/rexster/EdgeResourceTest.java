@@ -1,8 +1,5 @@
 package com.tinkerpop.rexster;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.After;
@@ -10,12 +7,15 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class EdgeResourceTest extends BaseTest {
 
-	@Before
+    @Before
     public void setUp() {
         try {
             this.startWebServer();
@@ -24,7 +24,7 @@ public class EdgeResourceTest extends BaseTest {
         }
     }
 
-	@After
+    @After
     public void tearDown() {
         try {
             this.stopWebServer();
@@ -33,22 +33,22 @@ public class EdgeResourceTest extends BaseTest {
         }
     }
 
-	@Test
+    @Test
     public void getAllEdges() throws Exception {
         sh.stopWatch();
         String uri = createURI("edges");
         JSONObject object = getResource(uri);
         printPerformance("GET all edges", null, uri, sh.stopWatch());
         JSONArray arr = object.getJSONArray("results");
-        
-        for (int ix = 0; ix < arr.length(); ix ++) {
-        	JSONObject vertex = arr.getJSONObject(ix);
-        	Assert.assertEquals("edge", vertex.get("_type"));
+
+        for (int ix = 0; ix < arr.length(); ix++) {
+            JSONObject vertex = arr.getJSONObject(ix);
+            Assert.assertEquals("edge", vertex.get("_type"));
         }
         Assert.assertEquals(object.getLong("total_size"), (long) (object.getJSONArray("results")).length());
     }
 
-	@Test
+    @Test
     public void getEdge() throws Exception {
         sh.stopWatch();
         String uri = createURI("edges/6872");
@@ -60,7 +60,7 @@ public class EdgeResourceTest extends BaseTest {
         Assert.assertEquals("30", ((JSONObject) object.get("results")).getString("_inV"));
     }
 
-	@Test
+    @Test
     public void postEdge() throws Exception {
         sh.stopWatch();
         String uri = createURI("edges/999999?_outV=1&_inV=2&_label=test&key1=value1");
@@ -71,10 +71,10 @@ public class EdgeResourceTest extends BaseTest {
         Assert.assertEquals("test", object.getString("_label"));
         Assert.assertEquals("value1", object.getString("key1"));
         Assert.assertEquals("1", object.getString("_outV"));
-        Assert.assertEquals("2",object.getString("_inV"));
+        Assert.assertEquals("2", object.getString("_inV"));
     }
 
-	@Test
+    @Test
     public void postEdgeProperties() throws Exception {
         sh.stopWatch();
         String uri = createURI("edges/6872?key1=value1");
@@ -102,7 +102,7 @@ public class EdgeResourceTest extends BaseTest {
 
     }
 
-	@Test
+    @Test
     public void deleteEdge() throws Exception {
         sh.stopWatch();
         String uri = createURI("vertices/1/outE?rexster.return_keys=[_id]");
@@ -110,9 +110,9 @@ public class EdgeResourceTest extends BaseTest {
         printPerformance("GET vertex out edges ids", null, uri, sh.stopWatch());
         List<String> edgeIds = new ArrayList<String>();
         JSONArray arr = object.getJSONArray("results");
-        
-        for (int ix = 0; ix < arr.length(); ix ++) {
-        	JSONObject edge = arr.getJSONObject(ix);
+
+        for (int ix = 0; ix < arr.length(); ix++) {
+            JSONObject edge = arr.getJSONObject(ix);
             edgeIds.add(edge.getString("_id"));
         }
 

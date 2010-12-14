@@ -1,59 +1,47 @@
 package com.tinkerpop.rexster;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.Status;
-
+import com.tinkerpop.rexster.traversals.Traversal;
+import com.tinkerpop.rexster.traversals.TraversalException;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import com.tinkerpop.rexster.traversals.Traversal;
-import com.tinkerpop.rexster.traversals.TraversalException;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.Status;
+import java.util.List;
+import java.util.Map;
 
 @Path("/{graphname}/traversals")
 @Produces(MediaType.APPLICATION_JSON)
 public class TraversalResource extends AbstractSubResource {
-	
-	private static Logger logger = Logger.getLogger(TraversalResource.class);
+
+    private static Logger logger = Logger.getLogger(TraversalResource.class);
 
     public TraversalResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
-    	super(graphName, ui, req);
+        super(graphName, ui, req);
     }
-    
+
     @GET
     public Response getTraversals() {
 
-    	try {
-    		int counter = 0;
-	        JSONArray queriesArray = new JSONArray();
-	        for (Map.Entry<String, Class<? extends Traversal>> traversal : this.rag.getLoadedTraversals().entrySet()) {
-	        	JSONObject traversalItem = new JSONObject();
-	        	traversalItem.put("path", traversal.getKey());
-	        	traversalItem.put("traversal", traversal.getValue().getName());
-	            queriesArray.put(traversalItem);
-	            counter++;
-	        }
+        try {
+            int counter = 0;
+            JSONArray queriesArray = new JSONArray();
+            for (Map.Entry<String, Class<? extends Traversal>> traversal : this.rag.getLoadedTraversals().entrySet()) {
+                JSONObject traversalItem = new JSONObject();
+                traversalItem.put("path", traversal.getKey());
+                traversalItem.put("traversal", traversal.getValue().getName());
+                queriesArray.put(traversalItem);
+                counter++;
+            }
 
-	        this.resultObject.put(Tokens.RESULTS, queriesArray);
+            this.resultObject.put(Tokens.RESULTS, queriesArray);
             this.resultObject.put(Tokens.TOTAL_SIZE, counter);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-    	} catch (JSONException ex) {
+        } catch (JSONException ex) {
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);
@@ -63,22 +51,22 @@ public class TraversalResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
     }
 
-	@GET
-	@Path("/{path: .+}")
-	public Response getTraversal() {
-		return this.processTraversal();
-	}
-    
+    @GET
+    @Path("/{path: .+}")
+    public Response getTraversal() {
+        return this.processTraversal();
+    }
+
     @POST
-	@Path("/{path: .+}")
+    @Path("/{path: .+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getTraversal(JSONObject json) {
-    	this.requestObject = json;
-    	return this.processTraversal();
+        this.requestObject = json;
+        return this.processTraversal();
     }
-    
+
     private Response processTraversal() {
-    	Class<? extends Traversal> traversalClass = null;
+        Class<? extends Traversal> traversalClass = null;
         String pattern = "";
 
         try {

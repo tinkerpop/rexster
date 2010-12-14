@@ -1,14 +1,14 @@
 package com.tinkerpop.rexster;
 
+import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONObject;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-import org.codehaus.jettison.json.JSONObject;
-
 public class MapResultObjectCache implements ResultObjectCache {
-	private static final Logger logger = Logger.getLogger(MapResultObjectCache.class);
+    private static final Logger logger = Logger.getLogger(MapResultObjectCache.class);
     public static int maxSize = 1000;
     private static final Map<String, JSONObject> requestToResultMap = new LinkedHashMap<String, JSONObject>() {
         protected boolean removeEldestEntry(Map.Entry eldest) {
@@ -21,16 +21,16 @@ public class MapResultObjectCache implements ResultObjectCache {
     }
 
     public MapResultObjectCache(final Properties properties) {
-    	
-    	Object configuredMaxSizeString = properties.get(Tokens.REXSTER_CACHE_MAXSIZE_PATH);
-    	try {
-    		if (configuredMaxSizeString != null) {
-    			MapResultObjectCache.maxSize = Integer.parseInt(configuredMaxSizeString.toString());
-    		}
-    	} catch (NumberFormatException nfe) {
-    		logger.warn("Cache configuration for " + Tokens.REXSTER_CACHE_MAXSIZE_PATH + " does not contain a valid integer value.", nfe);
-    	}
-    	
+
+        Object configuredMaxSizeString = properties.get(Tokens.REXSTER_CACHE_MAXSIZE_PATH);
+        try {
+            if (configuredMaxSizeString != null) {
+                MapResultObjectCache.maxSize = Integer.parseInt(configuredMaxSizeString.toString());
+            }
+        } catch (NumberFormatException nfe) {
+            logger.warn("Cache configuration for " + Tokens.REXSTER_CACHE_MAXSIZE_PATH + " does not contain a valid integer value.", nfe);
+        }
+
         logger.info("Cache constructed with a maximum size of " + MapResultObjectCache.maxSize);
     }
 

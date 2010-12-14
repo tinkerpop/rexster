@@ -7,7 +7,7 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public interface ResultObjectCache {
 
-    public JSONObject getCachedResult(final String uriRequest) ;
+    public JSONObject getCachedResult(final String uriRequest);
 
     public void putCachedResult(final String uriRequest, final JSONObject resultObject);
 

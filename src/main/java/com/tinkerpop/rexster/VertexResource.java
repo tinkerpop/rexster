@@ -81,7 +81,7 @@ public class VertexResource extends AbstractSubResource {
                 throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
         } else {
-            String msg = "Could not find vertex [" + id + "] on graph [" + this.rag.getGraphName() + "].";
+            String msg = "Could not find vertex [" + id + "] on graph [" + this.rag.getGraphName() + "]";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
@@ -130,7 +130,7 @@ public class VertexResource extends AbstractSubResource {
                     }
                 }
             } else {
-                String msg = "Could not find vertex [" + vertexId + "] on graph [" + this.rag.getGraphName() + "].";
+                String msg = "Could not find vertex [" + vertexId + "] on graph [" + this.rag.getGraphName() + "]";
                 logger.info(msg);
 
                 JSONObject error = generateErrorObject(msg);

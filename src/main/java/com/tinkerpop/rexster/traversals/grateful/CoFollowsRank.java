@@ -9,13 +9,12 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.traversals.AbstractRankTraversal;
 import com.tinkerpop.rexster.traversals.grateful.pipes.FollowsInversePipeline;
 import com.tinkerpop.rexster.traversals.grateful.pipes.FollowsPipeline;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -28,7 +27,7 @@ public class CoFollowsRank extends AbstractRankTraversal {
         return CO_FOLLOWS_RANK;
     }
 
-    public void traverse() throws JSONException{
+    public void traverse() throws JSONException {
 
         Vertex song = this.getVertex(GratefulDeadTokens.SONG);
 
@@ -48,15 +47,16 @@ public class CoFollowsRank extends AbstractRankTraversal {
     }
 
     protected void addApiToResultObject() {
-    	try {
-	        Map<String, Object> api = new HashMap<String, Object>();
-	        JSONObject parameters = new JSONObject(super.getParameters());
-	        
-	        parameters.put("song.<key>", "the source song, where <key> is the song vertex property key");
-	        api.put(Tokens.DESCRIPTION, "rank all songs relative to the source song by the number of times they co-follow the source song");
-	        api.put(Tokens.PARAMETERS, parameters);
-        
-        	this.resultObject.put(Tokens.API, api);
-        } catch (JSONException e) {}
+        try {
+            Map<String, Object> api = new HashMap<String, Object>();
+            JSONObject parameters = new JSONObject(super.getParameters());
+
+            parameters.put("song.<key>", "the source song, where <key> is the song vertex property key");
+            api.put(Tokens.DESCRIPTION, "rank all songs relative to the source song by the number of times they co-follow the source song");
+            api.put(Tokens.PARAMETERS, parameters);
+
+            this.resultObject.put(Tokens.API, api);
+        } catch (JSONException e) {
+        }
     }
 }
