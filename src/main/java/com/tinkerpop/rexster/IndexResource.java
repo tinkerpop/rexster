@@ -305,6 +305,7 @@ public class IndexResource extends AbstractSubResource {
         Object value = null;
         String id = null;
         String clazz = null;
+        String type = null;
 
         Object temp = this.requestObject.opt(Tokens.KEY);
         if (null != temp)
@@ -318,6 +319,9 @@ public class IndexResource extends AbstractSubResource {
         temp = this.requestObject.opt(Tokens.CLASS);
         if (null != temp)
             clazz = temp.toString();
+        temp = this.requestObject.opt(Tokens.TYPE);
+        if (null != temp)
+            type = temp.toString();
 
 
         if (null != index & key != null && value != null && clazz != null && id != null) {
@@ -341,32 +345,30 @@ public class IndexResource extends AbstractSubResource {
                 JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
+        } else if (null != index && null != type && null != clazz) {
+            String msg = "Index [" + indexName + "] on graph [" + this.rag.getGraphName() + "] already exists";
+            logger.info(msg);
+
+            JSONObject error = generateErrorObject(msg);
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
         } else if (null == index) {
 
-            String indexType = null;
-            String indexClass = null;
-            temp = this.requestObject.opt(Tokens.TYPE);
-            if (null != temp)
-                indexType = temp.toString();
-            temp = this.requestObject.opt(Tokens.CLASS);
-            if (null != temp)
-                indexClass = temp.toString();
 
-            if (null != indexType && null != indexClass) {
+            if (null != type && null != clazz) {
                 Index.Type t;
                 Class c;
-                if (indexType.equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
+                if (type.equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
                     t = Index.Type.AUTOMATIC;
-                else if (indexType.equals(Index.Type.MANUAL.toString().toLowerCase()))
+                else if (type.equals(Index.Type.MANUAL.toString().toLowerCase()))
                     t = Index.Type.MANUAL;
                 else {
                     JSONObject error = generateErrorObject("Index type must be either automatic or manual");
                     throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
                 }
 
-                if (indexClass.equals(Tokens.VERTEX))
+                if (clazz.equals(Tokens.VERTEX))
                     c = Vertex.class;
-                else if (indexClass.equals(Tokens.EDGE))
+                else if (clazz.equals(Tokens.EDGE))
                     c = Edge.class;
                 else {
                     JSONObject error = generateErrorObject("Index class must be either vertex or edge");

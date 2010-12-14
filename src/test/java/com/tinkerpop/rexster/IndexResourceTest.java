@@ -92,7 +92,10 @@ public class IndexResourceTest extends BaseTest {
         arr = object.getJSONArray("results");
         Assert.assertEquals(arr.length(), 0);
 
-
+        sh.stopWatch();
+        uri = createURI("indices/testIndex?class=vertex&type=manual");
+        object = postResource(uri);
+        Assert.assertTrue(object.has("message"));
     }
 
     @Test
