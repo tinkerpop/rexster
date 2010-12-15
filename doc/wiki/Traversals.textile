@@ -1,0 +1,33 @@
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/dog-running.png!
+
+Rexster was designed to solve a particular problem in a lightweight manner---namely, the problem of scoring and ranking elements (i.e. vertices and edges) in a graph. While it is possible to extend the core Rexster functionality, Rexster comes prepacked to handle these two types of problems. Specifically, there are two abstract classes that serve this purpose: @AbstractScoreTraversal@ and @AbstractRankTraversal@. This section of the documentation will discuss each.
+
+* Abstract Traversals
+## "Score Traversals":#score
+## "Rank Traversals":#rank
+
+Before discussing these particular traversals, it is important to be familiar with @AbstractTraversal@. This abstract class implements the @Traversal@ interface. It has the following important fields:
+
+* @Graph graph@: the "Blueprints":http://blueprints.tinkerpop.com graph to execute the traversal on.
+* @JSONObject requestObject@: the query parameters of the requested URI represented as a JSON document (see [[Mapping a URI to JSON]]).
+* @JSONObject resultObject@: the result of the traversal that is to be constructed by the implemented @Traversal@
+* @boolean success@: whether the traversal was successful or not.
+* @String message@: an optional message to be added to the @resultObject@ upon delivery.
+
+h2(#score). Score Traversals
+
+A score traversal is the simplest type of traversal. It provides a floating point score for a particular element (i.e. vertex or edge). To create a score traversal, simply extend @AbstractScoreTraversal@ and, at minimum, implement the following methods:
+
+* @Traversal.getTraversalName()@: returns the @String@ name of the traversal for the URI component.
+* @Traversal.traverse()@: the main body of code that execute a traversal and populates the result object.
+
+The @Traversal.traverse()@ method must, at some point, provide a floating-point value to the protected @AbstractScoreTraversal.score@ field. When @Traversal.traverse()@ returns, that score is added to the @resultObject@. If the code in @Traversal.traverse()@ evaluates correctly, then set the @AbstractTraversal.success@ field to @true@. If an error has occurred, set @AbstractTraversal.success@ field to @false@.
+
+h2(#rank). Rank Traversals
+
+A rank traversal is more complicated than a score traversal. It provides a ranking (@List@) for elements. To create a rank traversal, simply extend @AbstractRankTraversal@ and, at minimum, implement the following methods:
+
+* @Traversal.getTraversalName()@: returns the @String@ name of the traversal for the URI component.
+* @Traversal.traverse()@: the main body of code that execute a traversal and populates the result object.
+
+The @Traversal.traverse()@ method must, at some point, update the protected @Map<Object, ElementJSONObject>@ @AbstractRankTraversal.idToElement@ field. For every element being ranked a JSON representation of that element is created. Which properties of the element to include depend on the @return_keys@ parameter provided at query time. Each @ElementJSONObject@ will also have a rank key the references the elements score for that particular traversal. When the traversal is complete, a @List<ElementJSONObject>@ is created and returned. The lists order is manipulated by such parameters as @sort@ and @sort_key@.

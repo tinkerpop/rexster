@@ -1,0 +1,25 @@
+All releases can be accessed through the TinkerPop Maven2 repository identified below.
+
+```xml
+<repository>
+  <id>tinkerpop-repository</id>
+  <name>TinkerPop Maven2 Repository</name>
+  <url>http://tinkerpop.com/maven2</url>
+</repository>
+```
+
+==<hr/>==
+
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-fluffy.png!
+
+h3. Version 0.1 (Fluffy -- December 14, 2010)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>rexster</artifactId>
+  <version>0.1</version>
+</dependency>
+```
+
+* Initial release of the web service shell and rank and score support

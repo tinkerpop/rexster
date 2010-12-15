@@ -1,0 +1,8 @@
+This section provides a list of the people that have contributed in some way to the creation of Rexster.
+
+# "Marko A. Rodriguez":http://markorodriguez.com -- designed, developed, tested, and documented Rexster.
+# "Stephen Mallete":https://github.com/spmallette -- developed and tested Rexster.
+# "Aaron Patterson":http://tenderlovemaking.com -- designed the Rexster RESTful API. 
+# "Peter Neubauer":http://www.linkedin.com/in/neubauer -- aided in the evangelizing and conceptualizing of Rexster.
+
+Please review Rexster's "pom.xml":http://github.com/tinkerpop/rexster/blob/master/pom.xml. Rexster would not be possible without the work done by others to create these useful packages.

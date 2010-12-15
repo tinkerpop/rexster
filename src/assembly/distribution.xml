@@ -9,7 +9,17 @@
             </includes>
         </fileSet>
         <fileSet>
+            <fileMode>0775</fileMode>
+            <includes>
+                <include>rexster.sh</include>
+                <include>rexster.bat</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>src</directory>
+        </fileSet>
+        <fileSet>
+            <directory>data</directory>
         </fileSet>
         <fileSet>
             <directory>target/apidocs</directory>
@@ -18,10 +28,7 @@
             <directory>target/site</directory>
         </fileSet>
         <fileSet>
-            <directory>target</directory>
-            <includes>
-                <include>rexster-*.jar</include>
-            </includes>
+            <directory>target/rexster-${project.version}-standalone</directory>
         </fileSet>
     </fileSets>
 </assembly>
