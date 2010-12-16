@@ -26,6 +26,16 @@
         </graph>
         <graph>
             <graph-enabled>false</graph-enabled>
+            <graph-name>sailgraph</graph-name>
+            <graph-type>com.tinkerpop.rexster.config.SailGraphConfiguration</graph-type>
+            <graph-file>/tmp/sail-graph</graph-file>
+            <packages-allowed></packages-allowed>
+            <properties>
+                <blueprints-sail-type>memory</blueprints-sail-type>
+            </properties>
+        </graph>
+        <graph>
+            <graph-enabled>false</graph-enabled>
             <graph-name>orientdbsample</graph-name>
             <graph-type>orientgraph</graph-type>
             <graph-file>local:C:/data/graph/graph</graph-file>

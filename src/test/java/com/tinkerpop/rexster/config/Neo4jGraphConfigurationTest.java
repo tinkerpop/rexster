@@ -22,7 +22,7 @@ public class Neo4jGraphConfigurationTest {
     }
 
     @Test(expected = GraphConfigurationException.class)
-    public void configureGraphInstanceNoOrientConfig() throws GraphConfigurationException {
+    public void configureGraphInstanceNoNeo4jConfig() throws GraphConfigurationException {
         Configuration graphConfig = new HierarchicalConfiguration();
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_FILE, this.neo4jFile);
         configuration.configureGraphInstance(graphConfig);

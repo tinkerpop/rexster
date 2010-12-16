@@ -88,6 +88,8 @@ public class GraphConfigurationContainer {
             graphConfigurationType = OrientGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("tinkergraph")) {
             graphConfigurationType = TinkerGraphGraphConfiguration.class.getName();
+        } else if (graphConfigurationType.equals("sailgraph")) {
+            graphConfigurationType = SailGraphConfiguration.class.getName();
         }
 
         Graph graph = null;
