@@ -160,7 +160,7 @@ public class VertexResource extends AbstractSubResource {
      * graph.addVertex(null);
      */
     @POST
-    public Response postNull() {
+    public Response postNullVertex() {
         return this.postVertex(null);
     }
 

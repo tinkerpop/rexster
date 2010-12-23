@@ -3,6 +3,7 @@ package com.tinkerpop.rexster;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
@@ -254,6 +255,188 @@ public class VertexResourceTest extends BaseTest {
     	Assert.assertEquals(0, jsonResultArray.length());
     }
 
+    @Test
+    public void postNullValid(){
+    	final HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put("some-property", "300a");
+    	
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	final Vertex v = new MockVertex("1");
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getVertex(with(any(Object.class)));
+            will(returnValue(null));
+            allowing(graph).addVertex(with(any(Object.class)));
+            will(returnValue(v));
+        }});
+    	
+    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	Response response = resource.postNullVertex();
+    	
+    	Assert.assertNotNull(response);
+    	Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    	Assert.assertNotNull(response.getEntity());
+    	Assert.assertTrue(response.getEntity() instanceof JSONObject);
+    	
+    	JSONObject json = (JSONObject) response.getEntity();
+    	Assert.assertTrue(json.has(Tokens.QUERY_TIME));
+    	Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
+    	
+    	Assert.assertTrue(json.has(Tokens.RESULTS));
+    	Assert.assertFalse(json.isNull(Tokens.RESULTS));
+    }
+    
+    @Test
+    public void postVertexValid(){
+    	final HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put("some-property", "300a");
+    	
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	final Vertex v = new MockVertex("1");
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getVertex(with(any(Object.class)));
+            will(returnValue(v));
+        }});
+    	
+    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	Response response = resource.postVertex("1");
+    	
+    	Assert.assertNotNull(response);
+    	Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    	Assert.assertNotNull(response.getEntity());
+    	Assert.assertTrue(response.getEntity() instanceof JSONObject);
+    	
+    	JSONObject json = (JSONObject) response.getEntity();
+    	Assert.assertTrue(json.has(Tokens.QUERY_TIME));
+    	Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
+    	
+    	Assert.assertTrue(json.has(Tokens.RESULTS));
+    	Assert.assertFalse(json.isNull(Tokens.RESULTS));
+    	
+    	Assert.assertEquals("300a", v.getProperty("some-property"));
+    }
+    
+    @Test(expected = WebApplicationException.class)
+    public void postVertexButHasElementProperties(){
+    	final HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put(Tokens._ID, "300");
+    	
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	final Vertex v = new MockVertex("1");
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getVertex(with(any(Object.class)));
+            will(returnValue(v));
+        }});
+    	
+    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	resource.postVertex("1");
+    }
+    
+    @Test
+    public void deleteVertexValid(){
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	final Vertex v = new MockVertex("1");
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(new HashMap<String, String>()));
+            allowing(graph).getVertex(with(any(Object.class)));
+            will(returnValue(v));
+            allowing(graph).removeVertex(v);
+        }});
+    	
+    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	Response response = resource.deleteVertex("1");
+    	
+    	Assert.assertNotNull(response);
+    	Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    	Assert.assertNotNull(response.getEntity());
+    	Assert.assertTrue(response.getEntity() instanceof JSONObject);
+    	
+    	JSONObject json = (JSONObject) response.getEntity();
+    	Assert.assertTrue(json.has(Tokens.QUERY_TIME));
+    	Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
+    }
+    
+    @Test(expected = WebApplicationException.class)
+    public void deleteVertexNoVertexFound(){
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(new HashMap<String, String>()));
+            allowing(graph).getVertex(with(any(Object.class)));
+            will(returnValue(null));
+        }});
+    	
+    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	resource.deleteVertex("1");
+    }
+    
+    @Test
+    public void deleteVertexPropertiesValid(){
+    	final HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put("some-property", "");
+    	
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	final Vertex v = new MockVertex("1");
+    	v.setProperty("some-property", "to-delete");
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getVertex(with(any(Object.class)));
+            will(returnValue(v));
+        }});
+    	
+    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	Response response = resource.deleteVertex("1");
+    	
+    	Assert.assertNotNull(response);
+    	Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    	Assert.assertNotNull(response.getEntity());
+    	Assert.assertTrue(response.getEntity() instanceof JSONObject);
+    	
+    	JSONObject json = (JSONObject) response.getEntity();
+    	Assert.assertTrue(json.has(Tokens.QUERY_TIME));
+    	Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
+    	
+    	Set<String> keys = v.getPropertyKeys();
+    	Assert.assertEquals(0, keys.size());
+    }
+    
 	private JSONObject assertEdgesOkResponseJsonStructure(Response response, int expectedTotalSize) {
 		Assert.assertNotNull(response);
     	Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
