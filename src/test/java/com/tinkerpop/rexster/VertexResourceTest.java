@@ -1,247 +1,402 @@
 package com.tinkerpop.rexster;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.junit.After;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Vertex;
+
 /**
- * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * Tests vertex resource.  Should not need to test any specific returns values as they are 
+ * covered under other unit tests.  The format of the results themselves should be covered 
+ * under the ElementJSONObject.
  */
 public class VertexResourceTest extends BaseTest {
 
+	protected Mockery mockery = new JUnit4Mockery();
+    protected final String baseUri = "http://localhost/mock";
+
     @Before
-    public void setUp() {
-        try {
-            this.startWebServer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void init() {
+        this.mockery = new JUnit4Mockery();
     }
-
-    @After
-    public void tearDown() {
-        try {
-            this.stopWebServer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
+    
     @Test
-    public void getAllVertices() throws Exception {
-        sh.stopWatch();
-        String uri = createURI("vertices");
-        JSONObject object = getResource(uri);
-        printPerformance("GET all vertices", null, uri, sh.stopWatch());
-        Assert.assertEquals(809l, object.getLong("total_size"));
-
-        JSONArray arr = object.getJSONArray("results");
-
-        for (int ix = 0; ix < arr.length(); ix++) {
-            JSONObject vertex = arr.getJSONObject(ix);
-            Assert.assertEquals("vertex", vertex.getString("_type"));
-        }
-        Assert.assertEquals(object.getLong("total_size"), (long) ((JSONArray) object.get("results")).length());
+    public void getVerticesAll(){
+    	final int numberOfVertices = 100;
+    	VertexResource resource = this.constructMockGetVerticesScenario(numberOfVertices);
+    	
+    	Response response = resource.getVertices();
+    	this.assertVerticesOkResponseJsonStructure(numberOfVertices, numberOfVertices, response);
     }
-
+    
     @Test
-    public void getAllVerticesWithOffset() throws Exception {
-        sh.stopWatch();
-        String uri = createURI("vertices?rexster.offset.start=10&rexster.offset.end=20");
-        JSONObject object = getResource(uri);
-        printPerformance("GET vertices 10-20", null, uri, sh.stopWatch());
-        Assert.assertEquals(809l, object.getLong("total_size"));
-
-        JSONArray arr = object.getJSONArray("results");
-
-        for (int ix = 0; ix < arr.length(); ix++) {
-            JSONObject vertex = arr.getJSONObject(ix);
-
-            Assert.assertEquals("vertex", vertex.getString("_type"));
-        }
-        Assert.assertEquals(10, (long) ((JSONArray) object.get("results")).length());
+    public void getVerticesNoResults(){
+    	final int numberOfVertices = 0;
+    	VertexResource resource = this.constructMockGetVerticesScenario(numberOfVertices);
+    	
+    	Response response = resource.getVertices();
+    	this.assertVerticesOkResponseJsonStructure(numberOfVertices, numberOfVertices, response);
     }
-
+    
     @Test
-    public void getVertexEdges() throws Exception {
-        long total = 0l;
-        sh.stopWatch();
-        String uri = createURI("vertices/1/outE");
-        JSONObject object = getResource(uri);
-        printPerformance("GET vertex out edges", null, uri, sh.stopWatch());
-        total = total + object.getLong("total_size");
-        Assert.assertEquals(object.getLong("total_size"), (long) ((JSONArray) object.get("results")).length());
-
-        sh.stopWatch();
-        uri = createURI("vertices/1/inE");
-        object = getResource(uri);
-        printPerformance("GET vertex in edges", null, uri, sh.stopWatch());
-        total = total + object.getLong("total_size");
-        Assert.assertEquals(object.getLong("total_size"), (long) ((JSONArray) object.get("results")).length());
-
-        sh.stopWatch();
-        uri = createURI("vertices/1/bothE");
-        object = getResource(uri);
-        printPerformance("GET vertex both edges", null, uri, sh.stopWatch());
-        Assert.assertEquals(total, object.getLong("total_size"));
-        Assert.assertEquals(object.getLong("total_size"), (long) ((JSONArray) object.get("results")).length());
-
+    public void getVerticesWithValidOffset(){
+    	final int numberOfVertices = 100;
+    	HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_START, "10");
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
+    	VertexResource resource = this.constructMockGetVerticesScenario(numberOfVertices, parameters);
+    	
+    	Response response = resource.getVertices();
+    	this.assertVerticesOkResponseJsonStructure(10, numberOfVertices, response);
+    	
+    	JSONObject json = (JSONObject) response.getEntity();
+    	JSONArray jsonResults = json.optJSONArray(Tokens.RESULTS);
+    	
+    	// should return ids 10 through 19 from the random generated data
+    	for (int ix = 0; ix < jsonResults.length(); ix++) {
+    		Assert.assertEquals(ix + 10, jsonResults.optJSONObject(ix).optInt(Tokens._ID));
+    	}
     }
-
+    
     @Test
-    public void getVertexEdgesLabelFilter() throws Exception {
-        sh.stopWatch();
-        String uri = createURI("vertices/1/outE?_label=sung_by");
-        JSONObject object = getResource(uri);
-        printPerformance("GET vertex out edges label filter", null, uri, sh.stopWatch());
-        Assert.assertEquals(1l, object.getLong("total_size"));
-        Assert.assertEquals(object.getLong("total_size"), (long) ((JSONArray) object.get("results")).length());
-
-        sh.stopWatch();
-        uri = createURI("vertices/1/outE?_label=written_by");
-        object = getResource(uri);
-        printPerformance("GET vertex out edges label filter", null, uri, sh.stopWatch());
-        Assert.assertEquals(1l, object.getLong("total_size"));
-        Assert.assertEquals(object.getLong("total_size"), (long) ((JSONArray) object.get("results")).length());
+    public void getVerticesWithInvalidOffsetNotEnoughResults(){
+    	final int numberOfVertices = 5;
+    	HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_START, "10");
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
+    	VertexResource resource = this.constructMockGetVerticesScenario(numberOfVertices, parameters);
+    	
+    	Response response = resource.getVertices();
+    	this.assertVerticesOkResponseJsonStructure(0, numberOfVertices, response);
     }
-
+    
     @Test
-    public void postVertex() throws Exception {
-        sh.stopWatch();
-        String uri = createURI("vertices/9999");
-        JSONObject object = postResource(uri);
-        printPerformance("POST vertex", null, uri, sh.stopWatch());
-        object = object.getJSONObject("results");
-        Assert.assertEquals("9999", object.getString("_id"));
-        Assert.assertEquals("vertex", object.getString("_type"));
-        Assert.assertNull(object.opt("_outE"));
-        uri = createURI("vertices/9999/");
-        object = getResource(uri);
-        object = object.getJSONObject("results");
-        Assert.assertEquals("9999", object.getString("_id"));
-        Assert.assertEquals("vertex", object.getString("_type"));
-        Assert.assertNull(object.opt("_outE"));
+    public void getVerticesWithInvalidOffsetStartAfterEnd(){
+    	final int numberOfVertices = 5;
+    	HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_START, "100");
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
+    	VertexResource resource = this.constructMockGetVerticesScenario(numberOfVertices, parameters);
+    	
+    	Response response = resource.getVertices();
+    	this.assertVerticesOkResponseJsonStructure(0, numberOfVertices, response);
     }
-
+    
     @Test
-    public void postManyVertices() throws Exception {
-        sh.stopWatch();
-        int startVertexId = 9999;
-        int total = 250;
-        for (int i = startVertexId; i < startVertexId + total; i++) {
-            String uri = createURI("vertices/" + i);
-            JSONObject object = postResource(uri);
-            object = object.getJSONObject("results");
-            Assert.assertEquals("" + i, object.getString("_id"));
-            Assert.assertEquals("vertex", object.getString("_type"));
-            Assert.assertNull(object.opt("_outE"));
-        }
-        printPerformance("POST vertices", total, "vertices/xxxx", sh.stopWatch());
-
-        sh.stopWatch();
-        for (int i = startVertexId; i < startVertexId + total; i++) {
-            String uri = createURI("vertices/" + i);
-            JSONObject object = getResource(uri);
-            object = object.getJSONObject("results");
-            Assert.assertEquals("" + i, object.getString("_id"));
-            Assert.assertEquals("vertex", object.getString("_type"));
-            Assert.assertNull(object.opt("_outE"));
-        }
-        printPerformance("GET vertices", total, "vertices/xxxx", sh.stopWatch());
+    @Ignore("Can't seem to toss an exception here as ElementJSONObject seems to be the only thing that will toss it.  Need to test this path or refactor ElementJSONObject.")
+    public void getVerticesWithException(){
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	
+    	final ArrayList<Vertex> verticesWithNullProperties = new ArrayList<Vertex>();
+    	Vertex v = new MockVertex("0");
+    	v.setProperty(null, "will-throw-exception");
+    	verticesWithNullProperties.add(v);
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(new HashMap<String, String>()));
+            allowing(graph).getVertices();
+            will(returnValue(verticesWithNullProperties));
+        }});
+    	
+    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	Response response = resource.getVertices();
+    	Assert.assertNotNull(response);
+    	Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());    	
     }
-
+    
+    @Test(expected = WebApplicationException.class)
+    public void getSingleVertexNotFound() {
+    	VertexResource resource = this.constructMockGetSingleVertexScenario(null, new HashMap<String, String>());
+    	Response response = resource.getSingleVertex("id-does-not-match-any");
+    }
+    
     @Test
-    public void postVertexProperties() throws Exception {
-        // to existing vertex
-        sh.stopWatch();
-        String uri = createURI("vertices/1?key1=value1&key2=value2&name=REXSTER");
-        JSONObject object = postResource(uri);
-        printPerformance("POST vertex", null, uri, sh.stopWatch());
-        object = object.getJSONObject("results");
-        Assert.assertEquals("1", object.getString("_id"));
-        Assert.assertEquals("vertex", object.getString("_type"));
-        Assert.assertEquals("value1", object.getString("key1"));
-        Assert.assertEquals("value2", object.getString("key2"));
-        Assert.assertEquals("REXSTER", object.getString("name"));
-        uri = createURI("vertices/1");
-        object = getResource(uri);
-        object = object.getJSONObject("results");
-        printPerformance("GET vertex", null, uri, sh.stopWatch());
-        Assert.assertEquals("1", object.getString("_id"));
-        Assert.assertEquals("vertex", object.getString("_type"));
-        Assert.assertEquals("value1", object.getString("key1"));
-        Assert.assertEquals("value2", object.getString("key2"));
-        Assert.assertEquals("REXSTER", object.getString("name"));
-
-        // to new vertex
-        sh.stopWatch();
-        uri = createURI("vertices/9999?key1=value1&key2=value2&name=REXSTER");
-        object = postResource(uri);
-        printPerformance("POST vertex", null, uri, sh.stopWatch());
-        object = object.getJSONObject("results");
-        Assert.assertEquals("9999", object.getString("_id"));
-        Assert.assertEquals("vertex", object.getString("_type"));
-        Assert.assertEquals("value1", object.getString("key1"));
-        Assert.assertEquals("value2", object.getString("key2"));
-        Assert.assertEquals("REXSTER", object.getString("name"));
-        uri = createURI("vertices/9999");
-        object = getResource(uri);
-        object = object.getJSONObject("results");
-        printPerformance("GET vertex", null, uri, sh.stopWatch());
-        Assert.assertEquals("9999", object.getString("_id"));
-        Assert.assertEquals("vertex", object.getString("_type"));
-        Assert.assertEquals("value1", object.getString("key1"));
-        Assert.assertEquals("value2", object.getString("key2"));
-        Assert.assertEquals("REXSTER", object.getString("name"));
+    public void getSingleVertexFound() {
+    	Vertex v = new MockVertex("1");
+    	VertexResource resource = this.constructMockGetSingleVertexScenario(v, new HashMap<String, String>());
+    	
+    	Response response = resource.getSingleVertex("1");
+    	Assert.assertNotNull(response);
+    	Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    	Assert.assertNotNull(response.getEntity());
+    	Assert.assertTrue(response.getEntity() instanceof JSONObject);
+    	
+    	JSONObject json = (JSONObject) response.getEntity();
+    	Assert.assertTrue(json.has(Tokens.QUERY_TIME));
+    	Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
+    	
+    	Assert.assertTrue(json.has(Tokens.RESULTS));
+    	Assert.assertFalse(json.isNull(Tokens.RESULTS));
+    	
+    	JSONObject jsonResult = (JSONObject) json.optJSONObject(Tokens.RESULTS);
+    	Assert.assertNotNull(jsonResult);
     }
 
+    @Test(expected = WebApplicationException.class)
+    public void getVertexEdgesNotFound() {
+    	VertexResource resource = this.constructMockGetSingleVertexScenario(null, new HashMap<String, String>());
+    	Response response = resource.getSingleVertex("id-does-not-match-any");
+    }
+    
     @Test
-    public void deleteVertex() throws Exception {
-        sh.stopWatch();
-        String uri = createURI("vertices/1");
-        deleteResource(uri);
-        printPerformance("DELETE vertex", null, uri, sh.stopWatch());
+    public void getVertexEdgesFoundVertexReturnInEdgesNoOffset() {
+    	VertexResource resource = this.constructMockSimpleGraphScenario();
+    	
+    	Response response = resource.getVertexEdges("1", Tokens.IN_E);
+    	JSONObject json = assertEdgesOkResponseJsonStructure(response, 1);
+    	
+    	JSONArray jsonResultArray = (JSONArray) json.optJSONArray(Tokens.RESULTS);
+    	Assert.assertNotNull(jsonResultArray);
+    	Assert.assertEquals(1, jsonResultArray.length());
 
-        sh.stopWatch();
-        uri = createURI("vertices/1");
-        JSONObject object = getResource(uri);
-        printPerformance("GET vertex", null, uri, sh.stopWatch());
+    	JSONObject jsonResult = jsonResultArray.optJSONObject(0);
+    	Assert.assertNotNull(jsonResult);
+    	Assert.assertTrue(jsonResult.has(Tokens._ID));
+    	Assert.assertEquals("1-2", jsonResult.optString(Tokens._ID));
+    }
+    
+    @Test
+    public void getVertexEdgesFoundVertexOutEdgesNoOffset() {
+    	VertexResource resource = this.constructMockSimpleGraphScenario();
+    	
+    	Response response = resource.getVertexEdges("1", Tokens.OUT_E);
+    	JSONObject json = assertEdgesOkResponseJsonStructure(response, 1);
+    	
+    	JSONArray jsonResultArray = (JSONArray) json.optJSONArray(Tokens.RESULTS);
+    	Assert.assertNotNull(jsonResultArray);
+    	Assert.assertEquals(1, jsonResultArray.length());
 
-        // this is a not found 404 error so should return a JSON error message
-        Assert.assertTrue(object.has("message"));
-
-        int vertexAmount = 809;
-
-        sh.stopWatch();
-        for (int i = 0; i < vertexAmount; i++) {
-            // the first vertex was delete as the first part of the test
-            if (i != 1) {
-                uri = createURI("vertices/" + i);
-                deleteResource(uri);
-            }
-        }
-        printPerformance("DELETE vertices", vertexAmount, uri, sh.stopWatch());
-
-        sh.stopWatch();
-        uri = createURI("vertices");
-        object = getResource(uri);
-        printPerformance("GET vertices", null, uri, sh.stopWatch());
-        Assert.assertEquals(0, object.getJSONArray("results").length());
+    	JSONObject jsonResult = jsonResultArray.optJSONObject(0);
+    	Assert.assertNotNull(jsonResult);
+    	Assert.assertTrue(jsonResult.has(Tokens._ID));
+    	Assert.assertEquals("3-1", jsonResult.optString(Tokens._ID));
+    }
+    
+    @Test
+    public void getVertexEdgesFoundVertexBothEdgesNoOffset() {
+    	VertexResource resource = this.constructMockSimpleGraphScenario();
+    	
+    	Response response = resource.getVertexEdges("1", Tokens.BOTH_E);
+    	JSONObject json = assertEdgesOkResponseJsonStructure(response, 2);
+    	
+    	JSONArray jsonResultArray = (JSONArray) json.optJSONArray(Tokens.RESULTS);
+    	Assert.assertNotNull(jsonResultArray);
+    	Assert.assertEquals(2, jsonResultArray.length());
+    }
+    
+    @Test
+    public void getVertexEdgesFoundVertexBothEdgesWithValidOffset() {
+    	HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_START, "10");
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
+    	VertexResource resource = this.constructMockMultiEdgedGraphScenario(100, parameters);
+    	
+    	Response response = resource.getVertexEdges("1", Tokens.BOTH_E);
+    	JSONObject json = assertEdgesOkResponseJsonStructure(response, 100);
+    	
+    	JSONArray jsonResultArray = (JSONArray) json.optJSONArray(Tokens.RESULTS);
+    	Assert.assertNotNull(jsonResultArray);
+    	Assert.assertEquals(10, jsonResultArray.length());
+    }
+    
+    @Test
+    public void getVertexEdgesFoundVertexBothEdgesWithOffsetNotEnoughResults() {
+    	HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_START, "10");
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
+    	VertexResource resource = this.constructMockMultiEdgedGraphScenario(5, parameters);
+    	
+    	Response response = resource.getVertexEdges("1", Tokens.BOTH_E);
+    	JSONObject json = assertEdgesOkResponseJsonStructure(response, 5);
+    	
+    	JSONArray jsonResultArray = (JSONArray) json.optJSONArray(Tokens.RESULTS);
+    	Assert.assertNotNull(jsonResultArray);
+    	Assert.assertEquals(0, jsonResultArray.length());
+    }
+    
+    @Test
+    public void getVertexEdgesFoundVertexBothEdgesWithOffsetStartAfterEnd() {
+    	HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_START, "30");
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
+    	VertexResource resource = this.constructMockMultiEdgedGraphScenario(100, parameters);
+    	
+    	Response response = resource.getVertexEdges("1", Tokens.BOTH_E);
+    	JSONObject json = assertEdgesOkResponseJsonStructure(response, 100);
+    	
+    	JSONArray jsonResultArray = (JSONArray) json.optJSONArray(Tokens.RESULTS);
+    	Assert.assertNotNull(jsonResultArray);
+    	Assert.assertEquals(0, jsonResultArray.length());
     }
 
-    /*@Test
-    public void deleteAllVertices() throws Exception {
-        sh.stopWatch();
-        String uri = createURI("vertices");
-        System.out.println(uri);
-        deleteResource(uri);
-        printPerformance("DELETE all vertices", null, uri, sh.stopWatch());
+	private JSONObject assertEdgesOkResponseJsonStructure(Response response, int expectedTotalSize) {
+		Assert.assertNotNull(response);
+    	Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    	Assert.assertNotNull(response.getEntity());
+    	Assert.assertTrue(response.getEntity() instanceof JSONObject);
+    	
+    	JSONObject json = (JSONObject) response.getEntity();
+    	Assert.assertTrue(json.has(Tokens.QUERY_TIME));
+    	Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
+    	
+    	Assert.assertTrue(json.has(Tokens.TOTAL_SIZE));
+    	Assert.assertEquals(expectedTotalSize, json.optInt(Tokens.TOTAL_SIZE));
+    	
+    	Assert.assertTrue(json.has(Tokens.RESULTS));
+    	Assert.assertFalse(json.isNull(Tokens.RESULTS));
+		return json;
+	}
+	
+	private VertexResource constructMockMultiEdgedGraphScenario(int numberOfEdgesToGenerate, HashMap<String, String> parameters){
+		MockVertex v1 = new MockVertex("1");
+    	MockVertex v2 = new MockVertex("2");
+    	
+    	ArrayList<Edge> v1InEdges = new ArrayList<Edge>();
+    	ArrayList<Edge> v2OutEdges = new ArrayList<Edge>();
+    	
+    	for (int ix = 0; ix < numberOfEdgesToGenerate; ix++) {
+    		MockEdge edge = new MockEdge(new Integer(ix).toString(), 
+    				"label" + new Integer(ix).toString(), new Hashtable<String, Object>(), v1, v2);
+    		
+        	v1InEdges.add(edge);
+        	v2OutEdges.add(edge);
+    	}
+    	    	
+    	v1.setInEdges(v1InEdges);
+    	v2.setOutEdges(v2OutEdges);
+    	
+    	VertexResource resource = this.constructMockGetSingleVertexScenario(v1, parameters);
+		return resource;
+	}
 
-        uri = createURI("vertices");
-        JSONObject object = getResource(uri);
-        System.out.println(object);
-    }*/
+    /**
+     * Creates a simple graph with two vertices and an edge between them.
+     * @return
+     */
+	private VertexResource constructMockSimpleGraphScenario() {
+		MockVertex v1 = new MockVertex("1");
+    	MockVertex v2 = new MockVertex("2");
+    	MockVertex v3 = new MockVertex("3");
+    	
+    	MockEdge edge1 = new MockEdge("1-2", "label12", new Hashtable<String, Object>(), v1, v2);
+    	MockEdge edge2 = new MockEdge("3-1", "label12", new Hashtable<String, Object>(), v3, v1);
+    	
+    	ArrayList<Edge> v1InEdges = new ArrayList<Edge>();
+    	v1InEdges.add(edge1);
+    	
+    	ArrayList<Edge> v3InEdges = new ArrayList<Edge>();
+    	v3InEdges.add(edge2);
+    	
+    	ArrayList<Edge> v1OutEdges = new ArrayList<Edge>();
+    	v1OutEdges.add(edge2);
+    	
+    	ArrayList<Edge> v2OutEdges = new ArrayList<Edge>();
+    	v2OutEdges.add(edge1);
+    	
+    	v1.setInEdges(v1InEdges);
+    	v1.setOutEdges(v1OutEdges);
+    	v2.setOutEdges(v2OutEdges);
+    	v3.setInEdges(v3InEdges);
+    	
+    	VertexResource resource = this.constructMockGetSingleVertexScenario(v1, new HashMap<String, String>());
+		return resource;
+	}
+    
+    private void assertVerticesOkResponseJsonStructure(int numberOfVerticesReturned, 
+    		int numberOfVerticesTotal, Response response) {
+		Assert.assertNotNull(response);
+    	Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    	Assert.assertNotNull(response.getEntity());
+    	Assert.assertTrue(response.getEntity() instanceof JSONObject);
+    	
+    	JSONObject json = (JSONObject) response.getEntity();
+    	Assert.assertTrue(json.has(Tokens.TOTAL_SIZE));
+    	Assert.assertEquals(numberOfVerticesTotal, json.optInt(Tokens.TOTAL_SIZE));
+    	Assert.assertTrue(json.has(Tokens.QUERY_TIME));
+    	Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
+    	
+    	Assert.assertTrue(json.has(Tokens.RESULTS));
+    	Assert.assertFalse(json.isNull(Tokens.RESULTS));
+    	
+    	JSONArray jsonResults = json.optJSONArray(Tokens.RESULTS);
+    	Assert.assertEquals(numberOfVerticesReturned, jsonResults.length());
+	}
+    
+    private VertexResource constructMockGetSingleVertexScenario(final Vertex vertex, final HashMap<String, String> parameters){
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getVertex(with(any(Object.class)));
+            will(returnValue(vertex));
+        }});
+    	
+    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+		return resource;
+    }
+    
+    private VertexResource constructMockGetVerticesScenario(final int numberOfVertices) {
+    	return this.constructMockGetVerticesScenario(numberOfVertices, new HashMap<String, String>());
+    }
+    
+    private VertexResource constructMockGetVerticesScenario(final int numberOfVertices, final HashMap<String, String> parameters) {
+		final Graph graph = this.mockery.mock(Graph.class);
+    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getVertices();
+            will(returnValue(generateMockedVertices(numberOfVertices)));
+        }});
+    	
+    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+		return resource;
+	}
+    
+    private static Iterable<Vertex> generateMockedVertices(int numberOfVertices) {
+    	ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+    	
+    	for (int ix = 0; ix < numberOfVertices; ix++) {
+    		MockVertex v = new MockVertex(new Integer(ix).toString());
+    		vertices.add(v);
+    	}
+    	
+    	return vertices;
+    }
 }

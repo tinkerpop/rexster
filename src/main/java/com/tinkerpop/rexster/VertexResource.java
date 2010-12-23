@@ -28,7 +28,11 @@ public class VertexResource extends AbstractSubResource {
     public VertexResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
         super(graphName, ui, req);
     }
-
+    
+    public VertexResource(RexsterApplicationGraph rag, UriInfo ui, HttpServletRequest req) {
+    	super(rag, ui, req);
+    }
+    
     /**
      * GET http://host/graph/vertices
      * graph.getVertices();
