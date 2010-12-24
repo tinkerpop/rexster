@@ -82,7 +82,7 @@ public class WebServer {
         rexster.stop();
     }
 
-    public static RexsterApplication GetRexsterApplication() {
+    public static RexsterApplication getRexsterApplication() {
         return rexster;
     }
 

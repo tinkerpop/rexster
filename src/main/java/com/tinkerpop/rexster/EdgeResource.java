@@ -26,9 +26,13 @@ public class EdgeResource extends AbstractSubResource {
     private static Logger logger = Logger.getLogger(EdgeResource.class);
 
     public EdgeResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
-        super(graphName, ui, req);
+        super(graphName, ui, req, null);
     }
-
+    
+    public EdgeResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
+        super(graphName, ui, req, rap);
+    }
+    
     /**
      * GET http://host/graph/edges
      * graph.getEdges();

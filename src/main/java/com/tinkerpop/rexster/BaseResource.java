@@ -31,9 +31,19 @@ public abstract class BaseResource {
     protected HttpServletRequest request;
 
     protected UriInfo uriInfo;
+    
+    protected RexsterApplicationProvider rexsterApplicationProvider;
 
-    public BaseResource() {
-        sh.stopWatch();
+    public BaseResource(RexsterApplicationProvider rexsterApplicationProvider) {
+    	
+    	// the general assumption is that the web server is the provider for RexsterApplication
+    	// instances.  this really should only change in unit test scenarios.  
+    	this.rexsterApplicationProvider = rexsterApplicationProvider;
+    	if (this.rexsterApplicationProvider == null) {
+    		this.rexsterApplicationProvider = new WebServerRexsterApplicationProvider();
+    	}
+    	
+    	sh.stopWatch();
 
         try {
             this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
@@ -295,7 +305,7 @@ public abstract class BaseResource {
     }
 
     protected String getTimeAlive() {
-        long timeMillis = System.currentTimeMillis() - WebServer.GetRexsterApplication().getStartTime();
+        long timeMillis = System.currentTimeMillis() - this.rexsterApplicationProvider.getStartTime();
         long timeSeconds = timeMillis / 1000;
         long timeMinutes = timeSeconds / 60;
         long timeHours = timeMinutes / 60;

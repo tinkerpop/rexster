@@ -21,7 +21,11 @@ public class TraversalResource extends AbstractSubResource {
     private static Logger logger = Logger.getLogger(TraversalResource.class);
 
     public TraversalResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
-        super(graphName, ui, req);
+        super(graphName, ui, req, null);
+    }
+    
+    public TraversalResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
+        super(graphName, ui, req, rap);
     }
 
     @GET
@@ -93,7 +97,7 @@ public class TraversalResource extends AbstractSubResource {
                 ctx.setUriInfo(this.uriInfo);
                 ctx.setRexsterApplicationGraph(this.rag);
                 ctx.setRequestObject(this.requestObject);
-                ctx.setCache(WebServer.GetRexsterApplication().getResultObjectCache());
+                ctx.setCache(this.rexsterApplicationProvider.getResultObjectCache());
 
                 traversal.evaluate(ctx);
             } else {

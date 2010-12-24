@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -130,7 +131,44 @@ public class BaseResourceTest {
     }
 
     protected class MockResource extends BaseResource {
+    	public MockResource(){
+    		super(new MockRexsterApplicationProvider());
+    	}
     }
 
+    protected class MockRexsterApplicationProvider implements RexsterApplicationProvider{
+
+    	private final long startTime = System.currentTimeMillis();
+    	
+		@Override
+		public RexsterApplication getRexsterApplication() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public RexsterApplicationGraph getApplicationGraph(String graphName) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public ResultObjectCache getResultObjectCache() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Set<String> getGraphsNames() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public long getStartTime() {
+			return this.startTime;
+		}
+    	
+    }
 }
 

@@ -24,16 +24,19 @@ public class AbstractSubResourceTest {
 
         final UriInfo uriInfo = this.mockery.mock(UriInfo.class);
         final HttpServletRequest req = this.mockery.mock(HttpServletRequest.class);
-        ;
+        
         final Graph graph = this.mockery.mock(Graph.class);
-
+        final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        
         this.mockery.checking(new Expectations() {{
             allowing(req).getParameterMap();
             will(returnValue(new HashMap<String, String>()));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
         }});
 
-        RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        this.mockResource = new MockAbstractSubResource(rag, uriInfo, req);
+        this.mockResource = new MockAbstractSubResource("graph", uriInfo, req, rap);
     }
 
     @Test
@@ -299,8 +302,8 @@ public class AbstractSubResourceTest {
 
     private class MockAbstractSubResource extends AbstractSubResource {
 
-        public MockAbstractSubResource(RexsterApplicationGraph graph, UriInfo ui, HttpServletRequest req) {
-            super(graph, ui, req);
+        public MockAbstractSubResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
+            super(graphName, ui, req, rap);
         }
 
         public Object getTypedPropertyValue(String propertyValue) {

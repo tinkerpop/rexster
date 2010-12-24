@@ -27,7 +27,11 @@ public class IndexResource extends AbstractSubResource {
     private static Logger logger = Logger.getLogger(EdgeResource.class);
 
     public IndexResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
-        super(graphName, ui, req);
+        super(graphName, ui, req, null);
+    }
+    
+    public IndexResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
+        super(graphName, ui, req, rap);
     }
 
     /**

@@ -20,9 +20,13 @@ public class GraphResource extends AbstractSubResource {
     private static Logger logger = Logger.getLogger(GraphResource.class);
 
     public GraphResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
-        super(graphName, ui, req);
+        super(graphName, ui, req, null);
     }
-
+    
+    public GraphResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
+        super(graphName, ui, req, rap);
+    }
+    
     /**
      * GET http://host/graph
      * graph.toString();

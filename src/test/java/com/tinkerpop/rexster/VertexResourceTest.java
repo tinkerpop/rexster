@@ -106,11 +106,12 @@ public class VertexResourceTest extends BaseTest {
     @Ignore("Can't seem to toss an exception here as ElementJSONObject seems to be the only thing that will toss it.  Need to test this path or refactor ElementJSONObject.")
     public void getVerticesWithException(){
     	final Graph graph = this.mockery.mock(Graph.class);
-    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
     	
     	final UriInfo uri = this.mockery.mock(UriInfo.class);
     	
     	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
     	
     	final ArrayList<Vertex> verticesWithNullProperties = new ArrayList<Vertex>();
     	Vertex v = new MockVertex("0");
@@ -122,9 +123,11 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(new HashMap<String, String>()));
             allowing(graph).getVertices();
             will(returnValue(verticesWithNullProperties));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
         }});
     	
-    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
     	Response response = resource.getVertices();
     	Assert.assertNotNull(response);
     	Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());    	
@@ -133,7 +136,7 @@ public class VertexResourceTest extends BaseTest {
     @Test(expected = WebApplicationException.class)
     public void getSingleVertexNotFound() {
     	VertexResource resource = this.constructMockGetSingleVertexScenario(null, new HashMap<String, String>());
-    	Response response = resource.getSingleVertex("id-does-not-match-any");
+    	resource.getSingleVertex("id-does-not-match-any");
     }
     
     @Test
@@ -161,7 +164,7 @@ public class VertexResourceTest extends BaseTest {
     @Test(expected = WebApplicationException.class)
     public void getVertexEdgesNotFound() {
     	VertexResource resource = this.constructMockGetSingleVertexScenario(null, new HashMap<String, String>());
-    	Response response = resource.getSingleVertex("id-does-not-match-any");
+    	resource.getSingleVertex("id-does-not-match-any");
     }
     
     @Test
@@ -261,7 +264,8 @@ public class VertexResourceTest extends BaseTest {
     	parameters.put("some-property", "300a");
     	
     	final Graph graph = this.mockery.mock(Graph.class);
-    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
     	
     	final UriInfo uri = this.mockery.mock(UriInfo.class);
     	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -274,9 +278,11 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(null));
             allowing(graph).addVertex(with(any(Object.class)));
             will(returnValue(v));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
         }});
     	
-    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
     	Response response = resource.postNullVertex();
     	
     	Assert.assertNotNull(response);
@@ -298,7 +304,8 @@ public class VertexResourceTest extends BaseTest {
     	parameters.put("some-property", "300a");
     	
     	final Graph graph = this.mockery.mock(Graph.class);
-    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
     	
     	final UriInfo uri = this.mockery.mock(UriInfo.class);
     	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -309,9 +316,11 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(parameters));
             allowing(graph).getVertex(with(any(Object.class)));
             will(returnValue(v));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
         }});
     	
-    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
     	Response response = resource.postVertex("1");
     	
     	Assert.assertNotNull(response);
@@ -335,7 +344,8 @@ public class VertexResourceTest extends BaseTest {
     	parameters.put(Tokens._ID, "300");
     	
     	final Graph graph = this.mockery.mock(Graph.class);
-    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
     	
     	final UriInfo uri = this.mockery.mock(UriInfo.class);
     	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -346,16 +356,19 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(parameters));
             allowing(graph).getVertex(with(any(Object.class)));
             will(returnValue(v));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
         }});
     	
-    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
     	resource.postVertex("1");
     }
     
     @Test
     public void deleteVertexValid(){
     	final Graph graph = this.mockery.mock(Graph.class);
-    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
     	
     	final UriInfo uri = this.mockery.mock(UriInfo.class);
     	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -367,9 +380,11 @@ public class VertexResourceTest extends BaseTest {
             allowing(graph).getVertex(with(any(Object.class)));
             will(returnValue(v));
             allowing(graph).removeVertex(v);
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
         }});
     	
-    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
     	Response response = resource.deleteVertex("1");
     	
     	Assert.assertNotNull(response);
@@ -385,7 +400,8 @@ public class VertexResourceTest extends BaseTest {
     @Test(expected = WebApplicationException.class)
     public void deleteVertexNoVertexFound(){
     	final Graph graph = this.mockery.mock(Graph.class);
-    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
     	
     	final UriInfo uri = this.mockery.mock(UriInfo.class);
     	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -395,9 +411,11 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(new HashMap<String, String>()));
             allowing(graph).getVertex(with(any(Object.class)));
             will(returnValue(null));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
         }});
     	
-    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
     	resource.deleteVertex("1");
     }
     
@@ -407,7 +425,8 @@ public class VertexResourceTest extends BaseTest {
     	parameters.put("some-property", "");
     	
     	final Graph graph = this.mockery.mock(Graph.class);
-    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
     	
     	final UriInfo uri = this.mockery.mock(UriInfo.class);
     	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -419,9 +438,11 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(parameters));
             allowing(graph).getVertex(with(any(Object.class)));
             will(returnValue(v));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
         }});
     	
-    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
     	Response response = resource.deleteVertex("1");
     	
     	Assert.assertNotNull(response);
@@ -532,7 +553,8 @@ public class VertexResourceTest extends BaseTest {
     
     private VertexResource constructMockGetSingleVertexScenario(final Vertex vertex, final HashMap<String, String> parameters){
     	final Graph graph = this.mockery.mock(Graph.class);
-    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
     	
     	final UriInfo uri = this.mockery.mock(UriInfo.class);
     	
@@ -543,9 +565,11 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(parameters));
             allowing(graph).getVertex(with(any(Object.class)));
             will(returnValue(vertex));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
         }});
     	
-    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
 		return resource;
     }
     
@@ -555,7 +579,8 @@ public class VertexResourceTest extends BaseTest {
     
     private VertexResource constructMockGetVerticesScenario(final int numberOfVertices, final HashMap<String, String> parameters) {
 		final Graph graph = this.mockery.mock(Graph.class);
-    	RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
     	
     	final UriInfo uri = this.mockery.mock(UriInfo.class);
     	
@@ -566,9 +591,11 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(parameters));
             allowing(graph).getVertices();
             will(returnValue(generateMockedVertices(numberOfVertices)));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
         }});
     	
-    	VertexResource resource = new VertexResource(rag, uri, httpServletRequest);
+    	VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
 		return resource;
 	}
     

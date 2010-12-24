@@ -26,11 +26,11 @@ public class VertexResource extends AbstractSubResource {
     private static Logger logger = Logger.getLogger(VertexResource.class);
 
     public VertexResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
-        super(graphName, ui, req);
+        super(graphName, ui, req, null);
     }
     
-    public VertexResource(RexsterApplicationGraph rag, UriInfo ui, HttpServletRequest req) {
-    	super(rag, ui, req);
+    public VertexResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
+        super(graphName, ui, req, rap);
     }
     
     /**
