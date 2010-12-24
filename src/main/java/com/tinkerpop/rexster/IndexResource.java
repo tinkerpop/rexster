@@ -1,6 +1,11 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import com.tinkerpop.rexster.traversals.IndexJSONObject;
 import org.apache.log4j.Logger;
@@ -9,7 +14,13 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -40,6 +51,16 @@ public class IndexResource extends AbstractSubResource {
      */
     @GET
     public Response getAllIndices() {
+    	IndexableGraph idxGraph = null;
+    	if (this.rag.getGraph() instanceof IndexableGraph) {
+    		idxGraph = (IndexableGraph) this.rag.getGraph();
+    	}
+    	
+    	if (idxGraph == null) {
+    		JSONObject error = this.generateErrorObject("The requested graph is not of type IndexableGraph.");
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
+    	}
+    	
         Long start = this.getStartOffset();
         Long end = this.getEndOffset();
 
@@ -47,7 +68,7 @@ public class IndexResource extends AbstractSubResource {
 
         try {
             JSONArray indexArray = new JSONArray();
-            for (Index index : ((IndexableGraph) this.rag.getGraph()).getIndices()) {
+            for (Index index : idxGraph.getIndices()) {
                 if (counter >= start && counter < end) {
                     indexArray.put(new IndexJSONObject(index));
                 }
@@ -461,11 +482,23 @@ public class IndexResource extends AbstractSubResource {
     }
 
     private Index getIndexFromGraph(final String name) {
-        final IndexableGraph graph = (IndexableGraph) this.rag.getGraph();
-        for (final Index index : graph.getIndices()) {
+    	
+    	IndexableGraph idxGraph = null;
+    	if (this.rag.getGraph() instanceof IndexableGraph) {
+    		idxGraph = (IndexableGraph) this.rag.getGraph();
+    	}
+    	
+    	if (idxGraph == null) {
+    		JSONObject error = this.generateErrorObject("The requested graph is not of type IndexableGraph.");
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
+    	}
+        
+
+        for (final Index index : idxGraph.getIndices()) {
             if (index.getIndexName().equals(name))
                 return index;
         }
+        
         return null;
     }
 
