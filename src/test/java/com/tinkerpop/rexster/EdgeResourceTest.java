@@ -2,131 +2,218 @@ package com.tinkerpop.rexster;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Vertex;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
+
 /**
- * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * Tests edge resource.  Should not need to test any specific returns values as they are 
+ * covered under other unit tests.  The format of the results themselves should be covered 
+ * under the ElementJSONObject.
  */
-public class EdgeResourceTest extends BaseTest {
+public class EdgeResourceTest {
+
+	protected Mockery mockery = new JUnit4Mockery();
+    protected final String baseUri = "http://localhost/mock";
 
     @Before
-    public void setUp() {
-        try {
-            this.startWebServer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void init() {
+        this.mockery = new JUnit4Mockery();
     }
-
-    @After
-    public void tearDown() {
-        try {
-            this.stopWebServer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
+    
     @Test
-    public void getAllEdges() throws Exception {
-        sh.stopWatch();
-        String uri = createURI("edges");
-        JSONObject object = getResource(uri);
-        printPerformance("GET all edges", null, uri, sh.stopWatch());
-        JSONArray arr = object.getJSONArray("results");
-
-        for (int ix = 0; ix < arr.length(); ix++) {
-            JSONObject vertex = arr.getJSONObject(ix);
-            Assert.assertEquals("edge", vertex.get("_type"));
-        }
-        Assert.assertEquals(object.getLong("total_size"), (long) (object.getJSONArray("results")).length());
+    public void getAllEdgesNoOffset(){
+    	final int numberOfEdges = 100;
+    	EdgeResource resource = this.constructMockGetAllEdgesScenario(numberOfEdges);
+    	
+    	Response response = resource.getAllEdges();
+    	this.assertEdgesOkResponseJsonStructure(numberOfEdges, numberOfEdges, response);
     }
-
+    
     @Test
-    public void getEdge() throws Exception {
-        sh.stopWatch();
-        String uri = createURI("edges/6872");
-        JSONObject object = getResource(uri);
-        printPerformance("GET edge", null, uri, sh.stopWatch());
-        Assert.assertEquals("edge", ((JSONObject) object.get("results")).getString("_type"));
-        Assert.assertEquals("64", ((JSONObject) object.get("results")).getString("_outV"));
-        Assert.assertEquals("followed_by", ((JSONObject) object.get("results")).getString("_label"));
-        Assert.assertEquals("30", ((JSONObject) object.get("results")).getString("_inV"));
+    public void getAllEdgesNoResults(){
+    	final int numberOfEdges = 0;
+    	EdgeResource resource = this.constructMockGetAllEdgesScenario(numberOfEdges);
+    	
+    	Response response = resource.getAllEdges();
+    	this.assertEdgesOkResponseJsonStructure(numberOfEdges, numberOfEdges, response);
     }
-
+    
     @Test
-    public void postEdge() throws Exception {
-        sh.stopWatch();
-        String uri = createURI("edges/999999?_outV=1&_inV=2&_label=test&key1=value1");
-        JSONObject object = postResource(uri);
-        printPerformance("POST edge", null, uri, sh.stopWatch());
-        object = (JSONObject) object.get("results");
-        Assert.assertEquals("edge", object.getString("_type"));
-        Assert.assertEquals("test", object.getString("_label"));
-        Assert.assertEquals("value1", object.getString("key1"));
-        Assert.assertEquals("1", object.getString("_outV"));
-        Assert.assertEquals("2", object.getString("_inV"));
+    public void getAllEdgesWithValidOffset(){
+    	final int numberOfEdges = 100;
+    	HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_START, "10");
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
+    	EdgeResource resource = this.constructMockGetAllEdgesScenario(numberOfEdges, parameters);
+    	
+    	Response response = resource.getAllEdges();
+    	this.assertEdgesOkResponseJsonStructure(10, numberOfEdges, response);
+    	
+    	JSONObject json = (JSONObject) response.getEntity();
+    	JSONArray jsonResults = json.optJSONArray(Tokens.RESULTS);
+    	
+    	// should return ids 10 through 19 from the random generated data
+    	for (int ix = 0; ix < jsonResults.length(); ix++) {
+    		Assert.assertEquals(ix + 10, jsonResults.optJSONObject(ix).optInt(Tokens._ID));
+    	}
     }
-
+    
     @Test
-    public void postEdgeProperties() throws Exception {
-        sh.stopWatch();
-        String uri = createURI("edges/6872?key1=value1");
-        JSONObject object = postResource(uri);
-        printPerformance("POST edge properties", null, uri, sh.stopWatch());
-        object = object.getJSONObject("results");
-        Assert.assertEquals("edge", object.getString("_type"));
-        Assert.assertEquals("followed_by", object.getString("_label"));
-        Assert.assertEquals("value1", object.getString("key1"));
-        Assert.assertEquals("64", object.getString("_outV"));
-        Assert.assertEquals("30", object.getString("_inV"));
-        String id = object.getString("_id");
-
-        uri = createURI("edges/6872?key2=value2&key3=value3&key1=asdf");
-        object = postResource(uri);
-        printPerformance("POST edge properties", null, uri, sh.stopWatch());
-        object = object.getJSONObject("results");
-        Assert.assertEquals("edge", object.getString("_type"));
-        Assert.assertEquals("followed_by", object.getString("_label"));
-        Assert.assertEquals("asdf", object.getString("key1"));
-        Assert.assertEquals("value2", object.getString("key2"));
-        Assert.assertEquals("value3", object.getString("key3"));
-        Assert.assertEquals("64", object.getString("_outV"));
-        Assert.assertEquals("30", object.getString("_inV"));
-
+    public void getAllEdgesWithInvalidOffsetNotEnoughResults(){
+    	final int numberOfEdges = 5;
+    	HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_START, "10");
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
+    	EdgeResource resource = this.constructMockGetAllEdgesScenario(numberOfEdges, parameters);
+    	
+    	Response response = resource.getAllEdges();
+    	this.assertEdgesOkResponseJsonStructure(0, numberOfEdges, response);
     }
-
+    
     @Test
-    public void deleteEdge() throws Exception {
-        sh.stopWatch();
-        String uri = createURI("vertices/1/outE?rexster.return_keys=[_id]");
-        JSONObject object = getResource(uri);
-        printPerformance("GET vertex out edges ids", null, uri, sh.stopWatch());
-        List<String> edgeIds = new ArrayList<String>();
-        JSONArray arr = object.getJSONArray("results");
+    public void getAllEdgesWithInvalidOffsetStartAfterEnd(){
+    	final int numberOfEdges = 5;
+    	HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_START, "100");
+    	parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
+    	EdgeResource resource = this.constructMockGetAllEdgesScenario(numberOfEdges, parameters);
+    	
+    	Response response = resource.getAllEdges();
+    	this.assertEdgesOkResponseJsonStructure(0, numberOfEdges, response);
+    }
+    
+    @Test(expected = WebApplicationException.class)
+    public void getSingleEdgeNotFound() {
+    	EdgeResource resource = this.constructMockGetSingleEdgeScenario(null, new HashMap<String, String>());
+    	resource.getSingleEdge("id-does-not-match-any");
+    }
+    
+    @Test
+    public void getSingleVertexFound() {
 
-        for (int ix = 0; ix < arr.length(); ix++) {
-            JSONObject edge = arr.getJSONObject(ix);
-            edgeIds.add(edge.getString("_id"));
-        }
-
-        sh.stopWatch();
-        for (String edgeId : edgeIds) {
-            uri = createURI("edges/" + edgeId);
-            deleteResource(uri);
-        }
-        printPerformance("DELETE edges", edgeIds.size(), uri, sh.stopWatch());
-
-        sh.stopWatch();
-        uri = createURI("vertices/1/outE");
-        object = getResource(uri);
-        printPerformance("GET vertice out edges", null, uri, sh.stopWatch());
-        Assert.assertEquals(0, object.getJSONArray("results").length());
+    	Vertex v1 = new MockVertex("1");
+    	Vertex v2 = new MockVertex("2");
+    	
+    	Edge v = new MockEdge("1", "label-1", new Hashtable<String, Object>(), v1, v2);
+    	EdgeResource resource = this.constructMockGetSingleEdgeScenario(v, new HashMap<String, String>());
+    	
+    	Response response = resource.getSingleEdge("1");
+    	Assert.assertNotNull(response);
+    	Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    	Assert.assertNotNull(response.getEntity());
+    	Assert.assertTrue(response.getEntity() instanceof JSONObject);
+    	
+    	JSONObject json = (JSONObject) response.getEntity();
+    	Assert.assertTrue(json.has(Tokens.QUERY_TIME));
+    	Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
+    	
+    	Assert.assertTrue(json.has(Tokens.RESULTS));
+    	Assert.assertFalse(json.isNull(Tokens.RESULTS));
+    	
+    	JSONObject jsonResult = (JSONObject) json.optJSONObject(Tokens.RESULTS);
+    	Assert.assertNotNull(jsonResult);
+    }
+    
+    private EdgeResource constructMockGetSingleEdgeScenario(final Edge edge, final HashMap<String, String> parameters){
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getEdge(with(any(Object.class)));
+            will(returnValue(edge));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
+        }});
+    	
+    	EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+		return resource;
+    }
+    
+    private EdgeResource constructMockGetAllEdgesScenario(final int numberOfVertices) {
+    	return this.constructMockGetAllEdgesScenario(numberOfVertices, new HashMap<String, String>());
+    }
+    
+    private EdgeResource constructMockGetAllEdgesScenario(final int numberOfEdges, final HashMap<String, String> parameters) {
+		final Graph graph = this.mockery.mock(Graph.class);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getEdges();
+            will(returnValue(generateMockedEdges(numberOfEdges)));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
+        }});
+    	
+    	EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+		return resource;
+	}
+    
+    private void assertEdgesOkResponseJsonStructure(int numberOfEdgesReturned, 
+    		int numberOfEdgesTotal, Response response) {
+		Assert.assertNotNull(response);
+    	Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    	Assert.assertNotNull(response.getEntity());
+    	Assert.assertTrue(response.getEntity() instanceof JSONObject);
+    	
+    	JSONObject json = (JSONObject) response.getEntity();
+    	Assert.assertTrue(json.has(Tokens.TOTAL_SIZE));
+    	Assert.assertEquals(numberOfEdgesTotal, json.optInt(Tokens.TOTAL_SIZE));
+    	Assert.assertTrue(json.has(Tokens.QUERY_TIME));
+    	Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
+    	
+    	Assert.assertTrue(json.has(Tokens.RESULTS));
+    	Assert.assertFalse(json.isNull(Tokens.RESULTS));
+    	
+    	JSONArray jsonResults = json.optJSONArray(Tokens.RESULTS);
+    	Assert.assertEquals(numberOfEdgesReturned, jsonResults.length());
+	}
+    
+    private static Iterable<Edge> generateMockedEdges(int numberOfEdges) {
+    	ArrayList<Edge> edges = new ArrayList<Edge>();
+    	
+    	MockVertex v1 = new MockVertex("1");
+    	MockVertex v2 = new MockVertex("2");
+    	
+    	for (int ix = 0; ix < numberOfEdges; ix++) {
+    		MockEdge e = new MockEdge(new Integer(ix).toString(), 
+    				"label-" + new Integer(ix).toString(), new Hashtable<String, Object>(), v1, v2);
+    		edges.add(e);
+    	}
+    	
+    	return edges;
     }
 }

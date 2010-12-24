@@ -105,7 +105,7 @@ public class EdgeResource extends AbstractSubResource {
      * e.setProperty(key,value);
      */
     @POST
-    public Response postNull() {
+    public Response postNullEdge() {
         return this.postEdge(null);
     }
 

@@ -31,7 +31,7 @@ public class RexsterResourceTest {
     }
     
     @Test
-    public void evaluateValid() {
+    public void evaluateMultipleGraphs() {
     	final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
     	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
     	final Set<String> graphNames = new HashSet<String>();
@@ -68,5 +68,42 @@ public class RexsterResourceTest {
     	
     	JSONArray jsonArray = json.optJSONArray("graphs");
     	Assert.assertEquals(3, jsonArray.length());
+    }
+    
+    @Test
+    public void evaluateNoGraphs() {
+    	final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	final Set<String> graphNames = new HashSet<String>();
+    	
+    	final long startTime = System.currentTimeMillis() - 1000;
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(new HashMap<String, String>()));
+            allowing(rap).getGraphsNames();
+            will(returnValue(graphNames));
+            allowing(rap).getStartTime();
+            will(returnValue(startTime));
+        }});
+    	
+    	RexsterResource resource = new RexsterResource(rap);
+		Response response = resource.evaluate();
+		
+		Assert.assertNotNull(response);
+    	Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    	Assert.assertNotNull(response.getEntity());
+    	Assert.assertTrue(response.getEntity() instanceof JSONObject);
+    	
+    	JSONObject json = (JSONObject) response.getEntity();
+    	Assert.assertTrue(json.has(Tokens.QUERY_TIME));
+    	Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
+    	Assert.assertTrue(json.has("name"));
+    	Assert.assertTrue(json.has("graphs"));
+    	Assert.assertTrue(json.has("up_time"));
+    	Assert.assertNotNull(json.optJSONArray("graphs"));
+    	
+    	JSONArray jsonArray = json.optJSONArray("graphs");
+    	Assert.assertEquals(0, jsonArray.length());
     }
 }
