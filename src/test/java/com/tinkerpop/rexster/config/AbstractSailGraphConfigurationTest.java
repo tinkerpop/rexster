@@ -1,0 +1,80 @@
+package com.tinkerpop.rexster.config;
+
+import java.util.ArrayList;
+
+import junit.framework.Assert;
+
+import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.junit.Test;
+
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.impls.sail.impls.MemoryStoreSailGraph;
+import com.tinkerpop.rexster.Tokens;
+
+public class AbstractSailGraphConfigurationTest {
+	
+	private MockSailGraphConfiguration configuration = new MockSailGraphConfiguration();
+    
+    @Test(expected = GraphConfigurationException.class)
+    public void configureGraphInstanceNeo4jSailTypeNoGraphFile() throws GraphConfigurationException {
+    	HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
+        
+    	this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_NEO4J);
+
+    	this.configuration.configureGraphInstance(graphConfig);
+    }
+    
+    @Test(expected = GraphConfigurationException.class)
+    public void configureGraphInstanceNativeSailTypeNoGraphFile() throws GraphConfigurationException {
+    	HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
+        
+    	this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_NATIVE);
+
+        this.configuration.configureGraphInstance(graphConfig);
+    }
+    
+    @Test(expected = GraphConfigurationException.class)
+    public void configureGraphInstanceNeo4jSailTypeEmptyGraphFile() throws GraphConfigurationException {
+    	HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
+    	graphConfig.setProperty(Tokens.REXSTER_GRAPH_FILE, "");
+
+    	this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_NEO4J);
+
+        this.configuration.configureGraphInstance(graphConfig);
+    }
+    
+    @Test(expected = GraphConfigurationException.class)
+    public void configureGraphInstanceNativeSailTypeEmptyGraphFile() throws GraphConfigurationException {
+    	HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
+    	graphConfig.setProperty(Tokens.REXSTER_GRAPH_FILE, "");
+
+    	this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_NATIVE);
+
+        this.configuration.configureGraphInstance(graphConfig);
+    }
+    
+    @Test
+    public void configureGraphInstanceMemorySailTypeEmptyGraphFile() throws GraphConfigurationException {
+    	HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
+    	graphConfig.setProperty(Tokens.REXSTER_GRAPH_FILE, "");
+        
+    	this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_MEMORY);
+
+        Graph graph = this.configuration.configureGraphInstance(graphConfig);
+        Assert.assertNotNull(graph);
+        Assert.assertTrue(graph instanceof MemoryStoreSailGraph);
+    }
+    
+    @Test
+    public void configureGraphInstanceMemorySailTypeNoGraphFileProperty() throws GraphConfigurationException {
+    	HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
+        
+    	this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_MEMORY);
+
+        Graph graph = this.configuration.configureGraphInstance(graphConfig);
+        Assert.assertNotNull(graph);
+        Assert.assertTrue(graph instanceof MemoryStoreSailGraph);
+    }
+    
+    // TODO: implement tests for all sail graph types.  need some sail data or a way to test without it.
+}

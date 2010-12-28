@@ -88,8 +88,12 @@ public class GraphConfigurationContainer {
             graphConfigurationType = OrientGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("tinkergraph")) {
             graphConfigurationType = TinkerGraphGraphConfiguration.class.getName();
-        } else if (graphConfigurationType.equals("sailgraph")) {
-            graphConfigurationType = SailGraphConfiguration.class.getName();
+        } else if (graphConfigurationType.equals("memorystoresailgraph")) {
+            graphConfigurationType = MemoryStoreSailGraphConfiguration.class.getName();
+        } else if (graphConfigurationType.equals("nativestoresailgraph")) {
+            graphConfigurationType = NativeStoreSailGraphConfiguration.class.getName();
+        } else if (graphConfigurationType.equals("neo4jsailgraph")) {
+            graphConfigurationType = Neo4jSailGraphConfiguration.class.getName();
         }
 
         Graph graph = null;
