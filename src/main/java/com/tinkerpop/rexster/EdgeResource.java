@@ -134,10 +134,15 @@ public class EdgeResource extends AbstractSubResource {
 
         Edge edge = graph.getEdge(id);
         if (null == edge && null != outV && null != inV && null != label) {
+        	// there is no edge but the in/out vertex params and label are present so
+        	// validate that the vertexes are present before creating the edge
             final Vertex out = graph.getVertex(outV);
             final Vertex in = graph.getVertex(inV);
-            if (null != out && null != in)
+            if (null != out && null != in) {
+            	// in/out vertexes are found so edge can be created
                 edge = graph.addEdge(id, out, in, label);
+            } 
+            
         } else if (edge != null) {
             if (!this.hasElementProperties(this.requestObject)) {
                 JSONObject error = generateErrorObjectJsonFail(new Exception("Edge with id " + id + " already exists"));
@@ -155,6 +160,10 @@ public class EdgeResource extends AbstractSubResource {
                     }
                 }
                 this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
+            } else {
+            	// edge could not be found.  likely an error condition on the request
+            	JSONObject error = generateErrorObjectJsonFail(new Exception("Edge cannot be found or created.  Please check the format of the request."));
+                throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
 
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
@@ -187,7 +196,7 @@ public class EdgeResource extends AbstractSubResource {
             final Edge edge = graph.getEdge(id);
             if (null != edge) {
                 if (keys.size() > 0) {
-                    // delete edge properites
+                    // delete edge properties
                     for (final String key : keys) {
                         edge.removeProperty(key);
                     }

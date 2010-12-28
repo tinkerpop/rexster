@@ -134,6 +134,328 @@ public class EdgeResourceTest {
     	Assert.assertNotNull(jsonResult);
     }
     
+    @Test(expected = WebApplicationException.class)
+    public void postNullEdgeBadRequest() {
+    	EdgeResource resource = this.constructMockPostEdgeScenario(null, new HashMap<String, String>());
+    	resource.postNullEdge();
+    }
+    
+    @Test(expected = WebApplicationException.class)
+    public void postNullEdgeVertexesNotFound() {
+    	final HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put(Tokens._IN_V, "1");
+    	parameters.put(Tokens._OUT_V, "2");
+    	parameters.put(Tokens._LABEL, "edge-label");
+    	
+    	EdgeResource resource = this.constructMockPostEdgeScenario(
+    			null, "1", "2", null, null, parameters);
+    	resource.postNullEdge();
+    }
+    
+    @Test
+    public void postNullEdgeValid() {
+    	final HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put(Tokens._IN_V, "1");
+    	parameters.put(Tokens._OUT_V, "2");
+    	parameters.put(Tokens._LABEL, "edge-label");
+    	
+        final Vertex v1 = new MockVertex("1");
+    	final Vertex v2 = new MockVertex("2");
+
+    	final Edge returnEdge = new MockEdge("1", "label-1", new Hashtable<String, Object>(), v1, v2);
+    	
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getEdge(with(any(Object.class)));
+            will(returnValue(null));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
+            allowing(graph).getVertex(with(equal("1")));
+		    will(returnValue(v1));
+            allowing(graph).getVertex(with(equal("2")));
+		    will(returnValue(v2));
+		    allowing(graph).addEdge(null, v2, v1, "edge-label");
+		    will(returnValue(returnEdge));
+        }});
+    	
+    	EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+    	resource.postNullEdge();
+    }
+    
+    @Test
+    public void postEdgeWithIdThatIsNewEdge() {
+    	final HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put(Tokens._IN_V, "1");
+    	parameters.put(Tokens._OUT_V, "2");
+    	parameters.put(Tokens._LABEL, "edge-label");
+    	
+        final Vertex v1 = new MockVertex("1");
+    	final Vertex v2 = new MockVertex("2");
+
+    	final Edge returnEdge = new MockEdge("1", "label-1", new Hashtable<String, Object>(), v1, v2);
+    	
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getEdge(with(any(Object.class)));
+            will(returnValue(null));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
+            allowing(graph).getVertex(with(equal("1")));
+		    will(returnValue(v1));
+            allowing(graph).getVertex(with(equal("2")));
+		    will(returnValue(v2));
+		    allowing(graph).addEdge("1", v2, v1, "edge-label");
+		    will(returnValue(returnEdge));
+        }});
+    	
+    	EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+    	resource.postEdge("1");
+    }
+    
+    @Test(expected = WebApplicationException.class)
+    public void postEdgeWithIdThatIsExistingEdgeNoProperties() {
+    	final HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put(Tokens._IN_V, "1");
+    	parameters.put(Tokens._OUT_V, "2");
+    	parameters.put(Tokens._LABEL, "edge-label");
+    	
+        final Vertex v1 = new MockVertex("1");
+    	final Vertex v2 = new MockVertex("2");
+
+    	final Edge returnEdge = new MockEdge("1", "label-1", new Hashtable<String, Object>(), v1, v2);
+    	
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getEdge(with(any(Object.class)));
+            will(returnValue(returnEdge));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
+            allowing(graph).getVertex(with(equal("1")));
+		    will(returnValue(v1));
+            allowing(graph).getVertex(with(equal("2")));
+		    will(returnValue(v2));
+        }});
+    	
+    	EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+    	resource.postEdge("1");
+    }
+    
+    @Test
+    public void postEdgeWithIdThatIsExistingEdgeHasProperties() {
+    	final HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put(Tokens._IN_V, "1");
+    	parameters.put(Tokens._OUT_V, "2");
+    	parameters.put(Tokens._LABEL, "edge-label");
+    	parameters.put("some-property", "edge-property-value");
+    	
+        final Vertex v1 = new MockVertex("1");
+    	final Vertex v2 = new MockVertex("2");
+
+    	final Edge returnEdge = new MockEdge("1", "label-1", new Hashtable<String, Object>(), v1, v2);
+    	
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getEdge(with(any(Object.class)));
+            will(returnValue(returnEdge));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
+            allowing(graph).getVertex(with(equal("1")));
+		    will(returnValue(v1));
+            allowing(graph).getVertex(with(equal("2")));
+		    will(returnValue(v2));
+        }});
+    	
+    	EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+    	Response response = resource.postEdge("1");
+    	
+    	Assert.assertNotNull(response);
+    	Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    	Assert.assertNotNull(response.getEntity());
+    	Assert.assertTrue(response.getEntity() instanceof JSONObject);
+    	
+    	JSONObject json = (JSONObject) response.getEntity();
+    	Assert.assertTrue(json.has(Tokens.QUERY_TIME));
+    	Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
+    	Assert.assertTrue(json.has(Tokens.RESULTS));
+    	
+    	Assert.assertEquals("edge-property-value", returnEdge.getProperty("some-property"));
+    	
+    }
+    
+    @Test(expected = WebApplicationException.class)
+    public void deleteEdgeEdgeNotFound() {
+    	EdgeResource resource = this.constructMockDeleteEdgeScenario(null, new HashMap<String, String>());
+    	resource.deleteEdge("100");
+    }
+    
+    @Test
+    public void deleteEdgeRemoveEdgeFromGraph() {
+    	final Vertex v1 = new MockVertex("1");
+    	final Vertex v2 = new MockVertex("2");
+
+    	final Edge returnEdge = new MockEdge("1", "label-1", new Hashtable<String, Object>(), v1, v2);
+    	
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(new HashMap<String, String>()));
+            allowing(graph).getEdge(with(any(Object.class)));
+            will(returnValue(returnEdge));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
+            allowing(graph).removeEdge(returnEdge);
+        }});
+    	
+    	EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+    	resource.deleteEdge("100");
+    }
+    
+    @Test
+    public void deleteEdgeRemovePropertyFromEdge() {
+    	final HashMap<String, String> parameters = new HashMap<String, String>();
+    	parameters.put("to-delete", "");
+    	
+    	final Vertex v1 = new MockVertex("1");
+    	final Vertex v2 = new MockVertex("2");
+
+    	Hashtable <String, Object> properties = new Hashtable<String, Object>();
+    	properties.put("to-delete", "value");
+    	final Edge returnEdge = new MockEdge("100", "label-1", properties, v1, v2);
+    	
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getEdge(with(any(Object.class)));
+            will(returnValue(returnEdge));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
+        }});
+    	
+    	EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+    	resource.deleteEdge("100");
+    	
+    	Assert.assertNull(returnEdge.getProperty("to-delete"));
+    }
+    
+    private EdgeResource constructMockDeleteEdgeScenario(final Edge edge,  
+    		final HashMap<String, String> parameters){
+    	
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getEdge(with(any(Object.class)));
+            will(returnValue(edge));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
+        }});
+    	
+    	EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+		return resource;
+    }
+    
+    private EdgeResource constructMockPostEdgeScenario(final Edge edge,
+    		final String requestedInId, final String requestedOutId, final Vertex inVertex, final Vertex outVertex, 
+    		final HashMap<String, String> parameters){
+    	
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getEdge(with(any(Object.class)));
+            will(returnValue(edge));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
+            allowing(graph).getVertex(with(equal(requestedInId)));
+		    will(returnValue(inVertex));
+            allowing(graph).getVertex(with(equal(requestedOutId)));
+		    will(returnValue(outVertex));
+        }});
+    	
+    	EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+		return resource;
+    }
+    
+    private EdgeResource constructMockPostEdgeScenario(final Edge edge,  
+    		final HashMap<String, String> parameters){
+    	
+    	final Graph graph = this.mockery.mock(Graph.class);
+    	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+    	
+    	final UriInfo uri = this.mockery.mock(UriInfo.class);
+    	final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+    	
+    	this.mockery.checking(new Expectations() {{
+    		allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getEdge(with(any(Object.class)));
+            will(returnValue(edge));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
+        }});
+    	
+    	EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+		return resource;
+    }
+    
     private EdgeResource constructMockGetSingleEdgeScenario(final Edge edge, final HashMap<String, String> parameters){
     	final Graph graph = this.mockery.mock(Graph.class);
     	final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
