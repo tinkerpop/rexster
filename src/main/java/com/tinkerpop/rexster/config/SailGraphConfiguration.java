@@ -1,5 +1,8 @@
 package com.tinkerpop.rexster.config;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
@@ -37,20 +40,23 @@ public class SailGraphConfiguration implements GraphConfiguration {
         	&& !sailType.equals(SAIL_TYPE_NEO4J)) {
             throw new GraphConfigurationException("Check graph configuration. Missing, empty or incorrect configuration element: properties/blueprints-sail-type");
         }
+
+        String dataDirectory = sailSpecificConfiguration.getString("data-directory", null);
         
-        // graphfile must be present for native and neo4j
-        if ((sailType.equals(SAIL_TYPE_NATIVE) || sailType.equals(SAIL_TYPE_NEO4J) 
-        		&& (graphFile == null || graphFile.trim().length() == 0))){
-        	throw new GraphConfigurationException("Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_FILE);
+        // graphfile and data-directory must be present for native and neo4j
+        if ((sailType.equals(SAIL_TYPE_NATIVE) || sailType.equals(SAIL_TYPE_NEO4J)) 
+        		&& (graphFile == null || graphFile.trim().length() == 0)
+        		&& (dataDirectory == null || dataDirectory.trim().length() == 0)){
+        	throw new GraphConfigurationException("Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_FILE + " or data-directory");
     	}
-	
+        
         try {
         	
             SailGraph graph = null;
             
             if (sailType.equals(SAIL_TYPE_MEMORY)) {
-            	if (graphFile != null && graphFile.trim().length() > 0) {
-            		graph = new MemoryStoreSailGraph(graphFile);
+            	if (dataDirectory != null && dataDirectory.trim().length() > 0) {
+            		graph = new MemoryStoreSailGraph(dataDirectory);
             	} else {
             		graph = new MemoryStoreSailGraph();
             	}
@@ -58,14 +64,19 @@ public class SailGraphConfiguration implements GraphConfiguration {
             	String configTripleIndices = sailSpecificConfiguration.getString("triple-indices", "");
                 
             	if (configTripleIndices  != null && configTripleIndices.trim().length() > 0){
-            		graph = new NativeStoreSailGraph(graphFile, configTripleIndices);
+            		graph = new NativeStoreSailGraph(dataDirectory, configTripleIndices);
             	} else {
-            		graph = new NativeStoreSailGraph(graphFile);
+            		graph = new NativeStoreSailGraph(dataDirectory);
             	}
             } else if (sailType.equals(SAIL_TYPE_NEO4J)) {
-            	graph = new Neo4jSailGraph(graphFile);
+            	graph = new Neo4jSailGraph(dataDirectory);
             }
 
+            if (graphFile != null && graphFile.trim().length() > 0) {
+	            InputStream stream = new FileInputStream(graphFile);
+	            graph.loadRDF(stream, "", "n-triples", null);
+            }
+            
             return graph;
         } catch (Exception ex) {
             throw new GraphConfigurationException(ex);

@@ -25,10 +25,10 @@
             <packages-allowed>gremlin;grateful</packages-allowed>
         </graph>
         <graph>
-            <graph-enabled>false</graph-enabled>
+            <graph-enabled>true</graph-enabled>
             <graph-name>sailgraph</graph-name>
             <graph-type>com.tinkerpop.rexster.config.SailGraphConfiguration</graph-type>
-            <graph-file>/tmp/sail-graph</graph-file>
+            <graph-file>data/graph-example-1.ntriple</graph-file>
             <packages-allowed></packages-allowed>
             <properties>
                 <blueprints-sail-type>memory</blueprints-sail-type>
