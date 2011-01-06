@@ -248,7 +248,7 @@ public abstract class BaseResource {
     public List<String> getReturnKeys() {
         JSONObject rexster = this.getRexsterRequest();
         if (null != rexster) {
-            //return (List<String>) rexster.opt(Tokens.RETURN_KEYS);
+            //return (List<String>) rexster.opt(GremlinTokens.RETURN_KEYS);
             JSONArray arr = rexster.optJSONArray(Tokens.RETURN_KEYS);
             List<String> keys = new ArrayList<String>();
 

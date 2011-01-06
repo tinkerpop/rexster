@@ -233,7 +233,7 @@ public class EdgeResource extends AbstractSubResource {
         }
 
         try {
-            this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
+            this.resultObject.put(GremlinTokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);
 
