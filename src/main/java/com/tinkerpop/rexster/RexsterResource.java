@@ -42,7 +42,8 @@ public class RexsterResource extends BaseResource {
 
         } catch (JSONException ex) {
             JSONObject error = generateErrorObject(ex.getMessage());
-            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            throw new WebApplicationException(
+            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
     }
 }

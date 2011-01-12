@@ -49,7 +49,8 @@ public class TraversalResource extends AbstractSubResource {
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            throw new WebApplicationException(
+            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
         return this.addHeaders(Response.ok(this.resultObject)).build();
@@ -112,25 +113,29 @@ public class TraversalResource extends AbstractSubResource {
             logger.error(jsonEx);
 
             JSONObject error = generateErrorObjectJsonFail(jsonEx);
-            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            throw new WebApplicationException(
+            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         } catch (TraversalException ex) {
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            throw new WebApplicationException(
+            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         } catch (IllegalAccessException iae) {
             logger.error(iae);
 
             JSONObject error = generateErrorObject("Failed to instantiate the Traversal for [" + pattern + "].  No access to [" + traversalClass.getName() + "]", iae);
-            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            throw new WebApplicationException(
+            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
 
         } catch (InstantiationException ie) {
             logger.error(ie);
 
             JSONObject error = generateErrorObject("Failed to instantiate the Traversal for [" + pattern + "].  Expected a concrete class definition for [" + traversalClass.getName() + "]", ie);
-            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            throw new WebApplicationException(
+            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
-        return Response.ok(this.resultObject).build();
+        return this.addHeaders(Response.ok(this.resultObject)).build();
     }
 }

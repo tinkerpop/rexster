@@ -11,7 +11,6 @@ import org.codehaus.jettison.json.JSONTokener;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -22,6 +21,8 @@ public abstract class BaseResource {
 
     private static Logger logger = Logger.getLogger(BaseResource.class);
 
+    public static final String HEADER_ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
+    
     protected RexsterApplicationGraph rag = null;
 
     protected final StatisticsHelper sh = new StatisticsHelper();
@@ -332,8 +333,16 @@ public abstract class BaseResource {
         return days + "[d]:" + hours + "[h]:" + minutes + "[m]:" + seconds + "[s]";
     }
     
-    protected ResponseBuilder addHeaders( ResponseBuilder builder )
+    /**
+     * Adds headers to a response.
+     *
+     * @param builder  The response builder to append headers to.
+     * @return The builder for the response with the appended headers.
+     */
+    protected ResponseBuilder addHeaders(ResponseBuilder builder)
     {
-        return builder.header("Access-Control-Allow-Origin", "*");
+    	// allows services to be consumed from other domains...specifically, 
+    	// the one used by the rexster web tool
+        return builder.header(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
     }
 }

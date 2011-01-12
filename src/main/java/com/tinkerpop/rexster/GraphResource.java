@@ -48,7 +48,8 @@ public class GraphResource extends AbstractSubResource {
         } catch (JSONException ex) {
             logger.error(ex);
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            throw new WebApplicationException(
+            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
         return this.addHeaders(Response.ok(this.resultObject)).build();
@@ -70,10 +71,11 @@ public class GraphResource extends AbstractSubResource {
         } catch (JSONException ex) {
             logger.error(ex);
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            throw new WebApplicationException(
+            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
-        return Response.ok(this.resultObject).build();
+        return this.addHeaders(Response.ok(this.resultObject)).build();
 
     }
 

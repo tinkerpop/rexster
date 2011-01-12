@@ -62,10 +62,11 @@ public class EdgeResource extends AbstractSubResource {
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            throw new WebApplicationException(
+            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
-        return Response.ok(this.resultObject).build();
+        return this.addHeaders(Response.ok(this.resultObject)).build();
 
     }
 
@@ -86,17 +87,19 @@ public class EdgeResource extends AbstractSubResource {
                 logger.error(ex);
 
                 JSONObject error = generateErrorObjectJsonFail(ex);
-                throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+                throw new WebApplicationException(
+                		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
             }
         } else {
             String msg = "Could not find edge [" + id + "] on graph [" + this.rag.getGraphName() + "]";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
+            throw new WebApplicationException(
+            		this.addHeaders(Response.status(Status.NOT_FOUND).entity(error)).build());
         }
 
-        return Response.ok(this.resultObject).build();
+        return this.addHeaders(Response.ok(this.resultObject)).build();
     }
 
     /**
@@ -146,7 +149,8 @@ public class EdgeResource extends AbstractSubResource {
         } else if (edge != null) {
             if (!this.hasElementProperties(this.requestObject)) {
                 JSONObject error = generateErrorObjectJsonFail(new Exception("Edge with id " + id + " already exists"));
-                throw new WebApplicationException(Response.status(Status.CONFLICT).entity(error).build());
+                throw new WebApplicationException(
+                		this.addHeaders(Response.status(Status.CONFLICT).entity(error)).build());
             }
         }
 
@@ -163,7 +167,8 @@ public class EdgeResource extends AbstractSubResource {
             } else {
             	// edge could not be found.  likely an error condition on the request
             	JSONObject error = generateErrorObjectJsonFail(new Exception("Edge cannot be found or created.  Please check the format of the request."));
-                throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+                throw new WebApplicationException(
+                		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
             }
 
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
@@ -171,10 +176,11 @@ public class EdgeResource extends AbstractSubResource {
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            throw new WebApplicationException(
+            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
-        return Response.ok(this.resultObject).build();
+        return this.addHeaders(Response.ok(this.resultObject)).build();
     }
 
     /**
@@ -208,7 +214,8 @@ public class EdgeResource extends AbstractSubResource {
                 String msg = "Could not find edge [" + id + "] on graph [" + this.rag.getGraphName() + "]";
                 logger.info(msg);
                 JSONObject error = generateErrorObject(msg);
-                throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
+                throw new WebApplicationException(
+                		this.addHeaders(Response.status(Status.NOT_FOUND).entity(error)).build());
             }
 
 
@@ -216,10 +223,11 @@ public class EdgeResource extends AbstractSubResource {
         } catch (JSONException ex) {
             logger.error(ex);
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            throw new WebApplicationException(
+            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
-        return Response.ok(this.resultObject).build();
+        return this.addHeaders(Response.ok(this.resultObject)).build();
 
     }
 
