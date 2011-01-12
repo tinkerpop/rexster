@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rexster>
-    <base-uri>http://localhost</base-uri>
     <webserver-port>8182</webserver-port>
+    <adminserver-port>8183</adminserver-port>
     <cache-maxsize>1000</cache-maxsize>
+    <web-root>public</web-root>
     <web-server-configuration>
         <com.sun.jersey.config.property.packages>com.tinkerpop.rexster</com.sun.jersey.config.property.packages>
     </web-server-configuration>

@@ -1,6 +1,7 @@
 *.log
 /target
 /bin
-# eclipse project files
+# eclipse project files and local rexster.xml
 *.classpath
 *.project
+rexster.xml

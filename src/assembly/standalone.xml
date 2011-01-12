@@ -15,6 +15,24 @@
             <directory>target/*.jar</directory>
             <outputDirectory>/lib</outputDirectory>
         </fileSet>
+        <!-- PUBLIC -->
+        <fileSet>
+            <directory>target/classes/public</directory>
+            <outputDirectory>/bin/public</outputDirectory>
+            <includes>
+                <include>*.html</include>
+                <include>img/**</include>
+                <include>css/**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+        	<directory>target/generated-sources/web</directory>
+        	<outputDirectory>/bin/public/javascript</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>data</directory>
+            <outputDirectory>/bin/data</outputDirectory>
+        </fileSet>
     </fileSets>
 
     <dependencySets>

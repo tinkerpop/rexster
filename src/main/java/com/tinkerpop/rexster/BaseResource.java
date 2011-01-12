@@ -11,7 +11,9 @@ import org.codehaus.jettison.json.JSONTokener;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import java.util.*;
@@ -328,5 +330,10 @@ public abstract class BaseResource {
             }
         }
         return days + "[d]:" + hours + "[h]:" + minutes + "[m]:" + seconds + "[s]";
+    }
+    
+    protected ResponseBuilder addHeaders( ResponseBuilder builder )
+    {
+        return builder.header("Access-Control-Allow-Origin", "*");
     }
 }

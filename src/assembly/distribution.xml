@@ -15,6 +15,16 @@
                 <include>rexster.bat</include>
             </includes>
         </fileSet>
+        <!-- PUBLIC -->
+        <fileSet>
+            <directory>target/classes/public</directory>
+            <outputDirectory>/bin/public</outputDirectory>
+            <includes>
+                <include>*.html</include>
+                <include>img/**</include>
+                <include>css/**</include>
+            </includes>
+        </fileSet>
         <fileSet>
             <directory>src</directory>
         </fileSet>

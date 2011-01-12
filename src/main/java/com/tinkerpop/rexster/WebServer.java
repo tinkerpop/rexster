@@ -1,12 +1,18 @@
 package com.tinkerpop.rexster;
 
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
+import com.sun.grizzly.http.embed.GrizzlyWebServer;
+import com.sun.grizzly.http.servlet.ServletAdapter;
+import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
+import com.sun.grizzly.tcp.http11.GrizzlyRequest;
+import com.sun.grizzly.tcp.http11.GrizzlyResponse;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
+
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -18,6 +24,7 @@ import java.util.Map;
  */
 public class WebServer {
 
+	private static final String DEFAULT_WEB_ROOT_PATH = "public";
     protected static Logger logger = Logger.getLogger(WebServer.class);
     private static RexsterApplication rexster;
 
@@ -25,8 +32,9 @@ public class WebServer {
         PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
     }
 
-    protected SelectorThread threadSelector;
-
+    protected GrizzlyWebServer server;
+    protected GrizzlyWebServer adminServer;
+    
     public WebServer(final XMLConfiguration properties, boolean user) throws Exception {
         logger.info(".:Welcome to Rexster:.");
         if (user)
@@ -47,10 +55,9 @@ public class WebServer {
 
     protected void start(final XMLConfiguration properties) throws Exception {
         rexster = new RexsterApplication(properties);
-        Integer port = properties.getInteger("rexster.webserver-port", new Integer(8182));
-        String baseUri = properties.getString("rexster.base-uri", "http://localhost");
-
-        String baseUriWithPort = baseUri + ":" + port.toString() + "/";
+        Integer port = properties.getInteger("webserver-port", new Integer(8182));
+        Integer adminPort = properties.getInteger("adminserver-port", new Integer(8183));
+        String webRootPath = properties.getString("web-root", DEFAULT_WEB_ROOT_PATH);
 
         HierarchicalConfiguration webServerConfig = properties.configurationAt("web-server-configuration");
 
@@ -63,7 +70,7 @@ public class WebServer {
             // as that represents a path statement for that lib.  need to remove
             // the double dot so that it can pass directly to grizzly.  hopefully
             // there are no cases where this will cause a problem and a double dot
-            // is expected
+            // is always expected
             String grizzlyKey = key.replace("..", ".");
             String configValue = webServerConfig.getString(key);
             initParams.put(grizzlyKey, configValue);
@@ -71,14 +78,44 @@ public class WebServer {
             logger.info("Web Server configured with " + key + ": " + configValue);
         }
 
-        this.threadSelector = GrizzlyWebContainerFactory.create(baseUriWithPort, initParams);
-
-        logger.info("Server running on " + baseUri + ":" + port);
+        this.server = new GrizzlyWebServer(port);
+        this.adminServer = new GrizzlyWebServer(adminPort);
+        
+        ServletAdapter jerseyAdapter = new ServletAdapter();
+        for (Map.Entry<String, String> entry : initParams.entrySet()) {
+        	jerseyAdapter.addInitParameter(entry.getKey(), entry.getValue());
+        }
+        
+        jerseyAdapter.setContextPath("/");
+        jerseyAdapter.setServletInstance(new ServletContainer());
+         
+        // not sure if the staticAdapter is necessary now that there are two 
+        // web servers in play.  it was only required because as a hack where
+        // the addition of the jerseyAdapter would blow out serving of static 
+        // content.
+        String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
+        GrizzlyAdapter staticAdapter = new GrizzlyAdapter(absoluteWebRootPath)
+        {
+            public void service(GrizzlyRequest req, GrizzlyResponse res )
+            {
+            }
+        };
+        staticAdapter.setHandleStaticResources(true);
+        
+        this.server.addGrizzlyAdapter(jerseyAdapter, new String[]{""});
+        this.adminServer.addGrizzlyAdapter(staticAdapter, new String[]{""});
+        
+        this.server.start();
+        this.adminServer.start();
+        
+        logger.info("Server running on:" + port);
+        logger.info("Admin server running on:" + adminPort);
 
     }
 
     protected void stop() throws Exception {
-        this.threadSelector.stopEndpoint();
+    	this.server.stop();
+    	this.adminServer.stop();
         rexster.stop();
     }
 

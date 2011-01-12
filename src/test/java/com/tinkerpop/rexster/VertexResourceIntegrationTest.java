@@ -114,7 +114,8 @@ public class VertexResourceIntegrationTest extends BaseTest {
         Assert.assertEquals("9999", object.getString("_id"));
         Assert.assertEquals("vertex", object.getString("_type"));
         Assert.assertNull(object.opt("_outE"));
-        uri = createURI("vertices/9999/");
+        
+        uri = createURI("vertices/9999");
         object = getResource(uri);
         object = object.getJSONObject("results");
         Assert.assertEquals("9999", object.getString("_id"));

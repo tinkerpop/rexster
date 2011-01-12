@@ -63,7 +63,7 @@ public class VertexResource extends AbstractSubResource {
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 
-        return Response.ok(this.resultObject).build();
+        return this.addHeaders(Response.ok(this.resultObject)).build();
     }
 
     /**

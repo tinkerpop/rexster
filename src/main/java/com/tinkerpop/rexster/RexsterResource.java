@@ -38,7 +38,7 @@ public class RexsterResource extends BaseResource {
             this.resultObject.put("graphs", jsonArrayNames);
             this.resultObject.put("query_time", this.sh.stopWatch());
             this.resultObject.put("up_time", this.getTimeAlive());
-            return Response.ok(this.resultObject).build();
+            return this.addHeaders(Response.ok(this.resultObject)).build();
 
         } catch (JSONException ex) {
             JSONObject error = generateErrorObject(ex.getMessage());
