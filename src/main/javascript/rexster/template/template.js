@@ -6,7 +6,7 @@ Rexster.modules.template = function(api) {
 	var templater = {};
 	
 	templater.templateNameMainMenuItem = "mainMenuItem";
-	templater.templateNameAccordionGraph = "accordionGraph";
+	templater.templateNameMenuGraph = "menuGraph";
 	templater.templateNameListTraversals = "listTraversals";
 	templater.templateNameListVertices = "listVertices";
 	
@@ -15,9 +15,9 @@ Rexster.modules.template = function(api) {
 		var templateMainMenuMarkup = '<input type="radio" id="radioMenu${id}" name="radioMenu" {{if checked}}checked="checked"{{/if}} {{if disabled}}disabled="disabled"{{/if}}/><label for="radioMenu${id}">${menuName}</label>';
 		$.template(templater.templateNameMainMenuItem, templateMainMenuMarkup);
 		
-		// expects {graphName, graphDescription}
-		var templateAccordionGraph = '<h3><a href="#">${graphName}</a></h3><div><p>${graphDescription}</p><p><a _type="vertex" _graph="${graphName}" href="#">Browse Vertices</a></p><p><a _type="edge" _graph="${graphName}" href="#">Browse Edges</a></p></div>';
-		$.template(templater.templateNameAccordionGraph, templateAccordionGraph);
+		// expects {menuName}
+		var templateMenuGraph = '<div id="graphItem${menuName}" class="ui-state-default ui-corner-all" style="cursor:pointer;padding:2px;margin:1px"><a href="#graph,${menuName}">${menuName}</a></div>';
+		$.template(templater.templateNameMenuGraph, templateMenuGraph);
 		
 		// expects {traversalName}
 		var templateListTraversal = '<li class="column"><a href="http://www.google.com">${path}</a></li>';
@@ -70,14 +70,14 @@ Rexster.modules.template = function(api) {
 	}
 	
 	/**
-	 * Constructs accordion menu values for an array of graphs.
+	 * Constructs graph menu values for an array of graphs.
 	 * 
 	 * @param data 		{Array} The list of graph objects to render.
 	 * @param selector	{String} A jQuery selector or element to append the template to.
 	 */
-	api.applyAccordionGraphTemplate = function(data, selector) {
+	api.applyMenuGraphTemplate = function(data, selector) {
 		if (data.length > 0) { 
-			templater.applyTemplate(templater.templateNameAccordionGraph, data, selector);
+			templater.applyTemplate(templater.templateNameMenuGraph, data, selector);
 		} else {
 			// TODO: need something here if nothing is configured ???
 		}

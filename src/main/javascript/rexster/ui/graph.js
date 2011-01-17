@@ -3,33 +3,56 @@
  */
 Rexster.modules.graph = function(api) {
 	
-	var mediator = new GraphPanelMediator("#accordionGraph", "#panelTraversals", "#panelVertices");
+	var mediator = new GraphPanelMediator("#menuGraph", "#panelTraversals", "#panelVertices");
 	
 	/**
 	 * Manages graph panel interactions.
 	 */
-	function GraphPanelMediator(accordionGraph, panelTraversals, panelVertices) {
-		var  containerAccordionGraph = $(accordionGraph),
+	function GraphPanelMediator(menuGraph, panelTraversals, panelVertices) {
+		var  containerMenuGraph = $(menuGraph),
 			 containerPanelTraversals = $(panelTraversals),
 			 containerPanelTraversalsList = containerPanelTraversals.find("ul"),
-			 containerPanelVertices = $(panelVertices);
+			 containerPanelVertices = $(panelVertices),
+			 currentGraphName = "";
 		
 		if (!(this instanceof GraphPanelMediator)) {
 			return new GraphPanelMediator();
 		}
 		
-		this.containerPanelTraversalsList = containerPanelTraversalsList;
-		this.containerAccordionGraph = containerAccordionGraph;
+		this.getCurrentGraphName = function() {
+			return currentGraphName;
+		}
 		
-		this.accordionLoaded = function(t) {
+		this.getContainerPanelTraversalsList = function() {
+			return containerPanelTraversalsList;
+		}
+		
+		this.getContainerMenuGraph = function() {
+			return containerMenuGraph;
+		}
+		
+		this.graphSelectionChanged = function(currentSelectedGraphName) {
 			containerPanelTraversals.show();
 			containerPanelVertices.hide();
 			containerPanelTraversalsList.empty();
-		};
+			
+			currentGraphName = currentSelectedGraphName;
+		}
+		
+		this.resetMenuGraph = function() {
+			containerMenuGraph.empty();
+		}
 	} 
 	
-	api.initGraphAccordion = function(){
+	/**
+	 * Initializes the graph list.
+	 * 
+	 * @param initialGraphName {String} The name of the graph that should be marked as selected.
+	 * @param onInitComplete   {Function} The callback made when graph initialization is completed. 
+	 */
+	api.initGraphList = function(state, onInitComplete){
 		
+		mediator.resetMenuGraph();
 		Rexster("ajax", "template", "info", function(api) {
 			api.getGraphs(function(result){
 				
@@ -37,58 +60,75 @@ Rexster.modules.graph = function(api) {
 					max = 0,
 				    graphs = [];
 				
-				// construct a list of graphs that can be pushed into the graph accordion
+				// construct a list of graphs that can be pushed into the graph menu
 				max = result.graphs.length;
 				for (ix = 0; ix < max; ix += 1) {
-					// synchronous
-					api.getGraph(result.graphs[ix], function(graphResult) {
-						graphs.push({ "graphName": result.graphs[ix], "graphDescription":graphResult.graph});
-					},
-					function(err){
-						api.showMessageError("Could not get the list of graphs from Rexster.");
-					});
+					graphs.push({ "menuName": result.graphs[ix] });
 				}
 
-				api.applyAccordionGraphTemplate(graphs, mediator.containerAccordionGraph);
+				api.applyMenuGraphTemplate(graphs, mediator.getContainerMenuGraph());
 				
-				mediator.containerAccordionGraph.accordion({
-					autoHeight: false,
-					active: false,
-					change: function(event, ui) {
-						
-						// load traversals panel if the user changes graphs.
-						api.getTraversals(ui.newHeader.text(), function(traversalResult) { 
-							mediator.accordionLoaded();
-							api.applyListTraversalsTemplate(traversalResult.results, mediator.containerPanelTraversalsList);
-						},
-						function(err){
-							api.showMessageError("Could not get the list of traversals from Rexster.");
-						});
-					}
+				mediator.getContainerMenuGraph().find("div").hover(function() {
+					$(this).toggleClass("ui-state-hover");
 				});
 				
-				// init the first item in the graph
-				mediator.containerAccordionGraph.accordion("activate", 0);
+				mediator.getContainerMenuGraph().find("div").click(function() {
+	                var uri = $(this).find("a").attr('href');
+	                uri = uri.replace(/^.*#/, '');
+					$.history.load(uri);
+					return false;
+				});
+				
+				// check the state, if it is at least two items deep then the state 
+				// of the graph is also selected and an attempt to make the graph active
+				// should be made.
+				if (state.length >= 2) {
+					mediator.getContainerMenuGraph().find("#graphItem" + state[1]).addClass("ui-state-active");
+					
+					// load traversals panel for the current graph
+					api.getTraversals(state[1], function(traversalResult) { 
+						mediator.graphSelectionChanged(state[1]);
+						api.applyListTraversalsTemplate(traversalResult.results, mediator.getContainerPanelTraversalsList());
+						
+						// execute the callback now that the traversals are done.
+						onInitComplete();
+					},
+					function(err){
+						api.showMessageError("Could not get the list of traversals from Rexster.");
+					});
+				}
+				
+				// if the state does not specify a graph then select the first one. 
+				if (state.length < 2) {
+					mediator.getContainerMenuGraph().find("#graphItem" + graphs[0].menuName).click();
+				}	
+				
+				/*
+				// init the selected item in the graph
+				if (state != undefined && $("#graph-" + state).length) {
+					mediator.getContainerMenuGraph().accordion("click", "#graph-" + state);
+				} else {
+					mediator.getContainerMenuGraph().accordion("click", 0);
+				}
+				
 				
 				$("#accordionGraph a[_type='vertex']").click(function(){
 					$("#panelTraversals").hide();
 					$("#panelVertices").show();
 					
-					var graphName = $(this).attr("_graph");
-					api.getVertices(graphName, 0, 99, function(verticesResult) {
+					var graphName = mediator.getCurrentGraphName();
+					api.getVertices(graphName, 0, 49, function(verticesResult) {
 						$("#panelVertices").show();
-						$("#panelVertices ul").empty();
+						$("#panelVertices #panelVerticesList").empty();
 						
-						// yuck
-						$("#panelVertices").attr("_graph", graphName);
-						
-						api.applyListVerticesTemplate(verticesResult.results, "#panelVertices ul");
+						api.applyListVerticesTemplate(verticesResult.results, "#panelVertices #panelVerticesList");
 					},
 					function (err){
 						api.showMessageError("Could not get the list of vertices from Rexster.");
 					});
 					
 				});
+				*/
 				
 			}, 
 			function(err) {

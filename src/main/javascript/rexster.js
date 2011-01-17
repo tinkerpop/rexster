@@ -27,18 +27,32 @@ function Rexster() {
 }
 
 $(function(){
+
+    $.history.init(function(hash){
+    	if (hash == undefined) {
+    		hash = "";
+    	}
+    	
+    	var state = hash.split(/,/);
+        restoreApplication(state);
+    },
+    { unescape: ",/" });
 	
-	Rexster("template", "mainMenu", "graph", function(api) {
-		
-		// compile the templates
-		api.initTemplates();
-		
-		// build the main menu
-		api.initMainMenu();
-		
-		// the graph panel is the only active thing right now, so 
-		// just initialize for simplicity sake.
-		api.initGraphAccordion();
-	});
-	
+    function restoreApplication(state) {
+		Rexster("template", "mainMenu", "graph", function(api) {
+			
+			// compile the templates
+			api.initTemplates();
+			
+			// build the main menu
+			api.initMainMenu(state);
+			
+			// the graph panel is the only active thing right now, so 
+			// just initialize for simplicity sake.
+			api.initGraphList(state, function(){
+				Elastic.refresh($("#main"));
+			});
+		});
+	}
+    
 });

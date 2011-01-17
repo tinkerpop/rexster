@@ -2,7 +2,10 @@
  * Manages loading of the main menu for the application.
  */
 Rexster.modules.mainMenu = function(api) {
-	api.initMainMenu = function(){
+	api.initMainMenu = function(state){
+		
+		$("#radiosetMainMenu").empty();
+		
 		var menuItems = [
 		                  {"id":1, "menuName":"Dashboard", "disabled":true},
 		                  {"id":2, "menuName":"Graphs", "checked":true},
