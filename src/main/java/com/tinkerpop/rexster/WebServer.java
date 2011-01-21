@@ -88,12 +88,17 @@ public class WebServer {
         
         jerseyAdapter.setContextPath("/");
         jerseyAdapter.setServletInstance(new ServletContainer());
-         
-        // not sure if the staticAdapter is necessary now that there are two 
-        // web servers in play.  it was only required because as a hack where
-        // the addition of the jerseyAdapter would blow out serving of static 
-        // content.
+        
+        // servlet that services all url from "main" by simply sending
+        // main.html back to the calling client.  main.html handles its own
+        // state given the uri
+        ServletAdapter servletAdapter = new ServletAdapter();
+        servletAdapter.setContextPath("/main");
+        servletAdapter.setServletInstance(new ToolServlet());
+        servletAdapter.setHandleStaticResources(false);
+        
         String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
+        servletAdapter.addInitParameter("root", "/" + webRootPath);
         GrizzlyAdapter staticAdapter = new GrizzlyAdapter(absoluteWebRootPath)
         {
             public void service(GrizzlyRequest req, GrizzlyResponse res )
@@ -103,6 +108,7 @@ public class WebServer {
         staticAdapter.setHandleStaticResources(true);
         
         this.server.addGrizzlyAdapter(jerseyAdapter, new String[]{""});
+        this.adminServer.addGrizzlyAdapter(servletAdapter, new String[]{"/main"});
         this.adminServer.addGrizzlyAdapter(staticAdapter, new String[]{""});
         
         this.server.start();
