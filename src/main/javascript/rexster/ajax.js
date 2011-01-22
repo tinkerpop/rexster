@@ -39,7 +39,6 @@ Rexster.modules.ajax = function(api) {
 			  type: "GET",
 			  dataType:"json",
 			  success: onSuccess,
-			  async:false,
 			  error: onFail
 			});
 	};
