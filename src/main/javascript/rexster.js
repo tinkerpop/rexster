@@ -28,15 +28,40 @@ function Rexster() {
 
 $(function(){
 
+	/*
     $.history.init(function(hash){
     	if (hash == undefined) {
     		hash = "";
     	}
     	
-    	var state = hash.split(/,/);
+    	var state = hash.split("/");
         restoreApplication(state);
     },
     { unescape: ",/" });
+	*/
+	
+	window.onpopstate = function(event) {
+		restoreApplication(tryReadState(null, event));
+	};
+	
+	function tryReadState(defaultState, event) {
+		var path = location.pathname.split("/");
+		var state = {};
+		
+		// TODO: probably consider refactoring this later...kinda messy
+		if (path.length >= 4) {
+			state.graph = path[3];
+		}
+		
+		if (path.length >= 3) {
+			state.menu = path[2];
+		} else {
+			// this means that the state is not defined by the uri.
+			state = defaultState;
+		}
+		
+		return state;
+	}
 	
     function restoreApplication(state) {
 		Rexster("template", "mainMenu", "graph", function(api) {
@@ -54,5 +79,7 @@ $(function(){
 			});
 		});
 	}
+    
+    restoreApplication(tryReadState({ "menu":"graph" }));
     
 });

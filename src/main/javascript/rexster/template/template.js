@@ -16,7 +16,7 @@ Rexster.modules.template = function(api) {
 		$.template(templater.templateNameMainMenuItem, templateMainMenuMarkup);
 		
 		// expects {menuName}
-		var templateMenuGraph = '<div id="graphItem${menuName}" class="ui-state-default ui-corner-all" style="cursor:pointer;padding:2px;margin:1px"><a href="#graph,${menuName}">${menuName}</a></div>';
+		var templateMenuGraph = '<div id="graphItem${menuName}" class="graph-item ui-state-default ui-corner-all" style="cursor:pointer;padding:2px;margin:1px"><a href="/main/graph/${menuName}">${menuName}</a></div>';
 		$.template(templater.templateNameMenuGraph, templateMenuGraph);
 		
 		// expects {traversalName}

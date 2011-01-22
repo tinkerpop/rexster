@@ -72,22 +72,38 @@ Rexster.modules.graph = function(api) {
 					$(this).toggleClass("ui-state-hover");
 				});
 				
-				mediator.getContainerMenuGraph().find("div").click(function() {
-	                var uri = $(this).find("a").attr('href');
-	                uri = uri.replace(/^.*#/, '');
-					$.history.load(uri);
-					return false;
+				mediator.getContainerMenuGraph().find("div").click(function(evt) {
+					evt.preventDefault();
+					var selectedLink = $(this).find("a"); 
+	                var uri = selectedLink.attr('href');
+	                window.history.pushState({"uri":uri}, '', uri);
+	                
+	                mediator.getContainerMenuGraph().find(".graph-item").removeClass("ui-state-active");
+	                mediator.getContainerMenuGraph().find("#graphItem" + selectedLink.text()).addClass("ui-state-active");
+					
+					// load traversals panel for the current graph
+					api.getTraversals(selectedLink.text(), function(traversalResult) { 
+						mediator.graphSelectionChanged(selectedLink.text());
+						api.applyListTraversalsTemplate(traversalResult.results, mediator.getContainerPanelTraversalsList());
+						
+						// execute the callback now that the traversals are done.
+						onInitComplete();
+					},
+					function(err){
+						api.showMessageError("Could not get the list of traversals from Rexster.");
+					});
 				});
 				
 				// check the state, if it is at least two items deep then the state 
 				// of the graph is also selected and an attempt to make the graph active
 				// should be made.
-				if (state.length >= 2) {
-					mediator.getContainerMenuGraph().find("#graphItem" + state[1]).addClass("ui-state-active");
+				if (state.hasOwnProperty("graph")) {
+					mediator.getContainerMenuGraph().find(".graph-item").removeClass("ui-state-active");
+					mediator.getContainerMenuGraph().find("#graphItem" + state.graph).toggleClass("ui-state-active");
 					
 					// load traversals panel for the current graph
-					api.getTraversals(state[1], function(traversalResult) { 
-						mediator.graphSelectionChanged(state[1]);
+					api.getTraversals(state.graph, function(traversalResult) { 
+						mediator.graphSelectionChanged(state.graph);
 						api.applyListTraversalsTemplate(traversalResult.results, mediator.getContainerPanelTraversalsList());
 						
 						// execute the callback now that the traversals are done.
@@ -99,7 +115,7 @@ Rexster.modules.graph = function(api) {
 				}
 				
 				// if the state does not specify a graph then select the first one. 
-				if (state.length < 2) {
+				if (!state.hasOwnProperty("graph")) {
 					mediator.getContainerMenuGraph().find("#graphItem" + graphs[0].menuName).click();
 				}	
 				
