@@ -3,14 +3,16 @@
  */
 Rexster.modules.graph = function(api) {
 	
-	var mediator = new GraphPanelMediator("#menuGraph", "#panelTraversals", "#panelVertices", "#panelGraphMenu"),
+	var mediator = new GraphPanelMediator("#menuGraph", "#panelTraversals", "#panelVertices", "#panelGraphMenu", "#panelBrowser", "#panelBrowserMain"),
 	    currentGraph;
 	
 	/**
 	 * Manages graph panel interactions.
 	 */
-	function GraphPanelMediator(menuGraph, panelTraversals, panelVertices, panelGraphMenu) {
+	function GraphPanelMediator(menuGraph, panelTraversals, panelVertices, panelGraphMenu, panelBrowser, panelBrowserMain) {
 		var  containerMenuGraph = $(menuGraph),
+	         containerPanelBrowser = $(panelBrowser),
+		     containerPanelBrowserMain = $(panelBrowserMain),
 			 containerPanelTraversals = $(panelTraversals),
 			 containerPanelTraversalsList = containerPanelTraversals.find("ul"),
 			 containerPanelVertices = $(panelVertices),
@@ -77,8 +79,28 @@ Rexster.modules.graph = function(api) {
 			});
 		}
 		
-		this.panelGraphNavigationSelected = function(navigation) {
-			return;
+		this.panelGraphNavigationSelected = function(api, navigation) {
+			containerPanelTraversals.hide();
+			containerPanelBrowser.show();
+			containerPanelBrowserMain.empty();
+
+			api.getVertices(currentGraph, 0, 10, function(data) {
+				for (var ix = 0; ix < data.results.length; ix++) {
+					containerPanelBrowserMain.append("<div class='make-space'>");
+					containerPanelBrowserMain.children().last().jsonviewer({ "json_name": "Result #" + (ix + 1), "json_data": data.results[ix], "outer-padding":"0px" });
+					
+					if(ix % 2 == 0) {
+						containerPanelBrowserMain.children().last().find(".json-widget-header").addClass("json-widget-alt");
+						containerPanelBrowserMain.children().last().find(".json-widget-content").addClass("json-widget-alt");
+					}
+				}
+				
+				Elastic.refresh($("#main"));
+			},
+			function(err) {
+				
+			});
+			
 		}
 		
 		this.resetMenuGraph = function() {
@@ -115,7 +137,7 @@ Rexster.modules.graph = function(api) {
 					evt.preventDefault();
 	                var uri = $(this).attr('href');
 	                window.history.pushState({"uri":uri}, '', uri);
-					mediator.panelGraphNavigationSelected($(this).attr("_type"));
+					mediator.panelGraphNavigationSelected(api, $(this).attr("_type"));
 				});
 				
 				mediator.getContainerMenuGraph().find("div").hover(function() {

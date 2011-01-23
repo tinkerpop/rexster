@@ -29,31 +29,30 @@
         var type_prefix = v.type().charAt(0);
         var container = $('<div/>');
         $(container).appendTo(element);
-        $(container).addClass('ui-widget').css({'padding': config['outer-padding'], 'padding-left': config['ident'] });
+        $(container).addClass('json-widget').css({'padding': config['outer-padding'], 'padding-left': config['ident'] });
         $(container).click(function(event) {
-        $(container).children('.ui-widget-content').toggleClass('ui-helper-hidden');
+        $(container).children('.json-widget-content').toggleClass('ui-helper-hidden');
             return false;
         });
         var header = $('<div/>');
         $(header).appendTo(container);
-        $(header).addClass('ui-widget-header ui-corner-all')
+        $(header).addClass('json-widget-header ui-corner-top')
             .css({ 'cursor': 'hand', //'float': 'left',
-                'text-align': 'left', 'white-space': 'nowrap',
-                'overflow': 'hidden'
+                'text-align': 'left', 'white-space': 'nowrap'
             });
         $(header).text('' + (config['type_prefix'] ? "(" + type_prefix + ")" : "") + name);
 
         if (v.type() == "object" || v.type() == "array") {
             var content = $('<div/>');
             $(content).appendTo(container);
-            $(content).addClass('ui-widget-content ui-corner-all')
-            .css({ 'overflow': 'hidden', 'white-space': 'nowrap', 'padding': config['inner-padding'] });
+            $(content).addClass('json-widget-content ui-corner-bottom')
+            .css({ 'white-space': 'nowrap', 'padding': config['inner-padding'] });
             for (name in data) { format_value(content, name, data[name], config); }
         }
         else {
             var content = $('<div/>');
             $(content).appendTo(container);
-            $(content).addClass('ui-widget-content ui-corner-all')
+            $(content).addClass('json-widget-content ui-corner-bottom')
             .css({ 'overflow': 'hidden', 'white-space': 'nowrap' });
             $(content).text('' + data);
         }

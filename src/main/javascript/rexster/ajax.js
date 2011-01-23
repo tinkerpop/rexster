@@ -71,7 +71,6 @@ Rexster.modules.ajax = function(api) {
 	 * @param onSuccess	{Function} The action that occurs on a successful REST call.
 	 * @param onFail 	{Function} The action that occurs on a failed REST call.
 	 */
-	
 	api.getVertices = function(graphName, start, end, onSuccess, onFail){
 		$.ajax({
 			  url: baseUri + graphName + "/vertices?rexster.offset.start=" + start + "&rexster.offset.end=" + end,
