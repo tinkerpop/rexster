@@ -10,7 +10,7 @@
 	<script type="text/javascript" src="/javascript/rexster.js"></script>
 </head>
 <body>
-	<div id="header" class="unit on-2 columns" style="height:40px;margin:5px">
+	<div id="header" class="unit on-2 columns make-space" style="height:40px">
 		<div class="column vertical-center" >
 			<div class="unit" >
 				<div id="radiosetMainMenu">
@@ -36,20 +36,26 @@
 	<div id="main" class="unit on-2 columns">
 		<div class="container">
 			<div class="fixed column" >
-				<div id="menuGraph" class="container ui-widget" style="margin:5px;width:200px">
+				<div id="menuGraph" class="container ui-widget make-space" style="width:200px">
 					<!-- graph menu set goes here  -->
 				</div>
 			</div>
 			<div class="elastic column">
-				<div id="panelGraph" class="container ui-widget" style="margin:5px">
+				<div id="panelGraph" class="container ui-widget make-space">
 					<div class="ui-widget-header ui-corner-top">Graph</div>
 					<div class="ui-widget-content ui-corner-bottom">
-						<div class="container" style="margin:5px">
-							<span id="panelGraphTitle" style="font-weight:bold"></span><span> - </span><span id="panelGraphDetail"></span>
+						<div class="container">
+							<div class="make-space">
+								<span id="panelGraphTitle" style="font-weight:bold"></span><span> - </span><span id="panelGraphDetail"></span>
+							</div>
+							<div id="panelGraphMenu" class="make-space" style="font-size:small">
+								<a _type="vertices">Browse Vertices</a>
+								<a _type="edges">Browse Edges</a>
+							</div>
 						</div>
 					</div>
 				</div>
-				<div id="panelTraversals" class="container ui-widget" style="margin:5px">
+				<div id="panelTraversals" class="container ui-widget make-space">
 					<div class="ui-widget-header ui-corner-top">Traversals</div>
 					<div class="ui-widget-content ui-corner-bottom">
 						<ul class="unit on-3 columns">

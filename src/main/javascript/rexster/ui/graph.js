@@ -3,16 +3,18 @@
  */
 Rexster.modules.graph = function(api) {
 	
-	var mediator = new GraphPanelMediator("#menuGraph", "#panelTraversals", "#panelVertices");
+	var mediator = new GraphPanelMediator("#menuGraph", "#panelTraversals", "#panelVertices", "#panelGraphMenu"),
+	    currentGraph;
 	
 	/**
 	 * Manages graph panel interactions.
 	 */
-	function GraphPanelMediator(menuGraph, panelTraversals, panelVertices) {
+	function GraphPanelMediator(menuGraph, panelTraversals, panelVertices, panelGraphMenu) {
 		var  containerMenuGraph = $(menuGraph),
 			 containerPanelTraversals = $(panelTraversals),
 			 containerPanelTraversalsList = containerPanelTraversals.find("ul"),
 			 containerPanelVertices = $(panelVertices),
+			 containerPanelGraphMenu = $(panelGraphMenu),
 			 currentGraphName = "";
 		
 		if (!(this instanceof GraphPanelMediator)) {
@@ -27,14 +29,25 @@ Rexster.modules.graph = function(api) {
 			return containerPanelTraversalsList;
 		}
 		
+		this.getContainerPanelGraphMenu = function() {
+			return containerPanelGraphMenu;
+		}
+		
 		this.getContainerMenuGraph = function() {
 			return containerMenuGraph;
 		}
 		
 		this.graphSelectionChanged = function(api, currentSelectedGraphName, onComplete) {
 			
+			// keep track of the currently selected graph.
+			currentGraph = currentSelectedGraphName;
+			
 			containerMenuGraph.find(".graph-item").removeClass("ui-state-active");
 			containerMenuGraph.find("#graphItem" + currentSelectedGraphName).addClass("ui-state-active");
+			
+			// modify the links on the browse menus to match current state
+			containerPanelGraphMenu.find("a[_type='vertices']").attr("href", "/main/" + currentSelectedGraphName + "/vertices");
+			containerPanelGraphMenu.find("a[_type='edges']").attr("href", "/main/" + currentSelectedGraphName + "/edges");
 			
 			// load the graph profile
 			api.getGraph(currentSelectedGraphName, function(graphResult) {
@@ -62,6 +75,10 @@ Rexster.modules.graph = function(api) {
 			function(err){
 				api.showMessageError("Could not get the list of traversals from Rexster.");
 			});
+		}
+		
+		this.panelGraphNavigationSelected = function(navigation) {
+			return;
 		}
 		
 		this.resetMenuGraph = function() {
@@ -92,6 +109,14 @@ Rexster.modules.graph = function(api) {
 				}
 
 				api.applyMenuGraphTemplate(graphs, mediator.getContainerMenuGraph());
+				
+				mediator.getContainerPanelGraphMenu().find("a").button({ icons: {primary:"ui-icon-search"}});
+				mediator.getContainerPanelGraphMenu().find("a").click(function(evt) {
+					evt.preventDefault();
+	                var uri = $(this).attr('href');
+	                window.history.pushState({"uri":uri}, '', uri);
+					mediator.panelGraphNavigationSelected($(this).attr("_type"));
+				});
 				
 				mediator.getContainerMenuGraph().find("div").hover(function() {
 					$(this).toggleClass("ui-state-hover");
