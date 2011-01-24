@@ -110,7 +110,7 @@ Rexster.modules.graph = function(api) {
 					// no results - disable pagers
 				}
 				
-				Elastic.refresh($("#main"));
+				Elastic.refresh();
 			},
 			function(err) {
 				

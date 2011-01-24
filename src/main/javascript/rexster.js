@@ -27,18 +27,6 @@ function Rexster() {
 }
 
 $(function(){
-
-	/*
-    $.history.init(function(hash){
-    	if (hash == undefined) {
-    		hash = "";
-    	}
-    	
-    	var state = hash.split("/");
-        restoreApplication(state);
-    },
-    { unescape: ",/" });
-	*/
 	
 	window.onpopstate = function(event) {
 		restoreApplication(tryReadState(null, event));
@@ -75,7 +63,7 @@ $(function(){
 			// the graph panel is the only active thing right now, so 
 			// just initialize for simplicity sake.
 			api.initGraphList(state, function(){
-				Elastic.refresh($("#main"));
+				Elastic.refresh();
 			});
 		});
 	}
