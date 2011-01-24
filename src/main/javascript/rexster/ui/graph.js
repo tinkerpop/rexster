@@ -85,14 +85,29 @@ Rexster.modules.graph = function(api) {
 			containerPanelBrowserMain.empty();
 
 			api.getVertices(currentGraph, 0, 10, function(data) {
-				for (var ix = 0; ix < data.results.length; ix++) {
-					containerPanelBrowserMain.append("<div class='make-space'>");
-					containerPanelBrowserMain.children().last().jsonviewer({ "json_name": "Result #" + (ix + 1), "json_data": data.results[ix], "outer-padding":"0px" });
-					
-					if(ix % 2 == 0) {
-						containerPanelBrowserMain.children().last().find(".json-widget-header").addClass("json-widget-alt");
-						containerPanelBrowserMain.children().last().find(".json-widget-content").addClass("json-widget-alt");
+				
+				if (data.results.length > 0) {
+					for (var ix = 0; ix < data.results.length; ix++) {
+						containerPanelBrowserMain.append("<div class='make-space'>");
+						containerPanelBrowserMain.children().last().jsonviewer({ "json_name": "Result #" + (ix + 1), "json_data": data.results[ix], "outer-padding":"0px" });
+						
+						if(ix % 2 > 0) {
+							containerPanelBrowserMain.children().last().find(".json-widget-header").addClass("json-widget-alt");
+							containerPanelBrowserMain.children().last().find(".json-widget-content").addClass("json-widget-alt");
+						}
 					}
+					
+					$(containerPanelBrowser).find("li.pager-button").hover(function(){
+						$(this).addClass("ui-state-hover");
+						$(this).removeClass("ui-state-default");
+					}, 
+					function(){
+						$(this).addClass("ui-state-default");
+						$(this).removeClass("ui-state-hover");
+					});
+					
+				} else {
+					// no results - disable pagers
 				}
 				
 				Elastic.refresh($("#main"));

@@ -25,3 +25,10 @@ html {
 .json-widget-alt {
 	background-color:#2B2728;
 }
+.pager-button {
+	cursor:pointer;
+}
+.pager-button a {
+	margin: 0 auto;
+	width:15px;
+}
