@@ -79,12 +79,34 @@ Rexster.modules.graph = function(api) {
 			});
 		}
 		
-		this.panelGraphNavigationSelected = function(api, navigation) {
+		this.panelGraphNavigationSelected = function(api, navigation, start, end) {
+			
+			var pageStart = 0, 
+				pageEnd = 10;
+			
 			containerPanelTraversals.hide();
 			containerPanelBrowser.show();
 			containerPanelBrowserMain.empty();
+			
+			containerPanelBrowser.find(".pager").show();
+			containerPanelBrowser.find("li.pager-button").hover(function(){
+				$(this).addClass("ui-state-hover");
+				$(this).removeClass("ui-state-default");
+			}, 
+			function(){
+				$(this).addClass("ui-state-default");
+				$(this).removeClass("ui-state-hover");
+			});
+			
+			if (start != undefined) {
+				pageStart = start;
+			}
+			
+			if (end != undefined) {
+				pageEnd = end;
+			}
 
-			api.getVertices(currentGraph, 0, 10, function(data) {
+			api.getVertices(currentGraph, pageStart, pageEnd, function(data) {
 				
 				if (data.results.length > 0) {
 					for (var ix = 0; ix < data.results.length; ix++) {
@@ -97,17 +119,15 @@ Rexster.modules.graph = function(api) {
 						}
 					}
 					
-					$(containerPanelBrowser).find("li.pager-button").hover(function(){
-						$(this).addClass("ui-state-hover");
-						$(this).removeClass("ui-state-default");
-					}, 
-					function(){
-						$(this).addClass("ui-state-default");
-						$(this).removeClass("ui-state-hover");
-					});
+					// display the paging information plus total record count
+					containerPanelBrowser.find(".pager-label").text("Results " + (pageStart + 1) + " - " + data.results.length + " of " + data.total_size);
+					
 					
 				} else {
-					// no results - disable pagers
+					// no results - hide pagers and show message
+					containerPanelBrowser.find(".pager").hide();
+					
+					// TODO: there are no records
 				}
 				
 				Elastic.refresh();

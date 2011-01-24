@@ -32,3 +32,11 @@ html {
 	margin: 0 auto;
 	width:15px;
 }
+.pager-label {
+	border-top-width:1px;
+	border-top-style:solid;
+	border-top-color:#9CCDFC;
+	border-bottom-width:1px;
+	border-bottom-style:solid;
+	border-bottom-color:#9CCDFC;
+}
