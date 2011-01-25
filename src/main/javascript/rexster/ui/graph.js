@@ -55,8 +55,8 @@ Rexster.modules.graph = function(api) {
 			containerMenuGraph.find("#graphItem" + currentSelectedGraphName).addClass("ui-state-active");
 			
 			// modify the links on the browse menus to match current state
-			containerPanelGraphMenu.find("a[_type='vertices']").attr("href", "/main/" + currentSelectedGraphName + "/vertices");
-			containerPanelGraphMenu.find("a[_type='edges']").attr("href", "/main/" + currentSelectedGraphName + "/edges");
+			containerPanelGraphMenu.find("a[_type='vertices']").attr("href", "/main/graph/" + currentSelectedGraphName + "/vertices?start=0&end=10");
+			containerPanelGraphMenu.find("a[_type='edges']").attr("href", "/main/graph/" + currentSelectedGraphName + "/edges?start=0&end=10");
 			
 			// load the graph profile
 			api.getGraph(currentSelectedGraphName, function(graphResult) {
@@ -86,33 +86,33 @@ Rexster.modules.graph = function(api) {
 			});
 		}
 		
-		this.panelGraphNavigationPagedPrevious = function(api) {
+		this.panelGraphNavigationPagedPrevious = function(api, sender) {
 			var start = currentPageStart - pageSize,
 			    end = currentPageStart;
 			
 			if (start < 0) {
-				this.panelGraphNavigationPagedFirst(api);
+				this.panelGraphNavigationPagedFirst(api, sender);
 			} else {
-				this.panelGraphNavigationPaged(api, start, end);
+				this.panelGraphNavigationPaged(api, start, end, sender);
 			}
 		}
 		
-		this.panelGraphNavigationPagedNext = function(api) {
+		this.panelGraphNavigationPagedNext = function(api, sender) {
 			var start = currentPageStart + pageSize,
 			     end = start + pageSize;
 			
 			if (start > currentTotal) {
-				this.panelGraphNavigationPagedLast(api);
+				this.panelGraphNavigationPagedLast(api, sender);
 			} else {
-				this.panelGraphNavigationPaged(api, start, end);
+				this.panelGraphNavigationPaged(api, start, end, sender);
 			}
 		}
 		
-		this.panelGraphNavigationPagedFirst = function(api) {
-			this.panelGraphNavigationPaged(api, 0, pageSize);
+		this.panelGraphNavigationPagedFirst = function(api, sender) {
+			this.panelGraphNavigationPaged(api, 0, pageSize, sender);
 		}
 		
-		this.panelGraphNavigationPagedLast = function(api) {
+		this.panelGraphNavigationPagedLast = function(api, sender) {
 			var remainder = currentTotal % pageSize,
 			start = currentTotal - pageSize;
 			
@@ -120,10 +120,13 @@ Rexster.modules.graph = function(api) {
 				start = currentTotal - remainder;
 			}
 			
-			this.panelGraphNavigationPaged(api, start, currentTotal);
+			this.panelGraphNavigationPaged(api, start, currentTotal, sender);
 		}
 		
-		this.panelGraphNavigationPaged = function(api, start, end) {
+		this.panelGraphNavigationPaged = function(api, start, end, sender) {
+			var pageStart = 0,
+			    pageEnd = 10;
+			
 			if (start != undefined) {
 				pageStart = start;
 			}
@@ -132,9 +135,11 @@ Rexster.modules.graph = function(api) {
 				pageEnd = end;
 			}
 
+			$(sender).children().first().attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=" + pageStart + "&end=" + pageEnd);
+			
 			containerPanelBrowserMain.empty();
 			
-			api.getVertices(currentGraph, pageStart, pageEnd, function(data) {
+			api.getVertices(currentGraphName, pageStart, pageEnd, function(data) {
 				
 				if (data.results.length > 0) {
 					for (var ix = 0; ix < data.results.length; ix++) {
@@ -262,20 +267,29 @@ Rexster.modules.graph = function(api) {
 				
 				// get the browser panel pager hooked up 
 				mediator.getContainerPanelBrowser().find("li.pager-button").unbind("click");
-				mediator.getContainerPanelBrowser().find("li.pager-button").click(function(){
+				mediator.getContainerPanelBrowser().find("li.pager-button").click(function(evt){
+					var uri, selectedLink;
+					
 					if ($(this).children().first().hasClass("ui-icon-seek-first")) {
 						// go to first batch of records on the list
-						mediator.panelGraphNavigationPagedFirst(api);
+						mediator.panelGraphNavigationPagedFirst(api, this);
 					} else if ($(this).children().first().hasClass("ui-icon-seek-end")) {
 						// go to the last batch of records on the list
-						mediator.panelGraphNavigationPagedLast(api);
+						mediator.panelGraphNavigationPagedLast(api, this);
 					} else if ($(this).children().first().hasClass("ui-icon-seek-prev")) {
 						// go to the previous batch of records on the list
-						mediator.panelGraphNavigationPagedPrevious(api);
+						mediator.panelGraphNavigationPagedPrevious(api, this);
 					} else if ($(this).children().first().hasClass("ui-icon-seek-next")) {
 						// go to the next batch of records on the list
-						mediator.panelGraphNavigationPagedNext(api);
+						mediator.panelGraphNavigationPagedNext(api, this);
 					}
+					
+					evt.preventDefault();
+					
+					selectedLink = $(this).find("a"); 
+	                uri = selectedLink.attr("href");
+	                window.history.pushState({"uri":uri}, "", uri);
+
 				})
 			}, 
 			function(err) {

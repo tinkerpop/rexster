@@ -33,16 +33,28 @@ $(function(){
 	};
 	
 	function tryReadState(defaultState, event) {
-		var path = location.pathname.split("/");
+		var url = jQuery.url.setUrl(location.href);
 		var state = {};
 		
-		// TODO: probably consider refactoring this later...kinda messy
-		if (path.length >= 4) {
-			state.graph = path[3];
+		if (url.segment() >= 4) {
+			state.browse = {
+				element : url.segment(4),
+				start : 0,
+				end : 10 
+			};
+			
+			if (url.param("start") != null && url.param("end")) {
+				state.browse.start = url.param("start");
+				state.browse.end = url.param("end");
+			}
 		}
 		
-		if (path.length >= 3) {
-			state.menu = path[2];
+		if (url.segment() >= 3) {
+			state.graph = url.segment(2);
+		}
+		
+		if (url.segment() >= 2) {
+			state.menu = url.segment(1);
 		} else {
 			// this means that the state is not defined by the uri.
 			state = defaultState;

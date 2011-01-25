@@ -214,6 +214,7 @@
 								<include>lib/jquery-jtmpl-beta1-min.js</include>
 								<include>lib/elastic-2.0.3-min.js</include>
 								<include>lib/jquery-history-min.js</include>
+								<include>lib/jquery-url-min.js</include>
 								<include>lib/jquery-jsonviewer-min.js</include>
 
 								<include>rexster-min.js</include>
