@@ -230,12 +230,21 @@ Rexster.modules.graph = function(api) {
 
 			containerPanelBrowserMain.empty();
 			
-			api.getVertices(currentGraphName, pageStart, pageEnd, function(data) {
-				that.renderPagedResults(data.results, data.total_size, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
-			},
-			function(err) {
-				api.showMessageError("Could not get the vertices of graphs from Rexster.");
-			});
+			if (currentFeatureBrowsed === "vertices") {
+				api.getVertices(currentGraphName, pageStart, pageEnd, function(data) {
+					that.renderPagedResults(data.results, data.total_size, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
+				},
+				function(err) {
+					api.showMessageError("Could not get the vertices of graphs from Rexster.");
+				});
+			} else if (currentFeatureBrowsed === "edges") {
+				api.getEdges(currentGraphName, pageStart, pageEnd, function(data) {
+					that.renderPagedResults(data.results, data.total_size, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
+				},
+				function(err) {
+					api.showMessageError("Could not get the edges of graphs from Rexster.");
+				});
+			}
 		}
 		
 		this.panelGraphNavigationSelected = function(api, featureToBrowse, start, end) {

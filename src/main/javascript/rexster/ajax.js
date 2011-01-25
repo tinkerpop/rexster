@@ -81,4 +81,24 @@ Rexster.modules.ajax = function(api) {
 			  error: onFail
 			});
 	};
+	
+	/**
+	 * Get a list of edges for a specific graph.
+	 * 
+	 * @param graphName {String} the name of the graph.
+	 * @param start		{int} The first edge to return in the set.
+	 * @param end		{int} The last edge to return in the set.
+	 * @param onSuccess	{Function} The action that occurs on a successful REST call.
+	 * @param onFail 	{Function} The action that occurs on a failed REST call.
+	 */
+	api.getEdges = function(graphName, start, end, onSuccess, onFail){
+		$.ajax({
+			  url: baseUri + graphName + "/edges?rexster.offset.start=" + start + "&rexster.offset.end=" + end,
+			  type: "GET",
+			  dataType:"json",
+			  success: onSuccess,
+			  async:false,
+			  error: onFail
+			});
+	};
 };
