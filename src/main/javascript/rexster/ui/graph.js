@@ -161,6 +161,53 @@ Rexster.modules.graph = function(api) {
 			return range;
 		}
 		
+		this.renderPagedResults = function(results, resultSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete){
+			
+			var that = this;
+			
+			if (results.length > 0) {
+				for (var ix = 0; ix < results.length; ix++) {
+					containerPanelBrowserMain.append("<div class='make-space'>");
+					containerPanelBrowserMain.children().last().jsonviewer({ "json_name": "Result #" + (pageStart + ix + 1), "json_data": results[ix], "outer-padding":"0px" });
+					
+					if(ix % 2 > 0) {
+						containerPanelBrowserMain.children().last().find(".json-widget-header").addClass("json-widget-alt");
+						containerPanelBrowserMain.children().last().find(".json-widget-content").addClass("json-widget-alt");
+					}
+				}
+				
+				// display the paging information plus total record count
+				containerPanelBrowser.find(".pager-label").text("Results " + (pageStart + 1) + " - " + (pageStart + results.length) + " of " + resultSize);
+				
+				currentPageStart = pageStart;
+				currentTotal = resultSize;
+				
+			} else {
+				// no results - hide pagers and show message
+				containerPanelBrowser.find(".pager").hide();
+				
+				currentPageStart = 0;
+				currentTotal = 0;
+				
+				// TODO: there are no records
+				
+			}
+			
+			// set the links for the paging...kind of a nicety.  not really used in
+			// the paging process at this point.  just makes for clean uris
+			nextRange = that.calculateNextPageRange();
+			previousRange = that.calculatePreviousPageRange();
+			
+			containerPanelBrowser.find(".ui-icon-seek-first").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=0&end=" + pageSize);
+			containerPanelBrowser.find(".ui-icon-seek-end").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=" + that.calculateStartForLastPage() + "&end=" + currentTotal);
+			containerPanelBrowser.find(".ui-icon-seek-prev").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=" + previousRange.start + "&end=" + previousRange.end);
+			containerPanelBrowser.find(".ui-icon-seek-next").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=" + nextRange.start + "&end=" + nextRange.end);
+			
+			if (onPageChangeComplete != undefined) {
+				onPageChangeComplete();
+			}
+		}
+		
 		this.panelGraphNavigationPaged = function(api, start, end, onPageChangeComplete) {
 			var pageStart = 0,
 			    pageEnd = 10,
@@ -184,48 +231,7 @@ Rexster.modules.graph = function(api) {
 			containerPanelBrowserMain.empty();
 			
 			api.getVertices(currentGraphName, pageStart, pageEnd, function(data) {
-				
-				if (data.results.length > 0) {
-					for (var ix = 0; ix < data.results.length; ix++) {
-						containerPanelBrowserMain.append("<div class='make-space'>");
-						containerPanelBrowserMain.children().last().jsonviewer({ "json_name": "Result #" + (pageStart + ix + 1), "json_data": data.results[ix], "outer-padding":"0px" });
-						
-						if(ix % 2 > 0) {
-							containerPanelBrowserMain.children().last().find(".json-widget-header").addClass("json-widget-alt");
-							containerPanelBrowserMain.children().last().find(".json-widget-content").addClass("json-widget-alt");
-						}
-					}
-					
-					// display the paging information plus total record count
-					containerPanelBrowser.find(".pager-label").text("Results " + (pageStart + 1) + " - " + (pageStart + data.results.length) + " of " + data.total_size);
-					
-					currentPageStart = pageStart;
-					currentTotal = data.total_size;
-					
-				} else {
-					// no results - hide pagers and show message
-					containerPanelBrowser.find(".pager").hide();
-					
-					currentPageStart = 0;
-					currentTotal = 0;
-					
-					// TODO: there are no records
-					
-				}
-				
-				// set the links for the paging...kind of a nicety.  not really used in
-				// the paging process at this point.  just makes for clean uris
-				nextRange = that.calculateNextPageRange();
-				previousRange = that.calculatePreviousPageRange();
-				
-				containerPanelBrowser.find(".ui-icon-seek-first").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=0&end=" + pageSize);
-				containerPanelBrowser.find(".ui-icon-seek-end").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=" + that.calculateStartForLastPage() + "&end=" + currentTotal);
-				containerPanelBrowser.find(".ui-icon-seek-prev").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=" + previousRange.start + "&end=" + previousRange.end);
-				containerPanelBrowser.find(".ui-icon-seek-next").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=" + nextRange.start + "&end=" + nextRange.end);
-				
-				if (onPageChangeComplete != undefined) {
-					onPageChangeComplete();
-				}
+				that.renderPagedResults(data.results, data.total_size, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
 			},
 			function(err) {
 				api.showMessageError("Could not get the vertices of graphs from Rexster.");
@@ -340,6 +346,12 @@ Rexster.modules.graph = function(api) {
 					evt.preventDefault();
 					var uri, selectedLink;
 					
+					// need to push state first before navigation so that when the mediator
+					// is done it will place a new href value in for the next set of links
+					selectedLink = $(this).find("a"); 
+	                uri = selectedLink.attr("href");
+	                window.history.pushState({"uri":uri}, "", uri);
+					
 					if ($(this).children().first().hasClass("ui-icon-seek-first")) {
 						// go to first batch of records on the list
 						mediator.panelGraphNavigationPagedFirst(api);
@@ -354,10 +366,6 @@ Rexster.modules.graph = function(api) {
 						mediator.panelGraphNavigationPagedNext(api);
 					}
 					
-					selectedLink = $(this).find("a"); 
-	                uri = selectedLink.attr("href");
-	                window.history.pushState({"uri":uri}, "", uri);
-
 				})
 			}, 
 			function(err) {
