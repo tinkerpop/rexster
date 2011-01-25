@@ -17,9 +17,9 @@ Rexster.modules.graph = function(api) {
 			 containerPanelTraversalsList = containerPanelTraversals.find("ul"),
 			 containerPanelGraphMenu = $(panelGraphMenu),
 			 currentGraphName = "",
+			 currentFeatureBrowsed = "",
 			 currentPageStart = 0,
 			 currentTotal = 0,
-			 currentFeatureBrowsed = "",
 			 pageSize = 10;
 		
 		if (!(this instanceof GraphPanelMediator)) {
@@ -46,6 +46,14 @@ Rexster.modules.graph = function(api) {
 			return containerPanelBrowser;
 		}
 		
+		/**
+		 * A graph was selected from the graph menu.
+		 * 
+		 * @param api        {Object} A Rexster API instance.
+		 * @param state      {Object} A state object constructed from the URI or the name of the 
+		 *                              currently selected graph.
+		 * @param onComplete {Object}   Call back function made when the event is complete.
+		 */
 		this.graphSelectionChanged = function(api, state, onComplete) {
 			
 			// keep track of the currently selected graph.  could be a better way
@@ -100,24 +108,50 @@ Rexster.modules.graph = function(api) {
 			}
 		}
 		
+		/**
+		 * Move the data view to the previous page given the current position.
+		 * 
+		 * @param api {Object} A Rexster API instance.
+		 */
 		this.panelGraphNavigationPagedPrevious = function(api) {
 			var range = this.calculatePreviousPageRange();
 			this.panelGraphNavigationPaged(api, range.start, range.end);
 		}
 		
+		/**
+		 * Move the data view to the next page given the current position.
+		 * 
+		 * @param api {Object} A Rexster API instance.
+		 */
 		this.panelGraphNavigationPagedNext = function(api) {
 			var range = this.calculateNextPageRange();
 			this.panelGraphNavigationPaged(api, range.start, range.end);
 		}
 		
+		/**
+		 * Move the data view to the first page in the data set.
+		 * 
+		 * @param api {Object} A Rexster API instance.
+		 */
 		this.panelGraphNavigationPagedFirst = function(api) {
 			this.panelGraphNavigationPaged(api, 0, pageSize);
 		}
 		
+		/**
+		 * Move the data view to the last page in the data set.
+		 * 
+		 * @param api {Object} A Rexster API instance.
+		 */
 		this.panelGraphNavigationPagedLast = function(api) {
 			this.panelGraphNavigationPaged(api, this.calculateStartForLastPage(), currentTotal);
 		}
 		
+		/**
+		 * Calculates the index of the start for the last page.
+		 * 
+		 * Since the last page may have less than the page size number of records, the
+		 * last page will not start a page size from the length of the records.
+		 */
 		this.calculateStartForLastPage = function() {
 			var remainder = currentTotal % pageSize,
 			start = currentTotal - pageSize;
@@ -129,6 +163,12 @@ Rexster.modules.graph = function(api) {
 			return start;
 		}
 		
+		/**
+		 * Calculates the next page range given the current position.
+		 * 
+		 * @returns {Object} A range object that describes a start and end point for the 
+		 *                   paging mechanism.
+		 */
 		this.calculateNextPageRange = function() {
 			var start = currentPageStart + pageSize,
 		        end = start + pageSize,
@@ -145,6 +185,12 @@ Rexster.modules.graph = function(api) {
 			return range;
 		}
 		
+		/**
+		 * Calculates the previous page range given the current position.
+		 * 
+		 * @returns {Object} A range object that describes a start and end point for the 
+		 *                   paging mechanism.
+		 */
 		this.calculatePreviousPageRange = function() {
 			var start = currentPageStart - pageSize,
 		    	end = currentPageStart,
@@ -161,6 +207,18 @@ Rexster.modules.graph = function(api) {
 			return range;
 		}
 		
+		/**
+		 * Renders a set of paged results.
+		 * 
+		 * @param results              {Array} This is an array of any object.  It will be rendered as JSON in 
+		 *                                     a generic tree-like fashion.
+		 * @param resultSize           {int} The total size of the results.  The results will only represent
+		 *                                   one page of the total result set.
+		 * @param currentGraphName     {String} The current name of the graph being accessed.
+		 * @param pageStart            {int} The start index of the paged set.
+		 * @param pageEnd              {int} The end index of the paged set.
+		 * @param onPageChangeComplete {Function}    Call back function to execute when the render is finished.
+		 */
 		this.renderPagedResults = function(results, resultSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete){
 			
 			var that = this;
@@ -208,6 +266,15 @@ Rexster.modules.graph = function(api) {
 			}
 		}
 		
+		/**
+		 * The page of data to view has been changed.  The data must be requested and the results
+		 * rendered to the view.
+		 * 
+		 * @param api                  {Object} A Rexster API instance.
+		 * @param start                {int} The start index of the paged set.
+		 * @param end                  {int} The end index of the paged set.
+		 * @param onPageChangeComplete {Function}    Call back function to execute when the render is finished.
+		 */
 		this.panelGraphNavigationPaged = function(api, start, end, onPageChangeComplete) {
 			var pageStart = 0,
 			    pageEnd = 10,
@@ -247,6 +314,14 @@ Rexster.modules.graph = function(api) {
 			}
 		}
 		
+		/**
+		 * A choice has been made to browse a particular aspect of the graph. 
+		 * 
+		 * @param api             {Object} A Rexster API instance.
+		 * @param featureToBrowse {String} The feature that was selected (ie. vertices, edges, etc).
+		 * @param start           {int} The start index of the paged set.
+		 * @param end             {int} The end index of the paged set.
+		 */
 		this.panelGraphNavigationSelected = function(api, featureToBrowse, start, end) {
 			
 			var startPoint = 0,
