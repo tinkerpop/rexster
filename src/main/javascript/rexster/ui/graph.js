@@ -46,73 +46,79 @@ Rexster.modules.graph = function(api) {
 			return containerPanelBrowser;
 		}
 		
-		this.graphSelectionChanged = function(api, currentSelectedGraphName, onComplete) {
+		this.graphSelectionChanged = function(api, state, onComplete) {
 			
-			// keep track of the currently selected graph.
-			currentGraph = currentSelectedGraphName;
+			// keep track of the currently selected graph.  could be a better way
+			// to do this check.  would be nice if the state object could be managed
+			// across all cases
+			if (state.graph === undefined) {
+				// in this case the state is just the name of the selected graph
+				// as selected by the graph menu
+				currentGraphName = state;
+			} else {
+				// in this case the state comes from the browser history and url
+				currentGraphName = state.graph;
+			}
 			
 			containerMenuGraph.find(".graph-item").removeClass("ui-state-active");
-			containerMenuGraph.find("#graphItem" + currentSelectedGraphName).addClass("ui-state-active");
+			containerMenuGraph.find("#graphItem" + currentGraphName).addClass("ui-state-active");
 			
 			// modify the links on the browse menus to match current state
-			containerPanelGraphMenu.find("a[_type='vertices']").attr("href", "/main/graph/" + currentSelectedGraphName + "/vertices?start=0&end=10");
-			containerPanelGraphMenu.find("a[_type='edges']").attr("href", "/main/graph/" + currentSelectedGraphName + "/edges?start=0&end=10");
+			containerPanelGraphMenu.find("a[_type='vertices']").attr("href", "/main/graph/" + currentGraphName + "/vertices?start=0&end=10");
+			containerPanelGraphMenu.find("a[_type='edges']").attr("href", "/main/graph/" + currentGraphName + "/edges?start=0&end=10");
 			
 			// load the graph profile
-			api.getGraph(currentSelectedGraphName, function(graphResult) {
-				$("#panelGraphTitle").text(currentSelectedGraphName);
+			api.getGraph(currentGraphName, function(graphResult) {
+				$("#panelGraphTitle").text(currentGraphName);
 				$("#panelGraphDetail").text(graphResult.graph);
 			},
 			function(err){
 				api.showMessageError("Could not get the graph profile from Rexster.");
 			});
 			
-			// load traversals panel for the current graph
-			api.getTraversals(currentSelectedGraphName, function(traversalResult) { 
-				
-				containerPanelTraversals.show();
-				containerPanelBrowser.hide();
-				containerPanelTraversalsList.empty();
-				
-				currentGraphName = currentSelectedGraphName;
-				
-				api.applyListTraversalsTemplate(traversalResult.results, containerPanelTraversalsList);
-				
-				// execute the callback now that the traversals are done.
-				onComplete();
-			},
-			function(err){
-				api.showMessageError("Could not get the list of traversals from Rexster.");
-			});
-		}
-		
-		this.panelGraphNavigationPagedPrevious = function(api, sender) {
-			var start = currentPageStart - pageSize,
-			    end = currentPageStart;
-			
-			if (start < 0) {
-				this.panelGraphNavigationPagedFirst(api, sender);
+			// check the state.  if the browse panel is on, then don't worry about loading
+			// traversals.
+			if (state.browse === undefined) {
+				// load traversals panel for the current graph
+				api.getTraversals(currentGraphName, function(traversalResult) { 
+					
+					containerPanelTraversals.show();
+					containerPanelBrowser.hide();
+					containerPanelTraversalsList.empty();
+					
+					api.applyListTraversalsTemplate(traversalResult.results, containerPanelTraversalsList);
+					
+					// execute the callback now that the traversals are done.
+					onComplete();
+				},
+				function(err){
+					api.showMessageError("Could not get the list of traversals from Rexster.");
+				});
 			} else {
-				this.panelGraphNavigationPaged(api, start, end, sender);
+				// restore state to a page on the browser
+				this.panelGraphNavigationSelected(api, state.browse.element, state.browse.start, state.browse.end);
 			}
 		}
 		
-		this.panelGraphNavigationPagedNext = function(api, sender) {
-			var start = currentPageStart + pageSize,
-			     end = start + pageSize;
-			
-			if (start > currentTotal) {
-				this.panelGraphNavigationPagedLast(api, sender);
-			} else {
-				this.panelGraphNavigationPaged(api, start, end, sender);
-			}
+		this.panelGraphNavigationPagedPrevious = function(api) {
+			var range = this.calculatePreviousPageRange();
+			this.panelGraphNavigationPaged(api, range.start, range.end);
 		}
 		
-		this.panelGraphNavigationPagedFirst = function(api, sender) {
-			this.panelGraphNavigationPaged(api, 0, pageSize, sender);
+		this.panelGraphNavigationPagedNext = function(api) {
+			var range = this.calculateNextPageRange();
+			this.panelGraphNavigationPaged(api, range.start, range.end);
 		}
 		
-		this.panelGraphNavigationPagedLast = function(api, sender) {
+		this.panelGraphNavigationPagedFirst = function(api) {
+			this.panelGraphNavigationPaged(api, 0, pageSize);
+		}
+		
+		this.panelGraphNavigationPagedLast = function(api) {
+			this.panelGraphNavigationPaged(api, this.calculateStartForLastPage(), currentTotal);
+		}
+		
+		this.calculateStartForLastPage = function() {
 			var remainder = currentTotal % pageSize,
 			start = currentTotal - pageSize;
 			
@@ -120,12 +126,47 @@ Rexster.modules.graph = function(api) {
 				start = currentTotal - remainder;
 			}
 			
-			this.panelGraphNavigationPaged(api, start, currentTotal, sender);
+			return start;
 		}
 		
-		this.panelGraphNavigationPaged = function(api, start, end, sender) {
+		this.calculateNextPageRange = function() {
+			var start = currentPageStart + pageSize,
+		        end = start + pageSize,
+		        range = {
+					start : start,
+					end : end
+				};
+		
+			if (start > currentTotal) {
+				range.start = this.calculateStartForLastPage();
+				range.end = currentTotal;
+			}
+			
+			return range;
+		}
+		
+		this.calculatePreviousPageRange = function() {
+			var start = currentPageStart - pageSize,
+		    	end = currentPageStart,
+		    	range = {
+					start : start,
+					end : end
+				};
+		
+			if (start < 0) {
+				range.start = 0;
+				range.end = pageSize;
+			} 
+			
+			return range;
+		}
+		
+		this.panelGraphNavigationPaged = function(api, start, end, onPageChangeComplete) {
 			var pageStart = 0,
-			    pageEnd = 10;
+			    pageEnd = 10,
+			    nextRange = {},
+			    previousRange = {},
+			    that = this;
 			
 			if (start != undefined) {
 				pageStart = start;
@@ -134,9 +175,12 @@ Rexster.modules.graph = function(api) {
 			if (end != undefined) {
 				pageEnd = end;
 			}
-
-			$(sender).children().first().attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=" + pageStart + "&end=" + pageEnd);
 			
+			// these better be numbers.  perhaps the state coming from the uri
+			// is sending the params in as strings.
+			pageStart = parseInt(pageStart);
+			pageEnd = parseInt(pageEnd);
+
 			containerPanelBrowserMain.empty();
 			
 			api.getVertices(currentGraphName, pageStart, pageEnd, function(data) {
@@ -169,14 +213,37 @@ Rexster.modules.graph = function(api) {
 					
 				}
 				
-				Elastic.refresh();
+				// set the links for the paging...kind of a nicety.  not really used in
+				// the paging process at this point.  just makes for clean uris
+				nextRange = that.calculateNextPageRange();
+				previousRange = that.calculatePreviousPageRange();
+				
+				containerPanelBrowser.find(".ui-icon-seek-first").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=0&end=" + pageSize);
+				containerPanelBrowser.find(".ui-icon-seek-end").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=" + that.calculateStartForLastPage() + "&end=" + currentTotal);
+				containerPanelBrowser.find(".ui-icon-seek-prev").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=" + previousRange.start + "&end=" + previousRange.end);
+				containerPanelBrowser.find(".ui-icon-seek-next").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=" + nextRange.start + "&end=" + nextRange.end);
+				
+				if (onPageChangeComplete != undefined) {
+					onPageChangeComplete();
+				}
 			},
 			function(err) {
-				
+				api.showMessageError("Could not get the vertices of graphs from Rexster.");
 			});
 		}
 		
-		this.panelGraphNavigationSelected = function(api, featureToBrowse) {
+		this.panelGraphNavigationSelected = function(api, featureToBrowse, start, end) {
+			
+			var startPoint = 0,
+			    endPoint = pageSize;
+			
+			if (start != undefined) {
+				startPoint = start;
+			}
+			
+			if (end != undefined) {
+				endPoint = end;
+			}
 			
 			currentFeatureBrowsed = featureToBrowse;
 			
@@ -185,7 +252,9 @@ Rexster.modules.graph = function(api) {
 			
 			containerPanelBrowser.find(".pager").show();;
 			
-			this.panelGraphNavigationPaged(api, 0, pageSize);
+			this.panelGraphNavigationPaged(api, startPoint, endPoint, function() {
+				Elastic.refresh();
+			});
 			
 		}
 		
@@ -246,7 +315,7 @@ Rexster.modules.graph = function(api) {
 				// of the graph is also selected and an attempt to make the graph active
 				// should be made.
 				if (state.hasOwnProperty("graph")) {
-	                mediator.graphSelectionChanged(api, state.graph, onInitComplete);
+	                mediator.graphSelectionChanged(api, state, onInitComplete);
 				}
 				
 				// if the state does not specify a graph then select the first one. 
@@ -268,23 +337,22 @@ Rexster.modules.graph = function(api) {
 				// get the browser panel pager hooked up 
 				mediator.getContainerPanelBrowser().find("li.pager-button").unbind("click");
 				mediator.getContainerPanelBrowser().find("li.pager-button").click(function(evt){
+					evt.preventDefault();
 					var uri, selectedLink;
 					
 					if ($(this).children().first().hasClass("ui-icon-seek-first")) {
 						// go to first batch of records on the list
-						mediator.panelGraphNavigationPagedFirst(api, this);
+						mediator.panelGraphNavigationPagedFirst(api);
 					} else if ($(this).children().first().hasClass("ui-icon-seek-end")) {
 						// go to the last batch of records on the list
-						mediator.panelGraphNavigationPagedLast(api, this);
+						mediator.panelGraphNavigationPagedLast(api);
 					} else if ($(this).children().first().hasClass("ui-icon-seek-prev")) {
 						// go to the previous batch of records on the list
-						mediator.panelGraphNavigationPagedPrevious(api, this);
+						mediator.panelGraphNavigationPagedPrevious(api);
 					} else if ($(this).children().first().hasClass("ui-icon-seek-next")) {
 						// go to the next batch of records on the list
-						mediator.panelGraphNavigationPagedNext(api, this);
+						mediator.panelGraphNavigationPagedNext(api);
 					}
-					
-					evt.preventDefault();
 					
 					selectedLink = $(this).find("a"); 
 	                uri = selectedLink.attr("href");

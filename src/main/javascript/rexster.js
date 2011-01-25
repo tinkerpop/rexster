@@ -38,7 +38,7 @@ $(function(){
 		
 		if (url.segment() >= 4) {
 			state.browse = {
-				element : url.segment(4),
+				element : url.segment(3),
 				start : 0,
 				end : 10 
 			};
