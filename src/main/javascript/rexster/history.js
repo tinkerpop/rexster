@@ -38,6 +38,12 @@ Rexster.modules.history = function(api) {
 		window.history.pushState({"uri":uri}, '', uri);
 	}
 	
+	/**
+	 * Gets the current application state given the current URI.  
+	 * 
+	 * It is important that changes to browser history happen prior to getting
+	 * state as the state is read from the current URI.
+	 */
 	api.getApplicationState = function() {
 		return tryReadStateFromUri();
 	}

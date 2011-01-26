@@ -29,7 +29,7 @@ function Rexster() {
 }
 
 $(function(){
-
+	
 	window.onpopstate = function(event) {
 		restoreApplication();
 	};
