@@ -2,7 +2,7 @@ package com.tinkerpop.rexster.config;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
-import com.tinkerpop.blueprints.pgm.parser.GraphMLReader;
+import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReader;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.configuration.Configuration;
 

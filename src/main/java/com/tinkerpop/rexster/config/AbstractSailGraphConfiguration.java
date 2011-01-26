@@ -65,8 +65,6 @@ public abstract class AbstractSailGraphConfiguration implements GraphConfigurati
             	} else {
             		graph = new NativeStoreSailGraph(graphFile);
             	}
-            } else if (this.sailType.equals(SAIL_TYPE_NEO4J)) {
-            	graph = new Neo4jSailGraph(graphFile);
             }
             
             return graph;

@@ -22,8 +22,8 @@ public class GremlinTraversal extends AbstractTraversal {
     private ScriptEngine engine = new ScriptEngineManager().getEngineByName(GREMLIN);
 
     private static final String GREMLIN = "gremlin";
-    private static final String ROOT_VARIABLE = "$_";
-    private static final String GRAPH_VARIABLE = "$_g";
+    private static final String ROOT_VARIABLE = "v";
+    private static final String GRAPH_VARIABLE = "g";
     private static final String WILDCARD = "*";
     private static final String ROOT = "root";
     private static final String SCRIPT = "script";
