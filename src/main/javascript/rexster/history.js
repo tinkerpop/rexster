@@ -1,0 +1,45 @@
+/**
+ * Manages browser history and application state. 
+ */
+Rexster.modules.history = function(api) {
+	
+	function tryReadStateFromUri() {
+		var encodedState = jQuery.url.setUrl(location.href),
+		    state = {};
+		
+		if (encodedState.segment() >= 4) {
+			state.browse = {
+				element : encodedState.segment(3),
+				start : 0,
+				end : 10 
+			};
+			
+			if (encodedState.param("start") != null && encodedState.param("end")) {
+				state.browse.start = encodedState.param("start");
+				state.browse.end = encodedState.param("end");
+			}
+		}
+		
+		if (encodedState.segment() >= 3) {
+			state.graph = encodedState.segment(2);
+		}
+		
+		if (encodedState.segment() >= 2) {
+			state.menu = encodedState.segment(1);
+		} 
+		
+		return state;
+	}
+	
+	/**
+	 * Pushes a URI into the browser history and parses it to current state. 
+	 */
+	api.historyPush = function(uri) {
+		window.history.pushState({"uri":uri}, '', uri);
+	}
+	
+	api.getApplicationState = function() {
+		return tryReadStateFromUri();
+	}
+};
+	

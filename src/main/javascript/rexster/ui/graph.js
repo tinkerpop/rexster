@@ -50,23 +50,13 @@ Rexster.modules.graph = function(api) {
 		 * A graph was selected from the graph menu.
 		 * 
 		 * @param api        {Object} A Rexster API instance.
-		 * @param state      {Object} A state object constructed from the URI or the name of the 
-		 *                              currently selected graph.
 		 * @param onComplete {Object}   Call back function made when the event is complete.
 		 */
-		this.graphSelectionChanged = function(api, state, onComplete) {
+		this.graphSelectionChanged = function(api, onComplete) {
 			
-			// keep track of the currently selected graph.  could be a better way
-			// to do this check.  would be nice if the state object could be managed
-			// across all cases
-			if (state.graph === undefined) {
-				// in this case the state is just the name of the selected graph
-				// as selected by the graph menu
-				currentGraphName = state;
-			} else {
-				// in this case the state comes from the browser history and url
-				currentGraphName = state.graph;
-			}
+			var state = api.getApplicationState();
+			    
+			currentGraphName = state.graph;
 			
 			containerMenuGraph.find(".graph-item").removeClass("ui-state-active");
 			containerMenuGraph.find("#graphItem" + currentGraphName).addClass("ui-state-active");
@@ -97,14 +87,16 @@ Rexster.modules.graph = function(api) {
 					api.applyListTraversalsTemplate(traversalResult.results, containerPanelTraversalsList);
 					
 					// execute the callback now that the traversals are done.
-					onComplete();
+					if (onComplete != undefined) {
+						onComplete();
+					}
 				},
 				function(err){
 					api.showMessageError("Could not get the list of traversals from Rexster.");
 				});
 			} else {
 				// restore state to a page on the browser
-				this.panelGraphNavigationSelected(api, state.browse.element, state.browse.start, state.browse.end);
+				this.panelGraphNavigationSelected(api, state.browse.element, state.browse.start, state.browse.end, onComplete);
 			}
 		}
 		
@@ -322,7 +314,7 @@ Rexster.modules.graph = function(api) {
 		 * @param start           {int} The start index of the paged set.
 		 * @param end             {int} The end index of the paged set.
 		 */
-		this.panelGraphNavigationSelected = function(api, featureToBrowse, start, end) {
+		this.panelGraphNavigationSelected = function(api, featureToBrowse, start, end, onComplete) {
 			
 			var startPoint = 0,
 			    endPoint = pageSize;
@@ -343,7 +335,13 @@ Rexster.modules.graph = function(api) {
 			containerPanelBrowser.find(".pager").show();;
 			
 			this.panelGraphNavigationPaged(api, startPoint, endPoint, function() {
-				Elastic.refresh();
+				// it is expected that the onComplete will call Elastic.refresh() 
+				// at some point
+				if (onComplete != undefined) {
+					onComplete();
+				} else {
+					Elastic.refresh();
+				}
 			});
 			
 		}
@@ -356,18 +354,20 @@ Rexster.modules.graph = function(api) {
 	/**
 	 * Initializes the graph list.
 	 * 
-	 * @param initialGraphName {String} The name of the graph that should be marked as selected.
 	 * @param onInitComplete   {Function} The callback made when graph initialization is completed. 
 	 */
-	api.initGraphList = function(state, onInitComplete){
+	api.initGraphList = function(onInitComplete){
 		
 		mediator.resetMenuGraph();
-		Rexster("ajax", "template", "info", function(api) {
+		Rexster("ajax", "template", "info", "history", function(api) {
 			api.getGraphs(function(result){
 				
 				var ix = 0,
 					max = 0,
-				    graphs = [];
+				    graphs = [],
+				    state = {};
+				
+				state = api.getApplicationState();
 				
 				// construct a list of graphs that can be pushed into the graph menu
 				max = result.graphs.length;
@@ -382,7 +382,7 @@ Rexster.modules.graph = function(api) {
 				mediator.getContainerPanelGraphMenu().find("a").click(function(evt) {
 					evt.preventDefault();
 	                var uri = $(this).attr('href');
-	                window.history.pushState({"uri":uri}, '', uri);
+	                api.historyPush(uri);
 					mediator.panelGraphNavigationSelected(api, $(this).attr("_type"));
 				});
 				
@@ -396,21 +396,24 @@ Rexster.modules.graph = function(api) {
 					evt.preventDefault();
 					var selectedLink = $(this).find("a"); 
 	                var uri = selectedLink.attr('href');
-	                window.history.pushState({"uri":uri}, '', uri);
+	                api.historyPush(uri);
 	                
-	                mediator.graphSelectionChanged(api, selectedLink.text(), onInitComplete);
+	                mediator.graphSelectionChanged(api);
 				});
 				
 				// check the state, if it is at least two items deep then the state 
 				// of the graph is also selected and an attempt to make the graph active
 				// should be made.
 				if (state.hasOwnProperty("graph")) {
-	                mediator.graphSelectionChanged(api, state, onInitComplete);
+	                mediator.graphSelectionChanged(api, onInitComplete);
 				}
 				
 				// if the state does not specify a graph then select the first one. 
 				if (!state.hasOwnProperty("graph")) {
 					mediator.getContainerMenuGraph().find("#graphItem" + graphs[0].menuName).click();
+					if (onInitComplete != undefined) {
+						onInitComplete();
+					}
 				}	
 				
 				// initialize the browser panel
@@ -434,7 +437,7 @@ Rexster.modules.graph = function(api) {
 					// is done it will place a new href value in for the next set of links
 					selectedLink = $(this).find("a"); 
 	                uri = selectedLink.attr("href");
-	                window.history.pushState({"uri":uri}, "", uri);
+	                api.historyPush(uri);
 					
 					if ($(this).children().first().hasClass("ui-icon-seek-first")) {
 						// go to first batch of records on the list

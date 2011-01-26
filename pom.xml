@@ -218,6 +218,7 @@
 								<include>lib/jquery-jsonviewer-min.js</include>
 
 								<include>rexster-min.js</include>
+								<include>rexster/history-min.js</include>
 								<include>rexster/server-min.js</include>
 								<include>rexster/ajax-min.js</include>
 								<include>rexster/template/template-min.js</include>

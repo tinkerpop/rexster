@@ -12,7 +12,7 @@ Rexster.modules.template = function(api) {
 	
 	templater.init = function() {
 		// expects {id, menuName, [checked], [disabled]}
-		var templateMainMenuMarkup = '<input type="radio" id="radioMenu${id}" name="radioMenu" {{if checked}}checked="checked"{{/if}} {{if disabled}}disabled="disabled"{{/if}}/><label for="radioMenu${id}">${menuName}</label>';
+		var templateMainMenuMarkup = '<input type="radio" id="radioMenu${id}" value="${id}" name="radioMenu" {{if checked}}checked="checked"{{/if}} {{if disabled}}disabled="disabled"{{/if}}/><label for="radioMenu${id}">${menuName}</label>';
 		$.template(templater.templateNameMainMenuItem, templateMainMenuMarkup);
 		
 		// expects {menuName}
