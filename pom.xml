@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop</groupId>
     <artifactId>rexster</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.1.5</version>
     <packaging>jar</packaging>
     <url>http://rexster.tinkerpop.com</url>
     <name>Rexster: A RESTful Graph Shell</name>
