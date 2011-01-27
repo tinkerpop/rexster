@@ -9,12 +9,29 @@ bc. <repository>
 
 ==<hr/>==
 
-h3. Version 0.1 (Fluffy -- NOT OFFICIALLY RELEASED YET)
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-fluffy.png!
+
+h3. Version 0.1.5 (Fluffy -- January 27, 2011)
 
 bc. <dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>rexster</artifactId>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.1.5</version>
+</dependency>
+
+
+* Support for "Gremlin":http://gremlin.tinkerpop.com 0.7
+* Bug fix in configuration parameters of @rexster.xml@ preventing certain values from being configurable.
+* Early release of web tool for Rexster for browsing vertices and edges.  Will be expanded with additional features in future releases.  This feature is experimental only.
+* Sail support
+* Unit test coverage greatly expanded.
+
+h3. Version 0.1 (Fluffy -- December 14, 2010)
+
+bc. <dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>rexster</artifactId>
+  <version>0.1</version>
 </dependency>
 
 * Initial release of the web service shell and rank and score support
