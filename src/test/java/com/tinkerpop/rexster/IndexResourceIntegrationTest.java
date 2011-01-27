@@ -1,8 +1,5 @@
 package com.tinkerpop.rexster;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.After;
@@ -95,8 +92,8 @@ public class IndexResourceIntegrationTest extends BaseTest {
         Assert.assertTrue(object.has("message"));
     }
 
-    // TODO: Pangloss error introduced in Blueprints dealing with auto-index.
-    /*@Test
+
+    @Test
     public void testAutomaticIndexKeys() throws Exception {
         sh.stopWatch();
         String uri = createURI("indices/vertices/keys");
@@ -107,31 +104,16 @@ public class IndexResourceIntegrationTest extends BaseTest {
         Assert.assertEquals(arr.get(0), null);
 
         sh.stopWatch();
-        uri = createURI("indices/vertices/keys?key1&key2&key3");
+        uri = createURI("indices/testIndex?class=vertex&type=automatic&keys=[name,age]");
         object = postResource(uri);
-        Assert.assertEquals(object.length(), 1); // void return only "version"
-        printPerformance("PUT 3 automatic index keys", null, uri, sh.stopWatch());
-        uri = createURI("indices/vertices/keys");
-        object = getResource(uri);
-
-        arr = object.getJSONArray("results");
-        Assert.assertEquals(arr.length(), 3);
-        List<String> keys = Arrays.asList("key1", "key2", "key3");
-        Assert.assertTrue(keys.contains(arr.get(0)));
-        Assert.assertTrue(keys.contains(arr.get(1)));
-        Assert.assertTrue(keys.contains(arr.get(2)));
-
+        printPerformance("POST automatic index", null, uri, sh.stopWatch());
         sh.stopWatch();
-        uri = createURI("indices/vertices/keys?key1&key2");
-        deleteResource(uri);
-        printPerformance("DELETE 2 automatic index keys", null, uri, sh.stopWatch());
-        uri = createURI("indices/vertices/keys");
+        uri = createURI("indices/testIndex/keys");
         object = getResource(uri);
-
+        printPerformance("GET automatic index keys", null, uri, sh.stopWatch());
         arr = object.getJSONArray("results");
-        Assert.assertEquals(arr.length(), 1);
-        keys = Arrays.asList("key3");
-        Assert.assertTrue(keys.contains(arr.get(0)));
-
-    }*/
+        Assert.assertEquals(arr.length(), 2);
+        Assert.assertEquals(arr.get(0), "name");
+        Assert.assertEquals(arr.get(1), "age");
+    }
 }

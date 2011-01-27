@@ -7,18 +7,19 @@ import java.util.Set;
  * which the RexsterApplication gets delivered to resources.
  */
 public interface RexsterApplicationProvider {
-	
-	/**
-	 * Gets the current RexsterApplication instance.
-	 * @return The RexsterApplication instance.
-	 */
-	RexsterApplication getRexsterApplication();
-	
-	RexsterApplicationGraph getApplicationGraph(String graphName);
-	
-	ResultObjectCache getResultObjectCache();
-	
-	Set<String> getGraphsNames();
-	
-	long getStartTime();
+
+    /**
+     * Gets the current RexsterApplication instance.
+     *
+     * @return The RexsterApplication instance.
+     */
+    RexsterApplication getRexsterApplication();
+
+    RexsterApplicationGraph getApplicationGraph(String graphName);
+
+    ResultObjectCache getResultObjectCache();
+
+    Set<String> getGraphsNames();
+
+    long getStartTime();
 }

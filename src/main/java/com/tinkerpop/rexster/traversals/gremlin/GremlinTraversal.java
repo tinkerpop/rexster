@@ -11,7 +11,6 @@ import org.codehaus.jettison.json.JSONObject;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;

@@ -6,7 +6,6 @@ import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
 import com.sun.grizzly.tcp.http11.GrizzlyRequest;
 import com.sun.grizzly.tcp.http11.GrizzlyResponse;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
-
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
@@ -24,7 +23,7 @@ import java.util.Map;
  */
 public class WebServer {
 
-	private static final String DEFAULT_WEB_ROOT_PATH = "public";
+    private static final String DEFAULT_WEB_ROOT_PATH = "public";
     protected static Logger logger = Logger.getLogger(WebServer.class);
     private static RexsterApplication rexster;
 
@@ -34,7 +33,7 @@ public class WebServer {
 
     protected GrizzlyWebServer server;
     protected GrizzlyWebServer adminServer;
-    
+
     public WebServer(final XMLConfiguration properties, boolean user) throws Exception {
         logger.info(".:Welcome to Rexster:.");
         if (user)
@@ -80,15 +79,15 @@ public class WebServer {
 
         this.server = new GrizzlyWebServer(port);
         this.adminServer = new GrizzlyWebServer(adminPort);
-        
+
         ServletAdapter jerseyAdapter = new ServletAdapter();
         for (Map.Entry<String, String> entry : initParams.entrySet()) {
-        	jerseyAdapter.addInitParameter(entry.getKey(), entry.getValue());
+            jerseyAdapter.addInitParameter(entry.getKey(), entry.getValue());
         }
-        
+
         jerseyAdapter.setContextPath("/");
         jerseyAdapter.setServletInstance(new ServletContainer());
-        
+
         // servlet that services all url from "main" by simply sending
         // main.html back to the calling client.  main.html handles its own
         // state given the uri
@@ -96,32 +95,30 @@ public class WebServer {
         servletAdapter.setContextPath("/main");
         servletAdapter.setServletInstance(new ToolServlet());
         servletAdapter.setHandleStaticResources(false);
-        
+
         String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
         servletAdapter.addInitParameter("root", "/" + webRootPath);
-        GrizzlyAdapter staticAdapter = new GrizzlyAdapter(absoluteWebRootPath)
-        {
-            public void service(GrizzlyRequest req, GrizzlyResponse res )
-            {
+        GrizzlyAdapter staticAdapter = new GrizzlyAdapter(absoluteWebRootPath) {
+            public void service(GrizzlyRequest req, GrizzlyResponse res) {
             }
         };
         staticAdapter.setHandleStaticResources(true);
-        
+
         this.server.addGrizzlyAdapter(jerseyAdapter, new String[]{""});
         this.adminServer.addGrizzlyAdapter(servletAdapter, new String[]{"/main"});
         this.adminServer.addGrizzlyAdapter(staticAdapter, new String[]{""});
-        
+
         this.server.start();
         this.adminServer.start();
-        
+
         logger.info("Server running on:" + port);
         logger.info("Admin server running on:" + adminPort);
 
     }
 
     protected void stop() throws Exception {
-    	this.server.stop();
-    	this.adminServer.stop();
+        this.server.stop();
+        this.adminServer.stop();
         rexster.stop();
     }
 

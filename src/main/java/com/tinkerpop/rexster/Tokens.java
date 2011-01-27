@@ -62,6 +62,7 @@ public class Tokens {
     public static final String LEFT_BRACKET = "[";
     public static final String RIGHT_BRACKET = "]";
     public static final String KEY = "key";
+    public static final String KEYS = "keys";
     public static final String VALUE = "value";
     public static final String TYPE = "type";
     public static final String CLASS = "class";

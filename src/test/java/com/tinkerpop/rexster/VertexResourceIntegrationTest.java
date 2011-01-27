@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class VertexResourceIntegrationTest extends BaseTest {
-	@Before
+    @Before
     public void setUp() {
         try {
             this.startWebServer();
@@ -114,7 +114,7 @@ public class VertexResourceIntegrationTest extends BaseTest {
         Assert.assertEquals("9999", object.getString("_id"));
         Assert.assertEquals("vertex", object.getString("_type"));
         Assert.assertNull(object.opt("_outE"));
-        
+
         uri = createURI("vertices/9999");
         object = getResource(uri);
         object = object.getJSONObject("results");
