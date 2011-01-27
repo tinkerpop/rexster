@@ -40,3 +40,43 @@ html {
 	border-bottom-style:solid;
 	border-bottom-color:#9CCDFC;
 }
+#terminal {
+  border: 1px solid black;
+  height: 400px;
+  background: black;
+  overflow: scroll;
+}
+
+#terminal div.line {
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+#terminal input {
+  width: 95%;
+  margin: 1px 0 1px 10px;
+  border: none;
+  display: inline;
+  padding: 2px;
+  background: black;
+  color: #45FF17;
+  font-size: small;
+  font-family: Monaco, monospace;
+}
+
+#terminal p, #terminal pre {
+  margin: 2px;
+  color: #45FF17;
+  font-size: small;
+  font-family: Monaco, serif;
+}
+
+#terminal a {
+  color: #6495ED;
+}
+
+#terminal span.prompt {
+  color: #45FF17;
+  font-size: small;
+  margin-left: 2px;
+}

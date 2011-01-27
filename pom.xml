@@ -225,6 +225,7 @@
 								<include>rexster/ui/main-menu-min.js</include>
 								<include>rexster/ui/graph-min.js</include>
 								<include>rexster/ui/info-min.js</include>
+								<include>rexster/ui/terminal-min.js</include>
 							</includes>
 						</aggregation>
 					</aggregations>

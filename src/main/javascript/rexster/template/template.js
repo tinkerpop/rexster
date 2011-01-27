@@ -15,8 +15,8 @@ Rexster.modules.template = function(api) {
 		var templateMainMenuMarkup = '<input type="radio" id="radioMenu${id}" value="${id}" name="radioMenu" {{if checked}}checked="checked"{{/if}} {{if disabled}}disabled="disabled"{{/if}}/><label for="radioMenu${id}">${menuName}</label>';
 		$.template(templater.templateNameMainMenuItem, templateMainMenuMarkup);
 		
-		// expects {menuName}
-		var templateMenuGraph = '<div id="graphItem${menuName}" class="graph-item ui-state-default ui-corner-all" style="cursor:pointer;padding:2px;margin:1px"><a href="/main/graph/${menuName}">${menuName}</a></div>';
+		// expects {menuName, panel}
+		var templateMenuGraph = '<div id="graphItem${panel}${menuName}" class="graph-item ui-state-default ui-corner-all" style="cursor:pointer;padding:2px;margin:1px"><a href="/main/${panel}/${menuName}">${menuName}</a></div>';
 		$.template(templater.templateNameMenuGraph, templateMenuGraph);
 		
 		// expects {traversalName}

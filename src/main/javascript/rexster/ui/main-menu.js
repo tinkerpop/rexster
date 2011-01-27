@@ -91,8 +91,10 @@ Rexster.modules.mainMenu = function(api) {
 			Rexster.currentPanel.show("slide");
 			Elastic.refresh();
  
-			Rexster("history", function(innerApi) {
+			Rexster("history", "terminal", function(innerApi) {
 				innerApi.historyPush("/main/gremlin");
+				
+				innerApi.initTerminal();
 			});
 
             return false;

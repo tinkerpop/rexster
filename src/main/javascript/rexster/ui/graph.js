@@ -3,19 +3,19 @@
  */
 Rexster.modules.graph = function(api) {
 	
-	var mediator = new GraphPanelMediator("#menuGraph", "#panelTraversals", "#panelGraphMenu", "#panelBrowser", "#panelBrowserMain"),
+	var mediator = new GraphPanelMediator("#panelGraphMenuGraph", "#panelTraversals", "#panelGraphMenu", "#panelBrowser", "#panelBrowserMain"),
 	    currentGraph;
 	
 	/**
 	 * Manages graph panel interactions.
 	 */
 	function GraphPanelMediator(menuGraph, panelTraversals, panelGraphMenu, panelBrowser, panelBrowserMain) {
-		var  containerMenuGraph = $(menuGraph),
+		var  containerMenuGraph = $(menuGraph), // graph menu in the left panel
 	         containerPanelBrowser = $(panelBrowser),
 		     containerPanelBrowserMain = $(panelBrowserMain),
 			 containerPanelTraversals = $(panelTraversals),
 			 containerPanelTraversalsList = containerPanelTraversals.find("ul"),
-			 containerPanelGraphMenu = $(panelGraphMenu),
+			 containerPanelGraphMenu = $(panelGraphMenu), // browse options
 			 currentGraphName = "",
 			 currentFeatureBrowsed = "",
 			 currentPageStart = 0,
@@ -59,7 +59,7 @@ Rexster.modules.graph = function(api) {
 			currentGraphName = state.graph;
 			
 			containerMenuGraph.find(".graph-item").removeClass("ui-state-active");
-			containerMenuGraph.find("#graphItem" + currentGraphName).addClass("ui-state-active");
+			containerMenuGraph.find("#graphItemgraph" + currentGraphName).addClass("ui-state-active");
 			
 			// modify the links on the browse menus to match current state
 			containerPanelGraphMenu.find("a[_type='vertices']").attr("href", "/main/graph/" + currentGraphName + "/vertices?start=0&end=10");
@@ -372,7 +372,7 @@ Rexster.modules.graph = function(api) {
 				// construct a list of graphs that can be pushed into the graph menu
 				max = result.graphs.length;
 				for (ix = 0; ix < max; ix += 1) {
-					graphs.push({ "menuName": result.graphs[ix] });
+					graphs.push({ "menuName": result.graphs[ix], "panel" : "graph" });
 				}
 
 				api.applyMenuGraphTemplate(graphs, mediator.getContainerMenuGraph());
@@ -410,7 +410,7 @@ Rexster.modules.graph = function(api) {
 				
 				// if the state does not specify a graph then select the first one. 
 				if (!state.hasOwnProperty("graph")) {
-					mediator.getContainerMenuGraph().find("#graphItem" + graphs[0].menuName).click();
+					mediator.getContainerMenuGraph().find("#graphItemgraph" + graphs[0].menuName).click();
 					if (onInitComplete != undefined) {
 						onInitComplete();
 					}

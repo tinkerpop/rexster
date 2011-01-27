@@ -6,6 +6,9 @@ import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
 import com.sun.grizzly.tcp.http11.GrizzlyRequest;
 import com.sun.grizzly.tcp.http11.GrizzlyResponse;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.tinkerpop.rexster.servlet.EvaluatorServlet;
+import com.tinkerpop.rexster.servlet.ToolServlet;
+import com.tinkerpop.rexster.servlet.VisualizationServlet;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -92,13 +95,25 @@ public class WebServer {
         // servlet that services all url from "main" by simply sending
         // main.html back to the calling client.  main.html handles its own
         // state given the uri
-        ServletAdapter servletAdapter = new ServletAdapter();
-        servletAdapter.setContextPath("/main");
-        servletAdapter.setServletInstance(new ToolServlet());
-        servletAdapter.setHandleStaticResources(false);
+        ServletAdapter webToolAdapter = new ServletAdapter();
+        webToolAdapter.setContextPath("/main");
+        webToolAdapter.setServletInstance(new ToolServlet());
+        webToolAdapter.setHandleStaticResources(false);
+        
+        // servlet for gremlin console
+        ServletAdapter visualizationAdapter = new ServletAdapter();
+        visualizationAdapter.setContextPath("/visualize");
+        visualizationAdapter.setServletInstance(new VisualizationServlet());
+        visualizationAdapter.setHandleStaticResources(false);
+        
+        // servlet for gremlin console
+        ServletAdapter evaluatorAdapter = new ServletAdapter();
+        evaluatorAdapter.setContextPath("/exec");
+        evaluatorAdapter.setServletInstance(new EvaluatorServlet());
+        evaluatorAdapter.setHandleStaticResources(false);
         
         String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
-        servletAdapter.addInitParameter("root", "/" + webRootPath);
+        webToolAdapter.addInitParameter("root", "/" + webRootPath);
         GrizzlyAdapter staticAdapter = new GrizzlyAdapter(absoluteWebRootPath)
         {
             public void service(GrizzlyRequest req, GrizzlyResponse res )
@@ -108,7 +123,9 @@ public class WebServer {
         staticAdapter.setHandleStaticResources(true);
         
         this.server.addGrizzlyAdapter(jerseyAdapter, new String[]{""});
-        this.adminServer.addGrizzlyAdapter(servletAdapter, new String[]{"/main"});
+        this.adminServer.addGrizzlyAdapter(webToolAdapter, new String[]{"/main"});
+        this.adminServer.addGrizzlyAdapter(visualizationAdapter, new String[]{"/visualize"});
+        this.adminServer.addGrizzlyAdapter(evaluatorAdapter, new String[]{"/exec"});
         this.adminServer.addGrizzlyAdapter(staticAdapter, new String[]{""});
         
         this.server.start();
