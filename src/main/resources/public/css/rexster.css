@@ -61,14 +61,14 @@ html {
   background: black;
   color: #45FF17;
   font-size: small;
-  font-family: Monaco, monospace;
+  font-family: Monaco, Lucinda Console, Courier, Courier New, monospace;
 }
 
 #terminal p, #terminal pre {
   margin: 2px;
   color: #45FF17;
   font-size: small;
-  font-family: Monaco, serif;
+  font-family: Monaco, Lucinda Console, Courier, Courier New, monospace;
 }
 
 #terminal a {
