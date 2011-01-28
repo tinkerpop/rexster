@@ -109,7 +109,24 @@ Rexster.modules.mainMenu = function(api) {
 				$("#radioMenuGraph").click();			
 			}
 		} else if (state.menu === "gremlin") {
-			$("#radioMenuGremlin").click();
+			if (state.hasOwnProperty("graph")) {
+				var options = {};
+				
+				// hide the current panel as a new one has been selected
+				if (Rexster.currentPanel != undefined && Rexster.currentPanel != null) {
+					Rexster.currentPanel.hide("slide");
+				}
+
+				Rexster.currentPanel = $("#mainGremlin");
+				Rexster.currentPanel.show("slide");
+				Elastic.refresh();
+	 
+				Rexster("terminal", function(innerApi) {
+					innerApi.initTerminal();
+				});
+			} else {
+				$("#radioMenuGremlin").click();
+			}
 		}
 	};
 };

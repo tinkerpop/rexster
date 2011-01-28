@@ -32,16 +32,16 @@ public class ConsoleGarbageCollector extends Thread {
 			} catch (InterruptedException e) {
 			}
 
-			Collection<String> sessionIds = ConsoleSessions.getSessionIds();
+			Collection<String> sessionKeys = ConsoleSessions.getSessionKeys();
 
-			for (String sessionId : sessionIds) {
+			for (String sessionKey : sessionKeys) {
 				// Make sure session exists (otherwise
 				// GremlinSessions.getSession() will create it)
-				if (ConsoleSessions.hasSession(sessionId)) {
+				if (ConsoleSessions.hasSessionKey(sessionKey)) {
 					// If idle time is above our threshold
-					if (ConsoleSessions.getSession(sessionId).getIdleTime() > maxIdleInterval) {
+					if (ConsoleSessions.findSessionByKey(sessionKey).getIdleTime() > maxIdleInterval) {
 						// Throw the GremlinSession instance to the wolves
-						ConsoleSessions.destroySession(sessionId);
+						ConsoleSessions.destroySession(sessionKey);
 					}
 				}
 			}

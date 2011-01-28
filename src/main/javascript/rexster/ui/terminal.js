@@ -17,7 +17,7 @@
  */
 
 // Readline class to handle line input.
-var ReadLine = function(options) {
+var ReadLine = function(options, api) {
   this.options      = options || {};
   this.htmlForInput = this.options.htmlForInput;
   this.inputHandler = function(h, v, scope) { 
@@ -31,12 +31,13 @@ var ReadLine = function(options) {
     if(/visualize/.test(v)) {
       var vertex = ".";
       var parts = v.split(' ');
-
+      var state = api.getApplicationState();
+      
       if(parts.length == 2) {
         vertex = parts[1];
       }
 
-      $.get('/visualize', { v : vertex, "g" : "gratefulgraph" }, function(value) {
+      $.get('/visualize', { v : vertex, "g" : state.graph }, function(value) {
         if(/Could not/.test(value)) {
           h.insertResponse(value);   
         } else {
@@ -66,7 +67,8 @@ var ReadLine = function(options) {
       req = v;
     }
 
-    $.post('/exec', { code : req, "g" : "gratefulgraph" }, function(value) { 
+    var state = api.getApplicationState();
+    $.post('/exec', { code : req, "g" : state.graph }, function(value) { 
       h.insertResponse(value.replace(/\n/g, "<br />"));
 
       // Save to the command history...
@@ -108,7 +110,7 @@ ReadLine.prototype = {
     var ctx = this;
     ctx.activeLine = $(this.lineClass + '.active');
 
-    // Bind key events for entering and navigting history.
+    // Bind key events for entering and navigating history.
     ctx.activeLine.bind("keydown", function(ev) {
       switch (ev.keyCode) {
         case EnterKeyCode:
@@ -232,9 +234,7 @@ Rexster.modules.terminal = function(api) {
 				var ix = 0,
 					max = 0,
 				    graphs = [],
-				    state = {};
-				
-				state = api.getApplicationState();
+				    state = api.getApplicationState();
 				
 				// construct a list of graphs that can be pushed into the graph menu
 				max = result.graphs.length;
@@ -262,7 +262,25 @@ Rexster.modules.terminal = function(api) {
 	                
 				});
 				
-				var terminal = new ReadLine({htmlForInput: DefaultInputHtml});
+				// check the state, if it is at least two items deep then the state 
+				// of the graph is also selected and an attempt to make the graph active
+				// should be made.
+				if (state.hasOwnProperty("graph")) {
+					$("#panelGremlinMenuGraph").find("#graphItemgremlin" + state.graph).click();
+					if (onInitComplete != undefined) {
+						onInitComplete();
+					}
+				}
+				
+				// if the state does not specify a graph then select the first one. 
+				if (!state.hasOwnProperty("graph")) {
+					$("#panelGremlinMenuGraph").find("#graphItemgremlin" + graphs[0].menuName).click();
+					if (onInitComplete != undefined) {
+						onInitComplete();
+					}
+				}	
+				
+				var terminal = new ReadLine({htmlForInput: DefaultInputHtml}, api);
 			});
 		});
 	}
