@@ -41,7 +41,6 @@ public class EvaluatorServlet extends HttpServlet {
         }
           
         String sessionId = request.getSession(true).getId();
-        //GremlinEvaluator gremlin = WeblingLauncher.getEvaluatorBySessionId(sessionId);
           
         response.setContentType("text/plain");
         response.setStatus(HttpServletResponse.SC_OK);
@@ -55,8 +54,10 @@ public class EvaluatorServlet extends HttpServlet {
         System.setOut(out);
         
         try {
-        	List<String> result = ConsoleSessions.getSession(sessionId, graphName).evaluate(code);
-            out.println("==> " + ((result.size() == 1) ? result.get(0) : result));
+        	List<String> lines = ConsoleSessions.getSession(sessionId, graphName).evaluate(code);
+        	for (String line : lines) {
+        		out.println("==> " + line);
+        	}
         } catch(Exception e) {
             out.println(e.getMessage());
         }

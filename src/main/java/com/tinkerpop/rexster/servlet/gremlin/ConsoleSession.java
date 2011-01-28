@@ -142,8 +142,6 @@ public class ConsoleSession implements Runnable {
 			this.lastTimeUsed = new Date();
 			resetOutputWriter();
 
-			//List<Object> resultLines = (List<Object>) scriptEngine.eval(line);
-
 			List<Object> resultLines = new ArrayList<Object>();
 			Object result = scriptEngine.eval(line);
             if (result instanceof Iterable) {
