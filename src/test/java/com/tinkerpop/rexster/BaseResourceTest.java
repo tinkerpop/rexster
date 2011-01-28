@@ -4,13 +4,12 @@ import org.codehaus.jettison.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -133,66 +132,66 @@ public class BaseResourceTest {
         Assert.assertEquals("key2", tt.getReturnKeys().get(1));
         Assert.assertEquals("key3", tt.getReturnKeys().get(2));
     }
-    
+
     @Test
     public void addHeadersAllPresent() {
-    	MockResource mock = new MockResource();
-    	ResponseBuilder builder = mock.addHeaders(Response.ok());
-    	
-    	Assert.assertNotNull(builder);
-    	
-    	Response response = builder.build();
-    	MultivaluedMap<String, Object> map = response.getMetadata();
-    	Assert.assertNotNull(map);
-    	
-    	// without this the web tool for rexster won't work
-    	Assert.assertTrue(map.containsKey(BaseResource.HEADER_ACCESS_CONTROL_ALLOW_ORIGIN));
-    	
+        MockResource mock = new MockResource();
+        ResponseBuilder builder = mock.addHeaders(Response.ok());
+
+        Assert.assertNotNull(builder);
+
+        Response response = builder.build();
+        MultivaluedMap<String, Object> map = response.getMetadata();
+        Assert.assertNotNull(map);
+
+        // without this the web tool for rexster won't work
+        Assert.assertTrue(map.containsKey(BaseResource.HEADER_ACCESS_CONTROL_ALLOW_ORIGIN));
+
     }
 
     protected class MockResource extends BaseResource {
-    	public MockResource(){
-    		super(new MockRexsterApplicationProvider());
-    	}
-    	
-    	public ResponseBuilder addHeaders(ResponseBuilder builder) {
-    		return super.addHeaders(builder);
-    	}
+        public MockResource() {
+            super(new MockRexsterApplicationProvider());
+        }
+
+        public ResponseBuilder addHeaders(ResponseBuilder builder) {
+            return super.addHeaders(builder);
+        }
     }
 
-    protected class MockRexsterApplicationProvider implements RexsterApplicationProvider{
+    protected class MockRexsterApplicationProvider implements RexsterApplicationProvider {
 
-    	private final long startTime = System.currentTimeMillis();
-    	
-		@Override
-		public RexsterApplication getRexsterApplication() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+        private final long startTime = System.currentTimeMillis();
 
-		@Override
-		public RexsterApplicationGraph getApplicationGraph(String graphName) {
-			// TODO Auto-generated method stub
-			return null;
-		}
+        @Override
+        public RexsterApplication getRexsterApplication() {
+            // TODO Auto-generated method stub
+            return null;
+        }
 
-		@Override
-		public ResultObjectCache getResultObjectCache() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+        @Override
+        public RexsterApplicationGraph getApplicationGraph(String graphName) {
+            // TODO Auto-generated method stub
+            return null;
+        }
 
-		@Override
-		public Set<String> getGraphsNames() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+        @Override
+        public ResultObjectCache getResultObjectCache() {
+            // TODO Auto-generated method stub
+            return null;
+        }
 
-		@Override
-		public long getStartTime() {
-			return this.startTime;
-		}
-    	
+        @Override
+        public Set<String> getGraphsNames() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public long getStartTime() {
+            return this.startTime;
+        }
+
     }
 }
 

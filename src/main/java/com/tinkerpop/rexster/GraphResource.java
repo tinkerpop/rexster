@@ -22,11 +22,11 @@ public class GraphResource extends AbstractSubResource {
     public GraphResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
         super(graphName, ui, req, null);
     }
-    
+
     public GraphResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
         super(graphName, ui, req, rap);
     }
-    
+
     /**
      * GET http://host/graph
      * graph.toString();
@@ -48,8 +48,7 @@ public class GraphResource extends AbstractSubResource {
         } catch (JSONException ex) {
             logger.error(ex);
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(
-            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
         return this.addHeaders(Response.ok(this.resultObject)).build();
@@ -71,8 +70,7 @@ public class GraphResource extends AbstractSubResource {
         } catch (JSONException ex) {
             logger.error(ex);
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(
-            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
         return this.addHeaders(Response.ok(this.resultObject)).build();

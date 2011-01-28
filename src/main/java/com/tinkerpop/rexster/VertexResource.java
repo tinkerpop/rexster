@@ -28,11 +28,11 @@ public class VertexResource extends AbstractSubResource {
     public VertexResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
         super(graphName, ui, req, null);
     }
-    
+
     public VertexResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
         super(graphName, ui, req, rap);
     }
-    
+
     /**
      * GET http://host/graph/vertices
      * graph.getVertices();
@@ -60,8 +60,7 @@ public class VertexResource extends AbstractSubResource {
         } catch (JSONException ex) {
             logger.error(ex);
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(
-            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
         return this.addHeaders(Response.ok(this.resultObject)).build();
@@ -83,16 +82,14 @@ public class VertexResource extends AbstractSubResource {
                 logger.error(ex);
 
                 JSONObject error = generateErrorObjectJsonFail(ex);
-                throw new WebApplicationException(
-                		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+                throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
             }
         } else {
             String msg = "Could not find vertex [" + id + "] on graph [" + this.rag.getGraphName() + "]";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(
-            		this.addHeaders(Response.status(Status.NOT_FOUND).entity(error)).build());
+            throw new WebApplicationException(this.addHeaders(Response.status(Status.NOT_FOUND).entity(error)).build());
         }
 
 
@@ -141,8 +138,7 @@ public class VertexResource extends AbstractSubResource {
                 logger.info(msg);
 
                 JSONObject error = generateErrorObject(msg);
-                throw new WebApplicationException(
-                		this.addHeaders(Response.status(Status.NOT_FOUND).entity(error)).build());
+                throw new WebApplicationException(this.addHeaders(Response.status(Status.NOT_FOUND).entity(error)).build());
             }
 
             this.resultObject.put(Tokens.RESULTS, edgeArray);
@@ -153,8 +149,7 @@ public class VertexResource extends AbstractSubResource {
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(
-            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
         return this.addHeaders(Response.ok(this.resultObject)).build();
@@ -186,8 +181,7 @@ public class VertexResource extends AbstractSubResource {
             } else {
                 if (!this.hasElementProperties(this.requestObject)) {
                     JSONObject error = generateErrorObjectJsonFail(new Exception("Vertex with id " + id + " already exists"));
-                    throw new WebApplicationException(
-                    		this.addHeaders(Response.status(Status.CONFLICT).entity(error)).build());
+                    throw new WebApplicationException(this.addHeaders(Response.status(Status.CONFLICT).entity(error)).build());
                 }
             }
 
@@ -205,8 +199,7 @@ public class VertexResource extends AbstractSubResource {
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(
-            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
         return this.addHeaders(Response.ok(this.resultObject)).build();
@@ -243,16 +236,14 @@ public class VertexResource extends AbstractSubResource {
                 logger.info(msg);
 
                 JSONObject error = generateErrorObject(msg);
-                throw new WebApplicationException(
-                		this.addHeaders(Response.status(Status.NOT_FOUND).entity(error)).build());
+                throw new WebApplicationException(this.addHeaders(Response.status(Status.NOT_FOUND).entity(error)).build());
             }
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(
-            		this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
         return this.addHeaders(Response.ok(this.resultObject)).build();

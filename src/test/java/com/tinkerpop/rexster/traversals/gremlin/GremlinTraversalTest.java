@@ -4,7 +4,6 @@ import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.traversals.TraversalBaseTest;
 import com.tinkerpop.rexster.traversals.TraversalException;
-import com.tinkerpop.rexster.traversals.grateful.FollowsScore;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;

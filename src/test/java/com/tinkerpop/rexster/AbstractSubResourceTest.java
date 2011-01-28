@@ -24,11 +24,11 @@ public class AbstractSubResourceTest {
 
         final UriInfo uriInfo = this.mockery.mock(UriInfo.class);
         final HttpServletRequest req = this.mockery.mock(HttpServletRequest.class);
-        
+
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
-        
+
         this.mockery.checking(new Expectations() {{
             allowing(req).getParameterMap();
             will(returnValue(new HashMap<String, String>()));

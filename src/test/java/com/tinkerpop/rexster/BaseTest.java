@@ -87,12 +87,12 @@ public abstract class BaseTest {
     }
 
     public static String createURI(String graphName, String extension) {
-    	String uri = baseURI + graphName;
-    	if (extension != null && extension.trim().length() > 0) {
-        	return uri + "/" + extension;
-    	}
-    	
-    	return uri;
+        String uri = baseURI + graphName;
+        if (extension != null && extension.trim().length() > 0) {
+            return uri + "/" + extension;
+        }
+
+        return uri;
     }
 
     public static void printPerformance(String name, Integer events, String eventName, double timeInMilliseconds) {
