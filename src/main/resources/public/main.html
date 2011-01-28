@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="/css/elastic.print.css" type="text/css" media="print"/>
     <link rel="stylesheet" href="/css/rexster.css" type="text/css" media="all"/>
     <link type="text/css" href="/css/dot-luv/jquery-ui-1.8.7.custom.css" rel="stylesheet"/>
+    <!-- the {{inject}} is kind of a hack to allow injection of a small javascript provide by the ToolServlet  -->
+    {{inject}}
     <script type="text/javascript" src="/javascript/rexster.js"></script>
 </head>
 <body>
@@ -42,12 +44,12 @@
 			</div>
 			<div class="elastic column">
 				<div id="panelGremlin" class="container ui-widget make-space">
-					<div class="ui-widget-header ui-corner-top">Gremlin Terminal</div>
+					<div class="ui-widget-header ui-corner-top">Gremlin Console</div>
 					<div class="ui-widget-content ui-corner-bottom">
 						<div class="container">
 							<div class="make-space">
 							    <div id="terminal">
-							      <p>Gremlin 0.1</p>
+							      <p id="gremlinVersion"></p>
 							      <p>type "help" for help</p>
 							    </div>
 							    <div id="graph" style="margin:auto;"></div>

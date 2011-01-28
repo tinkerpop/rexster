@@ -228,6 +228,8 @@ Rexster.modules.terminal = function(api) {
 		$("#panelGremlinMenuGraph").empty();
 		$("#terminal .line").remove();
 		
+		$("#gremlinVersion").text("Gremlin " + GREMLIN_VERSION);
+		
 		Rexster("ajax", "template", "info", "history", function(api) {
 			api.getGraphs(function(result){
 				
