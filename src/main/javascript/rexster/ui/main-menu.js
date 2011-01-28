@@ -30,6 +30,27 @@ Rexster.modules.mainMenu = function(api) {
 		});
 	}
 	
+	function slideGremlinPanel(newState) {
+		var options = {};
+		
+		// hide the current panel as a new one has been selected
+		if (Rexster.currentPanel != undefined && Rexster.currentPanel != null) {
+			Rexster.currentPanel.hide("slide");
+		}
+
+		Rexster.currentPanel = $("#mainGremlin");
+		Rexster.currentPanel.show("slide");
+		Elastic.refresh();
+
+		Rexster("terminal", "history", function(innerApi) {
+			if (newState != undefined) {
+				innerApi.historyPush(newState);
+			}
+			
+			innerApi.initTerminal();
+		});
+	}
+	
 	function isPanelDifferent(newPanel) {
 		var diff = true;
 		
@@ -80,23 +101,7 @@ Rexster.modules.mainMenu = function(api) {
 
 		$("#radioMenuGremlin").unbind("click");
 		$("#radioMenuGremlin").click(function() {
-			var options = {};
-			
-			// hide the current panel as a new one has been selected
-			if (Rexster.currentPanel != undefined && Rexster.currentPanel != null) {
-				Rexster.currentPanel.hide("slide");
-			}
-
-			Rexster.currentPanel = $("#mainGremlin");
-			Rexster.currentPanel.show("slide");
-			Elastic.refresh();
- 
-			Rexster("history", "terminal", function(innerApi) {
-				innerApi.historyPush("/main/gremlin");
-				
-				innerApi.initTerminal();
-			});
-
+			slideGremlinPanel("/main/gremlin");
             return false;
 		});
 		
@@ -110,20 +115,7 @@ Rexster.modules.mainMenu = function(api) {
 			}
 		} else if (state.menu === "gremlin") {
 			if (state.hasOwnProperty("graph")) {
-				var options = {};
-				
-				// hide the current panel as a new one has been selected
-				if (Rexster.currentPanel != undefined && Rexster.currentPanel != null) {
-					Rexster.currentPanel.hide("slide");
-				}
-
-				Rexster.currentPanel = $("#mainGremlin");
-				Rexster.currentPanel.show("slide");
-				Elastic.refresh();
-	 
-				Rexster("terminal", function(innerApi) {
-					innerApi.initTerminal();
-				});
+				slideGremlinPanel();
 			} else {
 				$("#radioMenuGremlin").click();
 			}
