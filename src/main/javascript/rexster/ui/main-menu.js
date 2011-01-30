@@ -4,12 +4,12 @@
 Rexster.modules.mainMenu = function(api) {
 	
 	function slideGraphPanel(newState) {
-		var options = {},
+		var options = { direction:"right" },
 		    different = isPanelDifferent("mainGraph");
 		
 		// hide the current panel as a new one has been selected
 		if (Rexster.currentPanel != undefined && Rexster.currentPanel != null && different) {
-			Rexster.currentPanel.hide("slide");
+			Rexster.currentPanel.hide("slide", options);
 		}
 		
 		Rexster("graph", "history", function(innerApi) {
@@ -22,6 +22,7 @@ Rexster.modules.mainMenu = function(api) {
 			innerApi.initGraphList(function(){
 				if (different) {
 					Rexster.currentPanel = $("#mainGraph");
+					$("#slideHolder").prepend(Rexster.currentPanel);
 					Rexster.currentPanel.show("slide");
 				}
 				
@@ -31,14 +32,15 @@ Rexster.modules.mainMenu = function(api) {
 	}
 	
 	function slideGremlinPanel(newState) {
-		var options = {};
+		var options = { direction:"right" };
 		
 		// hide the current panel as a new one has been selected
 		if (Rexster.currentPanel != undefined && Rexster.currentPanel != null) {
-			Rexster.currentPanel.hide("slide");
+			Rexster.currentPanel.hide("slide", options);
 		}
 
 		Rexster.currentPanel = $("#mainGremlin");
+		$("#slideHolder").prepend(Rexster.currentPanel);
 		Rexster.currentPanel.show("slide");
 		Elastic.refresh();
 
