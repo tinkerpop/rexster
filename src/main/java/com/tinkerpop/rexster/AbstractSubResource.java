@@ -17,6 +17,10 @@ public abstract class AbstractSubResource extends BaseResource {
 
     private static final Logger logger = Logger.getLogger(AbstractSubResource.class);
 
+    protected HttpServletRequest request;
+
+    protected UriInfo uriInfo;
+
     protected AbstractSubResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
         super(rap);
 
@@ -30,12 +34,13 @@ public abstract class AbstractSubResource extends BaseResource {
         }
 
         try {
-            this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
-            Map<String, String> queryParameters = req.getParameterMap();
-            this.buildRequestObject(queryParameters);
-
             this.request = req;
             this.uriInfo = ui;
+            
+            this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
+            Map<String, String> queryParameters = this.request.getParameterMap();
+            this.buildRequestObject(queryParameters);
+
         } catch (JSONException ex) {
 
             logger.error(ex);

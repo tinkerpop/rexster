@@ -31,10 +31,6 @@ public abstract class BaseResource {
 
     protected JSONObject resultObject = new JSONObject();
 
-    protected HttpServletRequest request;
-
-    protected UriInfo uriInfo;
-
     protected RexsterApplicationProvider rexsterApplicationProvider;
 
     public BaseResource(RexsterApplicationProvider rexsterApplicationProvider) {
