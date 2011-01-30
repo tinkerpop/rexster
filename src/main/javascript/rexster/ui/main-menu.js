@@ -9,7 +9,7 @@ Rexster.modules.mainMenu = function(api) {
 		
 		// hide the current panel as a new one has been selected
 		if (Rexster.currentPanel != undefined && Rexster.currentPanel != null && different) {
-			Rexster.currentPanel.hide("slide", options);
+			Rexster.currentPanel.hide("slide", options, 500);
 		}
 		
 		Rexster("graph", "history", function(innerApi) {
@@ -23,33 +23,33 @@ Rexster.modules.mainMenu = function(api) {
 				if (different) {
 					Rexster.currentPanel = $("#mainGraph");
 					$("#slideHolder").prepend(Rexster.currentPanel);
-					Rexster.currentPanel.show("slide");
+					Rexster.currentPanel.delay(500).show("slide", null, function() { Elastic.refresh(); });
 				}
-				
-				Elastic.refresh();
 			});
 		});
 	}
 	
 	function slideGremlinPanel(newState) {
-		var options = { direction:"right" };
+		var options = { direction:"right" },
+	    different = isPanelDifferent("mainGremlin");;
 		
 		// hide the current panel as a new one has been selected
-		if (Rexster.currentPanel != undefined && Rexster.currentPanel != null) {
+		if (Rexster.currentPanel != undefined && Rexster.currentPanel != null && different) {
 			Rexster.currentPanel.hide("slide", options);
 		}
-
-		Rexster.currentPanel = $("#mainGremlin");
-		$("#slideHolder").prepend(Rexster.currentPanel);
-		Rexster.currentPanel.show("slide");
-		Elastic.refresh();
 
 		Rexster("terminal", "history", function(innerApi) {
 			if (newState != undefined) {
 				innerApi.historyPush(newState);
 			}
 			
-			innerApi.initTerminal();
+			innerApi.initTerminal(function(){
+				if (different) {
+					Rexster.currentPanel = $("#mainGremlin");
+					$("#slideHolder").prepend(Rexster.currentPanel);
+					Rexster.currentPanel.delay(500).show("slide", null, function() { Elastic.refresh(); });
+				}
+			});
 		});
 	}
 	
