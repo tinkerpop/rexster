@@ -247,7 +247,7 @@ public abstract class BaseResource {
     public List<String> getReturnKeys() {
         JSONObject rexster = this.getRexsterRequest();
         if (null != rexster) {
-            //return (List<String>) rexster.opt(GremlinTokens.RETURN_KEYS);
+
             JSONArray arr = rexster.optJSONArray(Tokens.RETURN_KEYS);
             List<String> keys = new ArrayList<String>();
 
@@ -259,6 +259,10 @@ public abstract class BaseResource {
                 keys = null;
             }
 
+            if (keys != null && keys.size() == 1 && keys.get(0).equals(Tokens.WILDCARD)) {
+            	keys = null;
+            }
+            
             return keys;
         } else {
             return null;

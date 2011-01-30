@@ -11,6 +11,8 @@ import org.codehaus.jettison.json.JSONObject;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -98,9 +100,21 @@ public class GremlinTraversal extends AbstractTraversal {
         super.preQuery();
 
         if (this.requestObject.has(RETURN_KEYS)) {
-            this.returnKeys = (List<String>) this.requestObject.opt(RETURN_KEYS);
-            if (this.returnKeys.size() == 1 && this.returnKeys.get(0).equals(WILDCARD))
+        	JSONArray list = this.requestObject.optJSONArray(RETURN_KEYS);
+            this.returnKeys = new ArrayList<String>();
+
+            if (list != null) {
+                for (int ix = 0; ix < list.length(); ix++) {
+                	this.returnKeys.add(list.optString(ix));
+                }
+            } else {
+            	this.returnKeys = null;
+            }
+            
+            if (this.returnKeys != null && this.returnKeys.size() == 1 
+            		&& this.returnKeys.get(0).equals(WILDCARD)) {
                 this.returnKeys = null;
+            }
         }
 
     }
