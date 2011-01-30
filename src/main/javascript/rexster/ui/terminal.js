@@ -21,12 +21,13 @@ var ReadLine = function(options, api) {
   this.options      = options || {};
   this.htmlForInput = this.options.htmlForInput;
   this.inputHandler = function(h, v, scope) { 
+	/*
     if(v == 'help') {
       h.insertResponse('Coming soon');
       h.newPromptLine();
       return null;
     }
-
+    */
     
     if(/visualize/.test(v)) {
       var vertex = ".";

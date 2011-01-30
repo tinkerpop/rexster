@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -153,6 +154,11 @@ public class ConsoleSession implements Runnable {
                 while (itty.hasNext()) {
                     resultLines.add(itty.next());
                 }
+            } else if (result instanceof Map){
+            	Map map = (Map) result;
+            	for (Object key : map.keySet()) {
+            		resultLines.add(map.get(key).toString());
+            	}
             } else {
                 resultLines.add(result);
             }
