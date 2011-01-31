@@ -213,12 +213,19 @@ Rexster.modules.graph = function(api) {
 		 */
 		this.renderPagedResults = function(results, resultSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete){
 			
-			var that = this;
+			var that = this,
+			    metaDataLabel = "";
 			
 			if (results.length > 0) {
 				for (var ix = 0; ix < results.length; ix++) {
 					containerPanelBrowserMain.append("<div class='make-space'>");
-					containerPanelBrowserMain.children().last().jsonviewer({ "json_name": "Result #" + (pageStart + ix + 1), "json_data": results[ix], "outer-padding":"0px" });
+					
+					metaDataLabel = "Type:[" + results[ix]._type + "] ID:[" + results[ix]._id + "]";
+					if (results[ix]._type == "edge") {
+						metaDataLabel = metaDataLabel + " In:[" + results[ix]._inV + "] Out:[" + results[ix]._outV + "] Label:[" + results[ix]._label + "]";
+					}
+					
+					containerPanelBrowserMain.children().last().jsonviewer({ "json_name": "#" + (pageStart + ix + 1) + " | " + metaDataLabel, "json_data": results[ix], "outer-padding":"0px" });
 					
 					if(ix % 2 > 0) {
 						containerPanelBrowserMain.children().last().find(".json-widget-header").addClass("json-widget-alt");

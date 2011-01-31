@@ -29,37 +29,40 @@
 
     function format_value(element, name, data, config) {
         //debug('name=' + name + "; data=" + data);
-        var v = new TypeHandler(data);
-        var type_prefix = v.type().charAt(0);
-        var container = $('<div/>');
-        $(container).appendTo(element);
-        $(container).addClass('json-widget').css({'padding': config['outer-padding'], 'padding-left': config['ident'] });
-        $(container).click(function(event) {
-        $(container).children('.json-widget-content').toggleClass('ui-helper-hidden');
-            return false;
-        });
-        var header = $('<div/>');
-        $(header).appendTo(container);
-        $(header).addClass('json-widget-header ui-corner-top')
-            .css({ 'cursor': 'hand', //'float': 'left',
-                'text-align': 'left', 'white-space': 'nowrap'
-            });
-        $(header).text('' + (config['type_prefix'] ? "(" + type_prefix + ")" : "") + name);
-
-        if (v.type() == "object" || v.type() == "array") {
-            var content = $('<div/>');
-            $(content).appendTo(container);
-            $(content).addClass('json-widget-content ui-corner-bottom')
-            .css({ 'white-space': 'nowrap', 'padding': config['inner-padding'] });
-            for (name in data) { format_value(content, name, data[name], config); }
-        }
-        else {
-            var content = $('<div/>');
-            $(content).appendTo(container);
-            $(content).addClass('json-widget-content ui-corner-bottom')
-            .css({ 'overflow': 'hidden', 'white-space': 'nowrap' });
-            $(content).text('' + data);
-        }
+    	var isMetaData = name === "_type" || name === "_id" || name === "_outV" || name === "_inV" || name === "_label"; 
+    	if (!isMetaData) {
+	        var v = new TypeHandler(data);
+	        var type_prefix = v.type().charAt(0);
+	        var container = $('<div/>');
+	        $(container).appendTo(element);
+	        $(container).addClass('json-widget').css({'padding': config['outer-padding'], 'padding-left': config['ident'] });
+	        $(container).click(function(event) {
+	        $(container).children('.json-widget-content').toggleClass('ui-helper-hidden');
+	            return false;
+	        });
+	        
+	        if (v.type() == "object" || v.type() == "array") {
+	        	var header = $('<div/>');
+		        $(header).appendTo(container);
+		        $(header).addClass('json-widget-header ui-corner-top')
+		            .css({ 'cursor': 'hand', //'float': 'left',
+		                'text-align': 'left', 'white-space': 'nowrap'
+		            });
+		        $(header).text('' + (config['type_prefix'] ? "(" + type_prefix + ")" : "") + name);
+	        	
+	            var content = $('<div/>');
+	            $(content).appendTo(container);
+	            $(content).addClass('json-widget-content ui-corner-bottom')
+	            .css({ 'white-space': 'nowrap', 'padding': config['inner-padding'] });
+	            for (name in data) { format_value(content, name, data[name], config); }
+	        }
+	        else {
+	            var content = $('<div/>');
+	            $(content).appendTo(container);
+	            $(content).css({ 'overflow': 'hidden', 'white-space': 'nowrap' });
+	            $(content).text(name + ' : ' + data);
+	        }
+    	}
     };
 
 
