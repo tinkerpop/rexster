@@ -60,7 +60,7 @@
 	            var content = $('<div/>');
 	            $(content).appendTo(container);
 	            $(content).css({ 'overflow': 'hidden', 'white-space': 'nowrap' });
-	            $(content).text(name + ' : ' + data);
+	            $(content).text(name + ': ' + data);
 	        }
     	}
     };

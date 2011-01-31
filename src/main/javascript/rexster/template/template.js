@@ -20,7 +20,7 @@ Rexster.modules.template = function(api) {
 		$.template(templater.templateNameMenuGraph, templateMenuGraph);
 		
 		// expects {traversalName}
-		var templateListTraversal = '<li class="column"><a href="http://www.google.com">${path}</a></li>';
+		var templateListTraversal = '<li class="column">${path}</li>';
 		$.template(templater.templateNameListTraversals, templateListTraversal);
 		
 		// expects {_id}
