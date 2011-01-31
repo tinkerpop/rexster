@@ -1,3 +1,6 @@
+/** 
+ * Credit to http://code.google.com/p/jquery-jsonviewer-plugin/ as the basis for this JSON Viewer
+ */
 (function($) {
 
     $.fn.jsonviewer = function(settings) {
@@ -15,6 +18,7 @@
 
         if (settings) $.extend(config, settings);
 
+        
         this.each(function(key, element) {
             format_value(element, config['json_name'], config['json_data'], config);
         });
