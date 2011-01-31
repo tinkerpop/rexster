@@ -37,8 +37,13 @@
 	        $(container).appendTo(element);
 	        $(container).addClass('json-widget').css({'padding': config['outer-padding'], 'padding-left': config['ident'] });
 	        $(container).click(function(event) {
-	        $(container).children('.json-widget-content').toggleClass('ui-helper-hidden');
+	        	$(container).children('.json-widget-content').toggleClass('ui-helper-hidden');
 	            return false;
+	        });
+	        
+	        // highlight on hover
+	        $(container).hover(function(event) {
+	        	$(container).children().toggleClass("json-widget-highlight");
 	        });
 	        
 	        if (v.type() == "object" || v.type() == "array") {

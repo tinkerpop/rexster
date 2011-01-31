@@ -227,10 +227,12 @@ Rexster.modules.graph = function(api) {
 					
 					containerPanelBrowserMain.children().last().jsonviewer({ "json_name": "#" + (pageStart + ix + 1) + " | " + metaDataLabel, "json_data": results[ix], "outer-padding":"0px" });
 					
+					/*
 					if(ix % 2 > 0) {
 						containerPanelBrowserMain.children().last().find(".json-widget-header").addClass("json-widget-alt");
 						containerPanelBrowserMain.children().last().find(".json-widget-content").addClass("json-widget-alt");
 					}
+					*/
 				}
 				
 				// display the paging information plus total record count
