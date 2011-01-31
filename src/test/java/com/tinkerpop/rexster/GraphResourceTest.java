@@ -27,7 +27,7 @@ public class GraphResourceTest {
     @Test
     public void getGraphValid() {
         GraphResource resource = this.constructMockGetGraphScenario(new HashMap<String, String>());
-        Response response = resource.getGraph();
+        Response response = resource.getGraph("graph");
 
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -62,8 +62,8 @@ public class GraphResourceTest {
             allowing(graph).clear();
         }});
 
-        GraphResource resource = new GraphResource("graph", uri, httpServletRequest, rap);
-        Response response = resource.deleteGraph();
+        GraphResource resource = new GraphResource(uri, httpServletRequest, rap);
+        Response response = resource.deleteGraph("graph");
 
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -93,7 +93,7 @@ public class GraphResourceTest {
             will(returnValue(System.currentTimeMillis() - 10000));
         }});
 
-        GraphResource resource = new GraphResource("graph", uri, httpServletRequest, rap);
+        GraphResource resource = new GraphResource(uri, httpServletRequest, rap);
         return resource;
     }
 }

@@ -19,12 +19,14 @@ public class GraphResource extends AbstractSubResource {
 
     private static Logger logger = Logger.getLogger(GraphResource.class);
 
-    public GraphResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
-        super(graphName, ui, req, null);
+    public GraphResource() {
+        super(null);
     }
 
-    public GraphResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
-        super(graphName, ui, req, rap);
+    public GraphResource(UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
+        super(rap);
+        this.httpServletRequest = req;
+        this.uriInfo = ui;
     }
 
     /**
@@ -32,14 +34,14 @@ public class GraphResource extends AbstractSubResource {
      * graph.toString();
      */
     @GET
-    public Response getGraph() {
+    public Response getGraph(@PathParam("graphname") String graphName) {
         try {
 
             // graph should be ready to go at this point.  checks in the
             // constructor ensure that the rag is not null.
-            Graph graph = this.rag.getGraph();
+            Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
 
-            this.resultObject.put("name", this.rag.getGraphName());
+            this.resultObject.put("name", graphName);
             this.resultObject.put("graph", graph.toString());
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             this.resultObject.put("up_time", this.getTimeAlive());
@@ -61,8 +63,8 @@ public class GraphResource extends AbstractSubResource {
      * @return Query time
      */
     @DELETE
-    public Response deleteGraph() {
-        Graph graph = this.rag.getGraph();
+    public Response deleteGraph(@PathParam("graphname") String graphName) {
+        Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
         graph.clear();
 
         try {

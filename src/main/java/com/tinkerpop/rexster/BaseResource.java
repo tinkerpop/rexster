@@ -9,8 +9,10 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -23,25 +25,31 @@ public abstract class BaseResource {
 
     public static final String HEADER_ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
 
-    protected RexsterApplicationGraph rag = null;
+    private RexsterApplicationGraph rag = null;
 
     protected final StatisticsHelper sh = new StatisticsHelper();
 
-    protected JSONObject requestObject = new JSONObject();
+    private JSONObject requestObject = null;
 
     protected JSONObject resultObject = new JSONObject();
 
-    protected RexsterApplicationProvider rexsterApplicationProvider;
+    private RexsterApplicationProvider rexsterApplicationProvider;
+    
+    @Context
+    protected HttpServletRequest httpServletRequest;
+    
+    @Context
+    protected UriInfo uriInfo;
+    
+    @Context
+    protected ServletContext servletContext;
 
     public BaseResource(RexsterApplicationProvider rexsterApplicationProvider) {
 
         // the general assumption is that the web server is the provider for RexsterApplication
         // instances.  this really should only change in unit test scenarios.
         this.rexsterApplicationProvider = rexsterApplicationProvider;
-        if (this.rexsterApplicationProvider == null) {
-            this.rexsterApplicationProvider = new WebServerRexsterApplicationProvider();
-        }
-
+        
         sh.stopWatch();
 
         try {
@@ -72,40 +80,63 @@ public abstract class BaseResource {
         // will not be thrown
         return new JSONObject(m);
     }
+    
+    protected RexsterApplicationProvider getRexsterApplicationProvider() {
+    	if (this.rexsterApplicationProvider == null) {
+    		try {
+    			this.rexsterApplicationProvider = new WebServerRexsterApplicationProvider(this.servletContext);
+    		} catch (Exception ex) {
+    			logger.info("The Rexster Application Provider could not be configured", ex);
+    		}
+    	}
+    	
+    	return this.rexsterApplicationProvider;
+    }
+    
+    /**
+     * Sets the request object.
+     * 
+     * If this is set then the any previous call to getRequestObject which instantiated 
+     * the request object from the URI parameters will be overriden.
+     * 
+     * @param jsonObject The JSON Object.
+     */
+    protected void setRequestObject(JSONObject jsonObject) {
+    	this.requestObject = jsonObject;
+    }
 
+    /**
+     * Gets the request object.  
+     * 
+     * If it does not exist then an attempt is made to parse the parameter list on
+     * the URI into a JSON object.  It is then stored until the next request so 
+     * that parse of the URI does not have to happen more than once.
+     *  
+     * @return The request object.
+     */
     public JSONObject getRequestObject() {
-        return requestObject;
+    	if (this.requestObject == null) {
+	    	try {
+	    		this.requestObject = new JSONObject();	    		
+	    		
+	    		if (this.httpServletRequest != null) {
+			    	Map<String, String> queryParameters = this.httpServletRequest.getParameterMap();
+			        this.buildRequestObject(queryParameters);
+	    		}
+	    		
+	    	} catch (JSONException ex) {
+	
+	            logger.error(ex);
+	
+	            JSONObject error = generateErrorObjectJsonFail(ex);
+	            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+	        }
+    	} 
+    	
+    	return this.requestObject;
     }
 
-    /*public void setRequestObject(JSONObject requestObject) {
-        this.requestObject = requestObject;
-    }
-
-    public JSONObject getResultObject() {
-        return resultObject;
-    }
-
-    public void setResultObject(JSONObject resultObject) {
-        this.resultObject = resultObject;
-    }
-
-    public UriInfo getUriInfo() {
-        return uriInfo;
-    }
-
-    public void setUriInfo(UriInfo uriInfo) {
-        this.uriInfo = uriInfo;
-    }
-
-    public HttpServletRequest getRequest() {
-        return request;
-    }
-
-    public void setRequest(HttpServletRequest request) {
-        this.request = request;
-    }*/
-
-    public void buildRequestObject(final Map queryParameters) throws JSONException {
+    private void buildRequestObject(final Map queryParameters) throws JSONException {
         for (String key : (Set<String>) queryParameters.keySet()) {
             String[] keys = key.split(Tokens.PERIOD_REGEX);
             JSONObject embeddedObject = this.requestObject;
@@ -157,16 +188,16 @@ public abstract class BaseResource {
     }
 
     public JSONObject getRexsterRequest() {
-        return this.requestObject.optJSONObject(Tokens.REXSTER);
+        return this.getRequestObject().optJSONObject(Tokens.REXSTER);
     }
 
     protected JSONObject getNonRexsterRequest() throws JSONException {
         JSONObject object = new JSONObject();
-        Iterator keys = this.requestObject.keys();
+        Iterator keys = this.getRequestObject().keys();
         while (keys.hasNext()) {
             String key = keys.next().toString();
             if (!key.equals(Tokens.REXSTER)) {
-                object.put(key, this.requestObject.opt(key));
+                object.put(key, this.getRequestObject().opt(key));
             }
         }
         return object;
@@ -204,7 +235,7 @@ public abstract class BaseResource {
 
     private Long getOffset(String offsetToken) {
         JSONObject rexster = this.getRexsterRequest();
-        if (null != rexster) {
+        if (rexster != null) {
             if (rexster.has(Tokens.OFFSET)) {
 
                 // returns zero if the value identified by the offsetToken is

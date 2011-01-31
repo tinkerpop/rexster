@@ -30,7 +30,6 @@ public class WebServer {
 
     private static final String DEFAULT_WEB_ROOT_PATH = "public";
     protected static Logger logger = Logger.getLogger(WebServer.class);
-    private static RexsterApplication rexster;
 
     static {
         PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
@@ -41,10 +40,11 @@ public class WebServer {
 
     public WebServer(final XMLConfiguration properties, boolean user) throws Exception {
         logger.info(".:Welcome to Rexster:.");
-        if (user)
+        if (user) {
             this.startUser(properties);
-        else
+        } else {
             this.start(properties);
+        }
     }
 
     protected void startUser(final XMLConfiguration properties) throws Exception {
@@ -58,35 +58,19 @@ public class WebServer {
     }
 
     protected void start(final XMLConfiguration properties) throws Exception {
-        rexster = new RexsterApplication(properties);
+    	WebServerRexsterApplicationProvider.start(properties);
         Integer port = properties.getInteger("webserver-port", new Integer(8182));
         Integer adminPort = properties.getInteger("adminserver-port", new Integer(8183));
         String webRootPath = properties.getString("web-root", DEFAULT_WEB_ROOT_PATH);
 
         HierarchicalConfiguration webServerConfig = properties.configurationAt("web-server-configuration");
-
-        final Map<String, String> initParams = new HashMap<String, String>();
-        Iterator keys = webServerConfig.getKeys();
-        while (keys.hasNext()) {
-            String key = keys.next().toString();
-
-            // commons config double dots keys with just one period in it.
-            // as that represents a path statement for that lib.  need to remove
-            // the double dot so that it can pass directly to grizzly.  hopefully
-            // there are no cases where this will cause a problem and a double dot
-            // is always expected
-            String grizzlyKey = key.replace("..", ".");
-            String configValue = webServerConfig.getString(key);
-            initParams.put(grizzlyKey, configValue);
-
-            logger.info("Web Server configured with " + key + ": " + configValue);
-        }
+        final Map<String, String> jerseyInitParameters = getServletInitParameters(webServerConfig);
 
         this.server = new GrizzlyWebServer(port);
         this.adminServer = new GrizzlyWebServer(adminPort);
 
         ServletAdapter jerseyAdapter = new ServletAdapter();
-        for (Map.Entry<String, String> entry : initParams.entrySet()) {
+        for (Map.Entry<String, String> entry : jerseyInitParameters.entrySet()) {
             jerseyAdapter.addInitParameter(entry.getKey(), entry.getValue());
         }
 
@@ -101,14 +85,24 @@ public class WebServer {
         webToolAdapter.setServletInstance(new ToolServlet());
         webToolAdapter.setHandleStaticResources(false);
         
+        HierarchicalConfiguration adminServerConfig = properties.configurationAt("admin-server-configuration");
+        final Map<String, String> adminInitParameters = getServletInitParameters(webServerConfig);
+        
         // servlet for gremlin console
         ServletAdapter visualizationAdapter = new ServletAdapter();
+        for (Map.Entry<String, String> entry : adminInitParameters.entrySet()) {
+        	visualizationAdapter.addInitParameter(entry.getKey(), entry.getValue());
+        }
+        
         visualizationAdapter.setContextPath("/visualize");
         visualizationAdapter.setServletInstance(new VisualizationServlet());
         visualizationAdapter.setHandleStaticResources(false);
         
         // servlet for gremlin console
         ServletAdapter evaluatorAdapter = new ServletAdapter();
+        for (Map.Entry<String, String> entry : adminInitParameters.entrySet()) {
+        	evaluatorAdapter.addInitParameter(entry.getKey(), entry.getValue());
+        }
         evaluatorAdapter.setContextPath("/exec");
         evaluatorAdapter.setServletInstance(new EvaluatorServlet());
         evaluatorAdapter.setHandleStaticResources(false);
@@ -137,14 +131,31 @@ public class WebServer {
 
     }
 
+	private Map<String, String> getServletInitParameters(
+			HierarchicalConfiguration webServerConfig) {
+		final Map<String, String> initParams = new HashMap<String, String>();
+        Iterator keys = webServerConfig.getKeys();
+        while (keys.hasNext()) {
+            String key = keys.next().toString();
+
+            // commons config double dots keys with just one period in it.
+            // as that represents a path statement for that lib.  need to remove
+            // the double dot so that it can pass directly to grizzly.  hopefully
+            // there are no cases where this will cause a problem and a double dot
+            // is always expected
+            String grizzlyKey = key.replace("..", ".");
+            String configValue = webServerConfig.getString(key);
+            initParams.put(grizzlyKey, configValue);
+
+            logger.info("Web Server configured with " + key + ": " + configValue);
+        }
+		return initParams;
+	}
+
     protected void stop() throws Exception {
         this.server.stop();
         this.adminServer.stop();
-        rexster.stop();
-    }
-
-    public static RexsterApplication getRexsterApplication() {
-        return rexster;
+        WebServerRexsterApplicationProvider.stop();
     }
 
     public static void main(final String[] args) throws Exception {

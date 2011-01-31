@@ -5,6 +5,7 @@ import javax.script.ScriptEngine;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
+import com.tinkerpop.rexster.RexsterApplicationProvider;
 import com.tinkerpop.rexster.WebServer;
 
 /**
@@ -22,10 +23,10 @@ public class GremlinFactory {
 
 	protected volatile static boolean initiated = false;
 
-	public static ScriptEngine createGremlinScriptEngine(String graphName) {
+	public static ScriptEngine createGremlinScriptEngine(String graphName, RexsterApplicationProvider rap) {
 		try {
 			ScriptEngine engine = new GremlinScriptEngine();
-			Graph graph = WebServer.getRexsterApplication().getGraph(graphName);
+			Graph graph = rap.getRexsterApplication().getGraph(graphName);
 			engine.getBindings(ScriptContext.ENGINE_SCOPE).put("g", graph);
 
 			/*

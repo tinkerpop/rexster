@@ -43,7 +43,7 @@ public class VertexResourceTest extends BaseTest {
         final int numberOfVertices = 100;
         VertexResource resource = this.constructMockGetVerticesScenario(numberOfVertices);
 
-        Response response = resource.getVertices();
+        Response response = resource.getVertices("graph");
         this.assertVerticesOkResponseJsonStructure(numberOfVertices, numberOfVertices, response);
     }
 
@@ -52,7 +52,7 @@ public class VertexResourceTest extends BaseTest {
         final int numberOfVertices = 0;
         VertexResource resource = this.constructMockGetVerticesScenario(numberOfVertices);
 
-        Response response = resource.getVertices();
+        Response response = resource.getVertices("graph");
         this.assertVerticesOkResponseJsonStructure(numberOfVertices, numberOfVertices, response);
     }
 
@@ -64,7 +64,7 @@ public class VertexResourceTest extends BaseTest {
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
         VertexResource resource = this.constructMockGetVerticesScenario(numberOfVertices, parameters);
 
-        Response response = resource.getVertices();
+        Response response = resource.getVertices("graph");
         this.assertVerticesOkResponseJsonStructure(10, numberOfVertices, response);
 
         JSONObject json = (JSONObject) response.getEntity();
@@ -84,7 +84,7 @@ public class VertexResourceTest extends BaseTest {
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
         VertexResource resource = this.constructMockGetVerticesScenario(numberOfVertices, parameters);
 
-        Response response = resource.getVertices();
+        Response response = resource.getVertices("graph");
         this.assertVerticesOkResponseJsonStructure(0, numberOfVertices, response);
     }
 
@@ -96,7 +96,7 @@ public class VertexResourceTest extends BaseTest {
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
         VertexResource resource = this.constructMockGetVerticesScenario(numberOfVertices, parameters);
 
-        Response response = resource.getVertices();
+        Response response = resource.getVertices("graph");
         this.assertVerticesOkResponseJsonStructure(0, numberOfVertices, response);
     }
 
@@ -125,8 +125,8 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(rag));
         }});
 
-        VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
-        Response response = resource.getVertices();
+        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        Response response = resource.getVertices("graph");
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
     }
@@ -134,7 +134,7 @@ public class VertexResourceTest extends BaseTest {
     @Test(expected = WebApplicationException.class)
     public void getSingleVertexNotFound() {
         VertexResource resource = this.constructMockGetSingleVertexScenario(null, new HashMap<String, String>());
-        resource.getSingleVertex("id-does-not-match-any");
+        resource.getSingleVertex("graph", "id-does-not-match-any");
     }
 
     @Test
@@ -142,7 +142,7 @@ public class VertexResourceTest extends BaseTest {
         Vertex v = new MockVertex("1");
         VertexResource resource = this.constructMockGetSingleVertexScenario(v, new HashMap<String, String>());
 
-        Response response = resource.getSingleVertex("1");
+        Response response = resource.getSingleVertex("graph", "1");
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertNotNull(response.getEntity());
@@ -162,14 +162,14 @@ public class VertexResourceTest extends BaseTest {
     @Test(expected = WebApplicationException.class)
     public void getVertexEdgesNotFound() {
         VertexResource resource = this.constructMockGetSingleVertexScenario(null, new HashMap<String, String>());
-        resource.getSingleVertex("id-does-not-match-any");
+        resource.getSingleVertex("graph", "id-does-not-match-any");
     }
 
     @Test
     public void getVertexEdgesFoundVertexReturnInEdgesNoOffset() {
         VertexResource resource = this.constructMockSimpleGraphScenario();
 
-        Response response = resource.getVertexEdges("1", Tokens.IN_E);
+        Response response = resource.getVertexEdges("graph", "1", Tokens.IN_E);
         JSONObject json = assertEdgesOkResponseJsonStructure(response, 1);
 
         JSONArray jsonResultArray = (JSONArray) json.optJSONArray(Tokens.RESULTS);
@@ -186,7 +186,7 @@ public class VertexResourceTest extends BaseTest {
     public void getVertexEdgesFoundVertexOutEdgesNoOffset() {
         VertexResource resource = this.constructMockSimpleGraphScenario();
 
-        Response response = resource.getVertexEdges("1", Tokens.OUT_E);
+        Response response = resource.getVertexEdges("graph", "1", Tokens.OUT_E);
         JSONObject json = assertEdgesOkResponseJsonStructure(response, 1);
 
         JSONArray jsonResultArray = (JSONArray) json.optJSONArray(Tokens.RESULTS);
@@ -203,7 +203,7 @@ public class VertexResourceTest extends BaseTest {
     public void getVertexEdgesFoundVertexBothEdgesNoOffset() {
         VertexResource resource = this.constructMockSimpleGraphScenario();
 
-        Response response = resource.getVertexEdges("1", Tokens.BOTH_E);
+        Response response = resource.getVertexEdges("graph", "1", Tokens.BOTH_E);
         JSONObject json = assertEdgesOkResponseJsonStructure(response, 2);
 
         JSONArray jsonResultArray = (JSONArray) json.optJSONArray(Tokens.RESULTS);
@@ -218,7 +218,7 @@ public class VertexResourceTest extends BaseTest {
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
         VertexResource resource = this.constructMockMultiEdgedGraphScenario(100, parameters);
 
-        Response response = resource.getVertexEdges("1", Tokens.BOTH_E);
+        Response response = resource.getVertexEdges("graph", "1", Tokens.BOTH_E);
         JSONObject json = assertEdgesOkResponseJsonStructure(response, 100);
 
         JSONArray jsonResultArray = (JSONArray) json.optJSONArray(Tokens.RESULTS);
@@ -233,7 +233,7 @@ public class VertexResourceTest extends BaseTest {
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
         VertexResource resource = this.constructMockMultiEdgedGraphScenario(5, parameters);
 
-        Response response = resource.getVertexEdges("1", Tokens.BOTH_E);
+        Response response = resource.getVertexEdges("graph", "1", Tokens.BOTH_E);
         JSONObject json = assertEdgesOkResponseJsonStructure(response, 5);
 
         JSONArray jsonResultArray = (JSONArray) json.optJSONArray(Tokens.RESULTS);
@@ -248,7 +248,7 @@ public class VertexResourceTest extends BaseTest {
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
         VertexResource resource = this.constructMockMultiEdgedGraphScenario(100, parameters);
 
-        Response response = resource.getVertexEdges("1", Tokens.BOTH_E);
+        Response response = resource.getVertexEdges("graph", "1", Tokens.BOTH_E);
         JSONObject json = assertEdgesOkResponseJsonStructure(response, 100);
 
         JSONArray jsonResultArray = (JSONArray) json.optJSONArray(Tokens.RESULTS);
@@ -280,8 +280,8 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(rag));
         }});
 
-        VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
-        Response response = resource.postNullVertex();
+        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        Response response = resource.postNullVertex("graph");
 
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -318,8 +318,8 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(rag));
         }});
 
-        VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
-        Response response = resource.postVertex("1");
+        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        Response response = resource.postVertex("graph", "1");
 
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -358,8 +358,8 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(rag));
         }});
 
-        VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
-        resource.postVertex("1");
+        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        resource.postVertex("graph", "1");
     }
 
     @Test
@@ -382,8 +382,8 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(rag));
         }});
 
-        VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
-        Response response = resource.deleteVertex("1");
+        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        Response response = resource.deleteVertex("graph", "1");
 
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -413,8 +413,8 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(rag));
         }});
 
-        VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
-        resource.deleteVertex("1");
+        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        resource.deleteVertex("graph", "1");
     }
 
     @Test
@@ -440,8 +440,8 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(rag));
         }});
 
-        VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
-        Response response = resource.deleteVertex("1");
+        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        Response response = resource.deleteVertex("graph", "1");
 
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -566,7 +566,7 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(rag));
         }});
 
-        VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
         return resource;
     }
 
@@ -592,7 +592,7 @@ public class VertexResourceTest extends BaseTest {
             will(returnValue(rag));
         }});
 
-        VertexResource resource = new VertexResource("graph", uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
         return resource;
     }
 

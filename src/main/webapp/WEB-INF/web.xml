@@ -15,6 +15,10 @@
             <param-name>com.sun.jersey.config.property.packages</param-name>
             <param-value>com.tinkerpop.rexster</param-value>
         </init-param>
+        <init-param>
+            <param-name>com.tinkerpop.rexster.config</param-name>
+            <param-value>rexster.xml</param-value>
+        </init-param>
     </servlet>
     <!-- Catch all requests -->
     <servlet-mapping>

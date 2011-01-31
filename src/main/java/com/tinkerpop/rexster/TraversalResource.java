@@ -20,21 +20,23 @@ public class TraversalResource extends AbstractSubResource {
 
     private static Logger logger = Logger.getLogger(TraversalResource.class);
 
-    public TraversalResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
-        super(graphName, ui, req, null);
+    public TraversalResource() {
+        super(null);
     }
 
-    public TraversalResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
-        super(graphName, ui, req, rap);
+    public TraversalResource(UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
+        super(rap);
+        this.httpServletRequest = req;
+        this.uriInfo = ui;
     }
 
     @GET
-    public Response getTraversals() {
+    public Response getTraversals(@PathParam("graphname") String graphName) {
 
         try {
             int counter = 0;
             JSONArray queriesArray = new JSONArray();
-            for (Map.Entry<String, Class<? extends Traversal>> traversal : this.rag.getLoadedTraversals().entrySet()) {
+            for (Map.Entry<String, Class<? extends Traversal>> traversal : this.getRexsterApplicationGraph(graphName).getLoadedTraversals().entrySet()) {
                 JSONObject traversalItem = new JSONObject();
                 traversalItem.put("path", traversal.getKey());
                 traversalItem.put("traversal", traversal.getValue().getName());
@@ -57,19 +59,19 @@ public class TraversalResource extends AbstractSubResource {
 
     @GET
     @Path("/{path: .+}")
-    public Response getTraversal() {
-        return this.processTraversal();
+    public Response getTraversal(@PathParam("graphname") String graphName) {
+        return this.processTraversal(graphName);
     }
 
     @POST
     @Path("/{path: .+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getTraversal(JSONObject json) {
-        this.requestObject = json;
-        return this.processTraversal();
+    public Response getTraversal(@PathParam("graphname") String graphName, JSONObject json) {
+        this.setRequestObject(json);
+        return this.processTraversal(graphName);
     }
 
-    private Response processTraversal() {
+    private Response processTraversal(String graphName) {
         Class<? extends Traversal> traversalClass = null;
         String pattern = "";
 
@@ -86,18 +88,18 @@ public class TraversalResource extends AbstractSubResource {
 
             // get the traversal class based on the pattern of the URI. strip the first
             // character of the pattern as the variable is initialized that way in the loop
-            traversalClass = this.rag.getLoadedTraversals().get(pattern.substring(1));
+            traversalClass = this.getRexsterApplicationGraph(graphName).getLoadedTraversals().get(pattern.substring(1));
 
             if (traversalClass != null) {
                 Traversal traversal = (Traversal) traversalClass.newInstance();
 
                 RexsterResourceContext ctx = new RexsterResourceContext();
-                ctx.setRequest(this.request);
+                ctx.setRequest(this.httpServletRequest);
                 ctx.setResultObject(this.resultObject);
                 ctx.setUriInfo(this.uriInfo);
-                ctx.setRexsterApplicationGraph(this.rag);
-                ctx.setRequestObject(this.requestObject);
-                ctx.setCache(this.rexsterApplicationProvider.getResultObjectCache());
+                ctx.setRexsterApplicationGraph(this.getRexsterApplicationGraph(graphName));
+                ctx.setRequestObject(this.getRequestObject());
+                ctx.setCache(this.getRexsterApplicationProvider().getResultObjectCache());
 
                 traversal.evaluate(ctx);
             } else {

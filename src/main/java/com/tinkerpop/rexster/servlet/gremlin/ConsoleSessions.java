@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.tinkerpop.rexster.RexsterApplicationProvider;
+
 /**
  * Keeps track of currently running gremlin sessions. Each one is associated
  * with a web client and a particular graph hosted within Rexster.
@@ -23,8 +25,8 @@ public class ConsoleSessions {
 	 * Gets a GremlinSession for a given session identifier and graph name, 
 	 * creating a GremlinSession if one does not exist.  
 	 */
-	public static ConsoleSession getSession(String sessionId, String graphName) {
-		ensureSessionExists(sessionId, graphName);
+	public static ConsoleSession getSession(String sessionId, String graphName, RexsterApplicationProvider rap) {
+		ensureSessionExists(sessionId, graphName, rap);
 		return sessions.get(sessionId + graphName);
 	}
 	
@@ -70,10 +72,10 @@ public class ConsoleSessions {
 		return sessions.keySet();
 	}
 
-	protected static void ensureSessionExists(String sessionId, String graphName) {
+	protected static void ensureSessionExists(String sessionId, String graphName, RexsterApplicationProvider rap) {
 		String key = sessionId + graphName;
 		if (!sessions.containsKey(key)) {
-			sessions.put(key, new ConsoleSession(graphName));
+			sessions.put(key, new ConsoleSession(graphName, rap));
 		}
 	}
 

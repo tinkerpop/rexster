@@ -47,14 +47,14 @@ public class IndexResourceTest {
             will(returnValue(rag));
         }});
 
-        IndexResource resource = new IndexResource("graph", uri, httpServletRequest, rap);
-        resource.getAllIndices();
+        IndexResource resource = new IndexResource(uri, httpServletRequest, rap);
+        resource.getAllIndices("graph");
     }
 
     @Test
     public void getAllIndicesNoOffset() {
         IndexResource resource = constructMockGetAllIndicesScenario(100, new HashMap<String, String>());
-        Response response = resource.getAllIndices();
+        Response response = resource.getAllIndices("graph");
 
         this.assertIndexOkResponseJsonStructure(100, 100, response);
     }
@@ -67,7 +67,7 @@ public class IndexResourceTest {
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
 
         IndexResource resource = constructMockGetAllIndicesScenario(100, parameters);
-        Response response = resource.getAllIndices();
+        Response response = resource.getAllIndices("graph");
 
         this.assertIndexOkResponseJsonStructure(10, 100, response);
     }
@@ -79,7 +79,7 @@ public class IndexResourceTest {
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
         IndexResource resource = this.constructMockGetAllIndicesScenario(5, parameters);
 
-        Response response = resource.getAllIndices();
+        Response response = resource.getAllIndices("graph");
         this.assertIndexOkResponseJsonStructure(0, 5, response);
 
     }
@@ -91,7 +91,7 @@ public class IndexResourceTest {
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
         IndexResource resource = this.constructMockGetAllIndicesScenario(100, parameters);
 
-        Response response = resource.getAllIndices();
+        Response response = resource.getAllIndices("graph");
         this.assertIndexOkResponseJsonStructure(0, 100, response);
 
     }
@@ -118,7 +118,7 @@ public class IndexResourceTest {
             will(returnValue(indices));
         }});
 
-        IndexResource resource = new IndexResource("graph", uri, httpServletRequest, rap);
+        IndexResource resource = new IndexResource(uri, httpServletRequest, rap);
         return resource;
     }
 

@@ -12,6 +12,8 @@ import java.util.concurrent.BlockingQueue;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
+import com.tinkerpop.rexster.RexsterApplicationProvider;
+
 /**
  * A wrapper thread for a given gremlin instance. Webadmin spawns one of these
  * threads for each client that uses the gremlin console.
@@ -62,9 +64,12 @@ public class ConsoleSession implements Runnable {
 	protected Thread runner = new Thread(this, "GremlinSession");
 
 	private String graphName;
+	
+	private RexsterApplicationProvider rap;
 
-	public ConsoleSession(String graphName) {
+	public ConsoleSession(String graphName, RexsterApplicationProvider rap) {
 		this.graphName = graphName;
+		this.rap = rap;
 		runner.start();
 	}
 
@@ -75,7 +80,7 @@ public class ConsoleSession implements Runnable {
 			while (true) {
 				if (scriptEngine == null) {
 					scriptEngine = GremlinFactory
-							.createGremlinScriptEngine(this.graphName);
+							.createGremlinScriptEngine(this.graphName, this.rap);
 				}
 
 				job = jobQueue.take();

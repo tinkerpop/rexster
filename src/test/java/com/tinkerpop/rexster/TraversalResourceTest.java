@@ -51,8 +51,8 @@ public class TraversalResourceTest {
             will(returnValue(rag));
         }});
 
-        TraversalResource resource = new TraversalResource("graph", uri, httpServletRequest, rap);
-        Response response = resource.getTraversals();
+        TraversalResource resource = new TraversalResource(uri, httpServletRequest, rap);
+        Response response = resource.getTraversals("graph");
 
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -104,8 +104,8 @@ public class TraversalResourceTest {
             will(returnValue(rag));
         }});
 
-        TraversalResource resource = new TraversalResource("graph", uri, httpServletRequest, rap);
-        resource.getTraversal();
+        TraversalResource resource = new TraversalResource(uri, httpServletRequest, rap);
+        resource.getTraversal("graph");
 
     }
 
@@ -141,8 +141,8 @@ public class TraversalResourceTest {
             will(returnValue(rag));
         }});
 
-        TraversalResource resource = new TraversalResource("graph", uri, httpServletRequest, rap);
-        resource.getTraversal();
+        TraversalResource resource = new TraversalResource(uri, httpServletRequest, rap);
+        resource.getTraversal("graph");
 
     }
 
@@ -177,8 +177,8 @@ public class TraversalResourceTest {
             will(returnValue(resultObjectCache));
         }});
 
-        TraversalResource resource = new TraversalResource("graph", uri, httpServletRequest, rap);
-        Response response = resource.getTraversals();
+        TraversalResource resource = new TraversalResource(uri, httpServletRequest, rap);
+        Response response = resource.getTraversals("graph");
 
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());

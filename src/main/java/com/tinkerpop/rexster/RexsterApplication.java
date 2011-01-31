@@ -140,6 +140,7 @@ public class RexsterApplication {
             // on graph creation
             if (graph != null) {
                 graph.shutdown();
+                graph = null;
             }
         }
 

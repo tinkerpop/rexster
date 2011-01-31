@@ -41,7 +41,7 @@ public class EdgeResourceTest {
         final int numberOfEdges = 100;
         EdgeResource resource = this.constructMockGetAllEdgesScenario(numberOfEdges);
 
-        Response response = resource.getAllEdges();
+        Response response = resource.getAllEdges("graph");
         this.assertEdgesOkResponseJsonStructure(numberOfEdges, numberOfEdges, response);
     }
 
@@ -50,7 +50,7 @@ public class EdgeResourceTest {
         final int numberOfEdges = 0;
         EdgeResource resource = this.constructMockGetAllEdgesScenario(numberOfEdges);
 
-        Response response = resource.getAllEdges();
+        Response response = resource.getAllEdges("graph");
         this.assertEdgesOkResponseJsonStructure(numberOfEdges, numberOfEdges, response);
     }
 
@@ -62,7 +62,7 @@ public class EdgeResourceTest {
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
         EdgeResource resource = this.constructMockGetAllEdgesScenario(numberOfEdges, parameters);
 
-        Response response = resource.getAllEdges();
+        Response response = resource.getAllEdges("graph");
         this.assertEdgesOkResponseJsonStructure(10, numberOfEdges, response);
 
         JSONObject json = (JSONObject) response.getEntity();
@@ -82,7 +82,7 @@ public class EdgeResourceTest {
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
         EdgeResource resource = this.constructMockGetAllEdgesScenario(numberOfEdges, parameters);
 
-        Response response = resource.getAllEdges();
+        Response response = resource.getAllEdges("graph");
         this.assertEdgesOkResponseJsonStructure(0, numberOfEdges, response);
     }
 
@@ -94,14 +94,14 @@ public class EdgeResourceTest {
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
         EdgeResource resource = this.constructMockGetAllEdgesScenario(numberOfEdges, parameters);
 
-        Response response = resource.getAllEdges();
+        Response response = resource.getAllEdges("graph");
         this.assertEdgesOkResponseJsonStructure(0, numberOfEdges, response);
     }
 
     @Test(expected = WebApplicationException.class)
     public void getSingleEdgeNotFound() {
         EdgeResource resource = this.constructMockGetSingleEdgeScenario(null, new HashMap<String, String>());
-        resource.getSingleEdge("id-does-not-match-any");
+        resource.getSingleEdge("graph", "id-does-not-match-any");
     }
 
     @Test
@@ -113,7 +113,7 @@ public class EdgeResourceTest {
         Edge v = new MockEdge("1", "label-1", new Hashtable<String, Object>(), v1, v2);
         EdgeResource resource = this.constructMockGetSingleEdgeScenario(v, new HashMap<String, String>());
 
-        Response response = resource.getSingleEdge("1");
+        Response response = resource.getSingleEdge("graph", "1");
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertNotNull(response.getEntity());
@@ -133,7 +133,7 @@ public class EdgeResourceTest {
     @Test(expected = WebApplicationException.class)
     public void postNullEdgeBadRequest() {
         EdgeResource resource = this.constructMockPostEdgeScenario(null, new HashMap<String, String>());
-        resource.postNullEdge();
+        resource.postNullEdge("graph");
     }
 
     @Test(expected = WebApplicationException.class)
@@ -144,7 +144,7 @@ public class EdgeResourceTest {
         parameters.put(Tokens._LABEL, "edge-label");
 
         EdgeResource resource = this.constructMockPostEdgeScenario(null, "1", "2", null, null, parameters);
-        resource.postNullEdge();
+        resource.postNullEdge("graph");
     }
 
     @Test
@@ -181,8 +181,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
         }});
 
-        EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
-        resource.postNullEdge();
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        resource.postNullEdge("graph");
     }
 
     @Test
@@ -219,8 +219,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
         }});
 
-        EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
-        resource.postEdge("1");
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        resource.postEdge("graph", "1");
     }
 
     @Test(expected = WebApplicationException.class)
@@ -255,8 +255,8 @@ public class EdgeResourceTest {
             will(returnValue(v2));
         }});
 
-        EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
-        resource.postEdge("1");
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        resource.postEdge("graph", "1");
     }
 
     @Test
@@ -292,8 +292,8 @@ public class EdgeResourceTest {
             will(returnValue(v2));
         }});
 
-        EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
-        Response response = resource.postEdge("1");
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        Response response = resource.postEdge("graph", "1");
 
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -312,7 +312,7 @@ public class EdgeResourceTest {
     @Test(expected = WebApplicationException.class)
     public void deleteEdgeEdgeNotFound() {
         EdgeResource resource = this.constructMockDeleteEdgeScenario(null, new HashMap<String, String>());
-        resource.deleteEdge("100");
+        resource.deleteEdge("graph", "100");
     }
 
     @Test
@@ -339,8 +339,8 @@ public class EdgeResourceTest {
             allowing(graph).removeEdge(returnEdge);
         }});
 
-        EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
-        resource.deleteEdge("100");
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        resource.deleteEdge("graph", "100");
     }
 
     @Test
@@ -371,8 +371,8 @@ public class EdgeResourceTest {
             will(returnValue(rag));
         }});
 
-        EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
-        resource.deleteEdge("100");
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        resource.deleteEdge("graph", "100");
 
         Assert.assertNull(returnEdge.getProperty("to-delete"));
     }
@@ -395,7 +395,7 @@ public class EdgeResourceTest {
             will(returnValue(rag));
         }});
 
-        EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
         return resource;
     }
 
@@ -421,7 +421,7 @@ public class EdgeResourceTest {
             will(returnValue(outVertex));
         }});
 
-        EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
         return resource;
     }
 
@@ -443,7 +443,7 @@ public class EdgeResourceTest {
             will(returnValue(rag));
         }});
 
-        EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
         return resource;
     }
 
@@ -465,7 +465,7 @@ public class EdgeResourceTest {
             will(returnValue(rag));
         }});
 
-        EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
         return resource;
     }
 
@@ -491,7 +491,7 @@ public class EdgeResourceTest {
             will(returnValue(rag));
         }});
 
-        EdgeResource resource = new EdgeResource("graph", uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
         return resource;
     }
 

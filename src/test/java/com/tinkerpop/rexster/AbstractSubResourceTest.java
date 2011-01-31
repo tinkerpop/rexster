@@ -36,7 +36,7 @@ public class AbstractSubResourceTest {
             will(returnValue(rag));
         }});
 
-        this.mockResource = new MockAbstractSubResource("graph", uriInfo, req, rap);
+        this.mockResource = new MockAbstractSubResource(uriInfo, req, rap);
     }
 
     @Test
@@ -302,8 +302,10 @@ public class AbstractSubResourceTest {
 
     private class MockAbstractSubResource extends AbstractSubResource {
 
-        public MockAbstractSubResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
-            super(graphName, ui, req, rap);
+        public MockAbstractSubResource(UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
+            super(rap);
+            this.httpServletRequest = req;
+            this.uriInfo = ui;
         }
 
         public Object getTypedPropertyValue(String propertyValue) {

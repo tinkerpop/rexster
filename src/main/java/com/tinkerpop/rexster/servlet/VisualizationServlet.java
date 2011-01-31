@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.tinkerpop.rexster.RexsterApplicationProvider;
+import com.tinkerpop.rexster.WebServerRexsterApplicationProvider;
 import com.tinkerpop.rexster.servlet.gremlin.ConsoleSessions;
 import com.tinkerpop.rexster.servlet.gremlin.ConsoleSession;
 	
@@ -37,7 +39,9 @@ public class VisualizationServlet extends HttpServlet {
         sc.log("[GET /visualize?v=" + request.getParameter("v") + "] 200 OK");
 
         try {
-        	List<String> result = ConsoleSessions.getSession(sessionId, graphName).evaluate(code);
+        	RexsterApplicationProvider rap = new WebServerRexsterApplicationProvider(this.getServletContext());
+        	
+        	List<String> result = ConsoleSessions.getSession(sessionId, graphName, rap).evaluate(code);
             response.getWriter().println(((result.size() == 1) ? result.get(0) : result));
         } catch(Exception e) {
             response.getWriter().println(e.getMessage());

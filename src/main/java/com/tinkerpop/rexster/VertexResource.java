@@ -25,12 +25,14 @@ public class VertexResource extends AbstractSubResource {
 
     private static Logger logger = Logger.getLogger(VertexResource.class);
 
-    public VertexResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
-        super(graphName, ui, req, null);
+    public VertexResource() {
+        super(null);
     }
 
-    public VertexResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
-        super(graphName, ui, req, rap);
+    public VertexResource(UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
+        super(rap);
+        this.httpServletRequest = req;
+        this.uriInfo = ui;
     }
 
     /**
@@ -38,7 +40,7 @@ public class VertexResource extends AbstractSubResource {
      * graph.getVertices();
      */
     @GET
-    public Response getVertices() {
+    public Response getVertices(@PathParam("graphname") String graphName) {
         Long start = this.getStartOffset();
         Long end = this.getEndOffset();
 
@@ -46,7 +48,7 @@ public class VertexResource extends AbstractSubResource {
             long counter = 0l;
             final JSONArray vertexArray = new JSONArray();
 
-            for (Vertex vertex : this.rag.getGraph().getVertices()) {
+            for (Vertex vertex : this.getRexsterApplicationGraph(graphName).getGraph().getVertices()) {
                 if (counter >= start && counter < end) {
                     vertexArray.put(new ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
                 }
@@ -72,8 +74,8 @@ public class VertexResource extends AbstractSubResource {
      */
     @GET
     @Path("/{id}")
-    public Response getSingleVertex(@PathParam("id") String id) {
-        Vertex vertex = this.rag.getGraph().getVertex(id);
+    public Response getSingleVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        Vertex vertex = this.getRexsterApplicationGraph(graphName).getGraph().getVertex(id);
         if (null != vertex) {
             try {
                 this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
@@ -85,7 +87,7 @@ public class VertexResource extends AbstractSubResource {
                 throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
             }
         } else {
-            String msg = "Could not find vertex [" + id + "] on graph [" + this.rag.getGraphName() + "]";
+            String msg = "Could not find vertex [" + id + "] on graph [" + graphName + "]";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
@@ -102,13 +104,13 @@ public class VertexResource extends AbstractSubResource {
      */
     @GET
     @Path("/{id}/{direction}")
-    public Response getVertexEdges(@PathParam("id") String vertexId, @PathParam("direction") String direction) {
+    public Response getVertexEdges(@PathParam("graphname") String graphName, @PathParam("id") String vertexId, @PathParam("direction") String direction) {
         try {
             Long start = this.getStartOffset();
             Long end = this.getEndOffset();
 
             long counter = 0l;
-            Vertex vertex = this.rag.getGraph().getVertex(vertexId);
+            Vertex vertex = this.getRexsterApplicationGraph(graphName).getGraph().getVertex(vertexId);
             JSONArray edgeArray = new JSONArray();
 
             if (null != vertex) {
@@ -134,7 +136,7 @@ public class VertexResource extends AbstractSubResource {
                     }
                 }
             } else {
-                String msg = "Could not find vertex [" + vertexId + "] on graph [" + this.rag.getGraphName() + "]";
+                String msg = "Could not find vertex [" + vertexId + "] on graph [" + graphName + "]";
                 logger.info(msg);
 
                 JSONObject error = generateErrorObject(msg);
@@ -160,8 +162,8 @@ public class VertexResource extends AbstractSubResource {
      * graph.addVertex(null);
      */
     @POST
-    public Response postNullVertex() {
-        return this.postVertex(null);
+    public Response postNullVertex(@PathParam("graphname") String graphName) {
+        return this.postVertex(graphName, null);
     }
 
     /**
@@ -171,25 +173,25 @@ public class VertexResource extends AbstractSubResource {
      */
     @POST
     @Path("/{id}")
-    public Response postVertex(@PathParam("id") String id) {
+    public Response postVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
         try {
-            Graph graph = this.rag.getGraph();
+            Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
             Vertex vertex = graph.getVertex(id);
             if (null == vertex) {
                 vertex = graph.addVertex(id);
             } else {
-                if (!this.hasElementProperties(this.requestObject)) {
+                if (!this.hasElementProperties(this.getRequestObject())) {
                     JSONObject error = generateErrorObjectJsonFail(new Exception("Vertex with id " + id + " already exists"));
                     throw new WebApplicationException(this.addHeaders(Response.status(Status.CONFLICT).entity(error)).build());
                 }
             }
 
-            Iterator keys = this.requestObject.keys();
+            Iterator keys = this.getRequestObject().keys();
             while (keys.hasNext()) {
                 String key = keys.next().toString();
                 if (!key.startsWith(Tokens.UNDERSCORE)) {
-                    vertex.setProperty(key, this.getTypedPropertyValue(this.requestObject.getString(key)));
+                    vertex.setProperty(key, this.getTypedPropertyValue(this.getRequestObject().getString(key)));
                 }
             }
 
@@ -216,10 +218,10 @@ public class VertexResource extends AbstractSubResource {
      */
     @DELETE
     @Path("/{id}")
-    public Response deleteVertex(@PathParam("id") String id) {
+    public Response deleteVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         try {
             final List<String> keys = this.getNonRexsterRequestKeys();
-            final Graph graph = this.rag.getGraph();
+            final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
             final Vertex vertex = graph.getVertex(id);
             if (null != vertex) {
                 if (keys.size() > 0) {
@@ -232,7 +234,7 @@ public class VertexResource extends AbstractSubResource {
                     graph.removeVertex(vertex);
                 }
             } else {
-                final String msg = "Could not find vertex [" + id + "] on graph [" + this.rag.getGraphName() + "]";
+                final String msg = "Could not find vertex [" + id + "] on graph [" + graphName + "]";
                 logger.info(msg);
 
                 JSONObject error = generateErrorObject(msg);

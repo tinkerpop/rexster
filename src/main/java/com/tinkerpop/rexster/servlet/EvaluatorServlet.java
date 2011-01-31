@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.tinkerpop.rexster.RexsterApplicationProvider;
+import com.tinkerpop.rexster.WebServerRexsterApplicationProvider;
 import com.tinkerpop.rexster.servlet.gremlin.ConsoleSessions;
 	
 /**
@@ -54,7 +56,8 @@ public class EvaluatorServlet extends HttpServlet {
         System.setOut(out);
         
         try {
-        	List<String> lines = ConsoleSessions.getSession(sessionId, graphName).evaluate(code);
+        	RexsterApplicationProvider rap = new WebServerRexsterApplicationProvider(this.getServletContext());
+        	List<String> lines = ConsoleSessions.getSession(sessionId, graphName, rap).evaluate(code);
         	for (String line : lines) {
         		out.println("==> " + line);
         	}

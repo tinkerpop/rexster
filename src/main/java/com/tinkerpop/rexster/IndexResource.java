@@ -26,12 +26,14 @@ public class IndexResource extends AbstractSubResource {
 
     private static Logger logger = Logger.getLogger(EdgeResource.class);
 
-    public IndexResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
-        super(graphName, ui, req, null);
+    public IndexResource() {
+        super(null);
     }
 
-    public IndexResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
-        super(graphName, ui, req, rap);
+    public IndexResource(UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
+        super(rap);
+        this.httpServletRequest = req;
+        this.uriInfo = ui;
     }
 
     /**
@@ -39,10 +41,10 @@ public class IndexResource extends AbstractSubResource {
      * get.getIndices();
      */
     @GET
-    public Response getAllIndices() {
+    public Response getAllIndices(@PathParam("graphname") String graphName) {
         IndexableGraph idxGraph = null;
-        if (this.rag.getGraph() instanceof IndexableGraph) {
-            idxGraph = (IndexableGraph) this.rag.getGraph();
+        if (this.getRexsterApplicationGraph(graphName).getGraph() instanceof IndexableGraph) {
+            idxGraph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
         }
 
         if (idxGraph == null) {
@@ -86,17 +88,17 @@ public class IndexResource extends AbstractSubResource {
      */
     @GET
     @Path("/{indexName}")
-    public Response getElementsFromIndex(@PathParam("indexName") String indexName) {
-        final Index index = this.getIndexFromGraph(indexName);
+    public Response getElementsFromIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
+        final Index index = this.getIndexFromGraph(graphName, indexName);
 
         String key = null;
         Object value = null;
 
-        Object temp = this.requestObject.opt(Tokens.KEY);
+        Object temp = this.getRequestObject().opt(Tokens.KEY);
         if (null != temp)
             key = temp.toString();
 
-        temp = this.requestObject.opt(Tokens.VALUE);
+        temp = this.getRequestObject().opt(Tokens.VALUE);
         if (null != temp)
             value = getTypedPropertyValue(temp.toString());
 
@@ -129,7 +131,7 @@ public class IndexResource extends AbstractSubResource {
                 throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
             }
         } else if (null == index) {
-            String msg = "Could not find index [" + indexName + "] on graph [" + this.rag.getGraphName() + "]";
+            String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
@@ -152,8 +154,8 @@ public class IndexResource extends AbstractSubResource {
      */
     @GET
     @Path("/{indexName}/keys")
-    public Response getAutomaticIndexKeys(@PathParam("indexName") String indexName) {
-        Index index = this.getIndexFromGraph(indexName);
+    public Response getAutomaticIndexKeys(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
+        Index index = this.getIndexFromGraph(graphName, indexName);
 
         if (null != index && index.getIndexType().equals(Index.Type.AUTOMATIC)) {
             try {
@@ -175,7 +177,7 @@ public class IndexResource extends AbstractSubResource {
                 throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR)).entity(error).build());
             }
         } else if (null == index) {
-            String msg = "Could not find index [" + indexName + "] on graph [" + this.rag.getGraphName() + "]";
+            String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
@@ -201,25 +203,25 @@ public class IndexResource extends AbstractSubResource {
      */
     @DELETE
     @Path("/{indexName}")
-    public Response deleteIndex(@PathParam("indexName") String indexName) {
-        final Index index = this.getIndexFromGraph(indexName);
-        final IndexableGraph graph = (IndexableGraph) this.rag.getGraph();
+    public Response deleteIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
+        final Index index = this.getIndexFromGraph(graphName, indexName);
+        final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
 
         String key = null;
         Object value = null;
         String id = null;
         String clazz = null;
 
-        Object temp = this.requestObject.opt(Tokens.KEY);
+        Object temp = this.getRequestObject().opt(Tokens.KEY);
         if (null != temp)
             key = temp.toString();
-        temp = this.requestObject.opt(Tokens.VALUE);
+        temp = this.getRequestObject().opt(Tokens.VALUE);
         if (null != temp)
             value = getTypedPropertyValue(temp.toString());
-        temp = this.requestObject.opt(Tokens.ID);
+        temp = this.getRequestObject().opt(Tokens.ID);
         if (null != temp)
             id = temp.toString();
-        temp = this.requestObject.opt(Tokens.CLASS);
+        temp = this.getRequestObject().opt(Tokens.CLASS);
         if (null != temp)
             clazz = temp.toString();
 
@@ -242,7 +244,7 @@ public class IndexResource extends AbstractSubResource {
                 throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
             }
         } else if (null == index) {
-            String msg = "Could not find index [" + indexName + "] on graph [" + this.rag.getGraphName() + "]";
+            String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
@@ -270,9 +272,9 @@ public class IndexResource extends AbstractSubResource {
      */
     @POST
     @Path("/{indexName}")
-    public Response putElementInIndexOrCreateIndex(@PathParam("indexName") String indexName) {
-        final Index index = this.getIndexFromGraph(indexName);
-        final IndexableGraph graph = (IndexableGraph) this.rag.getGraph();
+    public Response putElementInIndexOrCreateIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
+        final Index index = this.getIndexFromGraph(graphName, indexName);
+        final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
 
         String key = null;
         Object value = null;
@@ -281,22 +283,22 @@ public class IndexResource extends AbstractSubResource {
         String type = null;
         Set<String> keys = null;
 
-        Object temp = this.requestObject.opt(Tokens.KEY);
+        Object temp = this.getRequestObject().opt(Tokens.KEY);
         if (null != temp)
             key = temp.toString();
-        temp = this.requestObject.opt(Tokens.VALUE);
+        temp = this.getRequestObject().opt(Tokens.VALUE);
         if (null != temp)
             value = getTypedPropertyValue(temp.toString());
-        temp = this.requestObject.opt(Tokens.ID);
+        temp = this.getRequestObject().opt(Tokens.ID);
         if (null != temp)
             id = temp.toString();
-        temp = this.requestObject.opt(Tokens.CLASS);
+        temp = this.getRequestObject().opt(Tokens.CLASS);
         if (null != temp)
             clazz = temp.toString();
-        temp = this.requestObject.opt(Tokens.TYPE);
+        temp = this.getRequestObject().opt(Tokens.TYPE);
         if (null != temp)
             type = temp.toString();
-        temp = this.requestObject.opt(Tokens.KEYS);
+        temp = this.getRequestObject().opt(Tokens.KEYS);
         if (null != temp) {
             try {
                 JSONArray ks = (JSONArray) temp;
@@ -324,10 +326,8 @@ public class IndexResource extends AbstractSubResource {
                     throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.BAD_REQUEST).entity(error)).build());
                 }
 
-
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-
-
+                
             } catch (JSONException ex) {
                 logger.error(ex);
 
@@ -335,7 +335,7 @@ public class IndexResource extends AbstractSubResource {
                 throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR)).entity(error).build());
             }
         } else if (null != index && null != type && null != clazz) {
-            String msg = "Index [" + indexName + "] on graph [" + this.rag.getGraphName() + "] already exists";
+            String msg = "Index [" + indexName + "] on graph [" + graphName + "] already exists";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
@@ -387,7 +387,7 @@ public class IndexResource extends AbstractSubResource {
 
 
             } else {
-                String msg = "Could not find index [" + indexName + "] on graph [" + this.rag.getGraphName() + "]";
+                String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
                 logger.info(msg);
 
                 JSONObject error = generateErrorObject(msg);
@@ -404,11 +404,11 @@ public class IndexResource extends AbstractSubResource {
         return this.addHeaders(Response.ok(this.resultObject)).build();
     }
 
-    private Index getIndexFromGraph(final String name) {
+    private Index getIndexFromGraph(String graphName, final String name) {
 
         IndexableGraph idxGraph = null;
-        if (this.rag.getGraph() instanceof IndexableGraph) {
-            idxGraph = (IndexableGraph) this.rag.getGraph();
+        if (this.getRexsterApplicationGraph(graphName).getGraph() instanceof IndexableGraph) {
+            idxGraph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
         }
 
         if (idxGraph == null) {

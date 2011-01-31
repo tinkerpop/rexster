@@ -16,14 +16,11 @@ import java.util.Map;
 public abstract class AbstractSubResource extends BaseResource {
 
     private static final Logger logger = Logger.getLogger(AbstractSubResource.class);
-
-    protected HttpServletRequest request;
-
-    protected UriInfo uriInfo;
-
-    protected AbstractSubResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
+    
+    protected AbstractSubResource(RexsterApplicationProvider rap) {
         super(rap);
-
+        
+        /*
         this.rag = this.rexsterApplicationProvider.getApplicationGraph(graphName);
         if (this.rag == null) {
 
@@ -32,14 +29,11 @@ public abstract class AbstractSubResource extends BaseResource {
             JSONObject error = generateErrorObject("Graph [" + graphName + "] could not be found");
             throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
         }
-
+         */
+        
         try {
-            this.request = req;
-            this.uriInfo = ui;
             
             this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
-            Map<String, String> queryParameters = this.request.getParameterMap();
-            this.buildRequestObject(queryParameters);
 
         } catch (JSONException ex) {
 
@@ -48,6 +42,19 @@ public abstract class AbstractSubResource extends BaseResource {
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
+    }
+    
+    public RexsterApplicationGraph getRexsterApplicationGraph(String graphName) {
+    	RexsterApplicationGraph rag = this.getRexsterApplicationProvider().getApplicationGraph(graphName);
+        if (rag == null) {
+
+            logger.info("Request for a non-configured graph [" + graphName + "]");
+
+            JSONObject error = generateErrorObject("Graph [" + graphName + "] could not be found");
+            throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
+        }
+        
+        return rag;
     }
 
     /**

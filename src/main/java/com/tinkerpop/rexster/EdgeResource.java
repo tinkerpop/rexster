@@ -25,12 +25,14 @@ public class EdgeResource extends AbstractSubResource {
 
     private static Logger logger = Logger.getLogger(EdgeResource.class);
 
-    public EdgeResource(@PathParam("graphname") String graphName, @Context UriInfo ui, @Context HttpServletRequest req) {
-        super(graphName, ui, req, null);
+    public EdgeResource() {
+        super(null);
     }
 
-    public EdgeResource(String graphName, UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
-        super(graphName, ui, req, rap);
+    public EdgeResource(UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
+        super(rap);
+        this.httpServletRequest = req;
+        this.uriInfo = ui;
     }
 
     /**
@@ -38,7 +40,7 @@ public class EdgeResource extends AbstractSubResource {
      * graph.getEdges();
      */
     @GET
-    public Response getAllEdges() {
+    public Response getAllEdges(@PathParam("graphname") String graphName) {
 
         Long start = this.getStartOffset();
         Long end = this.getEndOffset();
@@ -47,7 +49,7 @@ public class EdgeResource extends AbstractSubResource {
 
         try {
             JSONArray edgeArray = new JSONArray();
-            for (Edge edge : this.rag.getGraph().getEdges()) {
+            for (Edge edge : this.getRexsterApplicationGraph(graphName).getGraph().getEdges()) {
                 if (counter >= start && counter < end) {
                     edgeArray.put(new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
                 }
@@ -75,8 +77,8 @@ public class EdgeResource extends AbstractSubResource {
      */
     @GET
     @Path("/{id}")
-    public Response getSingleEdge(@PathParam("id") String id) {
-        final Edge edge = this.rag.getGraph().getEdge(id);
+    public Response getSingleEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        final Edge edge = this.getRexsterApplicationGraph(graphName).getGraph().getEdge(id);
 
         if (null != edge) {
             try {
@@ -89,7 +91,7 @@ public class EdgeResource extends AbstractSubResource {
                 throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
             }
         } else {
-            String msg = "Could not find edge [" + id + "] on graph [" + this.rag.getGraphName() + "]";
+            String msg = "Could not find edge [" + id + "] on graph [" + this.getRexsterApplicationGraph(graphName).getGraphName() + "]";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
@@ -105,8 +107,8 @@ public class EdgeResource extends AbstractSubResource {
      * e.setProperty(key,value);
      */
     @POST
-    public Response postNullEdge() {
-        return this.postEdge(null);
+    public Response postNullEdge(@PathParam("graphname") String graphName) {
+        return this.postEdge(graphName, null);
     }
 
     /**
@@ -116,19 +118,19 @@ public class EdgeResource extends AbstractSubResource {
      */
     @POST
     @Path("/{id}")
-    public Response postEdge(@PathParam("id") String id) {
+    public Response postEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
-        final Graph graph = this.rag.getGraph();
+        final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
         String inV = null;
-        Object temp = this.requestObject.opt(Tokens._IN_V);
+        Object temp = this.getRequestObject().opt(Tokens._IN_V);
         if (null != temp)
             inV = temp.toString();
         String outV = null;
-        temp = this.requestObject.opt(Tokens._OUT_V);
+        temp = this.getRequestObject().opt(Tokens._OUT_V);
         if (null != temp)
             outV = temp.toString();
         String label = null;
-        temp = this.requestObject.opt(Tokens._LABEL);
+        temp = this.getRequestObject().opt(Tokens._LABEL);
         if (null != temp)
             label = temp.toString();
 
@@ -144,7 +146,7 @@ public class EdgeResource extends AbstractSubResource {
             }
 
         } else if (edge != null) {
-            if (!this.hasElementProperties(this.requestObject)) {
+            if (!this.hasElementProperties(this.getRequestObject())) {
                 JSONObject error = generateErrorObjectJsonFail(new Exception("Edge with id " + id + " already exists"));
                 throw new WebApplicationException(this.addHeaders(Response.status(Status.CONFLICT).entity(error)).build());
             }
@@ -152,11 +154,11 @@ public class EdgeResource extends AbstractSubResource {
 
         try {
             if (edge != null) {
-                Iterator keys = this.requestObject.keys();
+                Iterator keys = this.getRequestObject().keys();
                 while (keys.hasNext()) {
                     String key = keys.next().toString();
                     if (!key.startsWith(Tokens.UNDERSCORE)) {
-                        edge.setProperty(key, this.getTypedPropertyValue(this.requestObject.getString(key)));
+                        edge.setProperty(key, this.getTypedPropertyValue(this.getRequestObject().getString(key)));
                     }
                 }
                 this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
@@ -188,11 +190,11 @@ public class EdgeResource extends AbstractSubResource {
      */
     @DELETE
     @Path("/{id}")
-    public Response deleteEdge(@PathParam("id") String id) {
+    public Response deleteEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
         try {
             final List<String> keys = this.getNonRexsterRequestKeys();
-            final Graph graph = this.rag.getGraph();
+            final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
             final Edge edge = graph.getEdge(id);
             if (null != edge) {
                 if (keys.size() > 0) {
@@ -205,7 +207,7 @@ public class EdgeResource extends AbstractSubResource {
                     graph.removeEdge(edge);
                 }
             } else {
-                String msg = "Could not find edge [" + id + "] on graph [" + this.rag.getGraphName() + "]";
+                String msg = "Could not find edge [" + id + "] on graph [" + this.getRexsterApplicationGraph(graphName).getGraphName() + "]";
                 logger.info(msg);
                 JSONObject error = generateErrorObject(msg);
                 throw new WebApplicationException(this.addHeaders(Response.status(Status.NOT_FOUND).entity(error)).build());
