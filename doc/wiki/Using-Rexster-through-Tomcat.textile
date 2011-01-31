@@ -1,5 +1,0 @@
-!http://tomcat.apache.org/images/tomcat.gif!
-
-bq. "Apache Tomcat is an open source software implementation of the Java Servlet and JavaServer Pages technologies. The Java Servlet and JavaServer Pages specifications are developed under the Java Community Process." -- "Tomcat homepage":http://tomcat.apache.org/
-
-Rexster makes use of the "Jersey REST framework":http://jersey.java.net/ and comes with an example "web.xml":https://github.com/tinkerpop/rexster/blob/master/src/main/webapp/WEB-INF/web.xml for including Rexster within Tomcat.
