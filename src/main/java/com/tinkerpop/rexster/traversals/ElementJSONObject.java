@@ -34,42 +34,33 @@ public class ElementJSONObject extends JSONObject {
 
     public ElementJSONObject(final Element element, final List<String> propertyKeys, boolean showTypes) throws JSONException {
         this.id = element.getId();
+        
+        // always add the meta data regardless of the value of the propertyKeys(return_keys)
+        this.put(Tokens._ID, this.getValue(this.id, showTypes));
         if (element instanceof Vertex) {
             this.put(Tokens._TYPE, Tokens.VERTEX);
         } else {
+        	// if not a vertex then it must be an edge
             this.put(Tokens._TYPE, Tokens.EDGE);
+            
+            Edge edge = (Edge) element;
+            this.put(Tokens._LABEL, edge.getLabel());
+            this.put(Tokens._IN_V, this.getValue(edge.getInVertex().getId(), showTypes));
+            this.put(Tokens._OUT_V, this.getValue(edge.getOutVertex().getId(), showTypes));
         }
 
         if (propertyKeys == null) {
-            this.put(Tokens._ID, this.getValue(this.id, showTypes));
+        	
+        	// add all the properties
             for (String key : element.getPropertyKeys()) {
                 this.put(key, this.getValue(element.getProperty(key), showTypes));
             }
-
-            if (element instanceof Edge) {
-                Edge edge = (Edge) element;
-                this.put(Tokens._LABEL, edge.getLabel());
-                this.put(Tokens._IN_V, this.getValue(edge.getInVertex().getId(), showTypes));
-                this.put(Tokens._OUT_V, this.getValue(edge.getOutVertex().getId(), showTypes));
-            }
+            
         } else {
             for (String key : propertyKeys) {
-                if (key.equals(Tokens._ID)) {
-                    this.put(Tokens._ID, this.getValue(this.id, showTypes));
-                } else if (element instanceof Edge && key.equals(Tokens._LABEL)) {
-                    Edge edge = (Edge) element;
-                    this.put(Tokens._LABEL, edge.getLabel());
-                } else if (element instanceof Edge && key.equals(Tokens._IN_V)) {
-                    Edge edge = (Edge) element;
-                    this.put(Tokens._IN_V, this.getValue(edge.getInVertex().getId(), showTypes));
-                } else if (element instanceof Edge && key.equals(Tokens._OUT_V)) {
-                    Edge edge = (Edge) element;
-                    this.put(Tokens._IN_V, this.getValue(edge.getOutVertex().getId(), showTypes));
-                } else {
-                    Object temp = this.getValue(element.getProperty(key), showTypes);
-                    if (null != temp) {
-                        this.put(key, temp);
-                    }
+                Object temp = this.getValue(element.getProperty(key), showTypes);
+                if (temp != null) {
+                    this.put(key, temp);
                 }
             }
         }

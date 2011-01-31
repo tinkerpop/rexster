@@ -50,6 +50,41 @@ public class ElementJSONObjectTest {
             Assert.fail(ex.getMessage());
         }
     }
+    
+    @Test
+    public void constructorVertexElementWithPropertyKeys() {
+        final Vertex v = this.mockery.mock(Vertex.class);
+        final Set<String> keys = new HashSet<String>();
+        keys.add("some-key");
+        keys.add("other-key");
+
+        this.mockery.checking(new Expectations() {{
+            allowing(v).getId();
+            will(returnValue("123"));
+            allowing(v).getPropertyKeys();
+            will(returnValue(keys));
+            allowing(v).getProperty("some-key");
+            will(returnValue("some-value-for-some-key"));
+            allowing(v).getProperty("other-key");
+            will(returnValue("other-value-for-some-key"));
+        }});
+
+        try {
+        	List<String> returnKeys = new ArrayList<String>();
+        	returnKeys.add("some-key");
+        	
+        	// always show meta data even with return key restrictions
+            ElementJSONObject jo = new ElementJSONObject(v, returnKeys);
+            Assert.assertEquals("123", jo.getId());
+            Assert.assertEquals("123", jo.getString(Tokens._ID));
+            Assert.assertEquals("some-value-for-some-key", jo.getString("some-key"));
+            Assert.assertEquals(Tokens.VERTEX, jo.getString(Tokens._TYPE));
+
+        } catch (JSONException ex) {
+            ex.printStackTrace();
+            Assert.fail(ex.getMessage());
+        }
+    }
 
     @Test
     public void constructorVertexElementNoPropertyKeysShowDataTypePrimitives() {
@@ -405,16 +440,16 @@ public class ElementJSONObjectTest {
         try {
             List<String> keysToAdd = new ArrayList<String>();
             keysToAdd.add("some-key");
-            keysToAdd.add(Tokens._ID);
-            keysToAdd.add(Tokens._IN_V);
-            keysToAdd.add(Tokens._OUT_V);
 
+            // all meta data is always returned.
             ElementJSONObject jo = new ElementJSONObject(e, keysToAdd);
             Assert.assertEquals("123", jo.getId());
             Assert.assertEquals("123", jo.getString(Tokens._ID));
             Assert.assertEquals("some-value-for-some-key", jo.getString("some-key"));
             Assert.assertEquals(Tokens.EDGE, jo.getString(Tokens._TYPE));
-            Assert.assertEquals("", jo.optString(Tokens._LABEL));
+            Assert.assertEquals("label-value", jo.optString(Tokens._LABEL));
+            Assert.assertEquals("345", jo.optString(Tokens._IN_V));
+            Assert.assertEquals("567", jo.optString(Tokens._OUT_V));
 
         } catch (JSONException ex) {
             ex.printStackTrace();
