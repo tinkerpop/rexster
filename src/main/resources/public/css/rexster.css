@@ -24,7 +24,6 @@ html {
 }
 .json-widget-highlight {
 	background-color:#2B2728;
-	cursor:pointer;
 }
 .pager-button {
 	cursor:pointer;
@@ -40,6 +39,23 @@ html {
 	border-bottom-width:1px;
 	border-bottom-style:solid;
 	border-bottom-color:#9CCDFC;
+}
+.edge-list {
+	list-style-type: none;
+	font-size: smaller;
+}
+.intense {
+	background-color: #d9d9d9;
+	color:black;
+	padding:4px;
+	width:auto;
+}
+.intense .value {
+	font-size:xx-large;
+	font-weight:bold;
+}
+.intense .label {
+	font-size:small;
 }
 #terminal {
   border: 1px solid black;

@@ -15,19 +15,18 @@
             'outer-padding': '4px',
             'debug' : false
         };
-
+        
         if (settings) $.extend(config, settings);
-
         
         this.each(function(key, element) {
-            format_value(element, config['json_name'], config['json_data'], config);
+            format_value(element, config['json_name'], config['json_data'], config, true);
         });
-
+        
         return this;
 
     };
 
-    function format_value(element, name, data, config) {
+    function format_value(element, name, data, config, showToolbar) {
         //debug('name=' + name + "; data=" + data);
     	var isMetaData = name === "_type" || name === "_id" || name === "_outV" || name === "_inV" || name === "_label"; 
     	if (!isMetaData) {
@@ -36,10 +35,6 @@
 	        var container = $('<div/>');
 	        $(container).appendTo(element);
 	        $(container).addClass('json-widget').css({'padding': config['outer-padding'], 'padding-left': config['ident'] });
-	        $(container).click(function(event) {
-	        	$(container).children('.json-widget-content').toggleClass('ui-helper-hidden');
-	            return false;
-	        });
 	        
 	        // highlight on hover
 	        $(container).hover(function(event) {
@@ -55,11 +50,20 @@
 		            });
 		        $(header).text('' + (config['type_prefix'] ? "(" + type_prefix + ")" : "") + name);
 	        	
+		        $(header).click(function(event) {
+		        	$(header).next().toggleClass('ui-helper-hidden');
+		            return false;
+		        });
+		        
 	            var content = $('<div/>');
 	            $(content).appendTo(container);
 	            $(content).addClass('json-widget-content ui-corner-bottom')
-	            .css({ 'white-space': 'nowrap', 'padding': config['inner-padding'] });
-	            for (name in data) { format_value(content, name, data[name], config); }
+	            	.css({ 'white-space': 'nowrap', 'padding': config['inner-padding'] });
+	            for (name in data) { format_value(content, name, data[name], config, false); }
+	            
+	            if (showToolbar && config.toolbar != undefined) {
+			        $(config.toolbar).appendTo(content);
+	            }
 	        }
 	        else {
 	            var content = $('<div/>');

@@ -9,6 +9,8 @@ Rexster.modules.template = function(api) {
 	templater.templateNameMenuGraph = "menuGraph";
 	templater.templateNameListTraversals = "listTraversals";
 	templater.templateNameListVertices = "listVertices";
+	templater.templateNameListVertexViewInEdgeList = "listVertexViewInEdgeList";
+	templater.templateNameListVertexViewOutEdgeList = "listVertexViewOutEdgeList";
 	
 	templater.init = function() {
 		// expects {id, menuName, [checked], [disabled]}
@@ -26,6 +28,14 @@ Rexster.modules.template = function(api) {
 		// expects {_id}
 		var templateListVertices = '<li class="column"><a href="http://www.google.com">${_id}</a></li>';
 		$.template(templater.templateNameListVertices, templateListVertices);
+		
+		// expects {_label, _inV}
+		var templateListVertexViewInEdgeList = '<li><a>${_label} - ${_inV}</a></li>';
+		$.template(templater.templateNameListVertexViewInEdgeList, templateListVertexViewInEdgeList);
+		
+		// expects {_label, _outV}
+		var templateListVertexViewOutEdgeList = '<li><a>${_label} - ${_outV}</a></li>';
+		$.template(templater.templateNameListVertexViewOutEdgeList, templateListVertexViewOutEdgeList);
 	}
 	
 	/**
@@ -91,5 +101,13 @@ Rexster.modules.template = function(api) {
 	 */
 	api.applyMainMenuTemplate = function(data, selector) {
 		templater.applyTemplate(templater.templateNameMainMenuItem, data, selector);
+	}
+	
+	api.applyListVertexViewOutEdgeListTempate = function(data, selector) {
+		templater.applyTemplate(templater.templateNameListVertexViewOutEdgeList, data, selector);
+	}
+	
+	api.applyListVertexViewInEdgeListTempate = function(data, selector) {
+		templater.applyTemplate(templater.templateNameListVertexViewInEdgeList, data, selector);
 	}
 };

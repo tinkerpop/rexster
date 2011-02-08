@@ -217,6 +217,7 @@
                                 <include>lib/jquery-history-min.js</include>
                                 <include>lib/jquery-url-min.js</include>
                                 <include>lib/jquery-jsonviewer-min.js</include>
+                                <include>lib/protovis-r3.2-min.js</include>
 
 								<include>rexster-min.js</include>
 								<include>rexster/history-min.js</include>

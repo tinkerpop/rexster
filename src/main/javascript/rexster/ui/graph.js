@@ -3,16 +3,17 @@
  */
 Rexster.modules.graph = function(api) {
 	
-	var mediator = new GraphPanelMediator("#panelGraphMenuGraph", "#panelTraversals", "#panelGraphMenu", "#panelBrowser", "#panelBrowserMain"),
+	var mediator = new GraphPanelMediator("#panelGraphMenuGraph", "#panelTraversals", "#panelElementViewer", "#panelGraphMenu", "#panelBrowser", "#panelBrowserMain"),
 	    currentGraph;
 	
 	/**
 	 * Manages graph panel interactions.
 	 */
-	function GraphPanelMediator(menuGraph, panelTraversals, panelGraphMenu, panelBrowser, panelBrowserMain) {
+	function GraphPanelMediator(menuGraph, panelTraversals, panelElementViewer, panelGraphMenu, panelBrowser, panelBrowserMain) {
 		var  containerMenuGraph = $(menuGraph), // graph menu in the left panel
 	         containerPanelBrowser = $(panelBrowser),
 		     containerPanelBrowserMain = $(panelBrowserMain),
+		     containerPanelElementViewer = $(panelElementViewer),
 			 containerPanelTraversals = $(panelTraversals),
 			 containerPanelTraversalsList = containerPanelTraversals.find("ul"),
 			 containerPanelGraphMenu = $(panelGraphMenu), // browse options
@@ -81,6 +82,7 @@ Rexster.modules.graph = function(api) {
 				api.getTraversals(currentGraphName, function(traversalResult) { 
 					
 					containerPanelTraversals.show();
+					containerPanelElementViewer.hide();
 					containerPanelBrowser.hide();
 					containerPanelTraversalsList.empty();
 					
@@ -94,6 +96,11 @@ Rexster.modules.graph = function(api) {
 				function(err){
 					api.showMessageError("Could not get the list of traversals from Rexster.");
 				});
+			} else if (state.objectId != undefined) {
+				// since the browse is defined then the check is to see if there is a browse
+				// of a individual element or the element list.  if the objectId is set then
+				// that means that there is an individual element being viewed.
+				this.panelGraphElementViewSelected(api, state.browse.element, state.objectId, onComplete);
 			} else {
 				// restore state to a page on the browser
 				this.panelGraphNavigationSelected(api, state.browse.element, state.browse.start, state.browse.end, onComplete);
@@ -211,7 +218,7 @@ Rexster.modules.graph = function(api) {
 		 * @param pageEnd              {int} The end index of the paged set.
 		 * @param onPageChangeComplete {Function}    Call back function to execute when the render is finished.
 		 */
-		this.renderPagedResults = function(results, resultSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete){
+		this.renderPagedResults = function(api, results, resultSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete){
 			
 			var that = this,
 			    metaDataLabel = "";
@@ -225,14 +232,88 @@ Rexster.modules.graph = function(api) {
 						metaDataLabel = metaDataLabel + " In:[" + results[ix]._inV + "] Out:[" + results[ix]._outV + "] Label:[" + results[ix]._label + "]";
 					}
 					
-					containerPanelBrowserMain.children().last().jsonviewer({ "json_name": "#" + (pageStart + ix + 1) + " | " + metaDataLabel, "json_data": results[ix], "outer-padding":"0px" });
+					var toolbar = $("<ul/>");
 					
-					/*
-					if(ix % 2 > 0) {
-						containerPanelBrowserMain.children().last().find(".json-widget-header").addClass("json-widget-alt");
-						containerPanelBrowserMain.children().last().find(".json-widget-content").addClass("json-widget-alt");
-					}
-					*/
+					// extra css here overrides some elastic css settings
+					toolbar.addClass("unit on-1 columns")
+						.css({ "margin" : "0px", "margin-left" : "10px" });
+					
+					var toolbarButtonGraph = toolbar.append("<li/>").children().first();
+					
+					toolbarButtonGraph.addClass("fixed column ui-state-default ui-corner-all pager-button")
+						.css({"width": "30px"});
+					toolbarButtonGraph.attr("title", "View Graph");
+					
+					toolbarButtonGraph.hover(function(){
+						$(this).addClass("ui-state-hover");
+						$(this).removeClass("ui-state-default");
+					}, 
+					function(){
+						$(this).addClass("ui-state-default");
+						$(this).removeClass("ui-state-hover");
+					});
+					
+					var toolbarButtonGraphLink = toolbarButtonGraph.append("<a/>").children().first();
+					toolbarButtonGraphLink.attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "/" + results[ix]._id);
+					toolbarButtonGraphLink.addClass("ui-icon ui-icon-arrow-4-diag");
+					
+					$(toolbarButtonGraphLink).click(function(event) {
+						event.preventDefault();
+						var uri = $(this).attr('href');
+						var split = uri.split("/");
+	                	api.historyPush(uri);
+						
+						that.panelGraphElementViewSelected(api, split[4], split[5]);
+						
+						/* bah...visualization is not working nicely
+						var split = $(this).attr("href").split("/");
+						alert(split[2]);
+						
+						var colors = pv.Colors.category20();
+						var vis = new pv.Panel()
+							.canvas("dialogGraphView")
+						    .width(760)
+						    .height(530)
+						    .fillStyle("white")
+						    .event("mousedown", pv.Behavior.pan())
+						    .event("mousewheel", pv.Behavior.zoom(1/8));
+						
+						var graph;
+						// this sux right now
+						api.getVertexCenteredGraph("gratefulgraph", split[2], 2, function(g) {
+								graph = g;
+							}, 
+							function() {
+								alert("junk");
+							});
+						 
+						var force = vis.add(pv.Layout.Arc)
+						    .nodes(graph.vertices)
+						    .links(graph.edges);
+						 
+						force.link.add(pv.Line);
+						
+						force.node.add(pv.Dot)
+						    .size(function(d) { return (d.linkDegree + 4) * Math.pow(this.scale, -1.5) })
+						    .fillStyle(function(d) { return d.fix ? "brown" : colors(d.group) })
+						    .strokeStyle(function() { return this.fillStyle().darker() })
+						    .lineWidth(1)
+						    .title(function(d) { return d.nodeName })
+						    .event("mousedown", pv.Behavior.drag())
+						    .event("drag", force);
+						    
+						$("#dialogGraphView").dialog({height:600, width:800});
+						 
+						vis.render();
+					    */
+					});
+					
+					containerPanelBrowserMain.children().last().jsonviewer({ 
+						"json_name": "#" + (pageStart + ix + 1) + " | " + metaDataLabel, 
+						"json_data": results[ix], 
+						"outer-padding":"0px",
+						"toolbar": toolbar});
+					
 				}
 				
 				// display the paging information plus total record count
@@ -300,18 +381,92 @@ Rexster.modules.graph = function(api) {
 			
 			if (currentFeatureBrowsed === "vertices") {
 				api.getVertices(currentGraphName, pageStart, pageEnd, function(data) {
-					that.renderPagedResults(data.results, data.total_size, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
+					that.renderPagedResults(api, data.results, data.total_size, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
 				},
 				function(err) {
 					api.showMessageError("Could not get the vertices of graphs from Rexster.");
 				});
 			} else if (currentFeatureBrowsed === "edges") {
 				api.getEdges(currentGraphName, pageStart, pageEnd, function(data) {
-					that.renderPagedResults(data.results, data.total_size, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
+					that.renderPagedResults(api, data.results, data.total_size, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
 				},
 				function(err) {
 					api.showMessageError("Could not get the edges of graphs from Rexster.");
 				});
+			}
+		}
+		
+		this.panelGraphElementViewSelected = function(api, featureToBrowse, objectId, onComplete) {
+			var elementHeaderTitle = "Vertex",
+			    containerPanelElementViewerMain = containerPanelElementViewer.find(".ui-widget-content");
+			
+			currentFeatureBrowsed = featureToBrowse;
+			
+			containerPanelTraversals.hide();
+			containerPanelBrowser.hide();
+			containerPanelElementViewer.show();
+			$("#panelElementViewerLeft > ul").empty();
+			$("#panelElementViewerRight > ul").empty();
+			$("#panelElementViewerMiddle").empty();
+			
+			if (featureToBrowse === "edges") {
+				elementHeaderTitle = "Edge";
+			} 
+			
+			elementHeaderTitle = elementHeaderTitle + " [" + objectId + "]";
+			
+			containerPanelElementViewer.find(".ui-widget-header").text(elementHeaderTitle); 
+			
+			if (featureToBrowse === "vertices") {
+				api.getVertexElement(currentGraphName, objectId, function(result) {
+					var element = result.results;
+					
+					// bah...duplicate code
+					metaDataLabel = "Type:[" + element._type + "] ID:[" + element._id + "]";
+					if (element._type == "edge") {
+						metaDataLabel = metaDataLabel + " In:[" + element._inV + "] Out:[" + element._outV + "] Label:[" + element._label + "]";
+					}
+					
+					$("#panelElementViewerMiddle").jsonviewer({ 
+						"json_name": metaDataLabel, 
+						"json_data": element, 
+						"outer-padding":"0px"});
+				}, 
+				function(err) {
+				},
+				false);
+				
+				api.getVertexOutEdges(currentGraphName, objectId, function(result) {
+					var outEdges = result.results;
+					
+					$("#panelElementViewerLeft .intense .value").text(outEdges.length);
+					
+					api.applyListVertexViewInEdgeListTempate(outEdges, $("#panelElementViewerLeft > ul"));
+				}, 
+				function(err) {
+				},
+				false);
+				
+				api.getVertexInEdges(currentGraphName, objectId, function(result) {
+					var inEdges = result.results;
+					
+					$("#panelElementViewerRight .intense .value").text(inEdges.length);
+					
+					api.applyListVertexViewOutEdgeListTempate(inEdges, $("#panelElementViewerRight > ul"));
+				}, 
+				function(err) {
+				},
+				false);
+			} else {
+			
+			}
+			
+			api.getVertexElement
+			
+			if (onComplete != undefined) {
+				onComplete();
+			} else {
+				Elastic.refresh();
 			}
 		}
 		
@@ -339,6 +494,7 @@ Rexster.modules.graph = function(api) {
 			currentFeatureBrowsed = featureToBrowse;
 			
 			containerPanelTraversals.hide();
+			containerPanelElementViewer.hide();
 			containerPanelBrowser.show();
 			
 			containerPanelBrowser.find(".pager").show();;

@@ -7,6 +7,10 @@ Rexster.modules.history = function(api) {
 		var encodedState = jQuery.url.setUrl(location.href),
 		    state = {};
 		
+		if (encodedState.segment() >= 5) {
+			state.objectId = encodedState.segment(4);
+		}
+		
 		if (encodedState.segment() >= 4) {
 			state.browse = {
 				element : encodedState.segment(3),

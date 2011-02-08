@@ -101,4 +101,125 @@ Rexster.modules.ajax = function(api) {
 			  error: onFail
 			});
 	};
+	
+	api.getVertexEdges = function(graphName, vertex, onSuccess, onFail, asynchronous) {
+		$.ajax({
+			  url: baseUri + graphName + "/vertices/" + vertex + "/bothE",
+			  type: "GET",
+			  dataType:"json",
+			  success: onSuccess,
+			  async:asynchronous,
+			  error: onFail
+			});
+	};
+	
+	api.getVertexInEdges = function(graphName, vertex, onSuccess, onFail, asynchronous) {
+		$.ajax({
+			  url: baseUri + graphName + "/vertices/" + vertex + "/inE",
+			  type: "GET",
+			  dataType:"json",
+			  success: onSuccess,
+			  async:asynchronous,
+			  error: onFail
+			});
+	};
+	
+	api.getVertexOutEdges = function(graphName, vertex, onSuccess, onFail, asynchronous) {
+		$.ajax({
+			  url: baseUri + graphName + "/vertices/" + vertex + "/outE",
+			  type: "GET",
+			  dataType:"json",
+			  success: onSuccess,
+			  async:asynchronous,
+			  error: onFail
+			});
+	};
+	
+	api.getVertexElement = function(graphName, vertex, onSuccess, onFail, asynchronous) {
+		$.ajax({
+			  url: baseUri + graphName + "/vertices/" + vertex,
+			  type: "GET",
+			  dataType:"json",
+			  success: onSuccess,
+			  async:asynchronous,
+			  error: onFail
+			});
+	};
+	
+	api.getVertexCenteredGraph = function(graphName, vertex, degrees, onSuccess, onFail) {
+		var graph = getVertexCenteredGraphByDegree(api, graphName, vertex, degrees, null);
+		onSuccess(graph);
+	};
+	
+	function getVertexCenteredGraphByDegree(api, graphName, sourceVertex, degrees, graph) {
+		if (graph == undefined || graph == null) {
+			graph = { vertices: new Array(), edges: new Array() };
+		}
+		
+		var tempVertices = new Array();
+		
+		api.getVertexEdges(graphName, sourceVertex, function(results) {
+			var edges = results.results;
+			for (var ix = 0; ix < edges.length; ix++) {
+				
+				if (!hasId(graph.vertices, edges[ix]._outV)) {
+					graph.vertices.push({id:edges[ix]._outV, nodeName:edges[ix]._outV, group:1});
+					tempVertices.push({id:edges[ix]._outV, nodeName:edges[ix]._outV, group:1})
+				}
+				
+				if (!hasId(graph.vertices, edges[ix]._inV)) {
+					graph.vertices.push({id:edges[ix]._inV, nodeName:edges[ix]._inV, group:1});
+					tempVertices.push({id:edges[ix]._inV, nodeName:edges[ix]._inV, group:1})
+				}
+			}
+			
+			for (var iz = 0; iz < edges.length; iz++) {
+				if (!hasEdge(graph.edges, edges[iz])) {
+					graph.edges.push({id:edges[iz]._id, source: findIndex(graph.vertices, edges[iz]._outV), target:findIndex(graph.vertices, edges[iz]._inV)});
+				}
+			}
+		}, 
+		function(err) {
+			
+		},
+		false);
+		
+		if ((degrees - 1) > 0) {
+			for (var iy = 0; iy < tempVertices.length; iy++) {
+				getVertexCenteredGraphByDegree(api, graphName, tempVertices[iy].id, degrees - 1, graph);
+			}
+		}
+		
+		return graph;
+	}
+	
+	function hasId(list, value) {
+		for (var ix = 0; ix < list.length; ix++) {
+			if (list[ix].id === value) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	function hasEdge(list, edge) {
+		for (var ix = 0; ix < list.length; ix++) {
+			if (list[ix].source === edge._outV && list[ix].target === edge._inV) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	function findIndex(list, value) {
+		for (var ix = 0; ix < list.length; ix++) {
+			if (list[ix].id === value) {
+				return ix;
+			}
+		}
+		
+		return -1;
+	}
 };
