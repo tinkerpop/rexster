@@ -39,7 +39,11 @@ Rexster.modules.history = function(api) {
 	 * Pushes a URI into the browser history and parses it to current state. 
 	 */
 	api.historyPush = function(uri) {
-		window.history.pushState({"uri":uri}, '', uri);
+		if ($.browser.webkit && $.browser.version >= 8) {
+			window.history.pushState({"uri":uri}, '', uri);
+		} else {
+			window.location.href = uri;
+		}
 	}
 	
 	/**

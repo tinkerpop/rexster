@@ -14,7 +14,7 @@ Rexster.modules.mainMenu = function(api) {
 		
 		Rexster("graph", "history", function(innerApi) {
 			
-			if (newState != undefined) {
+			if (newState != undefined && ($.browser.webkit && $.browser.version >= 8)) {
 				innerApi.historyPush(newState);
 			}
 			

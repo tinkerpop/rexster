@@ -30,9 +30,12 @@ function Rexster() {
 
 $(function(){
 	
-	window.onpopstate = function(event) {
-		restoreApplication();
-	};
+	// only make this feature available to browsers that support it
+	if ($.browser.webkit && $.browser.version >= 8) {
+		window.onpopstate = function(event) {
+			restoreApplication();
+		};
+	}
 	
     function restoreApplication() {
 		Rexster("template", "mainMenu", "graph", function(api) {
@@ -52,7 +55,12 @@ $(function(){
     	if (!state.hasOwnProperty("menu")) {
     		// since there is no menu selected initialized the graph page first.
 	    	api.historyPush("/main/graph");
+    	} else {
+    		if (!($.browser.webkit && $.browser.version >= 8)) {
+    			restoreApplication()
+    		}
     	}
+    	
     });
     
 });

@@ -483,7 +483,6 @@ Rexster.modules.graph = function(api) {
                 	
                 	// don't want the refresh to be called so pass an empty function
 					that.panelGraphElementViewSelected(api, split[4], split[5]);
-					
 				});
 			} else {
 				api.getEdgeElement(currentGraphName, objectId, function(result) {
@@ -543,7 +542,7 @@ Rexster.modules.graph = function(api) {
 							var split = uri.split("/");
 		                	api.historyPush(uri);
 							
-							that.panelGraphElementViewSelected(api, split[4], split[5]);
+						    that.panelGraphElementViewSelected(api, split[4], split[5]);
 						});
 						
 						$("#panelElementViewerLeft > ul").jsonviewer({ 
@@ -592,7 +591,7 @@ Rexster.modules.graph = function(api) {
 							var uri = $(this).attr('href');
 							var split = uri.split("/");
 		                	api.historyPush(uri);
-							
+								
 							that.panelGraphElementViewSelected(api, split[4], split[5]);
 						});
 						
