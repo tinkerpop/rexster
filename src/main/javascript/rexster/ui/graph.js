@@ -242,7 +242,7 @@ Rexster.modules.graph = function(api) {
 					
 					toolbarButtonGraph.addClass("fixed column ui-state-default ui-corner-all pager-button")
 						.css({"width": "30px"});
-					toolbarButtonGraph.attr("title", "View Graph");
+					toolbarButtonGraph.attr("title", "View Element");
 					
 					toolbarButtonGraph.hover(function(){
 						$(this).addClass("ui-state-hover");
@@ -512,10 +512,45 @@ Rexster.modules.graph = function(api) {
 						
 						metaDataLabel = "Type:[" + element._type + "] ID:[" + element._id + "]";
 						
+						var toolbar = $("<ul/>");
+						
+						// extra css here overrides some elastic css settings
+						toolbar.addClass("unit on-1 columns")
+							.css({ "margin" : "0px", "margin-left" : "10px" });
+						
+						var toolbarButtonGraph = toolbar.append("<li/>").children().first();
+						
+						toolbarButtonGraph.addClass("fixed column ui-state-default ui-corner-all pager-button")
+							.css({"width": "30px"});
+						toolbarButtonGraph.attr("title", "View Element");
+						
+						toolbarButtonGraph.hover(function(){
+							$(this).addClass("ui-state-hover");
+							$(this).removeClass("ui-state-default");
+						}, 
+						function(){
+							$(this).addClass("ui-state-default");
+							$(this).removeClass("ui-state-hover");
+						});
+						
+						var toolbarButtonGraphLink = toolbarButtonGraph.append("<a/>").children().first();
+						toolbarButtonGraphLink.attr("href", "/main/graph/" + currentGraphName + "/vertices/" + element._id);
+						toolbarButtonGraphLink.addClass("ui-icon ui-icon-arrow-4-diag");
+						
+						$(toolbarButtonGraphLink).click(function(event) {
+							event.preventDefault();
+							var uri = $(this).attr('href');
+							var split = uri.split("/");
+		                	api.historyPush(uri);
+							
+							that.panelGraphElementViewSelected(api, split[4], split[5]);
+						});
+						
 						$("#panelElementViewerLeft > ul").jsonviewer({ 
 							"json_name": metaDataLabel, 
 							"json_data": element, 
-							"outer-padding":"0px"});
+							"outer-padding":"0px",
+							"toolbar":toolbar});
 					}, 
 					function(err) {
 					},
@@ -527,10 +562,45 @@ Rexster.modules.graph = function(api) {
 						
 						metaDataLabel = "Type:[" + element._type + "] ID:[" + element._id + "]";
 						
+						var toolbar = $("<ul/>");
+						
+						// extra css here overrides some elastic css settings
+						toolbar.addClass("unit on-1 columns")
+							.css({ "margin" : "0px", "margin-left" : "10px" });
+						
+						var toolbarButtonGraph = toolbar.append("<li/>").children().first();
+						
+						toolbarButtonGraph.addClass("fixed column ui-state-default ui-corner-all pager-button")
+							.css({"width": "30px"});
+						toolbarButtonGraph.attr("title", "View Element");
+						
+						toolbarButtonGraph.hover(function(){
+							$(this).addClass("ui-state-hover");
+							$(this).removeClass("ui-state-default");
+						}, 
+						function(){
+							$(this).addClass("ui-state-default");
+							$(this).removeClass("ui-state-hover");
+						});
+						
+						var toolbarButtonGraphLink = toolbarButtonGraph.append("<a/>").children().first();
+						toolbarButtonGraphLink.attr("href", "/main/graph/" + currentGraphName + "/vertices/" + element._id);
+						toolbarButtonGraphLink.addClass("ui-icon ui-icon-arrow-4-diag");
+						
+						$(toolbarButtonGraphLink).click(function(event) {
+							event.preventDefault();
+							var uri = $(this).attr('href');
+							var split = uri.split("/");
+		                	api.historyPush(uri);
+							
+							that.panelGraphElementViewSelected(api, split[4], split[5]);
+						});
+						
 						$("#panelElementViewerRight > ul").jsonviewer({ 
 							"json_name": metaDataLabel, 
 							"json_data": element, 
-							"outer-padding":"0px"});
+							"outer-padding":"0px",
+							"toolbar":toolbar});
 					}, 
 					function(err) {
 					},
