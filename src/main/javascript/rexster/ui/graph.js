@@ -545,7 +545,7 @@ Rexster.modules.graph = function(api) {
 						    that.panelGraphElementViewSelected(api, split[4], split[5]);
 						});
 						
-						$("#panelElementViewerLeft > ul").jsonviewer({ 
+						$("#panelElementViewerRight > ul").jsonviewer({ 
 							"json_name": metaDataLabel, 
 							"json_data": element, 
 							"outer-padding":"0px",
@@ -595,7 +595,7 @@ Rexster.modules.graph = function(api) {
 							that.panelGraphElementViewSelected(api, split[4], split[5]);
 						});
 						
-						$("#panelElementViewerRight > ul").jsonviewer({ 
+						$("#panelElementViewerLeft > ul").jsonviewer({ 
 							"json_name": metaDataLabel, 
 							"json_data": element, 
 							"outer-padding":"0px",
