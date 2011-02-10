@@ -5,3 +5,5 @@
 *.classpath
 *.project
 rexster.xml
+.idea/
+rexster.iml
