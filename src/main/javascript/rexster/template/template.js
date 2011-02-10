@@ -29,12 +29,12 @@ Rexster.modules.template = function(api) {
 		var templateListVertices = '<li class="column"><a href="http://www.google.com">${_id}</a></li>';
 		$.template(templater.templateNameListVertices, templateListVertices);
 		
-		// expects {_label, _inV}
-		var templateListVertexViewInEdgeList = '<li><a>${_label} - ${_inV}</a></li>';
+		// expects {_label, _inV, _id, currentGraphName}
+		var templateListVertexViewInEdgeList = '<li><a href="/main/graph/${currentGraphName}/edges/${_id}">${_label}</a> - <a href="/main/graph/${currentGraphName}/vertices/${_inV}">${_inV}</a></li>';
 		$.template(templater.templateNameListVertexViewInEdgeList, templateListVertexViewInEdgeList);
 		
-		// expects {_label, _outV}
-		var templateListVertexViewOutEdgeList = '<li><a>${_label} - ${_outV}</a></li>';
+		// expects {_label, _outV, _id, currentGraphName}
+		var templateListVertexViewOutEdgeList = '<li><a href="/main/graph/${currentGraphName}/edges/${_id}">${_label}</a> - <a href="/main/graph/${currentGraphName}/vertices/${_outV}">${_outV}</a></li>';
 		$.template(templater.templateNameListVertexViewOutEdgeList, templateListVertexViewOutEdgeList);
 	}
 	

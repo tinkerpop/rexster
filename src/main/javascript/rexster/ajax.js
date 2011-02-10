@@ -146,6 +146,17 @@ Rexster.modules.ajax = function(api) {
 			});
 	};
 	
+	api.getEdgeElement = function(graphName, edge, onSuccess, onFail, asynchronous) {
+		$.ajax({
+			  url: baseUri + graphName + "/edges/" + edge,
+			  type: "GET",
+			  dataType:"json",
+			  success: onSuccess,
+			  async:asynchronous,
+			  error: onFail
+			});
+	};
+	
 	api.getVertexCenteredGraph = function(graphName, vertex, degrees, onSuccess, onFail) {
 		var graph = getVertexCenteredGraphByDegree(api, graphName, vertex, degrees, null);
 		onSuccess(graph);

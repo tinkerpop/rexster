@@ -397,7 +397,8 @@ Rexster.modules.graph = function(api) {
 		}
 		
 		this.panelGraphElementViewSelected = function(api, featureToBrowse, objectId, onComplete) {
-			var elementHeaderTitle = "Vertex",
+			var that = this,
+			    elementHeaderTitle = "Vertex",
 			    containerPanelElementViewerMain = containerPanelElementViewer.find(".ui-widget-content");
 			
 			currentFeatureBrowsed = featureToBrowse;
@@ -408,9 +409,17 @@ Rexster.modules.graph = function(api) {
 			$("#panelElementViewerLeft > ul").empty();
 			$("#panelElementViewerRight > ul").empty();
 			$("#panelElementViewerMiddle").empty();
+			$("#panelElementViewerLeft .intense").show();
+			$("#panelElementViewerRight .intense").show();
+			
+			// a bit of hack to get around some jsonviewer margins
+			$("#panelElementViewerLeft > ul").css("margin-left", "0px");
+			$("#panelElementViewerRight > ul").css("margin-left", "0px");
 			
 			if (featureToBrowse === "edges") {
 				elementHeaderTitle = "Edge";
+				$("#panelElementViewerLeft .intense").hide();
+				$("#panelElementViewerRight .intense").hide();
 			} 
 			
 			elementHeaderTitle = elementHeaderTitle + " [" + objectId + "]";
@@ -421,11 +430,7 @@ Rexster.modules.graph = function(api) {
 				api.getVertexElement(currentGraphName, objectId, function(result) {
 					var element = result.results;
 					
-					// bah...duplicate code
 					metaDataLabel = "Type:[" + element._type + "] ID:[" + element._id + "]";
-					if (element._type == "edge") {
-						metaDataLabel = metaDataLabel + " In:[" + element._inV + "] Out:[" + element._outV + "] Label:[" + element._label + "]";
-					}
 					
 					$("#panelElementViewerMiddle").jsonviewer({ 
 						"json_name": metaDataLabel, 
@@ -440,6 +445,12 @@ Rexster.modules.graph = function(api) {
 					var outEdges = result.results;
 					
 					$("#panelElementViewerLeft .intense .value").text(outEdges.length);
+					$("#panelElementViewerLeft .intense .label").text("Edges");
+					
+					// add the current graph name as a property
+					for (var ix = 0; ix < outEdges.length; ix++) {
+						outEdges[ix].currentGraphName = currentGraphName;
+					}
 					
 					api.applyListVertexViewInEdgeListTempate(outEdges, $("#panelElementViewerLeft > ul"));
 				}, 
@@ -451,17 +462,85 @@ Rexster.modules.graph = function(api) {
 					var inEdges = result.results;
 					
 					$("#panelElementViewerRight .intense .value").text(inEdges.length);
+					$("#panelElementViewerRight .intense .label").text("Edges");
+					
+					// add the current graph name as a property
+					for (var ix = 0; ix < inEdges.length; ix++) {
+						inEdges[ix].currentGraphName = currentGraphName;
+					}
 					
 					api.applyListVertexViewOutEdgeListTempate(inEdges, $("#panelElementViewerRight > ul"));
 				}, 
 				function(err) {
 				},
 				false);
+				
+				$("#panelElementViewerLeft > ul > li > a, #panelElementViewerRight > ul > li > a").click(function(evt) {
+					evt.preventDefault();
+					var uri = $(this).attr("href");
+					var split = uri.split("/");
+                	api.historyPush(uri);
+                	
+                	// don't want the refresh to be called so pass an empty function
+					that.panelGraphElementViewSelected(api, split[4], split[5]);
+					
+				});
 			} else {
-			
+				api.getEdgeElement(currentGraphName, objectId, function(result) {
+					var element = result.results;
+					
+					metaDataLabel = "Type:[" + element._type + "] ID:[" + element._id + "] Label:[" + element._label + "]";
+					
+					$("#panelElementViewerMiddle").jsonviewer({ 
+						"json_name": metaDataLabel, 
+						"json_data": element, 
+						"outer-padding":"0px"});
+					
+					$("#panelElementViewerRight .intense .value").text("");
+					$("#panelElementViewerRight .intense .label").text("");
+
+					$("#panelElementViewerLeft .intense .value").text("");
+					$("#panelElementViewerLeft .intense .label").text("");
+					
+					// have to add this in to get around the indent on jsonviewer.  ugh...
+					$("#panelElementViewerLeft > ul").css("margin-left", "-12px");
+					$("#panelElementViewerRight > ul").css("margin-left", "-12px");
+					
+					// get the in vertex of the edge
+					api.getVertexElement(currentGraphName, element._inV, function(result) {
+						var element = result.results;
+						
+						metaDataLabel = "Type:[" + element._type + "] ID:[" + element._id + "]";
+						
+						$("#panelElementViewerLeft > ul").jsonviewer({ 
+							"json_name": metaDataLabel, 
+							"json_data": element, 
+							"outer-padding":"0px"});
+					}, 
+					function(err) {
+					},
+					false);
+					
+					// get the out vertex of the edge
+					api.getVertexElement(currentGraphName, element._outV, function(result) {
+						var element = result.results;
+						
+						metaDataLabel = "Type:[" + element._type + "] ID:[" + element._id + "]";
+						
+						$("#panelElementViewerRight > ul").jsonviewer({ 
+							"json_name": metaDataLabel, 
+							"json_data": element, 
+							"outer-padding":"0px"});
+					}, 
+					function(err) {
+					},
+					false);
+					
+				}, 
+				function(err) {
+				},
+				false);
 			}
-			
-			api.getVertexElement
 			
 			if (onComplete != undefined) {
 				onComplete();

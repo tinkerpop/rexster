@@ -42,7 +42,12 @@ html {
 }
 .edge-list {
 	list-style-type: none;
+	list-style-image: none;
 	font-size: smaller;
+}
+.edge-list li {
+	list-style-type: none;
+	list-style-image: none;
 }
 .intense {
 	background-color: #d9d9d9;
