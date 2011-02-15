@@ -2,6 +2,9 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.pipes.Pipe;
+import com.tinkerpop.pipes.pgm.VertexEdgeLabelFilterPipe;
+import com.tinkerpop.pipes.pgm.VertexEdgePipe;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -61,6 +64,18 @@ public class MockVertex implements Vertex {
     @Override
     public Iterable<Edge> getOutEdges() {
         return this.outEdges;
+    }
+
+    public Iterable<Edge> getOutEdges(String label) {
+        Pipe pipe = new VertexEdgeLabelFilterPipe(VertexEdgePipe.Step.OUT_EDGES, label);
+        pipe.setStarts(this.outEdges);
+        return pipe;
+    }
+
+    public Iterable<Edge> getInEdges(String label) {
+        Pipe pipe = new VertexEdgeLabelFilterPipe(VertexEdgePipe.Step.IN_EDGES, label);
+        pipe.setStarts(this.inEdges);
+        return pipe;
     }
 
 }
