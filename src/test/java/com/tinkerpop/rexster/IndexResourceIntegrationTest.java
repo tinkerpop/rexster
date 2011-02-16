@@ -5,8 +5,10 @@ import org.codehaus.jettison.json.JSONObject;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class IndexResourceIntegrationTest extends BaseTest {
 
     @Before
