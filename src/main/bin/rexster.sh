@@ -16,7 +16,7 @@ if [ "$JAVA_OPTIONS" = "" ] ; then
 fi
 
 # Launch the application
-$JAVA $JAVA_OPTIONS -cp $CP com.tinkerpop.rexster.WebServer $1
+$JAVA $JAVA_OPTIONS -cp $CP com.tinkerpop.rexster.WebServer $@
 
 # Return the program's exit code
 exit $?

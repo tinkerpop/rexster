@@ -12,7 +12,7 @@ cd ..\..\..\
 set JAVA_OPTIONS=-Xms32M -Xmx512M
 
 :: Launch the application
-java %JAVA_OPTIONS% %JAVA_ARGS% -cp %CP% com.tinkerpop.rexster.WebServer %1
+java %JAVA_OPTIONS% %JAVA_ARGS% -cp %CP% com.tinkerpop.rexster.WebServer %*
 goto :eof
 
 :concatsep

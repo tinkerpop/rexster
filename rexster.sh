@@ -1,3 +1,3 @@
 #!/bin/bash
 
-target/rexster-*-standalone/bin/rexster.sh $@
+target/rexster-*-standalone/bin/rexster.sh -webroot target/rexster-*-standalone/bin/public $@

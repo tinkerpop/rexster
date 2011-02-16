@@ -11,6 +11,15 @@ import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.ToolServlet;
 import com.tinkerpop.rexster.servlet.VisualizationServlet;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
@@ -158,18 +167,108 @@ public class WebServer {
         WebServerRexsterApplicationProvider.stop();
     }
 
+	@SuppressWarnings("static-access")
+    private static Options getCliOptions() {
+    	Option help = new Option( "help", "print this message" );
+    	
+		Option rexsterFile  = OptionBuilder.withArgName("file")
+									       .hasArg()
+									       .withDescription("use given file for rexster.xml")
+									       .create("configuration");
+		
+		Option webServerPort  = OptionBuilder.withArgName("port")
+										     .hasArg()
+										     .withDescription("override port used for webserver-port in rexster.xml")
+										     .create("webserverport");
+		
+		Option adminServerPort  = OptionBuilder.withArgName("port")
+										       .hasArg()
+										       .withDescription("override port used for adminserver-port in rexster.xml")
+										       .create("adminserverport");
+
+		Option cacheMaxSize  = OptionBuilder.withArgName("max-size")
+									        .hasArg()
+	 								        .withDescription("override cache-maxsize in rexster.xml")
+	 								        .create("cachemaxsize");
+		
+		Option webRoot  = OptionBuilder.withArgName("path")
+								       .hasArg()
+ 								       .withDescription("override web-root in rexster.xml")
+ 								       .create("webroot");
+    	
+		Options options = new Options();
+		options.addOption(help);
+		options.addOption(rexsterFile);
+		options.addOption(webServerPort);
+		options.addOption(adminServerPort);
+		options.addOption(cacheMaxSize);
+		options.addOption(webRoot);
+		
+		return options;
+    }
+	
+	private static CommandLine getCliInput(final String[] args) throws Exception {
+		Options options = getCliOptions();
+		CommandLineParser parser = new GnuParser();
+		CommandLine line = null;
+		
+		try {
+		    line = parser.parse(options, args);
+		}
+		catch(ParseException exp) {
+			throw new Exception("Parsing failed.  Reason: " + exp.getMessage());
+		}
+		
+		if (line.hasOption("help")) {
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp("rexster", options);
+			System.exit(0);
+		}
+		
+		return line;
+	}
+
     public static void main(final String[] args) throws Exception {
         XMLConfiguration properties = new XMLConfiguration();
-        if (args.length == 1) {
+        
+        CommandLine line = getCliInput(args);
+        
+        if (line.hasOption("configuration")) {
+	        
+	        String rexsterXmlFile = line.getOptionValue("configuration");
+	        
             try {
-                properties.load(new FileReader(args[0]));
+                properties.load(new FileReader(rexsterXmlFile));
             } catch (IOException e) {
-                throw new Exception("Could not locate " + args[0] + " properties file.");
+                throw new Exception("Could not locate " + rexsterXmlFile + " properties file.");
             }
         } else {
+        	// no arguments to parse
             properties.load(RexsterApplication.class.getResourceAsStream("rexster.xml"));
         }
-
+        
+        // overrides webserver-port from command line
+        if (line.hasOption("webserverport")) {
+        	properties.setProperty("webserver-port", line.getOptionValue("webserverport"));
+        }
+        
+        // overrides adminserver-port from command line
+        if (line.hasOption("adminserverport")) {
+        	properties.setProperty("adminserver-port", line.getOptionValue("adminserverport"));
+        }
+        
+        // overrides cache-maxsize from command line
+        if (line.hasOption("cachemaxsize")) {
+        	properties.setProperty("cache-maxsize", line.getOptionValue("cachemaxsize"));
+        }
+        
+        // overrides web-root from command line	
+        if (line.hasOption("webroot")) {
+        	properties.setProperty("web-root", line.getOptionValue("webroot"));
+        }
+        
         new WebServer(properties, true);
     }
+
+	
 }
