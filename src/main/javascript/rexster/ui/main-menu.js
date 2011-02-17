@@ -14,7 +14,7 @@ Rexster.modules.mainMenu = function(api) {
 		
 		Rexster("graph", "history", function(innerApi) {
 			
-			if (newState != undefined && ($.browser.webkit && $.browser.version >= 8)) {
+			if (newState != undefined) {
 				innerApi.historyPush(newState);
 			}
 			
@@ -42,7 +42,7 @@ Rexster.modules.mainMenu = function(api) {
 		}
 
 		Rexster("terminal", "history", function(innerApi) {
-			if (newState != undefined && ($.browser.webkit && $.browser.version >= 8)) {
+			if (newState != undefined) {
 				innerApi.historyPush(newState);
 			}
 			

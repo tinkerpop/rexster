@@ -7,6 +7,10 @@ Rexster.modules.history = function(api) {
 		var encodedState = jQuery.url.setUrl(location.href),
 		    state = {};
 		
+		if (!($.browser.webkit && $.browser.version >= 8)) {
+			encodedState = jQuery.url.setUrl(Rexster.currentState);
+		}
+		
 		if (encodedState.segment() >= 5) {
 			state.objectId = encodedState.segment(4);
 		}
@@ -39,11 +43,10 @@ Rexster.modules.history = function(api) {
 	 * Pushes a URI into the browser history and parses it to current state. 
 	 */
 	api.historyPush = function(uri) {
+		Rexster.currentState = uri;
 		if ($.browser.webkit && $.browser.version >= 8) {
 			window.history.pushState({"uri":uri}, '', uri);
-		} else {
-			window.location.href = uri;
-		}
+		} 
 	}
 	
 	/**

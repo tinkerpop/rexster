@@ -12,6 +12,10 @@ function Rexster() {
 	
 	this.currentPanel = null;
 	
+	// the current state is used for backward compatibility for older browsers
+	// that don't support onpopstate feature
+	this.currentState = null;
+	
 	if (!modules || modules === '*') {
 		modules = [];
 		for (i in Rexster.modules) {
@@ -55,6 +59,11 @@ $(function(){
     	if (!state.hasOwnProperty("menu")) {
     		// since there is no menu selected initialized the graph page first.
 	    	api.historyPush("/main/graph");
+	    	
+	    	if (!($.browser.webkit && $.browser.version >= 8)) {
+    			restoreApplication()
+    		}
+	    	
     	} else {
     		if (!($.browser.webkit && $.browser.version >= 8)) {
     			restoreApplication()
