@@ -240,10 +240,9 @@ public abstract class BaseResource {
 
                 // returns zero if the value identified by the offsetToken is
                 // not a number and the key is just present.
-                Long offset = rexster.optJSONObject(Tokens.OFFSET).optLong(offsetToken);
-                if (offset != null) {
-                    return offset;
-                } else {
+            	if (rexster.optJSONObject(Tokens.OFFSET).has(offsetToken)) {
+	                return rexster.optJSONObject(Tokens.OFFSET).optLong(offsetToken);
+            	} else {
                     return null;
                 }
             } else {
