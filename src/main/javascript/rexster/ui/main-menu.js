@@ -22,8 +22,11 @@ Rexster.modules.mainMenu = function(api) {
 			innerApi.initGraphList(function(){
 				if (different) {
 					Rexster.currentPanel = $("#mainGraph");
-					$("#slideHolder").prepend(Rexster.currentPanel);
-					Rexster.currentPanel.delay(500).show("slide", null, function() { Elastic.refresh(); });
+					$("#footer").fadeOut();
+					$("#slideHolder").prepend(Rexster.currentPanel); 
+					Rexster.currentPanel.delay(500).show("slide", null, function() {
+						$("#footer").fadeIn()
+					});
 				}
 			});
 		});
@@ -46,8 +49,11 @@ Rexster.modules.mainMenu = function(api) {
 			innerApi.initTerminal(function(){
 				if (different) {
 					Rexster.currentPanel = $("#mainGremlin");
+					$("#footer").fadeOut();
 					$("#slideHolder").prepend(Rexster.currentPanel);
-					Rexster.currentPanel.delay(500).show("slide", null, function() { Elastic.refresh(); });
+					Rexster.currentPanel.delay(500).show("slide", null, function() {
+						$("#footer").fadeIn()
+					});
 				}
 			});
 		});
