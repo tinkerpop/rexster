@@ -278,13 +278,27 @@ public abstract class BaseResource {
         JSONObject rexster = this.getRexsterRequest();
         if (null != rexster) {
 
-            JSONArray arr = rexster.optJSONArray(Tokens.RETURN_KEYS);
             List<String> keys = new ArrayList<String>();
-
-            if (arr != null) {
-                for (int ix = 0; ix < arr.length(); ix++) {
-                    keys.add(arr.optString(ix));
-                }
+            Object returnKeys = rexster.opt(Tokens.RETURN_KEYS);
+            
+            if (returnKeys != null) {
+            	
+            	// returnKeys may be an array if multiple return keys were sent or
+            	// just a string...this could be an error in how the JSON request object
+            	// is being built...not sure.
+	            if (returnKeys instanceof JSONArray) {
+	            	JSONArray arr = (JSONArray) returnKeys;
+	
+		            if (arr != null) {
+		                for (int ix = 0; ix < arr.length(); ix++) {
+		                    keys.add(arr.optString(ix));
+		                }
+		            }
+	            } else if (returnKeys instanceof String) {
+	            	keys.add(returnKeys.toString());
+	            } else {
+	            	keys = null;
+	            }
             } else {
                 keys = null;
             }

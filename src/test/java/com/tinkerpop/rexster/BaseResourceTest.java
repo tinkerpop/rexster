@@ -159,6 +159,15 @@ public class BaseResourceTest {
         Assert.assertEquals("key2", tt.getReturnKeys().get(1));
         Assert.assertEquals("key3", tt.getReturnKeys().get(2));
     }
+    
+    @Test
+    public void getReturnKeysSingleKeyValid() {
+        BaseResource tt = new MockResource();
+        tt.buildRequestObject("{\"rexster\": { \"return_keys\": \"key1\"}}");
+        Assert.assertNotNull(tt.getReturnKeys());
+        Assert.assertEquals(1, tt.getReturnKeys().size());
+        Assert.assertEquals("key1", tt.getReturnKeys().get(0));
+    }
 
     @Test
     public void addHeadersAllPresent() {
