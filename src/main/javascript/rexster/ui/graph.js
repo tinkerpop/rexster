@@ -427,6 +427,9 @@ Rexster.modules.graph = function(api) {
 			containerPanelElementViewer.find(".ui-widget-header").text(elementHeaderTitle); 
 			
 			if (featureToBrowse === "vertices") {
+				$("#panelElementViewerLeft h3").text("In");
+				$("#panelElementViewerRight h3").text("Out");
+				
 				api.getVertexElement(currentGraphName, objectId, function(result) {
 					var element = result.results;
 					
@@ -444,15 +447,15 @@ Rexster.modules.graph = function(api) {
 				api.getVertexOutEdges(currentGraphName, objectId, function(result) {
 					var outEdges = result.results;
 					
-					$("#panelElementViewerLeft .intense .value").text(outEdges.length);
-					$("#panelElementViewerLeft .intense .label").text("Edges");
+					$("#panelElementViewerRight .intense .value").text(outEdges.length);
+					$("#panelElementViewerRight .intense .label").text("Edges");
 					
 					// add the current graph name as a property
 					for (var ix = 0; ix < outEdges.length; ix++) {
 						outEdges[ix].currentGraphName = currentGraphName;
 					}
 					
-					api.applyListVertexViewInEdgeListTempate(outEdges, $("#panelElementViewerLeft > ul"));
+					api.applyListVertexViewInEdgeListTempate(outEdges, $("#panelElementViewerRight > ul"));
 				}, 
 				function(err) {
 				},
@@ -461,15 +464,15 @@ Rexster.modules.graph = function(api) {
 				api.getVertexInEdges(currentGraphName, objectId, function(result) {
 					var inEdges = result.results;
 					
-					$("#panelElementViewerRight .intense .value").text(inEdges.length);
-					$("#panelElementViewerRight .intense .label").text("Edges");
+					$("#panelElementViewerLeft .intense .value").text(inEdges.length);
+					$("#panelElementViewerLeft .intense .label").text("Edges");
 					
 					// add the current graph name as a property
 					for (var ix = 0; ix < inEdges.length; ix++) {
 						inEdges[ix].currentGraphName = currentGraphName;
 					}
 					
-					api.applyListVertexViewOutEdgeListTempate(inEdges, $("#panelElementViewerRight > ul"));
+					api.applyListVertexViewOutEdgeListTempate(inEdges, $("#panelElementViewerLeft > ul"));
 				}, 
 				function(err) {
 				},
@@ -485,6 +488,10 @@ Rexster.modules.graph = function(api) {
 					that.panelGraphElementViewSelected(api, split[4], split[5]);
 				});
 			} else {
+
+				$("#panelElementViewerLeft h3").text("Out");
+				$("#panelElementViewerRight h3").text("In");
+				
 				api.getEdgeElement(currentGraphName, objectId, function(result) {
 					var element = result.results;
 					
