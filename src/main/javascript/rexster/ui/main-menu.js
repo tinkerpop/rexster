@@ -25,7 +25,8 @@ Rexster.modules.mainMenu = function(api) {
 					$("#footer").fadeOut();
 					$("#slideHolder").prepend(Rexster.currentPanel); 
 					Rexster.currentPanel.delay(500).show("slide", null, function() {
-						$("#footer").fadeIn()
+						$("#footer").fadeIn();
+						Elastic.refresh();
 					});
 				}
 			});
@@ -52,7 +53,8 @@ Rexster.modules.mainMenu = function(api) {
 					$("#footer").fadeOut();
 					$("#slideHolder").prepend(Rexster.currentPanel);
 					Rexster.currentPanel.delay(500).show("slide", null, function() {
-						$("#footer").fadeIn()
+						$("#footer").fadeIn();
+						Elastic.refresh();
 					});
 				}
 			});
