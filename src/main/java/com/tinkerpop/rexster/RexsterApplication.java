@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
 import com.tinkerpop.rexster.config.GraphConfigurationContainer;
 import com.tinkerpop.rexster.config.GraphConfigurationException;
 import com.tinkerpop.rexster.traversals.Traversal;
@@ -139,8 +140,14 @@ public class RexsterApplication {
             // graph may not have been initialized properly if an exception gets tossed in
             // on graph creation
             if (graph != null) {
-                graph.shutdown();
-                graph = null;
+            	Graph shutdownGraph = graph;
+            	
+            	if (graph instanceof ReadOnlyGraph) {
+            		// can't call shutdown on a readonly graph.
+            		shutdownGraph = ((ReadOnlyGraph) graph).getRawGraph();
+            	}
+            	
+                shutdownGraph.shutdown();
             }
         }
 

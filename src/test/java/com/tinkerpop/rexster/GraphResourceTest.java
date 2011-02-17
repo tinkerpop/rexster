@@ -40,6 +40,7 @@ public class GraphResourceTest {
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
         Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
         Assert.assertTrue(json.has("up_time"));
+        Assert.assertTrue(json.has("read_only"));
         Assert.assertTrue(json.has("version"));
         Assert.assertTrue(json.has("type"));
 

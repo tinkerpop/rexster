@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.config;
 
+import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
 import com.tinkerpop.rexster.Tokens;
 import junit.framework.Assert;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -102,7 +103,7 @@ public class GraphConfigurationContainerTest {
 
     @Test
     public void getApplicationGraphsDynamicGraphs() {
-        configList.add(constructHierarchicalConfiguration("test", "some-file", "com.tinkerpop.rexster.config.MockGraphConfiguration"));
+        configList.add(constructHierarchicalConfiguration("test", "some-file", "com.tinkerpop.rexster.config.MockGraphConfiguration", false));
 
         try {
             GraphConfigurationContainer container = new GraphConfigurationContainer(configList);
@@ -112,20 +113,35 @@ public class GraphConfigurationContainerTest {
             Assert.fail(ex.getMessage());
         }
     }
+    
+    @Test
+    public void getApplicationGraphsReadOnlyGraphs() {
+        configList.add(constructHierarchicalConfiguration("test", "some-file", "com.tinkerpop.rexster.config.MockGraphConfiguration", true));
+
+        try {
+            GraphConfigurationContainer container = new GraphConfigurationContainer(configList);
+            Assert.assertEquals(0, container.getFailedConfigurations().size());
+            Assert.assertEquals(configList.size(), container.getApplicationGraphs().size());
+            Assert.assertTrue(container.getApplicationGraphs().get("test").getGraph() instanceof ReadOnlyGraph);
+        } catch (Exception ex) {
+            Assert.fail(ex.getMessage());
+        }
+    }
 
     private HierarchicalConfiguration constructDefaultTinkerGraphHierarchicalConfiguration(String graphName) {
-        return constructHierarchicalConfiguration(graphName, "data/graph-example-1.xml", "tinkergraph");
+        return constructHierarchicalConfiguration(graphName, "data/graph-example-1.xml", "tinkergraph", false);
     }
 
     private HierarchicalConfiguration constructTinkerGraphHierarchicalConfiguration(String graphName, String fileName) {
-        return constructHierarchicalConfiguration(graphName, fileName, "tinkergraph");
+        return constructHierarchicalConfiguration(graphName, fileName, "tinkergraph", false);
     }
 
-    private HierarchicalConfiguration constructHierarchicalConfiguration(String graphName, String fileName, String graphType) {
+    private HierarchicalConfiguration constructHierarchicalConfiguration(String graphName, String fileName, String graphType, boolean readOnly) {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_FILE, fileName);
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_NAME, graphName);
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_TYPE, graphType);
+        graphConfig.addProperty(Tokens.REXSTER_GRAPH_READ_ONLY, readOnly);
 
         ArrayList<HierarchicalConfiguration.Node> listOfNodes = new ArrayList<HierarchicalConfiguration.Node>();
         listOfNodes.add(new HierarchicalConfiguration.Node("username", "me"));

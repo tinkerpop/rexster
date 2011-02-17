@@ -22,6 +22,7 @@ public class Tokens {
     public static final String REXSTER_GRAPH_NAME = "graph-name";
     public static final String REXSTER_GRAPH_TYPE = "graph-type";
     public static final String REXSTER_GRAPH_FILE = "graph-file";
+    public static final String REXSTER_GRAPH_READ_ONLY = "graph-read-only";
     public static final String REXSTER_GRAPH_ENABLED = "graph-enabled";
     public static final String REXSTER_GRAPH_PROPERTIES = "properties";
     public static final String REXSTER_CACHE_MAXSIZE_PATH = "cache-maxsize";

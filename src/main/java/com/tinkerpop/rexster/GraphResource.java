@@ -1,6 +1,8 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
+
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -43,7 +45,17 @@ public class GraphResource extends AbstractSubResource {
 
             this.resultObject.put("name", graphName);
             this.resultObject.put("graph", graph.toString());
-            this.resultObject.put("type", graph.getClass().getName());
+            
+            boolean isReadOnly = false;
+            String graphType = graph.getClass().getName();
+            if (graph instanceof ReadOnlyGraph) {
+            	// readonly graphs must unwrap to the underlying graph implementation
+            	graphType = ((ReadOnlyGraph) graph).getRawGraph().getClass().getName();
+            	isReadOnly = true;
+            }
+            
+            this.resultObject.put("read_only", isReadOnly);
+            this.resultObject.put("type", graphType);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             this.resultObject.put("up_time", this.getTimeAlive());
             this.resultObject.put("version", RexsterApplication.getVersion());

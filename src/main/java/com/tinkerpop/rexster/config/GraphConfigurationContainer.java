@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.config;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -81,7 +82,8 @@ public class GraphConfigurationContainer {
 
     private Graph getGraphFromConfiguration(HierarchicalConfiguration graphConfiguration) throws GraphConfigurationException {
         String graphConfigurationType = graphConfiguration.getString(Tokens.REXSTER_GRAPH_TYPE);
-
+        boolean isReadOnly = graphConfiguration.getBoolean(Tokens.REXSTER_GRAPH_READ_ONLY, false);
+        
         if (graphConfigurationType.equals("neo4jgraph")) {
             graphConfigurationType = Neo4jGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("orientgraph")) {
@@ -102,7 +104,15 @@ public class GraphConfigurationContainer {
         try {
             clazz = Class.forName(graphConfigurationType, true, Thread.currentThread().getContextClassLoader());
             graphConfigInstance = (GraphConfiguration) clazz.newInstance();
-            graph = graphConfigInstance.configureGraphInstance(graphConfiguration);
+            Graph readWriteGraph = graphConfigInstance.configureGraphInstance(graphConfiguration);
+            
+            if (isReadOnly) {
+            	// the graph is configured to be readonly so wrap it up
+            	graph = new ReadOnlyGraph(readWriteGraph);
+            } else {
+            	graph = readWriteGraph;
+            }
+            
         } catch (Exception ex) {
             throw new GraphConfigurationException("GraphConfiguration could not be found or otherwise instantiated:." + graphConfigurationType, ex);
         }
