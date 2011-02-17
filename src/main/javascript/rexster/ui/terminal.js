@@ -210,7 +210,7 @@ $htmlFormat = function(obj) {
 var DefaultInputHtml = function(stack) {
     var linePrompt = "";
     for(var i=0; i <= stack; i++) {
-      linePrompt += "<span class='prompt'>gremlin ></span>";
+      linePrompt += "<span class='prompt'>gremlin&gt;</span>";
     }
     return "<div class='line'>" +
            linePrompt +

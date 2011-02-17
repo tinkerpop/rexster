@@ -59,7 +59,7 @@ public class EvaluatorServlet extends HttpServlet {
         	RexsterApplicationProvider rap = new WebServerRexsterApplicationProvider(this.getServletContext());
         	List<String> lines = ConsoleSessions.getSession(sessionId, graphName, rap).evaluate(code);
         	for (String line : lines) {
-        		out.println("==> " + line);
+        		out.println("==>" + line);
         	}
         } catch(Exception e) {
             out.println(e.getMessage());
