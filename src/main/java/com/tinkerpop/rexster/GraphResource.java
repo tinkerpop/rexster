@@ -43,6 +43,7 @@ public class GraphResource extends AbstractSubResource {
 
             this.resultObject.put("name", graphName);
             this.resultObject.put("graph", graph.toString());
+            this.resultObject.put("type", graph.getClass().getName());
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             this.resultObject.put("up_time", this.getTimeAlive());
             this.resultObject.put("version", RexsterApplication.getVersion());
