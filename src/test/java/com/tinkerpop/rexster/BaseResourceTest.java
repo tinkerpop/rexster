@@ -73,6 +73,13 @@ public class BaseResourceTest {
         tt.buildRequestObject("{\"rexster\": { \"offset\": { \"start\":\"ten\", \"end\":100 }}}");
         Assert.assertEquals(0l, (long) tt.getStartOffset());
     }
+    
+    @Test
+    public void getStartOffsetWithNoStart() {
+        BaseResource tt = new MockResource();
+        tt.buildRequestObject("{\"rexster\": { \"offset\": { \"end\":100 }}}");
+        Assert.assertEquals(0l, (long) tt.getStartOffset());
+    }
 
     @Test
     public void getStartOffsetValid() {
@@ -88,6 +95,13 @@ public class BaseResourceTest {
     @Test
     public void getEndOffsetEmptyRequest() {
         BaseResource tt = new MockResource();
+        Assert.assertEquals(new Long(Long.MAX_VALUE), tt.getEndOffset());
+    }
+    
+    @Test
+    public void getEndOffsetStartWithNoEnd() {
+        BaseResource tt = new MockResource();
+        tt.buildRequestObject("{\"rexster\": { \"offset\": { \"start\":10 }}}");
         Assert.assertEquals(new Long(Long.MAX_VALUE), tt.getEndOffset());
     }
 
