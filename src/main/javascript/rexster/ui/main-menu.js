@@ -76,8 +76,7 @@ Rexster.modules.mainMenu = function(api) {
 		var menuItems = [
 		                  {"id":"Dashboard", "menuName":"Dashboard", "disabled":true},
 		                  {"id":"Graph", "menuName":"Browse", "checked":true},
-		                  {"id":"Gremlin", "menuName":"Gremlin"},
-		                  {"id":"Pacer", "menuName":"Pacer", "disabled":true}
+		                  {"id":"Gremlin", "menuName":"Gremlin"}
 		                ],
 		     state = {};
 		
