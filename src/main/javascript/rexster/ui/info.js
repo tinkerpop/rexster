@@ -19,7 +19,7 @@ Rexster.modules.info = function(api) {
 			
 			container.unbind("click");
 			container.click(function() {
-				container.hide();
+				container.fadeOut();
 			});
 		}
 		
@@ -29,7 +29,9 @@ Rexster.modules.info = function(api) {
 			containerIcon.addClass(icon);
 			containerStrong.text(strongText);
 			containerMessage.text(message);
-			container.show();
+			container.fadeIn();
+			
+			Elastic.refresh();
 		}
 		
 		this.displayInfo = function(message) {

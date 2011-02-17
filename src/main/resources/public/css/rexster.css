@@ -8,6 +8,11 @@ html {
 	background-color: #E3E3E3;
 }
 .make-space {
+	margin-top:5px;
+	margin-bottom:5px;
+	margin-right:5px;
+}
+.make-space-all {
 	margin:5px;
 }
 .json-widget {
