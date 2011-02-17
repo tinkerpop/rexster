@@ -269,7 +269,9 @@ Rexster.modules.terminal = function(api) {
 				// of the graph is also selected and an attempt to make the graph active
 				// should be made.
 				if (state.hasOwnProperty("graph")) {
-					$("#panelGremlinMenuGraph").find("#graphItemgremlin" + state.graph).click();
+					$("#panelGremlinMenuGraph").find(".graph-item").removeClass("ui-state-active");
+					$("#panelGremlinMenuGraph").find("#graphItemgremlin" + state.graph).addClass("ui-state-active");
+					
 					if (onInitComplete != undefined) {
 						onInitComplete();
 					}
