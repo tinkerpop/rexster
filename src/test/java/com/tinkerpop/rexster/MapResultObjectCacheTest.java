@@ -4,6 +4,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.*;
@@ -98,6 +99,7 @@ public class MapResultObjectCacheTest {
     }
 
     @Test
+    @Ignore
     public void testThreadSafety() {
         ResultObjectCache resultObjectCache = new MapResultObjectCache();
         for (int i = 0; i < totalThreads; i++) {

@@ -28,7 +28,7 @@ import java.util.Set;
  * covered under other unit tests.  The format of the results themselves should be covered
  * under the ElementJSONObject.
  */
-public class VertexResourceTest extends BaseTest {
+public class VertexResourceTest {
 
     protected Mockery mockery = new JUnit4Mockery();
     protected final String baseUri = "http://localhost/mock";
