@@ -1,0 +1,102 @@
+!https://github.com/tinkerpop/gremlin/raw/master/doc/images/grateful-dead-concert.jpg!
+
+Rexster comes with a collection of example traversals to help developers learn how to create their own for their particular domain models. The example traversals are for a "Grateful Dead graph":http://wiki.github.com/tinkerpop/gremlin/complex-graph-traversals which includes songs, artists, and their various relationships to each other (e.g. artists sing songs, artists write songs, songs follow other songs in concert, etc.). The raw data set can be found "here":http://github.com/tinkerpop/rexster/raw/master/data/grateful/grateful-concerts.xml. The examples provided with Rexster can be found "at this location":http://github.com/tinkerpop/rexster/tree/master/src/main/java/com/tinkerpop/rexster/traversals/grateful/. The remainder of the section will discuss each of these traversals.
+
+# "Constructing a Grateful Dead Graph":#constructing
+# "Grateful Dead Traversals":#traversals
+** "Co-Follows Rank":#cofollows
+** "Singer Writer Rank":#singerwriter
+
+h2(#constructing). Constructing a Grateful Dead Graph
+
+The Grateful Dead are known for their live concert performances.[1] There is a record of every song that the Grateful Dead played in concert. Moreover, there is a record of the order in which these songs were played. As such, songs followed each other in concert. For example, on November 30, 1979, during the second set, the Grateful Dead opened with:
+
+```text
+SCARLET BEGONIAS
+FIRE ON THE MOUNTAIN
+PASSENGER
+TERRAPIN STATION
+...
+```
+
+Thus, "Scarlet Begonias":http://en.wikipedia.org/wiki/Scarlet_Begonias is @followed_by@ "Fire on the Mountain":http://en.wikipedia.org/wiki/Fire_on_the_Mountain_%28Grateful_Dead_song%29. For all their concerts, a graph of the @followed_by@ relationships between songs is created. This graph also includes which songs were @sung_by@ and @written_by@ which artists. A small portion of the large Grateful Dead graph is diagrammed in the image below.
+
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/grateful-dataset.png!
+
+h2(#traversals). Grateful Dead Traversals
+
+h3(#cofollows). Co-Follows Rank
+
+Given this graph dataset, its possible to rank song vertices relative to other song vertices if they tend to co-follow the same songs frequently. To perform this ranking, the @CoFollowsRank@ class was created. The source code for @CoFollowsRank@ is "located here":http://github.com/tinkerpop/rexster/blob/master/src/main/java/com/tinkerpop/rexster/traversals/grateful/CoFollowsRank.java. The following request ranks songs relative to "Terrapin Station":http://en.wikipedia.org/wiki/Terrapin_Station is they co-follow many of the same songs in common as Terrapin Station.
+
+```text
+http://localhost:8182/gratefulgraph/traversals/grateful/co-follows-rank?song.name=TERRAPIN%20STATION&sort=reverse&return_keys=name&offset.end=10
+```
+
+```js
+{
+  "version":"0.1-SNAPSHOT",
+  "total_rank":1567,
+  "ranks":[
+    {"_type":"vertex","name":"UNCLE JOHNS BAND","grateful\/co-follows-rank":23},
+    {"_type":"vertex","name":"PLAYING IN THE BAND","grateful\/co-follows-rank":22},
+    {"_type":"vertex","name":"EYES OF THE WORLD","grateful\/co-follows-rank":22},
+    {"_type":"vertex","name":"FRANKLINS TOWER","grateful\/co-follows-rank":19},
+    {"_type":"vertex","name":"I KNOW YOU RIDER","grateful\/co-follows-rank":19},
+    {"_type":"vertex","name":"SUGAR MAGNOLIA","grateful\/co-follows-rank":18},
+    {"_type":"vertex","name":"PROMISED LAND","grateful\/co-follows-rank":17},
+    {"_type":"vertex","name":"IKO IKO","grateful\/co-follows-rank":17},
+    {"_type":"vertex","name":"AROUND AND AROUND","grateful\/co-follows-rank":16},
+    {"_type":"vertex","name":"NOT FADE AWAY","grateful\/co-follows-rank":16}
+  ],
+  "size":10,
+  "success":true,
+  "query_time":37.657579
+}
+```
+
+h3(#singerwriter). Singer Writer Rank
+
+Rarely did the singers in the Grateful Dead (e.g. "Jerry Garcia":http://en.wikipedia.org/wiki/Jerry_Garcia, "Bob Weir":http://en.wikipedia.org/wiki/Bob_Weir, etc.) write the lyrics to the songs. There were two primary song writers for the Grateful Dead: "Robert Hunter":http://en.wikipedia.org/wiki/Robert_Hunter_%28lyricist%29 and "John Barlow":http://en.wikipedia.org/wiki/John_Perry_Barlow. Moreover, the singers tended to sing the songs of a particular song writer. Jerry Garcia tended to sing Robert Hunter songs and Bob Weir tended to sing John Barlow songs. This knowledge is made explicit when using @SingerWriterRank@ which is "located here":http://github.com/tinkerpop/rexster/blob/master/src/main/java/com/tinkerpop/rexster/traversals/grateful/SingerWriterRank.java.
+
+```text
+http://localhost:8182/gratefulgraph/traversals/grateful/singer-writer-rank?singer.name=Garcia&return_keys=name&sort=reverse&offset.end=3
+```
+
+```js
+{
+  "version":"0.1-SNAPSHOT",
+  "total_rank":147,
+  "ranks":[
+    {"_type":"vertex","name":"Hunter","grateful\/singer-writer-rank":69},
+    {"_type":"vertex","name":"Traditional","grateful\/singer-writer-rank":21},
+    {"_type":"vertex","name":"Bob_Dylan","grateful\/singer-writer-rank":6}
+  ],
+  "size":3,
+  "success":true,
+  "query_time":25.735952
+}
+```
+
+```text
+http://localhost:8182/gratefulgraph/traversals/grateful/singer-writer-rank?singer.name=Weir&return_keys=name&sort=reverse&offset.end=3
+```
+
+```js
+{
+  "version":"0.1-SNAPSHOT",
+  "total_rank":99,
+  "ranks":[
+    {"_type":"vertex","name":"Barlow","grateful\/singer-writer-rank":20},
+    {"_type":"vertex","name":"Bob_Dylan","grateful\/singer-writer-rank":6},
+    {"_type":"vertex","name":"Traditional","grateful\/singer-writer-rank":5}
+  ],
+  "size":3,
+  "success":true,
+  "query_time":14.621412
+}
+```
+
+==<hr/>==
+
+fn1. Rodriguez, M.A., Gintautas, V., Pepe, A., "A Grateful Dead Analysis: The Relationship Between Concert and Listening Behavior":http://arxiv.org/abs/0807.2466, First Monday, volume 14, number 1, ISSN:1396-0466, LA-UR-08-04421, University of Illinois at Chicago Library, January 2009.

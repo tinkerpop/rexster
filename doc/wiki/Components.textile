@@ -1,0 +1,8 @@
+Rexster is intended to be deployed as a standalone server. Various applications can leverage a Rexster instance in order to get the results of triggered traversals. In order to make Rexster useful to these applications, its necessary to ensure that the following components exist.
+
+# *Graph dataset*: this is called the domain model and it is represented in a "graph database":http://en.wikipedia.org/wiki/Graph_database. Rexset supports "Blueprints-enabled":http://blueprints.tinkerpop.com graph databases.
+# *Collection of traversals*: these are domain specific algorithms that are identified by a URI.
+  ** Traversals can be represented using "Pipes":http://pipes.tinkerpop.com.
+  ** Usually a collection of reusable domain specific pipes are recomposed for different traversals.
+
+Once these components are properly set up within Rexster, then Rexster is ready to serve results to application requests. Moreover, Rexster provides low-level reading/writing operations of the underlying Blueprints graph database through REST (see [[Basic REST API]]).  Rexster also supplies a browser-based interface called [[The Dog House]], which provides access to a mechanism for browsing the elements of configured graphs and a Gremlin Console from which Gremlin scripts can be executed.

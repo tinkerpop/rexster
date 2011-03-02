@@ -1,5 +1,4 @@
-Rexster: A Graph-Based Ranking Engine
-"http://rexster.tinkerpop.com":http://rexster.tinkerpop.com
+All releases can be accessed through the TinkerPop Maven2 repository identified below.
 
 ```xml
 <repository>
@@ -10,7 +9,6 @@ Rexster: A Graph-Based Ranking Engine
 ```
 
 ==<hr/>==
-
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-doghouse.png!
 
@@ -36,7 +34,6 @@ h3. Version 0.2 (Dog House -- March 2, 2011)
 * Bumped to Blueprints 0.5, Pipes 0.3.1, and Gremlin 0.8.
 
 ==<hr/>==
-
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-fluffy.png!
 

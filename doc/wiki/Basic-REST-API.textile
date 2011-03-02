@@ -1,0 +1,52 @@
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/dog-reading.png!
+
+This cheat sheet provides a review of the RESTful API for Rexster. Note that beyond the query parameters provided in the table below, the standard Rexster parameters @rexster.offset.start@, @rexster.offset.end@, @rexster.return_keys@ and @rexster.show_types@ also work in cases where it makes sense. The @graph@ is the unique name of a graph configured within Rexster. Finally @base@ is the base of the URI and, when running locally, is generally @localhost:8182@.
+
+h3. GET Operations
+
+|_. returns |_. uri |_. description |
+| graphs | @http://base@ | get all the graphs |
+| graph | @http://base/graph@ | get the graph |
+| vertices | @http://base/graph/vertices@ | get all vertices |
+| vertex |@http://base/graph/vertices/1@ | get vertex with id @1@ |
+| edges |@http://base/graph/edges@ | get all edges |
+| edge |@http://base/graph/edges/1@ | get edge with id @1@ |
+| edges | @http://base/graph/vertices/1/outE@ | get the out edges of vertex @1@ |
+| edges | @http://base/graph/vertices/1/inE@ | get the in edges of vertex @1@ |
+| edges | @http://base/graph/vertices/1/bothE@ | get the both in and out edges of vertex @1@ |
+| edges | @http://base/graph/vertices/1/xxxE?_label=written_by@ | get the edges of vertex @1@ with edge label equal to "written_by" |
+| indices | @http://base/graph/indices@ | get all the indices associated with the graph |
+| elements | @http://base/graph/indices/index?key=k1&value=v1@ | get all elements with @k1@ property equal to @v1@ in @index@|
+| strings | @http://base/graph/indices/index/keys@ | get the auto index keys of the automatic index named @index@ |
+
+h3. POST Operations
+
+|_. returns |_. uri |_. description |
+| vertex | @http://base/graph/vertices@ | create a vertex with no specified identifier |
+| vertex | @http://base/graph/vertices/1@ | create a vertex with  id @1@ |
+| vertex | @http://base/graph/vertices/1?k1=v1&k2=v2@ | create a vertex with  id @1@ and the provided properties (or update vertex properties if vertex already exists). |
+| edge | @http://base/graph/edges?_outV=1&_label=friend&_inV=2&k1=k2@ | create an out edge with no specified identifier from vertex @1@ to vertex @2@ labeled "friend" with provided properties. |
+| edge | @http://base/graph/edges/3?_outV=1&_label=friend&_inV=2&k1=k2@ | create an out edge with id @3@ from vertex @1@ to vertex @2@ labeled "friend" with provided properties. |
+| edge | @http://base/graph/edges/3?k1=k2@ | update the properties of the edge with id @3@ |
+| index | @http://base/graph/indices/index?class=vertex&type=automatic@ | create a new automatic vertex index named @index@ |
+| void | @http://base/graph/indices/index?key=k1&value=v1&class=vertex&id=1@ | put vertex with @id@ 1 into @index@ at @k1/v1@ |
+| void | @http://base/graph/indices/index?k1&k2@ | add auto index keys @k1@ and @k2@ to index named @index@ |
+
+h3. DELETE Operations
+
+|_. returns |_. uri |_. description |
+| void | @http://base/graph/vertices/1@ | remove vertex @1@ |
+| void | @http://base/graph/vertices/1?key1&key2@ | remove properties @key1@ and @key2@ from vertex @1@ |
+| void | @http://base/graph/edges/3@ | remove the edge with id @3@ |
+| void | @http://base/graph/edges/3?key1&key2@ | remove properties @key1@ and @key2@ from edge @3@ |
+| void | @http://base/graph@ | clear the graph of all its elements and indices |
+| void | @http://base/graph/indices/index@ | drop the index named @index@ |
+| void | @http://base/graph/indices/index?key=k1&value=v1&class=vertex&id=1@ | remove the vertex 1 from @index@ at @k1/v1@ |
+| void | @http://base/graph/indices/index?k1&k2@ | remove the auto index keys @k1@ and @k2@ from auto index @index@ |
+
+h3. Rexster Parameters
+
+* @rexster.offset.start@ - Expects a numeric value that represents the start point for returning a set of records and is used in conjunction with @rexster.offset.end@ to allow for paging of results.  If used without a valid @rexster.offset.end@ parameter specified, Rexster will return all remaining records in the set.    
+* @rexster.offset.end@ - Expects a numeric value that represents the end point for returning a set of records and is used in conjunction with @rexster.offset.start@ to allow for paging of results.  If used without a valid @rexster.offset.start@ parameter specified, Rexster will assume the start value to be zero.
+* @rexster.return_keys@ - Expects a comma separated list of property names to return in the results.  Element meta-data will always be returned even if @rexster.return_keys@ are specified.  If a valid value for this parameter is not specified, then all properties are returned.
+* @rexster.show_types@ - Expects a boolean value of "true" or "false" to determine whether the data types of the properties should be returned in the results.

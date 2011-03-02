@@ -1,0 +1,14 @@
+!http://tomcat.apache.org/images/tomcat.gif!
+
+bq. "Apache Tomcat is an open source software implementation of the Java Servlet and JavaServer Pages technologies. The Java Servlet and JavaServer Pages specifications are developed under the Java Community Process." -- "Tomcat homepage":http://tomcat.apache.org/
+
+Rexster makes use of the "Jersey REST framework":http://jersey.java.net/ and comes with an example "web.xml":https://github.com/tinkerpop/rexster/blob/master/src/main/webapp/WEB-INF/web.xml for including Rexster within Tomcat.
+
+The following steps describe the fast path to getting Rexster (with the included sample graphs) to run in a default instance of Tomcat:
+
+# Build Rexster with Maven.  The Rexster "pom.xml":https://github.com/tinkerpop/rexster/blob/master/pom.xml will produce a WAR file in the target folder when built.  
+# Copy the WAR to the Tomcat @webapps@ directory.
+# Copy the @data@ directory from Rexster to the Tomcat @bin@ folder.
+# The Rexster instance will serve at @http://localhost:8080/{rexster-webapp-name}@ where the @rexster-webapp-name@ is the name of the WAR file (ie. rexster-0.2-SNAPSHOT). 
+
+The example "web.xml":https://github.com/tinkerpop/rexster/blob/master/src/main/webapp/WEB-INF/web.xml does not include configuration for the Rexster Administration Tool at this time as it is still an experimental feature.

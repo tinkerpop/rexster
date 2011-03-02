@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop</groupId>
     <artifactId>rexster</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2</version>
     <!-- DON'T FORGET TO UPDATE Tokens.VERSION AT RELEASE -->
     <packaging>jar</packaging>
     <url>http://rexster.tinkerpop.com</url>
@@ -33,24 +33,24 @@
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>graphdb-deps-all</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>0.5</version>
             <type>pom</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>blueprints</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>0.5</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>pipes</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.3.1</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>gremlin</artifactId>
-            <version>0.8-SNAPSHOT</version>
+            <version>0.8</version>
         </dependency>
         <!-- JSON SUPPORT -->
         <dependency>

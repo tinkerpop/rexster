@@ -1,0 +1,56 @@
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/dog-firehydrant.png!
+
+A "recommender system":http://en.wikipedia.org/wiki/Recommendation_system will recommend a user an item based upon some characteristic(s) of both the user and the item.[1]
+
+bq. "Recommender systems":http://en.wikipedia.org/wiki/Recommendation_system or recommendation engines form or work from a specific type of information filtering system technique that attempts to recommend information items (films, television, video on demand, music, books, news, images, web pages, etc) that are likely to be of interest to the user. Typically, a recommender system compares a user profile to some reference characteristics, and seeks to predict the 'rating' that a user would give to an item they had not yet considered. These characteristics may be from the information item (the content-based approach) or the user's social environment (the "collaborative filtering":http://en.wikipedia.org/wiki/Collaborative_filtering approach). -- Wikipedia
+
+There are numerous variations to the general recommender system theme. This section will present both a simple content-based and collaborative filtering recommender system that can be added to Rexster.[2] In both these examples, there are two types of objects 1.) users and 2.) items, where the items are songs.
+
+# "Content-Based Recommendations":#content
+# "Collaborative Filtering Recommendations":#collaborative
+
+h2(#content). Content-Based Recommendations
+
+Suppose a collection of items and each item has some properties (content) associated with it. For example, suppose the items are songs and with each song there are the following properties: singer, writer, etc. Now, lets say a user likes a collection of songs (the collection size can be 1). A content-based recommender system should be able to find other songs that are related to the songs that the user likes. The solution to this problem can be represented as a graph traversal. Here is a breakdown of the traversal algorithm (accompanying the English written representation is a "Gremlin":http://gremlin.tinkerpop.com representation of each step):
+
+# Traverse from the user to the songs that they like. 
+** @./outE[@@@label='likes']/inV@
+# Traverse from songs to the singer and writer properties that those songs have. 
+** @./outE[@@@label='sung_by' or @@@label='written_by']/inV@
+# Traverse from those properties to all the songs that have those properties.
+** @./outE[@@@label='sung_by' or @@@label='written_by']/inV@
+# Exclude those songs that the user already likes.
+** @.[g:except(./outE[@@@label='likes']/inV)]@
+
+Thus, those items in the collection that share the same content/metadata/properties as the source collection of items will be traversed to. The more content they share in common, the higher their rank.
+
+h2(#collaborative). Collaborative Filtering Recommendations
+
+From a graph perspective, there is little difference between a content-based recommender system and a collaborative filtering recommender system. In short, the "content" of content-based recommendation is the "likes/purchased/etc." of collaborative filtering. Given our song-based example from previous, in collaborative filtering, a user is able to specify a collection of songs (which can be of size 1) that they like. Moreover, other users in the system have also specified songs that they like. Given the collection of likes-based edges, its possible to recommend to the first user  songs based upon overlapping likes with other users. For example, if user A likes 95% of the songs that user B likes, then recommend the other 5% to user A as they seem to have shared interests. Here is a breakdown of a collaborative filtering traversal algorithm (accompanying the English written representation is a "Gremlin":http://gremlin.tinkerpop.com representation of each step):
+
+# Traverse from the user to the songs that they like. 
+** @./outE[@@@label='likes']/inV@
+# Traverse from the songs to the users that like those songs (excluding the first user) 
+** @./inE[@@@label='likes']/outV[g:except($_)]@
+# Traverse from these users to all the songs that they like
+** @./outE[@@@label='likes']/inV@
+# Exclude those songs that the user already likes.
+** @.[g:except(./outE[@@@label='likes']/inV)]@
+
+The more songs that the first user (user A) likes in common with another user (user B), the greater the rank the other songs that user B likes will receive. There are numerous variations to this theme. Itemized are some extensions that are possible:
+
+# Filter at the end by properties (e.g. only allow free-jazz songs)
+# Make use of edges weights (e.g. the user 1-5 likes a song).
+# Normalize by the number of songs that someone likes (e.g. if someone likes every song, then they are not that good of an item recommender as their entropy is to high).
+# Use usage data as a indicator of liking (e.g. if a user keeps clicking on a song, infer that they like it).
+
+With rich data that includes different types of items, different forms of preference, different content aspects, etc., very sophisticated recommendation algorithms can be created. Within a graph-based system such as Rexster, its easy to tweak the traversers to move in different ways exposing different variations of the recommender theme.[3]
+
+==<hr/>==
+
+
+fn1. Watkins, J.H., M.A. Rodriguez, "A Survey of Web-based Collective Decision Making Systems":http://escholarship.org/uc/item/04h3h1cr, Studies in Computational Intelligence: Evolution of the Web in Artificial Intelligence Environments, Springer-Verlag, doi:10.1007/978-3-540-79140-9_11, pages 245-279, 2008. 
+
+fn2. Rodriguez, M.A., Neubauer, P., "The Graph Traversal Pattern":http://arxiv.org/abs/1004.1001, AT&Ti and NeoTechnology Technical Report, April 2010.
+
+fn3. Rodriguez, M.A., Watkins, J., "Faith in the Algorithm, Part 2: Computational Eudaemonics":http://arxiv.org/abs/0904.0027, Proceedings of the International Conference on Knowledge-Based and Intelligent Information & Engineering Systems, Lecture Notes in Artificial Intelligence, volume 5712, pages 813-820, doi:10.1007/978-3-642-04592-9_101, Springer-Verlag, April 2009.
