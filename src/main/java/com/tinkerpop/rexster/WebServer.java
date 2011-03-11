@@ -72,8 +72,7 @@ public class WebServer {
         Integer adminPort = properties.getInteger("adminserver-port", new Integer(8183));
         String webRootPath = properties.getString("web-root", DEFAULT_WEB_ROOT_PATH);
 
-        HierarchicalConfiguration webServerConfig = properties.configurationAt("web-server-configuration");
-        final Map<String, String> jerseyInitParameters = getServletInitParameters(webServerConfig);
+        final Map<String, String> jerseyInitParameters = getServletInitParameters("web-server-configuration", properties);
 
         this.server = new GrizzlyWebServer(port);
         this.adminServer = new GrizzlyWebServer(adminPort);
@@ -94,8 +93,7 @@ public class WebServer {
         webToolAdapter.setServletInstance(new ToolServlet());
         webToolAdapter.setHandleStaticResources(false);
         
-        HierarchicalConfiguration adminServerConfig = properties.configurationAt("admin-server-configuration");
-        final Map<String, String> adminInitParameters = getServletInitParameters(webServerConfig);
+        final Map<String, String> adminInitParameters = getServletInitParameters("admin-server-configuration", properties);
         
         // servlet for gremlin console
         ServletAdapter visualizationAdapter = new ServletAdapter();
@@ -140,24 +138,42 @@ public class WebServer {
 
     }
 
+    /** 
+     * Extracts servlet configuration parameters from rexster.xml
+     */
 	private Map<String, String> getServletInitParameters(
-			HierarchicalConfiguration webServerConfig) {
-		final Map<String, String> initParams = new HashMap<String, String>();
-        Iterator keys = webServerConfig.getKeys();
-        while (keys.hasNext()) {
-            String key = keys.next().toString();
+			String webServerConfigKey, XMLConfiguration properties) {
 
-            // commons config double dots keys with just one period in it.
-            // as that represents a path statement for that lib.  need to remove
-            // the double dot so that it can pass directly to grizzly.  hopefully
-            // there are no cases where this will cause a problem and a double dot
-            // is always expected
-            String grizzlyKey = key.replace("..", ".");
-            String configValue = webServerConfig.getString(key);
-            initParams.put(grizzlyKey, configValue);
-
-            logger.info("Web Server configured with " + key + ": " + configValue);
+        final Map<String, String> initParams = new HashMap<String, String>();
+        
+        HierarchicalConfiguration webServerConfig = null;
+		try {
+			webServerConfig = properties.configurationAt(webServerConfigKey);
+		} catch (IllegalArgumentException iae) {
+			logger.info("No servlet initialization parameters passed for configuration: " + webServerConfigKey);
+		}
+	        
+        if (webServerConfig != null) {
+	        Iterator keys = webServerConfig.getKeys();
+	        while (keys.hasNext()) {
+	            String key = keys.next().toString();
+	
+	            // commons config double dots keys with just one period in it.
+	            // as that represents a path statement for that lib.  need to remove
+	            // the double dot so that it can pass directly to grizzly.  hopefully
+	            // there are no cases where this will cause a problem and a double dot
+	            // is always expected
+	            String grizzlyKey = key.replace("..", ".");
+	            String configValue = webServerConfig.getString(key);
+	            initParams.put(grizzlyKey, configValue);
+	
+	            logger.info("Web Server configured with " + key + ": " + configValue);
+	        }
         }
+	
+        // give all servlets access to rexster.xml location
+        initParams.put("com.tinkerpop.rexster.config", properties.getString("self-xml"));
+        
 		return initParams;
 	}
 
@@ -233,9 +249,11 @@ public class WebServer {
         
         CommandLine line = getCliInput(args);
         
+        String rexsterXmlFile = "rexster.xml";
+        
         if (line.hasOption("configuration")) {
 	        
-	        String rexsterXmlFile = line.getOptionValue("configuration");
+	        rexsterXmlFile = line.getOptionValue("configuration");
 	        
             try {
                 properties.load(new FileReader(rexsterXmlFile));
@@ -244,8 +262,16 @@ public class WebServer {
             }
         } else {
         	// no arguments to parse
-            properties.load(RexsterApplication.class.getResourceAsStream("rexster.xml"));
+            properties.load(RexsterApplication.class.getResourceAsStream(rexsterXmlFile));
         }
+        
+        // reference the location of the xml file used to configure the server.
+        // this will allow the configuration to be passed into components that 
+        // do not have access to the configuration file and need it for graph
+        // initialization preventing it from having to be explicitly defined
+        // in rexster.xml itself.  there's probably an even better way to do
+        // this *sigh*
+        properties.addProperty("self-xml", rexsterXmlFile);
         
         // overrides webserver-port from command line
         if (line.hasOption("webserverport")) {

@@ -6,11 +6,7 @@
     <web-root>public</web-root>
     <web-server-configuration>
         <com.sun.jersey.config.property.packages>com.tinkerpop.rexster</com.sun.jersey.config.property.packages>
-        <com.tinkerpop.rexster.config>rexster.xml</com.tinkerpop.rexster.config>
     </web-server-configuration>
-    <admin-server-configuration>
-        <com.tinkerpop.rexster.config>rexster.xml</com.tinkerpop.rexster.config>
-    </admin-server-configuration>
     <graphs>
         <graph>
             <graph-name>emptygraph</graph-name>
