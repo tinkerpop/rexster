@@ -25,7 +25,13 @@ public class ToolServlet extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
 
-        String rootPath = this.getInitParameter("root");
+		String baseRexsterApiUri = this.getInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri");
+		
+		if (!baseRexsterApiUri.endsWith("/")) {
+			baseRexsterApiUri = baseRexsterApiUri + "/"; 
+		}
+		
+        String rootPath = this.getInitParameter("com.tinkerpop.rexster.config.root");
         ServletContext ctx = this.getServletContext();
 
         // set the MIME type of the response, "text/html"
@@ -35,7 +41,7 @@ public class ToolServlet extends HttpServlet {
         
         // kind of opens a bad door here.  will probably rethink this a bit.  
         String content = ReaderWriter.readFromAsString(new InputStreamReader(resource.openStream()));
-        content = content.replace("{{inject}}", "<script type=\"text/javascript\">var GREMLIN_VERSION = \"" + GremlinTokens.VERSION + "\";</script>");
+        content = content.replace("{{inject}}", "<script type=\"text/javascript\">var GREMLIN_VERSION = \"" + GremlinTokens.VERSION + "\";var BASE_URI = \"" + baseRexsterApiUri + "\"</script>");
         response.getWriter().write(content);
     }
 }

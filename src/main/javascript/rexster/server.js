@@ -6,7 +6,7 @@ Rexster.modules.server = function(api) {
 	api.servers = [
 	                   { 
 	                	   serverName : "localhost",
-	                	   uri : "http://localhost:8182/"
+	                	   uri : BASE_URI
 	                   }
 	                  ];
 	api.getBaseUri = function(ix){

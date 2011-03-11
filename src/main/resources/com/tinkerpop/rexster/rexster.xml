@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rexster>
-    <webserver-port>8182</webserver-port>
-    <adminserver-port>8183</adminserver-port>
+    <rexster-server-port>8182</rexster-server-port>
+    <doghouse-server-port>8183</doghouse-server-port>
+    <base-uri>http://localhost</base-uri>
     <cache-maxsize>1000</cache-maxsize>
     <web-root>public</web-root>
     <web-server-configuration>

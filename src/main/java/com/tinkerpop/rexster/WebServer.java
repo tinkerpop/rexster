@@ -28,6 +28,7 @@ import org.apache.log4j.PropertyConfigurator;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -38,14 +39,15 @@ import java.util.Map;
 public class WebServer {
 
     private static final String DEFAULT_WEB_ROOT_PATH = "public";
+    private static final String DEFAULT_BASE_URI = "http://localhost";
     protected static Logger logger = Logger.getLogger(WebServer.class);
 
     static {
         PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
     }
 
-    protected GrizzlyWebServer server;
-    protected GrizzlyWebServer adminServer;
+    protected GrizzlyWebServer rexsterServer;
+    protected GrizzlyWebServer doghouseServer;
 
     public WebServer(final XMLConfiguration properties, boolean user) throws Exception {
         logger.info(".:Welcome to Rexster:.");
@@ -68,14 +70,15 @@ public class WebServer {
 
     protected void start(final XMLConfiguration properties) throws Exception {
     	WebServerRexsterApplicationProvider.start(properties);
-        Integer port = properties.getInteger("webserver-port", new Integer(8182));
-        Integer adminPort = properties.getInteger("adminserver-port", new Integer(8183));
+        Integer rexsterServerPort = properties.getInteger("rexster-server-port", new Integer(8182));
+        Integer doghouseServerPort = properties.getInteger("doghouse-server-port", new Integer(8183));
         String webRootPath = properties.getString("web-root", DEFAULT_WEB_ROOT_PATH);
-
+        String baseUri = properties.getString("base-uri", DEFAULT_BASE_URI);
+        
         final Map<String, String> jerseyInitParameters = getServletInitParameters("web-server-configuration", properties);
 
-        this.server = new GrizzlyWebServer(port);
-        this.adminServer = new GrizzlyWebServer(adminPort);
+        this.rexsterServer = new GrizzlyWebServer(rexsterServerPort);
+        this.doghouseServer = new GrizzlyWebServer(doghouseServerPort);
 
         ServletAdapter jerseyAdapter = new ServletAdapter();
         for (Map.Entry<String, String> entry : jerseyInitParameters.entrySet()) {
@@ -115,7 +118,8 @@ public class WebServer {
         evaluatorAdapter.setHandleStaticResources(false);
         
         String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
-        webToolAdapter.addInitParameter("root", "/" + webRootPath);
+        webToolAdapter.addInitParameter("com.tinkerpop.rexster.config.root", "/" + webRootPath);
+        webToolAdapter.addInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri", baseUri + ":" + rexsterServerPort.toString());
         GrizzlyAdapter staticAdapter = new GrizzlyAdapter(absoluteWebRootPath)
         {
             public void service(GrizzlyRequest req, GrizzlyResponse res )
@@ -124,17 +128,17 @@ public class WebServer {
         };
         staticAdapter.setHandleStaticResources(true);
 
-        this.server.addGrizzlyAdapter(jerseyAdapter, new String[]{""});
-        this.adminServer.addGrizzlyAdapter(webToolAdapter, new String[]{"/main"});
-        this.adminServer.addGrizzlyAdapter(visualizationAdapter, new String[]{"/visualize"});
-        this.adminServer.addGrizzlyAdapter(evaluatorAdapter, new String[]{"/exec"});
-        this.adminServer.addGrizzlyAdapter(staticAdapter, new String[]{""});
+        this.rexsterServer.addGrizzlyAdapter(jerseyAdapter, new String[]{""});
+        this.doghouseServer.addGrizzlyAdapter(webToolAdapter, new String[]{"/main"});
+        this.doghouseServer.addGrizzlyAdapter(visualizationAdapter, new String[]{"/visualize"});
+        this.doghouseServer.addGrizzlyAdapter(evaluatorAdapter, new String[]{"/exec"});
+        this.doghouseServer.addGrizzlyAdapter(staticAdapter, new String[]{""});
 
-        this.server.start();
-        this.adminServer.start();
+        this.rexsterServer.start();
+        this.doghouseServer.start();
 
-        logger.info("Server running on:" + port);
-        logger.info("Admin server running on:" + adminPort);
+        logger.info("Rexster Server running on: [" + baseUri + ":" + rexsterServerPort + "]");
+        logger.info("Dog House Server running on: [" + baseUri + ":" + doghouseServerPort + "]");
 
     }
 
@@ -178,8 +182,8 @@ public class WebServer {
 	}
 
     protected void stop() throws Exception {
-        this.server.stop();
-        this.adminServer.stop();
+        this.rexsterServer.stop();
+        this.doghouseServer.stop();
         WebServerRexsterApplicationProvider.stop();
     }
 
