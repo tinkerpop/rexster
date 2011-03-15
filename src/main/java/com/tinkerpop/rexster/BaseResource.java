@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.sun.jersey.api.core.HttpRequestContext;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
@@ -43,7 +44,7 @@ public abstract class BaseResource {
     
     @Context
     protected ServletContext servletContext;
-
+    
     public BaseResource(RexsterApplicationProvider rexsterApplicationProvider) {
 
         // the general assumption is that the web server is the provider for RexsterApplication

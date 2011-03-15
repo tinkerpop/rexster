@@ -1,21 +1,33 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.*;
-import com.tinkerpop.rexster.traversals.ElementJSONObject;
-import com.tinkerpop.rexster.traversals.IndexJSONObject;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import java.util.HashSet;
-import java.util.Set;
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.rexster.traversals.ElementJSONObject;
+import com.tinkerpop.rexster.traversals.IndexJSONObject;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -145,6 +157,7 @@ public class IndexResource extends AbstractSubResource {
         }
 
         return this.addHeaders(Response.ok(this.resultObject)).build();
+        //return this.addHeaders(Response.ok(this.resultObject).header("Content-Type", "application/json; charset=UTF-8")).build();
     }
 
     /**

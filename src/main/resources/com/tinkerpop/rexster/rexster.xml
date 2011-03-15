@@ -5,6 +5,7 @@
     <base-uri>http://localhost</base-uri>
     <cache-maxsize>1000</cache-maxsize>
     <web-root>public</web-root>
+    <character-set>UTF-8</character-set>
     <web-server-configuration>
         <com.sun.jersey.config.property.packages>com.tinkerpop.rexster</com.sun.jersey.config.property.packages>
     </web-server-configuration>

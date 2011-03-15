@@ -1,15 +1,12 @@
 package com.tinkerpop.rexster;
 
-import com.sun.grizzly.http.embed.GrizzlyWebServer;
-import com.sun.grizzly.http.servlet.ServletAdapter;
-import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
-import com.sun.grizzly.tcp.http11.GrizzlyRequest;
-import com.sun.grizzly.tcp.http11.GrizzlyResponse;
-import com.sun.jersey.spi.container.servlet.ServletContainer;
-
-import com.tinkerpop.rexster.servlet.EvaluatorServlet;
-import com.tinkerpop.rexster.servlet.ToolServlet;
-import com.tinkerpop.rexster.servlet.VisualizationServlet;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -19,19 +16,20 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import com.sun.grizzly.http.embed.GrizzlyWebServer;
+import com.sun.grizzly.http.servlet.ServletAdapter;
+import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
+import com.sun.grizzly.tcp.http11.GrizzlyRequest;
+import com.sun.grizzly.tcp.http11.GrizzlyResponse;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.tinkerpop.rexster.servlet.EvaluatorServlet;
+import com.tinkerpop.rexster.servlet.ToolServlet;
+import com.tinkerpop.rexster.servlet.VisualizationServlet;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -74,13 +72,53 @@ public class WebServer {
         Integer doghouseServerPort = properties.getInteger("doghouse-server-port", new Integer(8183));
         String webRootPath = properties.getString("web-root", DEFAULT_WEB_ROOT_PATH);
         String baseUri = properties.getString("base-uri", DEFAULT_BASE_URI);
+        final String characterEncoding = properties.getString("character-set", "ISO-8859-1");
         
         final Map<String, String> jerseyInitParameters = getServletInitParameters("web-server-configuration", properties);
 
         this.rexsterServer = new GrizzlyWebServer(rexsterServerPort);
         this.doghouseServer = new GrizzlyWebServer(doghouseServerPort);
 
-        ServletAdapter jerseyAdapter = new ServletAdapter();
+        ServletAdapter jerseyAdapter = new ServletAdapter() {
+        	@Override
+            public void service(GrizzlyRequest request, GrizzlyResponse response) {
+        		try {
+	        		if (request.getCharacterEncoding() == null) {
+	        			request.setCharacterEncoding(characterEncoding);
+	        			
+	        			// better way to use the content type to determine the charset from the URI???
+	        			/*
+	        			String contentType = request.getHeader("Content-Type");
+	        			if (contentType != null) {
+		        			int place = contentType.indexOf("charset=");
+		        			if (place > -1) {
+			        			String requestedCharSet = contentType.substring(place + 8);
+			        			request.setCharacterEncoding(requestedCharSet);
+		        			}
+	        			}
+	        			*/
+	        		}
+        		} catch (UnsupportedEncodingException ex) {
+        			// don't care...will just default to ISO-8859-1
+        		}
+        		
+        		super.service(request, response);
+            }
+        	
+        	@Override
+        	public void afterService(GrizzlyRequest request, GrizzlyResponse response) throws Exception {
+        		String contentType = response.getHeader("Content-Type");
+        		if (!contentType.contains("charset=")) {
+        			contentType = contentType + ";charset=" + characterEncoding;
+        		}
+        		
+        		response.getResponse().setHeader("Content-Type", contentType);
+        		
+        		super.afterService(request, response);
+        	}
+        	
+        };
+        
         for (Map.Entry<String, String> entry : jerseyInitParameters.entrySet()) {
             jerseyAdapter.addInitParameter(entry.getKey(), entry.getValue());
         }
