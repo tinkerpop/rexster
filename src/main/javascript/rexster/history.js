@@ -7,7 +7,7 @@ Rexster.modules.history = function(api) {
 		var encodedState = jQuery.url.setUrl(location.href),
 		    state = {};
 		
-		if (!($.browser.webkit && $.browser.version >= 8)) {
+		if (!has("native-history-state")) {
 			encodedState = jQuery.url.setUrl(Rexster.currentState);
 		}
 		
@@ -44,7 +44,7 @@ Rexster.modules.history = function(api) {
 	 */
 	api.historyPush = function(uri) {
 		Rexster.currentState = uri;
-		if ($.browser.webkit && $.browser.version >= 8) {
+		if (has("native-history-state")) {
 			window.history.pushState({"uri":uri}, '', uri);
 		} 
 	}

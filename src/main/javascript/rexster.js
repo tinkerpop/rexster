@@ -35,7 +35,7 @@ function Rexster() {
 $(function(){
 	
 	// only make this feature available to browsers that support it
-	if ($.browser.webkit && $.browser.version >= 8) {
+	if (has("native-history-state")) {
 		window.onpopstate = function(event) {
 			restoreApplication();
 		};
@@ -60,12 +60,12 @@ $(function(){
     		// since there is no menu selected initialized the graph page first.
 	    	api.historyPush("/main/graph");
 	    	
-	    	if (!($.browser.webkit && $.browser.version >= 8)) {
+	    	if (!has("native-history-state")) {
     			restoreApplication()
     		}
 	    	
     	} else {
-    		if (!($.browser.webkit && $.browser.version >= 8)) {
+    		if (!has("native-history-state")) {
     			restoreApplication()
     		}
     	}
