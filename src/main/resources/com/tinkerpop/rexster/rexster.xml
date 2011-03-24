@@ -108,7 +108,7 @@
             </properties>
         </graph>
         <graph>
-            <graph-enabled>true</graph-enabled>
+            <graph-enabled>false</graph-enabled>
             <graph-name>dexsample</graph-name>
             <graph-type>dexgraph</graph-type>
             <graph-file>/tmp/graph.dex</graph-file>
