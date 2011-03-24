@@ -96,6 +96,8 @@ public class GraphConfigurationContainer {
             graphConfigurationType = NativeStoreSailGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("neo4jsailgraph")) {
             graphConfigurationType = Neo4jSailGraphConfiguration.class.getName();
+        } else if (graphConfigurationType.equals("dexgraph")) {
+            graphConfigurationType = DexGraphConfiguration.class.getName();
         }
 
         Graph graph = null;

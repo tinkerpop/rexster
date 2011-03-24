@@ -12,7 +12,6 @@ import java.util.Iterator;
 
 public class Neo4jGraphConfiguration implements GraphConfiguration {
 
-    @Override
     public Graph configureGraphInstance(Configuration properties) throws GraphConfigurationException {
 
         String graphFile = properties.getString(Tokens.REXSTER_GRAPH_FILE);

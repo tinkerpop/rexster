@@ -107,5 +107,12 @@
                 <max_relationship_cache_size>3500</max_relationship_cache_size>
             </properties>
         </graph>
+        <graph>
+            <graph-enabled>true</graph-enabled>
+            <graph-name>dexsample</graph-name>
+            <graph-type>dexgraph</graph-type>
+            <graph-file>/tmp/graph.dex</graph-file>
+            <packages-allowed></packages-allowed>
+        </graph>
     </graphs>
 </rexster>

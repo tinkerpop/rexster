@@ -20,7 +20,6 @@ public abstract class AbstractSailGraphConfiguration implements GraphConfigurati
 
     protected String sailType;
 
-    @Override
     public Graph configureGraphInstance(Configuration properties) throws GraphConfigurationException {
         String graphFile = properties.getString(Tokens.REXSTER_GRAPH_FILE, null);
 

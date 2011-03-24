@@ -9,7 +9,6 @@ import org.apache.commons.configuration.SubnodeConfiguration;
 
 public class OrientGraphConfiguration implements GraphConfiguration {
 
-    @Override
     public Graph configureGraphInstance(Configuration properties) throws GraphConfigurationException {
 
         String graphFile = properties.getString(Tokens.REXSTER_GRAPH_FILE);

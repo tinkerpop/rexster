@@ -33,14 +33,14 @@
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>graphdb-deps-all</artifactId>
-            <version>0.5</version>
+            <version>0.6-SNAPSHOT</version>
             <type>pom</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>blueprints</artifactId>
-            <version>0.5</version>
+            <version>0.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop</groupId>
