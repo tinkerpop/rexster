@@ -12,29 +12,10 @@ public class AbstractSailGraphConfigurationTest {
     private MockSailGraphConfiguration configuration = new MockSailGraphConfiguration();
 
     @Test(expected = GraphConfigurationException.class)
-    public void configureGraphInstanceNeo4jSailTypeNoGraphFile() throws GraphConfigurationException {
-        HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
-
-        this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_NEO4J);
-
-        this.configuration.configureGraphInstance(graphConfig);
-    }
-
-    @Test(expected = GraphConfigurationException.class)
     public void configureGraphInstanceNativeSailTypeNoGraphFile() throws GraphConfigurationException {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
 
         this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_NATIVE);
-
-        this.configuration.configureGraphInstance(graphConfig);
-    }
-
-    @Test(expected = GraphConfigurationException.class)
-    public void configureGraphInstanceNeo4jSailTypeEmptyGraphFile() throws GraphConfigurationException {
-        HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
-        graphConfig.setProperty(Tokens.REXSTER_GRAPH_FILE, "");
-
-        this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_NEO4J);
 
         this.configuration.configureGraphInstance(graphConfig);
     }

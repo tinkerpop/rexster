@@ -16,7 +16,6 @@ public abstract class AbstractSailGraphConfiguration implements GraphConfigurati
 
     public static final String SAIL_TYPE_MEMORY = "memory";
     public static final String SAIL_TYPE_NATIVE = "native";
-    public static final String SAIL_TYPE_NEO4J = "neo4j";
 
     protected String sailType;
 
@@ -34,7 +33,7 @@ public abstract class AbstractSailGraphConfiguration implements GraphConfigurati
         }
 
         // graph-file and data-directory must be present for native and neo4j
-        if ((sailType.equals(SAIL_TYPE_NATIVE) || sailType.equals(SAIL_TYPE_NEO4J)) && (graphFile == null || graphFile.trim().length() == 0)) {
+        if (sailType.equals(SAIL_TYPE_NATIVE) && (graphFile == null || graphFile.trim().length() == 0)) {
             throw new GraphConfigurationException("Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_FILE);
         }
 
