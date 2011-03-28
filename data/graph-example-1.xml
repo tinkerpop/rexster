@@ -32,10 +32,6 @@
             <data key="name">peter</data>
             <data key="age">35</data>
         </node>
-        <node id="13">
-            <data key="name">saldaña</data>
-            <data key="age">21</data>
-        </node>
         <edge id="7" source="1" target="2" label="knows">
             <data key="weight">0.5</data>
         </edge>
@@ -53,9 +49,6 @@
         </edge>
         <edge id="12" source="6" target="3" label="created">
             <data key="weight">0.2</data>
-        </edge>
-        <edge id="14" source="1" target="13" label="knows">
-            <data key="weight">0.5</data>
         </edge>
     </graph>
 </graphml>
