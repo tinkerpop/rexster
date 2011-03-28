@@ -79,6 +79,8 @@ public class WebServer {
         this.rexsterServer = new GrizzlyWebServer(rexsterServerPort);
         this.doghouseServer = new GrizzlyWebServer(doghouseServerPort);
 
+        // all this character encoding stuff is a bit of a hack around jersey issues
+        // see: http://java.net/jira/browse/JAX_RS_SPEC-28
         ServletAdapter jerseyAdapter = new ServletAdapter() {
         	@Override
             public void service(GrizzlyRequest request, GrizzlyResponse response) {
@@ -107,13 +109,14 @@ public class WebServer {
         	
         	@Override
         	public void afterService(GrizzlyRequest request, GrizzlyResponse response) throws Exception {
+
+                // sets the content type with the configured character encoding.
         		String contentType = response.getHeader("Content-Type");
-        		if (!contentType.contains("charset=")) {
+        		if (contentType != null && !contentType.contains("charset=")) {
         			contentType = contentType + ";charset=" + characterEncoding;
+        		    response.getResponse().setHeader("Content-Type", contentType);
         		}
-        		
-        		response.getResponse().setHeader("Content-Type", contentType);
-        		
+
         		super.afterService(request, response);
         	}
         	
