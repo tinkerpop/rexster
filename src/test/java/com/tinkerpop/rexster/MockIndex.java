@@ -16,6 +16,12 @@ public class MockIndex implements Index {
     }
 
     @Override
+    public long count(String arg0, Object arg1)
+    {
+        return 0;
+    }
+
+    @Override
     public Iterable get(String arg0, Object arg1) {
         // TODO Auto-generated method stub
         return null;
