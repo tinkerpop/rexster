@@ -96,6 +96,54 @@ public class IndexResourceTest {
 
     }
 
+    @Test(expected = WebApplicationException.class)
+    public void getIndexCountIndexNotFound() {
+        HashMap<String, String> parameters = new HashMap<String, String>();
+        IndexResource resource = this.constructMockGetAllIndicesScenario(1, parameters);
+
+        // only one graph exists so index-name-2 is junk
+        Response response = resource.getIndexCount("graph", "index-name-2");
+    }
+
+    @Test(expected = WebApplicationException.class)
+    public void getIndexCountIndexBadRequestNoKey() {
+        HashMap<String, String> parameters = new HashMap<String, String>();
+        parameters.put("value", "name");
+        IndexResource resource = this.constructMockGetAllIndicesScenario(1, parameters);
+
+        Response response = resource.getIndexCount("graph", "index-name-0");
+    }
+
+    @Test(expected = WebApplicationException.class)
+    public void getIndexCountIndexBadRequestNoValue() {
+        HashMap<String, String> parameters = new HashMap<String, String>();
+        parameters.put("key", "name");
+        IndexResource resource = this.constructMockGetAllIndicesScenario(1, parameters);
+
+        Response response = resource.getIndexCount("graph", "index-name-0");
+    }
+
+    @Test
+    public void getIndexCountIndexValid() {
+        HashMap<String, String> parameters = new HashMap<String, String>();
+        parameters.put("key", "name");
+        parameters.put("value", "marko");
+        IndexResource resource = this.constructMockGetAllIndicesScenario(1, parameters);
+
+        Response response = resource.getIndexCount("graph", "index-name-0");
+
+        Assert.assertNotNull(response);
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertNotNull(response.getEntity());
+        Assert.assertTrue(response.getEntity() instanceof JSONObject);
+
+        JSONObject json = (JSONObject) response.getEntity();
+        Assert.assertTrue(json.has(Tokens.TOTAL_SIZE));
+        Assert.assertEquals(100, json.optInt(Tokens.TOTAL_SIZE));
+        Assert.assertTrue(json.has(Tokens.QUERY_TIME));
+        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
+    }
+
     private IndexResource constructMockGetAllIndicesScenario(int numberOfIndicesToGenerate, final HashMap<String, String> parameters) {
         final IndexableGraph graph = this.mockery.mock(IndexableGraph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
@@ -106,7 +154,7 @@ public class IndexResourceTest {
         final ArrayList<Index> indices = new ArrayList<Index>();
 
         for (int ix = 0; ix < numberOfIndicesToGenerate; ix++) {
-            indices.add(new MockIndex("index-name-" + new Integer(ix).toString(), Type.MANUAL, String.class));
+            indices.add(new MockIndex("index-name-" + new Integer(ix).toString(), Type.MANUAL, String.class, 100l));
         }
 
         this.mockery.checking(new Expectations() {{

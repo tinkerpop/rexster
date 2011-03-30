@@ -11,7 +11,7 @@ public class IndexJSONObjectTest {
 
     @Test
     public void constructorValid() {
-        Index idx = new MockIndex("idx", Type.MANUAL, String.class);
+        Index idx = new MockIndex("idx", Type.MANUAL, String.class, 0L);
 
         try {
             IndexJSONObject indexJsonObject = new IndexJSONObject(idx);

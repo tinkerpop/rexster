@@ -121,7 +121,7 @@ public class IndexResource extends AbstractSubResource {
         long counter = 0l;
 
 
-        if (null != index & key != null && value != null) {
+        if (null != index && key != null && value != null) {
             try {
                 JSONArray elementArray = new JSONArray();
                 for (Element element : (Iterable<Element>) index.get(key, value)) {
@@ -197,6 +197,57 @@ public class IndexResource extends AbstractSubResource {
             throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.NOT_FOUND).entity(error)).build());
         } else {
             String msg = "Only automatic indices have user provided keys";
+            logger.info(msg);
+
+            JSONObject error = generateErrorObject(msg);
+            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.BAD_REQUEST).entity(error)).build());
+        }
+
+        return this.addHeaders(Response.ok(this.resultObject)).build();
+    }
+
+    /**
+     * GET http://host/graph/indices/indexName/count?key=?&value=?
+     */
+    @GET
+    @Path("/{indexName}/count")
+    public Response getIndexCount(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
+        Index index = this.getIndexFromGraph(graphName, indexName);
+
+        String key = null;
+        Object value = null;
+
+        Object temp = this.getRequestObject().opt(Tokens.KEY);
+        if (temp != null) {
+            key = temp.toString();
+        }
+
+        temp = this.getRequestObject().opt(Tokens.VALUE);
+        if (temp != null) {
+            value = getTypedPropertyValue(temp.toString());
+        }
+
+        if (index != null && key != null && value != null) {
+            try {
+                long count = index.count(key, value);
+
+                this.resultObject.put(Tokens.TOTAL_SIZE, count);
+                this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
+
+            } catch (JSONException ex) {
+                logger.error(ex);
+
+                JSONObject error = generateErrorObjectJsonFail(ex);
+                throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            }
+        } else if (null == index) {
+            String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
+            logger.info(msg);
+
+            JSONObject error = generateErrorObject(msg);
+            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.NOT_FOUND).entity(error)).build());
+        } else {
+            String msg = "A key and value must be provided to lookup elements in an index";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
