@@ -31,6 +31,11 @@
     <dependencies>
         <!-- PROPERTY GRAPH MODEL SUPPORT -->
         <dependency>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-core</artifactId>
+            <version>0.6-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>pipes</artifactId>
             <version>0.4-SNAPSHOT</version>
@@ -39,6 +44,11 @@
             <groupId>com.tinkerpop</groupId>
             <artifactId>gremlin</artifactId>
             <version>0.9-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-sail-graph</artifactId>
+            <version>0.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
