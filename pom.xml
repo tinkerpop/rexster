@@ -44,16 +44,19 @@
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-dex-graph</artifactId>
             <version>0.6-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-neo4j-graph</artifactId>
             <version>0.6-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-orient-graph</artifactId>
             <version>0.6-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <!-- JSON SUPPORT -->
         <dependency>
@@ -120,11 +123,6 @@
             <url>http://download.java.net/maven/1</url>
             <layout>legacy</layout>
         </repository>
-        <!--<repository>
-            <id>maven-restlet</id>
-            <name>Public online Restlet repository</name>
-            <url>http://maven.restlet.org</url>
-        </repository>-->
         <repository>
             <id>tinkerpop-repository</id>
             <name>TinkerPop Maven2 Repository</name>
