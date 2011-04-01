@@ -144,7 +144,10 @@
     });
 
     addtest("native-history-state", function(g){
-        return ("history" in g) && ("pushState" in history);
+        // added the "onpopstate" check because it doesn't appear to be present in FF4
+        // even though this says otherwise https://developer.mozilla.org/en/DOM/window.onpopstate
+        // am i misreading something???
+        return ("history" in g) && ("pushState" in history) && ("onpopstate" in g);
     });
 
     addtest("native-websockets", function(g){
