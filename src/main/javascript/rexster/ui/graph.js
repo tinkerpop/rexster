@@ -46,8 +46,8 @@ Rexster.modules.graph = function(api) {
 		this.getContainerPanelBrowser = function() {
 			return containerPanelBrowser;
 		}
-		
-		/**
+
+ 		/**
 		 * A graph was selected from the graph menu.
 		 * 
 		 * @param api        {Object} A Rexster API instance.
@@ -58,14 +58,23 @@ Rexster.modules.graph = function(api) {
 			var state = api.getApplicationState();
 			    
 			currentGraphName = state.graph;
-			
+
+            // look to hide the browser vertices button because sail graphs have infinite vertices.
+            containerPanelGraphMenu.find("a[_type='vertices']").show();
+			api.getGraph(currentGraphName, function(result){
+			    if (result.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.MemoryStoreSailGraph"
+			        || result.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.NativeStoreSailGraph") {
+                    containerPanelGraphMenu.find("a[_type='vertices']").hide();
+			    }
+			});
+
 			containerMenuGraph.find(".graph-item").removeClass("ui-state-active");
 			containerMenuGraph.find("#graphItemgraph" + currentGraphName).addClass("ui-state-active");
-			
+
 			// modify the links on the browse menus to match current state
 			containerPanelGraphMenu.find("a[_type='vertices']").attr("href", "/main/graph/" + currentGraphName + "/vertices?start=0&end=10");
 			containerPanelGraphMenu.find("a[_type='edges']").attr("href", "/main/graph/" + currentGraphName + "/edges?start=0&end=10");
-			
+
 			// load the graph profile
 			api.getGraph(currentGraphName, function(graphResult) {
 				$("#panelGraphTitle").text(currentGraphName);
@@ -74,20 +83,20 @@ Rexster.modules.graph = function(api) {
 			function(err){
 				api.showMessageError("Could not get the graph profile from Rexster.");
 			});
-			
+
 			// check the state.  if the browse panel is on, then don't worry about loading
 			// traversals.
 			if (state.browse === undefined) {
 				// load traversals panel for the current graph
-				api.getTraversals(currentGraphName, function(traversalResult) { 
-					
+				api.getTraversals(currentGraphName, function(traversalResult) {
+
 					containerPanelTraversals.show();
 					containerPanelElementViewer.hide();
 					containerPanelBrowser.hide();
 					containerPanelTraversalsList.empty();
-					
+
 					api.applyListTraversalsTemplate(traversalResult.results, containerPanelTraversalsList);
-					
+
 					// execute the callback now that the traversals are done.
 					if (onComplete != undefined) {
 						onComplete();
