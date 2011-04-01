@@ -21,6 +21,7 @@
             <outputDirectory>/bin/public</outputDirectory>
             <includes>
                 <include>*.html</include>
+                <include>favicon.ico</include>
                 <include>img/**</include>
                 <include>css/**</include>
             </includes>
