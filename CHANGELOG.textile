@@ -11,6 +11,21 @@ Rexster: A Graph-Based Ranking Engine
 
 ==<hr/>==
 
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dogeatdog.png!
+
+h3. Version 0.3 (Dog Eat Dog -- NOT OFFICIALLY RELEASED YET)
+
+```xml
+ <dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>rexster</artifactId>
+  <version>0.3-SNAPSHOT</version>
+</dependency>
+```
+
+
+==<hr/>==
+
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-doghouse.png!
 
