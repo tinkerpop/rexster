@@ -23,6 +23,15 @@ h3. Version 0.3 (Dog Eat Dog -- NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Minor changes to rexster.xml:
+** Addition of the @<base-uri>@ element.
+** Renaming of @<webserver-port>@ to @<rexster-server-port>@.
+** Renaming of @<adminserver-port>@ to @<doghouse-server-port>@.
+** Removed some redundancy where rexster.xml had to reference itself within intialization parameters.
+* The port to which the Dog House connects for REST services is no longer hardcoded and is configurable given the changes to rexster.xml defined above.
+* Supports "DEX":http://www.sparsity-technologies.com/dex graph database.
+* Neo4jSail is no longer supported within Rexster and Blueprints.
+* Blueprints added a @count@ method to indices.  That function is exposed via @http://localhost/graph/indices/myindex/count?key=name&value=val@
 
 ==<hr/>==
 
