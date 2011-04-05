@@ -39,7 +39,7 @@
             <directory>target/site</directory>
         </fileSet>
         <fileSet>
-            <directory>target/rexster-${project.version}-standalone</directory>
+            <directory>target/${project.artifactId}-${project.version}-standalone</directory>
         </fileSet>
     </fileSets>
 </assembly>

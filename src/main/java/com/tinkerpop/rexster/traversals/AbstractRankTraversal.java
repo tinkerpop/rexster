@@ -6,7 +6,13 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -92,6 +98,16 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         while (iterator.hasNext()) {
             incrRank(iterator.next(), incr);
             totalRank = totalRank + incr;
+        }
+        return totalRank;
+    }
+
+    protected double setRank(final Map<? extends Element, Number> rank) throws JSONException {
+        double totalRank = 0.0f;
+        for (final Map.Entry<? extends Element, Number> entry : rank.entrySet()) {
+            final double value = entry.getValue().doubleValue();
+            incrRank(entry.getKey(), value);
+            totalRank = totalRank + value;
         }
         return totalRank;
     }
