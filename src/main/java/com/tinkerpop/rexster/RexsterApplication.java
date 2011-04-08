@@ -4,6 +4,8 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
 import com.tinkerpop.rexster.config.GraphConfigurationContainer;
 import com.tinkerpop.rexster.config.GraphConfigurationException;
+import com.tinkerpop.rexster.extension.ExtensionConfiguration;
+import com.tinkerpop.rexster.extension.RexsterExtension;
 import com.tinkerpop.rexster.traversals.Traversal;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -99,10 +101,6 @@ public class RexsterApplication {
                 }
             }
         }
-    }
-
-    public Map<String, Class<? extends Traversal>> getLoadedTraversalServices(String graphName) {
-        return this.graphs.get(graphName).getLoadedTraversals();
     }
 
     public static String getVersion() {

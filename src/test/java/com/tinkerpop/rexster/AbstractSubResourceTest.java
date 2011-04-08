@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.rexster.extension.*;
 import junit.framework.Assert;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -10,6 +11,7 @@ import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.UriInfo;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -300,6 +302,43 @@ public class AbstractSubResourceTest {
         Assert.assertEquals(123, innerMap2.get("x"));
     }
 
+    @Test
+    public void findExtensionNotPresent(){
+        RexsterExtension extension = this.mockResource.findExtensionExposed("not", "here");
+        Assert.assertNull(extension);
+    }
+
+    @Test
+    public void findExtensionFound(){
+        RexsterExtension extension = this.mockResource.findExtensionExposed("tp", "gremlin");
+        Assert.assertNotNull(extension);
+        Assert.assertTrue(extension instanceof GremlinExtension);
+    }
+
+    @Test
+    public void findExtensionMethodNotPresent() {
+        MockRexsterExtension ext = new MockRexsterExtension();
+        Method m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.VERTEX, "action");
+        Assert.assertNull(m);
+
+        m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "something-that-does-not-exist");
+        Assert.assertNull(m);
+    }
+
+    @Test
+    public void findExtensionMethodFoundRoot() {
+        MockRexsterExtension ext = new MockRexsterExtension();
+        Method m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "");
+        Assert.assertNotNull(m);
+    }
+
+    @Test
+    public void findExtensionMethodFoundSpecificAction() {
+        MockRexsterExtension ext = new MockRexsterExtension();
+        Method m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "action");
+        Assert.assertNotNull(m);
+    }
+
     private class MockAbstractSubResource extends AbstractSubResource {
 
         public MockAbstractSubResource(UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
@@ -310,6 +349,32 @@ public class AbstractSubResourceTest {
 
         public Object getTypedPropertyValue(String propertyValue) {
             return super.getTypedPropertyValue(propertyValue);
+        }
+
+        public RexsterExtension findExtensionExposed(String namespace, String extensionName) {
+            return findExtension(namespace, extensionName);
+        }
+
+        public Method findExtensionMethodExposed(
+                RexsterExtension rexsterExtension, ExtensionPoint extensionPoint, String extensionAction) {
+            return findExtensionMethod(rexsterExtension, extensionPoint, extensionAction);
+        }
+    }
+
+    private class MockRexsterExtension implements RexsterExtension {
+
+        @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
+        public ExtensionResponse doRoot(){
+            return null;
+        }
+
+        @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "action")
+        public ExtensionResponse doAction(){
+            return null;
+        }
+
+        public void justIgnoreMe() {
+            // ensuring no fails when no ExtensionDefinition annotation is supplied
         }
     }
 }

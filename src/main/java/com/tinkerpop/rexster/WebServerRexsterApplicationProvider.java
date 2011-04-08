@@ -42,28 +42,23 @@ public class WebServerRexsterApplicationProvider implements RexsterApplicationPr
 			logger.warn("Rexster graph may not have been shutdown properly", ex);
 		}
 	}
-	
-    @Override
+
     public RexsterApplication getRexsterApplication() {
         return rexster;
     }
 
-    @Override
     public RexsterApplicationGraph getApplicationGraph(String graphName) {
         return this.getRexsterApplication().getApplicationGraph(graphName);
     }
 
-    @Override
     public ResultObjectCache getResultObjectCache() {
         return this.getRexsterApplication().getResultObjectCache();
     }
 
-    @Override
     public Set<String> getGraphsNames() {
         return this.getRexsterApplication().getGraphsNames();
     }
 
-    @Override
     public long getStartTime() {
         return this.getRexsterApplication().getStartTime();
     }

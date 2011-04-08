@@ -1,7 +1,12 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.rexster.extension.ExtensionConfiguration;
+import com.tinkerpop.rexster.extension.ExtensionPoint;
+import com.tinkerpop.rexster.extension.RexsterExtension;
 import com.tinkerpop.rexster.traversals.Traversal;
+import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.log4j.Logger;
 
 import java.util.*;
 
@@ -10,24 +15,25 @@ import java.util.*;
  */
 public class RexsterApplicationGraph {
 
+    private static final Logger logger = Logger.getLogger(RexsterApplication.class);
+
     private Graph graph;
     private Map<String, Class<? extends Traversal>> loadedTraversals = new HashMap<String, Class<? extends Traversal>>();
     private String graphName;
     private Set<String> packageNames;
+    private Set<ExtensionConfiguration> extensionConfigurations;
 
     public RexsterApplicationGraph(String graphName, Graph graph) {
         this.graphName = graphName;
         this.graph = graph;
     }
 
-    public RexsterApplicationGraph(String graphName, Graph graph, String packageNames) {
-        this.graphName = graphName;
-        this.graph = graph;
-        this.loadPackageNames(packageNames);
-    }
-
     public boolean hasPackages() {
         return this.packageNames != null && this.packageNames.size() > 0;
+    }
+
+    public boolean hasExtensions() {
+        return this.extensionConfigurations != null && this.extensionConfigurations.size() > 0;
     }
 
     public String getGraphName() {
@@ -50,6 +56,34 @@ public class RexsterApplicationGraph {
         return packageNames;
     }
 
+    public boolean isExtensionAllowed(String namespace, String extensionName) {
+        boolean allowed = false;
+        for (ExtensionConfiguration extensionConfiguration : this.extensionConfigurations) {
+            if (extensionConfiguration.isExtensionAllowed(namespace, extensionName)) {
+                allowed = true;
+                break;
+            }
+        }
+
+        return allowed;
+    }
+
+    public void loadExtensionsConfigurations(String extensionString) {
+        this.extensionConfigurations = new HashSet<ExtensionConfiguration>();
+
+        if (extensionString != null && extensionString.trim().length() > 0) {
+            String[] splitNamespaces = extensionString.split(";");
+            for (String namespace : splitNamespaces) {
+                try {
+                    this.getExtensionConfigurations().add(new ExtensionConfiguration(namespace));
+                } catch (IllegalArgumentException iae) {
+                    logger.warn("Extension defined with an invalid namespace: " + namespace
+                        + ".  It will not be configured.", iae);
+                }
+            }
+        }
+    }
+
     public void loadPackageNames(String packageNameString) {
         if (packageNameString != null && packageNameString.length() > 0) {
             if (packageNameString.trim().equals(";")) {
@@ -64,5 +98,9 @@ public class RexsterApplicationGraph {
             // no packages when empty
             this.packageNames = new HashSet<String>();
         }
+    }
+
+    public Set<ExtensionConfiguration> getExtensionConfigurations() {
+        return extensionConfigurations;
     }
 }
