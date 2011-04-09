@@ -27,23 +27,14 @@ public class ExtensionConfiguration {
     /**
      * Determines if the namespace and extension are allowed given the configuration of the graph in rexster.xml.
      */
-    public boolean isExtensionAllowed(String namespace, String extensionName) {
-
-        if (namespace == null || namespace.isEmpty()) {
-            throw new IllegalArgumentException("Namespace argument cannot be null or empty.");
-        }
-
-        if (extensionName == null || extensionName.isEmpty()) {
-            throw new IllegalArgumentException("Extension name argument cannot be null or empty.");
-        }
-
+    public boolean isExtensionAllowed(ExtensionSegmentSet extensionSegmentSet){
         boolean allowed = false;
 
         if (this.namespace.equals("*:*")) {
             allowed = true;
-        } else if (this.namespace.equals(namespace + ":*")) {
+        } else if (this.namespace.equals(extensionSegmentSet.getNamespace() + ":*")) {
             allowed = true;
-        } else if (this.namespace.equals(namespace + ":" + extensionName)) {
+        } else if (this.namespace.equals(extensionSegmentSet.getNamespace() + ":" + extensionSegmentSet.getExtension())) {
             allowed = true;
         }
 

@@ -10,8 +10,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -304,13 +306,21 @@ public class AbstractSubResourceTest {
 
     @Test
     public void findExtensionNotPresent(){
-        RexsterExtension extension = this.mockResource.findExtensionExposed("not", "here");
+
+        this.mockery = new JUnit4Mockery();
+        UriInfo uri = this.mockTheUri("not", "here", "");
+
+        RexsterExtension extension = this.mockResource.findExtensionExposed(new ExtensionSegmentSet(uri));
         Assert.assertNull(extension);
     }
 
     @Test
     public void findExtensionFound(){
-        RexsterExtension extension = this.mockResource.findExtensionExposed("tp", "gremlin");
+
+        this.mockery = new JUnit4Mockery();
+        UriInfo uri = this.mockTheUri("tp", "gremlin", "");
+
+        RexsterExtension extension = this.mockResource.findExtensionExposed(new ExtensionSegmentSet(uri));
         Assert.assertNotNull(extension);
         Assert.assertTrue(extension instanceof GremlinExtension);
     }
@@ -339,6 +349,33 @@ public class AbstractSubResourceTest {
         Assert.assertNotNull(m);
     }
 
+    private UriInfo mockTheUri(final String namespace, final String extension, final String method) {
+        final UriInfo uri = this.mockery.mock(UriInfo.class);
+        final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
+        final PathSegment graphPathSegment = this.mockery.mock(PathSegment.class, "graphPathSegment");
+        final PathSegment namespacePathSegment = this.mockery.mock(PathSegment.class, "namespacePathSegment");
+        final PathSegment extensionPathSegment = this.mockery.mock(PathSegment.class, "extensionPathSegment");
+        final PathSegment methodPathSegment = this.mockery.mock(PathSegment.class, "methodPathSegment");
+
+        pathSegments.add(graphPathSegment);
+        pathSegments.add(namespacePathSegment);
+        pathSegments.add(extensionPathSegment);
+        pathSegments.add(methodPathSegment);
+
+        this.mockery.checking(new Expectations() {{
+            allowing(namespacePathSegment).getPath();
+            will(returnValue(namespace));
+            allowing(extensionPathSegment).getPath();
+            will(returnValue(extension));
+            allowing(methodPathSegment).getPath();
+            will(returnValue(method));
+            allowing(uri).getPathSegments();
+            will(returnValue(pathSegments));
+        }});
+
+        return uri;
+    }
+
     private class MockAbstractSubResource extends AbstractSubResource {
 
         public MockAbstractSubResource(UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
@@ -351,8 +388,8 @@ public class AbstractSubResourceTest {
             return super.getTypedPropertyValue(propertyValue);
         }
 
-        public RexsterExtension findExtensionExposed(String namespace, String extensionName) {
-            return findExtension(namespace, extensionName);
+        public RexsterExtension findExtensionExposed(ExtensionSegmentSet extensionSegmentSet) {
+            return findExtension(extensionSegmentSet);
         }
 
         public Method findExtensionMethodExposed(

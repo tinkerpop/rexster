@@ -83,58 +83,43 @@ public class GraphResource extends AbstractSubResource {
     public Response getGraphExtension(@PathParam("graphname") String graphName) {
 
         ExtensionResponse extResponse = null;
-        List<PathSegment> pathSegments = this.uriInfo.getPathSegments();
+        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.uriInfo);
 
-        // todo: better job checking these incoming values maybe
-        // the first item in the path is the graphname, the second is the namespace
-        String namespace = pathSegments.get(1).getPath();
-
-        // the third item in the path is the extension
-        String extensionName = "";
-        PathSegment extensionPathSegment = pathSegments.get(2);
-        if (extensionPathSegment != null) {
-            extensionName = extensionPathSegment.getPath();
+        if (!extensionSegmentSet.IsValidFormat()) {
+            logger.error("Tried to parse the extension segments but they appear invalid: " + extensionSegmentSet);
+            JSONObject error = generateErrorObject(
+                    "The [" + extensionSegmentSet + "] extension appears invalid for [" + graphName + "]");
+            throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
-
-        String namespaceAndExtension = namespace + ":" + extensionName;
 
         // determine if the namespace and extension are enabled for this graph
         RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 
-        if (rag.isExtensionAllowed(namespace, extensionName)) {
+        if (rag.isExtensionAllowed(extensionSegmentSet)) {
 
             // namespace was allowed so try to run the extension
             try {
 
                 // look for the extension as loaded through serviceloader
-                RexsterExtension rexsterExtension = findExtension(namespace, extensionName);
+                RexsterExtension rexsterExtension = findExtension(extensionSegmentSet);
 
                 if (rexsterExtension == null) {
                     // extension was not found for some reason
 
-                    logger.error("The [" + namespaceAndExtension + "] extension was not found for [" + graphName + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
+                    logger.error("The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
                     JSONObject error = generateErrorObject(
-                            "The [" + namespaceAndExtension + "] extension was not found for [" + graphName + "]");
+                            "The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "]");
                     throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
                 }
 
-                String extensionAction = "";
-
-                if (pathSegments.size() > 3) {
-                    PathSegment extensionActionSegment = pathSegments.get(3);
-                    if (extensionActionSegment != null) {
-                        extensionAction = extensionActionSegment.getPath();
-                    }
-                }
-
                 // look up the method on the extension that needs to be called.
-                Method methodToCall = findExtensionMethod(rexsterExtension, ExtensionPoint.GRAPH, extensionAction);
+                Method methodToCall = findExtensionMethod(rexsterExtension, ExtensionPoint.GRAPH, extensionSegmentSet.getExtensionMethod());
 
                 if (methodToCall == null) {
                     // extension method was not found for some reason
-                    logger.error("The [" + namespaceAndExtension + "/" + extensionAction + "] extension was not found for [" + graphName + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
+                    logger.error("The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
                     JSONObject error = generateErrorObject(
-                            "The [" + namespaceAndExtension + "/" + extensionAction + "] extension was not found for [" + graphName + "]");
+                            "The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "]");
                     throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
                 }
 
@@ -144,9 +129,9 @@ public class GraphResource extends AbstractSubResource {
                     extResponse = (ExtensionResponse) returnValue;
                 } else {
                     // extension method was not found for some reason
-                    logger.error("The [" + namespaceAndExtension + "/" + extensionAction + "] extension does not return an ExtensionResponse.");
+                    logger.error("The [" + extensionSegmentSet + "] extension does not return an ExtensionResponse.");
                     JSONObject error = generateErrorObject(
-                            "The [" + namespaceAndExtension + "/" + extensionAction + "] extension does not return an ExtensionResponse.");
+                            "The [" + extensionSegmentSet + "] extension does not return an ExtensionResponse.");
                     throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
                 }
 
@@ -157,9 +142,9 @@ public class GraphResource extends AbstractSubResource {
             }
         } else {
             // namespace was not allowed
-            logger.error("The [" + namespaceAndExtension + "] extension was not configured for [" + graphName + "]");
+            logger.error("The [" + extensionSegmentSet + "] extension was not configured for [" + graphName + "]");
             JSONObject error = generateErrorObject(
-                    "The [" + namespaceAndExtension + "] extension was not configured for [" + graphName + "]");
+                    "The [" + extensionSegmentSet + "] extension was not configured for [" + graphName + "]");
             throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 

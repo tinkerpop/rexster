@@ -1,51 +1,73 @@
 package com.tinkerpop.rexster.extension;
 
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ExtensionConfigurationTest {
 
-    @Test(expected = IllegalArgumentException.class)
-    public void isExtensionAllowedEmptyNamespace() {
-        ExtensionConfiguration configuration = new ExtensionConfiguration("*:*");
-        Assert.assertTrue(configuration.isExtensionAllowed("", "extension"));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void isExtensionAllowedNullNamespace() {
-        ExtensionConfiguration configuration = new ExtensionConfiguration("*:*");
-        Assert.assertTrue(configuration.isExtensionAllowed(null, "extension"));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void isExtensionAllowedNullExtension() {
-        ExtensionConfiguration configuration = new ExtensionConfiguration("*:*");
-        Assert.assertTrue(configuration.isExtensionAllowed("ns", null));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void isExtensionAllowedEmptyExtension() {
-        ExtensionConfiguration configuration = new ExtensionConfiguration("*:*");
-        Assert.assertTrue(configuration.isExtensionAllowed("ns", ""));
-    }
+    private Mockery mockery = new JUnit4Mockery();
 
     @Test
     public void isExtensionAllowedAllowAll() {
         ExtensionConfiguration configuration = new ExtensionConfiguration("*:*");
-        Assert.assertTrue(configuration.isExtensionAllowed("ns", "extension"));
+        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "extension", ""));
+        Assert.assertTrue(configuration.isExtensionAllowed(extensionSegmentSet));
     }
 
     @Test
     public void isExtensionAllowedAllowAllInNamespace() {
         ExtensionConfiguration configuration = new ExtensionConfiguration("ns:*");
-        Assert.assertTrue(configuration.isExtensionAllowed("ns", "extension"));
-        Assert.assertFalse(configuration.isExtensionAllowed("bs", "extension"));
+        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "extension", ""));
+        Assert.assertTrue(configuration.isExtensionAllowed(extensionSegmentSet));
+
+        extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("bs", "extension", ""));
+        Assert.assertFalse(configuration.isExtensionAllowed(extensionSegmentSet));
     }
 
     @Test
     public void isExtensionAllowedAllowSpecificExtension() {
         ExtensionConfiguration configuration = new ExtensionConfiguration("ns:allowed");
-        Assert.assertTrue(configuration.isExtensionAllowed("ns", "allowed"));
-        Assert.assertFalse(configuration.isExtensionAllowed("ns", "not-allowed"));
+        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "allowed", ""));
+        Assert.assertTrue(configuration.isExtensionAllowed(extensionSegmentSet));
+
+        extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "not-allowed", ""));
+        Assert.assertFalse(configuration.isExtensionAllowed(extensionSegmentSet));
+    }
+
+    private UriInfo mockTheUri(final String namespace, final String extension, final String method) {
+        this.mockery = new JUnit4Mockery();
+
+        final UriInfo uri = this.mockery.mock(UriInfo.class);
+        final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
+        final PathSegment graphPathSegment = this.mockery.mock(PathSegment.class, "graphPathSegment");
+        final PathSegment namespacePathSegment = this.mockery.mock(PathSegment.class, "namespacePathSegment");
+        final PathSegment extensionPathSegment = this.mockery.mock(PathSegment.class, "extensionPathSegment");
+        final PathSegment methodPathSegment = this.mockery.mock(PathSegment.class, "methodPathSegment");
+
+        pathSegments.add(graphPathSegment);
+        pathSegments.add(namespacePathSegment);
+        pathSegments.add(extensionPathSegment);
+        pathSegments.add(methodPathSegment);
+
+        this.mockery.checking(new Expectations() {{
+            allowing(namespacePathSegment).getPath();
+            will(returnValue(namespace));
+            allowing(extensionPathSegment).getPath();
+            will(returnValue(extension));
+            allowing(methodPathSegment).getPath();
+            will(returnValue(method));
+            allowing(uri).getPathSegments();
+            will(returnValue(pathSegments));
+        }});
+
+        return uri;
     }
 }

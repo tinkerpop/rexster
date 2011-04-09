@@ -78,7 +78,7 @@ public abstract class AbstractSubResource extends BaseResource {
      *
      * @return The found extension instance or null if one cannot be found.
      */
-    protected static RexsterExtension findExtension(String namespace, String extensionName) {
+    protected static RexsterExtension findExtension(ExtensionSegmentSet extensionSegmentSet) {
         ServiceLoader<? extends RexsterExtension> extensions = ServiceLoader.load(RexsterExtension.class);
         RexsterExtension rexsterExtension = null;
         for (RexsterExtension extension : extensions) {
@@ -104,11 +104,12 @@ public abstract class AbstractSubResource extends BaseResource {
                 }
             }
 
-             if (namespace.equals(currentExtensionNamespace) && extensionName.equals(currentExtensionName)) {
-                 // found what we're looking for
-                 rexsterExtension = extension;
-                 break;
-             }
+            if (extensionSegmentSet.getNamespace().equals(currentExtensionNamespace)
+                && extensionSegmentSet.getExtension().equals(currentExtensionName)) {
+                // found what we're looking for
+                rexsterExtension = extension;
+                break;
+            }
         }
 
         return rexsterExtension;

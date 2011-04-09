@@ -3,6 +3,7 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.rexster.extension.ExtensionConfiguration;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
+import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
 import com.tinkerpop.rexster.extension.RexsterExtension;
 import com.tinkerpop.rexster.traversals.Traversal;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -56,10 +57,10 @@ public class RexsterApplicationGraph {
         return packageNames;
     }
 
-    public boolean isExtensionAllowed(String namespace, String extensionName) {
+    public boolean isExtensionAllowed(ExtensionSegmentSet extensionSegmentSet) {
         boolean allowed = false;
         for (ExtensionConfiguration extensionConfiguration : this.extensionConfigurations) {
-            if (extensionConfiguration.isExtensionAllowed(namespace, extensionName)) {
+            if (extensionConfiguration.isExtensionAllowed(extensionSegmentSet)) {
                 allowed = true;
                 break;
             }
