@@ -1,12 +1,9 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
 
 import com.tinkerpop.rexster.extension.*;
-import com.tinkerpop.rexster.traversals.Traversal;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -15,14 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.Set;
 
 @Path("/{graphname}")
 @Produces(MediaType.APPLICATION_JSON)
@@ -85,7 +75,7 @@ public class GraphResource extends AbstractSubResource {
         ExtensionResponse extResponse = null;
         ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.uriInfo);
 
-        if (!extensionSegmentSet.IsValidFormat()) {
+        if (!extensionSegmentSet.isValidFormat()) {
             logger.error("Tried to parse the extension segments but they appear invalid: " + extensionSegmentSet);
             JSONObject error = generateErrorObject(
                     "The [" + extensionSegmentSet + "] extension appears invalid for [" + graphName + "]");

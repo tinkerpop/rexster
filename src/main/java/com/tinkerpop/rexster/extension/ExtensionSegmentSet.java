@@ -17,15 +17,15 @@ public class ExtensionSegmentSet {
 
         // the first item in the path is the graphname, the second is the namespace
         this.namespace = "";
-        PathSegment namespacePathSegment = pathSegments.get(1);
-        if (namespacePathSegment != null) {
+        if (pathSegments.size() > 1) {
+            PathSegment namespacePathSegment = pathSegments.get(1);
             this.namespace = namespacePathSegment.getPath();
         }
 
         // the third item in the path is the extension
         this.extension = "";
-        PathSegment extensionPathSegment = pathSegments.get(2);
-        if (extensionPathSegment != null) {
+        if (pathSegments.size() > 2) {
+            PathSegment extensionPathSegment = pathSegments.get(2);
             this.extension = extensionPathSegment.getPath();
         }
 
@@ -34,24 +34,28 @@ public class ExtensionSegmentSet {
         // the fourth item in the path is the extension...if it exists
         if (pathSegments.size() > 3) {
             PathSegment extensionMethodPathSegment = pathSegments.get(3);
-            if (extensionMethodPathSegment != null) {
-                this.extensionMethod = extensionMethodPathSegment.getPath();
-            }
+            this.extensionMethod = extensionMethodPathSegment.getPath();
         }
     }
 
-
-    public boolean IsValidFormat() {
+    public boolean isValidFormat() {
         return !this.getNamespace().isEmpty() && !this.getExtension().isEmpty();
     }
 
     public String getNamespaceAndExtension() {
-        return this.getNamespace() + ":" + this.getExtension();
+        String namespaceAndExtension = "";
+        if (this.isValidFormat()) {
+            namespaceAndExtension = this.getNamespace() + ":" + this.getExtension();
+        }
+
+        return namespaceAndExtension;
     }
 
     @Override
     public String toString() {
-        return this.getNamespace() + ":" + this.getExtension() + "+" + (this.getExtensionMethod().isEmpty() ? "*" : this.getExtensionMethod());
+        return  (this.getNamespace().isEmpty() ? "[parse error]" : this.getNamespace()) + ":" +
+                (this.getExtension().isEmpty() ? "[parse error]" : this.getExtension()) + "+"
+                + (this.getExtensionMethod().isEmpty() ? "*" : this.getExtensionMethod());
     }
 
     public String getNamespace() {
