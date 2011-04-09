@@ -117,6 +117,12 @@ public class GraphResource extends AbstractSubResource {
                 Object returnValue = invokeExtension(graphName, rexsterExtension, methodToCall);
                 if (returnValue instanceof ExtensionResponse) {
                     extResponse = (ExtensionResponse) returnValue;
+
+                    if (extResponse.isErrorResponse()) {
+                        // an error was raised within the extension.  pass it back out as an error.
+                        logger.error("The [" + extensionSegmentSet + "] extension raised an error response.");
+                        throw new WebApplicationException(this.addHeaders(Response.fromResponse(extResponse.getJerseyResponse())).build());
+                    }
                 } else {
                     // extension method was not found for some reason
                     logger.error("The [" + extensionSegmentSet + "] extension does not return an ExtensionResponse.");
