@@ -5,6 +5,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -50,14 +51,48 @@ public class ExtensionResponse {
      * Generates standard Rexster JSON error with an internal server error response code.
      */
     public static ExtensionResponse error(String message) {
-        return error(message, null);
+        return error(message, (Exception) null);
     }
 
     /**
-    * Generates standard Rexster JSON error with an internal server error response code.
-    */
+     * Generates standard Rexster JSON error with an internal server error response code.
+     */
+    public static ExtensionResponse error(String message, String appendKey, JSONObject appendJson) {
+        return error(message, null, appendKey, appendJson);
+    }
+
+    /**
+     * Generates standard Rexster JSON error with an internal server error response code.
+     *
+     * @param appendJson Additional JSON to push into the response. The root of the key values from this object
+     *                   will be merged into the root of the resulting JSON.
+     */
+    public static ExtensionResponse error(String message, JSONObject appendJson) {
+        return error(message, null, null, appendJson);
+    }
+
+    /**
+     * Generates standard Rexster JSON error with an internal server error response code.
+     */
     public static ExtensionResponse error(Exception source) {
         return error("", source);
+    }
+
+    /**
+     * Generates standard Rexster JSON error with an internal server error response code.
+     */
+    public static ExtensionResponse error(Exception source, String appendKey, JSONObject appendJson) {
+        return error("", source, appendKey, appendJson);
+    }
+
+    /**
+     * Generates standard Rexster JSON error with an internal server error response code.
+     *
+     * @param appendJson Additional JSON to push into the response. The root of the key values from this object
+     *                   will be merged into the root of the resulting JSON.
+     */
+    public static ExtensionResponse error(Exception source, JSONObject appendJson) {
+        return error("", source, null, appendJson);
     }
 
     /**
@@ -68,21 +103,97 @@ public class ExtensionResponse {
     }
 
     /**
+     * Generates standard Rexster JSON error with an internal server error response code.
+     *
+     * @param appendKey This parameter is only relevant if the appendJson parameter is passed.  If this value
+     *                  is not null or non-empty the value of appendJson will be assigned to this key value in
+     *                  the response object.  If the key is null or empty the appendJson parameter will be
+     *                  written at the root of the response object.
+     * @param appendJson Additional JSON to push into the response.
+     */
+    public static ExtensionResponse error(String message, Exception source, String appendKey, JSONObject appendJson) {
+        return error(message, source, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), appendKey, appendJson);
+    }
+
+    /**
+     * Generates standard Rexster JSON error with an internal server error response code.
+     *
+     * @param appendJson Additional JSON to push into the response. The root of the key values from this object
+     *                   will be merged into the root of the resulting JSON.
+     */
+    public static ExtensionResponse error(String message, Exception source, JSONObject appendJson) {
+         return error(message, source, null, appendJson);
+    }
+
+    /**
      * Generates standard Rexster JSON error with a specified server error response code.
      *
      * The status code is not validated, so throw the right code.
      */
     public static ExtensionResponse error(String message, Exception source, int statusCode) {
-        Map<String, String> m = new HashMap<String, String>();
+        return error(message, source, statusCode, null, null);
+    }
+
+    /**
+     * Generates standard Rexster JSON error with a specified server error response code.
+     *
+     * The status code is not validated, so throw the right code.
+     *
+     * @param appendKey This parameter is only relevant if the appendJson parameter is passed.  If this value
+     *                  is not null or non-empty the value of appendJson will be assigned to this key value in
+     *                  the response object.  If the key is null or empty the appendJson parameter will be
+     *                  written at the root of the response object.
+     * @param appendJson Additional JSON to push into the response.
+     */
+    public static ExtensionResponse error(String message, Exception source, int statusCode, String appendKey, JSONObject appendJson) {
+        Map<String, Object> m = new HashMap<String, Object>();
         m.put(Tokens.MESSAGE, message);
 
         if (source != null) {
             m.put("error", source.getMessage());
         }
 
+        if (appendJson != null) {
+            if (appendKey != null && !appendKey.isEmpty()) {
+                m.put(appendKey, appendJson);
+            } else {
+                Iterator keys = appendJson.keys();
+                while (keys.hasNext()) {
+                    String key = (String) keys.next();
+                    m.put(key, appendJson.opt(key));
+                }
+            }
+        }
+
         // use a hashmap with the constructor so that a JSONException
         // will not be thrown
         return new ExtensionResponse(Response.status(statusCode).entity(new JSONObject(m)).build(), true);
+    }
+
+    /**
+     * Generates a response with no content and matching status code.
+     */
+    public static ExtensionResponse noContent() {
+        return new ExtensionResponse(Response.noContent().build());
+    }
+
+    /**
+     * Generates an response with an OK status code.  Accepts a HashMap as the response value.
+     * It is converted to JSON.
+     */
+    public static ExtensionResponse ok(HashMap result) {
+        if (result == null) {
+            throw new IllegalArgumentException("result cannot be null");
+        }
+
+        return ok(new JSONObject(result));
+    }
+
+    /**
+     * Generates an response with an OK status code.
+     */
+    public static ExtensionResponse ok(JSONObject result) {
+        return new ExtensionResponse(Response.ok(result).build());
     }
 
     public Response getJerseyResponse() {

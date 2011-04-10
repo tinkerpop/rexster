@@ -87,6 +87,8 @@ public class GraphResource extends AbstractSubResource {
 
         if (rag.isExtensionAllowed(extensionSegmentSet)) {
 
+            Object returnValue = null;
+
             // namespace was allowed so try to run the extension
             try {
 
@@ -114,28 +116,30 @@ public class GraphResource extends AbstractSubResource {
                 }
 
                 // found the method...time to do work
-                Object returnValue = invokeExtension(graphName, rexsterExtension, methodToCall);
-                if (returnValue instanceof ExtensionResponse) {
-                    extResponse = (ExtensionResponse) returnValue;
-
-                    if (extResponse.isErrorResponse()) {
-                        // an error was raised within the extension.  pass it back out as an error.
-                        logger.error("The [" + extensionSegmentSet + "] extension raised an error response.");
-                        throw new WebApplicationException(this.addHeaders(Response.fromResponse(extResponse.getJerseyResponse())).build());
-                    }
-                } else {
-                    // extension method was not found for some reason
-                    logger.error("The [" + extensionSegmentSet + "] extension does not return an ExtensionResponse.");
-                    JSONObject error = generateErrorObject(
-                            "The [" + extensionSegmentSet + "] extension does not return an ExtensionResponse.");
-                    throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
-                }
+                returnValue = invokeExtension(graphName, rexsterExtension, methodToCall);
 
             } catch (Exception ex) {
                 logger.error(ex);
                 JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
             }
+
+            if (returnValue instanceof ExtensionResponse) {
+                extResponse = (ExtensionResponse) returnValue;
+
+                if (extResponse.isErrorResponse()) {
+                    // an error was raised within the extension.  pass it back out as an error.
+                    logger.error("The [" + extensionSegmentSet + "] extension raised an error response.");
+                    throw new WebApplicationException(this.addHeaders(Response.fromResponse(extResponse.getJerseyResponse())).build());
+                }
+            } else {
+                // extension method is not returning the correct type...needs to be an ExtensionResponse
+                logger.error("The [" + extensionSegmentSet + "] extension does not return an ExtensionResponse.");
+                JSONObject error = generateErrorObject(
+                        "The [" + extensionSegmentSet + "] extension does not return an ExtensionResponse.");
+                throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            }
+
         } else {
             // namespace was not allowed
             logger.error("The [" + extensionSegmentSet + "] extension was not configured for [" + graphName + "]");

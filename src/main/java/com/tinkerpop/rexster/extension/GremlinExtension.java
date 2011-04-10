@@ -52,12 +52,12 @@ public class GremlinExtension implements RexsterExtension{
     public ExtensionResponse doGremlinWorkOnGraph(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                                   @RexsterContext Graph graph){
 
+        ExtensionResponse extensionResponse = ExtensionResponse.noContent();
         String cacheRequestURI = this.createCacheRequestURI(rexsterResourceContext);
         boolean allowCached = rexsterResourceContext.getRequestObject().optBoolean(Tokens.ALLOW_CACHED, true);
         boolean showTypes = rexsterResourceContext.getRequestObject().optBoolean(Tokens.SHOW_TYPES, false);
 
         JSONObject requestObject = rexsterResourceContext.getRequestObject();
-        JSONObject resultObject = rexsterResourceContext.getResultObject();
 
         List<String> returnKeys = null;
         if (requestObject.has(RETURN_KEYS)) {
@@ -105,66 +105,59 @@ public class GremlinExtension implements RexsterExtension{
                         results.put(prepareOutput(result, returnKeys, showTypes));
                     }
 
-                    try {
-                        resultObject.put(Tokens.SUCCESS, true);
-                        resultObject.put(Tokens.RESULTS, results);
-                    } catch (Exception ex) {
-                        // todo: not really much that could go wrong here.  bug in jettison?
-                    }
+                    HashMap<String, Object> resultMap = new HashMap<String, Object>();
+                    resultMap.put(Tokens.SUCCESS, true);
+                    resultMap.put(Tokens.RESULTS, results);
+
+                    JSONObject resultObject = new JSONObject(resultMap);
+                    extensionResponse = ExtensionResponse.ok(resultObject);
 
                     this.cacheCurrentResultObjectState(rexsterResourceContext, cacheRequestURI, resultObject);
+
                 } else {
-                    returnErrorMessageInResult(resultObject, "no script provided");
+                    extensionResponse = ExtensionResponse.error("no script provided", this.generateErrorJson());
                 }
 
             } catch (Exception e) {
-                returnErrorMessageInResult(resultObject, e.getMessage());
+                extensionResponse = ExtensionResponse.error(e, this.generateErrorJson());
             }
         } else {
             // return cached results
-            try {
-                resultObject.putOpt(Tokens.RESULTS, cachedResultObject.opt(Tokens.RESULTS));
-            } catch (Exception ex) {
-                // todo: not really much that could go wrong here.  bug in jettison?
-            }
+            HashMap<String, Object> resultMap = new HashMap<String, Object>();
+            resultMap.put(Tokens.SUCCESS, true);
+            resultMap.put(Tokens.RESULTS, cachedResultObject.opt(Tokens.RESULTS));
+
+            JSONObject resultObject = new JSONObject(resultMap);
+            extensionResponse = ExtensionResponse.ok(resultObject);
         }
 
-        return ExtensionResponse.override(Response.ok(resultObject).build());
+        return extensionResponse;
     }
 
-    private void returnErrorMessageInResult(JSONObject resultObject, String message) {
-        try {
-            resultObject.put(Tokens.SUCCESS, false);
-            resultObject.put(Tokens.MESSAGE, message);
-        } catch (Exception ex) {
-            // todo: not really much that could go wrong here.  bug in jettison?
-        }
+    private JSONObject generateErrorJson() {
+        HashMap map = new HashMap();
+        map.put(Tokens.SUCCESS, false);
+        map.put(Tokens.API, this.generateApiJson());
+
+        return new JSONObject(map);
     }
 
-    private Map<String, Object> getParameters() {
-        Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put(Tokens.ALLOW_CACHED, "allow a previously cached result to be provided (default is true)");
-        parameters.put(Tokens.SHOW_TYPES, "displays the properties of the elements with their native data type (default is false)");
-        return parameters;
-    }
+    private JSONObject generateApiJson() {
 
-    private void addApiToResultObject(JSONObject resultObject) {
+        Map<String, Object> api = new HashMap<String, Object>();
 
-        try {
-            Map<String, Object> api = new HashMap<String, Object>();
-            JSONObject parameters = new JSONObject(this.getParameters());
+        Map<String, Object> parameterMap = new HashMap<String, Object>();
+        parameterMap.put(Tokens.ALLOW_CACHED, "allow a previously cached result to be provided (default is true)");
+        parameterMap.put(Tokens.SHOW_TYPES, "displays the properties of the elements with their native data type (default is false)");
+        parameterMap.put(SCRIPT, "the Gremlin script to be evaluated");
+        parameterMap.put(RETURN_KEYS, "the element property keys to return (default is to return all element properties)");
 
-            parameters.put(SCRIPT, "the Gremlin script to be evaluated");
-            parameters.put(RETURN_KEYS, "the element property keys to return (default is to return all element properties)");
+        JSONObject parameters = new JSONObject(parameterMap);
 
-            api.put(Tokens.DESCRIPTION, "evaluate an ad-hoc Gremlin script");
-            api.put(Tokens.PARAMETERS, parameters);
+        api.put(Tokens.DESCRIPTION, "evaluate an ad-hoc Gremlin script");
+        api.put(Tokens.PARAMETERS, parameters);
 
-            resultObject.put(Tokens.API, api);
-
-        } catch (JSONException ex) {
-            // can't really happen given the hardcoded values
-        }
+        return new JSONObject(api);
     }
 
     private void cacheCurrentResultObjectState(RexsterResourceContext ctx, String cacheRequestURI, JSONObject resultObject) {
