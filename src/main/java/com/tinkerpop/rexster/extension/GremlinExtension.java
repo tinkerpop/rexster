@@ -27,7 +27,6 @@ public class GremlinExtension implements RexsterExtension{
 
     private ScriptEngine engine = new GremlinScriptEngine();
 
-    private static final String GREMLIN = "gremlin";
     private static final String GRAPH_VARIABLE = "g";
     private static final String VERTEX_VARIABLE = "v";
     private static final String EDGE_VARIABLE = "e";
@@ -44,7 +43,7 @@ public class GremlinExtension implements RexsterExtension{
         return tryExecuteGremlinScript(rexsterResourceContext, graph, null, edge);
     }
 
-    @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX)
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX, produces = "application/json;charset=UTF-8")
     @ExtensionDescriptor("Gremlin extension for a vertex.")
     public ExtensionResponse doGremlinWorkOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                                    @RexsterContext Graph graph,

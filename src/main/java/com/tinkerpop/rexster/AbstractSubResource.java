@@ -204,11 +204,11 @@ public abstract class AbstractSubResource extends BaseResource {
      *                       path, just an ExtensionPoint).
      * @return The method to call or null if it cannot be found.
      */
-    protected static Method findExtensionMethod(RexsterExtension rexsterExtension, ExtensionPoint extensionPoint, String extensionAction) {
+    protected static ExtensionMethod findExtensionMethod(RexsterExtension rexsterExtension, ExtensionPoint extensionPoint, String extensionAction) {
         Class rexsterExtensionClass = rexsterExtension.getClass();
         Method[] methods = rexsterExtensionClass.getMethods();
 
-        Method methodToCall = null;
+        ExtensionMethod methodToCall = null;
         for (Method method : methods) {
             // looks for the first method that matches.  methods that multi-match will be ignored right now
             // todo: we probably need to add some kind of up-front validation of extensions.
@@ -220,7 +220,7 @@ public abstract class AbstractSubResource extends BaseResource {
                 && extensionDefinition.extensionPoint() == extensionPoint
                 && ((!extensionAction.equals("") && extensionDefinition.path().equals(extensionAction))
                     || (extensionAction.equals("") && extensionDefinition.path().equals("")))) {
-                methodToCall = method;
+                methodToCall = new ExtensionMethod(method, extensionDefinition);
                 break;
             }
         }

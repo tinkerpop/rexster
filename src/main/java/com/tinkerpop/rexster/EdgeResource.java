@@ -3,10 +3,7 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.rexster.extension.ExtensionPoint;
-import com.tinkerpop.rexster.extension.ExtensionResponse;
-import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
-import com.tinkerpop.rexster.extension.RexsterExtension;
+import com.tinkerpop.rexster.extension.*;
 import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -25,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 
 @Path("/{graphname}/edges")
-@Produces(MediaType.APPLICATION_JSON)
 public class EdgeResource extends AbstractSubResource {
 
     private static Logger logger = Logger.getLogger(EdgeResource.class);
@@ -45,6 +41,7 @@ public class EdgeResource extends AbstractSubResource {
      * graph.getEdges();
      */
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getAllEdges(@PathParam("graphname") String graphName) {
 
         Long start = this.getStartOffset();
@@ -82,6 +79,7 @@ public class EdgeResource extends AbstractSubResource {
      */
     @GET
     @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getSingleEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         final Edge edge = this.getRexsterApplicationGraph(graphName).getGraph().getEdge(id);
 
@@ -126,6 +124,7 @@ public class EdgeResource extends AbstractSubResource {
         final Edge edge = this.getRexsterApplicationGraph(graphName).getGraph().getEdge(id);
 
         ExtensionResponse extResponse;
+        ExtensionMethod methodToCall;
         ExtensionSegmentSet extensionSegmentSet = parseUriForExtensionSegment(graphName, ExtensionPoint.EDGE);
 
         // determine if the namespace and extension are enabled for this graph
@@ -150,7 +149,7 @@ public class EdgeResource extends AbstractSubResource {
                 }
 
                 // look up the method on the extension that needs to be called.
-                Method methodToCall = findExtensionMethod(rexsterExtension, ExtensionPoint.EDGE, extensionSegmentSet.getExtensionMethod());
+                methodToCall = findExtensionMethod(rexsterExtension, ExtensionPoint.EDGE, extensionSegmentSet.getExtensionMethod());
 
                 if (methodToCall == null) {
                     // extension method was not found for some reason
@@ -161,7 +160,7 @@ public class EdgeResource extends AbstractSubResource {
                 }
 
                 // found the method...time to do work
-                returnValue = invokeExtension(graphName, rexsterExtension, methodToCall, edge);
+                returnValue = invokeExtension(graphName, rexsterExtension, methodToCall.getMethod(), edge);
 
             } catch (Exception ex) {
                 logger.error(ex);
@@ -193,7 +192,12 @@ public class EdgeResource extends AbstractSubResource {
             throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
-        return this.addHeaders(Response.fromResponse(extResponse.getJerseyResponse())).build();
+        String mediaType = MediaType.APPLICATION_JSON;
+        if (methodToCall != null) {
+            mediaType = methodToCall.getExtensionDefinition().produces();
+        }
+
+        return this.addHeaders(Response.fromResponse(extResponse.getJerseyResponse()).type(mediaType)).build();
     }
 
     /**
@@ -202,6 +206,7 @@ public class EdgeResource extends AbstractSubResource {
      * e.setProperty(key,value);
      */
     @POST
+    @Produces(MediaType.APPLICATION_JSON)
     public Response postNullEdge(@PathParam("graphname") String graphName) {
         return this.postEdge(graphName, null);
     }
@@ -213,6 +218,7 @@ public class EdgeResource extends AbstractSubResource {
      */
     @POST
     @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response postEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
         final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
@@ -285,6 +291,7 @@ public class EdgeResource extends AbstractSubResource {
      */
     @DELETE
     @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response deleteEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
         try {

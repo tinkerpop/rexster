@@ -329,7 +329,7 @@ public class AbstractSubResourceTest {
     @Test
     public void findExtensionMethodNotPresent() {
         MockRexsterExtension ext = new MockRexsterExtension();
-        Method m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.VERTEX, "action");
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.VERTEX, "action");
         Assert.assertNull(m);
 
         m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "something-that-does-not-exist");
@@ -339,14 +339,14 @@ public class AbstractSubResourceTest {
     @Test
     public void findExtensionMethodFoundRoot() {
         MockRexsterExtension ext = new MockRexsterExtension();
-        Method m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "");
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "");
         Assert.assertNotNull(m);
     }
 
     @Test
     public void findExtensionMethodFoundSpecificAction() {
         MockRexsterExtension ext = new MockRexsterExtension();
-        Method m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "action");
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "action");
         Assert.assertNotNull(m);
     }
 
@@ -393,7 +393,7 @@ public class AbstractSubResourceTest {
             return findExtension(extensionSegmentSet);
         }
 
-        public Method findExtensionMethodExposed(
+        public ExtensionMethod findExtensionMethodExposed(
                 RexsterExtension rexsterExtension, ExtensionPoint extensionPoint, String extensionAction) {
             return findExtensionMethod(rexsterExtension, extensionPoint, extensionAction);
         }

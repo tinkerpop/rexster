@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -16,7 +17,6 @@ import javax.ws.rs.core.Response.Status;
 import java.lang.reflect.Method;
 
 @Path("/{graphname}")
-@Produces(MediaType.APPLICATION_JSON)
 public class GraphResource extends AbstractSubResource {
 
     private static Logger logger = Logger.getLogger(GraphResource.class);
@@ -36,6 +36,7 @@ public class GraphResource extends AbstractSubResource {
      * graph.toString();
      */
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getGraph(@PathParam("graphname") String graphName) {
         try {
 
@@ -87,6 +88,7 @@ public class GraphResource extends AbstractSubResource {
     public Response getGraphExtension(@PathParam("graphname") String graphName) {
 
         ExtensionResponse extResponse;
+        ExtensionMethod methodToCall;
         ExtensionSegmentSet extensionSegmentSet = parseUriForExtensionSegment(graphName, ExtensionPoint.GRAPH);
 
         // determine if the namespace and extension are enabled for this graph
@@ -111,7 +113,7 @@ public class GraphResource extends AbstractSubResource {
                 }
 
                 // look up the method on the extension that needs to be called.
-                Method methodToCall = findExtensionMethod(rexsterExtension, ExtensionPoint.GRAPH, extensionSegmentSet.getExtensionMethod());
+                methodToCall = findExtensionMethod(rexsterExtension, ExtensionPoint.GRAPH, extensionSegmentSet.getExtensionMethod());
 
                 if (methodToCall == null) {
                     // extension method was not found for some reason
@@ -122,7 +124,7 @@ public class GraphResource extends AbstractSubResource {
                 }
 
                 // found the method...time to do work
-                returnValue = invokeExtension(graphName, rexsterExtension, methodToCall);
+                returnValue = invokeExtension(graphName, rexsterExtension, methodToCall.getMethod());
 
             } catch (Exception ex) {
                 logger.error(ex);
@@ -154,7 +156,12 @@ public class GraphResource extends AbstractSubResource {
             throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
-        return this.addHeaders(Response.fromResponse(extResponse.getJerseyResponse())).build();
+        String mediaType = MediaType.APPLICATION_JSON;
+        if (methodToCall != null) {
+            mediaType = methodToCall.getExtensionDefinition().produces();
+        }
+
+        return this.addHeaders(Response.fromResponse(extResponse.getJerseyResponse()).type(mediaType)).build();
     }
 
     /**
@@ -164,6 +171,7 @@ public class GraphResource extends AbstractSubResource {
      * @return Query time
      */
     @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
     public Response deleteGraph(@PathParam("graphname") String graphName) {
         Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
         graph.clear();

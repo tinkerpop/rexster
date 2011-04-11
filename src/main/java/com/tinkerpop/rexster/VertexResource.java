@@ -3,10 +3,7 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.rexster.extension.ExtensionPoint;
-import com.tinkerpop.rexster.extension.ExtensionResponse;
-import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
-import com.tinkerpop.rexster.extension.RexsterExtension;
+import com.tinkerpop.rexster.extension.*;
 import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -25,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 
 @Path("/{graphname}/vertices")
-@Produces(MediaType.APPLICATION_JSON)
 public class VertexResource extends AbstractSubResource {
 
     private static Logger logger = Logger.getLogger(VertexResource.class);
@@ -45,6 +41,7 @@ public class VertexResource extends AbstractSubResource {
      * graph.getVertices();
      */
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getVertices(@PathParam("graphname") String graphName) {
         Long start = this.getStartOffset();
         Long end = this.getEndOffset();
@@ -84,6 +81,7 @@ public class VertexResource extends AbstractSubResource {
      */
     @GET
     @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getSingleVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
         try {
@@ -122,7 +120,7 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @POST
-    @Path("/{id}/{extension: .+}")
+    @Path("/{id}/{extension: (?!direction).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getGraphExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -136,6 +134,7 @@ public class VertexResource extends AbstractSubResource {
         Vertex vertex = this.getRexsterApplicationGraph(graphName).getGraph().getVertex(id);
 
         ExtensionResponse extResponse;
+        ExtensionMethod methodToCall;
         ExtensionSegmentSet extensionSegmentSet = parseUriForExtensionSegment(graphName, ExtensionPoint.VERTEX);
 
         // determine if the namespace and extension are enabled for this graph
@@ -160,7 +159,7 @@ public class VertexResource extends AbstractSubResource {
                 }
 
                 // look up the method on the extension that needs to be called.
-                Method methodToCall = findExtensionMethod(rexsterExtension, ExtensionPoint.VERTEX, extensionSegmentSet.getExtensionMethod());
+                methodToCall = findExtensionMethod(rexsterExtension, ExtensionPoint.VERTEX, extensionSegmentSet.getExtensionMethod());
 
                 if (methodToCall == null) {
                     // extension method was not found for some reason
@@ -171,7 +170,7 @@ public class VertexResource extends AbstractSubResource {
                 }
 
                 // found the method...time to do work
-                returnValue = invokeExtension(graphName, rexsterExtension, methodToCall, vertex);
+                returnValue = invokeExtension(graphName, rexsterExtension, methodToCall.getMethod(), vertex);
 
             } catch (Exception ex) {
                 logger.error(ex);
@@ -203,7 +202,12 @@ public class VertexResource extends AbstractSubResource {
             throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
         }
 
-        return this.addHeaders(Response.fromResponse(extResponse.getJerseyResponse())).build();
+        String mediaType = MediaType.APPLICATION_JSON;
+        if (methodToCall != null) {
+            mediaType = methodToCall.getExtensionDefinition().produces();
+        }
+
+        return this.addHeaders(Response.fromResponse(extResponse.getJerseyResponse()).type(mediaType)).build();
     }
 
     /**
@@ -212,6 +216,7 @@ public class VertexResource extends AbstractSubResource {
      */
     @GET
     @Path("/{id}/{direction}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getVertexEdges(@PathParam("graphname") String graphName, @PathParam("id") String vertexId, @PathParam("direction") String direction) {
         try {
             Long start = this.getStartOffset();
@@ -275,6 +280,7 @@ public class VertexResource extends AbstractSubResource {
      * graph.addVertex(null);
      */
     @POST
+    @Produces(MediaType.APPLICATION_JSON)
     public Response postNullVertex(@PathParam("graphname") String graphName) {
         return this.postVertex(graphName, null);
     }
@@ -286,6 +292,7 @@ public class VertexResource extends AbstractSubResource {
      */
     @POST
     @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response postVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
         try {
@@ -337,6 +344,7 @@ public class VertexResource extends AbstractSubResource {
      */
     @DELETE
     @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response deleteVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         try {
             final List<String> keys = this.getNonRexsterRequestKeys();
