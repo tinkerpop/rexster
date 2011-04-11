@@ -12,28 +12,34 @@ public class ExtensionSegmentSet {
 
     private String extensionMethod;
 
-    public ExtensionSegmentSet(UriInfo uriInfo) {
+    public ExtensionSegmentSet(UriInfo uriInfo, ExtensionPoint extensionPoint) {
+
+        int start = 1;
+        if (extensionPoint != ExtensionPoint.GRAPH) {
+            start = 3;
+        }
+
         List<PathSegment> pathSegments = uriInfo.getPathSegments();
 
         // the first item in the path is the graphname, the second is the namespace
         this.namespace = "";
-        if (pathSegments.size() > 1) {
-            PathSegment namespacePathSegment = pathSegments.get(1);
+        if (pathSegments.size() > start) {
+            PathSegment namespacePathSegment = pathSegments.get(start);
             this.namespace = namespacePathSegment.getPath();
         }
 
         // the third item in the path is the extension
         this.extension = "";
-        if (pathSegments.size() > 2) {
-            PathSegment extensionPathSegment = pathSegments.get(2);
+        if (pathSegments.size() > start + 1) {
+            PathSegment extensionPathSegment = pathSegments.get(start + 1);
             this.extension = extensionPathSegment.getPath();
         }
 
         this.extensionMethod = "";
 
         // the fourth item in the path is the extension...if it exists
-        if (pathSegments.size() > 3) {
-            PathSegment extensionMethodPathSegment = pathSegments.get(3);
+        if (pathSegments.size() > start + 2) {
+            PathSegment extensionMethodPathSegment = pathSegments.get(start + 2);
             this.extensionMethod = extensionMethodPathSegment.getPath();
         }
     }

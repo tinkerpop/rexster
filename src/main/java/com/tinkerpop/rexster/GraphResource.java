@@ -68,19 +68,20 @@ public class GraphResource extends AbstractSubResource {
         return this.addHeaders(Response.ok(this.resultObject)).build();
     }
 
+    @POST
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!traversals).+}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getGraphExtension(@PathParam("graphname") String graphName, JSONObject json) {
+        this.setRequestObject(json);
+        return this.getGraphExtension(graphName);
+    }
+
     @GET
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!traversals).+}")
     public Response getGraphExtension(@PathParam("graphname") String graphName) {
 
-        ExtensionResponse extResponse = null;
-        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.uriInfo);
-
-        if (!extensionSegmentSet.isValidFormat()) {
-            logger.error("Tried to parse the extension segments but they appear invalid: " + extensionSegmentSet);
-            JSONObject error = generateErrorObject(
-                    "The [" + extensionSegmentSet + "] extension appears invalid for [" + graphName + "]");
-            throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
-        }
+        ExtensionResponse extResponse;
+        ExtensionSegmentSet extensionSegmentSet = parseUriForExtensionSegment(graphName, ExtensionPoint.GRAPH);
 
         // determine if the namespace and extension are enabled for this graph
         RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
@@ -97,7 +98,6 @@ public class GraphResource extends AbstractSubResource {
 
                 if (rexsterExtension == null) {
                     // extension was not found for some reason
-
                     logger.error("The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
                     JSONObject error = generateErrorObject(
                             "The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "]");

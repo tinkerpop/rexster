@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
 import java.lang.reflect.Method;
@@ -305,22 +306,22 @@ public class AbstractSubResourceTest {
     }
 
     @Test
-    public void findExtensionNotPresent(){
+    public void findExtensionGraphExtensionNotPresent(){
 
         this.mockery = new JUnit4Mockery();
         UriInfo uri = this.mockTheUri("not", "here", "");
 
-        RexsterExtension extension = this.mockResource.findExtensionExposed(new ExtensionSegmentSet(uri));
+        RexsterExtension extension = this.mockResource.findExtensionExposed(new ExtensionSegmentSet(uri, ExtensionPoint.GRAPH));
         Assert.assertNull(extension);
     }
 
     @Test
-    public void findExtensionFound(){
+    public void findExtensionGraphExtensionFound(){
 
         this.mockery = new JUnit4Mockery();
         UriInfo uri = this.mockTheUri("tp", "gremlin", "");
 
-        RexsterExtension extension = this.mockResource.findExtensionExposed(new ExtensionSegmentSet(uri));
+        RexsterExtension extension = this.mockResource.findExtensionExposed(new ExtensionSegmentSet(uri, ExtensionPoint.GRAPH));
         Assert.assertNotNull(extension);
         Assert.assertTrue(extension instanceof GremlinExtension);
     }
@@ -395,6 +396,10 @@ public class AbstractSubResourceTest {
         public Method findExtensionMethodExposed(
                 RexsterExtension rexsterExtension, ExtensionPoint extensionPoint, String extensionAction) {
             return findExtensionMethod(rexsterExtension, extensionPoint, extensionAction);
+        }
+
+        public ExtensionSegmentSet parseUriForExtensionSegment(String graphName, ExtensionPoint extensionPoint) {
+            return parseUriForExtensionSegment(graphName, extensionPoint);
         }
     }
 

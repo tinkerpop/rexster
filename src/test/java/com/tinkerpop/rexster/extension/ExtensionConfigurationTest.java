@@ -18,27 +18,27 @@ public class ExtensionConfigurationTest {
     @Test
     public void isExtensionAllowedAllowAll() {
         ExtensionConfiguration configuration = new ExtensionConfiguration("*:*");
-        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "extension", ""));
+        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "extension", ""), ExtensionPoint.GRAPH);
         Assert.assertTrue(configuration.isExtensionAllowed(extensionSegmentSet));
     }
 
     @Test
     public void isExtensionAllowedAllowAllInNamespace() {
         ExtensionConfiguration configuration = new ExtensionConfiguration("ns:*");
-        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "extension", ""));
+        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "extension", ""), ExtensionPoint.GRAPH);
         Assert.assertTrue(configuration.isExtensionAllowed(extensionSegmentSet));
 
-        extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("bs", "extension", ""));
+        extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("bs", "extension", ""), ExtensionPoint.GRAPH);
         Assert.assertFalse(configuration.isExtensionAllowed(extensionSegmentSet));
     }
 
     @Test
     public void isExtensionAllowedAllowSpecificExtension() {
         ExtensionConfiguration configuration = new ExtensionConfiguration("ns:allowed");
-        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "allowed", ""));
+        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "allowed", ""), ExtensionPoint.GRAPH);
         Assert.assertTrue(configuration.isExtensionAllowed(extensionSegmentSet));
 
-        extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "not-allowed", ""));
+        extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "not-allowed", ""), ExtensionPoint.GRAPH);
         Assert.assertFalse(configuration.isExtensionAllowed(extensionSegmentSet));
     }
 

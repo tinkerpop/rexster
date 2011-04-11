@@ -3,6 +3,10 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.rexster.extension.ExtensionPoint;
+import com.tinkerpop.rexster.extension.ExtensionResponse;
+import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
+import com.tinkerpop.rexster.extension.RexsterExtension;
 import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -16,6 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 
@@ -99,6 +104,91 @@ public class EdgeResource extends AbstractSubResource {
         }
 
         return this.addHeaders(Response.ok(this.resultObject)).build();
+    }
+
+    @POST
+    @Path("/{id}/{extension: .+}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getGraphExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+        this.setRequestObject(json);
+        return this.getGraphExtension(graphName, id);
+    }
+
+    @GET
+    @Path("/{id}/{extension: .+}")
+    public Response getGraphExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+
+        final Edge edge = this.getRexsterApplicationGraph(graphName).getGraph().getEdge(id);
+
+        ExtensionResponse extResponse;
+        ExtensionSegmentSet extensionSegmentSet = parseUriForExtensionSegment(graphName, ExtensionPoint.EDGE);
+
+        // determine if the namespace and extension are enabled for this graph
+        RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+
+        if (rag.isExtensionAllowed(extensionSegmentSet)) {
+
+            Object returnValue = null;
+
+            // namespace was allowed so try to run the extension
+            try {
+
+                // look for the extension as loaded through serviceloader
+                RexsterExtension rexsterExtension = findExtension(extensionSegmentSet);
+
+                if (rexsterExtension == null) {
+                    // extension was not found for some reason
+                    logger.error("The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
+                    JSONObject error = generateErrorObject(
+                            "The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "]");
+                    throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+                }
+
+                // look up the method on the extension that needs to be called.
+                Method methodToCall = findExtensionMethod(rexsterExtension, ExtensionPoint.EDGE, extensionSegmentSet.getExtensionMethod());
+
+                if (methodToCall == null) {
+                    // extension method was not found for some reason
+                    logger.error("The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
+                    JSONObject error = generateErrorObject(
+                            "The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "]");
+                    throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+                }
+
+                // found the method...time to do work
+                returnValue = invokeExtension(graphName, rexsterExtension, methodToCall, edge);
+
+            } catch (Exception ex) {
+                logger.error(ex);
+                JSONObject error = generateErrorObjectJsonFail(ex);
+                throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            }
+
+            if (returnValue instanceof ExtensionResponse) {
+                extResponse = (ExtensionResponse) returnValue;
+
+                if (extResponse.isErrorResponse()) {
+                    // an error was raised within the extension.  pass it back out as an error.
+                    logger.error("The [" + extensionSegmentSet + "] extension raised an error response.");
+                    throw new WebApplicationException(this.addHeaders(Response.fromResponse(extResponse.getJerseyResponse())).build());
+                }
+            } else {
+                // extension method is not returning the correct type...needs to be an ExtensionResponse
+                logger.error("The [" + extensionSegmentSet + "] extension does not return an ExtensionResponse.");
+                JSONObject error = generateErrorObject(
+                        "The [" + extensionSegmentSet + "] extension does not return an ExtensionResponse.");
+                throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            }
+
+        } else {
+            // namespace was not allowed
+            logger.error("The [" + extensionSegmentSet + "] extension was not configured for [" + graphName + "]");
+            JSONObject error = generateErrorObject(
+                    "The [" + extensionSegmentSet + "] extension was not configured for [" + graphName + "]");
+            throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+        }
+
+        return this.addHeaders(Response.fromResponse(extResponse.getJerseyResponse())).build();
     }
 
     /**

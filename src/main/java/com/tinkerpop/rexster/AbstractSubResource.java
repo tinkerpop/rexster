@@ -116,6 +116,24 @@ public abstract class AbstractSubResource extends BaseResource {
     }
 
     /**
+     * Reads the URI of the request and tries to parse the extension requested.
+     *
+     * @throws WebApplicationException If the segment is an invalid format.
+     */
+    protected ExtensionSegmentSet parseUriForExtensionSegment(String graphName, ExtensionPoint extensionPoint) {
+        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.uriInfo, extensionPoint);
+
+        if (!extensionSegmentSet.isValidFormat()) {
+            logger.error("Tried to parse the extension segments but they appear invalid: " + extensionSegmentSet);
+            JSONObject error = this.generateErrorObject(
+                    "The [" + extensionSegmentSet + "] extension appears invalid for [" + graphName + "]");
+            throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+        }
+
+        return extensionSegmentSet;
+    }
+
+    /**
      * Find the method on the RexsterExtension implementation to call given the ExtensionPoint and the
      * extension action to be executed.
      *
