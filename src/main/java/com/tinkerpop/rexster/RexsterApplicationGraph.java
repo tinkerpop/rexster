@@ -69,12 +69,13 @@ public class RexsterApplicationGraph {
         return allowed;
     }
 
-    public void loadExtensionsConfigurations(String extensionString) {
+    public void loadExtensionsConfigurations(List<HierarchicalConfiguration> configurations) {
         this.extensionConfigurations = new HashSet<ExtensionConfiguration>();
 
-        if (extensionString != null && extensionString.trim().length() > 0) {
-            String[] splitNamespaces = extensionString.split(";");
-            for (String namespace : splitNamespaces) {
+        if (configurations != null) {
+            for (HierarchicalConfiguration configuration : configurations) {
+                String namespace = configuration.getString(Tokens.REXSTER_GRAPH_EXTENSION_NS);
+
                 try {
                     this.getExtensionConfigurations().add(new ExtensionConfiguration(namespace));
                 } catch (IllegalArgumentException iae) {

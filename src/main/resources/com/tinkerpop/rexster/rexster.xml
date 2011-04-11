@@ -14,14 +14,17 @@
             <graph-name>emptygraph</graph-name>
             <graph-type>tinkergraph</graph-type>
             <packages-allowed></packages-allowed>
-            <extensions></extensions>
         </graph>
         <graph>
             <graph-name>tinkergraph</graph-name>
             <graph-type>tinkergraph</graph-type>
             <graph-file>data/graph-example-1.xml</graph-file>
             <packages-allowed>gremlin</packages-allowed>
-            <extensions>tp:*</extensions>
+            <extensions>
+                <extension>
+                    <namespace>tp:*</namespace>
+                </extension>
+            </extensions>
         </graph>
         <graph>
             <graph-name>tinkergraph-readonly</graph-name>
@@ -29,14 +32,22 @@
             <graph-type>tinkergraph</graph-type>
             <graph-file>data/graph-example-1.xml</graph-file>
             <packages-allowed>gremlin</packages-allowed>
-            <extensions>tp:*</extensions>
+            <extensions>
+                <extension>
+                    <namespace>tp:*</namespace>
+                </extension>
+            </extensions>
         </graph>
         <graph>
             <graph-name>gratefulgraph</graph-name>
             <graph-type>com.tinkerpop.rexster.config.TinkerGraphGraphConfiguration</graph-type>
             <graph-file>data/graph-example-2.xml</graph-file>
             <packages-allowed>gremlin;grateful</packages-allowed>
-            <extensions>tp:*</extensions>
+            <extensions>
+                <extension>
+                    <namespace>tp:*</namespace>
+                </extension>
+            </extensions>
         </graph>
         <graph>
             <graph-enabled>true</graph-enabled>
@@ -44,7 +55,6 @@
             <graph-type>memorystoresailgraph</graph-type>
             <graph-file>data/graph-example-1.ntriple</graph-file>
             <packages-allowed></packages-allowed>
-            <extensions></extensions>
         </graph>
         <graph>
             <graph-enabled>false</graph-enabled>
@@ -52,7 +62,6 @@
             <graph-type>orientgraph</graph-type>
             <graph-file>local:C:/data/graph/graph</graph-file>
             <packages-allowed></packages-allowed>
-            <extensions></extensions>
             <properties>
                 <username>admin</username>
                 <password>admin</password>
@@ -64,7 +73,6 @@
             <graph-type>neo4jgraph</graph-type>
             <graph-file>/tmp/rexster-graph</graph-file>
             <packages-allowed></packages-allowed>
-            <extensions></extensions>
             <properties>
                 <!-- Memory mapped I/O settings -->
                 <!-- For high traversal speed it is important to have the nodestore.db and relationshipstore.db files. -->
@@ -120,7 +128,6 @@
             <graph-type>dexgraph</graph-type>
             <graph-file>/tmp/graph.dex</graph-file>
             <packages-allowed></packages-allowed>
-            <extensions></extensions>
         </graph>
     </graphs>
 </rexster>
