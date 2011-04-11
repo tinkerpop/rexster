@@ -115,11 +115,11 @@ public class GremlinExtension implements RexsterExtension{
                     this.cacheCurrentResultObjectState(rexsterResourceContext, cacheRequestURI, resultObject);
 
                 } else {
-                    extensionResponse = ExtensionResponse.error("no script provided", this.generateErrorJson());
+                    extensionResponse = ExtensionResponse.error("no script provided", generateErrorJson());
                 }
 
             } catch (Exception e) {
-                extensionResponse = ExtensionResponse.error(e, this.generateErrorJson());
+                extensionResponse = ExtensionResponse.error(e, generateErrorJson());
             }
         } else {
             // return cached results
@@ -156,15 +156,15 @@ public class GremlinExtension implements RexsterExtension{
         return returnKeys;
     }
 
-    private JSONObject generateErrorJson() {
+    private static JSONObject generateErrorJson() {
         HashMap map = new HashMap();
         map.put(Tokens.SUCCESS, false);
-        map.put(Tokens.API, this.generateApiJson());
+        map.put(Tokens.API, generateApiJson());
 
         return new JSONObject(map);
     }
 
-    private JSONObject generateApiJson() {
+    private static JSONObject generateApiJson() {
 
         Map<String, Object> api = new HashMap<String, Object>();
 

@@ -17,6 +17,7 @@ public class Tokens {
     public static final String VERTEX = "vertex";
     public static final String EDGE = "edge";
     public static final String RESULTS = "results";
+    public static final String LINKS = "links";
 
     public static final String REXSTER_GRAPH_PATH = "graphs.graph";
     public static final String REXSTER_GRAPH_NAME = "graph-name";

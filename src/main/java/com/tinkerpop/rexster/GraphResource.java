@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
 
 import com.tinkerpop.rexster.extension.*;
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -58,6 +59,11 @@ public class GraphResource extends AbstractSubResource {
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             this.resultObject.put("up_time", this.getTimeAlive());
             this.resultObject.put("version", RexsterApplication.getVersion());
+
+            JSONArray extensionsList = getExtensionHypermedia(ExtensionPoint.GRAPH);
+            if (extensionsList != null) {
+                this.resultObject.put(Tokens.LINKS, extensionsList);
+            }
 
         } catch (JSONException ex) {
             logger.error(ex);

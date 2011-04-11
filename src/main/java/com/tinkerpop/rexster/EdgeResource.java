@@ -89,6 +89,11 @@ public class EdgeResource extends AbstractSubResource {
             try {
                 this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
+
+                JSONArray extensionsList = getExtensionHypermedia(ExtensionPoint.EDGE);
+                if (extensionsList != null) {
+                    this.resultObject.put(Tokens.LINKS, extensionsList);
+                }
             } catch (JSONException ex) {
                 logger.error(ex);
 

@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.extension.*;
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -63,6 +64,62 @@ public abstract class AbstractSubResource extends BaseResource {
         }
         
         return rag;
+    }
+
+    protected static JSONArray getExtensionHypermedia(ExtensionPoint extensionPoint) {
+
+        JSONArray hypermediaLinks = new JSONArray();
+
+        ServiceLoader<? extends RexsterExtension> extensions = ServiceLoader.load(RexsterExtension.class);
+        for (RexsterExtension extension : extensions) {
+            Class clazz = extension.getClass();
+            ExtensionNaming extensionNaming = (ExtensionNaming) clazz.getAnnotation(ExtensionNaming.class);
+
+            // initialize the defaults
+            String currentExtensionNamespace = "g";
+            String currentExtensionName = clazz.getName();
+
+            if (extensionNaming != null) {
+
+                // naming annotation is present to try to override the defaults
+                // if the values are valid.
+                if (extensionNaming.name() != null && !extensionNaming.name().isEmpty()) {
+                    currentExtensionName = extensionNaming.name();
+                }
+
+                // naming annotation is defaulted to "g" anyway but checking anyway to make sure
+                // no one tries to pull any funny business.
+                if (extensionNaming.namespace() != null && !extensionNaming.namespace().isEmpty()) {
+                    currentExtensionNamespace = extensionNaming.namespace();
+                }
+            }
+
+            Method[] methods = clazz.getMethods();
+            for (Method method : methods) {
+                ExtensionDescriptor descriptor = method.getAnnotation(ExtensionDescriptor.class);
+                ExtensionDefinition definition = method.getAnnotation(ExtensionDefinition.class);
+
+                if (definition != null && definition.extensionPoint() == extensionPoint) {
+                    String href = currentExtensionNamespace + "/" + currentExtensionName;
+                    if (!definition.path().isEmpty()) {
+                        href = href + "/" + definition.path();
+                    }
+
+                    HashMap hypermediaLink = new HashMap();
+                    hypermediaLink.put("href", href);
+                    hypermediaLink.put("title", descriptor.value());
+
+                    hypermediaLinks.put(new JSONObject(hypermediaLink));
+                }
+
+            }
+        }
+
+        if (hypermediaLinks.length() == 0) {
+            return null;
+        } else {
+            return hypermediaLinks;
+        }
     }
 
     /**
