@@ -43,7 +43,7 @@ public class GremlinExtension implements RexsterExtension{
         return tryExecuteGremlinScript(rexsterResourceContext, graph, null, edge);
     }
 
-    @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX, produces = "application/json;charset=UTF-8")
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX)
     @ExtensionDescriptor("Gremlin extension for a vertex.")
     public ExtensionResponse doGremlinWorkOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                                    @RexsterContext Graph graph,

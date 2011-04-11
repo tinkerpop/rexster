@@ -26,7 +26,8 @@ public @interface ExtensionDefinition {
     String path() default "";
 
     /**
-     * Specifies the media type to be returned by the extension.
+     * Specifies the media type to be returned by the extension. By default this value
+     * is application/json.
      */
     String produces() default MediaType.APPLICATION_JSON;
 }
