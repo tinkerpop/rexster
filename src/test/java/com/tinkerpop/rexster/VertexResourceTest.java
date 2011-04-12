@@ -100,37 +100,6 @@ public class VertexResourceTest {
         this.assertVerticesOkResponseJsonStructure(0, numberOfVertices, response);
     }
 
-    @Test
-    @Ignore("Can't seem to toss an exception here as ElementJSONObject seems to be the only thing that will toss it.  Need to test this path or refactor ElementJSONObject.")
-    public void getVerticesWithException() {
-        final Graph graph = this.mockery.mock(Graph.class);
-        final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-
-        final UriInfo uri = this.mockery.mock(UriInfo.class);
-
-        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
-
-        final ArrayList<Vertex> verticesWithNullProperties = new ArrayList<Vertex>();
-        Vertex v = new MockVertex("0");
-        v.setProperty(null, "will-throw-exception");
-        verticesWithNullProperties.add(v);
-
-        this.mockery.checking(new Expectations() {{
-            allowing(httpServletRequest).getParameterMap();
-            will(returnValue(new HashMap<String, String>()));
-            allowing(graph).getVertices();
-            will(returnValue(verticesWithNullProperties));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
-            will(returnValue(rag));
-        }});
-
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
-        Response response = resource.getVertices("graph");
-        Assert.assertNotNull(response);
-        Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
-    }
-
     @Test(expected = WebApplicationException.class)
     public void getSingleVertexNotFound() {
         VertexResource resource = this.constructMockGetSingleVertexScenario(null, new HashMap<String, String>());

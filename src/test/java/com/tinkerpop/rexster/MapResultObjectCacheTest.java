@@ -98,19 +98,6 @@ public class MapResultObjectCacheTest {
         Assert.assertNull(resultObjectCache.getCachedResult(uuids.get(1)));
     }
 
-    @Test
-    @Ignore
-    public void testThreadSafety() {
-        ResultObjectCache resultObjectCache = new MapResultObjectCache();
-        for (int i = 0; i < totalThreads; i++) {
-            new Thread(new CacheTester(resultObjectCache)).start();
-        }
-        while (counter < totalThreads) {
-            Thread.yield();
-        }
-
-    }
-
     private class CacheTester implements Runnable {
 
         private ResultObjectCache cache;
