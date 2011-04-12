@@ -7,7 +7,6 @@ Rexster.modules.template = function(api) {
 	
 	templater.templateNameMainMenuItem = "mainMenuItem";
 	templater.templateNameMenuGraph = "menuGraph";
-	templater.templateNameListTraversals = "listTraversals";
 	templater.templateNameListVertices = "listVertices";
 	templater.templateNameListVertexViewInEdgeList = "listVertexViewInEdgeList";
 	templater.templateNameListVertexViewOutEdgeList = "listVertexViewOutEdgeList";
@@ -20,10 +19,6 @@ Rexster.modules.template = function(api) {
 		// expects {menuName, panel}
 		var templateMenuGraph = '<div id="graphItem${panel}${menuName}" class="graph-item ui-state-default ui-corner-all" style="cursor:pointer;padding:2px;margin:1px"><a href="/main/${panel}/${menuName}">${menuName}</a></div>';
 		$.template(templater.templateNameMenuGraph, templateMenuGraph);
-		
-		// expects {traversalName}
-		var templateListTraversal = '<li class="column">${path}</li>';
-		$.template(templater.templateNameListTraversals, templateListTraversal);
 		
 		// expects {_id}
 		var templateListVertices = '<li class="column"><a href="http://www.google.com">${_id}</a></li>';
@@ -62,20 +57,6 @@ Rexster.modules.template = function(api) {
 			templater.applyTemplate(templater.templateNameListVertices, data, selector);
 		} else {
 			templater.applyTemplate(templater.templateNameListVertices, [{ "_id":"No vertices in this graph"}], selector);
-		}
-	}
-	
-	/**
-	 * Constructs <li> values for an array of traversals.
-	 * 
-	 * @param data 		{Array} The list of traversal objects to render.
-	 * @param selector	{String} A jQuery selector or element to append the template to.
-	 */
-	api.applyListTraversalsTemplate = function(data, selector) {
-		if (data.length > 0) { 
-			templater.applyTemplate(templater.templateNameListTraversals, data, selector);
-		} else {
-			templater.applyTemplate(templater.templateNameListTraversals, [{ "path":"No traversals configured"}], selector);
 		}
 	}
 	

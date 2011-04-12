@@ -44,25 +44,6 @@ Rexster.modules.ajax = function(api) {
 	};
 	
 	/**
-	 * Get a list of traversals for a specific graph.
-	 * 
-	 * @param graphName	{String} The name of the graph.
-	 * @param onSuccess	{Function} The action that occurs on a successful REST call.
-	 * @param onFail 	{Function} The action that occurs on a failed REST call.
-	 */
-	
-	api.getTraversals = function(graphName, onSuccess, onFail){
-		$.ajax({
-			  url: baseUri + graphName + "/traversals",
-			  type: "GET",
-			  dataType:"json",
-			  success: onSuccess,
-			  async:false,
-			  error: onFail
-			});
-	};
-	
-	/**
 	 * Get a list of vertices for a specific graph.
 	 * 
 	 * @param graphName {String} the name of the graph.

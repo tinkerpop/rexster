@@ -3,19 +3,17 @@
  */
 Rexster.modules.graph = function(api) {
 	
-	var mediator = new GraphPanelMediator("#panelGraphMenuGraph", "#panelTraversals", "#panelElementViewer", "#panelGraphMenu", "#panelBrowser", "#panelBrowserMain"),
+	var mediator = new GraphPanelMediator("#panelGraphMenuGraph", "#panelElementViewer", "#panelGraphMenu", "#panelBrowser", "#panelBrowserMain"),
 	    currentGraph;
 	
 	/**
 	 * Manages graph panel interactions.
 	 */
-	function GraphPanelMediator(menuGraph, panelTraversals, panelElementViewer, panelGraphMenu, panelBrowser, panelBrowserMain) {
+	function GraphPanelMediator(menuGraph, panelElementViewer, panelGraphMenu, panelBrowser, panelBrowserMain) {
 		var  containerMenuGraph = $(menuGraph), // graph menu in the left panel
 	         containerPanelBrowser = $(panelBrowser),
 		     containerPanelBrowserMain = $(panelBrowserMain),
 		     containerPanelElementViewer = $(panelElementViewer),
-			 containerPanelTraversals = $(panelTraversals),
-			 containerPanelTraversalsList = containerPanelTraversals.find("ul"),
 			 containerPanelGraphMenu = $(panelGraphMenu), // browse options
 			 currentGraphName = "",
 			 currentFeatureBrowsed = "",
@@ -29,10 +27,6 @@ Rexster.modules.graph = function(api) {
 		
 		this.getCurrentGraphName = function() {
 			return currentGraphName;
-		}
-		
-		this.getContainerPanelTraversalsList = function() {
-			return containerPanelTraversalsList;
 		}
 		
 		this.getContainerPanelGraphMenu = function() {
@@ -84,27 +78,15 @@ Rexster.modules.graph = function(api) {
 				api.showMessageError("Could not get the graph profile from Rexster.");
 			});
 
-			// check the state.  if the browse panel is on, then don't worry about loading
-			// traversals.
+			// check the state.
 			if (state.browse === undefined) {
-				// load traversals panel for the current graph
-				api.getTraversals(currentGraphName, function(traversalResult) {
+				containerPanelElementViewer.hide();
+                containerPanelBrowser.hide();
 
-					containerPanelTraversals.show();
-					containerPanelElementViewer.hide();
-					containerPanelBrowser.hide();
-					containerPanelTraversalsList.empty();
-
-					api.applyListTraversalsTemplate(traversalResult.results, containerPanelTraversalsList);
-
-					// execute the callback now that the traversals are done.
-					if (onComplete != undefined) {
-						onComplete();
-					}
-				},
-				function(err){
-					api.showMessageError("Could not get the list of traversals from Rexster.");
-				});
+                // execute the callback now that the traversals are done.
+                if (onComplete != undefined) {
+                    onComplete();
+                }
 			} else if (state.objectId != undefined) {
 				// since the browse is defined then the check is to see if there is a browse
 				// of a individual element or the element list.  if the objectId is set then
@@ -411,8 +393,7 @@ Rexster.modules.graph = function(api) {
 			    containerPanelElementViewerMain = containerPanelElementViewer.find(".ui-widget-content");
 			
 			currentFeatureBrowsed = featureToBrowse;
-			
-			containerPanelTraversals.hide();
+
 			containerPanelBrowser.hide();
 			containerPanelElementViewer.show();
 			$("#panelElementViewerLeft > ul").empty();
@@ -656,8 +637,7 @@ Rexster.modules.graph = function(api) {
 			}
 			
 			currentFeatureBrowsed = featureToBrowse;
-			
-			containerPanelTraversals.hide();
+
 			containerPanelElementViewer.hide();
 			containerPanelBrowser.show();
 			
