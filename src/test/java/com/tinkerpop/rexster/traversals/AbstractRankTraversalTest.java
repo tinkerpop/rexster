@@ -143,21 +143,21 @@ public class AbstractRankTraversalTest {
 
     }
 
-    private static void buildTestRanks(Map<Object, ElementJSONObject> testRanks) throws JSONException {
+    private static void buildTestRanks(Map<Object, com.tinkerpop.rexster.ElementJSONObject> testRanks) throws JSONException {
         Graph graph = new TinkerGraph();
-        ElementJSONObject temp = new ElementJSONObject(graph.addVertex("a"));
+        com.tinkerpop.rexster.ElementJSONObject temp = new com.tinkerpop.rexster.ElementJSONObject(graph.addVertex("a"));
         temp.put("rank", 1.0f);
         testRanks.put("a", temp);
-        temp = new ElementJSONObject(graph.addVertex("b"));
+        temp = new com.tinkerpop.rexster.ElementJSONObject(graph.addVertex("b"));
         temp.put("rank", 2.0f);
         testRanks.put("b", temp);
-        temp = new ElementJSONObject(graph.addVertex("c"));
+        temp = new com.tinkerpop.rexster.ElementJSONObject(graph.addVertex("c"));
         temp.put("rank", 3.0f);
         testRanks.put("c", temp);
-        temp = new ElementJSONObject(graph.addVertex("d"));
+        temp = new com.tinkerpop.rexster.ElementJSONObject(graph.addVertex("d"));
         temp.put("rank", 4.0f);
         testRanks.put("d", temp);
-        temp = new ElementJSONObject(graph.addVertex("e"));
+        temp = new com.tinkerpop.rexster.ElementJSONObject(graph.addVertex("e"));
         temp.put("rank", 5.0f);
         testRanks.put("e", temp);
     }

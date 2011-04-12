@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.traversals;
 
 import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.*;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -19,8 +19,8 @@ import java.util.Map;
  */
 public abstract class AbstractRankTraversal extends AbstractTraversal {
 
-    protected Map<Object, ElementJSONObject> idToElement = new HashMap<Object, ElementJSONObject>();
-    protected List<ElementJSONObject> ranks = null;
+    protected Map<Object, com.tinkerpop.rexster.ElementJSONObject> idToElement = new HashMap<Object, com.tinkerpop.rexster.ElementJSONObject>();
+    protected List<com.tinkerpop.rexster.ElementJSONObject> ranks = null;
     protected Sort sort = Sort.NONE;
     protected String sortKey = null;
     protected List<String> returnKeys = null;
@@ -34,8 +34,8 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
     }
 
     protected void sortRanks(final String key) {
-        java.util.Collections.sort(this.ranks, new Comparator<ElementJSONObject>() {
-            public int compare(ElementJSONObject e1, ElementJSONObject e2) {
+        java.util.Collections.sort(this.ranks, new Comparator<com.tinkerpop.rexster.ElementJSONObject>() {
+            public int compare(com.tinkerpop.rexster.ElementJSONObject e1, com.tinkerpop.rexster.ElementJSONObject e2) {
                 try {
                     return -1 * ((Comparable) e1.get(key)).compareTo(e2.get(key));
                 } catch (JSONException ex) {
@@ -69,19 +69,19 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
     }
 
     protected void generateRankList() {
-        this.ranks = new ArrayList<ElementJSONObject>(this.idToElement.values());
+        this.ranks = new ArrayList<com.tinkerpop.rexster.ElementJSONObject>(this.idToElement.values());
     }
 
 
     protected void incrRank(final Element element, final Double incr) throws JSONException {
         Object elementId = element.getId();
         final String traversalName = getTraversalName();
-        ElementJSONObject elementObject = this.idToElement.get(elementId);
+        com.tinkerpop.rexster.ElementJSONObject elementObject = this.idToElement.get(elementId);
         if (null == elementObject) {
             if (null == this.returnKeys)
-                elementObject = new ElementJSONObject(element, this.showTypes);
+                elementObject = new com.tinkerpop.rexster.ElementJSONObject(element, this.showTypes);
             else
-                elementObject = new ElementJSONObject(element, this.returnKeys, this.showTypes);
+                elementObject = new com.tinkerpop.rexster.ElementJSONObject(element, this.returnKeys, this.showTypes);
             this.idToElement.put(elementId, elementObject);
         }
 
@@ -165,7 +165,7 @@ public abstract class AbstractRankTraversal extends AbstractTraversal {
         boolean inCache = false;
         JSONObject tempResultObject = this.resultObjectCache.getCachedResult(this.cacheRequestURI);
         if (tempResultObject != null) {
-            this.ranks = (List<ElementJSONObject>) tempResultObject.opt(Tokens.RANKS);
+            this.ranks = (List<com.tinkerpop.rexster.ElementJSONObject>) tempResultObject.opt(Tokens.RANKS);
             this.totalRank = (Double) tempResultObject.opt(Tokens.TOTAL_RANK);
             this.success = true;
             inCache = true;

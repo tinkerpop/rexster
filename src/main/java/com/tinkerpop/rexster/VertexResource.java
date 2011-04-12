@@ -4,7 +4,6 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.extension.*;
-import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -12,12 +11,10 @@ import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 
@@ -52,7 +49,7 @@ public class VertexResource extends AbstractSubResource {
 
             for (Vertex vertex : this.getRexsterApplicationGraph(graphName).getGraph().getVertices()) {
                 if (counter >= start && counter < end) {
-                    vertexArray.put(new ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
+                    vertexArray.put(new com.tinkerpop.rexster.ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
                 }
                 counter++;
             }
@@ -88,7 +85,7 @@ public class VertexResource extends AbstractSubResource {
             Vertex vertex = this.getRexsterApplicationGraph(graphName).getGraph().getVertex(id);
             if (null != vertex) {
                 try {
-                    this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
+                    this.resultObject.put(Tokens.RESULTS, new com.tinkerpop.rexster.ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
                     this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
                     JSONArray extensionsList = getExtensionHypermedia(ExtensionPoint.VERTEX);
@@ -235,7 +232,7 @@ public class VertexResource extends AbstractSubResource {
                     for (Edge edge : vertex.getOutEdges()) {
                         if (this.hasPropertyValues(edge, tempRequest)) {
                             if (counter >= start && counter < end) {
-                                edgeArray.put(new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
+                                edgeArray.put(new com.tinkerpop.rexster.ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
                             }
                             counter++;
                         }
@@ -245,7 +242,7 @@ public class VertexResource extends AbstractSubResource {
                     for (Edge edge : vertex.getInEdges()) {
                         if (this.hasPropertyValues(edge, tempRequest)) {
                             if (counter >= start && counter < end) {
-                                edgeArray.put(new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
+                                edgeArray.put(new com.tinkerpop.rexster.ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
                             }
                             counter++;
                         }

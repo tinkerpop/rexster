@@ -1,8 +1,8 @@
-package com.tinkerpop.rexster.traversals;
+package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.*;
 import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -39,7 +39,7 @@ public class ElementJSONObjectTest {
         }});
 
         try {
-            ElementJSONObject jo = new ElementJSONObject(v);
+            com.tinkerpop.rexster.ElementJSONObject jo = new com.tinkerpop.rexster.ElementJSONObject(v);
             Assert.assertEquals("123", jo.getId());
             Assert.assertEquals("123", jo.getString(Tokens._ID));
             Assert.assertEquals("some-value-for-some-key", jo.getString("some-key"));
@@ -74,7 +74,7 @@ public class ElementJSONObjectTest {
         	returnKeys.add("some-key");
         	
         	// always show meta data even with return key restrictions
-            ElementJSONObject jo = new ElementJSONObject(v, returnKeys);
+            com.tinkerpop.rexster.ElementJSONObject jo = new com.tinkerpop.rexster.ElementJSONObject(v, returnKeys);
             Assert.assertEquals("123", jo.getId());
             Assert.assertEquals("123", jo.getString(Tokens._ID));
             Assert.assertEquals("some-value-for-some-key", jo.getString("some-key"));
@@ -115,7 +115,7 @@ public class ElementJSONObjectTest {
         }});
 
         try {
-            ElementJSONObject jo = new ElementJSONObject(v, null, true);
+            com.tinkerpop.rexster.ElementJSONObject jo = new com.tinkerpop.rexster.ElementJSONObject(v, null, true);
             Assert.assertEquals("123", jo.getId());
 
             JSONObject idWithDataType = jo.getJSONObject(Tokens._ID);
@@ -178,7 +178,7 @@ public class ElementJSONObjectTest {
         }});
 
         try {
-            ElementJSONObject jo = new ElementJSONObject(v, null, true);
+            com.tinkerpop.rexster.ElementJSONObject jo = new com.tinkerpop.rexster.ElementJSONObject(v, null, true);
 
             JSONObject propWithListDataType = jo.getJSONObject("some-list-key");
             Assert.assertNotNull(propWithListDataType);
@@ -232,7 +232,7 @@ public class ElementJSONObjectTest {
         }});
 
         try {
-            ElementJSONObject jo = new ElementJSONObject(v, null, false);
+            com.tinkerpop.rexster.ElementJSONObject jo = new com.tinkerpop.rexster.ElementJSONObject(v, null, false);
 
             JSONArray jsonList = jo.getJSONArray("some-list-key");
             Assert.assertNotNull(jsonList);
@@ -270,7 +270,7 @@ public class ElementJSONObjectTest {
         }});
 
         try {
-            ElementJSONObject jo = new ElementJSONObject(v, null, false);
+            com.tinkerpop.rexster.ElementJSONObject jo = new com.tinkerpop.rexster.ElementJSONObject(v, null, false);
 
             JSONObject jsonObject = jo.getJSONObject("some-map-key");
             Assert.assertNotNull(jsonObject);
@@ -307,7 +307,7 @@ public class ElementJSONObjectTest {
         }});
 
         try {
-            ElementJSONObject jo = new ElementJSONObject(v, null, false);
+            com.tinkerpop.rexster.ElementJSONObject jo = new com.tinkerpop.rexster.ElementJSONObject(v, null, false);
             Assert.assertNotNull("one,200.5,2", jo.get("some-simple-key"));
         } catch (JSONException ex) {
             ex.printStackTrace();
@@ -337,7 +337,7 @@ public class ElementJSONObjectTest {
         }});
 
         try {
-            ElementJSONObject jo = new ElementJSONObject(v, null, true);
+            com.tinkerpop.rexster.ElementJSONObject jo = new com.tinkerpop.rexster.ElementJSONObject(v, null, true);
 
             JSONObject jsonObject = jo.getJSONObject("some-map-key");
             Assert.assertNotNull(jsonObject);
@@ -395,7 +395,7 @@ public class ElementJSONObjectTest {
         }});
 
         try {
-            ElementJSONObject jo = new ElementJSONObject(e);
+            com.tinkerpop.rexster.ElementJSONObject jo = new com.tinkerpop.rexster.ElementJSONObject(e);
             Assert.assertEquals("123", jo.getId());
             Assert.assertEquals("123", jo.getString(Tokens._ID));
             Assert.assertEquals("some-value-for-some-key", jo.getString("some-key"));
@@ -442,7 +442,7 @@ public class ElementJSONObjectTest {
             keysToAdd.add("some-key");
 
             // all meta data is always returned.
-            ElementJSONObject jo = new ElementJSONObject(e, keysToAdd);
+            com.tinkerpop.rexster.ElementJSONObject jo = new com.tinkerpop.rexster.ElementJSONObject(e, keysToAdd);
             Assert.assertEquals("123", jo.getId());
             Assert.assertEquals("123", jo.getString(Tokens._ID));
             Assert.assertEquals("some-value-for-some-key", jo.getString("some-key"));

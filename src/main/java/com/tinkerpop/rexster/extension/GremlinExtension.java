@@ -8,7 +8,7 @@ import com.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
 import com.tinkerpop.rexster.ResultObjectCache;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.traversals.ElementJSONObject;
+import com.tinkerpop.rexster.ElementJSONObject;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -16,8 +16,6 @@ import org.codehaus.jettison.json.JSONObject;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
-import javax.ws.rs.core.Response;
-import java.awt.image.ImageFilter;
 import java.util.*;
 
 @ExtensionNaming(name = "gremlin", namespace = "tp")

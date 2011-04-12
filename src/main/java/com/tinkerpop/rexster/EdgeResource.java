@@ -4,7 +4,6 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.extension.*;
-import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -12,12 +11,10 @@ import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 
@@ -53,7 +50,7 @@ public class EdgeResource extends AbstractSubResource {
             JSONArray edgeArray = new JSONArray();
             for (Edge edge : this.getRexsterApplicationGraph(graphName).getGraph().getEdges()) {
                 if (counter >= start && counter < end) {
-                    edgeArray.put(new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
+                    edgeArray.put(new com.tinkerpop.rexster.ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
                 }
                 counter++;
             }
@@ -85,7 +82,7 @@ public class EdgeResource extends AbstractSubResource {
 
         if (null != edge) {
             try {
-                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
+                this.resultObject.put(Tokens.RESULTS, new com.tinkerpop.rexster.ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
                 JSONArray extensionsList = getExtensionHypermedia(ExtensionPoint.EDGE);
@@ -265,7 +262,7 @@ public class EdgeResource extends AbstractSubResource {
                         edge.setProperty(key, this.getTypedPropertyValue(this.getRequestObject().getString(key)));
                     }
                 }
-                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
+                this.resultObject.put(Tokens.RESULTS, new com.tinkerpop.rexster.ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
             } else {
                 // edge could not be found.  likely an error condition on the request
                 JSONObject error = generateErrorObjectJsonFail(new Exception("Edge cannot be found or created.  Please check the format of the request."));

@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster.traversals;
+package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Index;
 import org.codehaus.jettison.json.JSONException;

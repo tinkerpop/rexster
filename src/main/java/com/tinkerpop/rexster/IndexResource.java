@@ -26,8 +26,6 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.rexster.traversals.ElementJSONObject;
-import com.tinkerpop.rexster.traversals.IndexJSONObject;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -73,7 +71,7 @@ public class IndexResource extends AbstractSubResource {
             JSONArray indexArray = new JSONArray();
             for (Index index : idxGraph.getIndices()) {
                 if (counter >= start && counter < end) {
-                    indexArray.put(new IndexJSONObject(index));
+                    indexArray.put(new com.tinkerpop.rexster.IndexJSONObject(index));
                 }
                 counter++;
             }
@@ -126,7 +124,7 @@ public class IndexResource extends AbstractSubResource {
                 JSONArray elementArray = new JSONArray();
                 for (Element element : (Iterable<Element>) index.get(key, value)) {
                     if (counter >= start && counter < end) {
-                        elementArray.put(new ElementJSONObject(element, this.getReturnKeys(), this.hasShowTypes()));
+                        elementArray.put(new com.tinkerpop.rexster.ElementJSONObject(element, this.getReturnKeys(), this.hasShowTypes()));
                     }
                     counter++;
                 }
@@ -441,7 +439,7 @@ public class IndexResource extends AbstractSubResource {
                 }
                 try {
                     this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-                    this.resultObject.put(Tokens.RESULTS, new IndexJSONObject(i));
+                    this.resultObject.put(Tokens.RESULTS, new com.tinkerpop.rexster.IndexJSONObject(i));
                 } catch (JSONException ex) {
                     logger.error(ex);
 

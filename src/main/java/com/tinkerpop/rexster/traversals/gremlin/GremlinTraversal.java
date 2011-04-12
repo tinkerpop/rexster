@@ -4,7 +4,6 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.traversals.AbstractTraversal;
-import com.tinkerpop.rexster.traversals.ElementJSONObject;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -86,9 +85,9 @@ public class GremlinTraversal extends AbstractTraversal {
     private Object prepareOutput(Object object) throws JSONException {
         if (object instanceof Element) {
             if (null == this.returnKeys)
-                return new ElementJSONObject((Element) object, this.showTypes);
+                return new com.tinkerpop.rexster.ElementJSONObject((Element) object, this.showTypes);
             else
-                return new ElementJSONObject((Element) object, this.returnKeys, this.showTypes);
+                return new com.tinkerpop.rexster.ElementJSONObject((Element) object, this.returnKeys, this.showTypes);
         } else if (object instanceof Number || object instanceof Boolean) {
             return object;
         } else {
