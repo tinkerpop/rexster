@@ -13,7 +13,8 @@
     <description>
         Rexster is a RESTful graph shell for Blueprints-enabled graphs. An HTTP-based interface provides
         language agnostic connectivity. There is support for graph traversals aimed at searching,
-        scoring, ranking, and, in concert, recommending.
+        scoring, ranking, and, in concert, recommending.  Includes a browser-based client, called The
+        Dog House, which includes a Gremlin console and graph browsing capabilities.
     </description>
     <developers>
         <developer>
@@ -250,22 +251,6 @@
                             </includes>
                         </aggregation>
                     </aggregations>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.1.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>war</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <attachClasses>true</attachClasses>
                 </configuration>
             </plugin>
         </plugins>
