@@ -216,12 +216,18 @@ public abstract class AbstractSubResource extends BaseResource {
 
             // checks if the extension point is graph, and if the method path matches the specified action on
             // the uri (if it exists) or if the method has no path.
-            if (extensionDefinition != null
-                && extensionDefinition.extensionPoint() == extensionPoint
-                && ((!extensionAction.equals("") && extensionDefinition.path().equals(extensionAction))
-                    || (extensionAction.equals("") && extensionDefinition.path().equals("")))) {
-                methodToCall = new ExtensionMethod(method, extensionDefinition);
-                break;
+            if (extensionDefinition != null && extensionDefinition.extensionPoint() == extensionPoint) {
+
+                if (extensionDefinition.path().isEmpty()) {
+                    // try to use a root level method definition
+                    methodToCall = new ExtensionMethod(method, extensionDefinition);
+                    break;
+                } else if ((!extensionAction.equals("") && extensionDefinition.path().equals(extensionAction))
+                    || (extensionAction.equals("") && extensionDefinition.path().equals(""))) {
+                    // the extension path is valid so try to match on the action
+                    methodToCall = new ExtensionMethod(method, extensionDefinition);
+                    break;
+                }
             }
         }
 

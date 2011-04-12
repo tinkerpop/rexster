@@ -21,9 +21,9 @@
             <graph-file>data/graph-example-1.xml</graph-file>
             <packages-allowed>gremlin</packages-allowed>
             <extensions>
-                <extension>
-                    <namespace>tp:*</namespace>
-                </extension>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
             </extensions>
         </graph>
         <graph>
@@ -33,9 +33,9 @@
             <graph-file>data/graph-example-1.xml</graph-file>
             <packages-allowed>gremlin</packages-allowed>
             <extensions>
-                <extension>
-                    <namespace>tp:*</namespace>
-                </extension>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
             </extensions>
         </graph>
         <graph>
@@ -44,9 +44,9 @@
             <graph-file>data/graph-example-2.xml</graph-file>
             <packages-allowed>gremlin;grateful</packages-allowed>
             <extensions>
-                <extension>
-                    <namespace>tp:*</namespace>
-                </extension>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
             </extensions>
         </graph>
         <graph>

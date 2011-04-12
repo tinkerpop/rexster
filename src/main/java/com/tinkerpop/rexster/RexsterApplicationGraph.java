@@ -1,10 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.rexster.extension.ExtensionConfiguration;
-import com.tinkerpop.rexster.extension.ExtensionPoint;
-import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
-import com.tinkerpop.rexster.extension.RexsterExtension;
+import com.tinkerpop.rexster.extension.*;
 import com.tinkerpop.rexster.traversals.Traversal;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
@@ -22,6 +19,7 @@ public class RexsterApplicationGraph {
     private Map<String, Class<? extends Traversal>> loadedTraversals = new HashMap<String, Class<? extends Traversal>>();
     private String graphName;
     private Set<String> packageNames;
+    private Set<ExtensionAllowed> extensionAllowables;
     private Set<ExtensionConfiguration> extensionConfigurations;
 
     public RexsterApplicationGraph(String graphName, Graph graph) {
@@ -31,10 +29,6 @@ public class RexsterApplicationGraph {
 
     public boolean hasPackages() {
         return this.packageNames != null && this.packageNames.size() > 0;
-    }
-
-    public boolean hasExtensions() {
-        return this.extensionConfigurations != null && this.extensionConfigurations.size() > 0;
     }
 
     public String getGraphName() {
@@ -57,10 +51,15 @@ public class RexsterApplicationGraph {
         return packageNames;
     }
 
+    /**
+     * Determines if a particular extension is allowed given configured allowables from rexster.xml.
+     *
+     * Ensure that loadAllowableExtensions is called prior to this method.
+     */
     public boolean isExtensionAllowed(ExtensionSegmentSet extensionSegmentSet) {
         boolean allowed = false;
-        for (ExtensionConfiguration extensionConfiguration : this.extensionConfigurations) {
-            if (extensionConfiguration.isExtensionAllowed(extensionSegmentSet)) {
+        for (ExtensionAllowed extensionAllowed : this.extensionAllowables) {
+            if (extensionAllowed.isExtensionAllowed(extensionSegmentSet)) {
                 allowed = true;
                 break;
             }
@@ -69,15 +68,49 @@ public class RexsterApplicationGraph {
         return allowed;
     }
 
-    public void loadExtensionsConfigurations(List<HierarchicalConfiguration> configurations) {
+    public ExtensionConfiguration findExtensionConfiguration(String namespace, String extensionName) {
+        ExtensionConfiguration extensionConfigurationFound = null;
+        for (ExtensionConfiguration extensionConfiguration : this.extensionConfigurations) {
+            if (extensionConfiguration.getExtensionName().equals(extensionName)
+                && extensionConfiguration.getNamespace().equals(namespace)) {
+                extensionConfigurationFound = extensionConfiguration;
+                break;
+            }
+        }
+
+        return extensionConfigurationFound;
+    }
+
+    public void loadExtensionsConfigurations(List<HierarchicalConfiguration> extensionConfigurations) {
         this.extensionConfigurations = new HashSet<ExtensionConfiguration>();
 
-        if (configurations != null) {
-            for (HierarchicalConfiguration configuration : configurations) {
-                String namespace = configuration.getString(Tokens.REXSTER_GRAPH_EXTENSION_NS);
+        if (extensionConfigurations != null) {
+            for (HierarchicalConfiguration configuration : extensionConfigurations) {
+                String namespace = configuration.getString("namespace", "");
+                String name = configuration.getString("name", "");
+                HierarchicalConfiguration extensionConfig = configuration.configurationAt("configuration");
+
+                if (!namespace.isEmpty() && !name.isEmpty() && extensionConfig != null) {
+                    this.extensionConfigurations.add(new ExtensionConfiguration(namespace, name, extensionConfig));
+                } else {
+                    logger.warn("Extension [" + namespace + ":" + name + "] does not have a valid configuration.  Please check rexster.xml");
+                }
+            }
+        }
+    }
+
+    /**
+     * Loads a list of namespaces extension patterns that are allowed for this graph.
+     */
+    public void loadAllowableExtensions(List allowableNamespaces) {
+        this.extensionAllowables = new HashSet<ExtensionAllowed>();
+
+        if (allowableNamespaces != null) {
+            for (int ix = 0; ix < allowableNamespaces.size(); ix++) {
+                String namespace = allowableNamespaces.get(ix).toString();
 
                 try {
-                    this.getExtensionConfigurations().add(new ExtensionConfiguration(namespace));
+                    this.getExtensionAllowables().add(new ExtensionAllowed(namespace));
                 } catch (IllegalArgumentException iae) {
                     logger.warn("Extension defined with an invalid namespace: " + namespace
                         + ".  It will not be configured.", iae);
@@ -102,7 +135,7 @@ public class RexsterApplicationGraph {
         }
     }
 
-    public Set<ExtensionConfiguration> getExtensionConfigurations() {
-        return extensionConfigurations;
+    public Set<ExtensionAllowed> getExtensionAllowables() {
+        return this.extensionAllowables;
     }
 }

@@ -20,8 +20,8 @@ public class Tokens {
     public static final String LINKS = "links";
 
     public static final String REXSTER_GRAPH_PATH = "graphs.graph";
+    public static final String REXSTER_GRAPH_EXTENSIONS_ALLOWS_PATH = "extensions.allows.allow";
     public static final String REXSTER_GRAPH_EXTENSIONS_PATH = "extensions.extension";
-    public static final String REXSTER_GRAPH_EXTENSION_NS = "namespace";
     public static final String REXSTER_GRAPH_NAME = "graph-name";
     public static final String REXSTER_GRAPH_TYPE = "graph-type";
     public static final String REXSTER_GRAPH_FILE = "graph-file";

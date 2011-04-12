@@ -22,7 +22,7 @@ import java.util.*;
 
 @ExtensionNaming(name = "gremlin", namespace = "tp")
 @ExtensionDescriptor("Gremlin extension.")
-public class GremlinExtension implements RexsterExtension{
+public class GremlinExtension extends AbstractRexsterExtension{
     protected static Logger logger = Logger.getLogger(GremlinExtension.class);
 
     private ScriptEngine engine = new GremlinScriptEngine();
@@ -31,8 +31,6 @@ public class GremlinExtension implements RexsterExtension{
     private static final String VERTEX_VARIABLE = "v";
     private static final String EDGE_VARIABLE = "e";
     private static final String WILDCARD = "*";
-    private static final String SCRIPT = "script";
-    private static final String RETURN_KEYS = "return_keys";
 
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE)
@@ -133,6 +131,24 @@ public class GremlinExtension implements RexsterExtension{
         return extensionResponse;
     }
 
+    protected JSONObject generateApiJson() {
+
+        Map<String, Object> api = new HashMap<String, Object>();
+
+        Map<String, Object> parameterMap = new HashMap<String, Object>();
+        parameterMap.put(Tokens.ALLOW_CACHED, "allow a previously cached result to be provided (default is true)");
+        parameterMap.put(Tokens.SHOW_TYPES, "displays the properties of the elements with their native data type (default is false)");
+        parameterMap.put(SCRIPT, "the Gremlin script to be evaluated");
+        parameterMap.put(RETURN_KEYS, "the element property keys to return (default is to return all element properties)");
+
+        JSONObject parameters = new JSONObject(parameterMap);
+
+        api.put(Tokens.DESCRIPTION, "evaluate an ad-hoc Gremlin script");
+        api.put(Tokens.PARAMETERS, parameters);
+
+        return new JSONObject(api);
+    }
+
     private List<String> getReturnKeys(JSONObject requestObject) {
         List<String> returnKeys = null;
         if (requestObject.has(RETURN_KEYS)) {
@@ -153,32 +169,6 @@ public class GremlinExtension implements RexsterExtension{
             }
         }
         return returnKeys;
-    }
-
-    private static JSONObject generateErrorJson() {
-        HashMap map = new HashMap();
-        map.put(Tokens.SUCCESS, false);
-        map.put(Tokens.API, generateApiJson());
-
-        return new JSONObject(map);
-    }
-
-    private static JSONObject generateApiJson() {
-
-        Map<String, Object> api = new HashMap<String, Object>();
-
-        Map<String, Object> parameterMap = new HashMap<String, Object>();
-        parameterMap.put(Tokens.ALLOW_CACHED, "allow a previously cached result to be provided (default is true)");
-        parameterMap.put(Tokens.SHOW_TYPES, "displays the properties of the elements with their native data type (default is false)");
-        parameterMap.put(SCRIPT, "the Gremlin script to be evaluated");
-        parameterMap.put(RETURN_KEYS, "the element property keys to return (default is to return all element properties)");
-
-        JSONObject parameters = new JSONObject(parameterMap);
-
-        api.put(Tokens.DESCRIPTION, "evaluate an ad-hoc Gremlin script");
-        api.put(Tokens.PARAMETERS, parameters);
-
-        return new JSONObject(api);
     }
 
     private void cacheCurrentResultObjectState(RexsterResourceContext ctx, String cacheRequestURI, JSONObject resultObject) {

@@ -1,44 +1,85 @@
 package com.tinkerpop.rexster.extension;
 
+import org.apache.commons.configuration.HierarchicalConfiguration;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 /**
  * Holds information that details the configuration of an extension.
  */
 public class ExtensionConfiguration {
     private String namespace;
 
+    private String extensionName;
+
+    private HierarchicalConfiguration configuration;
+
     /**
      * Initializes a new ExtensionConfiguration object as taken from rexster.xml.
-     * The namespace may be wildcarded to be one of the follows: *:*, namespace:*, namespace:extension
+     * This is the specific configuration for a particular extension in a specific graph.
      */
-    public ExtensionConfiguration(String namespace) {
-        // must match this format *:*, namespace:*, namespace:extension
-        if (!(namespace.matches("(\\w+|\\*):(\\w+|\\*)")
-            && !(namespace.startsWith("*") && namespace.equals("*.*")))) {
-            throw new IllegalArgumentException("The namespace must match the format of *:*, namespace:*, namespace:extension");
+    public ExtensionConfiguration(String namespace, String extensionName, HierarchicalConfiguration extensionConfiguration) {
+
+        if (namespace == null || namespace.isEmpty()) {
+            throw new IllegalArgumentException("Namespace cannot be null or empty.");
+        }
+
+        if (extensionName == null || extensionName.isEmpty()) {
+            throw new IllegalArgumentException("Extension Name cannot be null or empty.");
+        }
+
+        if (extensionConfiguration == null) {
+            throw new IllegalArgumentException("Extension Configuration cannot be null.");
         }
 
         this.namespace = namespace;
+        this.extensionName = extensionName;
+        this.configuration = extensionConfiguration;
     }
 
     public String getNamespace() {
-        return namespace;
+        return this.namespace;
+    }
+
+
+    public String getExtensionName() {
+        return this.extensionName;
+    }
+
+    public HierarchicalConfiguration getConfiguration() {
+        return this.configuration;
     }
 
     /**
-     * Determines if the namespace and extension are allowed given the configuration of the graph in rexster.xml.
+     * Helper method that tries to read the configuration for the extension into a map.  The configuration
+     * section must appear as follows for this method to work:
+     *
+     * <configuration>
+     *     <key1>value</key1>
+     *     <key2>value</key2>
+     * </configuration>
+     *
+     * Key values must be unique within the configuration.
+     *
+     * @return A map or null if the parse does not work.
      */
-    public boolean isExtensionAllowed(ExtensionSegmentSet extensionSegmentSet){
-        boolean allowed = false;
+    public Map<String, String> tryGetMapFromConfiguration() {
 
-        if (this.namespace.equals("*:*")) {
-            allowed = true;
-        } else if (this.namespace.equals(extensionSegmentSet.getNamespace() + ":*")) {
-            allowed = true;
-        } else if (this.namespace.equals(extensionSegmentSet.getNamespace() + ":" + extensionSegmentSet.getExtension())) {
-            allowed = true;
+        Map<String, String> map = new HashMap<String, String>();
+        try {
+            Iterator keys = this.configuration.getKeys();
+            while (keys.hasNext()) {
+                String key = keys.next().toString();
+
+                map.put(key, this.configuration.getString(key));
+            }
+        } catch (Exception ex) {
+            // ignore and return null
+            map = null;
         }
 
-        return allowed;
+        return map;
     }
-
 }

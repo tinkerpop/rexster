@@ -1,73 +1,83 @@
 package com.tinkerpop.rexster.extension;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 public class ExtensionConfigurationTest {
 
-    private Mockery mockery = new JUnit4Mockery();
+    @Test(expected = IllegalArgumentException.class)
+    public void constructEmptyNamespace() {
+        new ExtensionConfiguration("", "name", new HierarchicalConfiguration());
+    }
 
-    @Test
-    public void isExtensionAllowedAllowAll() {
-        ExtensionConfiguration configuration = new ExtensionConfiguration("*:*");
-        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "extension", ""), ExtensionPoint.GRAPH);
-        Assert.assertTrue(configuration.isExtensionAllowed(extensionSegmentSet));
+    @Test(expected = IllegalArgumentException.class)
+    public void constructNullNamespace() {
+        new ExtensionConfiguration(null, "name", new HierarchicalConfiguration());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void constructEmptyName() {
+        new ExtensionConfiguration("ns", "", new HierarchicalConfiguration());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void constructNullName() {
+        new ExtensionConfiguration("ns", null, new HierarchicalConfiguration());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void constructNullConfiguration() {
+        new ExtensionConfiguration("ns", "name", null);
     }
 
     @Test
-    public void isExtensionAllowedAllowAllInNamespace() {
-        ExtensionConfiguration configuration = new ExtensionConfiguration("ns:*");
-        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "extension", ""), ExtensionPoint.GRAPH);
-        Assert.assertTrue(configuration.isExtensionAllowed(extensionSegmentSet));
+    public void constructValid() {
+        HierarchicalConfiguration hc = new HierarchicalConfiguration();
+        ExtensionConfiguration config = new ExtensionConfiguration("ns", "name", hc);
 
-        extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("bs", "extension", ""), ExtensionPoint.GRAPH);
-        Assert.assertFalse(configuration.isExtensionAllowed(extensionSegmentSet));
+        Assert.assertEquals("ns", config.getNamespace());
+        Assert.assertEquals("name", config.getExtensionName());
+        Assert.assertEquals(hc, config.getConfiguration());
     }
 
     @Test
-    public void isExtensionAllowedAllowSpecificExtension() {
-        ExtensionConfiguration configuration = new ExtensionConfiguration("ns:allowed");
-        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "allowed", ""), ExtensionPoint.GRAPH);
-        Assert.assertTrue(configuration.isExtensionAllowed(extensionSegmentSet));
+    public void tryGetMapFromConfigurationEmptyConfig() {
+        HierarchicalConfiguration hc = new HierarchicalConfiguration();
+        ExtensionConfiguration config = new ExtensionConfiguration("ns", "name", hc);
 
-        extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "not-allowed", ""), ExtensionPoint.GRAPH);
-        Assert.assertFalse(configuration.isExtensionAllowed(extensionSegmentSet));
+        Map<String, String> map = config.tryGetMapFromConfiguration();
+        Assert.assertNotNull(map);
+        Assert.assertTrue(map.isEmpty());
     }
 
-    private UriInfo mockTheUri(final String namespace, final String extension, final String method) {
-        this.mockery = new JUnit4Mockery();
+     @Test
+    public void tryGetMapFromConfigurationBadConfig() {
+        HierarchicalConfiguration hc = new HierarchicalConfiguration();
+        HierarchicalConfiguration innerHc = new HierarchicalConfiguration();
+        innerHc.addProperty("test", "1");
+        hc.addProperty("test-bad", innerHc);
 
-        final UriInfo uri = this.mockery.mock(UriInfo.class);
-        final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
-        final PathSegment graphPathSegment = this.mockery.mock(PathSegment.class, "graphPathSegment");
-        final PathSegment namespacePathSegment = this.mockery.mock(PathSegment.class, "namespacePathSegment");
-        final PathSegment extensionPathSegment = this.mockery.mock(PathSegment.class, "extensionPathSegment");
-        final PathSegment methodPathSegment = this.mockery.mock(PathSegment.class, "methodPathSegment");
+        ExtensionConfiguration config = new ExtensionConfiguration("ns", "name", hc);
 
-        pathSegments.add(graphPathSegment);
-        pathSegments.add(namespacePathSegment);
-        pathSegments.add(extensionPathSegment);
-        pathSegments.add(methodPathSegment);
+        Map<String, String> map = config.tryGetMapFromConfiguration();
+        Assert.assertNull(map);
+    }
 
-        this.mockery.checking(new Expectations() {{
-            allowing(namespacePathSegment).getPath();
-            will(returnValue(namespace));
-            allowing(extensionPathSegment).getPath();
-            will(returnValue(extension));
-            allowing(methodPathSegment).getPath();
-            will(returnValue(method));
-            allowing(uri).getPathSegments();
-            will(returnValue(pathSegments));
-        }});
+    @Test
+    public void tryGetMapFromConfigurationNiceConfig() {
+        HierarchicalConfiguration hc = new HierarchicalConfiguration();
+        hc.addProperty("key1", "value1");
+        hc.addProperty("key2", "value2");
+        ExtensionConfiguration config = new ExtensionConfiguration("ns", "name", hc);
 
-        return uri;
+        Map<String, String> map = config.tryGetMapFromConfiguration();
+        Assert.assertNotNull(map);
+        Assert.assertTrue(map.containsKey("key1"));
+        Assert.assertEquals("value1", map.get("key1"));
+        Assert.assertTrue(map.containsKey("key2"));
+        Assert.assertEquals("value2", map.get("key2"));
     }
 }

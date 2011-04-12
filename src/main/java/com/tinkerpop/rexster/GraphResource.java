@@ -126,6 +126,9 @@ public class GraphResource extends AbstractSubResource {
                 // found the method...time to do work
                 returnValue = invokeExtension(graphName, rexsterExtension, methodToCall.getMethod());
 
+            } catch (WebApplicationException wae){
+                // already logged this...just throw it  up.
+                throw wae;
             } catch (Exception ex) {
                 logger.error(ex);
                 JSONObject error = generateErrorObjectJsonFail(ex);

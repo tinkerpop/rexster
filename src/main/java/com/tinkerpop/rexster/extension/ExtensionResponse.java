@@ -181,7 +181,7 @@ public class ExtensionResponse {
      * Generates an response with an OK status code.  Accepts a HashMap as the response value.
      * It is converted to JSON.
      */
-    public static ExtensionResponse ok(HashMap result) {
+    public static ExtensionResponse ok(Map result) {
         if (result == null) {
             throw new IllegalArgumentException("result cannot be null");
         }
