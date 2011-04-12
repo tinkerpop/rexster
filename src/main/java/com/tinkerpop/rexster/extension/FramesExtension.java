@@ -1,24 +1,28 @@
 package com.tinkerpop.rexster.extension;
 
-import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.frames.FramesManager;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.rexster.RexsterResourceContext;
-import com.tinkerpop.rexster.Tokens;
-import netscape.javascript.JSObject;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * An extension that exposes Tinkerpop Frames via Rexster.  Configuration in rexster.xml looks like:
+ *
+ * <configuration>
+ *   <person>com.tinkerpop.frames.domain.classes.Person</person>
+ *   <project>com.tinkerpop.frames.domain.classes.Project</project>
+ * </configuration>
+ */
 @ExtensionNaming(name = FramesExtension.EXTENSION_NAME, namespace = FramesExtension.EXTENSION_NAMESPACE)
 @ExtensionDescriptor("Frames extension.")
 public class FramesExtension extends AbstractRexsterExtension {
