@@ -3,7 +3,6 @@ package com.tinkerpop.rexster.extension;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
-import sun.security.provider.certpath.OCSPResponse;
 
 import javax.ws.rs.core.Response;
 import java.util.HashMap;

@@ -2,7 +2,6 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.rexster.extension.*;
-import com.tinkerpop.rexster.traversals.Traversal;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 

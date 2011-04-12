@@ -6,7 +6,6 @@ import com.tinkerpop.rexster.config.GraphConfigurationContainer;
 import com.tinkerpop.rexster.config.GraphConfigurationException;
 import com.tinkerpop.rexster.extension.ExtensionConfiguration;
 import com.tinkerpop.rexster.extension.RexsterExtension;
-import com.tinkerpop.rexster.traversals.Traversal;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
