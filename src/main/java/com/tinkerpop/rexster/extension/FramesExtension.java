@@ -24,7 +24,6 @@ import java.util.Map;
  * </configuration>
  */
 @ExtensionNaming(name = FramesExtension.EXTENSION_NAME, namespace = FramesExtension.EXTENSION_NAMESPACE)
-@ExtensionDescriptor("Frames extension.")
 public class FramesExtension extends AbstractRexsterExtension {
     protected static Logger logger = Logger.getLogger(GremlinExtension.class);
 

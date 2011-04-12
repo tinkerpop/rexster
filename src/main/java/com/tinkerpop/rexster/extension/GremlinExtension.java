@@ -19,7 +19,6 @@ import javax.script.ScriptEngine;
 import java.util.*;
 
 @ExtensionNaming(name = "gremlin", namespace = "tp")
-@ExtensionDescriptor("Gremlin extension.")
 public class GremlinExtension extends AbstractRexsterExtension{
     protected static Logger logger = Logger.getLogger(GremlinExtension.class);
 
