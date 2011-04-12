@@ -55,52 +55,10 @@ public class RexsterApplication {
             logger.error("Graph initialization failed. Check the graph configuration in rexster.xml.");
         }
 
-        if (this.graphs != null && this.graphs.size() > 0) {
-
-            // only worth initializing if there are some graphs to deal with.
-            try {
-                initTraversals();
-                logger.info("Traversal initialization completed.");
-            } catch (Exception e) {
-                logger.error("Traversal initialization failed.", e);
-            }
-        }
-
         Properties cacheProperties = new Properties();
         cacheProperties.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, cacheMaxSize);
         this.resultObjectCache = new MapResultObjectCache(cacheProperties);
 
-    }
-
-    private void initTraversals() {
-        // get a list of all traversal implementations.
-        ServiceLoader<? extends Traversal> traversalServices = ServiceLoader.load(Traversal.class);
-
-        for (RexsterApplicationGraph rag : this.graphs.values()) {
-
-            if (rag.hasPackages()) {
-
-                // packages are explicitly configured
-                for (Traversal traversalService : traversalServices) {
-
-                    String traversalPackage;
-
-                    // the traversal is defined as a forward-slash separated set of path segments.
-                    // the first path segment is the package. if there is no forward slash then
-                    // the entire string is the package
-                    if (traversalService.getTraversalName().indexOf("/") == -1) {
-                        traversalPackage = traversalService.getTraversalName();
-                    } else {
-                        traversalPackage = traversalService.getTraversalName().substring(0, traversalService.getTraversalName().indexOf("/"));
-                    }
-
-                    if (rag.getPackageNames().contains(traversalPackage)) {
-                        logger.info("loading traversal: /" + rag.getGraphName() + "/traversal/" + traversalService.getTraversalName() + " [" + traversalService.getClass().getName() + "]");
-                        rag.getLoadedTraversals().put(traversalService.getTraversalName(), traversalService.getClass());
-                    }
-                }
-            }
-        }
     }
 
     public static String getVersion() {

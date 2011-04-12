@@ -16,9 +16,7 @@ public class RexsterApplicationGraph {
     private static final Logger logger = Logger.getLogger(RexsterApplication.class);
 
     private Graph graph;
-    private Map<String, Class<? extends Traversal>> loadedTraversals = new HashMap<String, Class<? extends Traversal>>();
     private String graphName;
-    private Set<String> packageNames;
     private Set<ExtensionAllowed> extensionAllowables;
     private Set<ExtensionConfiguration> extensionConfigurations;
 
@@ -27,28 +25,12 @@ public class RexsterApplicationGraph {
         this.graph = graph;
     }
 
-    public boolean hasPackages() {
-        return this.packageNames != null && this.packageNames.size() > 0;
-    }
-
     public String getGraphName() {
         return graphName;
     }
 
-    public Map<String, Class<? extends Traversal>> getLoadedTraversals() {
-        return loadedTraversals;
-    }
-
-    public void setLoadedTraversals(Map<String, Class<? extends Traversal>> loadedTraversals) {
-        this.loadedTraversals = loadedTraversals;
-    }
-
     public Graph getGraph() {
         return graph;
-    }
-
-    public Set<String> getPackageNames() {
-        return packageNames;
     }
 
     /**
@@ -116,22 +98,6 @@ public class RexsterApplicationGraph {
                         + ".  It will not be configured.", iae);
                 }
             }
-        }
-    }
-
-    public void loadPackageNames(String packageNameString) {
-        if (packageNameString != null && packageNameString.length() > 0) {
-            if (packageNameString.trim().equals(";")) {
-                // allows configuration of the root package only (ie. gremlin)
-                this.packageNames = new HashSet<String>();
-                this.packageNames.add("");
-            } else {
-                // allows configuration of the root package plus anything else
-                this.packageNames = new HashSet<String>(Arrays.asList(packageNameString.split(";")));
-            }
-        } else {
-            // no packages when empty
-            this.packageNames = new HashSet<String>();
         }
     }
 

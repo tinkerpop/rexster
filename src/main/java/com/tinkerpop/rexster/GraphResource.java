@@ -76,7 +76,7 @@ public class GraphResource extends AbstractSubResource {
     }
 
     @POST
-    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!traversals).+}")
+    @Path("{extension: (?!vertices)(?!edges)(?!indices).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getGraphExtension(@PathParam("graphname") String graphName, JSONObject json) {
         this.setRequestObject(json);
@@ -84,7 +84,7 @@ public class GraphResource extends AbstractSubResource {
     }
 
     @GET
-    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!traversals).+}")
+    @Path("{extension: (?!vertices)(?!edges)(?!indices).+}")
     public Response getGraphExtension(@PathParam("graphname") String graphName) {
 
         ExtensionResponse extResponse;

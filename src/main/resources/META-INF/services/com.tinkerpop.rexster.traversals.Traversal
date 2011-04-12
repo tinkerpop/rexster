@@ -1,5 +1,0 @@
-com.tinkerpop.rexster.traversals.gremlin.GremlinTraversal
-com.tinkerpop.rexster.traversals.grateful.CoFollowsRank
-com.tinkerpop.rexster.traversals.grateful.ArtistRank
-com.tinkerpop.rexster.traversals.grateful.SingerWriterRank
-com.tinkerpop.rexster.traversals.grateful.FollowsScore

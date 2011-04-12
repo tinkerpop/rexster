@@ -13,7 +13,6 @@
         <graph>
             <graph-name>emptygraph</graph-name>
             <graph-type>tinkergraph</graph-type>
-            <packages-allowed></packages-allowed>
         </graph>
         <graph>
             <graph-name>tinkergraph</graph-name>
@@ -54,14 +53,12 @@
             <graph-name>sailgraph</graph-name>
             <graph-type>memorystoresailgraph</graph-type>
             <graph-file>data/graph-example-1.ntriple</graph-file>
-            <packages-allowed></packages-allowed>
         </graph>
         <graph>
             <graph-enabled>false</graph-enabled>
             <graph-name>orientdbsample</graph-name>
             <graph-type>orientgraph</graph-type>
             <graph-file>local:C:/data/graph/graph</graph-file>
-            <packages-allowed></packages-allowed>
             <properties>
                 <username>admin</username>
                 <password>admin</password>
@@ -72,7 +69,6 @@
             <graph-name>neo4jsample</graph-name>
             <graph-type>neo4jgraph</graph-type>
             <graph-file>/tmp/rexster-graph</graph-file>
-            <packages-allowed></packages-allowed>
             <properties>
                 <!-- Memory mapped I/O settings -->
                 <!-- For high traversal speed it is important to have the nodestore.db and relationshipstore.db files. -->
@@ -127,7 +123,6 @@
             <graph-name>dexsample</graph-name>
             <graph-type>dexgraph</graph-type>
             <graph-file>/tmp/graph.dex</graph-file>
-            <packages-allowed></packages-allowed>
         </graph>
     </graphs>
 </rexster>

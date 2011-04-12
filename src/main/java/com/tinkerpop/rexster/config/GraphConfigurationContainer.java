@@ -46,7 +46,6 @@ public class GraphConfigurationContainer {
                         try {
                             Graph graph = getGraphFromConfiguration(graphConfig);
                             RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph);
-                            rag.loadPackageNames(graphConfig.getString(Tokens.REXSTER_PACKAGES_ALLOWED));
 
                             // loads extensions that are allowed to be served for this graph
                             List extensionConfigs = graphConfig.getList(Tokens.REXSTER_GRAPH_EXTENSIONS_ALLOWS_PATH);
