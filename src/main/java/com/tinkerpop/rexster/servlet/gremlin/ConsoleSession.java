@@ -162,7 +162,7 @@ public class ConsoleSession implements Runnable {
             } else if (result instanceof Map){
             	Map map = (Map) result;
             	for (Object key : map.keySet()) {
-            		resultLines.add(map.get(key).toString());
+            		resultLines.add(key + "=" + map.get(key).toString());
             	}
             } else {
                 resultLines.add(result);
