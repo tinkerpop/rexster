@@ -146,13 +146,13 @@ public class BaseResourceTest {
     @Test
     public void getReturnKeysValid() {
         BaseResource tt = new MockResource();
-        tt.buildRequestObject("{\"rexster\": { \"return_keys\": [ \"key1\" ]}}");
+        tt.buildRequestObject("{\"rexster\": { \"" + Tokens.RETURN_KEYS + "\": [ \"key1\" ]}}");
         Assert.assertNotNull(tt.getReturnKeys());
         Assert.assertEquals(1, tt.getReturnKeys().size());
         Assert.assertEquals("key1", tt.getReturnKeys().get(0));
 
         tt = new MockResource();
-        tt.buildRequestObject("{\"rexster\": { \"return_keys\": [ \"key1\", \"key2\", \"key3\" ]}}");
+        tt.buildRequestObject("{\"rexster\": { \"" + Tokens.RETURN_KEYS + "\": [ \"key1\", \"key2\", \"key3\" ]}}");
         Assert.assertNotNull(tt.getReturnKeys());
         Assert.assertEquals(3, tt.getReturnKeys().size());
         Assert.assertEquals("key1", tt.getReturnKeys().get(0));
@@ -163,7 +163,7 @@ public class BaseResourceTest {
     @Test
     public void getReturnKeysSingleKeyValid() {
         BaseResource tt = new MockResource();
-        tt.buildRequestObject("{\"rexster\": { \"return_keys\": \"key1\"}}");
+        tt.buildRequestObject("{\"rexster\": { \"" + Tokens.RETURN_KEYS + "\": \"key1\"}}");
         Assert.assertNotNull(tt.getReturnKeys());
         Assert.assertEquals(1, tt.getReturnKeys().size());
         Assert.assertEquals("key1", tt.getReturnKeys().get(0));

@@ -261,7 +261,7 @@ public abstract class BaseResource {
      * to a boolean value. Types are not shown by default or if the value
      * cannot be parsed from the request.
      *
-     * @return true if show_types is set to "true" and false otherwise.
+     * @return true if showTypes is set to "true" and false otherwise.
      */
     protected boolean hasShowTypes() {
         boolean showTypes = false;
