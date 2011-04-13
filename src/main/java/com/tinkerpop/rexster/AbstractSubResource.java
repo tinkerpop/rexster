@@ -66,12 +66,15 @@ public abstract class AbstractSubResource extends BaseResource {
         return rag;
     }
 
-    protected static JSONArray getExtensionHypermedia(ExtensionPoint extensionPoint) {
+    protected JSONArray getExtensionHypermedia(String graphName, ExtensionPoint extensionPoint) {
+
+        RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 
         JSONArray hypermediaLinks = new JSONArray();
 
         ServiceLoader<? extends RexsterExtension> extensions = ServiceLoader.load(RexsterExtension.class);
         for (RexsterExtension extension : extensions) {
+
             Class clazz = extension.getClass();
             ExtensionNaming extensionNaming = (ExtensionNaming) clazz.getAnnotation(ExtensionNaming.class);
 
@@ -94,24 +97,36 @@ public abstract class AbstractSubResource extends BaseResource {
                 }
             }
 
-            Method[] methods = clazz.getMethods();
-            for (Method method : methods) {
-                ExtensionDescriptor descriptor = method.getAnnotation(ExtensionDescriptor.class);
-                ExtensionDefinition definition = method.getAnnotation(ExtensionDefinition.class);
+            // test the configuration to see if the extension should even be available
+            ExtensionConfiguration extensionConfig = rag.findExtensionConfiguration(
+                    currentExtensionNamespace, currentExtensionName);
+            RexsterExtension rexsterExtension = null;
+            try {
+                rexsterExtension = (RexsterExtension) clazz.newInstance();
+            } catch (Exception ex) {
+                logger.warn("Failed extension configuration check for " + currentExtensionNamespace + ":"
+                        + currentExtensionName + "on graph " + graphName);
+            }
 
-                if (definition != null && definition.extensionPoint() == extensionPoint) {
-                    String href = currentExtensionNamespace + "/" + currentExtensionName;
-                    if (!definition.path().isEmpty()) {
-                        href = href + "/" + definition.path();
+            if (rexsterExtension != null && rexsterExtension.isConfigurationValid(extensionConfig)) {
+                Method[] methods = clazz.getMethods();
+                for (Method method : methods) {
+                    ExtensionDescriptor descriptor = method.getAnnotation(ExtensionDescriptor.class);
+                    ExtensionDefinition definition = method.getAnnotation(ExtensionDefinition.class);
+
+                    if (definition != null && definition.extensionPoint() == extensionPoint) {
+                        String href = currentExtensionNamespace + "/" + currentExtensionName;
+                        if (!definition.path().isEmpty()) {
+                            href = href + "/" + definition.path();
+                        }
+
+                        HashMap hypermediaLink = new HashMap();
+                        hypermediaLink.put("href", href);
+                        hypermediaLink.put("title", descriptor.value());
+
+                        hypermediaLinks.put(new JSONObject(hypermediaLink));
                     }
-
-                    HashMap hypermediaLink = new HashMap();
-                    hypermediaLink.put("href", href);
-                    hypermediaLink.put("title", descriptor.value());
-
-                    hypermediaLinks.put(new JSONObject(hypermediaLink));
                 }
-
             }
         }
 

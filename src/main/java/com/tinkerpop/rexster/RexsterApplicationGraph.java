@@ -51,11 +51,14 @@ public class RexsterApplicationGraph {
 
     public ExtensionConfiguration findExtensionConfiguration(String namespace, String extensionName) {
         ExtensionConfiguration extensionConfigurationFound = null;
-        for (ExtensionConfiguration extensionConfiguration : this.extensionConfigurations) {
-            if (extensionConfiguration.getExtensionName().equals(extensionName)
-                && extensionConfiguration.getNamespace().equals(namespace)) {
-                extensionConfigurationFound = extensionConfiguration;
-                break;
+
+        if (this.extensionConfigurations != null) {
+            for (ExtensionConfiguration extensionConfiguration : this.extensionConfigurations) {
+                if (extensionConfiguration.getExtensionName().equals(extensionName)
+                    && extensionConfiguration.getNamespace().equals(namespace)) {
+                    extensionConfigurationFound = extensionConfiguration;
+                    break;
+                }
             }
         }
 

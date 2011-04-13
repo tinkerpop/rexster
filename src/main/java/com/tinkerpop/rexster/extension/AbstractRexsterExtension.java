@@ -13,6 +13,14 @@ public abstract class AbstractRexsterExtension implements RexsterExtension {
     protected static final String SCRIPT = "script";
     protected static final String RETURN_KEYS = "return_keys";
 
+    /**
+     * By default this reutrns true.  Overriding classes should evaluate the configuration to determine
+     * if it is correct.
+     */
+    public boolean isConfigurationValid(ExtensionConfiguration extensionConfiguration) {
+        return true;
+    }
+
     protected JSONObject generateErrorJson() {
         Map map = new HashMap();
         map.put(Tokens.SUCCESS, false);

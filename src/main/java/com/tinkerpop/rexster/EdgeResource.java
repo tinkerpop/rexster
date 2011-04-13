@@ -85,7 +85,7 @@ public class EdgeResource extends AbstractSubResource {
                 this.resultObject.put(Tokens.RESULTS, new com.tinkerpop.rexster.ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
-                JSONArray extensionsList = getExtensionHypermedia(ExtensionPoint.EDGE);
+                JSONArray extensionsList = getExtensionHypermedia(graphName, ExtensionPoint.EDGE);
                 if (extensionsList != null) {
                     this.resultObject.put(Tokens.LINKS, extensionsList);
                 }

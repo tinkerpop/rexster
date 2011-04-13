@@ -88,7 +88,7 @@ public class VertexResource extends AbstractSubResource {
                     this.resultObject.put(Tokens.RESULTS, new com.tinkerpop.rexster.ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
                     this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
-                    JSONArray extensionsList = getExtensionHypermedia(ExtensionPoint.VERTEX);
+                    JSONArray extensionsList = getExtensionHypermedia(graphName, ExtensionPoint.VERTEX);
                     if (extensionsList != null) {
                         this.resultObject.put(Tokens.LINKS, extensionsList);
                     }

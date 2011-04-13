@@ -32,7 +32,7 @@ public class FramesExtension extends AbstractRexsterExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX)
     @ExtensionDescriptor("Frames extension for a vertex.")
-    public ExtensionResponse doGremlinWorkOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
+    public ExtensionResponse doFramesWorkOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                                    @RexsterContext Graph graph,
                                                    @RexsterContext Vertex vertex){
         ExtensionResponse extensionResponse;
@@ -90,6 +90,22 @@ public class FramesExtension extends AbstractRexsterExtension {
         }
 
         return extensionResponse;
+    }
+
+    /**
+     * By default this returns true.  Overriding classes should evaluate the configuration to determine
+     * if it is correct.
+     */
+    @Override
+    public boolean isConfigurationValid(ExtensionConfiguration extensionConfiguration) {
+        boolean valid = false;
+
+        if (extensionConfiguration != null) {
+            Map<String, String> mapFrames = extensionConfiguration.tryGetMapFromConfiguration();
+            valid = mapFrames != null && !mapFrames.isEmpty();
+        }
+
+        return valid;
     }
 
     protected JSONObject generateApiJson() {

@@ -421,5 +421,9 @@ public class AbstractSubResourceTest {
         public void justIgnoreMe() {
             // ensuring no fails when no ExtensionDefinition annotation is supplied
         }
+
+        public boolean isConfigurationValid(ExtensionConfiguration extensionConfiguration) {
+            return true;
+        }
     }
 }
