@@ -3,8 +3,8 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.pipes.Pipe;
-import com.tinkerpop.pipes.pgm.VertexEdgeLabelFilterPipe;
-import com.tinkerpop.pipes.pgm.VertexEdgePipe;
+import com.tinkerpop.pipes.filter.ComparisonFilterPipe;
+import com.tinkerpop.pipes.pgm.LabelFilterPipe;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -67,13 +67,13 @@ public class MockVertex implements Vertex {
     }
 
     public Iterable<Edge> getOutEdges(String label) {
-        Pipe pipe = new VertexEdgeLabelFilterPipe(VertexEdgePipe.Step.OUT_EDGES, label);
+        Pipe pipe = new LabelFilterPipe(label, ComparisonFilterPipe.Filter.NOT_EQUAL);
         pipe.setStarts(this.outEdges);
         return pipe;
     }
 
     public Iterable<Edge> getInEdges(String label) {
-        Pipe pipe = new VertexEdgeLabelFilterPipe(VertexEdgePipe.Step.IN_EDGES, label);
+        Pipe pipe = new LabelFilterPipe(label, ComparisonFilterPipe.Filter.NOT_EQUAL);
         pipe.setStarts(this.inEdges);
         return pipe;
     }
