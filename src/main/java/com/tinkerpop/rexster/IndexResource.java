@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -147,15 +148,23 @@ public class IndexResource extends AbstractSubResource {
             JSONObject error = generateErrorObject(msg);
             throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.NOT_FOUND).entity(error)).build());
         } else {
-            String msg = "A key and value must be provided to lookup elements in an index";
-            logger.info(msg);
+            // return info about the index itself
+            HashMap map = new HashMap();
+            map.put(Tokens.QUERY_TIME, this.sh.stopWatch());
+            map.put("name", index.getIndexName());
 
-            JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.BAD_REQUEST).entity(error)).build());
+            if (index.getIndexType().equals(Index.Type.AUTOMATIC)) {
+                map.put("type", "automatic");
+            } else if (index.getIndexType().equals(Index.Type.MANUAL)) {
+                map.put("type", "manual");
+            }
+
+            map.put("class", index.getIndexClass().getName());
+
+            this.resultObject = new JSONObject(map);
         }
 
         return this.addHeaders(Response.ok(this.resultObject)).build();
-        //return this.addHeaders(Response.ok(this.resultObject).header("Content-Type", "application/json; charset=UTF-8")).build();
     }
 
     /**
