@@ -7,10 +7,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -72,6 +69,13 @@ public class ElementJSONObject extends JSONObject {
         // string
         String type = determineType(value);
 
+        // values that are arrays need to get converted over to a list value so that
+        // it serializes properly.
+        if (type.equals("array")) {
+            value = this.convertArrayToList(value);
+            type = "list";
+        }
+
         // if the includeType is set to true then show the data types of the properties
         if (includeType) {
             JSONObject valueAndType = new JSONObject();
@@ -115,16 +119,44 @@ public class ElementJSONObject extends JSONObject {
             // even though the data type is not needed here, jettison needs these
             // objects converted to objects they understand.
             if (type.equals("list")) {
-                List list = (List) value;
-                JSONArray jsonArray = new JSONArray(list);
-                return jsonArray;
+                return new JSONArray((List) value);
             } else if (type.equals("map")) {
-                JSONObject jsonObject = new JSONObject((Map) value);
-                return jsonObject;
+                return new JSONObject((Map) value);
             } else {
                 return value;
             }
         }
+    }
+
+    private List convertArrayToList(Object value) {
+
+        // is there seriously no better way to do this...bah!
+        List list = new ArrayList();
+        if (value instanceof int[]) {
+            int[] arr = (int[]) value;
+            for (int ix = 0; ix < arr.length; ix++) {
+                list.add(arr[ix]);
+            }
+        } else if (value instanceof double[]) {
+            double[] arr = (double[]) value;
+            for (int ix = 0; ix < arr.length; ix++) {
+                list.add(arr[ix]);
+            }
+        } else if (value instanceof float[]) {
+            float[] arr = (float[]) value;
+            for (int ix = 0; ix < arr.length; ix++) {
+                list.add(arr[ix]);
+            }
+        } else if (value instanceof long[]) {
+            long[] arr = (long[]) value;
+            for (int ix = 0; ix < arr.length; ix++) {
+                list.add(arr[ix]);
+            }
+        } else {
+            list = Arrays.asList((Object[]) value);
+        }
+
+        return list;
     }
 
     private String determineType(Object value) {
@@ -141,6 +173,8 @@ public class ElementJSONObject extends JSONObject {
             type = "list";
         } else if (value instanceof Map) {
             type = "map";
+        } else if (value.getClass().isArray()) {
+            type = "array";
         }
 
         return type;
