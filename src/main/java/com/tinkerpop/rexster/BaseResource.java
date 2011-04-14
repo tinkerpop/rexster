@@ -14,6 +14,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -177,6 +178,25 @@ public abstract class BaseResource {
                 embeddedObject.put(keys[keys.length - 1], rawValue);
             }
         }
+    }
+
+    public void buildRequestObject(final MultivaluedMap<String, String> formParams) {
+        HashMap map = new HashMap();
+
+        // need to pick apart the multivalue map.  want single primitives instead of
+        // lists if possible.
+        for(String key : formParams.keySet()) {
+            List list = formParams.get(key);
+            if (list != null && list.size() > 1) {
+                map.put(key, list);
+            } else if (list.size() == 1) {
+                map.put(key, formParams.getFirst(key));
+            } else {
+                map.put(key, "");
+            }
+        }
+
+        this.requestObject = new JSONObject(map);
     }
 
     public void buildRequestObject(final String jsonString) {

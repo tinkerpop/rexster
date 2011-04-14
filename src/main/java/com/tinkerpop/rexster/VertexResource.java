@@ -12,6 +12,7 @@ import org.codehaus.jettison.json.JSONObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -281,8 +282,60 @@ public class VertexResource extends AbstractSubResource {
      */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response postNullVertex(@PathParam("graphname") String graphName, String json) {
+        this.buildRequestObject(json);
+        return this.postVertex(graphName, null);
+    }
+
+    /**
+     * POST http://host/graph/vertices
+     * graph.addVertex(null);
+     */
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response postNullVertex(@PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
+        this.buildRequestObject(formParams);
+        return this.postVertex(graphName, null);
+    }
+
+    /**
+     * POST http://host/graph/vertices
+     * graph.addVertex(null);
+     */
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
     public Response postNullVertex(@PathParam("graphname") String graphName) {
         return this.postVertex(graphName, null);
+    }
+
+    /**
+     * POST http://host/graph/vertices/id?key=value
+     * Vertex v = graph.addVertex(id);
+     * v.setProperty(key,value);
+     */
+    @POST
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response postVertex(@PathParam("graphname") String graphName, @PathParam("id") String id, String json) {
+        this.buildRequestObject(json);
+        return this.postVertex(graphName, id);
+    }
+
+    /**
+     * POST http://host/graph/vertices/id?key=value
+     * Vertex v = graph.addVertex(id);
+     * v.setProperty(key,value);
+     */
+    @POST
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response postVertex(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
+        this.buildRequestObject(formParams);
+        return this.postVertex(graphName, id);
     }
 
     /**
