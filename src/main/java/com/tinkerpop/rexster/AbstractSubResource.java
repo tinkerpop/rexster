@@ -269,13 +269,12 @@ public abstract class AbstractSubResource extends BaseResource {
             throws IllegalAccessException, InvocationTargetException {
         RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 
-        RexsterResourceContext rexsterResourceContext = new RexsterResourceContext();
-        rexsterResourceContext.setRequest(this.httpServletRequest);
-        rexsterResourceContext.setResultObject(this.resultObject);
-        rexsterResourceContext.setUriInfo(this.uriInfo);
-        rexsterResourceContext.setRexsterApplicationGraph(this.getRexsterApplicationGraph(graphName));
-        rexsterResourceContext.setRequestObject(this.getRequestObject());
-        rexsterResourceContext.setCache(this.getRexsterApplicationProvider().getResultObjectCache());
+        RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(
+                this.getRexsterApplicationGraph(graphName),
+                this.uriInfo,
+                this.httpServletRequest,
+                this.getRequestObject(),
+                this.getRexsterApplicationProvider().getResultObjectCache());
 
         Annotation[][] parametersAnnotations = methodToCall.getParameterAnnotations();
         ArrayList methodToCallParams = new ArrayList();
