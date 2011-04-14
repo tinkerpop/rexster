@@ -3,6 +3,7 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.rexster.extension.*;
 import junit.framework.Assert;
+import org.codehaus.jettison.json.JSONObject;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
@@ -11,6 +12,7 @@ import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
 import java.lang.reflect.Method;
@@ -353,6 +355,79 @@ public class AbstractSubResourceTest {
         Assert.assertNotNull(m);
     }
 
+    @Test
+    public void tryAppendRexsterAttributesIfJsonNonJsonMediaType() {
+        ExtensionResponse responseFromExtension = ExtensionResponse.noContent();
+        ExtensionResponse extResponse = this.mockResource.tryAppendRexsterAttributesIfJsonExposed(
+                responseFromExtension, null, MediaType.APPLICATION_FORM_URLENCODED);
+
+        Assert.assertNotNull(extResponse);
+        Assert.assertEquals(responseFromExtension, extResponse);
+    }
+
+    @Test
+    public void tryAppendRexsterAttributesIfJsonConfiguredNo() {
+        ExtensionResponse responseFromExtension = ExtensionResponse.noContent();
+
+        final ExtensionDefinition extensionDefinition = this.mockery.mock(ExtensionDefinition.class);
+        this.mockery.checking(new Expectations() {{
+            allowing(extensionDefinition).tryIncludeRexsterAttributes();
+            will(returnValue(false));
+        }});
+
+        ExtensionMethod extensionMethod = new ExtensionMethod(null, extensionDefinition);
+        ExtensionResponse extResponse = this.mockResource.tryAppendRexsterAttributesIfJsonExposed(
+                responseFromExtension, extensionMethod, MediaType.APPLICATION_JSON);
+
+        Assert.assertNotNull(extResponse);
+        Assert.assertEquals(responseFromExtension, extResponse);
+    }
+
+    @Test
+    public void tryAppendRexsterAttributesIfJsonNotJsonInEntity() {
+        ExtensionResponse responseFromExtension = ExtensionResponse.noContent();
+
+        final ExtensionDefinition extensionDefinition = this.mockery.mock(ExtensionDefinition.class);
+        this.mockery.checking(new Expectations() {{
+            allowing(extensionDefinition).tryIncludeRexsterAttributes();
+            will(returnValue(true));
+        }});
+
+        ExtensionMethod extensionMethod = new ExtensionMethod(null, extensionDefinition);
+        ExtensionResponse extResponse = this.mockResource.tryAppendRexsterAttributesIfJsonExposed(
+                responseFromExtension, extensionMethod, MediaType.APPLICATION_JSON);
+
+        Assert.assertNotNull(extResponse);
+        Assert.assertEquals(responseFromExtension, extResponse);
+    }
+
+    @Test
+    public void tryAppendRexsterAttributesIfJsonValid() {
+        HashMap map = new HashMap() {{
+            put("me", "you");
+        }};
+
+        ExtensionResponse responseFromExtension = ExtensionResponse.ok(new JSONObject(map));
+
+        final ExtensionDefinition extensionDefinition = this.mockery.mock(ExtensionDefinition.class);
+        this.mockery.checking(new Expectations() {{
+            allowing(extensionDefinition).tryIncludeRexsterAttributes();
+            will(returnValue(true));
+        }});
+
+        ExtensionMethod extensionMethod = new ExtensionMethod(null, extensionDefinition);
+        ExtensionResponse extResponse = this.mockResource.tryAppendRexsterAttributesIfJsonExposed(
+                responseFromExtension, extensionMethod, MediaType.APPLICATION_JSON);
+
+        Assert.assertNotNull(extResponse);
+
+        JSONObject jsonObjectWithAttributes = (JSONObject) extResponse.getJerseyResponse().getEntity();
+        Assert.assertNotNull(jsonObjectWithAttributes);
+        Assert.assertTrue(jsonObjectWithAttributes.has("me"));
+        Assert.assertTrue(jsonObjectWithAttributes.has(Tokens.VERSION));
+        Assert.assertTrue(jsonObjectWithAttributes.has(Tokens.QUERY_TIME));
+    }
+
     private UriInfo mockTheUri(final String namespace, final String extension, final String method) {
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
@@ -403,6 +478,10 @@ public class AbstractSubResourceTest {
 
         public ExtensionSegmentSet parseUriForExtensionSegment(String graphName, ExtensionPoint extensionPoint) {
             return parseUriForExtensionSegment(graphName, extensionPoint);
+        }
+
+        public ExtensionResponse tryAppendRexsterAttributesIfJsonExposed(ExtensionResponse extResponse, ExtensionMethod methodToCall, String mediaType) {
+            return tryAppendRexsterAttributesIfJson(extResponse, methodToCall, mediaType);
         }
     }
 

@@ -15,6 +15,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 
 @Path("/{graphname}")
 public class GraphResource extends AbstractSubResource {
@@ -162,6 +163,7 @@ public class GraphResource extends AbstractSubResource {
         String mediaType = MediaType.APPLICATION_JSON;
         if (methodToCall != null) {
             mediaType = methodToCall.getExtensionDefinition().produces();
+            extResponse = tryAppendRexsterAttributesIfJson(extResponse, methodToCall, mediaType);
         }
 
         return this.addHeaders(Response.fromResponse(extResponse.getJerseyResponse()).type(mediaType)).build();

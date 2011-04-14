@@ -26,6 +26,12 @@ public @interface ExtensionDefinition {
     String path() default "";
 
     /**
+     * If the ExtensionDefinition is configured to produce JSON, setting this value to true
+     * will try to insert the Rexster version and query time attributes.
+     */
+    boolean tryIncludeRexsterAttributes() default true;
+
+    /**
      * Specifies the media type to be returned by the extension. By default this value
      * is application/json.
      */

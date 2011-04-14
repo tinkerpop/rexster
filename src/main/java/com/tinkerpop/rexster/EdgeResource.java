@@ -196,6 +196,7 @@ public class EdgeResource extends AbstractSubResource {
         String mediaType = MediaType.APPLICATION_JSON;
         if (methodToCall != null) {
             mediaType = methodToCall.getExtensionDefinition().produces();
+            extResponse = tryAppendRexsterAttributesIfJson(extResponse, methodToCall, mediaType);
         }
 
         return this.addHeaders(Response.fromResponse(extResponse.getJerseyResponse()).type(mediaType)).build();

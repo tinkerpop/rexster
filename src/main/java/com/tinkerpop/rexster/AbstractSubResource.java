@@ -11,6 +11,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -382,6 +383,34 @@ public abstract class AbstractSubResource extends BaseResource {
 
         return typedPropertyValue;
     }
+
+    protected ExtensionResponse tryAppendRexsterAttributesIfJson(ExtensionResponse extResponse, ExtensionMethod methodToCall, String mediaType) {
+        if (mediaType.equals(MediaType.APPLICATION_JSON)
+            && methodToCall.getExtensionDefinition().tryIncludeRexsterAttributes()) {
+
+            Object obj = extResponse.getJerseyResponse().getEntity();
+            if (obj instanceof JSONObject) {
+                JSONObject entity = (JSONObject) obj;
+
+                if (entity != null) {
+                    try {
+                        entity.put(Tokens.VERSION, RexsterApplication.getVersion());
+                        entity.put(Tokens.QUERY_TIME, this.sh.stopWatch());
+                    } catch (JSONException jsonException) {
+                        // nothing bad happening here
+                        logger.error("Couldn't add Rexster attributes to response for an extension.");
+                    }
+
+                    extResponse = new ExtensionResponse(
+                            Response.fromResponse(extResponse.getJerseyResponse()).entity(entity).build());
+
+                }
+            }
+        }
+
+        return extResponse;
+    }
+
 
     private HashMap<String, String> tryParseMap(String mapValue) {
         // parens on the ends have been validated already...they must be
