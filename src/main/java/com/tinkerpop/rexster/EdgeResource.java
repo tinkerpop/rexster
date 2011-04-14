@@ -207,18 +207,6 @@ public class EdgeResource extends AbstractSubResource {
      */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response postNullEdge(@PathParam("graphname") String graphName, String json) {
-        this.buildRequestObject(json);
-        return this.postEdge(graphName, null);
-    }
-
-    /**
-     * POST http://host/graph/edges
-     * graph.addEdge(null);
-     */
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response postNullEdge(@PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
         this.buildRequestObject(formParams);
@@ -234,20 +222,6 @@ public class EdgeResource extends AbstractSubResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response postNullEdge(@PathParam("graphname") String graphName) {
         return this.postEdge(graphName, null);
-    }
-
-    /**
-     * POST http://host/graph/edge/id?_inV=id1&_outV=id2&label=string&key=value
-     * Edge e = graph.addEdge(id,graph.getVertex(id1),graph.getVertex(id2),label);
-     * e.setProperty(key,value);
-     */
-    @POST
-    @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response postEdge(@PathParam("graphname") String graphName, @PathParam("id") String id, String json) {
-        this.buildRequestObject(json);
-        return this.postEdge(graphName, id);
     }
 
     /**
