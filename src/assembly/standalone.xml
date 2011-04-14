@@ -12,6 +12,10 @@
             <fileMode>0755</fileMode>
         </fileSet>
         <fileSet>
+            <directory>src/main/resources/com/tinkerpop/rexster</directory>
+            <outputDirectory>/bin</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>target/*.jar</directory>
             <outputDirectory>/lib</outputDirectory>
         </fileSet>
