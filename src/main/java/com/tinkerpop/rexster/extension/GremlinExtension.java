@@ -1,29 +1,34 @@
 package com.tinkerpop.rexster.extension;
 
+import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
+import com.tinkerpop.rexster.ElementJSONObject;
 import com.tinkerpop.rexster.ResultObjectCache;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.ElementJSONObject;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import javax.script.ScriptContext;
+import javax.script.Bindings;
 import javax.script.ScriptEngine;
-import java.util.*;
+import javax.script.SimpleBindings;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-@ExtensionNaming(name = "gremlin", namespace = "tp")
-public class GremlinExtension extends AbstractRexsterExtension{
+@ExtensionNaming(namespace = "tp", name = "gremlin")
+public class GremlinExtension extends AbstractRexsterExtension {
     protected static Logger logger = Logger.getLogger(GremlinExtension.class);
 
-    private ScriptEngine engine = new GremlinScriptEngine();
-
+    private final ScriptEngine engine = new GremlinScriptEngine();
     private static final String GRAPH_VARIABLE = "g";
     private static final String VERTEX_VARIABLE = "v";
     private static final String EDGE_VARIABLE = "e";
@@ -32,24 +37,24 @@ public class GremlinExtension extends AbstractRexsterExtension{
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE)
     @ExtensionDescriptor("Gremlin extension for an edge.")
-    public ExtensionResponse doGremlinWorkOnEdge(@RexsterContext RexsterResourceContext rexsterResourceContext,
-                                                 @RexsterContext Graph graph,
-                                                 @RexsterContext Edge edge){
+    public ExtensionResponse evaluateOnEdge(@RexsterContext RexsterResourceContext rexsterResourceContext,
+                                            @RexsterContext Graph graph,
+                                            @RexsterContext Edge edge) {
         return tryExecuteGremlinScript(rexsterResourceContext, graph, null, edge);
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX)
     @ExtensionDescriptor("Gremlin extension for a vertex.")
-    public ExtensionResponse doGremlinWorkOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
-                                                   @RexsterContext Graph graph,
-                                                   @RexsterContext Vertex vertex){
+    public ExtensionResponse evaluateOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
+                                              @RexsterContext Graph graph,
+                                              @RexsterContext Vertex vertex) {
         return tryExecuteGremlinScript(rexsterResourceContext, graph, vertex, null);
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor("Gremlin extension for a graph.")
-    public ExtensionResponse doGremlinWorkOnGraph(@RexsterContext RexsterResourceContext rexsterResourceContext,
-                                                  @RexsterContext Graph graph){
+    public ExtensionResponse evaluateOnGraph(@RexsterContext RexsterResourceContext rexsterResourceContext,
+                                             @RexsterContext Graph graph) {
 
         return tryExecuteGremlinScript(rexsterResourceContext, graph, null, null);
     }
@@ -59,7 +64,10 @@ public class GremlinExtension extends AbstractRexsterExtension{
         String cacheRequestURI = this.createCacheRequestURI(rexsterResourceContext);
         boolean allowCached = rexsterResourceContext.getRequestObject().optBoolean(Tokens.ALLOW_CACHED, true);
         boolean showTypes = rexsterResourceContext.getRequestObject().optBoolean(Tokens.SHOW_TYPES, false);
-
+        Bindings bindings = new SimpleBindings();
+        bindings.put(GRAPH_VARIABLE, graph);
+        bindings.put(VERTEX_VARIABLE, vertex);
+        bindings.put(EDGE_VARIABLE, edge);
         JSONObject requestObject = rexsterResourceContext.getRequestObject();
 
         // read the return keys from the request object
@@ -75,17 +83,8 @@ public class GremlinExtension extends AbstractRexsterExtension{
                 if (requestObject.has(SCRIPT)) {
                     String script = requestObject.opt(SCRIPT).toString();
 
-                    engine.getBindings(ScriptContext.ENGINE_SCOPE).put(GRAPH_VARIABLE, graph);
-                    if (vertex != null) {
-                        engine.getBindings(ScriptContext.ENGINE_SCOPE).put(VERTEX_VARIABLE, vertex);
-                    }
-
-                    if (edge != null) {
-                        engine.getBindings(ScriptContext.ENGINE_SCOPE).put(EDGE_VARIABLE, edge);
-                    }
-
                     JSONArray results = new JSONArray();
-                    Object result = engine.eval(script);
+                    Object result = engine.eval(script, bindings);
                     if (result instanceof Iterable) {
                         for (Object o : (Iterable) result) {
                             results.put(prepareOutput(o, returnKeys, showTypes));
@@ -149,19 +148,19 @@ public class GremlinExtension extends AbstractRexsterExtension{
     private List<String> getReturnKeys(JSONObject requestObject) {
         List<String> returnKeys = null;
         if (requestObject.has(RETURN_KEYS)) {
-        	JSONArray list = requestObject.optJSONArray(RETURN_KEYS);
+            JSONArray list = requestObject.optJSONArray(RETURN_KEYS);
             returnKeys = new ArrayList<String>();
 
             if (list != null) {
                 for (int ix = 0; ix < list.length(); ix++) {
-                	returnKeys.add(list.optString(ix));
+                    returnKeys.add(list.optString(ix));
                 }
             } else {
-            	returnKeys = null;
+                returnKeys = null;
             }
 
             if (returnKeys != null && returnKeys.size() == 1
-            		&& returnKeys.get(0).equals(WILDCARD)) {
+                    && returnKeys.get(0).equals(WILDCARD)) {
                 returnKeys = null;
             }
         }
@@ -207,7 +206,7 @@ public class GremlinExtension extends AbstractRexsterExtension{
 
         List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>();
         for (Map.Entry<String, String> entry : queryParameters.entrySet()) {
-            if (entry.getKey() != Tokens.OFFSET_START && entry.getKey() != Tokens.OFFSET_END && entry.getKey() != Tokens.ALLOW_CACHED && entry.getKey() != Tokens.SHOW_TYPES) {
+            if (!entry.getKey().equals(Tokens.OFFSET_START) && !entry.getKey().equals(Tokens.OFFSET_END) && !entry.getKey().equals(Tokens.ALLOW_CACHED) && !entry.getKey().equals(Tokens.SHOW_TYPES)) {
                 list.add(entry);
             }
         }
