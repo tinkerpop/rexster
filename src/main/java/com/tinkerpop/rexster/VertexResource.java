@@ -91,7 +91,7 @@ public class VertexResource extends AbstractSubResource {
 
                     JSONArray extensionsList = getExtensionHypermedia(graphName, ExtensionPoint.VERTEX);
                     if (extensionsList != null) {
-                        this.resultObject.put(Tokens.LINKS, extensionsList);
+                        this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                     }
 
                 } catch (JSONException ex) {

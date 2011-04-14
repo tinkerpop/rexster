@@ -8,14 +8,11 @@ import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
-import java.lang.reflect.Method;
-import java.util.HashMap;
 
 @Path("/{graphname}")
 public class GraphResource extends AbstractSubResource {
@@ -64,7 +61,7 @@ public class GraphResource extends AbstractSubResource {
 
             JSONArray extensionsList = getExtensionHypermedia(graphName, ExtensionPoint.GRAPH);
             if (extensionsList != null) {
-                this.resultObject.put(Tokens.LINKS, extensionsList);
+                this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
             }
 
         } catch (JSONException ex) {

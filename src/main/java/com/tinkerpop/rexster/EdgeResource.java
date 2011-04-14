@@ -88,7 +88,7 @@ public class EdgeResource extends AbstractSubResource {
 
                 JSONArray extensionsList = getExtensionHypermedia(graphName, ExtensionPoint.EDGE);
                 if (extensionsList != null) {
-                    this.resultObject.put(Tokens.LINKS, extensionsList);
+                    this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                 }
             } catch (JSONException ex) {
                 logger.error(ex);
