@@ -5,10 +5,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Tries to extract a value from the request to inject into the extension.
+ */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
-public @interface ExtensionDescriptor {
-    String description();
-    ExtensionApi[] api() default {};
-    ExtensionApiBehavior apiBehavior() default ExtensionApiBehavior.DEFAULT;
+@Target({ElementType.PARAMETER})
+public @interface ExtensionRequestParameter {
+    String name();
+    String description() default "";
 }

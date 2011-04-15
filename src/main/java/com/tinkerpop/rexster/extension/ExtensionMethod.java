@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.extension;
 import com.tinkerpop.rexster.Tokens;
 import org.codehaus.jettison.json.JSONObject;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -39,17 +40,33 @@ public class ExtensionMethod {
             map.put(Tokens.DESCRIPTION, this.extensionDescriptor.description());
 
             JSONObject api = null;
-            if (this.extensionDescriptor.api().length > 0) {
-                HashMap<String, String> innerMap = new HashMap<String, String>();
+            HashMap<String, String> innerMap = new HashMap<String, String>();
+            if (this.extensionDescriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
+                    || this.extensionDescriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_DESCRIPTOR_ONLY) {
 
-                for (ExtensionApi apiItem : this.extensionDescriptor.api()){
-                    innerMap.put(apiItem.parameterName(), apiItem.description());
+                if (this.extensionDescriptor.api().length > 0) {
+
+                    for (ExtensionApi apiItem : this.extensionDescriptor.api()){
+                        innerMap.put(apiItem.parameterName(), apiItem.description());
+                    }
                 }
-
-                api = new JSONObject(innerMap);
             }
 
-            if (api != null) {
+            if (this.extensionDescriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
+                    || this.extensionDescriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_PARAMETER_ONLY) {
+                Annotation[][] parametersAnnotations = method.getParameterAnnotations();
+                for (int ix = 0; ix < parametersAnnotations.length; ix++) {
+                    Annotation[] annotation = parametersAnnotations[ix];
+
+                    if (annotation != null && annotation[0] instanceof ExtensionRequestParameter) {
+                        ExtensionRequestParameter extensionRequestParameter = (ExtensionRequestParameter) annotation[0];
+                        innerMap.put(extensionRequestParameter.name(), extensionRequestParameter.description());
+                    }
+                }
+            }
+
+            if (!innerMap.isEmpty()) {
+                api = new JSONObject(innerMap);
                 map.put(Tokens.PARAMETERS, api);
             }
 

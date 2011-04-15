@@ -286,29 +286,73 @@ public abstract class AbstractSubResource extends BaseResource {
             Annotation[] annotation = parametersAnnotations[ix];
             Class[] parameterTypes = method.getParameterTypes();
 
-            if (annotation[0] instanceof RexsterContext) {
-                if (parameterTypes[ix].equals(Graph.class)) {
-                    methodToCallParams.add(rag.getGraph());
-                } else if (parameterTypes[ix].equals(RexsterApplicationGraph.class)) {
-                    methodToCallParams.add(rag);
-                } else if (parameterTypes[ix].equals(ExtensionMethod.class)) {
-                    methodToCallParams.add(methodToCall);
-                } else if (parameterTypes[ix].equals(UriInfo.class)) {
-                    methodToCallParams.add(this.uriInfo);
-                } else if (parameterTypes[ix].equals(HttpServletRequest.class)) {
-                    methodToCallParams.add(this.httpServletRequest);
-                } else if (parameterTypes[ix].equals(RexsterResourceContext.class)) {
-                    methodToCallParams.add(rexsterResourceContext);
-                } else if (parameterTypes[ix].equals(Edge.class)) {
-                    methodToCallParams.add(edgeContext);
-                } else if (parameterTypes[ix].equals(Vertex.class)) {
-                    methodToCallParams.add(vertexContext);
+            if (annotation != null) {
+                if (annotation[0] instanceof RexsterContext) {
+                    if (parameterTypes[ix].equals(Graph.class)) {
+                        methodToCallParams.add(rag.getGraph());
+                    } else if (parameterTypes[ix].equals(RexsterApplicationGraph.class)) {
+                        methodToCallParams.add(rag);
+                    } else if (parameterTypes[ix].equals(ExtensionMethod.class)) {
+                        methodToCallParams.add(methodToCall);
+                    } else if (parameterTypes[ix].equals(UriInfo.class)) {
+                        methodToCallParams.add(this.uriInfo);
+                    } else if (parameterTypes[ix].equals(HttpServletRequest.class)) {
+                        methodToCallParams.add(this.httpServletRequest);
+                    } else if (parameterTypes[ix].equals(RexsterResourceContext.class)) {
+                        methodToCallParams.add(rexsterResourceContext);
+                    } else if (parameterTypes[ix].equals(Edge.class)) {
+                        methodToCallParams.add(edgeContext);
+                    } else if (parameterTypes[ix].equals(Vertex.class)) {
+                        methodToCallParams.add(vertexContext);
+                    } else {
+                        // don't know what it is so just push a null
+                        methodToCallParams.add(null);
+                    }
+                } else if (annotation[0] instanceof ExtensionRequestParameter) {
+                    ExtensionRequestParameter extensionRequestParameter = (ExtensionRequestParameter) annotation[0];
+                    if (parameterTypes[ix].equals(String.class)) {
+                        methodToCallParams.add(this.getRequestObject().optString(extensionRequestParameter.name()));
+                    } else if (parameterTypes[ix].equals(Integer.class)) {
+                        if (this.getRequestObject().has(extensionRequestParameter.name())) {
+                            int intValue = this.getRequestObject().optInt(extensionRequestParameter.name());
+                            methodToCallParams.add(new Integer(intValue));
+                        } else {
+                            methodToCallParams.add(null);
+                        }
+                    } else if (parameterTypes[ix].equals(Float.class)) {
+                        if (this.getRequestObject().has(extensionRequestParameter.name())) {
+                            float floatValue = (float) this.getRequestObject().optDouble(extensionRequestParameter.name());
+                            methodToCallParams.add(new Float(floatValue));
+                        } else {
+                            methodToCallParams.add(null);
+                        }
+                    } else if (parameterTypes[ix].equals(Double.class)) {
+                        if (this.getRequestObject().has(extensionRequestParameter.name())) {
+                            double doubleValue = this.getRequestObject().optDouble(extensionRequestParameter.name());
+                            methodToCallParams.add(new Double(doubleValue));
+                        } else {
+                            methodToCallParams.add(null);
+                        }
+                    } else if (parameterTypes[ix].equals(Long.class)) {
+                        if (this.getRequestObject().has(extensionRequestParameter.name())) {
+                            long longValue = this.getRequestObject().optLong(extensionRequestParameter.name());
+                            methodToCallParams.add(new Long(longValue));
+                        } else {
+                            methodToCallParams.add(null);
+                        }
+                    } else if (parameterTypes[ix].equals(JSONObject.class)) {
+                        methodToCallParams.add(this.getRequestObject().optJSONObject(extensionRequestParameter.name()));
+                    }
+                    else {
+                        // don't know what it is so just push a null
+                        methodToCallParams.add(null);
+                    }
                 } else {
-                    // don't know what it is so just push a null
+                    // the parameter was not marked with an annotation rexster cares about.
                     methodToCallParams.add(null);
                 }
             } else {
-                // the parameter was not marked with rexstercontext.
+                // the parameter was not marked with any annotation
                 methodToCallParams.add(null);
             }
         }
