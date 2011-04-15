@@ -10,8 +10,6 @@ import java.util.Map;
  * Base class for extensions.
  */
 public abstract class AbstractRexsterExtension implements RexsterExtension {
-    protected static final String SCRIPT = "script";
-    protected static final String RETURN_KEYS = "return_keys";
 
     /**
      * By default this returns true.  Overriding classes should evaluate the configuration to determine

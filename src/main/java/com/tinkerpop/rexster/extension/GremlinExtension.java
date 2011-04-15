@@ -33,7 +33,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
     private static final String VERTEX_VARIABLE = "v";
     private static final String EDGE_VARIABLE = "e";
     private static final String WILDCARD = "*";
-
+    private static final String SCRIPT = "script";
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE)
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for an edge.",
@@ -41,7 +41,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
           @ExtensionApi(parameterName = Tokens.ALLOW_CACHED, description = "allow a previously cached result to be provided (default is true)"),
           @ExtensionApi(parameterName = Tokens.SHOW_TYPES, description = "displays the properties of the elements with their native data type (default is false)"),
           @ExtensionApi(parameterName = SCRIPT, description = "the Gremlin script to be evaluated"),
-          @ExtensionApi(parameterName = RETURN_KEYS, description = "the element property keys to return (default is to return all element properties)")
+          @ExtensionApi(parameterName = Tokens.RETURN_KEYS, description = "the element property keys to return (default is to return all element properties)")
       })
     public ExtensionResponse evaluateOnEdge(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                             @RexsterContext Graph graph,
@@ -55,7 +55,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
           @ExtensionApi(parameterName = Tokens.ALLOW_CACHED, description = "allow a previously cached result to be provided (default is true)"),
           @ExtensionApi(parameterName = Tokens.SHOW_TYPES, description = "displays the properties of the elements with their native data type (default is false)"),
           @ExtensionApi(parameterName = SCRIPT, description = "the Gremlin script to be evaluated"),
-          @ExtensionApi(parameterName = RETURN_KEYS, description = "the element property keys to return (default is to return all element properties)")
+          @ExtensionApi(parameterName = Tokens.RETURN_KEYS, description = "the element property keys to return (default is to return all element properties)")
       })
     public ExtensionResponse evaluateOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                               @RexsterContext Graph graph,
@@ -69,7 +69,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
           @ExtensionApi(parameterName = Tokens.ALLOW_CACHED, description = "allow a previously cached result to be provided (default is true)"),
           @ExtensionApi(parameterName = Tokens.SHOW_TYPES, description = "displays the properties of the elements with their native data type (default is false)"),
           @ExtensionApi(parameterName = SCRIPT, description = "the Gremlin script to be evaluated"),
-          @ExtensionApi(parameterName = RETURN_KEYS, description = "the element property keys to return (default is to return all element properties)")
+          @ExtensionApi(parameterName = Tokens.RETURN_KEYS, description = "the element property keys to return (default is to return all element properties)")
       })
     public ExtensionResponse evaluateOnGraph(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                              @RexsterContext Graph graph) {
@@ -151,8 +151,8 @@ public class GremlinExtension extends AbstractRexsterExtension {
 
     private List<String> getReturnKeys(JSONObject requestObject) {
         List<String> returnKeys = null;
-        if (requestObject.has(RETURN_KEYS)) {
-            JSONArray list = requestObject.optJSONArray(RETURN_KEYS);
+        if (requestObject.has(Tokens.RETURN_KEYS)) {
+            JSONArray list = requestObject.optJSONArray(Tokens.RETURN_KEYS);
             returnKeys = new ArrayList<String>();
 
             if (list != null) {
