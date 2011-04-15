@@ -291,6 +291,12 @@ public abstract class AbstractSubResource extends BaseResource {
                     methodToCallParams.add(rag.getGraph());
                 } else if (parameterTypes[ix].equals(RexsterApplicationGraph.class)) {
                     methodToCallParams.add(rag);
+                } else if (parameterTypes[ix].equals(ExtensionMethod.class)) {
+                    methodToCallParams.add(methodToCall);
+                } else if (parameterTypes[ix].equals(UriInfo.class)) {
+                    methodToCallParams.add(this.uriInfo);
+                } else if (parameterTypes[ix].equals(HttpServletRequest.class)) {
+                    methodToCallParams.add(this.httpServletRequest);
                 } else if (parameterTypes[ix].equals(RexsterResourceContext.class)) {
                     methodToCallParams.add(rexsterResourceContext);
                 } else if (parameterTypes[ix].equals(Edge.class)) {
