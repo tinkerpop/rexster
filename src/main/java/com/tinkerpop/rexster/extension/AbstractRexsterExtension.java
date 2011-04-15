@@ -14,7 +14,7 @@ public abstract class AbstractRexsterExtension implements RexsterExtension {
     protected static final String RETURN_KEYS = "return_keys";
 
     /**
-     * By default this reutrns true.  Overriding classes should evaluate the configuration to determine
+     * By default this returns true.  Overriding classes should evaluate the configuration to determine
      * if it is correct.
      */
     public boolean isConfigurationValid(ExtensionConfiguration extensionConfiguration) {
@@ -22,17 +22,22 @@ public abstract class AbstractRexsterExtension implements RexsterExtension {
     }
 
     protected JSONObject generateErrorJson() {
+        return this.generateErrorJson(null);
+    }
+
+    /**
+     * Generates a standard JSON object with error information.
+     *
+     * @param api Adds an API element to the error output.  If null the key will not be added.
+     */
+    protected JSONObject generateErrorJson(JSONObject api) {
         Map map = new HashMap();
         map.put(Tokens.SUCCESS, false);
 
-        JSONObject api = generateApiJson();
         if (api != null) {
-            map.put(Tokens.API, generateApiJson());
+            map.put(Tokens.API, api);
         }
 
         return new JSONObject(map);
     }
-
-    protected abstract JSONObject generateApiJson();
-
 }

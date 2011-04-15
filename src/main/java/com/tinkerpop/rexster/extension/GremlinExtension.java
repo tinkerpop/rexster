@@ -36,7 +36,13 @@ public class GremlinExtension extends AbstractRexsterExtension {
 
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE)
-    @ExtensionDescriptor("Gremlin extension for an edge.")
+    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for an edge.",
+      api = {
+          @ExtensionApi(parameterName = Tokens.ALLOW_CACHED, description = "allow a previously cached result to be provided (default is true)"),
+          @ExtensionApi(parameterName = Tokens.SHOW_TYPES, description = "displays the properties of the elements with their native data type (default is false)"),
+          @ExtensionApi(parameterName = SCRIPT, description = "the Gremlin script to be evaluated"),
+          @ExtensionApi(parameterName = RETURN_KEYS, description = "the element property keys to return (default is to return all element properties)")
+      })
     public ExtensionResponse evaluateOnEdge(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                             @RexsterContext Graph graph,
                                             @RexsterContext Edge edge) {
@@ -44,7 +50,13 @@ public class GremlinExtension extends AbstractRexsterExtension {
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX)
-    @ExtensionDescriptor("Gremlin extension for a vertex.")
+    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a vertex.",
+      api = {
+          @ExtensionApi(parameterName = Tokens.ALLOW_CACHED, description = "allow a previously cached result to be provided (default is true)"),
+          @ExtensionApi(parameterName = Tokens.SHOW_TYPES, description = "displays the properties of the elements with their native data type (default is false)"),
+          @ExtensionApi(parameterName = SCRIPT, description = "the Gremlin script to be evaluated"),
+          @ExtensionApi(parameterName = RETURN_KEYS, description = "the element property keys to return (default is to return all element properties)")
+      })
     public ExtensionResponse evaluateOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                               @RexsterContext Graph graph,
                                               @RexsterContext Vertex vertex) {
@@ -52,10 +64,15 @@ public class GremlinExtension extends AbstractRexsterExtension {
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor("Gremlin extension for a graph.")
+    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a graph.",
+      api = {
+          @ExtensionApi(parameterName = Tokens.ALLOW_CACHED, description = "allow a previously cached result to be provided (default is true)"),
+          @ExtensionApi(parameterName = Tokens.SHOW_TYPES, description = "displays the properties of the elements with their native data type (default is false)"),
+          @ExtensionApi(parameterName = SCRIPT, description = "the Gremlin script to be evaluated"),
+          @ExtensionApi(parameterName = RETURN_KEYS, description = "the element property keys to return (default is to return all element properties)")
+      })
     public ExtensionResponse evaluateOnGraph(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                              @RexsterContext Graph graph) {
-
         return tryExecuteGremlinScript(rexsterResourceContext, graph, null, null);
     }
 
@@ -75,6 +92,8 @@ public class GremlinExtension extends AbstractRexsterExtension {
 
         ResultObjectCache cache = rexsterResourceContext.getCache();
         JSONObject cachedResultObject = cache.getCachedResult(cacheRequestURI);
+
+        ExtensionMethod extensionMethod = rexsterResourceContext.getExtensionMethod();
 
         // if the request does not want cached or the result is not in the cache
         // then go ahead and traverse
@@ -108,11 +127,14 @@ public class GremlinExtension extends AbstractRexsterExtension {
                     this.cacheCurrentResultObjectState(rexsterResourceContext, cacheRequestURI, resultObject);
 
                 } else {
-                    extensionResponse = ExtensionResponse.error("no script provided", generateErrorJson());
+                    extensionResponse = ExtensionResponse.error(
+                            "no script provided",
+                            generateErrorJson(extensionMethod.getExtensionApiAsJson()));
                 }
 
             } catch (Exception e) {
-                extensionResponse = ExtensionResponse.error(e, generateErrorJson());
+                extensionResponse = ExtensionResponse.error(e,
+                        generateErrorJson(extensionMethod.getExtensionApiAsJson()));
             }
         } else {
             // return cached results
@@ -125,24 +147,6 @@ public class GremlinExtension extends AbstractRexsterExtension {
         }
 
         return extensionResponse;
-    }
-
-    protected JSONObject generateApiJson() {
-
-        Map<String, Object> api = new HashMap<String, Object>();
-
-        Map<String, Object> parameterMap = new HashMap<String, Object>();
-        parameterMap.put(Tokens.ALLOW_CACHED, "allow a previously cached result to be provided (default is true)");
-        parameterMap.put(Tokens.SHOW_TYPES, "displays the properties of the elements with their native data type (default is false)");
-        parameterMap.put(SCRIPT, "the Gremlin script to be evaluated");
-        parameterMap.put(RETURN_KEYS, "the element property keys to return (default is to return all element properties)");
-
-        JSONObject parameters = new JSONObject(parameterMap);
-
-        api.put(Tokens.DESCRIPTION, "evaluate an ad-hoc Gremlin script");
-        api.put(Tokens.PARAMETERS, parameters);
-
-        return new JSONObject(api);
     }
 
     private List<String> getReturnKeys(JSONObject requestObject) {

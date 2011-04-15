@@ -123,7 +123,7 @@ public abstract class AbstractSubResource extends BaseResource {
 
                         HashMap hypermediaLink = new HashMap();
                         hypermediaLink.put("href", href);
-                        hypermediaLink.put("title", descriptor.value());
+                        hypermediaLink.put("title", descriptor.description());
 
                         hypermediaLinks.put(new JSONObject(hypermediaLink));
                     }
@@ -229,6 +229,7 @@ public abstract class AbstractSubResource extends BaseResource {
             // looks for the first method that matches.  methods that multi-match will be ignored right now
             // todo: we probably need to add some kind of up-front validation of extensions.
             ExtensionDefinition extensionDefinition = method.getAnnotation(ExtensionDefinition.class);
+            ExtensionDescriptor extensionDescriptor = method.getAnnotation(ExtensionDescriptor.class);
 
             // checks if the extension point is graph, and if the method path matches the specified action on
             // the uri (if it exists) or if the method has no path.
@@ -236,12 +237,12 @@ public abstract class AbstractSubResource extends BaseResource {
 
                 if (extensionDefinition.path().isEmpty()) {
                     // try to use a root level method definition
-                    methodToCall = new ExtensionMethod(method, extensionDefinition);
+                    methodToCall = new ExtensionMethod(method, extensionDefinition, extensionDescriptor);
                     break;
                 } else if ((!extensionAction.equals("") && extensionDefinition.path().equals(extensionAction))
                     || (extensionAction.equals("") && extensionDefinition.path().equals(""))) {
                     // the extension path is valid so try to match on the action
-                    methodToCall = new ExtensionMethod(method, extensionDefinition);
+                    methodToCall = new ExtensionMethod(method, extensionDefinition, extensionDescriptor);
                     break;
                 }
             }
@@ -250,37 +251,40 @@ public abstract class AbstractSubResource extends BaseResource {
         return methodToCall;
     }
 
-    protected Object invokeExtension(String graphName, RexsterExtension rexsterExtension, Method methodToCall)
+    protected Object invokeExtension(String graphName, RexsterExtension rexsterExtension, ExtensionMethod methodToCall)
                 throws IllegalAccessException, InvocationTargetException {
         return this.invokeExtension(graphName, rexsterExtension, methodToCall, null, null);
     }
 
-    protected Object invokeExtension(String graphName, RexsterExtension rexsterExtension, Method methodToCall, Vertex vertexContext)
+    protected Object invokeExtension(String graphName, RexsterExtension rexsterExtension, ExtensionMethod methodToCall, Vertex vertexContext)
             throws IllegalAccessException, InvocationTargetException {
         return this.invokeExtension(graphName, rexsterExtension, methodToCall, null, vertexContext);
     }
 
-    protected Object invokeExtension(String graphName, RexsterExtension rexsterExtension, Method methodToCall, Edge edgeContext)
+    protected Object invokeExtension(String graphName, RexsterExtension rexsterExtension, ExtensionMethod methodToCall, Edge edgeContext)
             throws IllegalAccessException, InvocationTargetException {
         return this.invokeExtension(graphName, rexsterExtension, methodToCall, edgeContext, null);
     }
 
-    protected Object invokeExtension(String graphName, RexsterExtension rexsterExtension, Method methodToCall, Edge edgeContext, Vertex vertexContext)
+    protected Object invokeExtension(String graphName, RexsterExtension rexsterExtension, ExtensionMethod methodToCall, Edge edgeContext, Vertex vertexContext)
             throws IllegalAccessException, InvocationTargetException {
         RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+
+        Method method = methodToCall.getMethod();
 
         RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(
                 this.getRexsterApplicationGraph(graphName),
                 this.uriInfo,
                 this.httpServletRequest,
                 this.getRequestObject(),
-                this.getRexsterApplicationProvider().getResultObjectCache());
+                this.getRexsterApplicationProvider().getResultObjectCache(),
+                methodToCall);
 
-        Annotation[][] parametersAnnotations = methodToCall.getParameterAnnotations();
+        Annotation[][] parametersAnnotations = method.getParameterAnnotations();
         ArrayList methodToCallParams = new ArrayList();
         for (int ix = 0; ix < parametersAnnotations.length; ix++) {
             Annotation[] annotation = parametersAnnotations[ix];
-            Class[] parameterTypes = methodToCall.getParameterTypes();
+            Class[] parameterTypes = method.getParameterTypes();
 
             if (annotation[0] instanceof RexsterContext) {
                 if (parameterTypes[ix].equals(Graph.class)) {
@@ -303,7 +307,7 @@ public abstract class AbstractSubResource extends BaseResource {
             }
         }
 
-        return methodToCall.invoke(rexsterExtension, methodToCallParams.toArray());
+        return method.invoke(rexsterExtension, methodToCallParams.toArray());
     }
 
     /**

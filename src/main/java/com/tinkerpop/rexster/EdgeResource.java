@@ -158,7 +158,7 @@ public class EdgeResource extends AbstractSubResource {
                 }
 
                 // found the method...time to do work
-                returnValue = invokeExtension(graphName, rexsterExtension, methodToCall.getMethod(), edge);
+                returnValue = invokeExtension(graphName, rexsterExtension, methodToCall, edge);
 
             } catch (WebApplicationException wae){
                 // already logged this...just throw it  up.

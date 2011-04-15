@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.extension.ExtensionMethod;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,34 +16,40 @@ public class RexsterResourceContext {
     private HttpServletRequest request;
     private JSONObject requestObject;
     private ResultObjectCache cache;
+    private ExtensionMethod extensionMethod;
 
     public RexsterResourceContext(RexsterApplicationGraph rag, UriInfo uriInfo, HttpServletRequest request,
-                                  JSONObject requestObject, ResultObjectCache cache) {
+                                  JSONObject requestObject, ResultObjectCache cache, ExtensionMethod extensionMethod) {
         this.rag = rag;
         this.uriInfo = uriInfo;
         this.request = request;
         this.requestObject = requestObject;
         this.cache = cache;
+        this.extensionMethod = extensionMethod;
     }
 
     public JSONObject getRequestObject() {
-        return requestObject;
+        return this.requestObject;
     }
 
     public UriInfo getUriInfo() {
-        return uriInfo;
+        return this.uriInfo;
     }
 
     public HttpServletRequest getRequest() {
-        return request;
+        return this.request;
     }
 
     public RexsterApplicationGraph getRexsterApplicationGraph() {
-        return rag;
+        return this.rag;
     }
 
     public ResultObjectCache getCache() {
-        return cache;
+        return this.cache;
+    }
+
+    public ExtensionMethod getExtensionMethod() {
+        return this.extensionMethod;
     }
 
 }

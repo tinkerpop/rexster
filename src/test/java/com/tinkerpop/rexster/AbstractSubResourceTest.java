@@ -375,7 +375,7 @@ public class AbstractSubResourceTest {
             will(returnValue(false));
         }});
 
-        ExtensionMethod extensionMethod = new ExtensionMethod(null, extensionDefinition);
+        ExtensionMethod extensionMethod = new ExtensionMethod(null, extensionDefinition, null);
         ExtensionResponse extResponse = this.mockResource.tryAppendRexsterAttributesIfJsonExposed(
                 responseFromExtension, extensionMethod, MediaType.APPLICATION_JSON);
 
@@ -393,7 +393,7 @@ public class AbstractSubResourceTest {
             will(returnValue(true));
         }});
 
-        ExtensionMethod extensionMethod = new ExtensionMethod(null, extensionDefinition);
+        ExtensionMethod extensionMethod = new ExtensionMethod(null, extensionDefinition, null);
         ExtensionResponse extResponse = this.mockResource.tryAppendRexsterAttributesIfJsonExposed(
                 responseFromExtension, extensionMethod, MediaType.APPLICATION_JSON);
 
@@ -415,7 +415,7 @@ public class AbstractSubResourceTest {
             will(returnValue(true));
         }});
 
-        ExtensionMethod extensionMethod = new ExtensionMethod(null, extensionDefinition);
+        ExtensionMethod extensionMethod = new ExtensionMethod(null, extensionDefinition, null);
         ExtensionResponse extResponse = this.mockResource.tryAppendRexsterAttributesIfJsonExposed(
                 responseFromExtension, extensionMethod, MediaType.APPLICATION_JSON);
 

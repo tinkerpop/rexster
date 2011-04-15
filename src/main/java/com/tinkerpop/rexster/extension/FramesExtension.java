@@ -31,7 +31,7 @@ public class FramesExtension extends AbstractRexsterExtension {
     public static final String EXTENSION_NAMESPACE = "tp";
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX)
-    @ExtensionDescriptor("Frames extension for a vertex.")
+    @ExtensionDescriptor(description = "Frames extension for a vertex.")
     public ExtensionResponse doFramesWorkOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                                    @RexsterContext Graph graph,
                                                    @RexsterContext Vertex vertex){
@@ -106,9 +106,5 @@ public class FramesExtension extends AbstractRexsterExtension {
         }
 
         return valid;
-    }
-
-    protected JSONObject generateApiJson() {
-        return null;
     }
 }

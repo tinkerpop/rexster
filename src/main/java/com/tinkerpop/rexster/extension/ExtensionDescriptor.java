@@ -8,5 +8,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface ExtensionDescriptor {
-    String value();
+    String description();
+    ExtensionApi[] api() default {};
 }

@@ -122,7 +122,7 @@ public class GraphResource extends AbstractSubResource {
                 }
 
                 // found the method...time to do work
-                returnValue = invokeExtension(graphName, rexsterExtension, methodToCall.getMethod());
+                returnValue = invokeExtension(graphName, rexsterExtension, methodToCall);
 
             } catch (WebApplicationException wae){
                 // already logged this...just throw it  up.
