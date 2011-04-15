@@ -340,7 +340,14 @@ public abstract class AbstractSubResource extends BaseResource {
                         } else {
                             methodToCallParams.add(null);
                         }
-                    } else if (parameterTypes[ix].equals(JSONObject.class)) {
+                    } else if (parameterTypes[ix].equals(Boolean.class)) {
+                        if (this.getRequestObject().has(extensionRequestParameter.name())) {
+                            boolean booleanValue = this.getRequestObject().optBoolean(extensionRequestParameter.name());
+                            methodToCallParams.add(new Boolean(booleanValue));
+                        } else {
+                            methodToCallParams.add(null);
+                        }
+                    }else if (parameterTypes[ix].equals(JSONObject.class)) {
                         methodToCallParams.add(this.getRequestObject().optJSONObject(extensionRequestParameter.name()));
                     }
                     else {
