@@ -347,8 +347,10 @@ public abstract class AbstractSubResource extends BaseResource {
                         } else {
                             methodToCallParams.add(null);
                         }
-                    }else if (parameterTypes[ix].equals(JSONObject.class)) {
+                    } else if (parameterTypes[ix].equals(JSONObject.class)) {
                         methodToCallParams.add(this.getRequestObject().optJSONObject(extensionRequestParameter.name()));
+                    } else if (parameterTypes[ix].equals(JSONArray.class)) {
+                        methodToCallParams.add(this.getRequestObject().optJSONArray(extensionRequestParameter.name()));
                     }
                     else {
                         // don't know what it is so just push a null
