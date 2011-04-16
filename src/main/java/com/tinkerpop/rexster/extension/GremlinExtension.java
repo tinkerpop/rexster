@@ -35,13 +35,18 @@ public class GremlinExtension extends AbstractRexsterExtension {
     private static final String WILDCARD = "*";
     private static final String SCRIPT = "script";
 
+    private static final String API_ALLOW_CACHED = "allow a previously cached result to be provided (default is true)";
+    private static final String API_SHOW_TYPES = "displays the properties of the elements with their native data type (default is false)";
+    private static final String API_SCRIPT = "the Gremlin script to be evaluated";
+    private static final String API_RETURN_KEYS = "the element property keys to return (default is to return all element properties)";
+
     @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE)
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for an edge.",
       api = {
-          @ExtensionApi(parameterName = Tokens.ALLOW_CACHED, description = "allow a previously cached result to be provided (default is true)"),
-          @ExtensionApi(parameterName = Tokens.SHOW_TYPES, description = "displays the properties of the elements with their native data type (default is false)"),
-          @ExtensionApi(parameterName = SCRIPT, description = "the Gremlin script to be evaluated"),
-          @ExtensionApi(parameterName = Tokens.RETURN_KEYS, description = "the element property keys to return (default is to return all element properties)")
+          @ExtensionApi(parameterName = Tokens.ALLOW_CACHED, description = API_ALLOW_CACHED),
+          @ExtensionApi(parameterName = Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
+          @ExtensionApi(parameterName = SCRIPT, description = API_SCRIPT),
+          @ExtensionApi(parameterName = Tokens.RETURN_KEYS, description = API_RETURN_KEYS)
       })
     public ExtensionResponse evaluateOnEdge(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                             @RexsterContext Graph graph,
@@ -52,10 +57,10 @@ public class GremlinExtension extends AbstractRexsterExtension {
     @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX)
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a vertex.",
       api = {
-          @ExtensionApi(parameterName = Tokens.ALLOW_CACHED, description = "allow a previously cached result to be provided (default is true)"),
-          @ExtensionApi(parameterName = Tokens.SHOW_TYPES, description = "displays the properties of the elements with their native data type (default is false)"),
-          @ExtensionApi(parameterName = SCRIPT, description = "the Gremlin script to be evaluated"),
-          @ExtensionApi(parameterName = Tokens.RETURN_KEYS, description = "the element property keys to return (default is to return all element properties)")
+          @ExtensionApi(parameterName = Tokens.ALLOW_CACHED, description = API_ALLOW_CACHED),
+          @ExtensionApi(parameterName = Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
+          @ExtensionApi(parameterName = SCRIPT, description = API_SCRIPT),
+          @ExtensionApi(parameterName = Tokens.RETURN_KEYS, description = API_RETURN_KEYS)
       })
     public ExtensionResponse evaluateOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                               @RexsterContext Graph graph,
@@ -66,10 +71,10 @@ public class GremlinExtension extends AbstractRexsterExtension {
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a graph.",
       api = {
-          @ExtensionApi(parameterName = Tokens.ALLOW_CACHED, description = "allow a previously cached result to be provided (default is true)"),
-          @ExtensionApi(parameterName = Tokens.SHOW_TYPES, description = "displays the properties of the elements with their native data type (default is false)"),
-          @ExtensionApi(parameterName = SCRIPT, description = "the Gremlin script to be evaluated"),
-          @ExtensionApi(parameterName = Tokens.RETURN_KEYS, description = "the element property keys to return (default is to return all element properties)")
+          @ExtensionApi(parameterName = Tokens.ALLOW_CACHED, description = API_ALLOW_CACHED),
+          @ExtensionApi(parameterName = Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
+          @ExtensionApi(parameterName = SCRIPT, description = API_SCRIPT),
+          @ExtensionApi(parameterName = Tokens.RETURN_KEYS, description = API_RETURN_KEYS)
       })
     public ExtensionResponse evaluateOnGraph(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                              @RexsterContext Graph graph) {
