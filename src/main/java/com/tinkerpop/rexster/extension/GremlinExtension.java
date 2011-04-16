@@ -41,59 +41,59 @@ public class GremlinExtension extends AbstractRexsterExtension {
     private static final String API_RETURN_KEYS = "the element property keys to return (default is to return all element properties)";
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE)
-    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for an edge.",
-      api = {
-          @ExtensionApi(parameterName = Tokens.ALLOW_CACHED, description = API_ALLOW_CACHED),
-          @ExtensionApi(parameterName = Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
-          @ExtensionApi(parameterName = SCRIPT, description = API_SCRIPT),
-          @ExtensionApi(parameterName = Tokens.RETURN_KEYS, description = API_RETURN_KEYS)
-      })
+    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for an edge.")
     public ExtensionResponse evaluateOnEdge(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                             @RexsterContext Graph graph,
-                                            @RexsterContext Edge edge) {
-        return tryExecuteGremlinScript(rexsterResourceContext, graph, null, edge);
+                                            @RexsterContext Edge edge,
+                                            @ExtensionRequestParameter(name = Tokens.ALLOW_CACHED, description = API_ALLOW_CACHED) Boolean allowCachedParam,
+                                            @ExtensionRequestParameter(name = Tokens.SHOW_TYPES, description = API_SHOW_TYPES) Boolean showTypesParam,
+                                            @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script,
+                                            @ExtensionRequestParameter(name = Tokens.RETURN_KEYS, description = API_RETURN_KEYS) JSONArray returnKeysParam) {
+        return tryExecuteGremlinScript(rexsterResourceContext, graph, null, edge, allowCachedParam, showTypesParam, script, returnKeysParam);
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX)
-    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a vertex.",
-      api = {
-          @ExtensionApi(parameterName = Tokens.ALLOW_CACHED, description = API_ALLOW_CACHED),
-          @ExtensionApi(parameterName = Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
-          @ExtensionApi(parameterName = SCRIPT, description = API_SCRIPT),
-          @ExtensionApi(parameterName = Tokens.RETURN_KEYS, description = API_RETURN_KEYS)
-      })
+    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a vertex.")
     public ExtensionResponse evaluateOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                               @RexsterContext Graph graph,
-                                              @RexsterContext Vertex vertex) {
-        return tryExecuteGremlinScript(rexsterResourceContext, graph, vertex, null);
+                                              @RexsterContext Vertex vertex,
+                                              @ExtensionRequestParameter(name = Tokens.ALLOW_CACHED, description = API_ALLOW_CACHED) Boolean allowCachedParam,
+                                              @ExtensionRequestParameter(name = Tokens.SHOW_TYPES, description = API_SHOW_TYPES) Boolean showTypesParam,
+                                              @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script,
+                                              @ExtensionRequestParameter(name = Tokens.RETURN_KEYS, description = API_RETURN_KEYS) JSONArray returnKeysParam) {
+        return tryExecuteGremlinScript(rexsterResourceContext, graph, vertex, null, allowCachedParam, showTypesParam, script, returnKeysParam);
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a graph.",
-      api = {
-          @ExtensionApi(parameterName = Tokens.ALLOW_CACHED, description = API_ALLOW_CACHED),
-          @ExtensionApi(parameterName = Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
-          @ExtensionApi(parameterName = SCRIPT, description = API_SCRIPT),
-          @ExtensionApi(parameterName = Tokens.RETURN_KEYS, description = API_RETURN_KEYS)
-      })
+    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a graph.")
     public ExtensionResponse evaluateOnGraph(@RexsterContext RexsterResourceContext rexsterResourceContext,
-                                             @RexsterContext Graph graph) {
-        return tryExecuteGremlinScript(rexsterResourceContext, graph, null, null);
+                                             @RexsterContext Graph graph,
+                                             @ExtensionRequestParameter(name = Tokens.ALLOW_CACHED, description = API_ALLOW_CACHED) Boolean allowCachedParam,
+                                             @ExtensionRequestParameter(name = Tokens.SHOW_TYPES, description = API_SHOW_TYPES) Boolean showTypesParam,
+                                             @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script,
+                                             @ExtensionRequestParameter(name = Tokens.RETURN_KEYS, description = API_RETURN_KEYS) JSONArray returnKeysParam) {
+        return tryExecuteGremlinScript(rexsterResourceContext, graph, null, null, allowCachedParam, showTypesParam, script, returnKeysParam);
     }
 
-    private ExtensionResponse tryExecuteGremlinScript(RexsterResourceContext rexsterResourceContext, Graph graph, Vertex vertex, Edge edge) {
+    private ExtensionResponse tryExecuteGremlinScript(RexsterResourceContext rexsterResourceContext,
+                                                      Graph graph, Vertex vertex, Edge edge,
+                                                      Boolean allowCachedParam,
+                                                      Boolean showTypesParam,
+                                                      String script,
+                                                      JSONArray returnKeysParam) {
         ExtensionResponse extensionResponse;
         String cacheRequestURI = this.createCacheRequestURI(rexsterResourceContext);
-        boolean allowCached = rexsterResourceContext.getRequestObject().optBoolean(Tokens.ALLOW_CACHED, true);
-        boolean showTypes = rexsterResourceContext.getRequestObject().optBoolean(Tokens.SHOW_TYPES, false);
+
+        boolean allowCached = allowCachedParam != null ? allowCachedParam.booleanValue() : true;
+        boolean showTypes = showTypesParam != null ? showTypesParam.booleanValue() : false;
+
         Bindings bindings = new SimpleBindings();
         bindings.put(GRAPH_VARIABLE, graph);
         bindings.put(VERTEX_VARIABLE, vertex);
         bindings.put(EDGE_VARIABLE, edge);
-        JSONObject requestObject = rexsterResourceContext.getRequestObject();
 
         // read the return keys from the request object
-        List<String> returnKeys = getReturnKeys(requestObject);
+        List<String> returnKeys = this.parseReturnKeys(returnKeysParam);
 
         ResultObjectCache cache = rexsterResourceContext.getCache();
         JSONObject cachedResultObject = cache.getCachedResult(cacheRequestURI);
@@ -104,8 +104,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
         // then go ahead and traverse
         if (!allowCached || cachedResultObject == null) {
             try {
-                if (requestObject.has(SCRIPT)) {
-                    String script = requestObject.opt(SCRIPT).toString();
+                if (script !=  null && !script.isEmpty()) {
 
                     JSONArray results = new JSONArray();
                     Object result = engine.eval(script, bindings);
@@ -154,15 +153,14 @@ public class GremlinExtension extends AbstractRexsterExtension {
         return extensionResponse;
     }
 
-    private List<String> getReturnKeys(JSONObject requestObject) {
+    private List<String> parseReturnKeys(JSONArray returnKeysJson) {
         List<String> returnKeys = null;
-        if (requestObject.has(Tokens.RETURN_KEYS)) {
-            JSONArray list = requestObject.optJSONArray(Tokens.RETURN_KEYS);
+        if (returnKeysJson != null) {
             returnKeys = new ArrayList<String>();
 
-            if (list != null) {
-                for (int ix = 0; ix < list.length(); ix++) {
-                    returnKeys.add(list.optString(ix));
+            if (returnKeysJson != null) {
+                for (int ix = 0; ix < returnKeysJson.length(); ix++) {
+                    returnKeys.add(returnKeysJson.optString(ix));
                 }
             } else {
                 returnKeys = null;
@@ -173,6 +171,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
                 returnKeys = null;
             }
         }
+
         return returnKeys;
     }
 
