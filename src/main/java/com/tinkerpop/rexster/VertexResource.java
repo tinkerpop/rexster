@@ -120,14 +120,14 @@ public class VertexResource extends AbstractSubResource {
     @POST
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response getVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
-        return this.getGraphExtension(graphName, id);
+        return this.getVertexExtension(graphName, id);
     }
 
     @GET
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
-    public Response getGraphExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response getVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
         Vertex vertex = this.getRexsterApplicationGraph(graphName).getGraph().getVertex(id);
 

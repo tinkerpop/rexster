@@ -110,14 +110,14 @@ public class EdgeResource extends AbstractSubResource {
     @POST
     @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response getEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
-        return this.getGraphExtension(graphName, id);
+        return this.getEdgeExtension(graphName, id);
     }
 
     @GET
     @Path("/{id}/{extension: .+}")
-    public Response getGraphExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response getEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
         final Edge edge = this.getRexsterApplicationGraph(graphName).getGraph().getEdge(id);
 

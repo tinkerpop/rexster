@@ -77,7 +77,7 @@ public class RexsterApplicationGraph {
                 if (!namespace.isEmpty() && !name.isEmpty() && extensionConfig != null) {
                     this.extensionConfigurations.add(new ExtensionConfiguration(namespace, name, extensionConfig));
                 } else {
-                    logger.warn("Extension [" + namespace + ":" + name + "] does not have a valid configuration.  Please check rexster.xml");
+                    logger.warn("Graph [" + graphName + "] - Extension [" + namespace + ":" + name + "] does not have a valid configuration.  Please check rexster.xml");
                 }
             }
         }
@@ -95,8 +95,10 @@ public class RexsterApplicationGraph {
 
                 try {
                     this.getExtensionAllowables().add(new ExtensionAllowed(namespace));
+
+                    logger.info("Graph [" + graphName + "] - configured with allowable namespace [" + namespace + "]");
                 } catch (IllegalArgumentException iae) {
-                    logger.warn("Extension defined with an invalid namespace: " + namespace
+                    logger.warn("Graph [" + graphName + "] - Extension defined with an invalid namespace: " + namespace
                         + ".  It will not be configured.", iae);
                 }
             }
