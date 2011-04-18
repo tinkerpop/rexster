@@ -1,0 +1,1 @@
+Place all extension jars in this directory and they will be loaded when ReXster is started.

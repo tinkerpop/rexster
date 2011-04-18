@@ -19,6 +19,10 @@
             <directory>target/*.jar</directory>
             <outputDirectory>/lib</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>src/main/ext</directory>
+            <outputDirectory>/ext</outputDirectory>
+        </fileSet>
         <!-- PUBLIC -->
         <fileSet>
             <directory>target/classes/public</directory>

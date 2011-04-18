@@ -2,9 +2,10 @@ package com.tinkerpop.rexster.util;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.rexster.ElementJSONObject;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -34,11 +35,23 @@ public class ElementJSONHelper {
         };
     }
 
-    public static Map<ElementJSONObject, Object> convertMap(final Map<Element, Object> map, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
-        final Map<ElementJSONObject, Object> retMap = new HashMap<ElementJSONObject, Object>();
+    /**
+     * Flattens a Map into an array of entries where the element JSON object has its map value as an key/value in the JSON object.
+     *
+     * @param map          the map to flatten
+     * @param valueKey     tbe key for the elements value
+     * @param propertyKeys the property keys to return for the element
+     * @param showTypes    whether to show the data types of the JSON object entries
+     * @return a JSON array of the the flattened map
+     * @throws JSONException if an exception happens during JSON generation
+     */
+    public static JSONArray convertMap(final Map<Element, Object> map, final String valueKey, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
+        final JSONArray retArray = new JSONArray();
         for (final Map.Entry<Element, Object> entry : map.entrySet()) {
-            retMap.put(new ElementJSONObject(entry.getKey(), propertyKeys, showTypes), entry.getValue());
+            final JSONObject object = new ElementJSONObject(entry.getKey(), propertyKeys, showTypes);
+            object.put(valueKey, entry.getValue());
+            retArray.put(object);
         }
-        return retMap;
+        return retArray;
     }
 }
