@@ -58,7 +58,7 @@ public class RexsterResourceTest {
         Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
         Assert.assertTrue(json.has("name"));
         Assert.assertTrue(json.has("graphs"));
-        Assert.assertTrue(json.has("up_time"));
+        Assert.assertTrue(json.has(Tokens.UP_TIME));
         Assert.assertNotNull(json.optJSONArray("graphs"));
 
         JSONArray jsonArray = json.optJSONArray("graphs");
@@ -95,7 +95,7 @@ public class RexsterResourceTest {
         Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
         Assert.assertTrue(json.has("name"));
         Assert.assertTrue(json.has("graphs"));
-        Assert.assertTrue(json.has("up_time"));
+        Assert.assertTrue(json.has(Tokens.UP_TIME));
         Assert.assertNotNull(json.optJSONArray("graphs"));
 
         JSONArray jsonArray = json.optJSONArray("graphs");

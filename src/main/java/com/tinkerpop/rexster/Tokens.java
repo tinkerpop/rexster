@@ -35,6 +35,8 @@ public class Tokens {
     public static final String SUCCESS = "success";
     public static final String ALLOW_CACHED = "allowCached";
     public static final String SHOW_TYPES = "showTypes";
+    public static final String UP_TIME = "upTime";
+    public static final String READ_ONLY = "readOnly";
     public static final String OFFSET_END = "offset.end";
     public static final String OFFSET_START = "offset.start";
     public static final String WILDCARD = "*";

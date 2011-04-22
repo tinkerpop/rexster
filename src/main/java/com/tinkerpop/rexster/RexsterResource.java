@@ -40,7 +40,7 @@ public class RexsterResource extends BaseResource {
             this.resultObject.put("name", "Rexster: A RESTful Graph Shell");
             this.resultObject.put("graphs", jsonArrayNames);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-            this.resultObject.put("up_time", this.getTimeAlive());
+            this.resultObject.put(Tokens.UP_TIME, this.getTimeAlive());
             return this.addHeaders(Response.ok(this.resultObject)).build();
 
         } catch (JSONException ex) {

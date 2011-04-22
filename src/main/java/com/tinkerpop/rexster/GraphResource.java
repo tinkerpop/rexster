@@ -53,10 +53,10 @@ public class GraphResource extends AbstractSubResource {
             	isReadOnly = true;
             }
             
-            this.resultObject.put("read_only", isReadOnly);
+            this.resultObject.put(Tokens.READ_ONLY, isReadOnly);
             this.resultObject.put("type", graphType);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-            this.resultObject.put("up_time", this.getTimeAlive());
+            this.resultObject.put(Tokens.UP_TIME, this.getTimeAlive());
             this.resultObject.put("version", RexsterApplication.getVersion());
 
             JSONArray extensionsList = getExtensionHypermedia(graphName, ExtensionPoint.GRAPH);
