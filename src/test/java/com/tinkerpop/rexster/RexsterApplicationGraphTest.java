@@ -1,7 +1,11 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.extension.ExtensionConfiguration;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
@@ -10,8 +14,10 @@ import org.junit.Test;
 
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class RexsterApplicationGraphTest {
     private Mockery mockery = new JUnit4Mockery();
@@ -103,5 +109,37 @@ public class RexsterApplicationGraphTest {
         }});
 
         Assert.assertFalse(rag.isExtensionAllowed(new ExtensionSegmentSet(uri, ExtensionPoint.GRAPH)));
+    }
+
+    @Test
+    public void loadExtensionsConfigurations() {
+
+        String xmlString = "<extension><namespace>tp</namespace><name>extensionname</name><configuration><test>1</test></configuration></extension>";
+
+        XMLConfiguration xmlConfig = new XMLConfiguration();
+
+        try {
+            xmlConfig.load(new StringReader(xmlString));
+        } catch (ConfigurationException ex) {
+            Assert.fail(ex.getMessage());
+        }
+
+        List<HierarchicalConfiguration> list = new ArrayList<HierarchicalConfiguration>();
+        list.add(xmlConfig);
+
+        RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", null);
+        rag.loadExtensionsConfigurations(list);
+
+        ExtensionConfiguration extConfig = rag.findExtensionConfiguration("tp", "extensionname");
+        Assert.assertNotNull(extConfig);
+        Assert.assertEquals("extensionname", extConfig.getExtensionName());
+        Assert.assertEquals("tp", extConfig.getNamespace());
+
+        Assert.assertNotNull(extConfig.getConfiguration());
+
+        Map map = extConfig.tryGetMapFromConfiguration();
+        Assert.assertNotNull(map);
+        Assert.assertTrue(map.containsKey("test"));
+        Assert.assertEquals("1", map.get("test"));
     }
 }
