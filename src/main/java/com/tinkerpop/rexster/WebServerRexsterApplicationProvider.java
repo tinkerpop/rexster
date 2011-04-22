@@ -51,10 +51,6 @@ public class WebServerRexsterApplicationProvider implements RexsterApplicationPr
         return this.getRexsterApplication().getApplicationGraph(graphName);
     }
 
-    public ResultObjectCache getResultObjectCache() {
-        return this.getRexsterApplication().getResultObjectCache();
-    }
-
     public Set<String> getGraphsNames() {
         return this.getRexsterApplication().getGraphsNames();
     }

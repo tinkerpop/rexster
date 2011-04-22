@@ -498,11 +498,6 @@ public class BaseResourceTest {
             return null;
         }
 
-        public ResultObjectCache getResultObjectCache() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
         public Set<String> getGraphsNames() {
             // TODO Auto-generated method stub
             return null;

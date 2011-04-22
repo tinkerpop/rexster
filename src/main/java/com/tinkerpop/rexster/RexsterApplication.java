@@ -22,7 +22,6 @@ public class RexsterApplication {
 
     private static final String version = Tokens.REXSTER_VERSION;
     private final long startTime = System.currentTimeMillis();
-    private ResultObjectCache resultObjectCache;
 
     private Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
 
@@ -31,21 +30,15 @@ public class RexsterApplication {
     }
 
     public RexsterApplication(final String graphName, final Graph graph) {
-        this(graphName, graph, new MapResultObjectCache());
-    }
-
-    public RexsterApplication(final String graphName, final Graph graph, final ResultObjectCache cache) {
         RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph);
         this.graphs.put(graphName, rag);
         logger.info("Graph " + rag.getGraph() + " loaded");
-        this.resultObjectCache = cache;
     }
 
     public RexsterApplication(final XMLConfiguration properties) {
 
         // get the graph configurations from the XML config file
         List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
-        int cacheMaxSize = properties.getInt(Tokens.REXSTER_CACHE_MAXSIZE_PATH, MapResultObjectCache.maxSize);
 
         try {
             GraphConfigurationContainer container = new GraphConfigurationContainer(graphConfigs);
@@ -53,10 +46,6 @@ public class RexsterApplication {
         } catch (GraphConfigurationException gce) {
             logger.error("Graph initialization failed. Check the graph configuration in rexster.xml.");
         }
-
-        Properties cacheProperties = new Properties();
-        cacheProperties.put(Tokens.REXSTER_CACHE_MAXSIZE_PATH, cacheMaxSize);
-        this.resultObjectCache = new MapResultObjectCache(cacheProperties);
 
     }
 
@@ -74,10 +63,6 @@ public class RexsterApplication {
 
     public Set<String> getGraphsNames() {
         return this.graphs.keySet();
-    }
-
-    public ResultObjectCache getResultObjectCache() {
-        return this.resultObjectCache;
     }
 
     public long getStartTime() {

@@ -277,7 +277,6 @@ public abstract class AbstractSubResource extends BaseResource {
                 this.uriInfo,
                 this.httpServletRequest,
                 this.getRequestObject(),
-                this.getRexsterApplicationProvider().getResultObjectCache(),
                 methodToCall);
 
         Annotation[][] parametersAnnotations = method.getParameterAnnotations();
@@ -304,8 +303,6 @@ public abstract class AbstractSubResource extends BaseResource {
                         methodToCallParams.add(edgeContext);
                     } else if (parameterTypes[ix].equals(Vertex.class)) {
                         methodToCallParams.add(vertexContext);
-                    } else if (parameterTypes[ix].equals(ResultObjectCache.class)) {
-                        methodToCallParams.add(this.getRexsterApplicationProvider().getResultObjectCache());
                     } else {
                         // don't know what it is so just push a null
                         methodToCallParams.add(null);

@@ -27,13 +27,11 @@ public class Tokens {
     public static final String REXSTER_GRAPH_READ_ONLY = "graph-read-only";
     public static final String REXSTER_GRAPH_ENABLED = "graph-enabled";
     public static final String REXSTER_GRAPH_PROPERTIES = "properties";
-    public static final String REXSTER_CACHE_MAXSIZE_PATH = "cache-maxsize";
 
     public static final String DESCRIPTION = "description";
     public static final String PARAMETERS = "parameters";
     public static final String API = "api";
     public static final String SUCCESS = "success";
-    public static final String ALLOW_CACHED = "allowCached";
     public static final String SHOW_TYPES = "showTypes";
     public static final String UP_TIME = "upTime";
     public static final String READ_ONLY = "readOnly";

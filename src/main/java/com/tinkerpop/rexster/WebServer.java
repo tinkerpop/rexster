@@ -246,11 +246,6 @@ public class WebServer {
 										       .hasArg()
 										       .withDescription("override port used for adminserver-port in rexster.xml")
 										       .create("adminserverport");
-
-		Option cacheMaxSize  = OptionBuilder.withArgName("max-size")
-									        .hasArg()
-	 								        .withDescription("override cache-maxsize in rexster.xml")
-	 								        .create("cachemaxsize");
 		
 		Option webRoot  = OptionBuilder.withArgName("path")
 								       .hasArg()
@@ -262,7 +257,6 @@ public class WebServer {
 		options.addOption(rexsterFile);
 		options.addOption(webServerPort);
 		options.addOption(adminServerPort);
-		options.addOption(cacheMaxSize);
 		options.addOption(webRoot);
 		
 		return options;
@@ -326,11 +320,6 @@ public class WebServer {
         // overrides adminserver-port from command line
         if (line.hasOption("adminserverport")) {
         	properties.setProperty("adminserver-port", line.getOptionValue("adminserverport"));
-        }
-        
-        // overrides cache-maxsize from command line
-        if (line.hasOption("cachemaxsize")) {
-        	properties.setProperty("cache-maxsize", line.getOptionValue("cachemaxsize"));
         }
         
         // overrides web-root from command line	

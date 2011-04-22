@@ -15,16 +15,14 @@ public class RexsterResourceContext {
     private UriInfo uriInfo;
     private HttpServletRequest request;
     private JSONObject requestObject;
-    private ResultObjectCache cache;
     private ExtensionMethod extensionMethod;
 
     public RexsterResourceContext(RexsterApplicationGraph rag, UriInfo uriInfo, HttpServletRequest request,
-                                  JSONObject requestObject, ResultObjectCache cache, ExtensionMethod extensionMethod) {
+                                  JSONObject requestObject, ExtensionMethod extensionMethod) {
         this.rag = rag;
         this.uriInfo = uriInfo;
         this.request = request;
         this.requestObject = requestObject;
-        this.cache = cache;
         this.extensionMethod = extensionMethod;
     }
 
@@ -42,10 +40,6 @@ public class RexsterResourceContext {
 
     public RexsterApplicationGraph getRexsterApplicationGraph() {
         return this.rag;
-    }
-
-    public ResultObjectCache getCache() {
-        return this.cache;
     }
 
     public ExtensionMethod getExtensionMethod() {

@@ -17,8 +17,6 @@ public interface RexsterApplicationProvider {
 
     RexsterApplicationGraph getApplicationGraph(String graphName);
 
-    ResultObjectCache getResultObjectCache();
-
     Set<String> getGraphsNames();
 
     long getStartTime();

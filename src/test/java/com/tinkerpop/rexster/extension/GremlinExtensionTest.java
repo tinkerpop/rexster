@@ -3,7 +3,6 @@ package com.tinkerpop.rexster.extension;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
-import com.tinkerpop.rexster.ResultObjectCache;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
 import org.codehaus.jettison.json.JSONArray;
@@ -32,7 +31,6 @@ public class GremlinExtensionTest {
     private HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
     private UriInfo uriInfo = this.mockery.mock(UriInfo.class);
     private URI uri = URI.create("http://localhost:8182");
-    private ResultObjectCache cache = this.mockery.mock(ResultObjectCache.class);
 
     /**
      * a null constructed extension method creates no API documentation on error
@@ -40,7 +38,7 @@ public class GremlinExtensionTest {
     private ExtensionMethod extensionMethodNoApi = new ExtensionMethod(null, null, null);
 
     private RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(null, uriInfo,
-                httpServletRequest, null, cache, extensionMethodNoApi);
+                httpServletRequest, null, extensionMethodNoApi);
 
     /**
      * Choosing not to mock Graph instance for these tests as GremlinScriptEngine is
@@ -86,29 +84,13 @@ public class GremlinExtensionTest {
     @Before
     public void beforeEachTest() {
         this.gremlinExtension = new GremlinExtension();
-
-        this.mockery.checking(new Expectations() {{
-
-            // called in createCacheRequestURI
-            allowing(httpServletRequest).getParameterMap();
-            will(returnValue(new HashMap<String, String>()));
-            allowing(uriInfo).getBaseUri();
-            will(returnValue(uri));
-
-            // the cache returns null
-            allowing(cache).getCachedResult(with(any(String.class)));
-            will(returnValue(null));
-
-            // the cache will take any json with any key
-            allowing(cache).putCachedResult(with(any(String.class)), with(any(JSONObject.class)));
-        }});
     }
 
     @Test
     public void evaluateOnGraphNoScript() {
 
         ExtensionResponse extensionResponse = this.gremlinExtension.evaluateOnGraph(
-                rexsterResourceContext, graph, false, false, "", null);
+                rexsterResourceContext, graph, false, "", null);
 
         JSONObject jsonResponse = assertResponseAndGetEntity(extensionResponse,
                 true,
@@ -120,9 +102,9 @@ public class GremlinExtensionTest {
     }
 
     @Test
-    public void evaluateOnGraphNoCacheNoKeysNoTypesReturnVertex() {
+    public void evaluateOnGraphNoKeysNoTypesReturnVertex() {
         ExtensionResponse extensionResponse = this.gremlinExtension.evaluateOnGraph(
-                rexsterResourceContext, graph, false, false, "g.v(1)", null);
+                rexsterResourceContext, graph, false, "g.v(1)", null);
         JSONObject jsonResponse = assertResponseAndGetEntity(extensionResponse,
                 Response.Status.OK.getStatusCode());
 
@@ -140,9 +122,9 @@ public class GremlinExtensionTest {
     }
 
     @Test
-    public void evaluateOnVertexNoCacheNoKeysNoTypesReturnOutEdges() {
+    public void evaluateOnVertexNoKeysNoTypesReturnOutEdges() {
         ExtensionResponse extensionResponse = this.gremlinExtension.evaluateOnVertex(
-                rexsterResourceContext, graph, graph.getVertex(6), false, false, "v.outEdges", null);
+                rexsterResourceContext, graph, graph.getVertex(6), false, "v.outEdges", null);
         JSONObject jsonResponse = assertResponseAndGetEntity(extensionResponse,
                 Response.Status.OK.getStatusCode());
 
@@ -155,9 +137,9 @@ public class GremlinExtensionTest {
     }
 
     @Test
-    public void evaluateOnEdgeNoCacheNoKeysNoTypesReturnOutVertex() {
+    public void evaluateOnEdgeNoKeysNoTypesReturnOutVertex() {
         ExtensionResponse extensionResponse = this.gremlinExtension.evaluateOnEdge(
-                rexsterResourceContext, graph, graph.getEdge(7), false, false, "e.outVertex", null);
+                rexsterResourceContext, graph, graph.getEdge(7), false, "e.outVertex", null);
         JSONObject jsonResponse = assertResponseAndGetEntity(extensionResponse,
                 Response.Status.OK.getStatusCode());
 
