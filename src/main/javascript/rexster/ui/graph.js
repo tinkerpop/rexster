@@ -372,14 +372,14 @@ Rexster.modules.graph = function(api) {
 			
 			if (currentFeatureBrowsed === "vertices") {
 				api.getVertices(currentGraphName, pageStart, pageEnd, function(data) {
-					that.renderPagedResults(api, data.results, data.total_size, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
+					that.renderPagedResults(api, data.results, data.totalSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
 				},
 				function(err) {
 					api.showMessageError("Could not get the vertices of graphs from Rexster.");
 				});
 			} else if (currentFeatureBrowsed === "edges") {
 				api.getEdges(currentGraphName, pageStart, pageEnd, function(data) {
-					that.renderPagedResults(api, data.results, data.total_size, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
+					that.renderPagedResults(api, data.results, data.totalSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
 				},
 				function(err) {
 					api.showMessageError("Could not get the edges of graphs from Rexster.");
