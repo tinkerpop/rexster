@@ -58,7 +58,9 @@ public abstract class AbstractSubResource extends BaseResource {
     	RexsterApplicationGraph rag = this.getRexsterApplicationProvider().getApplicationGraph(graphName);
         if (rag == null) {
 
-            logger.info("Request for a non-configured graph [" + graphName + "]");
+            if (!graphName.equals("favicon.ico")) {
+                logger.info("Request for a non-configured graph [" + graphName + "]");
+            }
 
             JSONObject error = generateErrorObject("Graph [" + graphName + "] could not be found");
             throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());

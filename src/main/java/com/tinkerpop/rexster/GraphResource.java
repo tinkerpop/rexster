@@ -14,7 +14,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
 
-@Path("/{graphname: (?!favicon.ico).+}")
+@Path("/{graphname}")
 public class GraphResource extends AbstractSubResource {
 
     private static Logger logger = Logger.getLogger(GraphResource.class);
