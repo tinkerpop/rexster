@@ -86,7 +86,6 @@ var ReadLine = function(options, api) {
   this.lineClass    = this.options.lineClass || '.readLine';
   this.history      = [];
   this.historyPtr   = 0;
-  this.depth        = 0;
   this.scopeHistory = [];
   this.initialize();
 };
@@ -163,7 +162,8 @@ ReadLine.prototype = {
       this.newPromptLine();
       return null;
     }
-    
+
+    /*
     if($.trim(value) == 'end') {
       this.depth--;
       if(this.depth == 0) { 
@@ -171,22 +171,11 @@ ReadLine.prototype = {
         return false;
       }
     }
-
-    var reserved = false;
-    for(i = 0; i < ReservedWords.length; i++) {
-        if(value.match(ReservedWords[i])) {
-            reserved = true;
-            this.depth++;
-        }
-    }
+    */
 
     this.scopeHistory.push(value);
     
-    if(this.depth == 0) {
-      this.inputHandler(this, value);
-    } else {
-      this.newPromptLine(this.depth);
-    }
+    this.inputHandler(this, value);
   },
 
   insertResponse: function(response) {
@@ -221,7 +210,6 @@ var DefaultInputHtml = function(stack) {
 var EnterKeyCode      = 13;
 var UpArrowKeyCode    = 38;
 var DownArrowKeyCode  = 40;
-var ReservedWords     = ['repeat', 'while', 'if', 'foreach', 'func', 'path'];
 
 
 Rexster.modules.terminal = function(api) {
