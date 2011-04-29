@@ -3,14 +3,25 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.rexster.extension.*;
+import com.tinkerpop.rexster.extension.ExtensionMethod;
+import com.tinkerpop.rexster.extension.ExtensionPoint;
+import com.tinkerpop.rexster.extension.ExtensionResponse;
+import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
+import com.tinkerpop.rexster.extension.RexsterExtension;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -47,16 +58,19 @@ public class VertexResource extends AbstractSubResource {
         try {
             long counter = 0l;
             final JSONArray vertexArray = new JSONArray();
-
+            boolean wasInSection = false;
             for (Vertex vertex : this.getRexsterApplicationGraph(graphName).getGraph().getVertices()) {
                 if (counter >= start && counter < end) {
+                    wasInSection = true;
                     vertexArray.put(new com.tinkerpop.rexster.ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
+                } else if (wasInSection) {
+                    break;
                 }
                 counter++;
             }
 
             this.resultObject.put(Tokens.RESULTS, vertexArray);
-            this.resultObject.put(Tokens.TOTAL_SIZE, counter);
+            this.resultObject.put(Tokens.TOTAL_SIZE, vertexArray.length());
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
         } catch (JSONException ex) {
@@ -170,7 +184,7 @@ public class VertexResource extends AbstractSubResource {
                 // found the method...time to do work
                 returnValue = invokeExtension(graphName, rexsterExtension, methodToCall, vertex);
 
-            } catch (WebApplicationException wae){
+            } catch (WebApplicationException wae) {
                 // already logged this...just throw it  up.
                 throw wae;
             } catch (Exception ex) {
@@ -351,7 +365,7 @@ public class VertexResource extends AbstractSubResource {
 
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
-        }  catch (RuntimeException re) {
+        } catch (RuntimeException re) {
             logger.error(re);
 
             JSONObject error = generateErrorObject(re.getMessage(), re);

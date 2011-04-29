@@ -3,14 +3,25 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.rexster.extension.*;
+import com.tinkerpop.rexster.extension.ExtensionMethod;
+import com.tinkerpop.rexster.extension.ExtensionPoint;
+import com.tinkerpop.rexster.extension.ExtensionResponse;
+import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
+import com.tinkerpop.rexster.extension.RexsterExtension;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -44,20 +55,22 @@ public class EdgeResource extends AbstractSubResource {
 
         Long start = this.getStartOffset();
         Long end = this.getEndOffset();
-
+        boolean wasInSection = false;
         long counter = 0l;
-
         try {
             JSONArray edgeArray = new JSONArray();
             for (Edge edge : this.getRexsterApplicationGraph(graphName).getGraph().getEdges()) {
                 if (counter >= start && counter < end) {
+                    wasInSection = true;
                     edgeArray.put(new com.tinkerpop.rexster.ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
+                } else if (wasInSection) {
+                    break;
                 }
                 counter++;
             }
 
             this.resultObject.put(Tokens.RESULTS, edgeArray);
-            this.resultObject.put(Tokens.TOTAL_SIZE, counter);
+            this.resultObject.put(Tokens.TOTAL_SIZE, edgeArray.length());
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
         } catch (JSONException ex) {
@@ -160,7 +173,7 @@ public class EdgeResource extends AbstractSubResource {
                 // found the method...time to do work
                 returnValue = invokeExtension(graphName, rexsterExtension, methodToCall, edge);
 
-            } catch (WebApplicationException wae){
+            } catch (WebApplicationException wae) {
                 // already logged this...just throw it  up.
                 throw wae;
             } catch (Exception ex) {
