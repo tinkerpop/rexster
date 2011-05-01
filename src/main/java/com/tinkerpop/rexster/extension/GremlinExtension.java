@@ -27,7 +27,7 @@ import java.util.Map;
 public class GremlinExtension extends AbstractRexsterExtension {
     protected static Logger logger = Logger.getLogger(GremlinExtension.class);
 
-    private final ScriptEngine engine = new GremlinScriptEngine();
+    private final static ScriptEngine engine = new GremlinScriptEngine();
     private static final String GRAPH_VARIABLE = "g";
     private static final String VERTEX_VARIABLE = "v";
     private static final String EDGE_VARIABLE = "e";
