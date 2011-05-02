@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-core</artifactId>
-            <version>0.6</version>
+            <version>0.7-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop</groupId>
@@ -49,35 +49,35 @@
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>frames</artifactId>
-            <version>0.1</version>
+            <version>0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-sail-graph</artifactId>
-            <version>0.6</version>
+            <version>0.7-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-graph-jung</artifactId>
-            <version>0.6</version>
+            <version>0.7-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-dex-graph</artifactId>
-            <version>0.6</version>
+            <version>0.7-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-neo4j-graph</artifactId>
-            <version>0.6</version>
+            <version>0.7-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-orient-graph</artifactId>
-            <version>0.6</version>
+            <version>0.7-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!-- JSON SUPPORT -->
