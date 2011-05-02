@@ -177,7 +177,7 @@ public class EdgeResource extends AbstractSubResource {
                 // already logged this...just throw it  up.
                 throw wae;
             } catch (Exception ex) {
-                logger.error(ex);
+                logger.error("Dynamic invocation of the [" + extensionSegmentSet + "] extension failed.", ex);
                 JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
             }
@@ -187,7 +187,7 @@ public class EdgeResource extends AbstractSubResource {
 
                 if (extResponse.isErrorResponse()) {
                     // an error was raised within the extension.  pass it back out as an error.
-                    logger.error("The [" + extensionSegmentSet + "] extension raised an error response.");
+                    logger.warn("The [" + extensionSegmentSet + "] extension raised an error response.");
                     throw new WebApplicationException(this.addHeaders(Response.fromResponse(extResponse.getJerseyResponse())).build());
                 }
             } else {

@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -251,13 +254,16 @@ public class WebServer {
 								       .hasArg()
  								       .withDescription("override web-root in rexster.xml")
  								       .create("webroot");
-    	
+
+        Option debug  = new Option( "debug", "run rexster with full console logging output from jersey");
+
 		Options options = new Options();
 		options.addOption(help);
 		options.addOption(rexsterFile);
 		options.addOption(webServerPort);
 		options.addOption(adminServerPort);
 		options.addOption(webRoot);
+        options.addOption(debug);
 		
 		return options;
     }
@@ -284,9 +290,22 @@ public class WebServer {
 	}
 
     public static void main(final String[] args) throws Exception {
+
         XMLConfiguration properties = new XMLConfiguration();
         
         CommandLine line = getCliInput(args);
+
+        if (line.hasOption("debug")) {
+            // turn on all logging for jersey
+            for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
+                java.util.logging.Logger.getLogger(l).setLevel(Level.ALL);
+            }
+        } else {
+            // turn off all logging for jersey
+            for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
+                java.util.logging.Logger.getLogger(l).setLevel(Level.OFF);
+            }
+        }
         
         String rexsterXmlFile = "rexster.xml";
         
