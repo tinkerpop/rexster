@@ -10,4 +10,4 @@ if exist "%%a\bin\rexster-stop.bat" set TARGET=%%a
 )
 
 cd %TARGET%\bin\
-call rexster-stop.bat -host 127.0.0.1 -port 8184 -cmd s %*
+call rexster-stop.bat %*

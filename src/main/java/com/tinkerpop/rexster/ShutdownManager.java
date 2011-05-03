@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 /**
  * Manages the socket listening for incoming shutdown requests.
@@ -40,6 +41,10 @@ public class ShutdownManager {
 
     private int port = 8184;
     private String host = "127.0.0.1";
+
+    static {
+        PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
+    }
 
     public ShutdownManager(String host, int port) {
         this.port = port;

@@ -258,13 +258,13 @@ public class WebServer {
 		
 		Option webServerPort  = OptionBuilder.withArgName("port")
 										     .hasArg()
-										     .withDescription("override port used for webserver-port in rexster.xml")
-										     .create("webserverport");
+										     .withDescription("override port used for rexster-server-port in rexster.xml")
+										     .create("rexsterport");
 		
 		Option adminServerPort  = OptionBuilder.withArgName("port")
 										       .hasArg()
-										       .withDescription("override port used for adminserver-port in rexster.xml")
-										       .create("adminserverport");
+										       .withDescription("override port used for doghouse-server-port in rexster.xml")
+										       .create("doghouseport");
 		
 		Option webRoot  = OptionBuilder.withArgName("path")
 								       .hasArg()
@@ -347,14 +347,14 @@ public class WebServer {
         // this *sigh*
         properties.addProperty("self-xml", rexsterXmlFile);
         
-        // overrides webserver-port from command line
-        if (line.hasOption("webserverport")) {
-        	properties.setProperty("webserver-port", line.getOptionValue("webserverport"));
+        // overrides rexster-server-port from command line
+        if (line.hasOption("rexsterport")) {
+        	properties.setProperty("rexster-server-port", line.getOptionValue("rexsterport"));
         }
         
-        // overrides adminserver-port from command line
-        if (line.hasOption("adminserverport")) {
-        	properties.setProperty("adminserver-port", line.getOptionValue("adminserverport"));
+        // overrides doghouse-server-port from command line
+        if (line.hasOption("doghouseport")) {
+        	properties.setProperty("doghouse-server-port", line.getOptionValue("doghouseport"));
         }
         
         // overrides web-root from command line	

@@ -74,7 +74,7 @@ public class Shutdown {
         CommandLine cmdLine = getCliInput(args);
 
         // default command line values
-        String command = ShutdownManager.COMMAND_STATUS;
+        String command = ShutdownManager.COMMAND_SHUTDOWN_NO_WAIT;
         String host = "127.0.0.1";
         int port = 8184;
 
