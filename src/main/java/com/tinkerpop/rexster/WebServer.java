@@ -52,21 +52,37 @@ public class WebServer {
 
     public WebServer(final XMLConfiguration properties, boolean user) throws Exception {
         logger.info(".:Welcome to Rexster:.");
+
         if (user) {
             this.startUser(properties);
         } else {
             this.start(properties);
         }
+
+        Integer shutdownServerPort = properties.getInteger("rexster-shutdown-port", new Integer(8184));
+        String shutdownServerHost = properties.getString("rexster-shutdown-host", "127.0.0.1");
+        final ShutdownManager shutdownManager = new ShutdownManager(shutdownServerHost, shutdownServerPort);
+
+        //Register a shutdown hook
+        shutdownManager.registerShutdownListener(new ShutdownManager.ShutdownListener() {
+            public void shutdown() {
+                try {
+                    stop();
+                } catch (Exception ex) {
+
+                }
+            }
+        });
+
+        //Start the shutdown listener
+        shutdownManager.start();
+
+        //Wait for a shutdown request and all shutdown listeners to complete
+        shutdownManager.waitForShutdown();
     }
 
     protected void startUser(final XMLConfiguration properties) throws Exception {
         this.start(properties);
-        // user interaction to shutdown server thread
-        logger.info("Hit <enter> to shutdown Rexster");
-        System.in.read();
-        logger.info("Shutting down Rexster");
-        this.stop();
-        System.exit(0);
     }
 
     protected void start(final XMLConfiguration properties) throws Exception {
@@ -345,7 +361,7 @@ public class WebServer {
         if (line.hasOption("webroot")) {
         	properties.setProperty("web-root", line.getOptionValue("webroot"));
         }
-        
+
         new WebServer(properties, true);
     }
 
