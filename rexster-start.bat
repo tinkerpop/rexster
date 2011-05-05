@@ -10,4 +10,4 @@ if exist "%%a\bin\rexster-start.bat" set TARGET=%%a
 )
 
 cd %TARGET%\bin\
-call rexster-start.bat %*
+call rexster-start.bat -webroot target/%TARGET%/bin/public %*

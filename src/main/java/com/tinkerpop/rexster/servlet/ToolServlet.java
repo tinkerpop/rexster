@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
 
@@ -36,8 +37,9 @@ public class ToolServlet extends HttpServlet {
 
         // set the MIME type of the response, "text/html"
         response.setContentType("text/html");
-
-        URL resource = ctx.getResource(rootPath + "/main.html");
+        
+        // no matter what this should always root from "public"
+        URL resource = ctx.getResource("/public/main.html");
         
         // kind of opens a bad door here.  will probably rethink this a bit.  
         String content = ReaderWriter.readFromAsString(new InputStreamReader(resource.openStream()));
