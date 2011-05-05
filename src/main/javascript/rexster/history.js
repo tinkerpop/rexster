@@ -22,9 +22,9 @@ Rexster.modules.history = function(api) {
 				end : 10 
 			};
 			
-			if (encodedState.param("start") != null && encodedState.param("end")) {
-				state.browse.start = encodedState.param("start");
-				state.browse.end = encodedState.param("end");
+			if (encodedState.param("rexster.offset.start") != null && encodedState.param("rexster.offset.end")) {
+				state.browse.start = encodedState.param("rexster.offset.start");
+				state.browse.end = encodedState.param("rexster.offset.end");
 			}
 		}
 		

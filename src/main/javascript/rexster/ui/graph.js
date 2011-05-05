@@ -66,8 +66,8 @@ Rexster.modules.graph = function(api) {
 			containerMenuGraph.find("#graphItemgraph" + currentGraphName).addClass("ui-state-active");
 
 			// modify the links on the browse menus to match current state
-			containerPanelGraphMenu.find("a[_type='vertices']").attr("href", "/main/graph/" + currentGraphName + "/vertices?start=0&end=10");
-			containerPanelGraphMenu.find("a[_type='edges']").attr("href", "/main/graph/" + currentGraphName + "/edges?start=0&end=10");
+			containerPanelGraphMenu.find("a[_type='vertices']").attr("href", "/main/graph/" + currentGraphName + "/vertices?rexster.offset.start=0&rexster.offset.end=10");
+			containerPanelGraphMenu.find("a[_type='edges']").attr("href", "/main/graph/" + currentGraphName + "/edges?rexster.offset.start=0&rexster.offset.end=10");
 
 			// load the graph profile
 			api.getGraph(currentGraphName, function(graphResult) {
@@ -128,35 +128,11 @@ Rexster.modules.graph = function(api) {
 		}
 		
 		/**
-		 * Move the data view to the last page in the data set.
-		 * 
-		 * @param api {Object} A Rexster API instance.
-		 */
-		this.panelGraphNavigationPagedLast = function(api) {
-			this.panelGraphNavigationPaged(api, this.calculateStartForLastPage(), currentTotal);
-		}
-		
-		/**
-		 * Calculates the index of the start for the last page.
-		 * 
-		 * Since the last page may have less than the page size number of records, the
-		 * last page will not start a page size from the length of the records.
-		 */
-		this.calculateStartForLastPage = function() {
-			var remainder = currentTotal % pageSize,
-			start = currentTotal - pageSize;
-			
-			if (remainder > 0) {
-				start = currentTotal - remainder;
-			}
-			
-			return start;
-		}
-		
-		/**
 		 * Calculates the next page range given the current position.
-		 * 
-		 * @returns {Object} A range object that describes a start and end point for the 
+ 		 *
+ 		 * It's ok if the end of the range exceeds the total amount.
+
+ 		 * @returns {Object} A range object that describes a start and end point for the
 		 *                   paging mechanism.
 		 */
 		this.calculateNextPageRange = function() {
@@ -166,12 +142,14 @@ Rexster.modules.graph = function(api) {
 					start : start,
 					end : end
 				};
-		
-			if (start > currentTotal) {
-				range.start = this.calculateStartForLastPage();
-				range.end = currentTotal;
-			}
-			
+
+            // if the previous total records returned is less than 10 then there aren't
+            // anymore records after the previous one.
+            if (currentTotal < 10) {
+                range.start = range.start - pageSize;
+                range.end = range.end - pageSize;
+            }
+
 			return range;
 		}
 		
@@ -308,7 +286,7 @@ Rexster.modules.graph = function(api) {
 				}
 				
 				// display the paging information plus total record count
-				containerPanelBrowser.find(".pager-label").text("Results " + (pageStart + 1) + " - " + (pageStart + results.length) + " of " + resultSize);
+				containerPanelBrowser.find(".pager-label").text("Results " + (pageStart + 1) + " - " + (pageStart + results.length));
 				
 				currentPageStart = pageStart;
 				currentTotal = resultSize;
@@ -329,10 +307,9 @@ Rexster.modules.graph = function(api) {
 			nextRange = that.calculateNextPageRange();
 			previousRange = that.calculatePreviousPageRange();
 			
-			containerPanelBrowser.find(".ui-icon-seek-first").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=0&end=" + pageSize);
-			containerPanelBrowser.find(".ui-icon-seek-end").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=" + that.calculateStartForLastPage() + "&end=" + currentTotal);
-			containerPanelBrowser.find(".ui-icon-seek-prev").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=" + previousRange.start + "&end=" + previousRange.end);
-			containerPanelBrowser.find(".ui-icon-seek-next").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?start=" + nextRange.start + "&end=" + nextRange.end);
+			containerPanelBrowser.find(".ui-icon-seek-first").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=0&rexster.offset.end=" + pageSize);
+			containerPanelBrowser.find(".ui-icon-seek-prev").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=" + previousRange.start + "&rexster.offset.end=" + previousRange.end);
+			containerPanelBrowser.find(".ui-icon-seek-next").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=" + nextRange.start + "&rexster.offset.end=" + nextRange.end);
 			
 			if (onPageChangeComplete != undefined) {
 				onPageChangeComplete();
