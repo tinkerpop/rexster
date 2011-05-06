@@ -162,7 +162,7 @@ public class ShutdownManager {
                 this.logger.info("ShutdownListener " + shutdownListener + " complete");
             }
             catch (Exception e) {
-                this.logger.warn("ShutdownListener " + shutdownListener + " threw an exception, continuing with shutdown", e);
+                this.logger.warn("ShutdownListener " + shutdownListener + " threw an exception, continuing with shutdown");
             }
         }
     }
