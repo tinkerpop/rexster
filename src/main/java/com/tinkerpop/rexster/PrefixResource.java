@@ -2,6 +2,7 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -46,11 +47,13 @@ public class PrefixResource extends AbstractSubResource {
         try {
             final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
             final SailGraph graph = ((SailGraph) rag.getGraph());
-            final JSONObject results = new JSONObject();
+            final JSONArray results = new JSONArray();
             for (final Map.Entry<String, String> entry : graph.getNamespaces().entrySet()) {
-                results.put(entry.getKey(), entry.getValue());
-
+                JSONObject result = new JSONObject();
+                result.put(entry.getKey(), entry.getValue());
+                results.put(result);
             }
+
             this.resultObject.put(Tokens.RESULTS, results);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
@@ -120,7 +123,8 @@ public class PrefixResource extends AbstractSubResource {
             final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
             final SailGraph graph = ((SailGraph) rag.getGraph());
             if (!formParams.containsKey("prefix") || !formParams.containsKey("namespace")) {
-                throw new RuntimeException("Parameters 'prefix' and 'namespace' required");
+                JSONObject error = generateErrorObject("Parameters 'prefix' and 'namespace' required");
+                throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
             }
             graph.addNamespace(formParams.get("prefix").get(0), formParams.get("namespace").get(0));
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
