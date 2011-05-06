@@ -1,5 +1,4 @@
-Rexster: A Graph-Based Ranking Engine
-"http://rexster.tinkerpop.com":http://rexster.tinkerpop.com
+All releases can be accessed through the TinkerPop Maven2 repository identified below.
 
 ```xml
 <repository>
@@ -13,7 +12,7 @@ Rexster: A Graph-Based Ranking Engine
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dogeatdog.png!
 
-h3. Version 0.3 (Dog Eat Dog -- NOT OFFICIALLY RELEASED YET)
+h3. Version 0.3 (Dog Eat Dog -- May 9, 2011)
 
 ```xml
  <dependency>
@@ -32,9 +31,24 @@ h3. Version 0.3 (Dog Eat Dog -- NOT OFFICIALLY RELEASED YET)
 * Supports "DEX":http://www.sparsity-technologies.com/dex graph database.
 * Neo4jSail is no longer supported within Rexster and Blueprints.
 * Blueprints added a @count@ method to indices.  That function is exposed via @http://localhost/graph/indices/myindex/count?key=name&value=val@
+* Introducing the new extension model.  The Gremlin traversal has been converted to the extension model.  Traversals have all been removed from Rexster.
+* The following REST API parameters have a new format:
+** @rexster.show_types@ is now @rexster.showTypes@
+** @rexster.return_keys@ is now @rexster.returnKeys@
+** @rexster.allow_cached@ is now @rexster.allowCached@
+* The following standard properties contained within the JSON response have been reformatted:
+** @up_time@ is now @upTime@
+** @query_time@ is now @queryTime@
+** @read_only@ is now @readOnly@
+* Arrays are now serialized to JSON in the same fashion as Lists.
+* Requesting an index resource without parameters will return information about that index instead of a Bad Request status code.
+* Removed built-in caching functions.
+* New command line "debug" option for Rexster server which will turn on all logging of the underlying Jersey/Grizzly server.
+* Remote shutdown.
+* Paging model changed in The Dog House.  There is no longer a "Move Last" button when paging through vertices and edges.
+* Prefix resource for SailGraph implementations.
 
 ==<hr/>==
-
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-doghouse.png!
 
@@ -60,7 +74,6 @@ h3. Version 0.2 (Dog House -- March 2, 2011)
 * Bumped to Blueprints 0.5, Pipes 0.3.1, and Gremlin 0.8.
 
 ==<hr/>==
-
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-fluffy.png!
 
