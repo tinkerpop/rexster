@@ -82,7 +82,7 @@ public class GraphResource extends AbstractSubResource {
     }
 
     @GET
-    @Path("{extension: (?!vertices)(?!edges)(?!indices).+}")
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
     public Response getGraphExtension(@PathParam("graphname") String graphName) {
 
         ExtensionResponse extResponse;
