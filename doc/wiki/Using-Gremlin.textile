@@ -1,0 +1,148 @@
+!https://github.com/tinkerpop/gremlin/raw/master/doc/images/gremlin-logo.png!
+
+"Gremlin":http://gremlin.tinkerpop.com is a graph-based traversal language developed for "property graphs":http://wiki.github.com/tinkerpop/gremlin/defining-a-property-graph. In combination with Rexster, Gremlin allows users to execute ad-hoc computations on the graph backend. 
+
+# "Gremlin Use-Cases":#usecases
+# "Example Gremlin Script in URI":#example
+# "Gremlin Traversal API":#api
+# "Using Multi-Line Scripts":#multiline
+
+Gremlin is exposed through Rexster as an [[Extension|Extensions]] and scripts may be executed via the REST API or through the Gremlin Console in [[The Dog House]].
+
+h2(#usecases). Gremlin Use-Cases
+
+Through Gremlin, its possible, amongst other things, to perform the following tasks:
+
+* Add/delete vertices and edges from the graph.
+* Manipulate the graph indices.
+* Search for elements of a graph.
+* Load graph data from a file or URL.
+* Make use of "JUNG":http://jung.sourceforge.net/ algorithms.
+* Make use of "SPARQL":http://www.w3.org/TR/rdf-sparql-query/ queries over OpenRDF-based graphs.
+* and much, much more.
+
+In general, using the @GremlinExtension@ provided with Rexster, various graph management tasks can be accomplished.
+
+h2(#example). Example Gremlin Script in URI
+
+Here is a simple ad-hoc query as an example of how Gremlin can be a useful Rexster service. Get the the vertex with @name@ Dark Star.
+
+```text
+http://localhost:8182/gratefulgraph/tp/gremlin?script=g.idx%28T.v%29[[name:%27DARK%20STAR%27]]
+```
+
+```javascript
+{
+  "results": [{
+    "_type":"vertex",
+    "_id":"89",
+    "name":"DARK STAR",
+    "song_type":"original",
+    "performances":219,
+    "type":"song"}
+  ],
+  "queryTime":6.753024,
+  "success":true,
+  "version":"0.1"
+}
+```
+
+The following script will determine the names of all the songs that follow "Dark Star":http://en.wikipedia.org/wiki/Dark_Star_%28song%29. In non-URI converted syntax, the Gremlin code in Rexster looks as such.
+
+```text
+http://localhost:8182/gratefulgraph/tp/gremlin?script=g.idx%28T.v%29[[name:%27DARK%20STAR%27]].outE%28%29[[label:%27followed_by%27]].inV.name
+```
+
+The Gremlin specific code is defined by the value of the @script@ query parameter. In isolation:
+
+```text
+g.idx(T.v)[[name:'DARK STAR']].outE().inV.name
+```
+
+h2(#configuration). Configuration
+
+The Gremlin Extension does not require any specific configuration beyond including it in the @<allows>@ section of the @<extensions>@ element of @rexster.xml@.  The Gremlin Extension is in the TinkerPop namespace called @tp@ and its name is @gremlin@.  Therefore, the configuration would look something like this:
+
+```xml
+<graph>
+  <graph-name>tinkergraph</graph-name>
+  <graph-type>tinkergraph</graph-type>
+  <graph-file>data/graph-example-1.xml</graph-file>
+  <extensions>
+    <allows>
+      <allow>tp:gremlin</allow>
+    </allows>
+  </extensions>
+</graph>
+```
+
+h2(#api). Gremlin Extension API
+
+To see the full API of the @GremlinExtension@ service, simply call the service without any query parameters.
+
+```text
+http://localhost:8182/gratefulgraph/tp/gremlin
+```
+
+The returned JSON is provided below.
+
+```javascript
+{
+   "message":"no script provided",
+   "queryTime":3,
+   "api":{
+      "description":"evaluate an ad-hoc Gremlin script",
+      "parameters":{
+         "showTypes":"displays the properties of the elements with their native data type (default is false)",
+         "returnKeys":"the element property keys to return (default is to return all element properties)",
+         "script":"the Gremlin script to be evaluated"
+      }
+   },
+   "success":false
+}
+```
+
+h3. The Return Keys Parameter
+
+Finally, @returnKeys@ allows one to specify how to construct a JSON object representation of a returned @Element@ (i.e. @Vertex@ or @Edge@). All elements are returned as JSON objects with the properties identified by the @returnKeys@ array being what is included in the JSON representation. The wildcard @*@ denotes to return all properties of the element.
+
+```text
+http://localhost:8182/gratefulgraph/tp/gremlin?script=g.idx%28T.v%29[[name:%27STANDING%20ON%20THE%20MOON%27]]
+```
+
+```javascript
+{
+  "results":[{
+    "_type":"vertex",
+    "_id":"92",
+    "name":"STANDING ON THE MOON",
+    "song_type":"original",
+    "performances":75,
+    "type":"song"}
+  ],
+  "queryTime":16.916992,
+  "success":true,
+  "version":"0.1"
+}
+```
+
+```text
+http://localhost:8182/gratefulgraph/tp/gremlin?script=g.idx%28T.v%29[[name:%27STANDING%20ON%20THE%20MOON%27]]&returnKeys=[name,performances]
+```
+
+```javascript
+{
+  "results":[{
+    "_type":"vertex",
+    "name":"STANDING ON THE MOON",
+    "performances":75}
+  ],
+  "queryTime":20.205824,
+  "success":true,
+  "version":"0.1"
+}
+```
+
+h2(#multiline). Using Multi-Line Scripts 
+
+For multi-line constructs, its possible to use tools like "cURL":http://en.wikipedia.org/wiki/CURL to post JSON to the traversal service instead of relying on the conversion of the URI query parameters to be mapped to JSON (see [[Mapping a URI to JSON]]). However, you can also use newline characters in your URI.

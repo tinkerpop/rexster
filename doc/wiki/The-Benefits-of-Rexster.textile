@@ -1,0 +1,9 @@
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-logo.png!
+
+Before diving into Rexster, its good to know what Rexster was designed for and what potential use it can serve. The following itemization provides a collection of reasons for using Rexster.
+
+* Rexster allows developers to communicate with "Blueprints-enabled":http://blueprints.tinkerpop.com graphs in a language agnostic fashion. Blueprints is a Java API for graph databases. By using Rexster, the Blueprints API is exposed over HTTP/REST.
+* Rexster allows any Blueprints-enabled graph to exist as a standalone server. Thus, multiple clients communicate with the same graph database through Rexster.
+* Rexster provides ad-hoc queries through the graph traversal language "Gremlin":http://gremlin.tinkerpop.com.
+* Rexster is extensible given the power of [[Extensions]] providing developer friendly classes that support common graph use cases such as searching, ranking, and recommendation.
+* The Rexster community provides a set of BSD-licensed extensions through the "Rexster Kibbles":http://rexster-kibbles.tinkerpop.com.
