@@ -1,11 +1,15 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.rexster.extension.*;
+import com.tinkerpop.rexster.extension.ExtensionAllowed;
+import com.tinkerpop.rexster.extension.ExtensionConfiguration;
+import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Holds a graph, its assigned traversals and packages.
@@ -34,7 +38,7 @@ public class RexsterApplicationGraph {
 
     /**
      * Determines if a particular extension is allowed given configured allowables from rexster.xml.
-     *
+     * <p/>
      * Ensure that loadAllowableExtensions is called prior to this method.
      */
     public boolean isExtensionAllowed(ExtensionSegmentSet extensionSegmentSet) {
@@ -55,7 +59,7 @@ public class RexsterApplicationGraph {
         if (this.extensionConfigurations != null) {
             for (ExtensionConfiguration extensionConfiguration : this.extensionConfigurations) {
                 if (extensionConfiguration.getExtensionName().equals(extensionName)
-                    && extensionConfiguration.getNamespace().equals(namespace)) {
+                        && extensionConfiguration.getNamespace().equals(namespace)) {
                     extensionConfigurationFound = extensionConfiguration;
                     break;
                 }
@@ -99,7 +103,7 @@ public class RexsterApplicationGraph {
                     logger.info("Graph [" + graphName + "] - configured with allowable namespace [" + namespace + "]");
                 } catch (IllegalArgumentException iae) {
                     logger.warn("Graph [" + graphName + "] - Extension defined with an invalid namespace: " + namespace
-                        + ".  It will not be configured.", iae);
+                            + ".  It will not be configured.", iae);
                 }
             }
         }

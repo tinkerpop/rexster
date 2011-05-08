@@ -5,7 +5,7 @@ package com.tinkerpop.rexster;
  */
 public class Tokens {
 
-    public static final String JSON_APPLICATION = "json/application";
+    public static final String REXSTER_VERSION = "0.3";
 
     public static final String _ID = "_id";
     public static final String ID = "id";
@@ -60,6 +60,4 @@ public class Tokens {
     public static final String VALUE = "value";
     public static final String TYPE = "type";
     public static final String CLASS = "class";
-
-    public static final String REXSTER_VERSION = "0.3-SNAPSHOT";
 }

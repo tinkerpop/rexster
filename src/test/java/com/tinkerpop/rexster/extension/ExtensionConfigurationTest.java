@@ -53,7 +53,7 @@ public class ExtensionConfigurationTest {
         Assert.assertTrue(map.isEmpty());
     }
 
-     @Test
+    @Test
     public void tryGetMapFromConfigurationBadConfig() {
         HierarchicalConfiguration hc = new HierarchicalConfiguration();
         HierarchicalConfiguration innerHc = new HierarchicalConfiguration();

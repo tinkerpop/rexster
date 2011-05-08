@@ -128,7 +128,7 @@ public class ExtensionResponseTest {
 
         final JSONObject deep = new JSONObject();
         try {
-        deep.put("deepone", "foundme");
+            deep.put("deepone", "foundme");
         } catch (Exception ex) {
             // never happen
         }
@@ -170,13 +170,13 @@ public class ExtensionResponseTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void okWithNullHashMap(){
+    public void okWithNullHashMap() {
         ExtensionResponse.ok((HashMap) null);
     }
 
     @Test
     public void okWithValidHashMap() {
-        HashMap<String, String> map = new HashMap<String, String>(){{
+        HashMap<String, String> map = new HashMap<String, String>() {{
             put("this", "that");
         }};
 
@@ -197,7 +197,7 @@ public class ExtensionResponseTest {
 
     @Test
     public void okWithValidJson() {
-        HashMap<String, String> map = new HashMap<String, String>(){{
+        HashMap<String, String> map = new HashMap<String, String>() {{
             put("this", "that");
         }};
 

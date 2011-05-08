@@ -113,7 +113,7 @@ public class GraphConfigurationContainerTest {
             Assert.fail(ex.getMessage());
         }
     }
-    
+
     @Test
     public void getApplicationGraphsReadOnlyGraphs() {
         configList.add(constructHierarchicalConfiguration("test", "some-file", "com.tinkerpop.rexster.config.MockGraphConfiguration", true));

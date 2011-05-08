@@ -9,7 +9,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 
 public class ExtensionMethodTest {
     private Mockery mockery = new JUnit4Mockery();
@@ -111,7 +110,7 @@ public class ExtensionMethodTest {
             allowing(extensionDescriptor).description();
             will(returnValue("desc"));
             allowing(extensionDescriptor).api();
-            will(returnValue(new ExtensionApi[] {extensionApi}));
+            will(returnValue(new ExtensionApi[]{extensionApi}));
             allowing(extensionDescriptor).apiBehavior();
             will(returnValue(ExtensionApiBehavior.EXTENSION_DESCRIPTOR_ONLY));
             allowing(extensionApi).parameterName();
@@ -146,7 +145,7 @@ public class ExtensionMethodTest {
             allowing(extensionDescriptor).description();
             will(returnValue("desc"));
             allowing(extensionDescriptor).api();
-            will(returnValue(new ExtensionApi[] {extensionApi}));
+            will(returnValue(new ExtensionApi[]{extensionApi}));
             allowing(extensionDescriptor).apiBehavior();
             will(returnValue(ExtensionApiBehavior.EXTENSION_PARAMETER_ONLY));
         }});
@@ -179,7 +178,7 @@ public class ExtensionMethodTest {
             allowing(extensionDescriptor).description();
             will(returnValue("desc"));
             allowing(extensionDescriptor).api();
-            will(returnValue(new ExtensionApi[] {extensionApi}));
+            will(returnValue(new ExtensionApi[]{extensionApi}));
             allowing(extensionDescriptor).apiBehavior();
             will(returnValue(ExtensionApiBehavior.DEFAULT));
             allowing(extensionApi).parameterName();
@@ -209,7 +208,7 @@ public class ExtensionMethodTest {
     }
 
     private class MockMethodHelper {
-        public void methodTest(@ExtensionRequestParameter(name="nme", description = "dsc") String x) {
+        public void methodTest(@ExtensionRequestParameter(name = "nme", description = "dsc") String x) {
         }
     }
 }

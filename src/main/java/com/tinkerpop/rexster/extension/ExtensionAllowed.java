@@ -13,7 +13,7 @@ public class ExtensionAllowed {
     public ExtensionAllowed(String namespace) {
         // must match this format *:*, namespace:*, namespace:extension
         if (!(namespace.matches("(\\w+|\\*):(\\w+|\\*)")
-            && !(namespace.startsWith("*") && namespace.equals("*.*")))) {
+                && !(namespace.startsWith("*") && namespace.equals("*.*")))) {
             throw new IllegalArgumentException("The namespace must match the format of *:*, namespace:*, namespace:extension");
         }
 
@@ -27,7 +27,7 @@ public class ExtensionAllowed {
     /**
      * Determines if the namespace and extension are allowed given the configuration of the graph in rexster.xml.
      */
-    public boolean isExtensionAllowed(ExtensionSegmentSet extensionSegmentSet){
+    public boolean isExtensionAllowed(ExtensionSegmentSet extensionSegmentSet) {
         boolean allowed = false;
 
         if (this.namespace.equals("*:*")) {

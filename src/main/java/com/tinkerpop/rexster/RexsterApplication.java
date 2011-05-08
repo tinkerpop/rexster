@@ -4,14 +4,15 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
 import com.tinkerpop.rexster.config.GraphConfigurationContainer;
 import com.tinkerpop.rexster.config.GraphConfigurationException;
-import com.tinkerpop.rexster.extension.ExtensionConfiguration;
-import com.tinkerpop.rexster.extension.RexsterExtension;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -80,13 +81,13 @@ public class RexsterApplication {
             // graph may not have been initialized properly if an exception gets tossed in
             // on graph creation
             if (graph != null) {
-            	Graph shutdownGraph = graph;
-            	
-            	if (graph instanceof ReadOnlyGraph) {
-            		// can't call shutdown on a readonly graph.
-            		shutdownGraph = ((ReadOnlyGraph) graph).getRawGraph();
-            	}
-            	
+                Graph shutdownGraph = graph;
+
+                if (graph instanceof ReadOnlyGraph) {
+                    // can't call shutdown on a readonly graph.
+                    shutdownGraph = ((ReadOnlyGraph) graph).getRawGraph();
+                }
+
                 shutdownGraph.shutdown();
             }
         }

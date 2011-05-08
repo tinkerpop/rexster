@@ -17,11 +17,9 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.SimpleBindings;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 @ExtensionNaming(namespace = "tp", name = "gremlin")
 public class GremlinExtension extends AbstractRexsterExtension {
@@ -90,7 +88,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
         ExtensionMethod extensionMethod = rexsterResourceContext.getExtensionMethod();
 
         try {
-            if (script !=  null && !script.isEmpty()) {
+            if (script != null && !script.isEmpty()) {
 
                 JSONArray results = new JSONArray();
                 Object result = engine.eval(script, bindings);

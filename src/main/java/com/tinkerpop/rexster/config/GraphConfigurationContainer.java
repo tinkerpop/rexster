@@ -90,7 +90,7 @@ public class GraphConfigurationContainer {
     private Graph getGraphFromConfiguration(HierarchicalConfiguration graphConfiguration) throws GraphConfigurationException {
         String graphConfigurationType = graphConfiguration.getString(Tokens.REXSTER_GRAPH_TYPE);
         boolean isReadOnly = graphConfiguration.getBoolean(Tokens.REXSTER_GRAPH_READ_ONLY, false);
-        
+
         if (graphConfigurationType.equals("neo4jgraph")) {
             graphConfigurationType = Neo4jGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("orientgraph")) {
@@ -112,14 +112,14 @@ public class GraphConfigurationContainer {
             clazz = Class.forName(graphConfigurationType, true, Thread.currentThread().getContextClassLoader());
             graphConfigInstance = (GraphConfiguration) clazz.newInstance();
             Graph readWriteGraph = graphConfigInstance.configureGraphInstance(graphConfiguration);
-            
+
             if (isReadOnly) {
-            	// the graph is configured to be readonly so wrap it up
-            	graph = new ReadOnlyGraph(readWriteGraph);
+                // the graph is configured to be readonly so wrap it up
+                graph = new ReadOnlyGraph(readWriteGraph);
             } else {
-            	graph = readWriteGraph;
+                graph = readWriteGraph;
             }
-            
+
         } catch (Exception ex) {
             throw new GraphConfigurationException("GraphConfiguration could not be found or otherwise instantiated:." + graphConfigurationType, ex);
         }

@@ -17,8 +17,7 @@ public class MockIndex implements Index {
         this.count = count;
     }
 
-    public long count(String arg0, Object arg1)
-    {
+    public long count(String arg0, Object arg1) {
         return count;
     }
 

@@ -13,5 +13,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface ExtensionNaming {
     String name() default "";
+
     String namespace() default "g";
 }

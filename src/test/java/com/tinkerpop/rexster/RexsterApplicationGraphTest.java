@@ -21,6 +21,7 @@ import java.util.Map;
 
 public class RexsterApplicationGraphTest {
     private Mockery mockery = new JUnit4Mockery();
+
     @Test
     public void loadAllowableExtensionsNullList() {
         RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", null);

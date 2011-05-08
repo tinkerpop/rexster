@@ -30,15 +30,15 @@ public class ElementJSONObject extends JSONObject {
 
     public ElementJSONObject(final Element element, final List<String> propertyKeys, boolean showTypes) throws JSONException {
         this.id = element.getId();
-        
+
         // always add the meta data regardless of the value of the propertyKeys(return_keys)
         this.put(Tokens._ID, this.getValue(this.id, showTypes));
         if (element instanceof Vertex) {
             this.put(Tokens._TYPE, Tokens.VERTEX);
         } else {
-        	// if not a vertex then it must be an edge
+            // if not a vertex then it must be an edge
             this.put(Tokens._TYPE, Tokens.EDGE);
-            
+
             Edge edge = (Edge) element;
             this.put(Tokens._LABEL, edge.getLabel());
             this.put(Tokens._IN_V, this.getValue(edge.getInVertex().getId(), showTypes));
@@ -46,12 +46,12 @@ public class ElementJSONObject extends JSONObject {
         }
 
         if (propertyKeys == null) {
-        	
-        	// add all the properties
+
+            // add all the properties
             for (String key : element.getPropertyKeys()) {
                 this.put(key, this.getValue(element.getProperty(key), showTypes));
             }
-            
+
         } else {
             for (String key : propertyKeys) {
                 Object temp = this.getValue(element.getProperty(key), showTypes);

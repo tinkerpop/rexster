@@ -26,23 +26,23 @@ import java.util.ServiceLoader;
 public abstract class AbstractSubResource extends BaseResource {
 
     private static final Logger logger = Logger.getLogger(AbstractSubResource.class);
-    
+
     protected AbstractSubResource(RexsterApplicationProvider rap) {
         super(rap);
-        
+
         /*
-        this.rag = this.rexsterApplicationProvider.getApplicationGraph(graphName);
-        if (this.rag == null) {
+       this.rag = this.rexsterApplicationProvider.getApplicationGraph(graphName);
+       if (this.rag == null) {
 
-            logger.info("Request for a non-configured graph [" + graphName + "]");
+           logger.info("Request for a non-configured graph [" + graphName + "]");
 
-            JSONObject error = generateErrorObject("Graph [" + graphName + "] could not be found");
-            throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
-        }
-         */
-        
+           JSONObject error = generateErrorObject("Graph [" + graphName + "] could not be found");
+           throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
+       }
+        */
+
         try {
-            
+
             this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
 
         } catch (JSONException ex) {
@@ -53,9 +53,9 @@ public abstract class AbstractSubResource extends BaseResource {
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
     }
-    
+
     public RexsterApplicationGraph getRexsterApplicationGraph(String graphName) {
-    	RexsterApplicationGraph rag = this.getRexsterApplicationProvider().getApplicationGraph(graphName);
+        RexsterApplicationGraph rag = this.getRexsterApplicationProvider().getApplicationGraph(graphName);
         if (rag == null) {
 
             if (!graphName.equals("favicon.ico")) {
@@ -65,7 +65,7 @@ public abstract class AbstractSubResource extends BaseResource {
             JSONObject error = generateErrorObject("Graph [" + graphName + "] could not be found");
             throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
         }
-        
+
         return rag;
     }
 
@@ -144,7 +144,7 @@ public abstract class AbstractSubResource extends BaseResource {
      * Tries to find an extension given the specified namespace and extension name. Extensions
      * are loaded using ServiceLoader so ensure that the RexsterExtension file in META-INF.services
      * has all required extension implementations.
-     *
+     * <p/>
      * This method tries to look for an ExtensionNaming annotation on the RexsterExtension
      * implementation and uses that for the namespace and extension name.  If for some reason that
      * annotation cannot be found or if the annotation is only partially defined defaults are used.
@@ -180,7 +180,7 @@ public abstract class AbstractSubResource extends BaseResource {
             }
 
             if (extensionSegmentSet.getNamespace().equals(currentExtensionNamespace)
-                && extensionSegmentSet.getExtension().equals(currentExtensionName)) {
+                    && extensionSegmentSet.getExtension().equals(currentExtensionName)) {
                 // found what we're looking for
                 rexsterExtension = extension;
                 break;
@@ -211,15 +211,15 @@ public abstract class AbstractSubResource extends BaseResource {
     /**
      * Find the method on the RexsterExtension implementation to call given the ExtensionPoint and the
      * extension action to be executed.
-     *
+     * <p/>
      * This method will find the first matching extension method.  If multiple extension method matches then
      * the remainder will be ignored.
      *
      * @param rexsterExtension The extension instance to be called.
-     * @param extensionPoint One of the extension points (graph, edge, vertex).
-     * @param extensionAction This value may be null or empty if the RexsterExtension is being exposed as a
-     *                       root level call (ie. the ExtensionDefinition annotation does not specify a
-     *                       path, just an ExtensionPoint).
+     * @param extensionPoint   One of the extension points (graph, edge, vertex).
+     * @param extensionAction  This value may be null or empty if the RexsterExtension is being exposed as a
+     *                         root level call (ie. the ExtensionDefinition annotation does not specify a
+     *                         path, just an ExtensionPoint).
      * @return The method to call or null if it cannot be found.
      */
     protected static ExtensionMethod findExtensionMethod(RexsterExtension rexsterExtension, ExtensionPoint extensionPoint, String extensionAction) {
@@ -242,7 +242,7 @@ public abstract class AbstractSubResource extends BaseResource {
                     methodToCall = new ExtensionMethod(method, extensionDefinition, extensionDescriptor);
                     break;
                 } else if ((!extensionAction.equals("") && extensionDefinition.path().equals(extensionAction))
-                    || (extensionAction.equals("") && extensionDefinition.path().equals(""))) {
+                        || (extensionAction.equals("") && extensionDefinition.path().equals(""))) {
                     // the extension path is valid so try to match on the action
                     methodToCall = new ExtensionMethod(method, extensionDefinition, extensionDescriptor);
                     break;
@@ -254,7 +254,7 @@ public abstract class AbstractSubResource extends BaseResource {
     }
 
     protected Object invokeExtension(String graphName, RexsterExtension rexsterExtension, ExtensionMethod methodToCall)
-                throws IllegalAccessException, InvocationTargetException {
+            throws IllegalAccessException, InvocationTargetException {
         return this.invokeExtension(graphName, rexsterExtension, methodToCall, null, null);
     }
 
@@ -352,8 +352,7 @@ public abstract class AbstractSubResource extends BaseResource {
                         methodToCallParams.add(this.getRequestObject().optJSONObject(extensionRequestParameter.name()));
                     } else if (parameterTypes[ix].equals(JSONArray.class)) {
                         methodToCallParams.add(this.getRequestObject().optJSONArray(extensionRequestParameter.name()));
-                    }
-                    else {
+                    } else {
                         // don't know what it is so just push a null
                         methodToCallParams.add(null);
                     }
@@ -449,7 +448,7 @@ public abstract class AbstractSubResource extends BaseResource {
 
     protected ExtensionResponse tryAppendRexsterAttributesIfJson(ExtensionResponse extResponse, ExtensionMethod methodToCall, String mediaType) {
         if (mediaType.equals(MediaType.APPLICATION_JSON)
-            && methodToCall.getExtensionDefinition().tryIncludeRexsterAttributes()) {
+                && methodToCall.getExtensionDefinition().tryIncludeRexsterAttributes()) {
 
             Object obj = extResponse.getJerseyResponse().getEntity();
             if (obj instanceof JSONObject) {

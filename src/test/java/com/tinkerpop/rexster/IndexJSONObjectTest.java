@@ -2,7 +2,6 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Index.Type;
-import com.tinkerpop.rexster.*;
 import org.codehaus.jettison.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;

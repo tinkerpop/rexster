@@ -11,11 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -308,7 +306,7 @@ public class AbstractSubResourceTest {
     }
 
     @Test
-    public void findExtensionGraphExtensionNotPresent(){
+    public void findExtensionGraphExtensionNotPresent() {
 
         this.mockery = new JUnit4Mockery();
         UriInfo uri = this.mockTheUri("not", "here", "");
@@ -318,7 +316,7 @@ public class AbstractSubResourceTest {
     }
 
     @Test
-    public void findExtensionGraphExtensionFound(){
+    public void findExtensionGraphExtensionFound() {
 
         this.mockery = new JUnit4Mockery();
         UriInfo uri = this.mockTheUri("tp", "gremlin", "");
@@ -488,12 +486,12 @@ public class AbstractSubResourceTest {
     private class MockRexsterExtension implements RexsterExtension {
 
         @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-        public ExtensionResponse doRoot(){
+        public ExtensionResponse doRoot() {
             return null;
         }
 
         @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "action")
-        public ExtensionResponse doAction(){
+        public ExtensionResponse doAction() {
             return null;
         }
 

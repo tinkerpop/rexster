@@ -33,7 +33,7 @@ public class ExtensionResponse {
 
     /**
      * Override the builder and literally construct the Jersey response.
-     *
+     * <p/>
      * Rexster will add its standard headers and override any provided in the response.  It is recommended
      * to use the @see error methods as opposed to override if the intention is to return an error on
      * the response.  The override methods will not throw a WebApplicationException or do any standard
@@ -105,10 +105,10 @@ public class ExtensionResponse {
     /**
      * Generates standard Rexster JSON error with an internal server error response code.
      *
-     * @param appendKey This parameter is only relevant if the appendJson parameter is passed.  If this value
-     *                  is not null or non-empty the value of appendJson will be assigned to this key value in
-     *                  the response object.  If the key is null or empty the appendJson parameter will be
-     *                  written at the root of the response object.
+     * @param appendKey  This parameter is only relevant if the appendJson parameter is passed.  If this value
+     *                   is not null or non-empty the value of appendJson will be assigned to this key value in
+     *                   the response object.  If the key is null or empty the appendJson parameter will be
+     *                   written at the root of the response object.
      * @param appendJson Additional JSON to push into the response.
      */
     public static ExtensionResponse error(String message, Exception source, String appendKey, JSONObject appendJson) {
@@ -122,12 +122,12 @@ public class ExtensionResponse {
      *                   will be merged into the root of the resulting JSON.
      */
     public static ExtensionResponse error(String message, Exception source, JSONObject appendJson) {
-         return error(message, source, null, appendJson);
+        return error(message, source, null, appendJson);
     }
 
     /**
      * Generates standard Rexster JSON error with a specified server error response code.
-     *
+     * <p/>
      * The status code is not validated, so throw the right code.
      */
     public static ExtensionResponse error(String message, Exception source, int statusCode) {
@@ -136,13 +136,13 @@ public class ExtensionResponse {
 
     /**
      * Generates standard Rexster JSON error with a specified server error response code.
-     *
+     * <p/>
      * The status code is not validated, so throw the right code.
      *
-     * @param appendKey This parameter is only relevant if the appendJson parameter is passed.  If this value
-     *                  is not null or non-empty the value of appendJson will be assigned to this key value in
-     *                  the response object.  If the key is null or empty the appendJson parameter will be
-     *                  written at the root of the response object.
+     * @param appendKey  This parameter is only relevant if the appendJson parameter is passed.  If this value
+     *                   is not null or non-empty the value of appendJson will be assigned to this key value in
+     *                   the response object.  If the key is null or empty the appendJson parameter will be
+     *                   written at the root of the response object.
      * @param appendJson Additional JSON to push into the response.
      */
     public static ExtensionResponse error(String message, Exception source, int statusCode, String appendKey, JSONObject appendJson) {

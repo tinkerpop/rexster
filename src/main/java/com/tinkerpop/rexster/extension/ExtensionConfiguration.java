@@ -55,12 +55,12 @@ public class ExtensionConfiguration {
     /**
      * Helper method that tries to read the configuration for the extension into a map.  The configuration
      * section must appear as follows for this method to work:
-     *
+     * <p/>
      * <configuration>
-     *     <key1>value</key1>
-     *     <key2>value</key2>
+     * <key1>value</key1>
+     * <key2>value</key2>
      * </configuration>
-     *
+     * <p/>
      * Key values must be unique within the configuration.
      *
      * @return A map or null if the parse does not work.

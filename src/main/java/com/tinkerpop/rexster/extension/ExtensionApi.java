@@ -9,5 +9,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ExtensionApi {
     String parameterName();
+
     String description() default "";
 }

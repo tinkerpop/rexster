@@ -59,7 +59,7 @@ public class ExtensionSegmentSet {
 
     @Override
     public String toString() {
-        return  (this.getNamespace().isEmpty() ? "[parse error]" : this.getNamespace()) + ":" +
+        return (this.getNamespace().isEmpty() ? "[parse error]" : this.getNamespace()) + ":" +
                 (this.getExtension().isEmpty() ? "[parse error]" : this.getExtension()) + "+"
                 + (this.getExtensionMethod().isEmpty() ? "*" : this.getExtensionMethod());
     }

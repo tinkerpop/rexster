@@ -2,7 +2,6 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
-
 import com.tinkerpop.rexster.extension.*;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -11,8 +10,10 @@ import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 @Path("/{graphname}")
 public class GraphResource extends AbstractSubResource {
@@ -44,15 +45,15 @@ public class GraphResource extends AbstractSubResource {
 
             this.resultObject.put("name", graphName);
             this.resultObject.put("graph", graph.toString());
-            
+
             boolean isReadOnly = false;
             String graphType = graph.getClass().getName();
             if (graph instanceof ReadOnlyGraph) {
-            	// readonly graphs must unwrap to the underlying graph implementation
-            	graphType = ((ReadOnlyGraph) graph).getRawGraph().getClass().getName();
-            	isReadOnly = true;
+                // readonly graphs must unwrap to the underlying graph implementation
+                graphType = ((ReadOnlyGraph) graph).getRawGraph().getClass().getName();
+                isReadOnly = true;
             }
-            
+
             this.resultObject.put(Tokens.READ_ONLY, isReadOnly);
             this.resultObject.put("type", graphType);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
@@ -124,7 +125,7 @@ public class GraphResource extends AbstractSubResource {
                 // found the method...time to do work
                 returnValue = invokeExtension(graphName, rexsterExtension, methodToCall);
 
-            } catch (WebApplicationException wae){
+            } catch (WebApplicationException wae) {
                 // already logged this...just throw it  up.
                 throw wae;
             } catch (Exception ex) {

@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster;
 
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
 import com.tinkerpop.blueprints.pgm.impls.sail.SailGraphFactory;
 import com.tinkerpop.blueprints.pgm.impls.sail.impls.MemoryStoreSailGraph;
@@ -22,7 +21,6 @@ import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

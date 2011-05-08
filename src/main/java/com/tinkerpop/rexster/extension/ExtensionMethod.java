@@ -46,7 +46,7 @@ public class ExtensionMethod {
 
                 if (this.extensionDescriptor.api().length > 0) {
 
-                    for (ExtensionApi apiItem : this.extensionDescriptor.api()){
+                    for (ExtensionApi apiItem : this.extensionDescriptor.api()) {
                         innerMap.put(apiItem.parameterName(), apiItem.description());
                     }
                 }

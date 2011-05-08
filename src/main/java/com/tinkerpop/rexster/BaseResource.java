@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster;
 
-import com.sun.jersey.api.core.HttpRequestContext;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
@@ -36,22 +35,22 @@ public abstract class BaseResource {
     protected JSONObject resultObject = new JSONObject();
 
     private RexsterApplicationProvider rexsterApplicationProvider;
-    
+
     @Context
     protected HttpServletRequest httpServletRequest;
-    
+
     @Context
     protected UriInfo uriInfo;
-    
+
     @Context
     protected ServletContext servletContext;
-    
+
     public BaseResource(RexsterApplicationProvider rexsterApplicationProvider) {
 
         // the general assumption is that the web server is the provider for RexsterApplication
         // instances.  this really should only change in unit test scenarios.
         this.rexsterApplicationProvider = rexsterApplicationProvider;
-        
+
         sh.stopWatch();
 
         try {
@@ -82,60 +81,60 @@ public abstract class BaseResource {
         // will not be thrown
         return new JSONObject(m);
     }
-    
+
     protected RexsterApplicationProvider getRexsterApplicationProvider() {
-    	if (this.rexsterApplicationProvider == null) {
-    		try {
-    			this.rexsterApplicationProvider = new WebServerRexsterApplicationProvider(this.servletContext);
-    		} catch (Exception ex) {
-    			logger.info("The Rexster Application Provider could not be configured", ex);
-    		}
-    	}
-    	
-    	return this.rexsterApplicationProvider;
-    }
-    
-    /**
-     * Sets the request object.
-     * 
-     * If this is set then the any previous call to getRequestObject which instantiated 
-     * the request object from the URI parameters will be overriden.
-     * 
-     * @param jsonObject The JSON Object.
-     */
-    protected void setRequestObject(JSONObject jsonObject) {
-    	this.requestObject = jsonObject;
+        if (this.rexsterApplicationProvider == null) {
+            try {
+                this.rexsterApplicationProvider = new WebServerRexsterApplicationProvider(this.servletContext);
+            } catch (Exception ex) {
+                logger.info("The Rexster Application Provider could not be configured", ex);
+            }
+        }
+
+        return this.rexsterApplicationProvider;
     }
 
     /**
-     * Gets the request object.  
-     * 
+     * Sets the request object.
+     * <p/>
+     * If this is set then the any previous call to getRequestObject which instantiated
+     * the request object from the URI parameters will be overriden.
+     *
+     * @param jsonObject The JSON Object.
+     */
+    protected void setRequestObject(JSONObject jsonObject) {
+        this.requestObject = jsonObject;
+    }
+
+    /**
+     * Gets the request object.
+     * <p/>
      * If it does not exist then an attempt is made to parse the parameter list on
-     * the URI into a JSON object.  It is then stored until the next request so 
+     * the URI into a JSON object.  It is then stored until the next request so
      * that parse of the URI does not have to happen more than once.
-     *  
+     *
      * @return The request object.
      */
     public JSONObject getRequestObject() {
-    	if (this.requestObject == null) {
-	    	try {
-	    		this.requestObject = new JSONObject();	    		
-	    		
-	    		if (this.httpServletRequest != null) {
-			    	Map<String, String> queryParameters = this.httpServletRequest.getParameterMap();
-			        this.buildRequestObject(queryParameters);
-	    		}
-	    		
-	    	} catch (JSONException ex) {
-	
-	            logger.error(ex);
-	
-	            JSONObject error = generateErrorObjectJsonFail(ex);
-	            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
-	        }
-    	} 
-    	
-    	return this.requestObject;
+        if (this.requestObject == null) {
+            try {
+                this.requestObject = new JSONObject();
+
+                if (this.httpServletRequest != null) {
+                    Map<String, String> queryParameters = this.httpServletRequest.getParameterMap();
+                    this.buildRequestObject(queryParameters);
+                }
+
+            } catch (JSONException ex) {
+
+                logger.error(ex);
+
+                JSONObject error = generateErrorObjectJsonFail(ex);
+                throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            }
+        }
+
+        return this.requestObject;
     }
 
     private void buildRequestObject(final Map queryParameters) throws JSONException {
@@ -185,7 +184,7 @@ public abstract class BaseResource {
 
         // need to pick apart the multivalue map.  want single primitives instead of
         // lists if possible.
-        for(String key : formParams.keySet()) {
+        for (String key : formParams.keySet()) {
             List list = formParams.get(key);
             if (list != null && list.size() > 1) {
                 map.put(key, list);
@@ -261,9 +260,9 @@ public abstract class BaseResource {
 
                 // returns zero if the value identified by the offsetToken is
                 // not a number and the key is just present.
-            	if (rexster.optJSONObject(Tokens.OFFSET).has(offsetToken)) {
-	                return rexster.optJSONObject(Tokens.OFFSET).optLong(offsetToken);
-            	} else {
+                if (rexster.optJSONObject(Tokens.OFFSET).has(offsetToken)) {
+                    return rexster.optJSONObject(Tokens.OFFSET).optLong(offsetToken);
+                } else {
                     return null;
                 }
             } else {
@@ -301,33 +300,33 @@ public abstract class BaseResource {
 
             List<String> keys = new ArrayList<String>();
             Object returnKeys = rexster.opt(Tokens.RETURN_KEYS);
-            
+
             if (returnKeys != null) {
-            	
-            	// returnKeys may be an array if multiple return keys were sent or
-            	// just a string...this could be an error in how the JSON request object
-            	// is being built...not sure.
-	            if (returnKeys instanceof JSONArray) {
-	            	JSONArray arr = (JSONArray) returnKeys;
-	
-		            if (arr != null) {
-		                for (int ix = 0; ix < arr.length(); ix++) {
-		                    keys.add(arr.optString(ix));
-		                }
-		            }
-	            } else if (returnKeys instanceof String) {
-	            	keys.add(returnKeys.toString());
-	            } else {
-	            	keys = null;
-	            }
+
+                // returnKeys may be an array if multiple return keys were sent or
+                // just a string...this could be an error in how the JSON request object
+                // is being built...not sure.
+                if (returnKeys instanceof JSONArray) {
+                    JSONArray arr = (JSONArray) returnKeys;
+
+                    if (arr != null) {
+                        for (int ix = 0; ix < arr.length(); ix++) {
+                            keys.add(arr.optString(ix));
+                        }
+                    }
+                } else if (returnKeys instanceof String) {
+                    keys.add(returnKeys.toString());
+                } else {
+                    keys = null;
+                }
             } else {
                 keys = null;
             }
 
             if (keys != null && keys.size() == 1 && keys.get(0).equals(Tokens.WILDCARD)) {
-            	keys = null;
+                keys = null;
             }
-            
+
             return keys;
         } else {
             return null;

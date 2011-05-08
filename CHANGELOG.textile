@@ -12,13 +12,13 @@ All releases can be accessed through the TinkerPop Maven2 repository identified 
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dogeatdog.png!
 
-h3. Version 0.3 (Dog Eat Dog -- May 9, 2011)
+h3. Version 0.3 (Dog Eat Dog -- May 8, 2011)
 
 ```xml
  <dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>rexster</artifactId>
-  <version>0.3-SNAPSHOT</version>
+  <version>0.3</version>
 </dependency>
 ```
 
@@ -46,7 +46,7 @@ h3. Version 0.3 (Dog Eat Dog -- May 9, 2011)
 * New command line "debug" option for Rexster server which will turn on all logging of the underlying Jersey/Grizzly server.
 * Remote shutdown.
 * Paging model changed in The Dog House.  There is no longer a "Move Last" button when paging through vertices and edges.
-* Prefix resource for SailGraph implementations.
+* Prefix resource for @SailGraph@ implementations.
 
 ==<hr/>==
 

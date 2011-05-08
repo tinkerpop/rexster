@@ -2,7 +2,6 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.rexster.ElementJSONObject;
 import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -50,7 +49,7 @@ public class ElementJSONObjectTest {
             Assert.fail(ex.getMessage());
         }
     }
-    
+
     @Test
     public void constructorVertexElementWithPropertyKeys() {
         final Vertex v = this.mockery.mock(Vertex.class);
@@ -70,10 +69,10 @@ public class ElementJSONObjectTest {
         }});
 
         try {
-        	List<String> returnKeys = new ArrayList<String>();
-        	returnKeys.add("some-key");
-        	
-        	// always show meta data even with return key restrictions
+            List<String> returnKeys = new ArrayList<String>();
+            returnKeys.add("some-key");
+
+            // always show meta data even with return key restrictions
             ElementJSONObject jo = new ElementJSONObject(v, returnKeys);
             Assert.assertEquals("123", jo.getId());
             Assert.assertEquals("123", jo.getString(Tokens._ID));

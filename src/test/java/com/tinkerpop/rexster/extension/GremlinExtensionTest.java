@@ -7,7 +7,6 @@ import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
@@ -19,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
-import java.util.HashMap;
 
 public class GremlinExtensionTest {
 
@@ -38,7 +36,7 @@ public class GremlinExtensionTest {
     private ExtensionMethod extensionMethodNoApi = new ExtensionMethod(null, null, null);
 
     private RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(null, uriInfo,
-                httpServletRequest, null, extensionMethodNoApi);
+            httpServletRequest, null, extensionMethodNoApi);
 
     /**
      * Choosing not to mock Graph instance for these tests as GremlinScriptEngine is

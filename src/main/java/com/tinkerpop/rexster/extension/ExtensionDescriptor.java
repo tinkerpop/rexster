@@ -9,6 +9,8 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD})
 public @interface ExtensionDescriptor {
     String description();
+
     ExtensionApi[] api() default {};
+
     ExtensionApiBehavior apiBehavior() default ExtensionApiBehavior.DEFAULT;
 }
