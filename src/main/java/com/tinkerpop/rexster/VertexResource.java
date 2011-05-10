@@ -85,36 +85,29 @@ public class VertexResource extends AbstractSubResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSingleVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
-        try {
-            Vertex vertex = this.getRexsterApplicationGraph(graphName).getGraph().getVertex(id);
-            if (null != vertex) {
-                try {
-                    this.resultObject.put(Tokens.RESULTS, new com.tinkerpop.rexster.ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
-                    this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
+        Vertex vertex = this.getRexsterApplicationGraph(graphName).getGraph().getVertex(id);
+        if (null != vertex) {
+            try {
+                this.resultObject.put(Tokens.RESULTS, new com.tinkerpop.rexster.ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
+                this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
-                    JSONArray extensionsList = getExtensionHypermedia(graphName, ExtensionPoint.VERTEX);
-                    if (extensionsList != null) {
-                        this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
-                    }
-
-                } catch (JSONException ex) {
-                    logger.error(ex);
-
-                    JSONObject error = generateErrorObjectJsonFail(ex);
-                    throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+                JSONArray extensionsList = getExtensionHypermedia(graphName, ExtensionPoint.VERTEX);
+                if (extensionsList != null) {
+                    this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                 }
-            } else {
-                String msg = "Could not find vertex [" + id + "] on graph [" + graphName + "]";
-                logger.info(msg);
 
-                JSONObject error = generateErrorObject(msg);
-                throw new WebApplicationException(this.addHeaders(Response.status(Status.NOT_FOUND).entity(error)).build());
+            } catch (JSONException ex) {
+                logger.error(ex);
+
+                JSONObject error = generateErrorObjectJsonFail(ex);
+                throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
             }
-        } catch (RuntimeException re) {
-            logger.error(re);
+        } else {
+            String msg = "Could not find vertex [" + id + "] on graph [" + graphName + "]";
+            logger.info(msg);
 
-            JSONObject error = generateErrorObject(re.getMessage(), re);
-            throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            JSONObject error = generateErrorObject(msg);
+            throw new WebApplicationException(this.addHeaders(Response.status(Status.NOT_FOUND).entity(error)).build());
         }
 
         return this.addHeaders(Response.ok(this.resultObject)).build();
