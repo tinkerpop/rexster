@@ -212,7 +212,25 @@ public class EdgeResource extends AbstractSubResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response postNullEdge(@PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
         this.buildRequestObject(formParams);
+        return this.postEdge(graphName, null);
+    }
+
+    /**
+     * POST http://host/graph/edges
+     * graph.addEdge(null);
+     */
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response postNullEdge(@PathParam("graphname") String graphName, String jsonString) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(jsonString);
         return this.postEdge(graphName, null);
     }
 
@@ -228,7 +246,7 @@ public class EdgeResource extends AbstractSubResource {
     }
 
     /**
-     * POST http://host/graph/edge/id?_inV=id1&_outV=id2&label=string&key=value
+     * POST http://host/graph/edge/id
      * Edge e = graph.addEdge(id,graph.getVertex(id1),graph.getVertex(id2),label);
      * e.setProperty(key,value);
      */
@@ -237,7 +255,27 @@ public class EdgeResource extends AbstractSubResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response postEdge(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
         this.buildRequestObject(formParams);
+        return this.postEdge(graphName, id);
+    }
+
+    /**
+     * POST http://host/graph/edge/id
+     * Edge e = graph.addEdge(id,graph.getVertex(id1),graph.getVertex(id2),label);
+     * e.setProperty(key,value);
+     */
+    @POST
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response postEdge(@PathParam("graphname") String graphName, @PathParam("id") String id, String jsonString) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(jsonString);
         return this.postEdge(graphName, id);
     }
 

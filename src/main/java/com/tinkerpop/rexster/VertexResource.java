@@ -288,7 +288,25 @@ public class VertexResource extends AbstractSubResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response postNullVertex(@PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
         this.buildRequestObject(formParams);
+        return this.postVertex(graphName, null);
+    }
+
+    /**
+     * POST http://host/graph/vertices
+     * graph.addVertex(null);
+     */
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response postNullVertex(@PathParam("graphname") String graphName, String jsonString) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(jsonString);
         return this.postVertex(graphName, null);
     }
 
@@ -303,7 +321,7 @@ public class VertexResource extends AbstractSubResource {
     }
 
     /**
-     * POST http://host/graph/vertices/id?key=value
+     * POST http://host/graph/vertices/id
      * Vertex v = graph.addVertex(id);
      * v.setProperty(key,value);
      */
@@ -312,7 +330,27 @@ public class VertexResource extends AbstractSubResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response postVertex(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
         this.buildRequestObject(formParams);
+        return this.postVertex(graphName, id);
+    }
+
+    /**
+     * POST http://host/graph/vertices/id
+     * Vertex v = graph.addVertex(id);
+     * v.setProperty(key,value);
+     */
+    @POST
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response postVertex(@PathParam("graphname") String graphName, @PathParam("id") String id, String jsonString) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(jsonString);
         return this.postVertex(graphName, id);
     }
 
