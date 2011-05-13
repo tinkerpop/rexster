@@ -9,6 +9,7 @@ import org.codehaus.jettison.json.JSONObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.HashMap;
@@ -19,7 +20,6 @@ import java.util.Set;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 @Path("/{graphname}/indices")
-@Produces(MediaType.APPLICATION_JSON)
 public class IndexResource extends AbstractSubResource {
 
     private static Logger logger = Logger.getLogger(EdgeResource.class);
@@ -39,6 +39,7 @@ public class IndexResource extends AbstractSubResource {
      * get.getIndices();
      */
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getAllIndices(@PathParam("graphname") String graphName) {
         IndexableGraph idxGraph = null;
         if (this.getRexsterApplicationGraph(graphName).getGraph() instanceof IndexableGraph) {
@@ -86,6 +87,7 @@ public class IndexResource extends AbstractSubResource {
      */
     @GET
     @Path("/{indexName}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getElementsFromIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
         final Index index = this.getIndexFromGraph(graphName, indexName);
 
@@ -161,6 +163,7 @@ public class IndexResource extends AbstractSubResource {
      */
     @GET
     @Path("/{indexName}/keys")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getAutomaticIndexKeys(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
         Index index = this.getIndexFromGraph(graphName, indexName);
 
@@ -205,6 +208,7 @@ public class IndexResource extends AbstractSubResource {
      */
     @GET
     @Path("/{indexName}/count")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getIndexCount(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
         Index index = this.getIndexFromGraph(graphName, indexName);
 
@@ -261,6 +265,7 @@ public class IndexResource extends AbstractSubResource {
      */
     @DELETE
     @Path("/{indexName}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response deleteIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
         final Index index = this.getIndexFromGraph(graphName, indexName);
         final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
@@ -319,6 +324,46 @@ public class IndexResource extends AbstractSubResource {
 
     }
 
+     /**
+     * POST http://host/graph/indices/indexName?key=key1&value=value1&class=vertex&id=id1
+     * Index index = graph.getIndex(indexName,...);
+     * index.put(key,value,graph.getVertex(id1));
+     * <p/>
+     * POST http://host/graph/indices/indexName?class=vertex&type=automatic&keys=[name,age]
+     * graph.createIndex(indexName,Vertex.class,AUTOMATIC, {name, age})
+     */
+    @POST
+    @Path("/{indexName}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response putElementInIndexOrCreateIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, MultivaluedMap<String, String> formParams) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(formParams);
+        return this.putElementInIndexOrCreateIndex(graphName, indexName);
+
+    }
+
+     /**
+     * POST http://host/graph/indices/indexName?key=key1&value=value1&class=vertex&id=id1
+     * Index index = graph.getIndex(indexName,...);
+     * index.put(key,value,graph.getVertex(id1));
+     * <p/>
+     * POST http://host/graph/indices/indexName?class=vertex&type=automatic&keys=[name,age]
+     * graph.createIndex(indexName,Vertex.class,AUTOMATIC, {name, age})
+     */
+    @POST
+    @Path("/{indexName}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response putElementInIndexOrCreateIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, String jsonString) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(jsonString);
+        return this.putElementInIndexOrCreateIndex(graphName, indexName);
+    }
 
     /**
      * POST http://host/graph/indices/indexName?key=key1&value=value1&class=vertex&id=id1
@@ -330,6 +375,7 @@ public class IndexResource extends AbstractSubResource {
      */
     @POST
     @Path("/{indexName}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response putElementInIndexOrCreateIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
         final Index index = this.getIndexFromGraph(graphName, indexName);
         final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
