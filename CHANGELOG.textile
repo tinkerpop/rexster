@@ -10,6 +10,18 @@ All releases can be accessed through the TinkerPop Maven2 repository identified 
 
 ==<hr/>==
 
+h3. Version 0.4 (NOT OFFICIALLY RELEASED YET)
+
+```xml
+ <dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>rexster</artifactId>
+  <version>0.4-SNAPSHOT</version>
+</dependency>
+```
+
+==<hr/>==
+
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dogeatdog.png!
 
 h3. Version 0.3 (Dog Eat Dog -- May 8, 2011)
