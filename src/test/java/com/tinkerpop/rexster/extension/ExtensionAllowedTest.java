@@ -37,7 +37,17 @@ public class ExtensionAllowedTest {
         ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "allowed", ""), ExtensionPoint.GRAPH);
         Assert.assertTrue(configuration.isExtensionAllowed(extensionSegmentSet));
 
-        extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "not-allowed", ""), ExtensionPoint.GRAPH);
+        extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "not_allowed", ""), ExtensionPoint.GRAPH);
+        Assert.assertFalse(configuration.isExtensionAllowed(extensionSegmentSet));
+    }
+
+    @Test
+    public void isExtensionAllowedAllowDashedExtension() {
+        ExtensionAllowed configuration = new ExtensionAllowed("ns-dash:allowed-dash");
+        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns-dash", "allowed-dash", ""), ExtensionPoint.GRAPH);
+        Assert.assertTrue(configuration.isExtensionAllowed(extensionSegmentSet));
+
+        extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "not_allowed", ""), ExtensionPoint.GRAPH);
         Assert.assertFalse(configuration.isExtensionAllowed(extensionSegmentSet));
     }
 

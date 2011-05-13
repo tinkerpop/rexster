@@ -12,7 +12,7 @@ public class ExtensionAllowed {
      */
     public ExtensionAllowed(String namespace) {
         // must match this format *:*, namespace:*, namespace:extension
-        if (!(namespace.matches("(\\w+|\\*):(\\w+|\\*)")
+        if (!(namespace.matches("([\\w-]+|\\*):([\\w-]+|\\*)")
                 && !(namespace.startsWith("*") && namespace.equals("*.*")))) {
             throw new IllegalArgumentException("The namespace must match the format of *:*, namespace:*, namespace:extension");
         }
