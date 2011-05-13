@@ -187,7 +187,9 @@ public abstract class BaseResource {
         for (String key : formParams.keySet()) {
             List list = formParams.get(key);
             if (list != null && list.size() > 1) {
-                map.put(key, list);
+                JSONArray set = new JSONArray();
+                set.put(list);
+                map.put(key, set);
             } else if (list.size() == 1) {
                 map.put(key, formParams.getFirst(key));
             } else {

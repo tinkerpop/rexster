@@ -405,7 +405,14 @@ public class IndexResource extends AbstractSubResource {
         temp = this.getRequestObject().opt(Tokens.KEYS);
         if (null != temp) {
             try {
-                JSONArray ks = (JSONArray) temp;
+                JSONArray ks;
+                if (temp instanceof String) {
+                    ks = new JSONArray();
+                    ks.put(temp);
+                } else {
+                    ks = (JSONArray) temp;
+                }
+
                 keys = new HashSet<String>();
                 for (int i = 0; i < ks.length(); i++) {
                     keys.add(ks.getString(i));
