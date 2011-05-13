@@ -7,19 +7,24 @@
 
         var config =
         {
-            'type_prefix': false,
-            'json_name': 'unknown',
-            'json_data': null,
+            'typePrefix': false,
+            'jsonName': 'unknown',
+            'jsonData': null,
             'ident' : '12px',
-            'inner-padding': '2px',
-            'outer-padding': '4px',
-            'debug' : false
+            'innerPadding': '2px',
+            'outerPadding': '4px',
+            'debug' : false,
+            'overrideCss' : {
+                'highlight':'json-widget-highlight',
+                'header':'json-widget-header',
+                'content' :'json-widget-content'
+            }
         };
         
         if (settings) $.extend(config, settings);
         
         this.each(function(key, element) {
-            format_value(element, config['json_name'], config['json_data'], config, true);
+            format_value(element, config['jsonName'], config['jsonData'], config, true);
         });
         
         return this;
@@ -31,24 +36,24 @@
     	var isMetaData = name === "_type" || name === "_id" || name === "_outV" || name === "_inV" || name === "_label"; 
     	if (!isMetaData) {
 	        var v = new TypeHandler(data);
-	        var type_prefix = v.type().charAt(0);
+	        var typePrefix = v.type().charAt(0);
 	        var container = $('<div/>');
 	        $(container).appendTo(element);
-	        $(container).addClass('json-widget').css({'padding': config['outer-padding'], 'padding-left': config['ident'] });
+	        $(container).addClass('json-widget').css({'padding': config['outerPadding'], 'padding-left': config['ident'] });
 	        
 	        // highlight on hover
 	        $(container).hover(function(event) {
-	        	$(container).children().toggleClass("json-widget-highlight");
+	        	$(container).children().toggleClass(config.overrideCss.highlight);
 	        });
 	        
 	        if (v.type() == "object" || v.type() == "array") {
 	        	var header = $('<div/>');
 		        $(header).appendTo(container);
-		        $(header).addClass('json-widget-header ui-corner-top')
+		        $(header).addClass(config.overrideCss.header + ' ui-corner-top')
 		            .css({ 'cursor': 'hand', //'float': 'left',
 		                'text-align': 'left', 'white-space': 'nowrap'
 		            });
-		        $(header).text('' + (config['type_prefix'] ? "(" + type_prefix + ")" : "") + name);
+		        $(header).text('' + (config['typePrefix'] ? "(" + typePrefix + ")" : "") + name);
 	        	
 		        $(header).click(function(event) {
 		        	$(header).next().toggleClass('ui-helper-hidden');
@@ -57,8 +62,8 @@
 		        
 	            var content = $('<div/>');
 	            $(content).appendTo(container);
-	            $(content).addClass('json-widget-content ui-corner-bottom')
-	            	.css({ 'white-space': 'nowrap', 'padding': config['inner-padding'] });
+	            $(content).addClass(config.overrideCss.content + ' ui-corner-bottom')
+	            	.css({ 'white-space': 'nowrap', 'padding': config['innerPadding'] });
 	            for (name in data) { format_value(content, name, data[name], config, false); }
 	            
 	            if (showToolbar && config.toolbar != undefined) {

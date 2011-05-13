@@ -276,12 +276,26 @@ Rexster.modules.graph = function(api) {
 						vis.render();
 					    */
 					});
-					
-					containerPanelBrowserMain.children().last().jsonviewer({ 
-						"json_name": "#" + (pageStart + ix + 1) + " | " + metaDataLabel, 
-						"json_data": results[ix], 
-						"outer-padding":"0px",
-						"toolbar": toolbar});
+
+					if (results[ix]._type == "edge") {
+                        containerPanelBrowserMain.children().last().jsonviewer({
+                            "jsonName": "#" + (pageStart + ix + 1) + " | " + metaDataLabel,
+                            "jsonData": results[ix],
+                            "outerPadding":"0px",
+                            "toolbar": toolbar});
+                    } else {
+						containerPanelBrowserMain.children().last().jsonviewer({
+                            "jsonName": "#" + (pageStart + ix + 1) + " | " + metaDataLabel,
+                            "jsonData": results[ix],
+                            "outerPadding":"0px",
+                            "toolbar": toolbar,
+                            "overrideCss" : {
+                                "highlight":"json-widget-highlight-vertex",
+                                "header":"json-widget-header-vertex",
+                                "content" :"json-widget-content-vertex"
+                            }
+                        });
+					}
 					
 				}
 				
@@ -403,9 +417,15 @@ Rexster.modules.graph = function(api) {
 					metaDataLabel = "Type:[" + element._type + "] ID:[" + element._id + "]";
 					
 					$("#panelElementViewerMiddle").jsonviewer({ 
-						"json_name": metaDataLabel, 
-						"json_data": element, 
-						"outer-padding":"0px"});
+						"jsonName": metaDataLabel,
+						"jsonData": element,
+						"outerPadding":"0px",
+						"overrideCss" : {
+						    "highlight":"json-widget-highlight-vertex",
+                            "header":"json-widget-header-vertex",
+                            "content" :"json-widget-content-vertex"
+						}
+				    });
 				}, 
 				function(err) {
 				},
@@ -465,9 +485,9 @@ Rexster.modules.graph = function(api) {
 					metaDataLabel = "Type:[" + element._type + "] ID:[" + element._id + "] Label:[" + element._label + "]";
 					
 					$("#panelElementViewerMiddle").jsonviewer({ 
-						"json_name": metaDataLabel, 
-						"json_data": element, 
-						"outer-padding":"0px"});
+						"jsonName": metaDataLabel,
+						"jsonData": element,
+						"outerPadding":"0px"});
 					
 					$("#panelElementViewerRight .intense .value").text("");
 					$("#panelElementViewerRight .intense .label").text("");
@@ -520,10 +540,15 @@ Rexster.modules.graph = function(api) {
 						});
 						
 						$("#panelElementViewerRight > ul").jsonviewer({ 
-							"json_name": metaDataLabel, 
-							"json_data": element, 
-							"outer-padding":"0px",
-							"toolbar":toolbar});
+							"jsonName": metaDataLabel,
+							"jsonData": element,
+							"outerPadding":"0px",
+							"toolbar":toolbar,
+                            "overrideCss" : {
+                                "highlight":"json-widget-highlight-vertex",
+                                "header":"json-widget-header-vertex",
+                                "content" :"json-widget-content-vertex"
+                            }});
 					}, 
 					function(err) {
 					},
@@ -570,10 +595,15 @@ Rexster.modules.graph = function(api) {
 						});
 						
 						$("#panelElementViewerLeft > ul").jsonviewer({ 
-							"json_name": metaDataLabel, 
-							"json_data": element, 
-							"outer-padding":"0px",
-							"toolbar":toolbar});
+							"jsonName": metaDataLabel,
+							"jsonData": element,
+							"outerPadding":"0px",
+							"toolbar":toolbar,
+                            "overrideCss" : {
+                                "highlight":"json-widget-highlight-vertex",
+                                "header":"json-widget-header-vertex",
+                                "content" :"json-widget-content-vertex"
+                            }});
 					}, 
 					function(err) {
 					},
