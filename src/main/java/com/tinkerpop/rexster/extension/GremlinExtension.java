@@ -92,7 +92,10 @@ public class GremlinExtension extends AbstractRexsterExtension {
 
                 JSONArray results = new JSONArray();
                 Object result = engine.eval(script, bindings);
-                if (result instanceof Iterable) {
+                if (result == null) {
+                    // for example a script like g.clear()
+                    results = null;
+                } else if (result instanceof Iterable) {
                     for (Object o : (Iterable) result) {
                         results.put(prepareOutput(o, returnKeys, showTypes));
                     }
