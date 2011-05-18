@@ -101,33 +101,38 @@ public abstract class AbstractSubResource extends BaseResource {
             }
 
             // test the configuration to see if the extension should even be available
-            ExtensionConfiguration extensionConfig = rag.findExtensionConfiguration(
+            ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(
                     currentExtensionNamespace, currentExtensionName);
-            RexsterExtension rexsterExtension = null;
-            try {
-                rexsterExtension = (RexsterExtension) clazz.newInstance();
-            } catch (Exception ex) {
-                logger.warn("Failed extension configuration check for " + currentExtensionNamespace + ":"
-                        + currentExtensionName + "on graph " + graphName);
-            }
 
-            if (rexsterExtension != null && rexsterExtension.isConfigurationValid(extensionConfig)) {
-                Method[] methods = clazz.getMethods();
-                for (Method method : methods) {
-                    ExtensionDescriptor descriptor = method.getAnnotation(ExtensionDescriptor.class);
-                    ExtensionDefinition definition = method.getAnnotation(ExtensionDefinition.class);
+            if (rag.isExtensionAllowed(extensionSegmentSet)) {
+                ExtensionConfiguration extensionConfig = rag.findExtensionConfiguration(
+                        currentExtensionNamespace, currentExtensionName);
+                RexsterExtension rexsterExtension = null;
+                try {
+                    rexsterExtension = (RexsterExtension) clazz.newInstance();
+                } catch (Exception ex) {
+                    logger.warn("Failed extension configuration check for " + currentExtensionNamespace + ":"
+                            + currentExtensionName + "on graph " + graphName);
+                }
 
-                    if (definition != null && definition.extensionPoint() == extensionPoint) {
-                        String href = currentExtensionNamespace + "/" + currentExtensionName;
-                        if (!definition.path().isEmpty()) {
-                            href = href + "/" + definition.path();
+                if (rexsterExtension != null && rexsterExtension.isConfigurationValid(extensionConfig)) {
+                    Method[] methods = clazz.getMethods();
+                    for (Method method : methods) {
+                        ExtensionDescriptor descriptor = method.getAnnotation(ExtensionDescriptor.class);
+                        ExtensionDefinition definition = method.getAnnotation(ExtensionDefinition.class);
+
+                        if (definition != null && definition.extensionPoint() == extensionPoint) {
+                            String href = currentExtensionNamespace + "/" + currentExtensionName;
+                            if (!definition.path().isEmpty()) {
+                                href = href + "/" + definition.path();
+                            }
+
+                            HashMap hypermediaLink = new HashMap();
+                            hypermediaLink.put("href", href);
+                            hypermediaLink.put("title", descriptor.description());
+
+                            hypermediaLinks.put(new JSONObject(hypermediaLink));
                         }
-
-                        HashMap hypermediaLink = new HashMap();
-                        hypermediaLink.put("href", href);
-                        hypermediaLink.put("title", descriptor.description());
-
-                        hypermediaLinks.put(new JSONObject(hypermediaLink));
                     }
                 }
             }

@@ -20,6 +20,7 @@ import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * Tests edge resource.  Should not need to test any specific returns values as they are
@@ -450,6 +451,11 @@ public class EdgeResourceTest {
     private EdgeResource constructMockGetSingleEdgeScenario(final Edge edge, final HashMap<String, String> parameters) {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+
+        List<String> namespaces = new ArrayList<String>();
+        namespaces.add("*:*");
+        rag.loadAllowableExtensions(namespaces);
+
         final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);

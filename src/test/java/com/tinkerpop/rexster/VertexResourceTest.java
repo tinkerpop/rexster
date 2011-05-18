@@ -11,16 +11,14 @@ import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xml.sax.helpers.NamespaceSupport;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Tests vertex resource.  Should not need to test any specific returns values as they are
@@ -520,6 +518,10 @@ public class VertexResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+
+        List<String> namespaces = new ArrayList<String>();
+        namespaces.add("*:*");
+        rag.loadAllowableExtensions(namespaces);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 

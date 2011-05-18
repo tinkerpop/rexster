@@ -13,7 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class GraphResourceTest {
     protected Mockery mockery = new JUnit4Mockery();
@@ -80,6 +82,10 @@ public class GraphResourceTest {
     private GraphResource constructMockGetGraphScenario(final HashMap<String, String> parameters) {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+
+        List<String> namespaces = new ArrayList<String>();
+        namespaces.add("*:*");
+        rag.loadAllowableExtensions(namespaces);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 

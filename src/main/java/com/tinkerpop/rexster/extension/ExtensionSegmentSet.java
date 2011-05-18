@@ -12,6 +12,12 @@ public class ExtensionSegmentSet {
 
     private String extensionMethod;
 
+    public ExtensionSegmentSet(String namespace, String extension) {
+        this.namespace = namespace;
+        this.extension = extension;
+        this.extensionMethod = "";
+    }
+
     public ExtensionSegmentSet(UriInfo uriInfo, ExtensionPoint extensionPoint) {
 
         int start = 1;
