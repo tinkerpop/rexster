@@ -129,7 +129,11 @@ public abstract class AbstractSubResource extends BaseResource {
 
                             HashMap hypermediaLink = new HashMap();
                             hypermediaLink.put("href", href);
-                            hypermediaLink.put("title", descriptor.description());
+
+                            // descriptor is not a required annotation for extensions.
+                            if (descriptor != null) {
+                                hypermediaLink.put("title", descriptor.description());
+                            }
 
                             hypermediaLinks.put(new JSONObject(hypermediaLink));
                         }
