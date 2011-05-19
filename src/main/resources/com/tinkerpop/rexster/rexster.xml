@@ -122,5 +122,11 @@
             <graph-type>dexgraph</graph-type>
             <graph-file>/tmp/graph.dex</graph-file>
         </graph>
+        <graph>
+            <graph-enabled>false</graph-enabled>
+            <graph-name>remotetinkergraph</graph-name>
+            <graph-type>rexstergraph</graph-type>
+            <graph-file>http://remoteserver:8182/tinkergraph</graph-file>
+        </graph>
     </graphs>
 </rexster>

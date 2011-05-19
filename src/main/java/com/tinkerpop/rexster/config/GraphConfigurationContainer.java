@@ -97,6 +97,8 @@ public class GraphConfigurationContainer {
             graphConfigurationType = OrientGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("tinkergraph")) {
             graphConfigurationType = TinkerGraphGraphConfiguration.class.getName();
+        } else if (graphConfigurationType.equals("rexstergraph")) {
+            graphConfigurationType = RexsterGraphGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("memorystoresailgraph")) {
             graphConfigurationType = MemoryStoreSailGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("nativestoresailgraph")) {

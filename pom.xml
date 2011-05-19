@@ -80,6 +80,12 @@
             <version>0.8-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+           <groupId>com.tinkerpop.blueprints</groupId>
+           <artifactId>blueprints-rexster-graph</artifactId>
+           <version>0.8-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- JSON SUPPORT -->
         <dependency>
             <groupId>com.sun.jersey</groupId>
