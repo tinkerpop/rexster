@@ -17,6 +17,18 @@ public class RequestObjectHelper {
     public static final String DEFAULT_WILDCARD = "*";
 
     /**
+     * Given a request object, return the fragment of JSON that deals with Rexster-reserved parameters.
+     *
+     * These parameters are the returnKeys, showTypes, and offset.
+     *
+     * @param requestObject  the request object
+     * @return the JSON
+     */
+    public static JSONObject getRexsterRequest(JSONObject requestObject) {
+        return requestObject != null ? requestObject.optJSONObject(Tokens.REXSTER) : null;
+    }
+
+    /**
      * Given a request object, return the desired returnKeys. Utilizes the value of the DEFAULT_WILDCARD.
      *
      * @param requestObject the request object
@@ -34,9 +46,12 @@ public class RequestObjectHelper {
      * @return the return keys
      */
     public static List<String> getReturnKeys(final JSONObject requestObject, final String wildcard) {
-        if (requestObject != null) {
+
+        JSONObject rexsterRequestObject = getRexsterRequest(requestObject);
+
+        if (rexsterRequestObject != null) {
             try {
-                final JSONArray jsonArrayOfReturnKeys = ((JSONArray) requestObject.get(Tokens.RETURN_KEYS));
+                final JSONArray jsonArrayOfReturnKeys = rexsterRequestObject.optJSONArray(Tokens.RETURN_KEYS);
                 return getReturnKeys(jsonArrayOfReturnKeys, wildcard);
             } catch (Exception e) {
                 return null;
@@ -84,9 +99,11 @@ public class RequestObjectHelper {
      * @return whether the user specified a show types (default is false)
      */
     public static boolean getShowTypes(final JSONObject requestObject) {
-        if (requestObject != null) {
+        JSONObject rexsterRequestObject = getRexsterRequest(requestObject);
+
+        if (rexsterRequestObject != null) {
             try {
-                return requestObject.getBoolean(Tokens.SHOW_TYPES);
+                return rexsterRequestObject.getBoolean(Tokens.SHOW_TYPES);
             } catch (JSONException e) {
                 return false;
             }
@@ -94,4 +111,56 @@ public class RequestObjectHelper {
             return false;
         }
     }
+
+    /**
+     * Given a request object, return the start offset for paging purposes.
+     *
+     * @param requestObject the request object.
+     * @return the start offset
+     */
+    public static Long getStartOffset(JSONObject requestObject) {
+        Long offset = getOffset(requestObject, Tokens.START);
+        if (null == offset)
+            return 0l;
+        else
+            return offset;
+    }
+
+    /**
+     * Given a request object, return the end offset for paging purposes.
+     *
+     * @param requestObject the request object.
+     * @return the end offset
+     */
+    public static Long getEndOffset(JSONObject requestObject) {
+        Long offset = getOffset(requestObject, Tokens.END);
+        if (null == offset)
+            return Long.MAX_VALUE;
+        else
+            return offset;
+    }
+
+    private static Long getOffset(JSONObject requestObject, String offsetToken) {
+
+        JSONObject rexsterRequestObject = getRexsterRequest(requestObject);
+
+        if (rexsterRequestObject != null) {
+
+            if (rexsterRequestObject != null && rexsterRequestObject.has(Tokens.OFFSET)) {
+
+                // returns zero if the value identified by the offsetToken is
+                // not a number and the key is just present.
+                if (rexsterRequestObject.optJSONObject(Tokens.OFFSET).has(offsetToken)) {
+                    return rexsterRequestObject.optJSONObject(Tokens.OFFSET).optLong(offsetToken);
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
 }

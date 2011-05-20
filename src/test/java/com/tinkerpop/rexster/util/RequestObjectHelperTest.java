@@ -1,9 +1,11 @@
 package com.tinkerpop.rexster.util;
 
+import com.tinkerpop.rexster.BaseResource;
 import com.tinkerpop.rexster.Tokens;
 import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONTokener;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -19,17 +21,13 @@ public class RequestObjectHelperTest {
 
     @Test
     public void getShowTypesBadValue() {
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put(Tokens.SHOW_TYPES, "not-true-or-false");
-        JSONObject jsonWithNonBooleanValueForKey = new JSONObject(map);
+        JSONObject jsonWithNonBooleanValueForKey = buildJSONObjectFromString("{\"rexster\": { \"showTypes\": \"not-true-or-false\"}}");
         Assert.assertFalse(RequestObjectHelper.getShowTypes(jsonWithNonBooleanValueForKey));
     }
 
     @Test
     public void getShowTypesValid() {
-        HashMap<String, Boolean> map = new HashMap<String, Boolean>();
-        map.put(Tokens.SHOW_TYPES, true);
-        JSONObject jsonWithBooleanValueForKey = new JSONObject(map);
+        JSONObject jsonWithBooleanValueForKey = buildJSONObjectFromString("{\"rexster\": { \"showTypes\": true}}");
         Assert.assertTrue(RequestObjectHelper.getShowTypes(jsonWithBooleanValueForKey));
     }
 
@@ -40,13 +38,7 @@ public class RequestObjectHelperTest {
 
     @Test
     public void getReturnKeysWildcarded() {
-        HashMap<String, JSONArray> map = new HashMap<String, JSONArray>();
-
-        JSONArray returnKeysAsJson =  new JSONArray();
-        returnKeysAsJson.put(RequestObjectHelper.DEFAULT_WILDCARD);
-        map.put(Tokens.RETURN_KEYS, returnKeysAsJson);
-
-        JSONObject jsonWithWildcard = new JSONObject(map);
+        JSONObject jsonWithWildcard = buildJSONObjectFromString("{\"rexster\": { \"returnKeys\": [\"" + RequestObjectHelper.DEFAULT_WILDCARD + "\"]}}");
         Assert.assertNull(RequestObjectHelper.getReturnKeys(jsonWithWildcard));
     }
 
@@ -58,28 +50,102 @@ public class RequestObjectHelperTest {
 
     @Test
     public void getReturnKeysNonArrayBased() {
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put(Tokens.RETURN_KEYS, RequestObjectHelper.DEFAULT_WILDCARD);
-
-        JSONObject jsonWithNonArrayReturnKeyValue = new JSONObject(map);
+        JSONObject jsonWithNonArrayReturnKeyValue = buildJSONObjectFromString("{\"rexster\": { \"" + Tokens.RETURN_KEYS + "\": \"" + RequestObjectHelper.DEFAULT_WILDCARD + "\"}}");
         Assert.assertNull(RequestObjectHelper.getReturnKeys(jsonWithNonArrayReturnKeyValue));
     }
 
     @Test
     public void getReturnKeysValid() {
-        HashMap<String, JSONArray> map = new HashMap<String, JSONArray>();
-
-        JSONArray returnKeysAsJson =  new JSONArray();
-        returnKeysAsJson.put("k1");
-        returnKeysAsJson.put("k2");
-        map.put(Tokens.RETURN_KEYS, returnKeysAsJson);
-
-        JSONObject jsonWithWildcard = new JSONObject(map);
-        List<String> keys = RequestObjectHelper.getReturnKeys(jsonWithWildcard);
+        JSONObject jsonWithTwoKeys = buildJSONObjectFromString("{\"rexster\": { \"" + Tokens.RETURN_KEYS + "\": [\"k1\",\"k2\"]}}");
+        List<String> keys = RequestObjectHelper.getReturnKeys(jsonWithTwoKeys);
         Assert.assertNotNull(keys);
         Assert.assertEquals(2, keys.size());
 
         Assert.assertEquals("k1", keys.get(0));
         Assert.assertEquals("k2", keys.get(1));
+    }
+
+    @Test
+    public void getStartOffsetEmptyRequest() {
+        Assert.assertEquals(new Long(0), RequestObjectHelper.getStartOffset(null));
+    }
+
+    private JSONObject buildJSONObjectFromString(String json) {
+        try {
+            JSONTokener tokener = new JSONTokener(json);
+            return new JSONObject(tokener);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Test
+    public void getEndOffsetNullRequest() {
+        Assert.assertEquals(new Long(0), RequestObjectHelper.getStartOffset(null));
+    }
+
+    @Test
+    public void getStartOffsetNoOffset() {
+        JSONObject requestObject = buildJSONObjectFromString("{\"rexster\": { \"anyotherproperty\": { \"start\":\"ten\", \"end\":100 }}}");
+        Assert.assertEquals(new Long(0), RequestObjectHelper.getStartOffset(requestObject));
+    }
+
+    @Test
+    public void getStartOffsetInvalidOffset() {
+        JSONObject requestObject = buildJSONObjectFromString("{\"rexster\": { \"offset\": { \"start\":\"ten\", \"end\":100 }}}");
+        Assert.assertEquals(0l, (long) RequestObjectHelper.getStartOffset(requestObject));
+    }
+
+    @Test
+    public void getStartOffsetWithNoStart() {
+        JSONObject requestObject = buildJSONObjectFromString("{\"rexster\": { \"offset\": { \"end\":100 }}}");
+        Assert.assertEquals(0l, (long) RequestObjectHelper.getStartOffset(requestObject));
+    }
+
+    @Test
+    public void getStartOffsetValid() {
+        JSONObject requestObject = buildJSONObjectFromString("{\"rexster\": { \"offset\": { \"start\":10, \"end\":100 }}}");
+        Assert.assertEquals(10l, (long) RequestObjectHelper.getStartOffset(requestObject));
+
+        requestObject = buildJSONObjectFromString("{\"rexster\": { \"offset\": { \"start\":-10, \"end\":10001 }}}");
+        Assert.assertEquals(-10l, (long) RequestObjectHelper.getStartOffset(requestObject));
+    }
+
+    @Test
+    public void getEndOffsetEmptyRequest() {
+        JSONObject requestObject = buildJSONObjectFromString("{\"rexster\": \"nothing\"}");
+        Assert.assertEquals(new Long(Long.MAX_VALUE), RequestObjectHelper.getEndOffset(requestObject));
+    }
+
+    @Test
+    public void getEndOffsetEndNull() {
+        Assert.assertEquals(new Long(Long.MAX_VALUE), RequestObjectHelper.getEndOffset(null));
+    }
+
+    @Test
+    public void getEndOffsetStartWithNoEnd() {
+        JSONObject requestObject = buildJSONObjectFromString("{\"rexster\": { \"offset\": { \"start\":10 }}}");
+        Assert.assertEquals(new Long(Long.MAX_VALUE), RequestObjectHelper.getEndOffset(requestObject));
+    }
+
+    @Test
+    public void getEndOffsetNoOffset() {
+        JSONObject requestObject = buildJSONObjectFromString("{\"rexster\": { \"anyotherproperty\": { \"start\":10, \"end\":100 }}}");
+        Assert.assertEquals(new Long(Long.MAX_VALUE), RequestObjectHelper.getEndOffset(requestObject));
+    }
+
+    @Test
+    public void getEndOffsetInvalidOffset() {
+        JSONObject requestObject = buildJSONObjectFromString("{\"rexster\": { \"offset\": { \"start\":10, \"end\":\"onehundred\" }}}");
+        Assert.assertEquals(0l, (long) RequestObjectHelper.getEndOffset(requestObject));
+    }
+
+    @Test
+    public void getEndOffsetValid() {
+        JSONObject requestObject = buildJSONObjectFromString("{\"rexster\": { \"offset\": { \"start\":10, \"end\":100 }}}");
+        Assert.assertEquals(100l, (long) RequestObjectHelper.getEndOffset(requestObject));
+
+        requestObject = buildJSONObjectFromString("{\"rexster\": { \"offset\": { \"start\":-10, \"end\":10001 }}}");
+        Assert.assertEquals(10001l, (long) RequestObjectHelper.getEndOffset(requestObject));
     }
 }

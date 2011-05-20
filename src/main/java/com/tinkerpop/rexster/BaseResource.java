@@ -240,50 +240,20 @@ public abstract class BaseResource {
     }
 
     public Long getStartOffset() {
-        Long offset = getOffset(Tokens.START);
-        if (null == offset)
-            return 0l;
-        else
-            return offset;
+        return RequestObjectHelper.getStartOffset(this.getRequestObject());
     }
-
 
     public Long getEndOffset() {
-        Long offset = getOffset(Tokens.END);
-        if (null == offset)
-            return Long.MAX_VALUE;
-        else
-            return offset;
-    }
-
-    private Long getOffset(String offsetToken) {
-        JSONObject rexster = this.getRexsterRequest();
-        if (rexster != null) {
-            if (rexster.has(Tokens.OFFSET)) {
-
-                // returns zero if the value identified by the offsetToken is
-                // not a number and the key is just present.
-                if (rexster.optJSONObject(Tokens.OFFSET).has(offsetToken)) {
-                    return rexster.optJSONObject(Tokens.OFFSET).optLong(offsetToken);
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
+        return RequestObjectHelper.getEndOffset(this.getRequestObject());
     }
 
     protected boolean hasShowTypes() {
-        return RequestObjectHelper.getShowTypes(this.getRexsterRequest());
+        return RequestObjectHelper.getShowTypes(this.getRequestObject());
     }
 
     protected List<String> getReturnKeys() {
-        return RequestObjectHelper.getReturnKeys(this.getRexsterRequest());
+        return RequestObjectHelper.getReturnKeys(this.getRequestObject());
     }
-
 
     protected boolean hasPropertyValues(Element element, JSONObject properties) throws JSONException {
         Iterator keys = properties.keys();
