@@ -4,6 +4,7 @@ import com.tinkerpop.rexster.Tokens;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import sun.reflect.generics.tree.ReturnType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,29 +36,41 @@ public class RequestObjectHelper {
     public static List<String> getReturnKeys(final JSONObject requestObject, final String wildcard) {
         try {
             final JSONArray jsonArrayOfReturnKeys = ((JSONArray) requestObject.get(Tokens.RETURN_KEYS));
-
-            List<String> returnKeys = null;
-            if (jsonArrayOfReturnKeys != null) {
-                returnKeys = new ArrayList<String>();
-
-                if (jsonArrayOfReturnKeys != null) {
-                    for (int ix = 0; ix < jsonArrayOfReturnKeys.length(); ix++) {
-                        returnKeys.add(jsonArrayOfReturnKeys.optString(ix));
-                    }
-                } else {
-                    returnKeys = null;
-                }
-
-                if (returnKeys != null && returnKeys.size() == 1
-                        && returnKeys.get(0).equals(wildcard)) {
-                    returnKeys = null;
-                }
-            }
-
-            return returnKeys;
+            return getReturnKeys(jsonArrayOfReturnKeys, wildcard);
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * Given an array of keys from the request object, return the desired returnKeys.
+     *
+     * Useful for when the return keys are being passed in as a parameter to an extension method.
+     *
+     * @param arrayOfKeys array of keys from the request object.
+     * @param wildcard a value that represents the specification of all keys
+     * @return the return keys
+     */
+    public static List<String> getReturnKeys(final JSONArray arrayOfKeys, final String wildcard) {
+        List<String> returnKeys = null;
+        if (arrayOfKeys != null) {
+            returnKeys = new ArrayList<String>();
+
+            if (arrayOfKeys != null) {
+                for (int ix = 0; ix < arrayOfKeys.length(); ix++) {
+                    returnKeys.add(arrayOfKeys.optString(ix));
+                }
+            } else {
+                returnKeys = null;
+            }
+
+            if (returnKeys != null && returnKeys.size() == 1
+                    && returnKeys.get(0).equals(wildcard)) {
+                returnKeys = null;
+            }
+        }
+
+        return returnKeys;
     }
 
     /**

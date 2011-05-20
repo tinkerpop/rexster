@@ -8,6 +8,7 @@ import com.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
 import com.tinkerpop.rexster.ElementJSONObject;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.util.RequestObjectHelper;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -34,7 +35,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
 
     private static final String API_SHOW_TYPES = "displays the properties of the elements with their native data type (default is false)";
     private static final String API_SCRIPT = "the Gremlin script to be evaluated";
-    private static final String API_RETURN_KEYS = "the element property keys to return (default is to return all element properties)";
+    private static final String API_RETURN_KEYS = "an array of element property keys to return (default is to return all element properties)";
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE)
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for an edge.")
@@ -83,7 +84,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
         bindings.put(EDGE_VARIABLE, edge);
 
         // read the return keys from the request object
-        List<String> returnKeys = this.parseReturnKeys(returnKeysParam);
+        List<String> returnKeys = RequestObjectHelper.getReturnKeys(returnKeysParam, WILDCARD);
 
         ExtensionMethod extensionMethod = rexsterResourceContext.getExtensionMethod();
 
@@ -127,28 +128,6 @@ public class GremlinExtension extends AbstractRexsterExtension {
         }
 
         return extensionResponse;
-    }
-
-    private List<String> parseReturnKeys(JSONArray returnKeysJson) {
-        List<String> returnKeys = null;
-        if (returnKeysJson != null) {
-            returnKeys = new ArrayList<String>();
-
-            if (returnKeysJson != null) {
-                for (int ix = 0; ix < returnKeysJson.length(); ix++) {
-                    returnKeys.add(returnKeysJson.optString(ix));
-                }
-            } else {
-                returnKeys = null;
-            }
-
-            if (returnKeys != null && returnKeys.size() == 1
-                    && returnKeys.get(0).equals(WILDCARD)) {
-                returnKeys = null;
-            }
-        }
-
-        return returnKeys;
     }
 
     private Object prepareOutput(Object object, List<String> returnKeys, boolean showTypes) throws JSONException {
