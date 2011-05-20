@@ -38,45 +38,51 @@ public class GremlinExtension extends AbstractRexsterExtension {
     private static final String API_RETURN_KEYS = "an array of element property keys to return (default is to return all element properties)";
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE)
-    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for an edge.")
+    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for an edge.",
+                         api = {
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS)
+                         })
     public ExtensionResponse evaluateOnEdge(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                             @RexsterContext Graph graph,
                                             @RexsterContext Edge edge,
-                                            @ExtensionRequestParameter(name = Tokens.SHOW_TYPES, description = API_SHOW_TYPES) Boolean showTypesParam,
-                                            @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script,
-                                            @ExtensionRequestParameter(name = Tokens.RETURN_KEYS, description = API_RETURN_KEYS) JSONArray returnKeysParam) {
-        return tryExecuteGremlinScript(rexsterResourceContext, graph, null, edge, showTypesParam, script, returnKeysParam);
+                                            @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script) {
+        return tryExecuteGremlinScript(rexsterResourceContext, graph, null, edge, script);
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX)
-    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a vertex.")
+    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a vertex.",
+                         api = {
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS)
+                         })
     public ExtensionResponse evaluateOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                               @RexsterContext Graph graph,
                                               @RexsterContext Vertex vertex,
-                                              @ExtensionRequestParameter(name = Tokens.SHOW_TYPES, description = API_SHOW_TYPES) Boolean showTypesParam,
-                                              @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script,
-                                              @ExtensionRequestParameter(name = Tokens.RETURN_KEYS, description = API_RETURN_KEYS) JSONArray returnKeysParam) {
-        return tryExecuteGremlinScript(rexsterResourceContext, graph, vertex, null, showTypesParam, script, returnKeysParam);
+                                              @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script) {
+        return tryExecuteGremlinScript(rexsterResourceContext, graph, vertex, null, script);
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a graph.")
+    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a graph.",
+                         api = {
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS)
+                         })
     public ExtensionResponse evaluateOnGraph(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                              @RexsterContext Graph graph,
-                                             @ExtensionRequestParameter(name = Tokens.SHOW_TYPES, description = API_SHOW_TYPES) Boolean showTypesParam,
-                                             @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script,
-                                             @ExtensionRequestParameter(name = Tokens.RETURN_KEYS, description = API_RETURN_KEYS) JSONArray returnKeysParam) {
-        return tryExecuteGremlinScript(rexsterResourceContext, graph, null, null, showTypesParam, script, returnKeysParam);
+                                             @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script) {
+        return tryExecuteGremlinScript(rexsterResourceContext, graph, null, null, script);
     }
 
     private ExtensionResponse tryExecuteGremlinScript(RexsterResourceContext rexsterResourceContext,
                                                       Graph graph, Vertex vertex, Edge edge,
-                                                      Boolean showTypesParam,
-                                                      String script,
-                                                      JSONArray returnKeysParam) {
+                                                      String script) {
         ExtensionResponse extensionResponse;
 
-        boolean showTypes = showTypesParam != null ? showTypesParam.booleanValue() : false;
+        JSONObject requestObject = rexsterResourceContext.getRequestObject();
+
+        boolean showTypes = RequestObjectHelper.getShowTypes(requestObject);
 
         Bindings bindings = new SimpleBindings();
         bindings.put(GRAPH_VARIABLE, graph);
@@ -84,7 +90,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
         bindings.put(EDGE_VARIABLE, edge);
 
         // read the return keys from the request object
-        List<String> returnKeys = RequestObjectHelper.getReturnKeys(returnKeysParam, WILDCARD);
+        List<String> returnKeys = RequestObjectHelper.getReturnKeys(requestObject, WILDCARD);
 
         ExtensionMethod extensionMethod = rexsterResourceContext.getExtensionMethod();
 

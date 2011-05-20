@@ -88,7 +88,7 @@ public class GremlinExtensionTest {
     public void evaluateOnGraphNoScript() {
 
         ExtensionResponse extensionResponse = this.gremlinExtension.evaluateOnGraph(
-                rexsterResourceContext, graph, false, "", null);
+                rexsterResourceContext, graph, "");
 
         JSONObject jsonResponse = assertResponseAndGetEntity(extensionResponse,
                 true,
@@ -102,7 +102,7 @@ public class GremlinExtensionTest {
     @Test
     public void evaluateOnGraphNoKeysNoTypesReturnVertex() {
         ExtensionResponse extensionResponse = this.gremlinExtension.evaluateOnGraph(
-                rexsterResourceContext, graph, false, "g.v(1)", null);
+                rexsterResourceContext, graph, "g.v(1)");
         JSONObject jsonResponse = assertResponseAndGetEntity(extensionResponse,
                 Response.Status.OK.getStatusCode());
 
@@ -122,7 +122,7 @@ public class GremlinExtensionTest {
     @Test
     public void evaluateOnVertexNoKeysNoTypesReturnOutEdges() {
         ExtensionResponse extensionResponse = this.gremlinExtension.evaluateOnVertex(
-                rexsterResourceContext, graph, graph.getVertex(6), false, "v.outEdges", null);
+                rexsterResourceContext, graph, graph.getVertex(6), "v.outEdges");
         JSONObject jsonResponse = assertResponseAndGetEntity(extensionResponse,
                 Response.Status.OK.getStatusCode());
 
@@ -137,7 +137,7 @@ public class GremlinExtensionTest {
     @Test
     public void evaluateOnEdgeNoKeysNoTypesReturnOutVertex() {
         ExtensionResponse extensionResponse = this.gremlinExtension.evaluateOnEdge(
-                rexsterResourceContext, graph, graph.getEdge(7), false, "e.outVertex", null);
+                rexsterResourceContext, graph, graph.getEdge(7), "e.outVertex");
         JSONObject jsonResponse = assertResponseAndGetEntity(extensionResponse,
                 Response.Status.OK.getStatusCode());
 
