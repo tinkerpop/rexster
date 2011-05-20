@@ -36,12 +36,16 @@ public class GremlinExtension extends AbstractRexsterExtension {
     private static final String API_SHOW_TYPES = "displays the properties of the elements with their native data type (default is false)";
     private static final String API_SCRIPT = "the Gremlin script to be evaluated";
     private static final String API_RETURN_KEYS = "an array of element property keys to return (default is to return all element properties)";
+    private static final String API_START_OFFSET = "start index for a paged set of data to be returned";
+    private static final String API_END_OFFSET = "end index for a paged set of data to be returned";
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE)
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for an edge.",
                          api = {
                              @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
-                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS)
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
                          })
     public ExtensionResponse evaluateOnEdge(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                             @RexsterContext Graph graph,
@@ -54,7 +58,9 @@ public class GremlinExtension extends AbstractRexsterExtension {
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a vertex.",
                          api = {
                              @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
-                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS)
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
                          })
     public ExtensionResponse evaluateOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                               @RexsterContext Graph graph,
@@ -67,7 +73,9 @@ public class GremlinExtension extends AbstractRexsterExtension {
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a graph.",
                          api = {
                              @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
-                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS)
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
                          })
     public ExtensionResponse evaluateOnGraph(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                              @RexsterContext Graph graph,
@@ -83,6 +91,8 @@ public class GremlinExtension extends AbstractRexsterExtension {
         JSONObject requestObject = rexsterResourceContext.getRequestObject();
 
         boolean showTypes = RequestObjectHelper.getShowTypes(requestObject);
+        long offsetStart = RequestObjectHelper.getStartOffset(requestObject);
+        long offsetEnd = RequestObjectHelper.getEndOffset(requestObject);
 
         Bindings bindings = new SimpleBindings();
         bindings.put(GRAPH_VARIABLE, graph);
@@ -103,13 +113,32 @@ public class GremlinExtension extends AbstractRexsterExtension {
                     // for example a script like g.clear()
                     results = null;
                 } else if (result instanceof Iterable) {
+                    long counter = 0;
                     for (Object o : (Iterable) result) {
-                        results.put(prepareOutput(o, returnKeys, showTypes));
+                        if (counter >= offsetStart && counter < offsetEnd) {
+                            results.put(prepareOutput(o, returnKeys, showTypes));
+                        }
+
+                        if (counter >= offsetEnd) {
+                            break;
+                        }
+
+                        counter++;
                     }
                 } else if (result instanceof Iterator) {
                     Iterator itty = (Iterator) result;
+
+                    long counter = 0;
                     while (itty.hasNext()) {
-                        results.put(prepareOutput(itty.next(), returnKeys, showTypes));
+                        if (counter >= offsetStart && counter < offsetEnd) {
+                            results.put(prepareOutput(itty.next(), returnKeys, showTypes));
+                        }
+
+                        if (counter >= offsetEnd) {
+                            break;
+                        }
+
+                        counter++;
                     }
                 } else {
                     results.put(prepareOutput(result, returnKeys, showTypes));
