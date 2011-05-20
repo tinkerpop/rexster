@@ -138,7 +138,7 @@ public class VertexResourceTest {
         Response response = resource.getVertexEdges("graph", "1", Tokens.IN_E);
         JSONObject json = assertEdgesOkResponseJsonStructure(response, 1);
 
-        JSONArray jsonResultArray = (JSONArray) json.optJSONArray(Tokens.RESULTS);
+        JSONArray jsonResultArray = json.optJSONArray(Tokens.RESULTS);
         Assert.assertNotNull(jsonResultArray);
         Assert.assertEquals(1, jsonResultArray.length());
 

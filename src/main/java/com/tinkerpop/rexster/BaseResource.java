@@ -3,6 +3,7 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.rexster.util.RequestObjectHelper;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -275,64 +276,12 @@ public abstract class BaseResource {
         }
     }
 
-    /**
-     * Determines if the data types should be shown in the results.
-     * <p/>
-     * Checks the request for the show_types parameter which must be set
-     * to a boolean value. Types are not shown by default or if the value
-     * cannot be parsed from the request.
-     *
-     * @return true if showTypes is set to "true" and false otherwise.
-     */
     protected boolean hasShowTypes() {
-        boolean showTypes = false;
-        JSONObject rexster = this.getRexsterRequest();
-        if (rexster != null) {
-            if (rexster.has(Tokens.SHOW_TYPES)) {
-                showTypes = rexster.optBoolean(Tokens.SHOW_TYPES, false);
-            }
-        }
-
-        return showTypes;
+        return RequestObjectHelper.getShowTypes(this.getRexsterRequest());
     }
 
-    public List<String> getReturnKeys() {
-        JSONObject rexster = this.getRexsterRequest();
-        if (null != rexster) {
-
-            List<String> keys = new ArrayList<String>();
-            Object returnKeys = rexster.opt(Tokens.RETURN_KEYS);
-
-            if (returnKeys != null) {
-
-                // returnKeys may be an array if multiple return keys were sent or
-                // just a string...this could be an error in how the JSON request object
-                // is being built...not sure.
-                if (returnKeys instanceof JSONArray) {
-                    JSONArray arr = (JSONArray) returnKeys;
-
-                    if (arr != null) {
-                        for (int ix = 0; ix < arr.length(); ix++) {
-                            keys.add(arr.optString(ix));
-                        }
-                    }
-                } else if (returnKeys instanceof String) {
-                    keys.add(returnKeys.toString());
-                } else {
-                    keys = null;
-                }
-            } else {
-                keys = null;
-            }
-
-            if (keys != null && keys.size() == 1 && keys.get(0).equals(Tokens.WILDCARD)) {
-                keys = null;
-            }
-
-            return keys;
-        } else {
-            return null;
-        }
+    protected List<String> getReturnKeys() {
+        return RequestObjectHelper.getReturnKeys(this.getRexsterRequest());
     }
 
 

@@ -34,6 +34,11 @@ public class RequestObjectHelperTest {
     }
 
     @Test
+    public void getReturnKeysNullRequestObject() {
+        Assert.assertNull(RequestObjectHelper.getReturnKeys(null));
+    }
+
+    @Test
     public void getReturnKeysWildcarded() {
         HashMap<String, JSONArray> map = new HashMap<String, JSONArray>();
 

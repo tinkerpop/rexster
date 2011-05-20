@@ -34,10 +34,14 @@ public class RequestObjectHelper {
      * @return the return keys
      */
     public static List<String> getReturnKeys(final JSONObject requestObject, final String wildcard) {
-        try {
-            final JSONArray jsonArrayOfReturnKeys = ((JSONArray) requestObject.get(Tokens.RETURN_KEYS));
-            return getReturnKeys(jsonArrayOfReturnKeys, wildcard);
-        } catch (Exception e) {
+        if (requestObject != null) {
+            try {
+                final JSONArray jsonArrayOfReturnKeys = ((JSONArray) requestObject.get(Tokens.RETURN_KEYS));
+                return getReturnKeys(jsonArrayOfReturnKeys, wildcard);
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
             return null;
         }
     }
@@ -80,9 +84,13 @@ public class RequestObjectHelper {
      * @return whether the user specified a show types (default is false)
      */
     public static boolean getShowTypes(final JSONObject requestObject) {
-        try {
-            return requestObject.getBoolean(Tokens.SHOW_TYPES);
-        } catch (JSONException e) {
+        if (requestObject != null) {
+            try {
+                return requestObject.getBoolean(Tokens.SHOW_TYPES);
+            } catch (JSONException e) {
+                return false;
+            }
+        } else {
             return false;
         }
     }
