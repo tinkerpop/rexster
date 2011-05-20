@@ -13,21 +13,49 @@ import java.util.List;
  */
 public class RequestObjectHelper {
 
+    public static final String DEFAULT_WILDCARD = "*";
+
     /**
-     * Given a request object, return the desired returnKeys.
+     * Given a request object, return the desired returnKeys. Utilizes the value of the DEFAULT_WILDCARD.
      *
      * @param requestObject the request object
      * @return the return keys
      */
     public static List<String> getReturnKeys(final JSONObject requestObject) {
+        return getReturnKeys(requestObject, DEFAULT_WILDCARD);
+    }
+
+    /**
+     * Given a request object, return the desired returnKeys.
+     *
+     * @param requestObject the request object
+     * @param wildcard a value that represents the specification of all keys
+     * @return the return keys
+     */
+    public static List<String> getReturnKeys(final JSONObject requestObject, final String wildcard) {
         try {
-            final List<String> keys = new ArrayList<String>();
-            final JSONArray array = ((JSONArray) requestObject.get(Tokens.RETURN_KEYS));
-            for (int i = 0; i < array.length(); i++) {
-                keys.add(array.getString(i));
+            final JSONArray jsonArrayOfReturnKeys = ((JSONArray) requestObject.get(Tokens.RETURN_KEYS));
+
+            List<String> returnKeys = null;
+            if (jsonArrayOfReturnKeys != null) {
+                returnKeys = new ArrayList<String>();
+
+                if (jsonArrayOfReturnKeys != null) {
+                    for (int ix = 0; ix < jsonArrayOfReturnKeys.length(); ix++) {
+                        returnKeys.add(jsonArrayOfReturnKeys.optString(ix));
+                    }
+                } else {
+                    returnKeys = null;
+                }
+
+                if (returnKeys != null && returnKeys.size() == 1
+                        && returnKeys.get(0).equals(wildcard)) {
+                    returnKeys = null;
+                }
             }
-            return keys;
-        } catch (JSONException e) {
+
+            return returnKeys;
+        } catch (Exception e) {
             return null;
         }
     }
