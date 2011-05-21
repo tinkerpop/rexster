@@ -126,6 +126,7 @@
             <graph-enabled>false</graph-enabled>
             <graph-name>remotetinkergraph</graph-name>
             <graph-type>rexstergraph</graph-type>
+            <graph-buffer-size>100</graph-buffer-size>
             <graph-file>http://remoteserver:8182/tinkergraph</graph-file>
         </graph>
     </graphs>
