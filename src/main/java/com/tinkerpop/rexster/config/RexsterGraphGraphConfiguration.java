@@ -13,15 +13,25 @@ public class RexsterGraphGraphConfiguration implements GraphConfiguration {
 
     public Graph configureGraphInstance(Configuration properties) throws GraphConfigurationException {
 
-        try {
-            String rexsterGraphUriToConnectTo = properties.getString(Tokens.REXSTER_GRAPH_FILE, null);
-            int bufferSize = properties.getInt(Tokens.REXSTER_GRAPH_BUFFER_SIZE, DEFAULT_BUFFER_SIZE);
-            RexsterGraph graph = new RexsterGraph(rexsterGraphUriToConnectTo, bufferSize);
+        String rexsterGraphUriToConnectTo;
+        int bufferSize;
 
-            return graph;
+        try {
+            rexsterGraphUriToConnectTo = properties.getString(Tokens.REXSTER_GRAPH_FILE, null);
+            bufferSize = properties.getInt(Tokens.REXSTER_GRAPH_BUFFER_SIZE, DEFAULT_BUFFER_SIZE);
         } catch (Exception ex) {
             throw new GraphConfigurationException(ex);
         }
 
+        RexsterGraph graph = null;
+        try {
+            graph = new RexsterGraph(rexsterGraphUriToConnectTo, bufferSize);
+        } catch (RuntimeException rte) {
+            // if the remote server is down just ignore the error for the moment.  let
+            // Rexster think the graph configuration is good.  the server may be up later.
+
+        }
+
+        return graph;
     }
 }

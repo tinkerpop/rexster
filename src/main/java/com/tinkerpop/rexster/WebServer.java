@@ -15,10 +15,7 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,6 +27,8 @@ import java.util.logging.LogManager;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class WebServer {
+
+    private static String characterEncoding;
 
     private static final String DEFAULT_WEB_ROOT_PATH = "public";
     private static final String DEFAULT_BASE_URI = "http://localhost";
@@ -73,6 +72,10 @@ public class WebServer {
         shutdownManager.waitForShutdown();
     }
 
+    public static String getCharacterEncoding() {
+        return characterEncoding;
+    }
+
     protected void startUser(final XMLConfiguration properties) throws Exception {
         this.start(properties);
     }
@@ -83,56 +86,14 @@ public class WebServer {
         Integer doghouseServerPort = properties.getInteger("doghouse-server-port", new Integer(8183));
         String webRootPath = properties.getString("web-root", DEFAULT_WEB_ROOT_PATH);
         String baseUri = properties.getString("base-uri", DEFAULT_BASE_URI);
-        final String characterEncoding = properties.getString("character-set", "ISO-8859-1");
+        characterEncoding = properties.getString("character-set", "ISO-8859-1");
 
         final Map<String, String> jerseyInitParameters = getServletInitParameters("web-server-configuration", properties);
 
         this.rexsterServer = new GrizzlyWebServer(rexsterServerPort);
         this.doghouseServer = new GrizzlyWebServer(doghouseServerPort);
 
-        // all this character encoding stuff is a bit of a hack around jersey issues
-        // see: http://java.net/jira/browse/JAX_RS_SPEC-28
-        ServletAdapter jerseyAdapter = new ServletAdapter() {
-            @Override
-            public void service(GrizzlyRequest request, GrizzlyResponse response) {
-                try {
-                    if (request.getCharacterEncoding() == null) {
-                        request.setCharacterEncoding(characterEncoding);
-
-                        // better way to use the content type to determine the charset from the URI???
-                        /*
-                              String contentType = request.getHeader("Content-Type");
-                              if (contentType != null) {
-                                  int place = contentType.indexOf("charset=");
-                                  if (place > -1) {
-                                      String requestedCharSet = contentType.substring(place + 8);
-                                      request.setCharacterEncoding(requestedCharSet);
-                                  }
-                              }
-                              */
-                    }
-                } catch (UnsupportedEncodingException ex) {
-                    // don't care...will just default to ISO-8859-1
-                }
-
-                super.service(request, response);
-            }
-
-            @Override
-            public void afterService(GrizzlyRequest request, GrizzlyResponse response) throws Exception {
-
-                // sets the content type with the configured character encoding.
-                String contentType = response.getHeader("Content-Type");
-                if (contentType != null && !contentType.contains("charset=")) {
-                    contentType = contentType + ";charset=" + characterEncoding;
-                    response.getResponse().setHeader("Content-Type", contentType);
-                }
-
-                super.afterService(request, response);
-            }
-
-        };
-
+        ServletAdapter jerseyAdapter = new ServletAdapter();
         for (Map.Entry<String, String> entry : jerseyInitParameters.entrySet()) {
             jerseyAdapter.addInitParameter(entry.getKey(), entry.getValue());
         }
