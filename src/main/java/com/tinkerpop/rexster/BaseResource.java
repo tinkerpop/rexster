@@ -25,8 +25,6 @@ public abstract class BaseResource {
 
     private static Logger logger = Logger.getLogger(BaseResource.class);
 
-    public static final String HEADER_ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
-
     private RexsterApplicationGraph rag = null;
 
     protected final StatisticsHelper sh = new StatisticsHelper();
@@ -327,6 +325,6 @@ public abstract class BaseResource {
     protected ResponseBuilder addHeaders(ResponseBuilder builder) {
         // allows services to be consumed from other domains...specifically,
         // the one used by the rexster web tool
-        return builder.header(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+        return builder;
     }
 }

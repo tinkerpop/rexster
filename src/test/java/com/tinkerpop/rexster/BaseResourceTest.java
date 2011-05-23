@@ -83,10 +83,6 @@ public class BaseResourceTest {
         Response response = builder.build();
         MultivaluedMap<String, Object> map = response.getMetadata();
         Assert.assertNotNull(map);
-
-        // without this the web tool for rexster won't work
-        Assert.assertTrue(map.containsKey(BaseResource.HEADER_ACCESS_CONTROL_ALLOW_ORIGIN));
-
     }
 
     protected class MockResource extends BaseResource {
