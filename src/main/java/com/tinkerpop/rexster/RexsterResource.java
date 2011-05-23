@@ -41,11 +41,11 @@ public class RexsterResource extends BaseResource {
             this.resultObject.put("graphs", jsonArrayNames);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             this.resultObject.put(Tokens.UP_TIME, this.getTimeAlive());
-            return this.addHeaders(Response.ok(this.resultObject)).build();
+            return Response.ok(this.resultObject).build();
 
         } catch (JSONException ex) {
             JSONObject error = generateErrorObject(ex.getMessage());
-            throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
     }
 }

@@ -73,18 +73,6 @@ public class BaseResourceTest {
         Assert.assertEquals("key3", tt.getReturnKeys().get(2));
     }
 
-    @Test
-    public void addHeadersAllPresent() {
-        MockResource mock = new MockResource();
-        ResponseBuilder builder = mock.addHeaders(Response.ok());
-
-        Assert.assertNotNull(builder);
-
-        Response response = builder.build();
-        MultivaluedMap<String, Object> map = response.getMetadata();
-        Assert.assertNotNull(map);
-    }
-
     protected class MockResource extends BaseResource {
         public MockResource() {
             super(new MockRexsterApplicationProvider());
@@ -93,10 +81,6 @@ public class BaseResourceTest {
         public MockResource(Map map) {
             super(new MockRexsterApplicationProvider());
             this.httpServletRequest = new MockHttpServletRequest(map);
-        }
-
-        public ResponseBuilder addHeaders(ResponseBuilder builder) {
-            return super.addHeaders(builder);
         }
 
         public void setRequestObject(JSONObject queryParameters) {

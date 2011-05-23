@@ -315,16 +315,4 @@ public abstract class BaseResource {
         }
         return days + "[d]:" + hours + "[h]:" + minutes + "[m]:" + seconds + "[s]";
     }
-
-    /**
-     * Adds headers to a response.
-     *
-     * @param builder The response builder to append headers to.
-     * @return The builder for the response with the appended headers.
-     */
-    protected ResponseBuilder addHeaders(ResponseBuilder builder) {
-        // allows services to be consumed from other domains...specifically,
-        // the one used by the rexster web tool
-        return builder;
-    }
 }

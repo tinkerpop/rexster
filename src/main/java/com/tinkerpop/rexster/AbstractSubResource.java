@@ -211,7 +211,7 @@ public abstract class AbstractSubResource extends BaseResource {
             logger.error("Tried to parse the extension segments but they appear invalid: " + extensionSegmentSet);
             JSONObject error = this.generateErrorObject(
                     "The [" + extensionSegmentSet + "] extension appears invalid for [" + graphName + "]");
-            throw new WebApplicationException(this.addHeaders(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 
         return extensionSegmentSet;

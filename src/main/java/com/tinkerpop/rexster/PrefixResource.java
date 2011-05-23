@@ -50,15 +50,15 @@ public class PrefixResource extends AbstractSubResource {
             this.resultObject.put(Tokens.RESULTS, results);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
-            return this.addHeaders(Response.ok(this.resultObject)).build();
+            return Response.ok(this.resultObject).build();
         } catch (JSONException ex) {
             logger.error(ex);
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (RuntimeException re) {
             logger.error(re);
             JSONObject error = generateErrorObject(re.getMessage(), re);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
     }
 
@@ -73,15 +73,15 @@ public class PrefixResource extends AbstractSubResource {
             this.resultObject.put(Tokens.RESULTS, graph.getNamespaces().get(prefix));
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
-            return this.addHeaders(Response.ok(this.resultObject)).build();
+            return Response.ok(this.resultObject).build();
         } catch (JSONException ex) {
             logger.error(ex);
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (RuntimeException re) {
             logger.error(re);
             JSONObject error = generateErrorObject(re.getMessage(), re);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
     }
 
@@ -96,15 +96,15 @@ public class PrefixResource extends AbstractSubResource {
             graph.removeNamespace(prefix);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
-            return this.addHeaders(Response.ok(this.resultObject)).build();
+            return Response.ok(this.resultObject).build();
         } catch (JSONException ex) {
             logger.error(ex);
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (RuntimeException re) {
             logger.error(re);
             JSONObject error = generateErrorObject(re.getMessage(), re);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
     }
 
@@ -117,20 +117,20 @@ public class PrefixResource extends AbstractSubResource {
             final SailGraph graph = ((SailGraph) rag.getGraph());
             if (!formParams.containsKey("prefix") || !formParams.containsKey("namespace")) {
                 JSONObject error = generateErrorObject("Parameters 'prefix' and 'namespace' required");
-                throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+                throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
             graph.addNamespace(formParams.get("prefix").get(0), formParams.get("namespace").get(0));
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
-            return this.addHeaders(Response.ok(this.resultObject)).build();
+            return Response.ok(this.resultObject).build();
         } catch (JSONException ex) {
             logger.error(ex);
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (RuntimeException re) {
             logger.error(re);
             JSONObject error = generateErrorObject(re.getMessage(), re);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
     }
 }

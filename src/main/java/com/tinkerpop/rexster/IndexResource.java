@@ -48,7 +48,7 @@ public class IndexResource extends AbstractSubResource {
 
         if (idxGraph == null) {
             JSONObject error = this.generateErrorObject("The requested graph is not of type IndexableGraph.");
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 
         Long start = this.getStartOffset();
@@ -73,10 +73,10 @@ public class IndexResource extends AbstractSubResource {
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 
-        return this.addHeaders(Response.ok(this.resultObject)).build();
+        return Response.ok(this.resultObject).build();
 
     }
 
@@ -128,14 +128,14 @@ public class IndexResource extends AbstractSubResource {
                 logger.error(ex);
 
                 JSONObject error = generateErrorObjectJsonFail(ex);
-                throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+                throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
         } else if (null == index) {
             String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.NOT_FOUND).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
         } else {
             // return info about the index itself
             HashMap map = new HashMap();
@@ -153,7 +153,7 @@ public class IndexResource extends AbstractSubResource {
             this.resultObject = new JSONObject(map);
         }
 
-        return this.addHeaders(Response.ok(this.resultObject)).build();
+        return Response.ok(this.resultObject).build();
     }
 
     /**
@@ -184,23 +184,23 @@ public class IndexResource extends AbstractSubResource {
                 logger.error(ex);
 
                 JSONObject error = generateErrorObjectJsonFail(ex);
-                throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR)).entity(error).build());
+                throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
         } else if (null == index) {
             String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.NOT_FOUND).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
         } else {
             String msg = "Only automatic indices have user provided keys";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.BAD_REQUEST).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
         }
 
-        return this.addHeaders(Response.ok(this.resultObject)).build();
+        return Response.ok(this.resultObject).build();
     }
 
     /**
@@ -236,23 +236,23 @@ public class IndexResource extends AbstractSubResource {
                 logger.error(ex);
 
                 JSONObject error = generateErrorObjectJsonFail(ex);
-                throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+                throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
         } else if (null == index) {
             String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.NOT_FOUND).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
         } else {
             String msg = "A key and value must be provided to lookup elements in an index";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.BAD_REQUEST).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
         }
 
-        return this.addHeaders(Response.ok(this.resultObject)).build();
+        return Response.ok(this.resultObject).build();
     }
 
     /**
@@ -304,23 +304,23 @@ public class IndexResource extends AbstractSubResource {
                 logger.error(ex);
 
                 JSONObject error = generateErrorObjectJsonFail(ex);
-                throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+                throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
         } else if (null == index) {
             String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.NOT_FOUND).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
         } else {
             String msg = "A key, value, id, and type (vertex/edge) must be provided to lookup elements in an index";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.BAD_REQUEST).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
         }
 
-        return this.addHeaders(Response.ok(this.resultObject)).build();
+        return Response.ok(this.resultObject).build();
 
     }
 
@@ -419,7 +419,7 @@ public class IndexResource extends AbstractSubResource {
                 }
             } catch (Exception e) {
                 JSONObject error = generateErrorObject("Automatic index keys must be in an array: " + temp);
-                throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.BAD_REQUEST).entity(error)).build());
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
             }
         } else {
             keys = null;
@@ -434,7 +434,7 @@ public class IndexResource extends AbstractSubResource {
                     index.put(key, value, graph.getEdge(id));
                 else {
                     JSONObject error = generateErrorObject("Index class must be either vertex or edge");
-                    throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.BAD_REQUEST).entity(error)).build());
+                    throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
                 }
 
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
@@ -443,14 +443,14 @@ public class IndexResource extends AbstractSubResource {
                 logger.error(ex);
 
                 JSONObject error = generateErrorObjectJsonFail(ex);
-                throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR)).entity(error).build());
+                throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
         } else if (null != index && null != type && null != clazz) {
             String msg = "Index [" + indexName + "] on graph [" + graphName + "] already exists";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.NOT_FOUND).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
         } else if (null == index) {
 
 
@@ -463,7 +463,7 @@ public class IndexResource extends AbstractSubResource {
                     t = Index.Type.MANUAL;
                 else {
                     JSONObject error = generateErrorObject("Index type must be either automatic or manual");
-                    throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.BAD_REQUEST).entity(error)).build());
+                    throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
                 }
 
                 if (clazz.equals(Tokens.VERTEX))
@@ -472,7 +472,7 @@ public class IndexResource extends AbstractSubResource {
                     c = Edge.class;
                 else {
                     JSONObject error = generateErrorObject("Index class must be either vertex or edge");
-                    throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.BAD_REQUEST).entity(error)).build());
+                    throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
                 }
 
                 Index i;
@@ -484,7 +484,7 @@ public class IndexResource extends AbstractSubResource {
                 } catch (Exception e) {
                     logger.info(e.getMessage());
                     JSONObject error = generateErrorObject(e.getMessage());
-                    throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.BAD_REQUEST).entity(error)).build());
+                    throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
                 }
                 try {
                     this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
@@ -493,7 +493,7 @@ public class IndexResource extends AbstractSubResource {
                     logger.error(ex);
 
                     JSONObject error = generateErrorObjectJsonFail(ex);
-                    throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+                    throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
                 }
 
 
@@ -502,17 +502,17 @@ public class IndexResource extends AbstractSubResource {
                 logger.info(msg);
 
                 JSONObject error = generateErrorObject(msg);
-                throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.NOT_FOUND).entity(error)).build());
+                throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
             }
         } else {
             String msg = "A key, value, id, and type (vertex/edge) must be provided to add elements to an index";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.BAD_REQUEST).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
         }
 
-        return this.addHeaders(Response.ok(this.resultObject)).build();
+        return Response.ok(this.resultObject).build();
     }
 
     private Index getIndexFromGraph(String graphName, final String name) {
@@ -524,7 +524,7 @@ public class IndexResource extends AbstractSubResource {
 
         if (idxGraph == null) {
             JSONObject error = this.generateErrorObject("The requested graph is not of type IndexableGraph.");
-            throw new WebApplicationException(this.addHeaders(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error)).build());
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 
 
