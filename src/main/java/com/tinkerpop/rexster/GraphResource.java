@@ -11,6 +11,7 @@ import org.codehaus.jettison.json.JSONObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -72,6 +73,17 @@ public class GraphResource extends AbstractSubResource {
         }
 
         return Response.ok(this.resultObject).build();
+    }
+
+    @POST
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response getGraphExtension(@PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(formParams);
+        return this.getGraphExtension(graphName);
     }
 
     @POST
