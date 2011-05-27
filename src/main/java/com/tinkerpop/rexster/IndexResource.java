@@ -357,11 +357,11 @@ public class IndexResource extends AbstractSubResource {
     @Path("/{indexName}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response putElementInIndexOrCreateIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, String jsonString) {
+    public Response putElementInIndexOrCreateIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
-        this.buildRequestObject(jsonString);
+        this.setRequestObject(json);
         return this.putElementInIndexOrCreateIndex(graphName, indexName);
     }
 

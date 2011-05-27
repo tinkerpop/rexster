@@ -199,15 +199,6 @@ public abstract class BaseResource {
         this.requestObject = new JSONObject(map);
     }
 
-    public void buildRequestObject(final String jsonString) {
-        try {
-            JSONTokener tokener = new JSONTokener(jsonString);
-            this.requestObject = new JSONObject(tokener);
-        } catch (JSONException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
     public JSONObject getRexsterRequest() {
         return this.getRequestObject().optJSONObject(Tokens.REXSTER);
     }

@@ -237,11 +237,11 @@ public class EdgeResource extends AbstractSubResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postNullEdge(@PathParam("graphname") String graphName, String jsonString) {
+    public Response postNullEdge(@PathParam("graphname") String graphName, JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
-        this.buildRequestObject(jsonString);
+        this.setRequestObject(json);
         return this.postEdge(graphName, null);
     }
 
@@ -282,11 +282,11 @@ public class EdgeResource extends AbstractSubResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postEdge(@PathParam("graphname") String graphName, @PathParam("id") String id, String jsonString) {
+    public Response postEdge(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
-        this.buildRequestObject(jsonString);
+        this.setRequestObject(json);
         return this.postEdge(graphName, id);
     }
 

@@ -2,6 +2,7 @@ package com.tinkerpop.rexster;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONTokener;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -50,22 +51,28 @@ public class BaseResourceTest {
     }
 
     @Test
-    public void getReturnKeysNoKeys() {
+    public void getReturnKeysNoKeys()  throws Exception {
         BaseResource tt = new MockResource();
-        tt.buildRequestObject("{\"rexster\": { \"someproperty\": [ \"key\" ]}}");
+        JSONTokener tokener = new JSONTokener("{\"rexster\": { \"someproperty\": [ \"key\" ]}}");
+        JSONObject jsonObject = new JSONObject(tokener);
+        tt.setRequestObject(jsonObject);
         Assert.assertNull(tt.getReturnKeys());
     }
 
     @Test
-    public void getReturnKeysValid() {
+    public void getReturnKeysValid() throws Exception {
         BaseResource tt = new MockResource();
-        tt.buildRequestObject("{\"rexster\": { \"" + Tokens.RETURN_KEYS + "\": [ \"key1\" ]}}");
+        JSONTokener tokener = new JSONTokener("{\"rexster\": { \"" + Tokens.RETURN_KEYS + "\": [ \"key1\" ]}}");
+        JSONObject jsonObject = new JSONObject(tokener);
+        tt.setRequestObject(jsonObject);
         Assert.assertNotNull(tt.getReturnKeys());
         Assert.assertEquals(1, tt.getReturnKeys().size());
         Assert.assertEquals("key1", tt.getReturnKeys().get(0));
 
         tt = new MockResource();
-        tt.buildRequestObject("{\"rexster\": { \"" + Tokens.RETURN_KEYS + "\": [ \"key1\", \"key2\", \"key3\" ]}}");
+        tokener = new JSONTokener("{\"rexster\": { \"" + Tokens.RETURN_KEYS + "\": [ \"key1\", \"key2\", \"key3\" ]}}");
+        jsonObject = new JSONObject(tokener);
+        tt.setRequestObject(jsonObject);
         Assert.assertNotNull(tt.getReturnKeys());
         Assert.assertEquals(3, tt.getReturnKeys().size());
         Assert.assertEquals("key1", tt.getReturnKeys().get(0));
