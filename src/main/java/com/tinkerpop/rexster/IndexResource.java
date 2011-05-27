@@ -60,7 +60,7 @@ public class IndexResource extends AbstractSubResource {
             JSONArray indexArray = new JSONArray();
             for (Index index : idxGraph.getIndices()) {
                 if (counter >= start && counter < end) {
-                    indexArray.put(new com.tinkerpop.rexster.IndexJSONObject(index));
+                    indexArray.put(new IndexJSONObject(index));
                 }
                 counter++;
             }
@@ -114,7 +114,7 @@ public class IndexResource extends AbstractSubResource {
                 JSONArray elementArray = new JSONArray();
                 for (Element element : (Iterable<Element>) index.get(key, value)) {
                     if (counter >= start && counter < end) {
-                        elementArray.put(new com.tinkerpop.rexster.ElementJSONObject(element, this.getReturnKeys(), this.hasShowTypes()));
+                        elementArray.put(new ElementJSONObject(element, this.getReturnKeys(), this.hasShowTypes()));
                     }
                     counter++;
                 }
@@ -488,7 +488,7 @@ public class IndexResource extends AbstractSubResource {
                 }
                 try {
                     this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-                    this.resultObject.put(Tokens.RESULTS, new com.tinkerpop.rexster.IndexJSONObject(i));
+                    this.resultObject.put(Tokens.RESULTS, new IndexJSONObject(i));
                 } catch (JSONException ex) {
                     logger.error(ex);
 

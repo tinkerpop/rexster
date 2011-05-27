@@ -181,13 +181,15 @@ public abstract class BaseResource {
     public void buildRequestObject(final MultivaluedMap<String, String> formParams) {
         HashMap map = new HashMap();
 
-        // need to pick apart the multivalue map.  want single primitives instead of
-        // lists if possible.
+        // need to pick apart the multivalue map.
         for (String key : formParams.keySet()) {
             List list = formParams.get(key);
             if (list != null && list.size() > 1) {
                 JSONArray set = new JSONArray();
-                set.put(list);
+                for (Object val : list) {
+                    set.put(val.toString());
+                }
+
                 map.put(key, set);
             } else if (list.size() == 1) {
                 map.put(key, formParams.getFirst(key));
