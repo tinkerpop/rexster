@@ -188,6 +188,10 @@ public abstract class AbstractSubResource extends BaseResource {
         return rexsterExtension;
     }
 
+    protected boolean isBaseExtensionAllowed(ExtensionSegmentSet extensionSegmentSet) {
+        return true;
+    }
+
     /**
      * Reads the URI of the request and tries to parse the extension requested.
      *
