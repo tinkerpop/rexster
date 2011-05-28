@@ -100,22 +100,10 @@ public class GraphResource extends AbstractSubResource {
         ExtensionMethod methodToCall;
         ExtensionSegmentSet extensionSegmentSet = parseUriForExtensionSegment(graphName, ExtensionPoint.GRAPH);
 
-        RexsterApplicationGraph rag = null;
-        try {
-            rag = this.getRexsterApplicationGraph(graphName);
-        } catch (WebApplicationException wae) {
-            // kinda stinks.  checking for a NOT FOUND which means that the graph does not exist
-            // which means we should try to find an extension worthwhile.  If it is something
-            // other than not-found then we need to bubble it up.
-            if (wae.getResponse().getStatus() != Status.NOT_FOUND.getStatusCode()) {
-                throw wae;
-            }
+        // determine if the namespace and extension are enabled for this graph
+        RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 
-            rag = null;
-        }
-
-        if ((rag != null && rag.isExtensionAllowed(extensionSegmentSet))
-                && (rag == null && isBaseExtensionAllowed(extensionSegmentSet))) {
+        if (rag.isExtensionAllowed(extensionSegmentSet)) {
 
             Object returnValue = null;
 
@@ -133,12 +121,8 @@ public class GraphResource extends AbstractSubResource {
                     throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
                 }
 
-                ExtensionPoint extensionPointCalledInRequest = ExtensionPoint.GRAPH;
-                if (rag == null) {
-                    extensionPointCalledInRequest = ExtensionPoint.BASE;
-                }
-
-                methodToCall = findExtensionMethod(rexsterExtension, extensionPointCalledInRequest, extensionSegmentSet.getExtensionMethod());
+                // look up the method on the extension that needs to be called.
+                methodToCall = findExtensionMethod(rexsterExtension, ExtensionPoint.GRAPH, extensionSegmentSet.getExtensionMethod());
 
                 if (methodToCall == null) {
                     // extension method was not found for some reason
