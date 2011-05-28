@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -12,6 +13,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -110,16 +114,34 @@ public class PrefixResource extends AbstractSubResource {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response postSinglePrefix(@PathParam("graphname") String graphName, JSONObject json) {
+        this.setRequestObject(json);
+        return this.postSinglePrefix(graphName);
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response postSinglePrefix(@PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
+        this.buildRequestObject(formParams);
+        return this.postSinglePrefix(graphName);
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response postSinglePrefix(@PathParam("graphname") String graphName) {
         try {
             final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
             final SailGraph graph = ((SailGraph) rag.getGraph());
-            if (!formParams.containsKey("prefix") || !formParams.containsKey("namespace")) {
+
+            JSONObject reqObject = this.getRequestObject();
+
+            if (!reqObject.has("prefix") || !reqObject.has("namespace")) {
                 JSONObject error = generateErrorObject("Parameters 'prefix' and 'namespace' required");
                 throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
-            graph.addNamespace(formParams.get("prefix").get(0), formParams.get("namespace").get(0));
+            graph.addNamespace(reqObject.optString("prefix"), reqObject.optString("namespace"));
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
             return Response.ok(this.resultObject).build();
