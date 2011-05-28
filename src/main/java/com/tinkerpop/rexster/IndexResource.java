@@ -41,9 +41,11 @@ public class IndexResource extends AbstractSubResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllIndices(@PathParam("graphname") String graphName) {
+        RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+
         IndexableGraph idxGraph = null;
-        if (this.getRexsterApplicationGraph(graphName).getGraph() instanceof IndexableGraph) {
-            idxGraph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
+        if (rag.getGraph() instanceof IndexableGraph) {
+            idxGraph = (IndexableGraph) rag.getGraph();
         }
 
         if (idxGraph == null) {

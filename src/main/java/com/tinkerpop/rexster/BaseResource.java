@@ -25,8 +25,6 @@ public abstract class BaseResource {
 
     private static Logger logger = Logger.getLogger(BaseResource.class);
 
-    private RexsterApplicationGraph rag = null;
-
     protected final StatisticsHelper sh = new StatisticsHelper();
 
     private JSONObject requestObject = null;

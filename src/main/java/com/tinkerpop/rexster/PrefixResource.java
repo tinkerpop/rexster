@@ -131,8 +131,9 @@ public class PrefixResource extends AbstractSubResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response postSinglePrefix(@PathParam("graphname") String graphName) {
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+
         try {
-            final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
             final SailGraph graph = ((SailGraph) rag.getGraph());
 
             JSONObject reqObject = this.getRequestObject();

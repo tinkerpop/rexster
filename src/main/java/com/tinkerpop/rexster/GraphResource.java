@@ -38,11 +38,9 @@ public class GraphResource extends AbstractSubResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getGraph(@PathParam("graphname") String graphName) {
-        try {
+        Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
 
-            // graph should be ready to go at this point.  checks in the
-            // constructor ensure that the rag is not null.
-            Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
+        try {
 
             this.resultObject.put("name", graphName);
             this.resultObject.put("graph", graph.toString());

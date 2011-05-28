@@ -42,16 +42,18 @@ public class EdgeResource extends AbstractSubResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllEdges(@PathParam("graphname") String graphName) {
 
+        RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+
         Long start = this.getStartOffset();
         Long end = this.getEndOffset();
         boolean wasInSection = false;
         long counter = 0l;
         try {
             JSONArray edgeArray = new JSONArray();
-            for (Edge edge : this.getRexsterApplicationGraph(graphName).getGraph().getEdges()) {
+            for (Edge edge : rag.getGraph().getEdges()) {
                 if (counter >= start && counter < end) {
                     wasInSection = true;
-                    edgeArray.put(new com.tinkerpop.rexster.ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
+                    edgeArray.put(new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
                 } else if (wasInSection) {
                     break;
                 }
@@ -85,7 +87,7 @@ public class EdgeResource extends AbstractSubResource {
 
         if (null != edge) {
             try {
-                this.resultObject.put(Tokens.RESULTS, new com.tinkerpop.rexster.ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
+                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
                 JSONArray extensionsList = getExtensionHypermedia(graphName, ExtensionPoint.EDGE);
@@ -341,7 +343,7 @@ public class EdgeResource extends AbstractSubResource {
                         edge.setProperty(key, this.getTypedPropertyValue(this.getRequestObject().getString(key)));
                     }
                 }
-                this.resultObject.put(Tokens.RESULTS, new com.tinkerpop.rexster.ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
+                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
             } else {
                 // edge could not be found.  likely an error condition on the request
                 JSONObject error = generateErrorObjectJsonFail(new Exception("Edge cannot be found or created.  Please check the format of the request."));
@@ -373,9 +375,10 @@ public class EdgeResource extends AbstractSubResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
+        final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
+
         try {
             final List<String> keys = this.getNonRexsterRequestKeys();
-            final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
             final Edge edge = graph.getEdge(id);
             if (null != edge) {
                 if (keys.size() > 0) {

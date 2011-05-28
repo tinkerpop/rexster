@@ -30,17 +30,6 @@ public abstract class AbstractSubResource extends BaseResource {
     protected AbstractSubResource(RexsterApplicationProvider rap) {
         super(rap);
 
-        /*
-       this.rag = this.rexsterApplicationProvider.getApplicationGraph(graphName);
-       if (this.rag == null) {
-
-           logger.info("Request for a non-configured graph [" + graphName + "]");
-
-           JSONObject error = generateErrorObject("Graph [" + graphName + "] could not be found");
-           throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
-       }
-        */
-
         try {
 
             this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());

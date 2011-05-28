@@ -42,6 +42,8 @@ public class VertexResource extends AbstractSubResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getVertices(@PathParam("graphname") String graphName) {
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+
         Long start = this.getStartOffset();
         Long end = this.getEndOffset();
 
@@ -49,7 +51,7 @@ public class VertexResource extends AbstractSubResource {
             long counter = 0l;
             final JSONArray vertexArray = new JSONArray();
             boolean wasInSection = false;
-            for (Vertex vertex : this.getRexsterApplicationGraph(graphName).getGraph().getVertices()) {
+            for (Vertex vertex : rag.getGraph().getVertices()) {
                 if (counter >= start && counter < end) {
                     wasInSection = true;
                     vertexArray.put(new ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
@@ -228,12 +230,13 @@ public class VertexResource extends AbstractSubResource {
     @Path("/{id}/{direction}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getVertexEdges(@PathParam("graphname") String graphName, @PathParam("id") String vertexId, @PathParam("direction") String direction) {
+        Vertex vertex = this.getRexsterApplicationGraph(graphName).getGraph().getVertex(vertexId);
+
         try {
             Long start = this.getStartOffset();
             Long end = this.getEndOffset();
 
             long counter = 0l;
-            Vertex vertex = this.getRexsterApplicationGraph(graphName).getGraph().getVertex(vertexId);
             JSONArray edgeArray = new JSONArray();
 
             if (null != vertex) {
@@ -368,9 +371,9 @@ public class VertexResource extends AbstractSubResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response postVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
 
         try {
-            Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
             Vertex vertex = graph.getVertex(id);
 
             if (null == vertex) {
@@ -420,9 +423,10 @@ public class VertexResource extends AbstractSubResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
+
         try {
             final List<String> keys = this.getNonRexsterRequestKeys();
-            final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
             final Vertex vertex = graph.getVertex(id);
             if (null != vertex) {
                 if (keys.size() > 0) {
