@@ -178,27 +178,25 @@ public abstract class BaseResource {
         }
     }
 
-    public void buildRequestObject(final MultivaluedMap<String, String> formParams) {
+    protected void buildRequestObject(final MultivaluedMap<String, String> formParams)  {
         HashMap map = new HashMap();
 
-        // need to pick apart the multivalue map.
         for (String key : formParams.keySet()) {
             List list = formParams.get(key);
-            if (list != null && list.size() > 1) {
-                JSONArray set = new JSONArray();
-                for (Object val : list) {
-                    set.put(val.toString());
-                }
-
-                map.put(key, set);
-            } else if (list.size() == 1) {
+            if (list != null && list.size() >= 1) {
+                // rexster ignores all other values in the list and just takes the first
                 map.put(key, formParams.getFirst(key));
             } else {
                 map.put(key, "");
             }
         }
 
-        this.requestObject = new JSONObject(map);
+        try {
+            this.requestObject = new JSONObject();
+            this.buildRequestObject(map);
+        } catch (JSONException jsonException) {
+            this.setRequestObject(null);
+        }
     }
 
     public JSONObject getRexsterRequest() {
