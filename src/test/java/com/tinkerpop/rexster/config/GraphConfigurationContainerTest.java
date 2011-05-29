@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.config;
 
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
+import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyIndexableGraph;
 import com.tinkerpop.rexster.Tokens;
 import junit.framework.Assert;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -123,6 +124,21 @@ public class GraphConfigurationContainerTest {
             Assert.assertEquals(0, container.getFailedConfigurations().size());
             Assert.assertEquals(configList.size(), container.getApplicationGraphs().size());
             Assert.assertTrue(container.getApplicationGraphs().get("test").getGraph() instanceof ReadOnlyGraph);
+            Assert.assertFalse(container.getApplicationGraphs().get("test").getGraph() instanceof ReadOnlyIndexableGraph);
+        } catch (Exception ex) {
+            Assert.fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void getApplicationGraphsReadOnlyIndexableGraphs() {
+        configList.add(constructHierarchicalConfiguration("test", "some-file", "com.tinkerpop.rexster.config.MockIndexableGraphConfiguration", true));
+
+        try {
+            GraphConfigurationContainer container = new GraphConfigurationContainer(configList);
+            Assert.assertEquals(0, container.getFailedConfigurations().size());
+            Assert.assertEquals(configList.size(), container.getApplicationGraphs().size());
+            Assert.assertTrue(container.getApplicationGraphs().get("test").getGraph() instanceof ReadOnlyIndexableGraph);
         } catch (Exception ex) {
             Assert.fail(ex.getMessage());
         }

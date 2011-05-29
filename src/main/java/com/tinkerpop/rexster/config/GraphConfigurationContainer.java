@@ -1,7 +1,9 @@
 package com.tinkerpop.rexster.config;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
+import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyIndexableGraph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -117,7 +119,11 @@ public class GraphConfigurationContainer {
 
             if (isReadOnly) {
                 // the graph is configured to be readonly so wrap it up
-                graph = new ReadOnlyGraph(readWriteGraph);
+                if (readWriteGraph instanceof IndexableGraph) {
+                    graph = new ReadOnlyIndexableGraph((IndexableGraph) readWriteGraph);
+                } else {
+                    graph = new ReadOnlyGraph(readWriteGraph);
+                }
             } else {
                 graph = readWriteGraph;
             }
