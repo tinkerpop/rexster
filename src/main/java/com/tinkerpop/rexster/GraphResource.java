@@ -76,7 +76,7 @@ public class GraphResource extends AbstractSubResource {
     @POST
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response getGraphExtension(@PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
+    public Response postGraphExtension(@PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
@@ -87,8 +87,14 @@ public class GraphResource extends AbstractSubResource {
     @POST
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphExtension(@PathParam("graphname") String graphName, JSONObject json) {
+    public Response postGraphExtension(@PathParam("graphname") String graphName, JSONObject json) {
         this.setRequestObject(json);
+        return this.getGraphExtension(graphName);
+    }
+
+    @POST
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
+    public Response postGraphExtension(@PathParam("graphname") String graphName) {
         return this.getGraphExtension(graphName);
     }
 

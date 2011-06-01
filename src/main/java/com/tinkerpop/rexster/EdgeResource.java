@@ -114,7 +114,7 @@ public class EdgeResource extends AbstractSubResource {
     @POST
     @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response getVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
+    public Response postVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
@@ -125,8 +125,14 @@ public class EdgeResource extends AbstractSubResource {
     @POST
     @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response postEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
+        return this.getEdgeExtension(graphName, id);
+    }
+
+    @POST
+    @Path("/{id}/{extension: .+}")
+    public Response postEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.getEdgeExtension(graphName, id);
     }
 
