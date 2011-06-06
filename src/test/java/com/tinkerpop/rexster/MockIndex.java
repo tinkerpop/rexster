@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 
@@ -21,7 +22,7 @@ public class MockIndex implements Index {
         return count;
     }
 
-    public Iterable get(String arg0, Object arg1) {
+    public CloseableSequence get(String arg0, Object arg1) {
         // TODO Auto-generated method stub
         return null;
     }
