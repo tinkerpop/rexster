@@ -10,7 +10,7 @@ All releases can be accessed through the TinkerPop Maven2 repository identified 
 
 ==<hr/>==
 
-h3. Version 0.4 (NOT OFFICIALLY RELEASED YET)
+h3. Version 0.4 (McGruff - NOT OFFICIALLY RELEASED YET)
 
 ```xml
  <dependency>
@@ -19,6 +19,19 @@ h3. Version 0.4 (NOT OFFICIALLY RELEASED YET)
   <version>0.4-SNAPSHOT</version>
 </dependency>
 ```
+
+* Failed vertex POST now returns a "not found" status if the identifier cannot be found in the graph
+* Raw JSON can be POSTed for vertices and edges.
+* Extension can now contain a hyphen in the extension name and namespace.
+* POSTing raw JSON and form data is now supported on the IndexResource.
+* Gremlin scripts that return a null value return a null as a result in the JSON.
+* Non-configured extensions do not appear in JSON for graphs, vertices, and edges.
+* @@ExtensionDescriptor@ is not required for an extension to work within Rexster.
+* Support for @RexsterGraph@ configuration within @rexster.xml@.
+* The @returnKeys@ parameter now works consistently across Rexster to only accept an array of keys as a value.
+* POST of form data to extensions.
+* POST to @prefixes@ resource works consistently now supporting form data, JSON and query string parameters.
+* Ensured that all requests for a graph that does not exist throws an NOT FOUND HTTP status code.
 
 ==<hr/>==
 
