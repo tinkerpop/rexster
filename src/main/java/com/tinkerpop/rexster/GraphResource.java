@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
 import com.tinkerpop.rexster.extension.*;
 import org.apache.log4j.Logger;
@@ -193,7 +194,28 @@ public class GraphResource extends AbstractSubResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteGraph(@PathParam("graphname") String graphName) {
         Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
-        graph.clear();
+        TransactionalGraph transactionalGraph = null;
+
+        try {
+            if (graph instanceof TransactionalGraph) {
+                transactionalGraph = (TransactionalGraph) graph;
+                transactionalGraph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+
+                transactionalGraph.clear();
+                transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            } else {
+                graph.clear();
+            }
+        } catch (Exception ex) {
+
+            if (transactionalGraph != null) {
+                transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            }
+
+            logger.error(ex);
+            JSONObject error = generateErrorObject(ex.getMessage());
+            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        }
 
         try {
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
