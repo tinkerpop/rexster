@@ -35,5 +35,7 @@ public @interface ExtensionDefinition {
      * Specifies the media type to be returned by the extension. By default this value
      * is application/json.
      */
-    String produces() default MediaType.APPLICATION_JSON;
+    String produces() default javax.ws.rs.core.MediaType.APPLICATION_JSON;
+
+    // don't clean up namespace http://stackoverflow.com/questions/1425088/incompatible-types-found-required-default-enums-in-annotations
 }

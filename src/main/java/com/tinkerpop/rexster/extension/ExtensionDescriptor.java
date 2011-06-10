@@ -12,5 +12,6 @@ public @interface ExtensionDescriptor {
 
     ExtensionApi[] api() default {};
 
-    ExtensionApiBehavior apiBehavior() default ExtensionApiBehavior.DEFAULT;
+    // don't clean up namespace http://stackoverflow.com/questions/1425088/incompatible-types-found-required-default-enums-in-annotations
+    ExtensionApiBehavior apiBehavior() default com.tinkerpop.rexster.extension.ExtensionApiBehavior.DEFAULT;
 }
