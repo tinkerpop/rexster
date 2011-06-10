@@ -103,7 +103,7 @@ public class RexsterApplicationGraph {
                     logger.info("Graph [" + graphName + "] - configured with allowable namespace [" + namespace + "]");
                 } catch (IllegalArgumentException iae) {
                     logger.warn("Graph [" + graphName + "] - Extension defined with an invalid namespace: " + namespace
-                            + ".  It will not be configured.", iae);
+                            + ".  It will not be configured.");
                 }
             }
         }
