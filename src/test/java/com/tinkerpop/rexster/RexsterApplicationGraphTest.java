@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.rexster.extension.ExtensionConfiguration;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
@@ -21,6 +22,12 @@ import java.util.Map;
 
 public class RexsterApplicationGraphTest {
     private Mockery mockery = new JUnit4Mockery();
+
+    @Test
+    public void isTransactionalGraphFalse() {
+        RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", TinkerGraphFactory.createTinkerGraph());
+        Assert.assertFalse(rag.isTransactionalGraph());
+    }
 
     @Test
     public void loadAllowableExtensionsNullList() {

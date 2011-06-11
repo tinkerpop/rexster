@@ -308,7 +308,8 @@ public class EdgeResource extends AbstractSubResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response postEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
-        final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final Graph graph = rag.getGraph();
         String inV = null;
         Object temp = this.getRequestObject().opt(Tokens._IN_V);
         if (null != temp)
@@ -322,45 +323,59 @@ public class EdgeResource extends AbstractSubResource {
         if (null != temp)
             label = temp.toString();
 
-        Edge edge = graph.getEdge(id);
-        if (null == edge && null != outV && null != inV && null != label) {
-            // there is no edge but the in/out vertex params and label are present so
-            // validate that the vertexes are present before creating the edge
-            final Vertex out = graph.getVertex(outV);
-            final Vertex in = graph.getVertex(inV);
-            if (null != out && null != in) {
-                // in/out vertexes are found so edge can be created
-                edge = graph.addEdge(id, out, in, label);
-            }
-
-        } else if (edge != null) {
-            if (!this.hasElementProperties(this.getRequestObject())) {
-                JSONObject error = generateErrorObjectJsonFail(new Exception("Edge with id " + id + " already exists"));
-                throw new WebApplicationException(Response.status(Status.CONFLICT).entity(error).build());
-            }
-        }
-
+        rag.tryStartTransaction();
         try {
-            if (edge != null) {
-                Iterator keys = this.getRequestObject().keys();
-                while (keys.hasNext()) {
-                    String key = keys.next().toString();
-                    if (!key.startsWith(Tokens.UNDERSCORE)) {
-                        edge.setProperty(key, this.getTypedPropertyValue(this.getRequestObject().getString(key)));
-                    }
+            Edge edge = graph.getEdge(id);
+            if (null == edge && null != outV && null != inV && null != label) {
+                // there is no edge but the in/out vertex params and label are present so
+                // validate that the vertexes are present before creating the edge
+                final Vertex out = graph.getVertex(outV);
+                final Vertex in = graph.getVertex(inV);
+                if (null != out && null != in) {
+                    // in/out vertexes are found so edge can be created
+                    edge = graph.addEdge(id, out, in, label);
                 }
-                this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
-            } else {
-                // edge could not be found.  likely an error condition on the request
-                JSONObject error = generateErrorObjectJsonFail(new Exception("Edge cannot be found or created.  Please check the format of the request."));
+
+            } else if (edge != null) {
+                if (!this.hasElementProperties(this.getRequestObject())) {
+                    JSONObject error = generateErrorObjectJsonFail(new Exception("Edge with id " + id + " already exists"));
+                    throw new WebApplicationException(Response.status(Status.CONFLICT).entity(error).build());
+                }
+            }
+
+            try {
+                if (edge != null) {
+                    Iterator keys = this.getRequestObject().keys();
+                    while (keys.hasNext()) {
+                        String key = keys.next().toString();
+                        if (!key.startsWith(Tokens.UNDERSCORE)) {
+                            edge.setProperty(key, this.getTypedPropertyValue(this.getRequestObject().getString(key)));
+                        }
+                    }
+                    this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(edge, this.getReturnKeys(), this.hasShowTypes()));
+                } else {
+                    // edge could not be found.  likely an error condition on the request
+                    JSONObject error = generateErrorObjectJsonFail(new Exception("Edge cannot be found or created.  Please check the format of the request."));
+                    throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+                }
+
+                rag.tryStopTransactionSuccess();
+
+                this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
+            } catch (JSONException ex) {
+                logger.error(ex);
+
+                JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
 
-            this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-        } catch (JSONException ex) {
-            logger.error(ex);
 
-            JSONObject error = generateErrorObjectJsonFail(ex);
+        } catch (WebApplicationException wae) {
+            rag.tryStopTransactionFailure();
+            throw wae;
+        } catch (Exception ex) {
+            rag.tryStopTransactionFailure();
+            JSONObject error = generateErrorObject("Transaction failed on POST of edge.", ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 
@@ -381,9 +396,11 @@ public class EdgeResource extends AbstractSubResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
-        final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final Graph graph = rag.getGraph();
 
         try {
+            rag.tryStartTransaction();
             final List<String> keys = this.getNonRexsterRequestKeys();
             final Edge edge = graph.getEdge(id);
             if (null != edge) {
@@ -403,11 +420,22 @@ public class EdgeResource extends AbstractSubResource {
                 throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
             }
 
+            rag.tryStopTransactionSuccess();
 
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);
+
+            rag.tryStopTransactionFailure();
+
             JSONObject error = generateErrorObjectJsonFail(ex);
+            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } catch (WebApplicationException wae) {
+            rag.tryStopTransactionFailure();
+            throw wae;
+        } catch (Exception ex) {
+            rag.tryStopTransactionFailure();
+            JSONObject error = generateErrorObject("Transaction failed on DELETE of edge.", ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 

@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.rexster.extension.ExtensionAllowed;
 import com.tinkerpop.rexster.extension.ExtensionConfiguration;
 import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
@@ -34,6 +35,41 @@ public class RexsterApplicationGraph {
 
     public Graph getGraph() {
         return graph;
+    }
+
+    public TransactionalGraph tryGetTransactionalGraph() {
+        TransactionalGraph transactionalGraph = null;
+        if (this.graph instanceof TransactionalGraph) {
+            transactionalGraph = (TransactionalGraph) graph;
+        }
+
+        return transactionalGraph;
+    }
+
+    public boolean isTransactionalGraph() {
+        TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
+        return transactionalGraph != null;
+    }
+
+    public void tryStartTransaction() {
+        TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
+        if (transactionalGraph != null) {
+            transactionalGraph.startTransaction();
+        }
+    }
+
+    public void tryStopTransactionSuccess() {
+        TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
+        if (transactionalGraph != null) {
+            transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        }
+    }
+
+    public void tryStopTransactionFailure() {
+        TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
+        if (transactionalGraph != null) {
+            transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        }
     }
 
     /**

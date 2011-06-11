@@ -377,9 +377,11 @@ public class VertexResource extends AbstractSubResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response postVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
-        final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final Graph graph = rag.getGraph();
 
         try {
+            rag.tryStartTransaction();
             Vertex vertex = graph.getVertex(id);
 
             if (null == vertex) {
@@ -399,14 +401,20 @@ public class VertexResource extends AbstractSubResource {
                 }
             }
 
+            rag.tryStopTransactionSuccess();
+
             this.resultObject.put(Tokens.RESULTS, new ElementJSONObject(vertex, this.getReturnKeys(), this.hasShowTypes()));
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
+            rag.tryStopTransactionFailure();
+
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (RuntimeException re) {
+            rag.tryStopTransactionFailure();
+
             logger.error(re);
 
             JSONObject error = generateErrorObject(re.getMessage(), re);
@@ -429,7 +437,10 @@ public class VertexResource extends AbstractSubResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
-        final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final Graph graph = rag.getGraph();
+
+        rag.tryStartTransaction();
 
         try {
             final List<String> keys = this.getNonRexsterRequestKeys();
@@ -451,13 +462,21 @@ public class VertexResource extends AbstractSubResource {
                 JSONObject error = generateErrorObject(msg);
                 throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
             }
+
+            rag.tryStopTransactionSuccess();
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
+
+            rag.tryStopTransactionFailure();
+
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (RuntimeException re) {
+
+            rag.tryStopTransactionFailure();
+
             logger.error(re);
 
             JSONObject error = generateErrorObject(re.getMessage(), re);

@@ -194,24 +194,10 @@ public class GraphResource extends AbstractSubResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteGraph(@PathParam("graphname") String graphName) {
         Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
-        TransactionalGraph transactionalGraph = null;
 
         try {
-            if (graph instanceof TransactionalGraph) {
-                transactionalGraph = (TransactionalGraph) graph;
-                transactionalGraph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
-
-                transactionalGraph.clear();
-                transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-            } else {
-                graph.clear();
-            }
+            graph.clear();
         } catch (Exception ex) {
-
-            if (transactionalGraph != null) {
-                transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            }
-
             logger.error(ex);
             JSONObject error = generateErrorObject(ex.getMessage());
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
