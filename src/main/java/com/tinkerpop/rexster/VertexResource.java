@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ServiceConfigurationError;
 
 @Path("/{graphname}/vertices")
 public class VertexResource extends AbstractSubResource {
@@ -162,7 +163,16 @@ public class VertexResource extends AbstractSubResource {
             try {
 
                 // look for the extension as loaded through serviceloader
-                RexsterExtension rexsterExtension = findExtension(extensionSegmentSet);
+                RexsterExtension rexsterExtension = null;
+                try {
+                    rexsterExtension = findExtension(extensionSegmentSet);
+                } catch (ServiceConfigurationError sce) {
+                    logger.error("ServiceLoader could not find a class referenced in com.tinkerpop.rexster.extension.RexsterExtension.");
+                    JSONObject error = generateErrorObject(
+                            "Class specified in com.tinkerpop.rexster.extension.RexsterExtension could not be found.",
+                            sce);
+                    throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+                }
 
                 if (rexsterExtension == null) {
                     // extension was not found for some reason

@@ -62,11 +62,11 @@ public abstract class BaseResource {
         return generateErrorObject(message, null);
     }
 
-    public JSONObject generateErrorObjectJsonFail(Exception source) {
+    public JSONObject generateErrorObjectJsonFail(Throwable source) {
         return generateErrorObject("An error occurred while generating the response object", source);
     }
 
-    public JSONObject generateErrorObject(String message, Exception source) {
+    public JSONObject generateErrorObject(String message, Throwable source) {
         Map<String, String> m = new HashMap<String, String>();
         m.put(Tokens.MESSAGE, message);
 
