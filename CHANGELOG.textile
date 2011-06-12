@@ -32,6 +32,8 @@ h3. Version 0.4 (McGruff - NOT OFFICIALLY RELEASED YET)
 * POST of form data to extensions.
 * POST to @prefixes@ resource works consistently now supporting form data, JSON and query string parameters.
 * Ensured that all requests for a graph that does not exist throws an NOT FOUND HTTP status code.
+* Support start and stop of transactions for POST/DELETE operations
+* Better messaging returned as JSON if Rexster cannot find an extension class not found in com.tinkerpop.rexster.extension.RexsterExtension.
 
 ==<hr/>==
 
