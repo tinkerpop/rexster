@@ -39,7 +39,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
     private static final String API_START_OFFSET = "start index for a paged set of data to be returned";
     private static final String API_END_OFFSET = "end index for a paged set of data to be returned";
 
-    @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE)
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE, method = HttpMethod.GET)
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for an edge.",
                          api = {
                              @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
@@ -47,14 +47,29 @@ public class GremlinExtension extends AbstractRexsterExtension {
                              @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                              @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
                          })
-    public ExtensionResponse evaluateOnEdge(@RexsterContext RexsterResourceContext rexsterResourceContext,
+    public ExtensionResponse evaluateGetOnEdge(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                             @RexsterContext Graph graph,
                                             @RexsterContext Edge edge,
                                             @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script) {
         return tryExecuteGremlinScript(rexsterResourceContext, graph, null, edge, script);
     }
 
-    @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX)
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE, method = HttpMethod.POST)
+    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for an edge.",
+                         api = {
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
+                         })
+    public ExtensionResponse evaluatePostOnEdge(@RexsterContext RexsterResourceContext rexsterResourceContext,
+                                            @RexsterContext Graph graph,
+                                            @RexsterContext Edge edge,
+                                            @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script) {
+        return tryExecuteGremlinScript(rexsterResourceContext, graph, null, edge, script);
+    }
+
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX, method = HttpMethod.GET)
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a vertex.",
                          api = {
                              @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
@@ -62,14 +77,29 @@ public class GremlinExtension extends AbstractRexsterExtension {
                              @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                              @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
                          })
-    public ExtensionResponse evaluateOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
+    public ExtensionResponse evaluateGetOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                               @RexsterContext Graph graph,
                                               @RexsterContext Vertex vertex,
                                               @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script) {
         return tryExecuteGremlinScript(rexsterResourceContext, graph, vertex, null, script);
     }
 
-    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX, method = HttpMethod.POST)
+    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a vertex.",
+                         api = {
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
+                         })
+    public ExtensionResponse evaluatePostOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
+                                              @RexsterContext Graph graph,
+                                              @RexsterContext Vertex vertex,
+                                              @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script) {
+        return tryExecuteGremlinScript(rexsterResourceContext, graph, vertex, null, script);
+    }
+
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.GET)
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a graph.",
                          api = {
                              @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
@@ -77,7 +107,21 @@ public class GremlinExtension extends AbstractRexsterExtension {
                              @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                              @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
                          })
-    public ExtensionResponse evaluateOnGraph(@RexsterContext RexsterResourceContext rexsterResourceContext,
+    public ExtensionResponse evaluateGetOnGraph(@RexsterContext RexsterResourceContext rexsterResourceContext,
+                                             @RexsterContext Graph graph,
+                                             @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script) {
+        return tryExecuteGremlinScript(rexsterResourceContext, graph, null, null, script);
+    }
+
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)
+    @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a graph.",
+                         api = {
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
+                             @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
+                         })
+    public ExtensionResponse evaluatePostOnGraph(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                              @RexsterContext Graph graph,
                                              @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script) {
         return tryExecuteGremlinScript(rexsterResourceContext, graph, null, null, script);

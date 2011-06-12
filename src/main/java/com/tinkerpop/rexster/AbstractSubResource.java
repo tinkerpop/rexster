@@ -218,9 +218,12 @@ public abstract class AbstractSubResource extends BaseResource {
      * @param extensionAction  This value may be null or empty if the RexsterExtension is being exposed as a
      *                         root level call (ie. the ExtensionDefinition annotation does not specify a
      *                         path, just an ExtensionPoint).
+     * @param httpMethodRequested The HTTP method made on the request.
      * @return The method to call or null if it cannot be found.
      */
-    protected static ExtensionMethod findExtensionMethod(RexsterExtension rexsterExtension, ExtensionPoint extensionPoint, String extensionAction) {
+    protected static ExtensionMethod findExtensionMethod(RexsterExtension rexsterExtension,
+                                                         ExtensionPoint extensionPoint,
+                                                         String extensionAction, HttpMethod httpMethodRequested) {
         Class rexsterExtensionClass = rexsterExtension.getClass();
         Method[] methods = rexsterExtensionClass.getMethods();
 
@@ -233,7 +236,8 @@ public abstract class AbstractSubResource extends BaseResource {
 
             // checks if the extension point is graph, and if the method path matches the specified action on
             // the uri (if it exists) or if the method has no path.
-            if (extensionDefinition != null && extensionDefinition.extensionPoint() == extensionPoint) {
+            if (extensionDefinition != null && extensionDefinition.extensionPoint() == extensionPoint
+                    && (extensionDefinition.method() == HttpMethod.ANY || extensionDefinition.method() == httpMethodRequested)) {
 
                 if (extensionDefinition.path().isEmpty()) {
                     // try to use a root level method definition

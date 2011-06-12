@@ -329,27 +329,41 @@ public class AbstractSubResourceTest {
     @Test
     public void findExtensionMethodNotPresent() {
         MockRexsterExtension ext = new MockRexsterExtension();
-        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.VERTEX, "action");
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.VERTEX, "action", HttpMethod.ANY);
         Assert.assertNull(m);
 
         // this does a check that really checks an bad allowable configuration where a match
         // of a method will occur if the action doesn't match but there is an extension point
         // with no path supplied.  yet to see if this is a big deal or not.
-        m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "something-that-does-not-exist");
+        m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "something-that-does-not-exist", HttpMethod.ANY);
         Assert.assertNotNull(m);
     }
 
     @Test
     public void findExtensionMethodFoundRoot() {
         MockRexsterExtension ext = new MockRexsterExtension();
-        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "");
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "", HttpMethod.ANY);
         Assert.assertNotNull(m);
     }
 
     @Test
     public void findExtensionMethodFoundSpecificAction() {
         MockRexsterExtension ext = new MockRexsterExtension();
-        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "action");
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "action", HttpMethod.ANY);
+        Assert.assertNotNull(m);
+    }
+
+    @Test
+    public void findExtensionMethodNotFoundSpecificActionAndMethod() {
+        MockRexsterExtension ext = new MockRexsterExtension();
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "headonly", HttpMethod.POST);
+        Assert.assertNotNull(m);
+    }
+
+    @Test
+    public void findExtensionMethodFoundSpecificActionAndMethod() {
+        MockRexsterExtension ext = new MockRexsterExtension();
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "headonly", HttpMethod.HEAD);
         Assert.assertNotNull(m);
     }
 
@@ -470,8 +484,8 @@ public class AbstractSubResourceTest {
         }
 
         public ExtensionMethod findExtensionMethodExposed(
-                RexsterExtension rexsterExtension, ExtensionPoint extensionPoint, String extensionAction) {
-            return findExtensionMethod(rexsterExtension, extensionPoint, extensionAction);
+                RexsterExtension rexsterExtension, ExtensionPoint extensionPoint, String extensionAction, HttpMethod httpMethodRequested) {
+            return findExtensionMethod(rexsterExtension, extensionPoint, extensionAction, httpMethodRequested);
         }
 
         public ExtensionSegmentSet parseUriForExtensionSegment(String graphName, ExtensionPoint extensionPoint) {
@@ -492,6 +506,11 @@ public class AbstractSubResourceTest {
 
         @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "action")
         public ExtensionResponse doAction() {
+            return null;
+        }
+
+        @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "headonly", method = HttpMethod.HEAD)
+        public ExtensionResponse headAccessOnly() {
             return null;
         }
 

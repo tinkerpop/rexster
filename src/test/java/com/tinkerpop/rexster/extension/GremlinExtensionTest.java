@@ -85,9 +85,9 @@ public class GremlinExtensionTest {
     }
 
     @Test
-    public void evaluateOnGraphNoScript() {
+    public void evaluateGetOnGraphNoScript() {
 
-        ExtensionResponse extensionResponse = this.gremlinExtension.evaluateOnGraph(
+        ExtensionResponse extensionResponse = this.gremlinExtension.evaluateGetOnGraph(
                 rexsterResourceContext, graph, "");
 
         JSONObject jsonResponse = assertResponseAndGetEntity(extensionResponse,
@@ -100,8 +100,8 @@ public class GremlinExtensionTest {
     }
 
     @Test
-    public void evaluateOnGraphNoKeysNoTypesReturnVertex() {
-        ExtensionResponse extensionResponse = this.gremlinExtension.evaluateOnGraph(
+    public void evaluateGetOnGraphNoKeysNoTypesReturnVertex() {
+        ExtensionResponse extensionResponse = this.gremlinExtension.evaluateGetOnGraph(
                 rexsterResourceContext, graph, "g.v(1)");
         JSONObject jsonResponse = assertResponseAndGetEntity(extensionResponse,
                 Response.Status.OK.getStatusCode());
@@ -120,8 +120,8 @@ public class GremlinExtensionTest {
     }
 
     @Test
-    public void evaluateOnVertexNoKeysNoTypesReturnOutEdges() {
-        ExtensionResponse extensionResponse = this.gremlinExtension.evaluateOnVertex(
+    public void evaluateGetOnVertexNoKeysNoTypesReturnOutEdges() {
+        ExtensionResponse extensionResponse = this.gremlinExtension.evaluateGetOnVertex(
                 rexsterResourceContext, graph, graph.getVertex(6), "v.outEdges");
         JSONObject jsonResponse = assertResponseAndGetEntity(extensionResponse,
                 Response.Status.OK.getStatusCode());
@@ -135,8 +135,8 @@ public class GremlinExtensionTest {
     }
 
     @Test
-    public void evaluateOnEdgeNoKeysNoTypesReturnOutVertex() {
-        ExtensionResponse extensionResponse = this.gremlinExtension.evaluateOnEdge(
+    public void evaluateGetOnEdgeNoKeysNoTypesReturnOutVertex() {
+        ExtensionResponse extensionResponse = this.gremlinExtension.evaluateGetOnEdge(
                 rexsterResourceContext, graph, graph.getEdge(7), "e.outVertex");
         JSONObject jsonResponse = assertResponseAndGetEntity(extensionResponse,
                 Response.Status.OK.getStatusCode());

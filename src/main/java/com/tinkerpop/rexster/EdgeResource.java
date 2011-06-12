@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.extension.*;
+import com.tinkerpop.rexster.extension.HttpMethod;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -112,6 +113,106 @@ public class EdgeResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
     }
 
+    @HEAD
+    @Path("/{id}/{extension: .+}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response headVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(formParams);
+        return this.executeEdgeExtension(graphName, id, HttpMethod.HEAD);
+    }
+
+    @HEAD
+    @Path("/{id}/{extension: .+}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response headEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+        this.setRequestObject(json);
+        return this.executeEdgeExtension(graphName, id, HttpMethod.HEAD);
+    }
+
+    @HEAD
+    @Path("/{id}/{extension: .+}")
+    public Response headEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        return this.executeEdgeExtension(graphName, id, HttpMethod.HEAD);
+    }
+
+    @PUT
+    @Path("/{id}/{extension: .+}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response putVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(formParams);
+        return this.executeEdgeExtension(graphName, id, HttpMethod.PUT);
+    }
+
+    @PUT
+    @Path("/{id}/{extension: .+}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response putEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+        this.setRequestObject(json);
+        return this.executeEdgeExtension(graphName, id, HttpMethod.PUT);
+    }
+
+    @PUT
+    @Path("/{id}/{extension: .+}")
+    public Response putEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        return this.executeEdgeExtension(graphName, id, HttpMethod.PUT);
+    }
+
+    @OPTIONS
+    @Path("/{id}/{extension: .+}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response optionsVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(formParams);
+        return this.executeEdgeExtension(graphName, id, HttpMethod.OPTIONS);
+    }
+
+    @OPTIONS
+    @Path("/{id}/{extension: .+}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response optionsEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+        this.setRequestObject(json);
+        return this.executeEdgeExtension(graphName, id, HttpMethod.OPTIONS);
+    }
+
+    @OPTIONS
+    @Path("/{id}/{extension: .+}")
+    public Response optionsEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        return this.executeEdgeExtension(graphName, id, HttpMethod.OPTIONS);
+    }
+
+    @DELETE
+    @Path("/{id}/{extension: .+}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response deleteVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(formParams);
+        return this.executeEdgeExtension(graphName, id, HttpMethod.DELETE);
+    }
+
+    @DELETE
+    @Path("/{id}/{extension: .+}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+        this.setRequestObject(json);
+        return this.executeEdgeExtension(graphName, id, HttpMethod.DELETE);
+    }
+
+    @DELETE
+    @Path("/{id}/{extension: .+}")
+    public Response deleteEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        return this.executeEdgeExtension(graphName, id, HttpMethod.DELETE);
+    }
+
     @POST
     @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -120,7 +221,7 @@ public class EdgeResource extends AbstractSubResource {
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
         this.buildRequestObject(formParams);
-        return this.getEdgeExtension(graphName, id);
+        return this.executeEdgeExtension(graphName, id, HttpMethod.POST);
     }
 
     @POST
@@ -128,18 +229,22 @@ public class EdgeResource extends AbstractSubResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response postEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
-        return this.getEdgeExtension(graphName, id);
+        return this.executeEdgeExtension(graphName, id, HttpMethod.POST);
     }
 
     @POST
     @Path("/{id}/{extension: .+}")
     public Response postEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
-        return this.getEdgeExtension(graphName, id);
+        return this.executeEdgeExtension(graphName, id, HttpMethod.POST);
     }
 
     @GET
     @Path("/{id}/{extension: .+}")
     public Response getEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        return this.executeEdgeExtension(graphName, id, HttpMethod.GET);
+    }
+
+    private Response executeEdgeExtension(String graphName, String id, HttpMethod httpMethodRequested) {
 
         final Edge edge = this.getRexsterApplicationGraph(graphName).getGraph().getEdge(id);
 
@@ -178,13 +283,13 @@ public class EdgeResource extends AbstractSubResource {
                 }
 
                 // look up the method on the extension that needs to be called.
-                methodToCall = findExtensionMethod(rexsterExtension, ExtensionPoint.EDGE, extensionSegmentSet.getExtensionMethod());
+                methodToCall = findExtensionMethod(rexsterExtension, ExtensionPoint.EDGE, extensionSegmentSet.getExtensionMethod(), httpMethodRequested);
 
                 if (methodToCall == null) {
                     // extension method was not found for some reason
-                    logger.error("The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
+                    logger.error("The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "] with a HTTP method of [" + httpMethodRequested.name() + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
                     JSONObject error = generateErrorObject(
-                            "The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "]");
+                            "The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "] with a HTTP method of [" + httpMethodRequested.name() + "]");
                     throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
                 }
 
