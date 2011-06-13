@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
+import com.tinkerpop.gremlin.pipes.util.Table;
 import com.tinkerpop.rexster.ElementJSONObject;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
@@ -17,10 +18,7 @@ import org.codehaus.jettison.json.JSONObject;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.SimpleBindings;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @ExtensionNaming(namespace = "tp", name = "gremlin")
 public class GremlinExtension extends AbstractRexsterExtension {
@@ -156,6 +154,21 @@ public class GremlinExtension extends AbstractRexsterExtension {
                 if (result == null) {
                     // for example a script like g.clear()
                     results = null;
+                } else if (result instanceof Table){
+                    Table table = (Table) result;
+                    Iterator<Table.Row> rows = table.iterator();
+
+                    List<String> columnNames = table.getColumnNames();
+
+                    while (rows.hasNext()) {
+                        Table.Row row = rows.next();
+                        Map<String, Object> map = new HashMap<String, Object>();
+                        for (String columnName : columnNames) {
+                            map.put(columnName, prepareOutput(row.getColumn(columnName), returnKeys, showTypes));
+                        }
+
+                        results.put(new JSONObject(map));
+                    }
                 } else if (result instanceof Iterable) {
                     long counter = 0;
                     for (Object o : (Iterable) result) {

@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.servlet.gremlin;
 
+import com.tinkerpop.gremlin.pipes.util.Table;
 import com.tinkerpop.rexster.RexsterApplicationProvider;
 
 import javax.script.ScriptEngine;
@@ -144,7 +145,33 @@ public class ConsoleSession implements Runnable {
 
             List<Object> resultLines = new ArrayList<Object>();
             Object result = scriptEngine.eval(line);
-            if (result instanceof Iterable) {
+            if (result instanceof Table) {
+                Table table = (Table) result;
+                Iterator<Table.Row> rows = table.iterator();
+
+                List<String> columnNames = table.getColumnNames();
+
+                while (rows.hasNext()) {
+                    Table.Row row = rows.next();
+                    StringBuffer sb = new StringBuffer();
+                    sb.append("[");
+                    for (String columnName : columnNames) {
+                        sb.append(columnName);
+                        sb.append(":");
+                        sb.append(row.getColumn(columnName).toString());
+                        sb.append(",");
+                    }
+
+                    // delete last comma
+                    if (sb.length() > 1) {
+                        sb.deleteCharAt(sb.length() - 1);
+                    }
+
+                    sb.append("]");
+
+                    resultLines.add(sb.toString());
+                }
+            } else if (result instanceof Iterable) {
                 for (Object o : (Iterable) result) {
                     resultLines.add(o);
                 }
