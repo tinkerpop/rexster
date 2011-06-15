@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
 import com.tinkerpop.rexster.extension.*;
 import com.tinkerpop.rexster.extension.HttpMethod;

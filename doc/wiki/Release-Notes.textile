@@ -1,4 +1,4 @@
-All releases can be accessed through the TinkerPop Maven2 repository identified below.
+All releases can be accessed through the "TinkerPop":http://tinkerpop.com Maven2 repository identified below.
 
 ```xml
 <repository>

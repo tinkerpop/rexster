@@ -2,10 +2,8 @@ package com.tinkerpop.rexster.config;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.impls.rexster.RexsterGraph;
-import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReader;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.configuration.Configuration;
-import org.omg.CORBA.PUBLIC_MEMBER;
 
 public class RexsterGraphGraphConfiguration implements GraphConfiguration {
 

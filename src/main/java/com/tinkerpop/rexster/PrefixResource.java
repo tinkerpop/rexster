@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -13,9 +12,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**

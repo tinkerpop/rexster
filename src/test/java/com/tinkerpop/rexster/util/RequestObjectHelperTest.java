@@ -1,14 +1,11 @@
 package com.tinkerpop.rexster.util;
 
-import com.tinkerpop.rexster.BaseResource;
 import com.tinkerpop.rexster.Tokens;
 import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONTokener;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class RequestObjectHelperTest {

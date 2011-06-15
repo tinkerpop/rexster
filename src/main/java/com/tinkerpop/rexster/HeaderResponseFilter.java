@@ -3,7 +3,6 @@ package com.tinkerpop.rexster;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
-import org.apache.log4j.helpers.OnlyOnceErrorHandler;
 
 import javax.ws.rs.core.MediaType;
 import java.util.Collections;
@@ -25,8 +24,8 @@ public class HeaderResponseFilter implements ContainerResponseFilter {
         // an individual services to specify this value.
         if (contentTypeSpecifiedByService != null && !contentTypeSpecifiedByService.getParameters().containsKey(CHARSET)) {
             MediaType mediaTypeWithCharset = new MediaType(contentTypeSpecifiedByService.getType(),
-                                                           contentTypeSpecifiedByService.getSubtype(),
-                                                           Collections.singletonMap(CHARSET, WebServer.getCharacterEncoding()));
+                    contentTypeSpecifiedByService.getSubtype(),
+                    Collections.singletonMap(CHARSET, WebServer.getCharacterEncoding()));
             response.getHttpHeaders().putSingle(CONTENT_TYPE, mediaTypeWithCharset);
         }
 

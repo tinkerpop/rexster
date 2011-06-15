@@ -326,7 +326,7 @@ public class IndexResource extends AbstractSubResource {
 
     }
 
-     /**
+    /**
      * POST http://host/graph/indices/indexName?key=key1&value=value1&class=vertex&id=id1
      * Index index = graph.getIndex(indexName,...);
      * index.put(key,value,graph.getVertex(id1));
@@ -347,7 +347,7 @@ public class IndexResource extends AbstractSubResource {
 
     }
 
-     /**
+    /**
      * POST http://host/graph/indices/indexName?key=key1&value=value1&class=vertex&id=id1
      * Index index = graph.getIndex(indexName,...);
      * index.put(key,value,graph.getVertex(id1));

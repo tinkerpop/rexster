@@ -4,7 +4,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.EnumSet;
 
 /**
  * Defines an extension method to rexster.  Extensions may be applied to one of three

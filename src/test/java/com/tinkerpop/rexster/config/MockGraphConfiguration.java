@@ -3,7 +3,6 @@ package com.tinkerpop.rexster.config;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import org.apache.commons.configuration.Configuration;
 
 public class MockGraphConfiguration implements GraphConfiguration {

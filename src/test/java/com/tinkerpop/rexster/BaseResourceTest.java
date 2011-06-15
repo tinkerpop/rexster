@@ -11,9 +11,6 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -51,7 +48,7 @@ public class BaseResourceTest {
     }
 
     @Test
-    public void getReturnKeysNoKeys()  throws Exception {
+    public void getReturnKeysNoKeys() throws Exception {
         BaseResource tt = new MockResource();
         JSONTokener tokener = new JSONTokener("{\"rexster\": { \"someproperty\": [ \"key\" ]}}");
         JSONObject jsonObject = new JSONObject(tokener);

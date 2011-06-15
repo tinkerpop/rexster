@@ -11,7 +11,6 @@ import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.xml.sax.helpers.NamespaceSupport;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;

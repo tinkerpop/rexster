@@ -16,7 +16,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import java.util.*;
@@ -176,7 +175,7 @@ public abstract class BaseResource {
         }
     }
 
-    protected void buildRequestObject(final MultivaluedMap<String, String> formParams)  {
+    protected void buildRequestObject(final MultivaluedMap<String, String> formParams) {
         HashMap map = new HashMap();
 
         for (String key : formParams.keySet()) {

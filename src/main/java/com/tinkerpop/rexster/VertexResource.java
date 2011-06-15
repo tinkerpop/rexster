@@ -3,7 +3,6 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.rexster.ElementJSONObject;
 import com.tinkerpop.rexster.extension.*;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import org.apache.log4j.Logger;

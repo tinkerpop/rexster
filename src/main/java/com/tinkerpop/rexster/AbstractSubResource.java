@@ -213,11 +213,11 @@ public abstract class AbstractSubResource extends BaseResource {
      * This method will find the first matching extension method.  If multiple extension method matches then
      * the remainder will be ignored.
      *
-     * @param rexsterExtension The extension instance to be called.
-     * @param extensionPoint   One of the extension points (graph, edge, vertex).
-     * @param extensionAction  This value may be null or empty if the RexsterExtension is being exposed as a
-     *                         root level call (ie. the ExtensionDefinition annotation does not specify a
-     *                         path, just an ExtensionPoint).
+     * @param rexsterExtension    The extension instance to be called.
+     * @param extensionPoint      One of the extension points (graph, edge, vertex).
+     * @param extensionAction     This value may be null or empty if the RexsterExtension is being exposed as a
+     *                            root level call (ie. the ExtensionDefinition annotation does not specify a
+     *                            path, just an ExtensionPoint).
      * @param httpMethodRequested The HTTP method made on the request.
      * @return The method to call or null if it cannot be found.
      */

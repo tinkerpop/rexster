@@ -4,7 +4,6 @@ import com.tinkerpop.rexster.Tokens;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import sun.reflect.generics.tree.ReturnType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +17,10 @@ public class RequestObjectHelper {
 
     /**
      * Given a request object, return the fragment of JSON that deals with Rexster-reserved parameters.
-     *
+     * <p/>
      * These parameters are the returnKeys, showTypes, and offset.
      *
-     * @param requestObject  the request object
+     * @param requestObject the request object
      * @return the JSON
      */
     public static JSONObject getRexsterRequest(JSONObject requestObject) {
@@ -42,7 +41,7 @@ public class RequestObjectHelper {
      * Given a request object, return the desired returnKeys.
      *
      * @param requestObject the request object
-     * @param wildcard a value that represents the specification of all keys
+     * @param wildcard      a value that represents the specification of all keys
      * @return the return keys
      */
     public static List<String> getReturnKeys(final JSONObject requestObject, final String wildcard) {
@@ -63,11 +62,11 @@ public class RequestObjectHelper {
 
     /**
      * Given an array of keys from the request object, return the desired returnKeys.
-     *
+     * <p/>
      * Useful for when the return keys are being passed in as a parameter to an extension method.
      *
      * @param arrayOfKeys array of keys from the request object.
-     * @param wildcard a value that represents the specification of all keys
+     * @param wildcard    a value that represents the specification of all keys
      * @return the return keys
      */
     public static List<String> getReturnKeys(final JSONArray arrayOfKeys, final String wildcard) {
