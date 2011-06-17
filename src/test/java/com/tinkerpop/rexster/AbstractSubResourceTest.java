@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -331,12 +332,6 @@ public class AbstractSubResourceTest {
         MockRexsterExtension ext = new MockRexsterExtension();
         ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.VERTEX, "action", HttpMethod.ANY);
         Assert.assertNull(m);
-
-        // this does a check that really checks an bad allowable configuration where a match
-        // of a method will occur if the action doesn't match but there is an extension point
-        // with no path supplied.  yet to see if this is a big deal or not.
-        m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "something-that-does-not-exist", HttpMethod.ANY);
-        Assert.assertNotNull(m);
     }
 
     @Test
@@ -344,6 +339,10 @@ public class AbstractSubResourceTest {
         MockRexsterExtension ext = new MockRexsterExtension();
         ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "", HttpMethod.ANY);
         Assert.assertNotNull(m);
+
+        Method methodFound = m.getMethod();
+        Assert.assertNotNull(methodFound);
+        Assert.assertEquals("doRoot", methodFound.getName());
     }
 
     @Test
@@ -351,13 +350,36 @@ public class AbstractSubResourceTest {
         MockRexsterExtension ext = new MockRexsterExtension();
         ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "action", HttpMethod.ANY);
         Assert.assertNotNull(m);
+
+        Method methodFound = m.getMethod();
+        Assert.assertNotNull(methodFound);
+        Assert.assertEquals("doAction", methodFound.getName());
     }
 
     @Test
     public void findExtensionMethodNotFoundSpecificActionAndMethod() {
         MockRexsterExtension ext = new MockRexsterExtension();
         ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "headonly", HttpMethod.POST);
+        Assert.assertNull(m);
+    }
+
+    @Test
+    public void findExtensionMethodMultipleRootCheck() {
+        MockMultiRootRexsterExtension ext = new MockMultiRootRexsterExtension();
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "", HttpMethod.GET);
         Assert.assertNotNull(m);
+
+        Method methodFound = m.getMethod();
+        Assert.assertNotNull(methodFound);
+        Assert.assertEquals("doRootGet", methodFound.getName());
+
+        // validates that the second method will get found
+        m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "", HttpMethod.POST);
+        Assert.assertNotNull(m);
+
+        methodFound = m.getMethod();
+        Assert.assertNotNull(methodFound);
+        Assert.assertEquals("doRootPost", methodFound.getName());
     }
 
     @Test
@@ -365,6 +387,10 @@ public class AbstractSubResourceTest {
         MockRexsterExtension ext = new MockRexsterExtension();
         ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "headonly", HttpMethod.HEAD);
         Assert.assertNotNull(m);
+
+        Method methodFound = m.getMethod();
+        Assert.assertNotNull(methodFound);
+        Assert.assertEquals("headAccessOnly", methodFound.getName());
     }
 
     @Test
@@ -488,7 +514,7 @@ public class AbstractSubResourceTest {
             return findExtensionMethod(rexsterExtension, extensionPoint, extensionAction, httpMethodRequested);
         }
 
-        public ExtensionSegmentSet parseUriForExtensionSegment(String graphName, ExtensionPoint extensionPoint) {
+        public ExtensionSegmentSet parseUriForExtensionSegmentExposed(String graphName, ExtensionPoint extensionPoint) {
             return parseUriForExtensionSegment(graphName, extensionPoint);
         }
 
@@ -516,6 +542,27 @@ public class AbstractSubResourceTest {
 
         public void justIgnoreMe() {
             // ensuring no fails when no ExtensionDefinition annotation is supplied
+        }
+
+        public boolean isConfigurationValid(ExtensionConfiguration extensionConfiguration) {
+            return true;
+        }
+    }
+
+    private class MockMultiRootRexsterExtension implements RexsterExtension {
+        @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.GET)
+        public ExtensionResponse doRootGet() {
+            return null;
+        }
+
+        @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "action")
+        public ExtensionResponse justSomeJunkToBeADistraction() {
+            return null;
+        }
+
+        @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)
+        public ExtensionResponse doRootPost() {
+            return null;
         }
 
         public boolean isConfigurationValid(ExtensionConfiguration extensionConfiguration) {

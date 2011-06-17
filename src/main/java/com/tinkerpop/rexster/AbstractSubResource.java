@@ -239,13 +239,8 @@ public abstract class AbstractSubResource extends BaseResource {
             if (extensionDefinition != null && extensionDefinition.extensionPoint() == extensionPoint
                     && (extensionDefinition.method() == HttpMethod.ANY || extensionDefinition.method() == httpMethodRequested)) {
 
-                if (extensionDefinition.path().isEmpty()) {
-                    // try to use a root level method definition
-                    methodToCall = new ExtensionMethod(method, extensionDefinition, extensionDescriptor);
-                    break;
-                } else if ((!extensionAction.equals("") && extensionDefinition.path().equals(extensionAction))
-                        || (extensionAction.equals("") && extensionDefinition.path().equals(""))) {
-                    // the extension path is valid so try to match on the action
+                if ((!extensionAction.isEmpty() && extensionDefinition.path().equals(extensionAction))
+                        || (extensionAction.isEmpty() && extensionDefinition.path().isEmpty())) {
                     methodToCall = new ExtensionMethod(method, extensionDefinition, extensionDescriptor);
                     break;
                 }
