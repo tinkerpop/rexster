@@ -10,6 +10,12 @@ All releases can be accessed through the TinkerPop Maven2 repository identified 
 
 ==<hr/>==
 
+h3. Version 0.5 (* -- NOT OFFICIALLY RELEASED)
+
+* It is now possible to mix and match root level extensions with pathed extensions in the same extension class.
+
+==<hr/>==
+
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-mcgruff.png!
 
 h3. Version 0.4 (McGruff -- June 15, 2011)
