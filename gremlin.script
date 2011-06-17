@@ -1,3 +1,0 @@
-{"script":"m=[];
-g.v(1).out('knows').aggregate(m)>>-1;
-m.sort{it.age}.reverse();"}
