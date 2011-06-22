@@ -1,11 +1,8 @@
 package com.tinkerpop.rexster;
 
-import com.sun.grizzly.http.embed.GrizzlyWebServer;
-import com.sun.grizzly.http.servlet.ServletAdapter;
-import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
-import com.sun.grizzly.tcp.http11.GrizzlyRequest;
-import com.sun.grizzly.tcp.http11.GrizzlyResponse;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.tinkerpop.rexster.protocol.RexProMessageFilter;
 import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.ToolServlet;
 import com.tinkerpop.rexster.servlet.VisualizationServlet;
@@ -14,6 +11,17 @@ import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.codehaus.groovy.util.Finalizable;
+import org.glassfish.grizzly.filterchain.FilterChainBuilder;
+import org.glassfish.grizzly.filterchain.TransportFilter;
+import org.glassfish.grizzly.http.server.*;
+import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
+import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
+import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
+import org.glassfish.grizzly.utils.EchoFilter;
+import org.glassfish.grizzly.servlet.ServletHandler;
+
+import javax.ws.rs.core.UriBuilder;
 
 import java.io.File;
 import java.io.FileReader;
@@ -40,8 +48,9 @@ public class WebServer {
         PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
     }
 
-    protected GrizzlyWebServer rexsterServer;
-    protected GrizzlyWebServer doghouseServer;
+    protected HttpServer rexsterServer;
+    protected HttpServer doghouseServer;
+    protected TCPNIOTransport rexproServer;
 
     public WebServer(final XMLConfiguration properties, boolean user) throws Exception {
         logger.info(".:Welcome to Rexster:.");
@@ -78,81 +87,107 @@ public class WebServer {
         return characterEncoding;
     }
 
-    protected void startUser(final XMLConfiguration properties) throws Exception {
+    private void startUser(final XMLConfiguration properties) throws Exception {
         this.start(properties);
     }
 
-    protected void start(final XMLConfiguration properties) throws Exception {
+    private void start(final XMLConfiguration properties) throws Exception {
         WebServerRexsterApplicationProvider.start(properties);
         Integer rexsterServerPort = properties.getInteger("rexster-server-port", new Integer(8182));
         Integer doghouseServerPort = properties.getInteger("doghouse-server-port", new Integer(8183));
+        Integer rexproServerPort = properties.getInteger("rexpro-server-port", new Integer(8185));
         String webRootPath = properties.getString("web-root", DEFAULT_WEB_ROOT_PATH);
         String baseUri = properties.getString("base-uri", DEFAULT_BASE_URI);
         characterEncoding = properties.getString("character-set", "ISO-8859-1");
 
-        final Map<String, String> jerseyInitParameters = getServletInitParameters("web-server-configuration", properties);
+        this.startRexsterServer(properties, baseUri, rexsterServerPort);
+        this.startDogHouseServer(properties, webRootPath, doghouseServerPort, baseUri, rexsterServerPort);
+        this.startRexProServer(rexproServerPort);
 
-        this.rexsterServer = new GrizzlyWebServer(rexsterServerPort);
-        this.doghouseServer = new GrizzlyWebServer(doghouseServerPort);
+    }
 
-        ServletAdapter jerseyAdapter = new ServletAdapter();
+    private void startRexsterServer(final XMLConfiguration properties,
+                                    final String baseUri, final Integer rexsterServerPort) throws Exception{
+        final Map<String, String> jerseyInitParameters = this.getServletInitParameters("web-server-configuration", properties);
+
+        ServletHandler jerseyHandler = new ServletHandler();
         for (Map.Entry<String, String> entry : jerseyInitParameters.entrySet()) {
-            jerseyAdapter.addInitParameter(entry.getKey(), entry.getValue());
+            jerseyHandler.addInitParameter(entry.getKey(), entry.getValue());
         }
 
-        jerseyAdapter.setContextPath("/");
-        jerseyAdapter.setServletInstance(new ServletContainer());
+        jerseyHandler.setContextPath("/");
+        jerseyHandler.setServletInstance(new ServletContainer());
 
+
+        this.rexsterServer = GrizzlyServerFactory.createHttpServer(
+                UriBuilder.fromUri(baseUri).port(rexsterServerPort).build(),
+                jerseyHandler);
+        this.rexsterServer.start();
+
+        logger.info("Rexster Server running on: [" + baseUri + ":" + rexsterServerPort + "]");
+    }
+
+    private void startDogHouseServer(final XMLConfiguration properties,
+                                     final String webRootPath,
+                                     final Integer doghouseServerPort,
+                                     final String baseUri,
+                                     final Integer rexsterServerPort) throws Exception {
         // servlet that services all url from "main" by simply sending
         // main.html back to the calling client.  main.html handles its own
         // state given the uri
-        ServletAdapter webToolAdapter = new ServletAdapter();
-        webToolAdapter.setContextPath("/main");
-        webToolAdapter.setServletInstance(new ToolServlet());
-        webToolAdapter.setHandleStaticResources(false);
+        ServletHandler dogHouseHandler = new ServletHandler();
+        dogHouseHandler.setContextPath("/main");
+        dogHouseHandler.setServletInstance(new ToolServlet());
 
         final Map<String, String> adminInitParameters = getServletInitParameters("admin-server-configuration", properties);
 
         // servlet for gremlin console
-        ServletAdapter visualizationAdapter = new ServletAdapter();
+        ServletHandler visualizationHandler = new ServletHandler();
         for (Map.Entry<String, String> entry : adminInitParameters.entrySet()) {
-            visualizationAdapter.addInitParameter(entry.getKey(), entry.getValue());
+            visualizationHandler.addInitParameter(entry.getKey(), entry.getValue());
         }
 
-        visualizationAdapter.setContextPath("/visualize");
-        visualizationAdapter.setServletInstance(new VisualizationServlet());
-        visualizationAdapter.setHandleStaticResources(false);
+        visualizationHandler.setContextPath("/visualize");
+        visualizationHandler.setServletInstance(new VisualizationServlet());
 
         // servlet for gremlin console
-        ServletAdapter evaluatorAdapter = new ServletAdapter();
+        ServletHandler evaluatorHandler = new ServletHandler();
         for (Map.Entry<String, String> entry : adminInitParameters.entrySet()) {
-            evaluatorAdapter.addInitParameter(entry.getKey(), entry.getValue());
+            evaluatorHandler.addInitParameter(entry.getKey(), entry.getValue());
         }
-        evaluatorAdapter.setContextPath("/exec");
-        evaluatorAdapter.setServletInstance(new EvaluatorServlet());
-        evaluatorAdapter.setHandleStaticResources(false);
+        evaluatorHandler.setContextPath("/exec");
+        evaluatorHandler.setServletInstance(new EvaluatorServlet());
 
         String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
-        webToolAdapter.addInitParameter("com.tinkerpop.rexster.config.root", "/" + webRootPath);
-        webToolAdapter.addInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri", baseUri + ":" + rexsterServerPort.toString());
-        GrizzlyAdapter staticAdapter = new GrizzlyAdapter(absoluteWebRootPath) {
-            public void service(GrizzlyRequest req, GrizzlyResponse res) {
-            }
-        };
-        staticAdapter.setHandleStaticResources(true);
+        dogHouseHandler.addInitParameter("com.tinkerpop.rexster.config.root", "/" + webRootPath);
+        dogHouseHandler.addInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri", baseUri + ":" + rexsterServerPort.toString());
 
-        this.rexsterServer.addGrizzlyAdapter(jerseyAdapter, new String[]{""});
-        this.doghouseServer.addGrizzlyAdapter(webToolAdapter, new String[]{"/main"});
-        this.doghouseServer.addGrizzlyAdapter(visualizationAdapter, new String[]{"/visualize"});
-        this.doghouseServer.addGrizzlyAdapter(evaluatorAdapter, new String[]{"/exec"});
-        this.doghouseServer.addGrizzlyAdapter(staticAdapter, new String[]{""});
-
-        this.rexsterServer.start();
+        this.doghouseServer = GrizzlyServerFactory.createHttpServer(
+                UriBuilder.fromUri(baseUri).port(doghouseServerPort).build(),
+                new StaticHttpHandler(absoluteWebRootPath));
+        final ServerConfiguration config = this.doghouseServer.getServerConfiguration();
+        config.addHttpHandler(dogHouseHandler, "/main");
+        config.addHttpHandler(visualizationHandler, "/visualize");
+        config.addHttpHandler(evaluatorHandler, "/exec");
         this.doghouseServer.start();
 
-        logger.info("Rexster Server running on: [" + baseUri + ":" + rexsterServerPort + "]");
         logger.info("Dog House Server running on: [" + baseUri + ":" + doghouseServerPort + "]");
+    }
 
+    private void startRexProServer(final Integer rexproServerPort) throws Exception {
+        FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
+        filterChainBuilder.add(new TransportFilter());
+        filterChainBuilder.add(new RexProMessageFilter());
+        filterChainBuilder.add(new EchoFilter());
+
+        this.rexproServer = TCPNIOTransportBuilder.newInstance().build();
+        this.rexproServer.setIOStrategy(WorkerThreadIOStrategy.getInstance());
+        this.rexproServer.setProcessor(filterChainBuilder.build());
+        this.rexproServer.bind(rexproServerPort);
+
+        this.rexproServer.start();
+
+        logger.info("RexPro serving on port: [" + rexproServerPort + "]");
     }
 
     /**
@@ -197,6 +232,7 @@ public class WebServer {
     protected void stop() throws Exception {
         this.rexsterServer.stop();
         this.doghouseServer.stop();
+        this.rexproServer.stop();
         WebServerRexsterApplicationProvider.stop();
     }
 

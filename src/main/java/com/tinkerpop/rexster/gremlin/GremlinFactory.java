@@ -1,17 +1,18 @@
-package com.tinkerpop.rexster.servlet.gremlin;
+package com.tinkerpop.rexster.gremlin;
 
-import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
-import com.tinkerpop.rexster.RexsterApplicationProvider;
 
+import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
+import javax.script.SimpleBindings;
+import java.util.Map;
 
 /**
  * Builds Gremlin evaluators.
  * <p/>
  * Credit to Neo Technology (http://neotechnology.com/) for most of the code related to the
- * Gremlin Terminal in Rexster.  Specifically, this code was borrowed from
+ * Gremlin in Rexster.  Specifically, this code was borrowed from
  * https://github.com/neo4j/webadmin and re-purposed for Rexster's needs.
  * <p/>
  * Original author Jacob Hansson <jacob@voltvoodoo.com>
@@ -21,16 +22,14 @@ public class GremlinFactory {
 
     protected volatile static boolean initiated = false;
 
-    public static ScriptEngine createGremlinScriptEngine(String graphName, RexsterApplicationProvider rap) {
+    public static ScriptEngine createGremlinScriptEngine(Map<String, Object> context) {
         try {
             ScriptEngine engine = new GremlinScriptEngine();
-            Graph graph = rap.getRexsterApplication().getGraph(graphName);
-            engine.getBindings(ScriptContext.ENGINE_SCOPE).put("g", graph);
 
-            /*
-                * try { engine.getBindings( ScriptContext.ENGINE_SCOPE ).put( "$_",
-                * graph.getVertex(0l)); } catch ( Exception e ) { // Om-nom-nom }
-                */
+            Bindings bindings = new SimpleBindings();
+            bindings.putAll(context);
+
+            engine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
 
             return engine;
         } catch (Throwable e) {
@@ -42,7 +41,7 @@ public class GremlinFactory {
 
     protected synchronized void ensureInitiated() {
         if (initiated == false) {
-            new ConsoleGarbageCollector();
+            new GremlinGarbageCollector();
         }
     }
 }

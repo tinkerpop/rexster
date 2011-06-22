@@ -9,6 +9,7 @@ import com.tinkerpop.gremlin.pipes.util.Table;
 import com.tinkerpop.rexster.ElementJSONObject;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.gremlin.converter.JSONResultConverter;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -152,57 +153,8 @@ public class GremlinExtension extends AbstractRexsterExtension {
         try {
             if (script != null && !script.isEmpty()) {
 
-                JSONArray results = new JSONArray();
                 Object result = engine.eval(script, bindings);
-                if (result == null) {
-                    // for example a script like g.clear()
-                    results = null;
-                } else if (result instanceof Table) {
-                    Table table = (Table) result;
-                    Iterator<Table.Row> rows = table.iterator();
-
-                    List<String> columnNames = table.getColumnNames();
-
-                    while (rows.hasNext()) {
-                        Table.Row row = rows.next();
-                        Map<String, Object> map = new HashMap<String, Object>();
-                        for (String columnName : columnNames) {
-                            map.put(columnName, prepareOutput(row.getColumn(columnName), returnKeys, showTypes));
-                        }
-
-                        results.put(new JSONObject(map));
-                    }
-                } else if (result instanceof Iterable) {
-                    long counter = 0;
-                    for (Object o : (Iterable) result) {
-                        if (counter >= offsetStart && counter < offsetEnd) {
-                            results.put(prepareOutput(o, returnKeys, showTypes));
-                        }
-
-                        if (counter >= offsetEnd) {
-                            break;
-                        }
-
-                        counter++;
-                    }
-                } else if (result instanceof Iterator) {
-                    Iterator itty = (Iterator) result;
-
-                    long counter = 0;
-                    while (itty.hasNext()) {
-                        if (counter >= offsetStart && counter < offsetEnd) {
-                            results.put(prepareOutput(itty.next(), returnKeys, showTypes));
-                        }
-
-                        if (counter >= offsetEnd) {
-                            break;
-                        }
-
-                        counter++;
-                    }
-                } else {
-                    results.put(prepareOutput(result, returnKeys, showTypes));
-                }
+                JSONArray results = new JSONResultConverter(showTypes, offsetStart, offsetEnd, returnKeys).convert(result, null);
 
                 HashMap<String, Object> resultMap = new HashMap<String, Object>();
                 resultMap.put(Tokens.SUCCESS, true);
@@ -223,19 +175,5 @@ public class GremlinExtension extends AbstractRexsterExtension {
         }
 
         return extensionResponse;
-    }
-
-    private Object prepareOutput(Object object, List<String> returnKeys, boolean showTypes) throws JSONException {
-        if (object instanceof Element) {
-            if (returnKeys == null) {
-                return new ElementJSONObject((Element) object, showTypes);
-            } else {
-                return new ElementJSONObject((Element) object, returnKeys, showTypes);
-            }
-        } else if (object instanceof Number || object instanceof Boolean) {
-            return object;
-        } else {
-            return object.toString();
-        }
     }
 }

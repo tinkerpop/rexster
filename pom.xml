@@ -86,27 +86,36 @@
             <version>0.9-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <!-- JSON SUPPORT -->
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-json</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <!-- REST SUPPORT -->
+        <!-- SERVER + REST SUPPORT -->
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>1.4</version>
+            <version>1.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-client</artifactId>
-            <version>1.4</version>
+            <version>1.8-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.grizzly</groupId>
-            <artifactId>grizzly-servlet-webserver</artifactId>
-            <version>1.9.8</version>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-grizzly2</artifactId>
+            <version>1.8-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+            <version>1.8-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.grizzly</groupId>
+            <artifactId>grizzly-http-servlet</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.grizzly</groupId>
+            <artifactId>grizzly-framework</artifactId>
+            <version>2.1.1</version>
         </dependency>
         <!-- LOGGING -->
         <dependency>
@@ -141,6 +150,7 @@
             <groupId>org.jmock</groupId>
             <artifactId>jmock-junit4</artifactId>
             <version>2.5.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <repositories>
@@ -162,6 +172,12 @@
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
             </snapshots>
+        </repository>
+        <repository>
+            <id>glassfish-maven2-repository.dev.java.net</id>
+            <name>Java.net Maven 2 Repository for GlassFish</name>
+            <url>http://download.java.net/maven/glassfish/</url>
+            <layout>default</layout>
         </repository>
     </repositories>
     <properties>

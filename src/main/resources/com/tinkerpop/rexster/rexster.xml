@@ -4,13 +4,13 @@
     <doghouse-server-port>8183</doghouse-server-port>
     <rexster-shutdown-port>8184</rexster-shutdown-port>
     <rexster-shutdown-host>127.0.0.1</rexster-shutdown-host>
+    <rexpro-server-port>8185</rexpro-server-port>
     <base-uri>http://localhost</base-uri>
     <web-root>public</web-root>
     <character-set>UTF-8</character-set>
     <web-server-configuration>
         <com.sun.jersey.config.property.packages>com.tinkerpop.rexster</com.sun.jersey.config.property.packages>
-        <com.sun.jersey.spi.container.ContainerResponseFilters>com.tinkerpop.rexster.HeaderResponseFilter
-        </com.sun.jersey.spi.container.ContainerResponseFilters>
+        <com.sun.jersey.spi.container.ContainerResponseFilters>com.tinkerpop.rexster.HeaderResponseFilter</com.sun.jersey.spi.container.ContainerResponseFilters>
     </web-server-configuration>
     <graphs>
         <graph>

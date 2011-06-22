@@ -2,7 +2,9 @@ package com.tinkerpop.rexster.servlet;
 
 import com.tinkerpop.rexster.RexsterApplicationProvider;
 import com.tinkerpop.rexster.WebServerRexsterApplicationProvider;
-import com.tinkerpop.rexster.servlet.gremlin.ConsoleSessions;
+import com.tinkerpop.rexster.gremlin.GremlinEvaluationJob;
+import com.tinkerpop.rexster.gremlin.GremlinSessions;
+import com.tinkerpop.rexster.gremlin.converter.ConsoleResultConverter;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -16,7 +18,7 @@ import java.util.List;
  * Visualization servlet migrated from Webling (https://github.com/xedin/webling) and modified.
  * <p/>
  * Credit to Neo Technology (http://neotechnology.com/) for most of the code related to the
- * Gremlin Terminal in Rexster.  Specifically, this code was borrowed from
+ * Gremlin in Rexster.  Specifically, this code was borrowed from
  * https://github.com/neo4j/webadmin and re-purposed for Rexster's needs.
  * <p/>
  * Original author Pavel A. Yaskevich
@@ -38,7 +40,8 @@ public class VisualizationServlet extends HttpServlet {
         try {
             RexsterApplicationProvider rap = new WebServerRexsterApplicationProvider(this.getServletContext());
 
-            List<String> result = ConsoleSessions.getSession(sessionId, graphName, rap).evaluate(code);
+            GremlinEvaluationJob job = GremlinSessions.getSession(sessionId, graphName, rap).evaluate(code);
+            List<String> result = new ConsoleResultConverter().convert(job.getResult(), job.getOutputWriter());
             response.getWriter().println(((result.size() == 1) ? result.get(0) : result));
         } catch (Exception e) {
             response.getWriter().println(e.getMessage());

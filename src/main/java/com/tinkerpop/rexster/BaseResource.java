@@ -117,7 +117,7 @@ public abstract class BaseResource {
                 this.requestObject = new JSONObject();
 
                 if (this.httpServletRequest != null) {
-                    Map<String, String> queryParameters = this.httpServletRequest.getParameterMap();
+                    Map<String, String[]> queryParameters = this.httpServletRequest.getParameterMap();
                     this.buildRequestObject(queryParameters);
                 }
 

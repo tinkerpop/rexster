@@ -2,7 +2,9 @@ package com.tinkerpop.rexster.servlet;
 
 import com.tinkerpop.rexster.RexsterApplicationProvider;
 import com.tinkerpop.rexster.WebServerRexsterApplicationProvider;
-import com.tinkerpop.rexster.servlet.gremlin.ConsoleSessions;
+import com.tinkerpop.rexster.gremlin.GremlinEvaluationJob;
+import com.tinkerpop.rexster.gremlin.GremlinSessions;
+import com.tinkerpop.rexster.gremlin.converter.ConsoleResultConverter;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -55,7 +57,8 @@ public class EvaluatorServlet extends HttpServlet {
 
         try {
             RexsterApplicationProvider rap = new WebServerRexsterApplicationProvider(this.getServletContext());
-            List<String> lines = ConsoleSessions.getSession(sessionId, graphName, rap).evaluate(code);
+            GremlinEvaluationJob job = GremlinSessions.getSession(sessionId, graphName, rap).evaluate(code);
+            List<String> lines = new ConsoleResultConverter().convert(job.getResult(), job.getOutputWriter());
             for (String line : lines) {
                 out.println("==>" + line);
             }

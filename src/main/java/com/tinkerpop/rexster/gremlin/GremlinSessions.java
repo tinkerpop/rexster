@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster.servlet.gremlin;
+package com.tinkerpop.rexster.gremlin;
 
 import com.tinkerpop.rexster.RexsterApplicationProvider;
 
@@ -11,25 +11,25 @@ import java.util.concurrent.ConcurrentHashMap;
  * with a web client and a particular graph hosted within Rexster.
  * <p/>
  * Credit to Neo Technology (http://neotechnology.com/) for most of the code related to the
- * Gremlin Terminal in Rexster.  Specifically, this code was borrowed from
+ * Gremlin in Rexster.  Specifically, this code was borrowed from
  * https://github.com/neo4j/webadmin and re-purposed for Rexster's needs.
  * <p/>
  * Original author Jacob Hansson <jacob@voltvoodoo.com>
  */
-public class ConsoleSessions {
+public class GremlinSessions {
 
-    protected static ConcurrentHashMap<String, ConsoleSession> sessions = new ConcurrentHashMap<String, ConsoleSession>();
+    protected static ConcurrentHashMap<String, GremlinSession> sessions = new ConcurrentHashMap<String, GremlinSession>();
 
     /**
      * Gets a GremlinSession for a given session identifier and graph name,
      * creating a GremlinSession if one does not exist.
      */
-    public static ConsoleSession getSession(String sessionId, String graphName, RexsterApplicationProvider rap) {
+    public static GremlinSession getSession(String sessionId, String graphName, RexsterApplicationProvider rap) {
         ensureSessionExists(sessionId, graphName, rap);
         return sessions.get(sessionId + graphName);
     }
 
-    public static ConsoleSession findSessionByKey(String sessionKey) {
+    public static GremlinSession findSessionByKey(String sessionKey) {
         return sessions.get(sessionKey);
     }
 
@@ -75,7 +75,7 @@ public class ConsoleSessions {
     protected static void ensureSessionExists(String sessionId, String graphName, RexsterApplicationProvider rap) {
         String key = sessionId + graphName;
         if (!sessions.containsKey(key)) {
-            sessions.put(key, new ConsoleSession(graphName, rap));
+            sessions.put(key, new GremlinSession(graphName, rap));
         }
     }
 
