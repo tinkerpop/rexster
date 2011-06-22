@@ -56,26 +56,25 @@ public class MockVertex implements Vertex {
         this.properties.put(key, value);
     }
 
-    @Override
-    public Iterable<Edge> getInEdges() {
-        return this.inEdges;
+    //TODO: Support multiple labels in MockVertex
+    public Iterable<Edge> getOutEdges(String... labels) {
+        if (labels.length == 0) {
+            return this.outEdges;
+        } else {
+            Pipe pipe = new LabelFilterPipe(labels[0], ComparisonFilterPipe.Filter.NOT_EQUAL);
+            pipe.setStarts(this.outEdges);
+            return pipe;
+        }
     }
 
-    @Override
-    public Iterable<Edge> getOutEdges() {
-        return this.outEdges;
-    }
-
-    public Iterable<Edge> getOutEdges(String label) {
-        Pipe pipe = new LabelFilterPipe(label, ComparisonFilterPipe.Filter.NOT_EQUAL);
-        pipe.setStarts(this.outEdges);
-        return pipe;
-    }
-
-    public Iterable<Edge> getInEdges(String label) {
-        Pipe pipe = new LabelFilterPipe(label, ComparisonFilterPipe.Filter.NOT_EQUAL);
-        pipe.setStarts(this.inEdges);
-        return pipe;
+    public Iterable<Edge> getInEdges(String... labels) {
+        if (labels.length == 0) {
+            return this.inEdges;
+        } else {
+            Pipe pipe = new LabelFilterPipe(labels[0], ComparisonFilterPipe.Filter.NOT_EQUAL);
+            pipe.setStarts(this.inEdges);
+            return pipe;
+        }
     }
 
 }
