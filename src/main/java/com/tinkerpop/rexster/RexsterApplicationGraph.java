@@ -54,6 +54,7 @@ public class RexsterApplicationGraph {
     public void tryStartTransaction() {
         TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
+            transactionalGraph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
             transactionalGraph.startTransaction();
         }
     }
