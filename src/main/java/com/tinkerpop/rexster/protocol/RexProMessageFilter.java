@@ -24,6 +24,9 @@ public class RexProMessageFilter extends BaseFilter {
         }
 
         // Get the body length
+        byte[] grr = new byte[sourceBufferLength];
+        sourceBuffer.get(grr);
+        sourceBuffer.rewind();
         final int bodyLength = sourceBuffer.getInt(RexProMessage.HEADER_SIZE - 4);
         // The complete message length
         final int completeMessageLength = RexProMessage.HEADER_SIZE + bodyLength;

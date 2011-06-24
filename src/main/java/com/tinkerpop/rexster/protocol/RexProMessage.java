@@ -18,19 +18,19 @@ public class RexProMessage {
     private byte x;
     private byte p;
 
-    private byte version;
+    protected byte version;
 
-    private byte type;
+    protected byte type;
 
-    private byte flag;
+    protected byte flag;
 
-    private byte[] session;
+    protected byte[] session;
 
-    private byte[] request;
+    protected byte[] request;
 
-    private int bodyLength;
+    protected int bodyLength;
 
-    private byte[] body;
+    protected byte[] body;
 
 
     public RexProMessage() {

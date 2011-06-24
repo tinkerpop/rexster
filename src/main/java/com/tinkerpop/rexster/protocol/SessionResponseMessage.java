@@ -9,7 +9,7 @@ public class SessionResponseMessage extends RexProMessage{
     }
 
     public SessionResponseMessage(UUID sessionKey, UUID request) {
-        super(RexProMessage.CURRENT_VERSION, MessageType.SESSION_REQUEST, (byte) 0,
+        super(RexProMessage.CURRENT_VERSION, MessageType.SESSION_RESPONSE, (byte) 0,
                 BitWorks.convertUUIDToByteArray(sessionKey),
                 BitWorks.convertUUIDToByteArray(request),
                 new byte[0]);

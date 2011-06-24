@@ -1,16 +1,18 @@
 package com.tinkerpop.rexster.protocol;
 
 import org.apache.log4j.Logger;
+import sun.java2d.pipe.SpanShapeRenderer;
 
 import javax.script.Bindings;
 import javax.script.ScriptException;
+import javax.script.SimpleBindings;
 import java.util.Date;
 import java.util.UUID;
 
 public class RexProSession {
     private static final Logger logger = Logger.getLogger(RexProSession.class);
 
-    private Bindings bindings;
+    private Bindings bindings = new SimpleBindings();
 
     private final UUID sessionIdentifier;
 

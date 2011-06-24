@@ -25,10 +25,10 @@ public class SessionFilter extends BaseFilter {
             return ctx.getStopAction();
         }
 
-        if (message.hasSession()) {
+        if (!message.hasSession()) {
             // there is no session to this message...that's a problem
             ctx.write(new ErrorResponseMessage(RexProMessage.EMPTY_SESSION, message.getRequestAsUUID(),
-                    ErrorResponseMessage.ERROR_MESSAGE_VALIDATION,
+                    ErrorResponseMessage.FLAG_ERROR_MESSAGE_VALIDATION,
                     "The message does not specify a session."));
 
             return ctx.getStopAction();
@@ -37,7 +37,7 @@ public class SessionFilter extends BaseFilter {
         if (!RexProSessions.hasSessionKey(message.getSessionAsUUID())) {
             // the message is assigned a session that does not exist on the server
             ctx.write(new ErrorResponseMessage(RexProMessage.EMPTY_SESSION, message.getRequestAsUUID(),
-                    ErrorResponseMessage.ERROR_INVALID_SESSION,
+                    ErrorResponseMessage.FLAG_ERROR_INVALID_SESSION,
                     "The session on the request does not exist or has otherwise expired."));
 
             return ctx.getStopAction();

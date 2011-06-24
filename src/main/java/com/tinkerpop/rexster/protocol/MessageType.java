@@ -2,6 +2,8 @@ package com.tinkerpop.rexster.protocol;
 
 public class MessageType {
     public static final byte ERROR = 0;
-    public static final byte SESSION_REQUEST = 10;
-    public static final byte SESSION_RESPONSE = 11;
+    public static final byte SESSION_REQUEST = 1;
+    public static final byte SESSION_RESPONSE = 2;
+    public static final byte SCRIPT_REQUEST = 3;
+    public static final byte SCRIPT_RESPONSE = 4;
 }

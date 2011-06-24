@@ -1,9 +1,14 @@
 package com.tinkerpop.rexster.protocol;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.nio.ByteBuffer;
+import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.glassfish.grizzly.Connection;
+import org.glassfish.grizzly.GrizzlyFuture;
 import org.glassfish.grizzly.filterchain.*;
 import org.glassfish.grizzly.impl.FutureImpl;
 import org.glassfish.grizzly.impl.SafeFutureImpl;
@@ -13,22 +18,43 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 public class RexProClient {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
-        Connection connection = null;
 
         final FutureImpl<RexProMessage> resultMessageFuture = SafeFutureImpl.create();
+        final FutureImpl<RexProMessage> sessionMessageFuture = SafeFutureImpl.create();
 
-        // Create a FilterChain using FilterChainBuilder
-        FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
-        // Add TransportFilter, which is responsible
-        // for reading and writing data to the connection
-        filterChainBuilder.add(new TransportFilter());
-        filterChainBuilder.add(new RexProMessageFilter());
-        filterChainBuilder.add(new CustomClientFilter(resultMessageFuture));
+        Connection connection = null;
+        TCPNIOTransport transport = getTransport(sessionMessageFuture);
+        UUID sessionKey = SessionRequestMessage.EMPTY_SESSION;
 
-        // Create TCP NIO transport
-        final TCPNIOTransport transport =
-                TCPNIOTransportBuilder.newInstance().build();
-        transport.setProcessor(filterChainBuilder.build());
+        try {
+            // start transport
+            transport.start();
+
+            // Connect client to the server
+            GrizzlyFuture<Connection> future = transport.connect("localhost", 8185);
+
+            connection = future.get(10, TimeUnit.SECONDS);
+
+            // Initialize session message
+            RexProMessage sentMessage = new SessionRequestMessage();
+
+            connection.write(sentMessage);
+
+            final RexProMessage rcvMessage = sessionMessageFuture.get(10, TimeUnit.SECONDS);
+            sessionKey = rcvMessage.getSessionAsUUID();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            if (connection != null) {
+                connection.close();
+            }
+
+            transport.stop();
+        }
+
+        transport = getTransport(resultMessageFuture);
 
         try {
             // start transport
@@ -39,15 +65,23 @@ public class RexProClient {
 
             connection = future.get(10, TimeUnit.SECONDS);
 
-            // Initialize session message
-            RexProMessage sentMessage = new SessionRequestMessage();
+            RexProMessage scriptMessage = new ScriptRequestMessage(sessionKey, "gremlin", "1+1;");
+            connection.write(scriptMessage);
 
-            connection.write(sentMessage);
+            final RexProMessage resultMessage = resultMessageFuture.get(10, TimeUnit.SECONDS);
 
-            final RexProMessage rcvMessage = resultMessageFuture.get(10, TimeUnit.SECONDS);
+            ByteBuffer bb = ByteBuffer.wrap(resultMessage.getBody());
+            int resultLength = bb.getInt();
+            System.out.println(resultLength);
 
-            System.out.println(rcvMessage);
+            byte[] resultObjectBytes = new byte[resultLength];
+            bb.get(resultObjectBytes);
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(resultObjectBytes);
+            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
 
+            Object o = objectInputStream.readObject();
+            System.out.println(o.getClass().getName());
+            System.out.print(o.toString());
         } finally {
             if (connection != null) {
                 connection.close();
@@ -55,6 +89,23 @@ public class RexProClient {
 
             transport.stop();
         }
+    }
+
+    private static TCPNIOTransport getTransport(FutureImpl<RexProMessage> future) {
+        // Create a FilterChain using FilterChainBuilder
+        FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
+        // Add TransportFilter, which is responsible
+        // for reading and writing data to the connection
+        filterChainBuilder.add(new TransportFilter());
+        filterChainBuilder.add(new RexProMessageFilter());
+        filterChainBuilder.add(new CustomClientFilter(future));
+
+        // Create TCP NIO transport
+        final TCPNIOTransport transport =
+                TCPNIOTransportBuilder.newInstance().build();
+        transport.setProcessor(filterChainBuilder.build());
+
+        return transport;
     }
 
     public static final class CustomClientFilter extends BaseFilter {
