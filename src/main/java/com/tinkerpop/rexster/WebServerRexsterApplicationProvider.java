@@ -30,8 +30,9 @@ public class WebServerRexsterApplicationProvider implements RexsterApplicationPr
         }
     }
 
-    public static void start(final XMLConfiguration properties) {
+    public static RexsterApplication start(final XMLConfiguration properties) {
         rexster = new RexsterApplication(properties);
+        return rexster;
     }
 
     public static void stop() {

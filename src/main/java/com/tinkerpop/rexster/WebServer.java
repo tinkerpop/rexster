@@ -94,7 +94,7 @@ public class WebServer {
     }
 
     private void start(final XMLConfiguration properties) throws Exception {
-        WebServerRexsterApplicationProvider.start(properties);
+        RexsterApplication rexsterApplication = WebServerRexsterApplicationProvider.start(properties);
         Integer rexsterServerPort = properties.getInteger("rexster-server-port", new Integer(8182));
         Integer doghouseServerPort = properties.getInteger("doghouse-server-port", new Integer(8183));
         Integer rexproServerPort = properties.getInteger("rexpro-server-port", new Integer(8185));
@@ -104,7 +104,7 @@ public class WebServer {
 
         this.startRexsterServer(properties, baseUri, rexsterServerPort);
         this.startDogHouseServer(properties, webRootPath, doghouseServerPort, baseUri, rexsterServerPort);
-        this.startRexProServer(rexproServerPort);
+        this.startRexProServer(rexproServerPort, rexsterApplication);
 
     }
 
@@ -176,11 +176,11 @@ public class WebServer {
         logger.info("Dog House Server running on: [" + baseUri + ":" + doghouseServerPort + "]");
     }
 
-    private void startRexProServer(final Integer rexproServerPort) throws Exception {
+    private void startRexProServer(final Integer rexproServerPort, final RexsterApplication rexsterApplication) throws Exception {
         FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
         filterChainBuilder.add(new TransportFilter());
         filterChainBuilder.add(new RexProMessageFilter());
-        filterChainBuilder.add(new SessionFilter());
+        filterChainBuilder.add(new SessionFilter(rexsterApplication));
         filterChainBuilder.add(new ScriptFilter());
         filterChainBuilder.add(new EchoFilter());
 

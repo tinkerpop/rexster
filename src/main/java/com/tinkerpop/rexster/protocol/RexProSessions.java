@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
+import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.RexsterApplicationProvider;
 import com.tinkerpop.rexster.gremlin.GremlinSession;
 
@@ -13,7 +14,6 @@ public class RexProSessions {
     protected static ConcurrentHashMap<UUID, RexProSession> sessions = new ConcurrentHashMap<UUID, RexProSession>();
 
     public static RexProSession getSession(UUID sessionKey) {
-        ensureSessionExists(sessionKey);
         return sessions.get(sessionKey);
     }
 
@@ -36,9 +36,9 @@ public class RexProSessions {
         return sessions.keySet();
     }
 
-    private static void ensureSessionExists(UUID sessionKey) {
+    public static void ensureSessionExists(UUID sessionKey, RexsterApplication rexsterApplication) {
         if (!sessions.containsKey(sessionKey)) {
-            sessions.put(sessionKey, new RexProSession());
+            sessions.put(sessionKey, new RexProSession(rexsterApplication));
         }
     }
 

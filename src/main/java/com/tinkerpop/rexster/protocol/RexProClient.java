@@ -65,7 +65,7 @@ public class RexProClient {
 
             connection = future.get(10, TimeUnit.SECONDS);
 
-            RexProMessage scriptMessage = new ScriptRequestMessage(sessionKey, "gremlin", "1+1;");
+            RexProMessage scriptMessage = new ScriptRequestMessage(sessionKey, "gremlin", "g = rexster.getGraph(\"tinkergraph\");g.v(1).name;");
             connection.write(scriptMessage);
 
             final RexProMessage resultMessage = resultMessageFuture.get(10, TimeUnit.SECONDS);

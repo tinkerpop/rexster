@@ -1,5 +1,8 @@
 package com.tinkerpop.rexster.protocol;
 
+import com.tinkerpop.rexster.RexsterApplication;
+import com.tinkerpop.rexster.WebServer;
+import com.tinkerpop.rexster.WebServerRexsterApplicationProvider;
 import org.apache.log4j.Logger;
 import sun.java2d.pipe.SpanShapeRenderer;
 
@@ -12,14 +15,16 @@ import java.util.UUID;
 public class RexProSession {
     private static final Logger logger = Logger.getLogger(RexProSession.class);
 
-    private Bindings bindings = new SimpleBindings();
+    private final Bindings bindings = new SimpleBindings();
 
     private final UUID sessionIdentifier;
 
     protected Date lastTimeUsed = new Date();
 
-    public RexProSession() {
+    public RexProSession(final RexsterApplication rexsterApplication) {
         this.sessionIdentifier = UUID.randomUUID();
+
+        this.bindings.put("rexster", rexsterApplication);
 
         logger.info("New RexPro Session created: " + this.sessionIdentifier.toString());
     }
@@ -30,10 +35,6 @@ public class RexProSession {
 
     public Bindings getBindings() {
         return this.bindings;
-    }
-
-    public void setBindings(Bindings bindings) {
-        this.bindings = bindings;
     }
 
     public long getIdleTime() {
