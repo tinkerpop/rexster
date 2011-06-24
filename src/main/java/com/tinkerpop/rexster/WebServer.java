@@ -3,6 +3,7 @@ package com.tinkerpop.rexster;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.tinkerpop.rexster.protocol.RexProMessageFilter;
+import com.tinkerpop.rexster.protocol.SessionFilter;
 import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.ToolServlet;
 import com.tinkerpop.rexster.servlet.VisualizationServlet;
@@ -178,6 +179,7 @@ public class WebServer {
         FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
         filterChainBuilder.add(new TransportFilter());
         filterChainBuilder.add(new RexProMessageFilter());
+        filterChainBuilder.add(new SessionFilter());
         filterChainBuilder.add(new EchoFilter());
 
         this.rexproServer = TCPNIOTransportBuilder.newInstance().build();

@@ -7,6 +7,9 @@ import org.jmock.Mockery;
 import org.jmock.Sequence;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Test;
+import sun.reflect.generics.tree.ByteSignature;
+
+import java.util.UUID;
 
 public class RexProMessageTest {
     private Mockery mockery = new JUnit4Mockery();
@@ -17,6 +20,11 @@ public class RexProMessageTest {
 
         final Buffer sourceBuffer = this.mockery.mock(Buffer.class);
         final Sequence sequence = this.mockery.sequence("sequence");
+        final UUID request = UUID.randomUUID();
+        final UUID session = UUID.randomUUID();
+
+        final byte[] sessionBytes = BitWorks.convertUUIDToByteArray(session);
+        final byte[] requestBytes = BitWorks.convertUUIDToByteArray(request);
 
         this.mockery.checking(new Expectations() {{
             // magic - r
@@ -55,13 +63,13 @@ public class RexProMessageTest {
             inSequence(sequence);
 
             // session
-            oneOf(sourceBuffer).getInt();
-            will(returnValue(100));
+            byte[] bytesSession = new byte[16];
+            oneOf(sourceBuffer).get(with(any(bytesSession.getClass())));
             inSequence(sequence);
 
             // request
-            oneOf(sourceBuffer).getInt();
-            will(returnValue(200));
+            byte[] bytesRequest = new byte[16];
+            oneOf(sourceBuffer).get(with(any(bytesRequest.getClass())));
             inSequence(sequence);
 
             // body length
@@ -86,8 +94,6 @@ public class RexProMessageTest {
         Assert.assertEquals((byte) 1, msg.getVersion());
         Assert.assertEquals((byte) 2, msg.getType());
         Assert.assertEquals((byte) 3, msg.getFlag());
-        Assert.assertEquals(100, msg.getSession());
-        Assert.assertEquals(200, msg.getRequest());
         Assert.assertEquals(5, msg.getBodyLength());
         Assert.assertEquals(5, msg.getBody().length);
     }
@@ -99,7 +105,13 @@ public class RexProMessageTest {
         final Buffer output = this.mockery.mock(Buffer.class);
         final Sequence sequence = this.mockery.sequence("sequence");
 
-        final RexProMessage sentMessage = new RexProMessage((byte) 1, (byte) 1, (byte) 1, 123, 456, "hello".getBytes());
+        final UUID request = UUID.randomUUID();
+        final UUID session = UUID.randomUUID();
+
+        final RexProMessage sentMessage = new RexProMessage((byte) 1, (byte) 1, (byte) 1,
+                BitWorks.convertUUIDToByteArray(session),
+                BitWorks.convertUUIDToByteArray(request),
+                "hello".getBytes());
 
         this.mockery.checking(new Expectations() {{
             oneOf(output).put(sentMessage.getHeader());
@@ -110,9 +122,9 @@ public class RexProMessageTest {
             inSequence(sequence);
             oneOf(output).put(sentMessage.getFlag());
             inSequence(sequence);
-            oneOf(output).putInt(sentMessage.getSession());
+            oneOf(output).put(sentMessage.getSession());
             inSequence(sequence);
-            oneOf(output).putInt(sentMessage.getRequest());
+            oneOf(output).put(sentMessage.getRequest());
             inSequence(sequence);
             oneOf(output).putInt(sentMessage.getBodyLength());
             inSequence(sequence);
@@ -123,5 +135,32 @@ public class RexProMessageTest {
         RexProMessage.write(output, sentMessage);
 
         this.mockery.assertIsSatisfied();
+    }
+
+    @Test
+    public void hasSessionNoBytes() {
+        RexProMessage msg = new RexProMessage();
+        Assert.assertFalse(msg.hasSession());
+    }
+
+    @Test
+    public void hasSessionWrongBytes() {
+        RexProMessage msg = new RexProMessage();
+        msg.setSession(new byte[5]);
+        Assert.assertFalse(msg.hasSession());
+    }
+
+    @Test
+    public void hasSessionEmptySession() {
+        RexProMessage msg = new RexProMessage();
+        msg.setSession(BitWorks.convertUUIDToByteArray(RexProMessage.EMPTY_SESSION));
+        Assert.assertFalse(msg.hasSession());
+    }
+
+    @Test
+    public void hasSessionValid() {
+        RexProMessage msg = new RexProMessage();
+        msg.setSession(BitWorks.convertUUIDToByteArray(UUID.randomUUID()));
+        Assert.assertTrue(msg.hasSession());
     }
 }

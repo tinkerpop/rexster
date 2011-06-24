@@ -3,10 +3,15 @@ package com.tinkerpop.rexster.protocol;
 import org.glassfish.grizzly.Buffer;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 public class RexProMessage {
 
-    public static final int HEADER_SIZE = 19;
+    public static final int HEADER_SIZE = 43;
+
+    public static final byte CURRENT_VERSION = (byte) 0;
+
+    protected static final UUID EMPTY_SESSION = new UUID(0, 0);
 
     private byte r;
     private byte e;
@@ -19,9 +24,9 @@ public class RexProMessage {
 
     private byte flag;
 
-    private int session;
+    private byte[] session;
 
-    private int request;
+    private byte[] request;
 
     private int bodyLength;
 
@@ -31,7 +36,7 @@ public class RexProMessage {
     public RexProMessage() {
     }
 
-    public RexProMessage(byte version, byte type, byte flag, int session, int request, byte[] body) {
+    public RexProMessage(byte version, byte type, byte flag, byte[] session, byte[] request, byte[] body) {
         this.r = 'R';
         this.e = 'E';
         this.x = 'X';
@@ -88,19 +93,27 @@ public class RexProMessage {
         this.flag = flag;
     }
 
-    public int getSession() {
+    public UUID getSessionAsUUID() {
+        return BitWorks.convertByteArrayToUUID(this.session);
+    }
+
+    public byte[] getSession() {
         return this.session;
     }
 
-    public void setSession(int session) {
+    public void setSession(byte[] session) {
         this.session = session;
     }
 
-    public int getRequest() {
-            return this.request;
-        }
+    public UUID getRequestAsUUID() {
+        return BitWorks.convertByteArrayToUUID(this.request);
+    }
 
-    public void setRequest(int request) {
+    public byte[] getRequest() {
+            return this.request;
+    }
+
+    public void setRequest(byte[] request) {
         this.request = request;
     }
 
@@ -120,6 +133,11 @@ public class RexProMessage {
         this.body = body;
     }
 
+    public boolean hasSession() {
+        return this.session != null && this.session.length == 16
+                && !BitWorks.convertByteArrayToUUID(this.session).equals(EMPTY_SESSION);
+    }
+
     public static RexProMessage read(Buffer sourceBuffer) {
         final RexProMessage message = new RexProMessage();
 
@@ -129,8 +147,15 @@ public class RexProMessage {
         message.setVersion(sourceBuffer.get());
         message.setType(sourceBuffer.get());
         message.setFlag(sourceBuffer.get());
-        message.setSession(sourceBuffer.getInt());
-        message.setRequest(sourceBuffer.getInt());
+
+        final byte[] session = new byte[16];
+        sourceBuffer.get(session);
+        message.setSession(session);
+
+        final byte[] request = new byte[16];
+        sourceBuffer.get(request);
+        message.setRequest(request);
+
         message.setBodyLength(sourceBuffer.getInt());
 
         final byte[] body = new byte[message.getBodyLength()];
@@ -145,8 +170,8 @@ public class RexProMessage {
         output.put(message.getVersion());
         output.put(message.getType());
         output.put(message.getFlag());
-        output.putInt(message.getSession());
-        output.putInt(message.getRequest());
+        output.put(message.getSession());
+        output.put(message.getRequest());
         output.putInt(message.getBodyLength());
         output.put(message.getBody());
     }
@@ -178,7 +203,12 @@ public class RexProMessage {
         if (this.flag != other.flag) {
             return false;
         }
-        if (this.session != other.session) {
+        if (this.session != other.session && (this.session == null ||
+                !Arrays.equals(this.session, other.session))) {
+            return false;
+        }
+        if (this.request != other.request && (this.request == null ||
+                !Arrays.equals(this.request, other.request))) {
             return false;
         }
         if (this.bodyLength != other.bodyLength) {
@@ -200,7 +230,8 @@ public class RexProMessage {
         hash = 97 * hash + this.p;
         hash = 97 * hash + this.version;
         hash = 97 * hash + this.flag;
-        hash = 97 * hash + this.session;
+        hash = 97 * hash + (this.session != null ? this.session.hashCode() : 0);
+        hash = 97 * hash + (this.request != null ? this.request.hashCode() : 0);
         hash = 97 * hash + this.bodyLength;
         hash = 97 * hash + (this.body != null ? this.body.hashCode() : 0);
         return hash;

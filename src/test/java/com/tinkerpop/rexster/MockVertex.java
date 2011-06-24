@@ -31,27 +31,22 @@ public class MockVertex implements Vertex {
         this.outEdges = outEdges;
     }
 
-    @Override
     public Object getId() {
         return this.id;
     }
 
-    @Override
     public Object getProperty(String key) {
         return this.properties.get(key);
     }
 
-    @Override
     public Set<String> getPropertyKeys() {
         return this.properties.keySet();
     }
 
-    @Override
     public Object removeProperty(String key) {
         return this.properties.remove(key);
     }
 
-    @Override
     public void setProperty(String key, Object value) {
         this.properties.put(key, value);
     }

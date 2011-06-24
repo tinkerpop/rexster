@@ -39,20 +39,14 @@ public class RexProClient {
 
             connection = future.get(10, TimeUnit.SECONDS);
 
-            // Initialize sample message
-            byte[] testMessage = "RexPro test".getBytes();
-            RexProMessage sentMessage = new RexProMessage((byte) 1, (byte) 1, (byte) 1, 123435, 67889, testMessage);
+            // Initialize session message
+            RexProMessage sentMessage = new SessionRequestMessage();
 
             connection.write(sentMessage);
 
             final RexProMessage rcvMessage = resultMessageFuture.get(10, TimeUnit.SECONDS);
 
-            // Check if echo returned message equal to original one
-            if (sentMessage.equals(rcvMessage)) {
-                System.out.println("DONE!");
-            } else {
-                System.out.println("Messages are not equal!");
-            }
+            System.out.println(rcvMessage);
 
         } finally {
             if (connection != null) {
