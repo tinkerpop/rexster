@@ -14,4 +14,8 @@ public class ErrorResponseMessage extends RexProMessage {
                 BitWorks.convertUUIDToByteArray(request),
                 message.getBytes());
     }
+
+    public String getErrorMessage() {
+        return new String(this.body);
+    }
 }
