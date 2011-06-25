@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
+import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
@@ -9,6 +10,8 @@ import org.glassfish.grizzly.memory.MemoryManager;
 import java.io.IOException;
 
 public class RexProMessageFilter extends BaseFilter {
+
+    private static final Logger logger = Logger.getLogger(RexProSession.class);
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
         // Get the source buffer from the context
@@ -45,6 +48,15 @@ public class RexProMessageFilter extends BaseFilter {
 
         // Construct a message
         final RexProMessage message = RexProMessage.read(sourceBuffer);
+        if (!message.isValid()) {
+            logger.warn("Checksum failure - Message was not valid for session [" + message.getSessionAsUUID()
+                        + "] and request [" + message.getRequestAsUUID() + "]");
+
+            ctx.write(new ErrorResponseMessage(message.getSessionAsUUID(), message.getRequestAsUUID(),
+                    ErrorResponseMessage.FLAG_ERROR_MESSAGE_VALIDATION,
+                    "Checksum failure"));
+        }
+
         ctx.setMessage(message);
 
         sourceBuffer.tryDispose();
