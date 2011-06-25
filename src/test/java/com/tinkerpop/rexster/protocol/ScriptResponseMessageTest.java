@@ -7,37 +7,26 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
 
-public class ScriptRequestMessageTest {
+public class ScriptResponseMessageTest {
     private final UUID sessionKey = UUID.randomUUID();
+
     @Test
     public void constructEmptyConstructorEnsureFormat() throws IOException {
 
-        ScriptRequestMessage msg = new ScriptRequestMessage(this.sessionKey, "language", "x=y;");
+        ScriptResponseMessage msg = new ScriptResponseMessage(this.sessionKey,
+                ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, "test".getBytes());
 
         Assert.assertEquals(sessionKey, msg.getSessionAsUUID());
         Assert.assertTrue(msg.hasSession());
         Assert.assertEquals((byte) 0, msg.getFlag());
-        Assert.assertEquals(20, msg.getBodyLength());
-        Assert.assertEquals(MessageType.SCRIPT_REQUEST, msg.getType());
-    }
-
-    @Test
-    public void getLanguageValid() throws IOException {
-        ScriptRequestMessage msg = new ScriptRequestMessage(this.sessionKey, "language", "x=y;");
-
-        Assert.assertEquals("language", msg.getLanguageName());
-    }
-
-    @Test
-    public void getScriptValid() throws IOException {
-        ScriptRequestMessage msg = new ScriptRequestMessage(this.sessionKey, "language", "x=y;");
-
-        Assert.assertEquals("x=y;", msg.getScript());
+        Assert.assertEquals(4, msg.getBodyLength());
+        Assert.assertEquals(MessageType.SCRIPT_RESPONSE, msg.getType());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void constructCopyRexProMessageWrongType() throws IOException {
-        RexProMessage msgToConvert = new ScriptRequestMessage(this.sessionKey, "language", "x=y;");
+        RexProMessage msgToConvert = new ScriptResponseMessage(this.sessionKey,
+                ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, "test".getBytes());
         msgToConvert.setType(MessageType.SESSION_RESPONSE);
 
         new SessionRequestMessage(msgToConvert);
@@ -45,8 +34,9 @@ public class ScriptRequestMessageTest {
 
     @Test
     public void constructCopyRexProMessage() throws IOException {
-        RexProMessage msgToConvert = new ScriptRequestMessage(this.sessionKey, "language", "x=y;");
-        RexProMessage convertedMsg = new ScriptRequestMessage(msgToConvert);
+        RexProMessage msgToConvert = new ScriptResponseMessage(this.sessionKey,
+                ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, "test".getBytes());
+        RexProMessage convertedMsg = new ScriptResponseMessage(msgToConvert);
 
         Assert.assertNotNull(convertedMsg);
         Assert.assertTrue(Arrays.equals(msgToConvert.getSession(), convertedMsg.getSession()));
