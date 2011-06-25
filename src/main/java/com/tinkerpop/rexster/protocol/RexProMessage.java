@@ -2,12 +2,15 @@ package com.tinkerpop.rexster.protocol;
 
 import org.glassfish.grizzly.Buffer;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 public class RexProMessage {
 
-    public static final int HEADER_SIZE = 43;
+    public static final int HEADER_SIZE = 51;
 
     public static final byte CURRENT_VERSION = (byte) 0;
 
@@ -17,6 +20,8 @@ public class RexProMessage {
     private byte e;
     private byte x;
     private byte p;
+
+    protected byte[] checksum;
 
     protected byte version;
 
@@ -34,13 +39,20 @@ public class RexProMessage {
 
 
     public RexProMessage() {
-    }
-
-    public RexProMessage(byte version, byte type, byte flag, byte[] session, byte[] request, byte[] body) {
         this.r = 'R';
         this.e = 'E';
         this.x = 'X';
         this.p = 'P';
+    }
+
+
+    public RexProMessage(byte version, byte type, byte flag, byte[] session, byte[] request, byte[] body) {
+        this(version, type, flag, session, request, null, body);
+    }
+
+    public RexProMessage(byte version, byte type, byte flag, byte[] session, byte[] request, byte[] checksum, byte[] body) {
+
+        this();
 
         this.version = version;
         this.type = type;
@@ -48,11 +60,12 @@ public class RexProMessage {
         this.session = session;
         this.request = request;
 
-        bodyLength = body.length;
+        this.bodyLength = body.length;
         this.body = body;
+        this.checksum = checksum == null ? this.calculateChecksum() : checksum;
     }
 
-    public byte[] getHeader() {
+    public byte[] getHeaderIdentification() {
         byte[] header = new byte[4];
         header[0] = r;
         header[1] = e;
@@ -62,11 +75,36 @@ public class RexProMessage {
         return header;
     }
 
-    public void setHeader(byte r, byte e, byte x, byte p) {
+    public void setHeaderIdentification(byte r, byte e, byte x, byte p) {
         this.r = r;
         this.e = e;
         this.x = x;
         this.p = p;
+    }
+
+    public byte[] getHeaderMessageInfo() {
+
+        // length of full header less the checksum  + rexp
+        ByteBuffer bb = ByteBuffer.allocate(HEADER_SIZE - 12);
+
+        bb.put(this.version);
+        bb.put(this.type);
+        bb.put(this.flag);
+        bb.put(this.session);
+        bb.put(this.request);
+        bb.putInt(this.bodyLength);
+
+        return bb.array();
+    }
+
+    public byte[] getHeaderFull() {
+        ByteBuffer bb = ByteBuffer.allocate(HEADER_SIZE);
+
+        bb.put(this.getHeaderIdentification());
+        bb.put(this.checksum);
+        bb.put(this.getHeaderMessageInfo());
+
+        return bb.array();
     }
 
     public byte getVersion() {
@@ -125,12 +163,23 @@ public class RexProMessage {
         this.bodyLength = bodyLength;
     }
 
+    public byte[] getChecksum() {
+        return this.checksum;
+    }
+
+    public void setChecksum(byte[] checksum) {
+        this.checksum = checksum;
+    }
+
     public byte[] getBody() {
         return body;
     }
 
     public void setBody(byte[] body) {
         this.body = body;
+
+        bodyLength = this.body.length;
+        checksum = calculateChecksum();
     }
 
     public boolean hasSession() {
@@ -138,11 +187,38 @@ public class RexProMessage {
                 && !BitWorks.convertByteArrayToUUID(this.session).equals(EMPTY_SESSION);
     }
 
+    public boolean isValid() {
+        return this.r == 'R' && this.e == 'E' && this.x == 'X' && this.p == 'P'
+                && Arrays.equals(calculateChecksum(), this.checksum);
+    }
+
+    private byte[] calculateChecksum() {
+        Checksum checksum = new CRC32();
+
+        // checksum calculated on body + header - rexp - checksum
+        int length = this.bodyLength + HEADER_SIZE - 12;
+        ByteBuffer bb = ByteBuffer.allocate(length);
+        bb.put(this.getHeaderMessageInfo());
+
+        if (this.bodyLength > 0) {
+            bb.put(this.body);
+        }
+
+		checksum.update(bb.array(), 0, length);
+		long lngChecksum = checksum.getValue();
+
+        return ByteBuffer.allocate(8).putLong(lngChecksum).array();
+    }
+
     public static RexProMessage read(Buffer sourceBuffer) {
         final RexProMessage message = new RexProMessage();
 
-        message.setHeader(sourceBuffer.get(), sourceBuffer.get(),
+        message.setHeaderIdentification(sourceBuffer.get(), sourceBuffer.get(),
                 sourceBuffer.get(), sourceBuffer.get());
+
+        final byte[] checksumBytes = new byte[8];
+        sourceBuffer.get(checksumBytes);
+        message.setChecksum(checksumBytes);
 
         message.setVersion(sourceBuffer.get());
         message.setType(sourceBuffer.get());
@@ -166,13 +242,7 @@ public class RexProMessage {
     }
 
     public static void write(Buffer output, RexProMessage message) {
-        output.put(message.getHeader());
-        output.put(message.getVersion());
-        output.put(message.getType());
-        output.put(message.getFlag());
-        output.put(message.getSession());
-        output.put(message.getRequest());
-        output.putInt(message.getBodyLength());
+        output.put(message.getHeaderFull());
         output.put(message.getBody());
     }
 
@@ -197,7 +267,14 @@ public class RexProMessage {
         if (this.p != other.p) {
             return false;
         }
+        if (this.checksum != other.checksum && (this.checksum == null ||
+                !Arrays.equals(this.checksum, other.checksum))) {
+            return false;
+        }
         if (this.version != other.version) {
+            return false;
+        }
+        if (this.type != other.type) {
             return false;
         }
         if (this.flag != other.flag) {
@@ -228,7 +305,9 @@ public class RexProMessage {
         hash = 97 * hash + this.e;
         hash = 97 * hash + this.x;
         hash = 97 * hash + this.p;
+        hash = 97 * hash + (this.checksum != null ? this.checksum.hashCode() : 0);
         hash = 97 * hash + this.version;
+        hash = 97 * hash + this.type;
         hash = 97 * hash + this.flag;
         hash = 97 * hash + (this.session != null ? this.session.hashCode() : 0);
         hash = 97 * hash + (this.request != null ? this.request.hashCode() : 0);

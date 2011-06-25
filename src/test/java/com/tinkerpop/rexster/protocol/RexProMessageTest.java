@@ -7,7 +7,6 @@ import org.jmock.Mockery;
 import org.jmock.Sequence;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Test;
-import sun.reflect.generics.tree.ByteSignature;
 
 import java.util.UUID;
 
@@ -45,6 +44,11 @@ public class RexProMessageTest {
             // magic - p
             oneOf(sourceBuffer).get();
             will(returnValue((byte) 'P'));
+            inSequence(sequence);
+
+             // checksum
+            byte[] bytesChecksum = new byte[4];
+            oneOf(sourceBuffer).get(with(any(bytesChecksum.getClass())));
             inSequence(sequence);
 
             // version
@@ -87,15 +91,17 @@ public class RexProMessageTest {
 
         this.mockery.assertIsSatisfied();
 
-        Assert.assertEquals('R', msg.getHeader()[0]);
-        Assert.assertEquals('E', msg.getHeader()[1]);
-        Assert.assertEquals('X', msg.getHeader()[2]);
-        Assert.assertEquals('P', msg.getHeader()[3]);
+        Assert.assertEquals('R', msg.getHeaderIdentification()[0]);
+        Assert.assertEquals('E', msg.getHeaderIdentification()[1]);
+        Assert.assertEquals('X', msg.getHeaderIdentification()[2]);
+        Assert.assertEquals('P', msg.getHeaderIdentification()[3]);
         Assert.assertEquals((byte) 1, msg.getVersion());
         Assert.assertEquals((byte) 2, msg.getType());
         Assert.assertEquals((byte) 3, msg.getFlag());
         Assert.assertEquals(5, msg.getBodyLength());
         Assert.assertEquals(5, msg.getBody().length);
+        Assert.assertNotNull(msg.getChecksum());
+        Assert.assertEquals(8, msg.getChecksum().length);
     }
 
     @Test
@@ -114,19 +120,7 @@ public class RexProMessageTest {
                 "hello".getBytes());
 
         this.mockery.checking(new Expectations() {{
-            oneOf(output).put(sentMessage.getHeader());
-            inSequence(sequence);
-            oneOf(output).put(sentMessage.getVersion());
-            inSequence(sequence);
-            oneOf(output).put(sentMessage.getType());
-            inSequence(sequence);
-            oneOf(output).put(sentMessage.getFlag());
-            inSequence(sequence);
-            oneOf(output).put(sentMessage.getSession());
-            inSequence(sequence);
-            oneOf(output).put(sentMessage.getRequest());
-            inSequence(sequence);
-            oneOf(output).putInt(sentMessage.getBodyLength());
+            oneOf(output).put(sentMessage.getHeaderFull());
             inSequence(sequence);
             oneOf(output).put(sentMessage.getBody());
             inSequence(sequence);
@@ -162,5 +156,53 @@ public class RexProMessageTest {
         RexProMessage msg = new RexProMessage();
         msg.setSession(BitWorks.convertUUIDToByteArray(UUID.randomUUID()));
         Assert.assertTrue(msg.hasSession());
+    }
+
+    @Test
+    public void getHeaderIdentificationAlwaysREXP() {
+        RexProMessage msg = new RexProMessage();
+        byte[] rexp = msg.getHeaderIdentification();
+        Assert.assertEquals('R', rexp[0]);
+        Assert.assertEquals('E', rexp[1]);
+        Assert.assertEquals('X', rexp[2]);
+        Assert.assertEquals('P', rexp[3]);
+    }
+
+    @Test
+    public void getHeaderMessageInfoValid() {
+        RexProMessage msg = new RexProMessage((byte) 1, (byte) 1, (byte) 1,
+                BitWorks.convertUUIDToByteArray(UUID.randomUUID()),
+                BitWorks.convertUUIDToByteArray(UUID.randomUUID()),
+                "test".getBytes());
+
+        byte[] headerBytes = msg.getHeaderMessageInfo();
+
+    }
+
+    @Test
+    public void isValidFalse() {
+        RexProMessage msg = new RexProMessage((byte) 1, (byte) 1, (byte) 1,
+                BitWorks.convertUUIDToByteArray(UUID.randomUUID()),
+                BitWorks.convertUUIDToByteArray(UUID.randomUUID()),
+                "test".getBytes());
+        msg.setChecksum(new byte[8]);
+
+        Assert.assertFalse(msg.isValid());
+    }
+
+    @Test
+    public void isValidTrue() {
+        RexProMessage msg1 = new RexProMessage((byte) 1, (byte) 1, (byte) 1,
+                BitWorks.convertUUIDToByteArray(UUID.randomUUID()),
+                BitWorks.convertUUIDToByteArray(UUID.randomUUID()),
+                "test".getBytes());
+        RexProMessage msg2 = new RexProMessage((byte) 1, (byte) 1, (byte) 1,
+                msg1.getSession(),
+                msg1.getRequest(),
+                "test".getBytes());
+
+        msg2.setChecksum(msg1.getChecksum());
+
+        Assert.assertTrue(msg2.isValid());
     }
 }

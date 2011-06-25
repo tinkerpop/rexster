@@ -40,7 +40,7 @@ public class ScriptResponseMessageTest {
 
         Assert.assertNotNull(convertedMsg);
         Assert.assertTrue(Arrays.equals(msgToConvert.getSession(), convertedMsg.getSession()));
-        Assert.assertTrue(Arrays.equals(msgToConvert.getHeader(), convertedMsg.getHeader()));
+        Assert.assertTrue(Arrays.equals(msgToConvert.getHeaderIdentification(), convertedMsg.getHeaderIdentification()));
         Assert.assertTrue(Arrays.equals(msgToConvert.getRequest(), convertedMsg.getRequest()));
         Assert.assertTrue(Arrays.equals(msgToConvert.getBody(), convertedMsg.getBody()));
         Assert.assertEquals(msgToConvert.getBodyLength(), convertedMsg.getBodyLength());
