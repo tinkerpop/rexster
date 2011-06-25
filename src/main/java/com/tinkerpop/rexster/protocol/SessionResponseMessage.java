@@ -6,6 +6,10 @@ public class SessionResponseMessage extends RexProMessage{
     public SessionResponseMessage(RexProMessage message) {
         super(message.getVersion(), message.getType(), message.getFlag(),
                 message.getSession(), message.getRequest(), message.getBody());
+
+        if (this.getType() != MessageType.SESSION_RESPONSE) {
+            throw new IllegalArgumentException("The message is not of type SESSION_RESPONSE");
+        }
     }
 
     public SessionResponseMessage(UUID sessionKey, UUID request) {
