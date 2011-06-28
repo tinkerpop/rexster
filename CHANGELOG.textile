@@ -18,6 +18,20 @@ h3. Version 0.5 (* -- NOT OFFICIALLY RELEASED)
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-mcgruff.png!
 
+h3. Version 0.4.1 (McGruff -- June 28, 2011)
+
+```xml
+ <dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>rexster</artifactId>
+  <version>0.4.1</version>
+</dependency>
+```
+
+* Fixed transactional graph error
+
+==<hr/>==
+
 h3. Version 0.4 (McGruff -- June 15, 2011)
 
 ```xml
