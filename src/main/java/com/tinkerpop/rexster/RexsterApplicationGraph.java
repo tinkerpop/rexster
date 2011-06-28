@@ -63,6 +63,7 @@ public class RexsterApplicationGraph {
         TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
             transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            transactionalGraph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
         }
     }
 
@@ -70,6 +71,14 @@ public class RexsterApplicationGraph {
         TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
             transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            transactionalGraph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
+        }
+    }
+
+    public void trySetTransactionalModeAutomatic() {
+        TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
+        if (transactionalGraph != null) {
+            transactionalGraph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
         }
     }
 
