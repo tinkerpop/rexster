@@ -76,21 +76,4 @@ public class MockVertex implements Vertex {
             return pipe;
         }
     }
-
-    public Iterable<Edge> getInEdges() {
-        return this.getInEdges(new String[]{});
-    }
-
-    public Iterable<Edge> getInEdges(String label) {
-        return this.getInEdges(new String[]{label});
-    }
-
-     public Iterable<Edge> getOutEdges() {
-        return this.getOutEdges(new String[]{});
-    }
-
-    public Iterable<Edge> getOutEdges(String label) {
-        return this.getOutEdges(new String[]{label});
-    }
-
 }
