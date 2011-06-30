@@ -56,7 +56,6 @@ public class MockVertex implements Vertex {
         this.properties.put(key, value);
     }
 
-    //TODO: Support multiple labels in MockVertex
     public Iterable<Edge> getOutEdges(String... labels) {
         if (labels.length == 0) {
             return this.outEdges;
