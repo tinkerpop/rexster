@@ -4,7 +4,6 @@ import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.WebServer;
 import com.tinkerpop.rexster.WebServerRexsterApplicationProvider;
 import org.apache.log4j.Logger;
-import sun.java2d.pipe.SpanShapeRenderer;
 
 import javax.script.Bindings;
 import javax.script.ScriptException;
