@@ -65,23 +65,23 @@ public class RexProClient {
 
             connection = future.get(10, TimeUnit.SECONDS);
 
-            RexProMessage scriptMessage = new ScriptRequestMessage(sessionKey, "gremlin", "g = rexster.getGraph(\"tinkergraph\");g.v(1).name;");
+            RexProMessage scriptMessage = new ScriptRequestMessage(sessionKey, "gremlin", "g = rexster.getGraph(\"tinkergraph\");g.V;");
             connection.write(scriptMessage);
 
             final RexProMessage resultMessage = resultMessageFuture.get(10, TimeUnit.SECONDS);
 
             ByteBuffer bb = ByteBuffer.wrap(resultMessage.getBody());
-            int resultLength = bb.getInt();
-            System.out.println(resultLength);
+            while (bb.hasRemaining()) {
+                int segmentLength = bb.getInt();
+                byte[] resultObjectBytes = new byte[segmentLength];
+                bb.get(resultObjectBytes);
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(resultObjectBytes);
+                ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
 
-            byte[] resultObjectBytes = new byte[resultLength];
-            bb.get(resultObjectBytes);
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(resultObjectBytes);
-            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-
-            Object o = objectInputStream.readObject();
-            System.out.println(o.getClass().getName());
-            System.out.print(o.toString());
+                Object o = objectInputStream.readObject();
+                System.out.println(o.getClass().getName());
+                System.out.println(o.toString());
+            }
         } finally {
             if (connection != null) {
                 connection.close();
@@ -90,6 +90,7 @@ public class RexProClient {
             transport.stop();
         }
     }
+
 
     private static TCPNIOTransport getTransport(FutureImpl<RexProMessage> future) {
         // Create a FilterChain using FilterChainBuilder

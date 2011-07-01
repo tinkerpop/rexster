@@ -9,7 +9,9 @@ import javax.script.ScriptException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.util.Iterator;
 
 public class ScriptFilter extends BaseFilter {
     private static final Logger logger = Logger.getLogger(RexProSession.class);
@@ -24,17 +26,8 @@ public class ScriptFilter extends BaseFilter {
             try {
                 Object result = session.evaluate(specificMessage.getScript(), specificMessage.getLanguageName());
 
-                ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
-                ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);
-                objectOutputStream.writeObject(result);
-                objectOutputStream.close();
-
-                ByteBuffer bb = ByteBuffer.allocate(4 + byteOuputStream.size());
-                bb.putInt(byteOuputStream.size());
-                bb.put(byteOuputStream.toByteArray());
-
                 ScriptResponseMessage resultMessage = new ScriptResponseMessage(message.getSessionAsUUID(),
-                        ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, bb.array());
+                        ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, getBytesBasedOnObject(result));
 
                 ctx.write(resultMessage);
 
@@ -54,5 +47,48 @@ public class ScriptFilter extends BaseFilter {
         }
 
         return ctx.getInvokeAction();
+    }
+
+    private byte[] getBytesBasedOnObject(Object result) throws IOException {
+        if (result instanceof Iterable) {
+            ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
+            for (Object o : (Iterable) result) {
+                byte[] bytesToWrite = getBytes(o);
+                byteOuputStream.write(bytesToWrite, 0, bytesToWrite.length);
+            }
+
+            return byteOuputStream.toByteArray();
+        } else if (result instanceof Iterator) {
+            ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
+            Iterator itty = (Iterator) result;
+            while (itty.hasNext()) {
+               byte[] bytesToWrite = getBytes(itty.next());
+                byteOuputStream.write(bytesToWrite, 0, bytesToWrite.length);
+            }
+
+            return byteOuputStream.toByteArray();
+        } else {
+            return getBytes(result);
+        }
+    }
+
+    private byte[] getBytes(Object result) throws IOException {
+
+        if (result == null) {
+            return null;
+        } else if (result instanceof Serializable) {
+            ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);
+            objectOutputStream.writeObject(result);
+            objectOutputStream.close();
+
+            ByteBuffer bb = ByteBuffer.allocate(4 + byteOuputStream.size());
+            bb.putInt(byteOuputStream.size());
+            bb.put(byteOuputStream.toByteArray());
+
+            return bb.array();
+        } else {
+            return result.toString().getBytes();
+        }
     }
 }

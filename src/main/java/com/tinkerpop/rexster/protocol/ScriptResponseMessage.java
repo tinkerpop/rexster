@@ -6,8 +6,6 @@ import java.util.UUID;
 public class ScriptResponseMessage extends RexProMessage {
 
     public static final byte FLAG_COMPLETE_MESSAGE = 0;
-    public static final byte FLAG_FRAGMENT_MORE = 1;
-    public static final byte FLAG_FRAMENT_FINAL = 2;
 
     public ScriptResponseMessage(RexProMessage message) {
         super(message.getVersion(), message.getType(), message.getFlag(),
