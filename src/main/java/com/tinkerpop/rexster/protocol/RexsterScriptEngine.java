@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.Tokens;
+import sun.reflect.generics.tree.IntSignature;
 
 import javax.script.*;
 import javax.sound.sampled.Port;
@@ -37,7 +38,27 @@ public class RexsterScriptEngine extends AbstractScriptEngine {
     }
 
     public Bindings createBindings() {
-        return new SimpleBindings();
+        return new RexsterBindings();
+    }
+
+    public void setBindings(Bindings bindings, int scope) {
+        if (!(bindings instanceof RexsterBindings)) {
+            throw new IllegalArgumentException("Bindings must be of type RexsterBindings.");
+        }
+
+        super.setBindings(bindings, scope);
+    }
+
+    public void setContext(ScriptContext context) {
+        if (!(context.getBindings(ScriptContext.ENGINE_SCOPE) instanceof RexsterBindings)) {
+            throw new IllegalArgumentException("Engine Scope Bindings must be of type RexsterBindings.");
+        }
+
+        if (!(context.getBindings(ScriptContext.GLOBAL_SCOPE) instanceof RexsterBindings)) {
+            throw new IllegalArgumentException("Global Scope Bindings must be of type RexsterBindings.");
+        }
+
+        super.setContext(context);
     }
 
     public ScriptEngineFactory getFactory() {
@@ -75,6 +96,15 @@ public class RexsterScriptEngine extends AbstractScriptEngine {
     }
 
     public Object eval(final Reader reader, final ScriptContext context) throws ScriptException {
+
+        if (!(context.getBindings(ScriptContext.ENGINE_SCOPE) instanceof RexsterBindings)) {
+            throw new IllegalArgumentException("Engine Scope Bindings must be of type RexsterBindings.");
+        }
+
+        if (!(context.getBindings(ScriptContext.GLOBAL_SCOPE) instanceof RexsterBindings)) {
+            throw new IllegalArgumentException("Global Scope Bindings must be of type RexsterBindings.");
+        }
+
         String line;
         BufferedReader bReader = new BufferedReader(reader);
         Object finalValue = null;
