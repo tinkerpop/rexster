@@ -24,7 +24,7 @@ public class ScriptFilter extends BaseFilter {
 
             RexProSession session = RexProSessions.getSession(specificMessage.getSessionAsUUID());
             try {
-                Object result = session.evaluate(specificMessage.getScript(), specificMessage.getLanguageName());
+                Object result = session.evaluate(specificMessage.getScript(), specificMessage.getLanguageName(), specificMessage.getBindings());
 
                 ScriptResponseMessage resultMessage = new ScriptResponseMessage(message.getSessionAsUUID(),
                         ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, getBytesBasedOnObject(result));

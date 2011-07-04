@@ -1,19 +1,15 @@
 package com.tinkerpop.rexster.protocol;
 
-import com.tinkerpop.rexster.Tokens;
-import sun.reflect.generics.tree.IntSignature;
-
 import javax.script.*;
-import javax.sound.sampled.Port;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 public class RexsterScriptEngine extends AbstractScriptEngine {
 
-    public static final String RESERVED_HOST = "host";
-    public static final String RESERVED_PORT = "port";
-    public static final String RESERVED_LANGUAGE = "language";
+    public static final String CONFIG_SCOPE_HOST = "_host";
+    public static final String CONFIG_SCOPE_PORT = "_port";
+    public static final String CONFIG_SCOPE_LANGUAGE = "_language";
 
     private RemoteRexsterSession session = null;
     private String scriptEngineName;
@@ -66,13 +62,13 @@ public class RexsterScriptEngine extends AbstractScriptEngine {
     }
 
     public void put(String key, Object value) {
-        if (key.equals(RESERVED_HOST)) {
+        if (key.equals(CONFIG_SCOPE_HOST)) {
             this.host = (String) value;
             isSessionChanged = true;
-        } else if (key.equals(RESERVED_PORT)) {
+        } else if (key.equals(CONFIG_SCOPE_PORT)) {
             this.port = Integer.parseInt(value.toString());
             isSessionChanged = true;
-        } else if (key.equals(RESERVED_LANGUAGE)) {
+        } else if (key.equals(CONFIG_SCOPE_LANGUAGE)) {
             this.scriptEngineName = (String) value;
         } else {
             this.getBindings(ScriptContext.ENGINE_SCOPE).put(key, value);
@@ -80,11 +76,11 @@ public class RexsterScriptEngine extends AbstractScriptEngine {
     }
 
     public Object get(String key) {
-        if (key.equals(RESERVED_HOST)) {
+        if (key.equals(CONFIG_SCOPE_HOST)) {
             return this.host;
-        } else if (key.equals(RESERVED_PORT)) {
+        } else if (key.equals(CONFIG_SCOPE_PORT)) {
             return this.port;
-        } else if (key.equals(RESERVED_LANGUAGE)) {
+        } else if (key.equals(CONFIG_SCOPE_LANGUAGE)) {
             return this.scriptEngineName;
         } else {
             return this.getBindings(ScriptContext.ENGINE_SCOPE).get(key);
@@ -126,7 +122,8 @@ public class RexsterScriptEngine extends AbstractScriptEngine {
                     this.isSessionChanged = false;
                 }
 
-                finalValue = eval(buffer.toString(), this.scriptEngineName, this.session);
+                // TODO: combine bindings???
+                finalValue = eval(buffer.toString(), this.scriptEngineName, this.session, (RexsterBindings) this.getBindings(ScriptContext.ENGINE_SCOPE));
             }
 
         } catch (Exception e) {
@@ -136,14 +133,14 @@ public class RexsterScriptEngine extends AbstractScriptEngine {
         return finalValue;
     }
 
-    private static Object eval(String script, String scriptEngineName, RemoteRexsterSession session) {
+    private static Object eval(String script, String scriptEngineName, RemoteRexsterSession session, RexsterBindings bindings) {
 
         Object returnValue = null;
 
         try {
             session.open();
             final RexProMessage scriptMessage = new ScriptRequestMessage(
-                    session.getSessionKey(), scriptEngineName, script);
+                    session.getSessionKey(), scriptEngineName, bindings, script);
 
             final RexProMessage resultMessage = RexPro.sendMessage(
                     session.getRexProHost(), session.getRexProPort(), scriptMessage);

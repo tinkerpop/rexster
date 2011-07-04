@@ -40,12 +40,17 @@ public class RexProSession {
         return (new Date()).getTime() - this.lastTimeUsed.getTime();
     }
 
-    public Object evaluate(String script, String languageName) throws ScriptException{
+    public Object evaluate(String script, String languageName, RexsterBindings rexsterBindings) throws ScriptException{
         EngineController controller = EngineController.getInstance();
 
         Object result = null;
         try {
             EngineHolder engine = controller.getEngineByLanguageName(languageName);
+
+            if (rexsterBindings != null) {
+                this.bindings.putAll(rexsterBindings);
+            }
+
             result = engine.getEngine().eval(script, this.bindings);
         } catch (ScriptException se) {
             throw se;

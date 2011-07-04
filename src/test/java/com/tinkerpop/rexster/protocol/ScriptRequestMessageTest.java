@@ -9,10 +9,12 @@ import java.util.UUID;
 
 public class ScriptRequestMessageTest {
     private final UUID sessionKey = UUID.randomUUID();
+    private final RexsterBindings bindings = new RexsterBindings();
+
     @Test
     public void constructEmptyConstructorEnsureFormat() throws IOException {
 
-        ScriptRequestMessage msg = new ScriptRequestMessage(this.sessionKey, "language", "x=y;");
+        ScriptRequestMessage msg = new ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
 
         Assert.assertEquals(sessionKey, msg.getSessionAsUUID());
         Assert.assertTrue(msg.hasSession());
@@ -23,21 +25,21 @@ public class ScriptRequestMessageTest {
 
     @Test
     public void getLanguageValid() throws IOException {
-        ScriptRequestMessage msg = new ScriptRequestMessage(this.sessionKey, "language", "x=y;");
+        ScriptRequestMessage msg = new ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
 
         Assert.assertEquals("language", msg.getLanguageName());
     }
 
     @Test
     public void getScriptValid() throws IOException {
-        ScriptRequestMessage msg = new ScriptRequestMessage(this.sessionKey, "language", "x=y;");
+        ScriptRequestMessage msg = new ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
 
         Assert.assertEquals("x=y;", msg.getScript());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void constructCopyRexProMessageWrongType() throws IOException {
-        RexProMessage msgToConvert = new ScriptRequestMessage(this.sessionKey, "language", "x=y;");
+        RexProMessage msgToConvert = new ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
         msgToConvert.setType(MessageType.SESSION_RESPONSE);
 
         new SessionRequestMessage(msgToConvert);
@@ -45,7 +47,7 @@ public class ScriptRequestMessageTest {
 
     @Test
     public void constructCopyRexProMessage() throws IOException {
-        RexProMessage msgToConvert = new ScriptRequestMessage(this.sessionKey, "language", "x=y;");
+        RexProMessage msgToConvert = new ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
         RexProMessage convertedMsg = new ScriptRequestMessage(msgToConvert);
 
         Assert.assertNotNull(convertedMsg);

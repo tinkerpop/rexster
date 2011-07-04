@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
+import javax.script.Bindings;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.UUID;
@@ -15,11 +16,11 @@ public class ScriptRequestMessage extends RexProMessage {
         }
     }
 
-    public ScriptRequestMessage(UUID sessionKey, String languageName, String script) throws IOException {
+    public ScriptRequestMessage(UUID sessionKey, String languageName, RexsterBindings bindings, String script) throws IOException {
         super(RexProMessage.CURRENT_VERSION, MessageType.SCRIPT_REQUEST, (byte) 0,
                 BitWorks.convertUUIDToByteArray(sessionKey),
                 BitWorks.convertUUIDToByteArray(UUID.randomUUID()),
-                BitWorks.convertStringsToByteArray(languageName, script));
+                buildBody(languageName, script, bindings));
     }
 
     public String getLanguageName() {
@@ -43,5 +44,40 @@ public class ScriptRequestMessage extends RexProMessage {
         byte[] scriptBytes = new byte[scriptLength];
         buffer.get(scriptBytes);
         return new String(scriptBytes);
+    }
+
+    public RexsterBindings getBindings() {
+        ByteBuffer buffer = ByteBuffer.wrap(this.body);
+        int languageLength = buffer.getInt();
+
+        int languageSegmentOffset = languageLength + 4;
+        buffer.position(languageSegmentOffset);
+
+        int scriptLength = buffer.getInt();
+        buffer.position(scriptLength + 4 + languageSegmentOffset);
+
+        RexsterBindings bindings = null;
+
+        try {
+            byte[] theRest = new byte[buffer.remaining()];
+            buffer.get(theRest);
+            bindings = BitWorks.convertByteArrayToRexsterBindings(theRest);
+        } catch (Exception e) {
+            // TODO: clean up
+            e.printStackTrace();
+        }
+
+        return bindings;
+    }
+
+    private static byte[] buildBody(String languageName, String script, RexsterBindings bindings) throws IOException {
+        byte[] languageNameAndScriptBytes = BitWorks.convertStringsToByteArray(languageName, script);
+        byte[] bindingsBytes = BitWorks.convertRexsterBindingsToByteArray(bindings);
+
+        ByteBuffer bb = ByteBuffer.allocate(languageNameAndScriptBytes.length + bindingsBytes.length);
+        bb.put(languageNameAndScriptBytes);
+        bb.put(bindingsBytes);
+
+        return bb.array();
     }
 }
