@@ -8,10 +8,10 @@ public class RexProClient {
 
         try {
 
-            RemoteRexster remote = new RemoteRexster();
-            remote.put(RemoteRexster.RESERVED_HOST, "localhost");
-            remote.put(RemoteRexster.RESERVED_PORT, 8185);
-            remote.put(RemoteRexster.RESERVED_LANGUAGE, "gremlin");
+            RexsterScriptEngine remote = new RexsterScriptEngine();
+            remote.put(RexsterScriptEngine.RESERVED_HOST, "localhost");
+            remote.put(RexsterScriptEngine.RESERVED_PORT, 8185);
+            remote.put(RexsterScriptEngine.RESERVED_LANGUAGE, "gremlin");
             Object retVal = remote.eval("g = rexster.getGraph(\"tinkergraph\");g.V;");
 
             if (retVal instanceof List) {

@@ -8,7 +8,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-public class RemoteRexster extends AbstractScriptEngine {
+public class RexsterScriptEngine extends AbstractScriptEngine {
 
     public static final String RESERVED_HOST = "host";
     public static final String RESERVED_PORT = "port";
@@ -23,11 +23,11 @@ public class RemoteRexster extends AbstractScriptEngine {
     private boolean isSessionChanged = true;
 
 
-    public RemoteRexster() {
+    public RexsterScriptEngine() {
 
     }
 
-    public RemoteRexster(String rexProHost, int rexProPort, String scriptEngineName) {
+    public RexsterScriptEngine(String rexProHost, int rexProPort, String scriptEngineName) {
         this.session = new RemoteRexsterSession(rexProHost, rexProPort);
         this.scriptEngineName = scriptEngineName;
     }

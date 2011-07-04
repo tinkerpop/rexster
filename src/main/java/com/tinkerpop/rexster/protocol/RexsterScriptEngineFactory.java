@@ -77,6 +77,6 @@ public class RexsterScriptEngineFactory implements ScriptEngineFactory {
     }
 
     public ScriptEngine getScriptEngine() {
-        return new RemoteRexster();
+        return new RexsterScriptEngine();
     }
 }
