@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.protocol;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
+import java.util.Iterator;
 import java.util.List;
 
 public class RexProClient {
@@ -21,19 +22,35 @@ public class RexProClient {
             remote.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
             remote.setBindings(bindings, ScriptContext.GLOBAL_SCOPE);
 
-            Object retVal = remote.eval("g = rexster.getGraph(\"tinkergraph\");g.V;x;");
+            System.out.println("before");
+            dumpBindings(bindings);
 
-            if (retVal instanceof List) {
-                List list = (List) retVal;
-                for (Object item : list) {
+            Object retVal = remote.eval("g = rexster.getGraph(\"tinkergraph\");g.V;x=\"testing\";");
+
+            if (retVal instanceof Iterator) {
+                Iterator list = (Iterator) retVal;
+                while (list.hasNext()) {
+                    Object item = list.next();
                     System.out.println(item.toString() + " [" + item.getClass().getName() + "]");
                 }
             } else {
                 System.out.println(retVal.toString() + " [" + retVal.getClass().getName() + "]");
             }
 
+            System.out.println("after");
+            dumpBindings(bindings);
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
+
+    public static void dumpBindings(Bindings bindings) {
+        if (bindings == null)
+          System.out.println("  No bindings");
+        else
+          for (String key : bindings.keySet())
+            System.out.println("  " + key + ": " + bindings.get(key));
+        System.out.println();
+      }
 }

@@ -1,5 +1,7 @@
 package com.tinkerpop.rexster.protocol;
 
+import com.tinkerpop.rexster.Tokens;
+
 import javax.script.Bindings;
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -32,17 +34,21 @@ public class BitWorks {
         return stream.toByteArray();
     }
 
-    public static byte[] convertRexsterBindingsToByteArray(RexsterBindings bindings) throws IOException {
+    public static byte[] convertSerializableBindingsToByteArray(Bindings bindings) throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
         for (String key : bindings.keySet()) {
-            stream.write(ByteBuffer.allocate(4).putInt(key.length()).array());
-            stream.write(key.getBytes());
+            // don't serialize the rexster key...doesn't make sense to send that back to the client
+            // as it is a server side resource
+            if (!key.equals(Tokens.REXPRO_REXSTER_CONTEXT)) {
+                Object objectToSerialize = bindings.get(key);
+                if (objectToSerialize instanceof Serializable) {
+                    stream.write(ByteBuffer.allocate(4).putInt(key.length()).array());
+                    stream.write(key.getBytes());
 
-            Object objectToSerialize = bindings.get(key);
-            if (objectToSerialize instanceof Serializable) {
-                byte[] objectBytes = getBytes(objectToSerialize);
-                stream.write(objectBytes);
+                    byte[] objectBytes = getBytes(objectToSerialize);
+                    stream.write(objectBytes);
+                }
             }
         }
 

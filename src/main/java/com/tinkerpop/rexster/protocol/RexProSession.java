@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.RexsterApplication;
+import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.WebServer;
 import com.tinkerpop.rexster.WebServerRexsterApplicationProvider;
 import org.apache.log4j.Logger;
@@ -23,7 +24,7 @@ public class RexProSession {
     public RexProSession(final RexsterApplication rexsterApplication) {
         this.sessionIdentifier = UUID.randomUUID();
 
-        this.bindings.put("rexster", rexsterApplication);
+        this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, rexsterApplication);
 
         logger.info("New RexPro Session created: " + this.sessionIdentifier.toString());
     }

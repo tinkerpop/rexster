@@ -5,6 +5,7 @@ import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;
 
+import javax.script.ScriptContext;
 import javax.script.ScriptException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -24,10 +25,11 @@ public class ScriptFilter extends BaseFilter {
 
             RexProSession session = RexProSessions.getSession(specificMessage.getSessionAsUUID());
             try {
-                Object result = session.evaluate(specificMessage.getScript(), specificMessage.getLanguageName(), specificMessage.getBindings());
+                Object result = session.evaluate(specificMessage.getScript(),
+                        specificMessage.getLanguageName(), specificMessage.getBindings());
 
                 ScriptResponseMessage resultMessage = new ScriptResponseMessage(message.getSessionAsUUID(),
-                        ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, getBytesBasedOnObject(result));
+                        ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, result, session.getBindings());
 
                 ctx.write(resultMessage);
 
@@ -47,48 +49,5 @@ public class ScriptFilter extends BaseFilter {
         }
 
         return ctx.getInvokeAction();
-    }
-
-    private byte[] getBytesBasedOnObject(Object result) throws IOException {
-        if (result instanceof Iterable) {
-            ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
-            for (Object o : (Iterable) result) {
-                byte[] bytesToWrite = getBytes(o);
-                byteOuputStream.write(bytesToWrite, 0, bytesToWrite.length);
-            }
-
-            return byteOuputStream.toByteArray();
-        } else if (result instanceof Iterator) {
-            ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
-            Iterator itty = (Iterator) result;
-            while (itty.hasNext()) {
-               byte[] bytesToWrite = getBytes(itty.next());
-                byteOuputStream.write(bytesToWrite, 0, bytesToWrite.length);
-            }
-
-            return byteOuputStream.toByteArray();
-        } else {
-            return getBytes(result);
-        }
-    }
-
-    private byte[] getBytes(Object result) throws IOException {
-
-        if (result == null) {
-            return null;
-        } else if (result instanceof Serializable) {
-            ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);
-            objectOutputStream.writeObject(result);
-            objectOutputStream.close();
-
-            ByteBuffer bb = ByteBuffer.allocate(4 + byteOuputStream.size());
-            bb.putInt(byteOuputStream.size());
-            bb.put(byteOuputStream.toByteArray());
-
-            return bb.array();
-        } else {
-            return result.toString().getBytes();
-        }
     }
 }

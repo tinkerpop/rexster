@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.protocol;
 
-import javax.script.Bindings;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.UUID;
@@ -72,7 +71,7 @@ public class ScriptRequestMessage extends RexProMessage {
 
     private static byte[] buildBody(String languageName, String script, RexsterBindings bindings) throws IOException {
         byte[] languageNameAndScriptBytes = BitWorks.convertStringsToByteArray(languageName, script);
-        byte[] bindingsBytes = BitWorks.convertRexsterBindingsToByteArray(bindings);
+        byte[] bindingsBytes = BitWorks.convertSerializableBindingsToByteArray(bindings);
 
         ByteBuffer bb = ByteBuffer.allocate(languageNameAndScriptBytes.length + bindingsBytes.length);
         bb.put(languageNameAndScriptBytes);

@@ -29,6 +29,8 @@ public class Tokens {
     public static final String REXSTER_GRAPH_PROPERTIES = "properties";
     public static final String REXSTER_GRAPH_BUFFER_SIZE = "graph-buffer-size";
 
+    public static final String REXPRO_REXSTER_CONTEXT = "rexster";
+
     public static final String DESCRIPTION = "description";
     public static final String PARAMETERS = "parameters";
     public static final String API = "api";

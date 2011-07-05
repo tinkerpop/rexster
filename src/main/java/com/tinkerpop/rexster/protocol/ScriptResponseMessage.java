@@ -1,6 +1,12 @@
 package com.tinkerpop.rexster.protocol;
 
+import javax.script.Bindings;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.util.Iterator;
 import java.util.UUID;
 
 public class ScriptResponseMessage extends RexProMessage {
@@ -16,10 +22,80 @@ public class ScriptResponseMessage extends RexProMessage {
         }
     }
 
-    public ScriptResponseMessage(UUID sessionKey, byte flag, byte[] body) throws IOException {
+    public ScriptResponseMessage(UUID sessionKey, byte flag, Object result, Bindings bindings) throws IOException {
         super(RexProMessage.CURRENT_VERSION, MessageType.SCRIPT_RESPONSE, flag,
                 BitWorks.convertUUIDToByteArray(sessionKey),
                 BitWorks.convertUUIDToByteArray(UUID.randomUUID()),
-                body);
+                buildBody(BitWorks.convertSerializableBindingsToByteArray(bindings), getBytesBasedOnObject(result)));
+    }
+
+    public RexsterBindings getBindings() {
+        ByteBuffer buffer = ByteBuffer.wrap(this.body);
+        int bindingsLength = buffer.getInt();
+
+        RexsterBindings bindings = null;
+
+        try {
+            byte[] bindingsBytes = new byte[bindingsLength];
+            buffer.get(bindingsBytes);
+            bindings = BitWorks.convertByteArrayToRexsterBindings(bindingsBytes);
+        } catch (Exception e) {
+            // TODO: clean up
+            e.printStackTrace();
+        }
+
+        return bindings;
+    }
+
+    private static byte[] buildBody(byte[] bindings, byte[] result) {
+        ByteBuffer bb = ByteBuffer.allocate(result.length + bindings.length + 4);
+        bb.putInt(bindings.length);
+        bb.put(bindings);
+        bb.put(result);
+
+        return bb.array();
+    }
+
+    private static byte[] getBytesBasedOnObject(Object result) throws IOException {
+        if (result instanceof Iterable) {
+            ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
+            for (Object o : (Iterable) result) {
+                byte[] bytesToWrite = getBytes(o);
+                byteOuputStream.write(bytesToWrite, 0, bytesToWrite.length);
+            }
+
+            return byteOuputStream.toByteArray();
+        } else if (result instanceof Iterator) {
+            ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
+            Iterator itty = (Iterator) result;
+            while (itty.hasNext()) {
+               byte[] bytesToWrite = getBytes(itty.next());
+                byteOuputStream.write(bytesToWrite, 0, bytesToWrite.length);
+            }
+
+            return byteOuputStream.toByteArray();
+        } else {
+            return getBytes(result);
+        }
+    }
+
+    private static byte[] getBytes(Object result) throws IOException {
+
+        if (result == null) {
+            return null;
+        } else if (result instanceof Serializable) {
+            ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);
+            objectOutputStream.writeObject(result);
+            objectOutputStream.close();
+
+            ByteBuffer bb = ByteBuffer.allocate(4 + byteOuputStream.size());
+            bb.putInt(byteOuputStream.size());
+            bb.put(byteOuputStream.toByteArray());
+
+            return bb.array();
+        } else {
+            return result.toString().getBytes();
+        }
     }
 }

@@ -122,8 +122,8 @@ public class RexsterScriptEngine extends AbstractScriptEngine {
                     this.isSessionChanged = false;
                 }
 
-                // TODO: combine bindings???
-                finalValue = eval(buffer.toString(), this.scriptEngineName, this.session, (RexsterBindings) this.getBindings(ScriptContext.ENGINE_SCOPE));
+                finalValue = eval(buffer.toString(), this.scriptEngineName, this.session,
+                        (RexsterBindings) this.getBindings(ScriptContext.ENGINE_SCOPE));
             }
 
         } catch (Exception e) {
@@ -145,8 +145,21 @@ public class RexsterScriptEngine extends AbstractScriptEngine {
             final RexProMessage resultMessage = RexPro.sendMessage(
                     session.getRexProHost(), session.getRexProPort(), scriptMessage);
 
+            final ScriptResponseMessage responseMessage = new ScriptResponseMessage(resultMessage);
+            RexsterBindings bindingsFromServer = responseMessage.getBindings();
+
+            // apply bindings from server to local bindings so that they are in synch
+            if (bindingsFromServer != null) {
+                bindings.putAll(bindingsFromServer);
+            }
+
             ArrayList listOfDeserializedObjects = new ArrayList();
             ByteBuffer bb = ByteBuffer.wrap(resultMessage.getBody());
+
+            // navigate to the start of the results
+            int lengthOfBindings = bb.getInt();
+            bb.position(lengthOfBindings + 4);
+
             while (bb.hasRemaining()) {
                 int segmentLength = bb.getInt();
                 byte[] resultObjectBytes = new byte[segmentLength];
@@ -159,7 +172,7 @@ public class RexsterScriptEngine extends AbstractScriptEngine {
                 listOfDeserializedObjects.add(o);
             }
 
-            returnValue = listOfDeserializedObjects;
+            returnValue = listOfDeserializedObjects.iterator();
 
             if (listOfDeserializedObjects.size() == 1) {
                 returnValue = listOfDeserializedObjects.get(0);
