@@ -139,6 +139,12 @@
             <artifactId>commons-io</artifactId>
             <version>2.0.1</version>
         </dependency>
+        <!-- OTHER -->
+        <dependency>
+            <groupId>jline</groupId>
+            <artifactId>jline</artifactId>
+            <version>0.9.94</version>
+        </dependency>
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>
