@@ -1,6 +1,6 @@
-package com.tinkerpop.rexster.protocol;
+package com.tinkerpop.rexster.protocol.message;
 
-import com.tinkerpop.rexster.protocol.message.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.message.ScriptResponseMessage;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -8,39 +8,26 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
 
-public class ScriptRequestMessageTest {
+public class ScriptResponseMessageTest {
     private final UUID sessionKey = UUID.randomUUID();
-    private final RexsterBindings bindings = new RexsterBindings();
 
     @Test
     public void constructEmptyConstructorEnsureFormat() throws IOException {
 
-        ScriptRequestMessage msg = new com.tinkerpop.rexster.protocol.message.ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
+        ScriptResponseMessage msg = new com.tinkerpop.rexster.protocol.message.ScriptResponseMessage(this.sessionKey,
+                com.tinkerpop.rexster.protocol.message.ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, "test".getBytes(), new RexsterBindings());
 
         Assert.assertEquals(sessionKey, msg.getSessionAsUUID());
         Assert.assertTrue(msg.hasSession());
         Assert.assertEquals((byte) 0, msg.getFlag());
-        Assert.assertEquals(20, msg.getBodyLength());
-        Assert.assertEquals(MessageType.SCRIPT_REQUEST, msg.getType());
-    }
-
-    @Test
-    public void getLanguageValid() throws IOException {
-        com.tinkerpop.rexster.protocol.message.ScriptRequestMessage msg = new com.tinkerpop.rexster.protocol.message.ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
-
-        Assert.assertEquals("language", msg.getLanguageName());
-    }
-
-    @Test
-    public void getScriptValid() throws IOException {
-        com.tinkerpop.rexster.protocol.message.ScriptRequestMessage msg = new com.tinkerpop.rexster.protocol.message.ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
-
-        Assert.assertEquals("x=y;", msg.getScript());
+        //Assert.assertEquals(8, msg.getBodyLength());
+        Assert.assertEquals(MessageType.SCRIPT_RESPONSE, msg.getType());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void constructCopyRexProMessageWrongType() throws IOException {
-        RexProMessage msgToConvert = new com.tinkerpop.rexster.protocol.message.ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
+        RexProMessage msgToConvert = new com.tinkerpop.rexster.protocol.message.ScriptResponseMessage(this.sessionKey,
+                com.tinkerpop.rexster.protocol.message.ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, "test".getBytes(), new RexsterBindings());
         msgToConvert.setType(MessageType.SESSION_RESPONSE);
 
         new com.tinkerpop.rexster.protocol.message.SessionRequestMessage(msgToConvert);
@@ -48,8 +35,9 @@ public class ScriptRequestMessageTest {
 
     @Test
     public void constructCopyRexProMessage() throws IOException {
-        RexProMessage msgToConvert = new com.tinkerpop.rexster.protocol.message.ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
-        RexProMessage convertedMsg = new com.tinkerpop.rexster.protocol.message.ScriptRequestMessage(msgToConvert);
+        RexProMessage msgToConvert = new com.tinkerpop.rexster.protocol.message.ScriptResponseMessage(this.sessionKey,
+                com.tinkerpop.rexster.protocol.message.ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, "test".getBytes(), new RexsterBindings());
+        RexProMessage convertedMsg = new com.tinkerpop.rexster.protocol.message.ScriptResponseMessage(msgToConvert);
 
         Assert.assertNotNull(convertedMsg);
         Assert.assertTrue(Arrays.equals(msgToConvert.getSession(), convertedMsg.getSession()));

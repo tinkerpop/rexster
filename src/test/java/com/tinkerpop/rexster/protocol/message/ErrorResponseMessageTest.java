@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster.protocol;
+package com.tinkerpop.rexster.protocol.message;
 
 import junit.framework.Assert;
 import org.junit.Test;
