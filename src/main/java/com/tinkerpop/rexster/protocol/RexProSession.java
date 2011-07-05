@@ -12,25 +12,25 @@ import javax.script.SimpleBindings;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * Server-side rexster session.
+ */
 public class RexProSession {
-    private static final Logger logger = Logger.getLogger(RexProSession.class);
 
     private final Bindings bindings = new SimpleBindings();
 
-    private final UUID sessionIdentifier;
+    private final UUID sessionKey;
 
     protected Date lastTimeUsed = new Date();
 
-    public RexProSession(final RexsterApplication rexsterApplication) {
-        this.sessionIdentifier = UUID.randomUUID();
+    public RexProSession(final UUID sessionKey, final RexsterApplication rexsterApplication) {
+        this.sessionKey = sessionKey;
 
         this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, rexsterApplication);
-
-        logger.info("New RexPro Session created: " + this.sessionIdentifier.toString());
     }
 
-    public UUID getSessionIdentifier() {
-        return this.sessionIdentifier;
+    public UUID getSessionKey() {
+        return this.sessionKey;
     }
 
     public Bindings getBindings() {

@@ -6,6 +6,9 @@ import java.util.UUID;
 
 public class SessionRequestMessage extends RexProMessage {
 
+    public static final byte FLAG_NEW = 0;
+    public static final byte FLAG_KILL = 1;
+
     public SessionRequestMessage(RexProMessage message) {
         super(message.getVersion(), message.getType(), message.getFlag(),
                 message.getSession(), message.getRequest(), message.getBody());
@@ -15,8 +18,8 @@ public class SessionRequestMessage extends RexProMessage {
         }
     }
 
-    public SessionRequestMessage() {
-        super(RexProMessage.CURRENT_VERSION, MessageType.SESSION_REQUEST, (byte) 0,
+    public SessionRequestMessage(byte flag) {
+        super(RexProMessage.CURRENT_VERSION, MessageType.SESSION_REQUEST, flag,
                 BitWorks.convertUUIDToByteArray(EMPTY_SESSION),
                 BitWorks.convertUUIDToByteArray(UUID.randomUUID()),
                 new byte[0]);

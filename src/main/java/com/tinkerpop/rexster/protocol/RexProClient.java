@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.protocol;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
+import java.rmi.Remote;
 import java.util.Iterator;
 import java.util.List;
 
@@ -9,9 +10,9 @@ public class RexProClient {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
 
+        RexsterScriptEngine remote = new RexsterScriptEngine();
         try {
 
-            RexsterScriptEngine remote = new RexsterScriptEngine();
             remote.put(RexsterScriptEngine.CONFIG_SCOPE_HOST, "localhost");
             remote.put(RexsterScriptEngine.CONFIG_SCOPE_PORT, 8185);
             remote.put(RexsterScriptEngine.CONFIG_SCOPE_LANGUAGE, "gremlin");
@@ -42,6 +43,8 @@ public class RexProClient {
 
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            remote.close();
         }
     }
 

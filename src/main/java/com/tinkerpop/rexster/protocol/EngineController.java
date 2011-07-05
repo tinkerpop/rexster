@@ -6,6 +6,9 @@ import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Manages the list of EngineHolder items for the current ScriptEngineManager.
+ */
 public class EngineController {
     private final ScriptEngineManager manager = new ScriptEngineManager();
     private final List<EngineHolder> engines = new ArrayList<EngineHolder>();

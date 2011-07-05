@@ -23,16 +23,6 @@ public class RexsterScriptEngine extends AbstractScriptEngine {
 
     private boolean isSessionChanged = true;
 
-
-    public RexsterScriptEngine() {
-
-    }
-
-    public RexsterScriptEngine(String rexProHost, int rexProPort, String scriptEngineName) {
-        this.session = new RemoteRexsterSession(rexProHost, rexProPort);
-        this.scriptEngineName = scriptEngineName;
-    }
-
     public RemoteRexsterSession getSession() {
         return this.session;
     }

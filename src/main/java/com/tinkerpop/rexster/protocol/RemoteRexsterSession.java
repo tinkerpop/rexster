@@ -1,9 +1,14 @@
 package com.tinkerpop.rexster.protocol;
 
+import com.tinkerpop.rexster.protocol.message.MessageType;
 import com.tinkerpop.rexster.protocol.message.RexProMessage;
+import com.tinkerpop.rexster.protocol.message.SessionRequestMessage;
 
 import java.util.UUID;
 
+/**
+ * Client-side session with Rexster.
+ */
 public class RemoteRexsterSession {
 
     private int rexProPort = 8185;
@@ -18,16 +23,29 @@ public class RemoteRexsterSession {
 
     public void open() {
         if (sessionKey == RexProMessage.EMPTY_SESSION) {
-            RexProMessage sessionRequestMessageToSend = new com.tinkerpop.rexster.protocol.message.SessionRequestMessage();
+            RexProMessage sessionRequestMessageToSend = new SessionRequestMessage(SessionRequestMessage.FLAG_NEW);
             final RexProMessage rcvMessage = RexPro.sendMessage(this.rexProHost, this.rexProPort, sessionRequestMessageToSend);
             this.sessionKey = rcvMessage.getSessionAsUUID();
         }
     }
 
     public void close() {
-        this.sessionKey = RexProMessage.EMPTY_SESSION;
 
-        // TODO: kill session on server
+        if (sessionKey != RexProMessage.EMPTY_SESSION) {
+            RexProMessage sessionKillMessageToSend = new SessionRequestMessage(SessionRequestMessage.FLAG_KILL);
+
+            // need to set the session here so that the server knows which one to delete.
+            sessionKillMessageToSend.setSession(BitWorks.convertUUIDToByteArray(this.sessionKey));
+            final RexProMessage rcvMessage = RexPro.sendMessage(this.rexProHost, this.rexProPort, sessionKillMessageToSend);
+
+            // response message will have an EMPTY_SESSION
+            if (rcvMessage.getType() == MessageType.SESSION_RESPONSE) {
+                this.sessionKey = rcvMessage.getSessionAsUUID();
+            } else {
+                // TODO: an error message
+            }
+
+        }
     }
 
     UUID getSessionKey() {
