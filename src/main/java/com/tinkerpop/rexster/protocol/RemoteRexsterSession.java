@@ -1,5 +1,7 @@
 package com.tinkerpop.rexster.protocol;
 
+import com.tinkerpop.rexster.protocol.message.RexProMessage;
+
 import java.util.UUID;
 
 public class RemoteRexsterSession {

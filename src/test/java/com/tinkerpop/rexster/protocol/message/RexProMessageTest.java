@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.protocol.message;
 
-import junit.framework.Assert;
+import com.tinkerpop.rexster.protocol.BitWorks;
+import org.junit.Assert;
 import org.glassfish.grizzly.Buffer;
 import org.jmock.Expectations;
 import org.jmock.Mockery;

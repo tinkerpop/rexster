@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.protocol.filter;
 
-import com.tinkerpop.rexster.protocol.RexProMessage;
+import com.tinkerpop.rexster.protocol.message.RexProMessage;
 import com.tinkerpop.rexster.protocol.RexProSession;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Buffer;

@@ -1,7 +1,9 @@
 package com.tinkerpop.rexster.protocol.filter;
 
 import com.tinkerpop.rexster.RexsterApplication;
-import com.tinkerpop.rexster.protocol.*;
+import com.tinkerpop.rexster.protocol.RexProSessions;
+import com.tinkerpop.rexster.protocol.message.MessageType;
+import com.tinkerpop.rexster.protocol.message.RexProMessage;
 import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;

@@ -1,5 +1,6 @@
-package com.tinkerpop.rexster.protocol;
+package com.tinkerpop.rexster.protocol.message;
 
+import com.tinkerpop.rexster.protocol.BitWorks;
 import org.glassfish.grizzly.Buffer;
 
 import java.nio.ByteBuffer;

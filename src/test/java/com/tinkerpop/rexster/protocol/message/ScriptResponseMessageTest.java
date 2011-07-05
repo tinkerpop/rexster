@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.protocol.message;
 
-import com.tinkerpop.rexster.protocol.message.ScriptResponseMessage;
-import junit.framework.Assert;
+import com.tinkerpop.rexster.protocol.RexsterBindings;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
