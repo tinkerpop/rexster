@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol.filter;
 
+import com.tinkerpop.rexster.protocol.message.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.message.RexProMessage;
 import com.tinkerpop.rexster.protocol.RexProSession;
 import org.apache.log4j.Logger;
@@ -54,7 +55,7 @@ public class RexProMessageFilter extends BaseFilter {
             logger.warn("Checksum failure - Message was not valid for session [" + message.getSessionAsUUID()
                         + "] and request [" + message.getRequestAsUUID() + "]");
 
-            ctx.write(new com.tinkerpop.rexster.protocol.message.ErrorResponseMessage(message.getSessionAsUUID(), message.getRequestAsUUID(),
+            ctx.write(new ErrorResponseMessage(message.getSessionAsUUID(), message.getRequestAsUUID(),
                     com.tinkerpop.rexster.protocol.message.ErrorResponseMessage.FLAG_ERROR_MESSAGE_VALIDATION,
                     "Checksum failure"));
         }

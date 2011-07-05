@@ -46,7 +46,7 @@ public class BitWorks {
                     stream.write(ByteBuffer.allocate(4).putInt(key.length()).array());
                     stream.write(key.getBytes());
 
-                    byte[] objectBytes = getBytes(objectToSerialize);
+                    byte[] objectBytes = getBytesWithLength(objectToSerialize);
                     stream.write(objectBytes);
                 }
             }
@@ -80,7 +80,7 @@ public class BitWorks {
         return bindings;
     }
 
-    public static byte[] getBytes(Object result) throws IOException {
+    public static byte[] getBytesWithLength(Object result) throws IOException {
 
         if (result == null) {
             return null;
@@ -96,7 +96,11 @@ public class BitWorks {
 
             return bb.array();
         } else {
-            return result.toString().getBytes();
+            byte[] bytes = result.toString().getBytes();
+            ByteBuffer bb = ByteBuffer.allocate(4 + bytes.length);
+            bb.putInt(bytes.length);
+            bb.put(bytes);
+            return bb.array();
         }
     }
 }
