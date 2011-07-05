@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
+import com.tinkerpop.rexster.protocol.message.ScriptRequestMessage;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -14,7 +15,7 @@ public class ScriptRequestMessageTest {
     @Test
     public void constructEmptyConstructorEnsureFormat() throws IOException {
 
-        ScriptRequestMessage msg = new ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
+        ScriptRequestMessage msg = new com.tinkerpop.rexster.protocol.message.ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
 
         Assert.assertEquals(sessionKey, msg.getSessionAsUUID());
         Assert.assertTrue(msg.hasSession());
@@ -25,30 +26,30 @@ public class ScriptRequestMessageTest {
 
     @Test
     public void getLanguageValid() throws IOException {
-        ScriptRequestMessage msg = new ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
+        com.tinkerpop.rexster.protocol.message.ScriptRequestMessage msg = new com.tinkerpop.rexster.protocol.message.ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
 
         Assert.assertEquals("language", msg.getLanguageName());
     }
 
     @Test
     public void getScriptValid() throws IOException {
-        ScriptRequestMessage msg = new ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
+        com.tinkerpop.rexster.protocol.message.ScriptRequestMessage msg = new com.tinkerpop.rexster.protocol.message.ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
 
         Assert.assertEquals("x=y;", msg.getScript());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void constructCopyRexProMessageWrongType() throws IOException {
-        RexProMessage msgToConvert = new ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
+        RexProMessage msgToConvert = new com.tinkerpop.rexster.protocol.message.ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
         msgToConvert.setType(MessageType.SESSION_RESPONSE);
 
-        new SessionRequestMessage(msgToConvert);
+        new com.tinkerpop.rexster.protocol.message.SessionRequestMessage(msgToConvert);
     }
 
     @Test
     public void constructCopyRexProMessage() throws IOException {
-        RexProMessage msgToConvert = new ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
-        RexProMessage convertedMsg = new ScriptRequestMessage(msgToConvert);
+        RexProMessage msgToConvert = new com.tinkerpop.rexster.protocol.message.ScriptRequestMessage(this.sessionKey, "language", bindings, "x=y;");
+        RexProMessage convertedMsg = new com.tinkerpop.rexster.protocol.message.ScriptRequestMessage(msgToConvert);
 
         Assert.assertNotNull(convertedMsg);
         Assert.assertTrue(Arrays.equals(msgToConvert.getSession(), convertedMsg.getSession()));

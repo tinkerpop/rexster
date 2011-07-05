@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class SessionRequestMessageTest {
     @Test
     public void constructEmptyConstructorEnsureFormat() {
-        RexProMessage msg = new SessionRequestMessage();
+        RexProMessage msg = new com.tinkerpop.rexster.protocol.message.SessionRequestMessage();
 
         Assert.assertEquals(RexProMessage.EMPTY_SESSION, msg.getSessionAsUUID());
 
@@ -21,16 +21,16 @@ public class SessionRequestMessageTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void constructCopyRexProMessageWrongType() {
-        RexProMessage msgToConvert = new SessionRequestMessage();
+        RexProMessage msgToConvert = new com.tinkerpop.rexster.protocol.message.SessionRequestMessage();
         msgToConvert.setType(MessageType.SESSION_RESPONSE);
 
-        new SessionRequestMessage(msgToConvert);
+        new com.tinkerpop.rexster.protocol.message.SessionRequestMessage(msgToConvert);
     }
 
     @Test
     public void constructCopyRexProMessage() {
-        RexProMessage msgToConvert = new SessionRequestMessage();
-        RexProMessage convertedMsg = new SessionRequestMessage(msgToConvert);
+        RexProMessage msgToConvert = new com.tinkerpop.rexster.protocol.message.SessionRequestMessage();
+        RexProMessage convertedMsg = new com.tinkerpop.rexster.protocol.message.SessionRequestMessage(msgToConvert);
 
         Assert.assertNotNull(convertedMsg);
         Assert.assertTrue(Arrays.equals(msgToConvert.getSession(), convertedMsg.getSession()));

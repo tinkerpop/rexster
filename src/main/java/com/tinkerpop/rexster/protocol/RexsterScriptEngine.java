@@ -1,5 +1,7 @@
 package com.tinkerpop.rexster.protocol;
 
+import com.tinkerpop.rexster.protocol.message.ScriptRequestMessage;
+
 import javax.script.*;
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -145,7 +147,7 @@ public class RexsterScriptEngine extends AbstractScriptEngine {
             final RexProMessage resultMessage = RexPro.sendMessage(
                     session.getRexProHost(), session.getRexProPort(), scriptMessage);
 
-            final ScriptResponseMessage responseMessage = new ScriptResponseMessage(resultMessage);
+            final com.tinkerpop.rexster.protocol.message.ScriptResponseMessage responseMessage = new com.tinkerpop.rexster.protocol.message.ScriptResponseMessage(resultMessage);
             RexsterBindings bindingsFromServer = responseMessage.getBindings();
 
             // apply bindings from server to local bindings so that they are in synch

@@ -1,8 +1,12 @@
-package com.tinkerpop.rexster.protocol;
+package com.tinkerpop.rexster.protocol.message;
+
+import com.tinkerpop.rexster.protocol.BitWorks;
+import com.tinkerpop.rexster.protocol.MessageType;
+import com.tinkerpop.rexster.protocol.RexProMessage;
 
 import java.util.UUID;
 
-public class SessionResponseMessage extends RexProMessage{
+public class SessionResponseMessage extends RexProMessage {
     public SessionResponseMessage(RexProMessage message) {
         super(message.getVersion(), message.getType(), message.getFlag(),
                 message.getSession(), message.getRequest(), message.getBody());

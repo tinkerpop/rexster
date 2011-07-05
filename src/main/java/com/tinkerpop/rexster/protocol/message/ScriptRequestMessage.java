@@ -1,4 +1,9 @@
-package com.tinkerpop.rexster.protocol;
+package com.tinkerpop.rexster.protocol.message;
+
+import com.tinkerpop.rexster.protocol.BitWorks;
+import com.tinkerpop.rexster.protocol.MessageType;
+import com.tinkerpop.rexster.protocol.RexProMessage;
+import com.tinkerpop.rexster.protocol.RexsterBindings;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

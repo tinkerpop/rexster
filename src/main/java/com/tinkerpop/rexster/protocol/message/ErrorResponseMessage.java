@@ -1,4 +1,8 @@
-package com.tinkerpop.rexster.protocol;
+package com.tinkerpop.rexster.protocol.message;
+
+import com.tinkerpop.rexster.protocol.BitWorks;
+import com.tinkerpop.rexster.protocol.MessageType;
+import com.tinkerpop.rexster.protocol.RexProMessage;
 
 import java.util.UUID;
 

@@ -1,10 +1,10 @@
 package com.tinkerpop.rexster.protocol;
 
+import com.tinkerpop.rexster.protocol.message.ScriptResponseMessage;
 import junit.framework.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -14,8 +14,8 @@ public class ScriptResponseMessageTest {
     @Test
     public void constructEmptyConstructorEnsureFormat() throws IOException {
 
-        ScriptResponseMessage msg = new ScriptResponseMessage(this.sessionKey,
-                ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, "test".getBytes(), new RexsterBindings());
+        ScriptResponseMessage msg = new com.tinkerpop.rexster.protocol.message.ScriptResponseMessage(this.sessionKey,
+                com.tinkerpop.rexster.protocol.message.ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, "test".getBytes(), new RexsterBindings());
 
         Assert.assertEquals(sessionKey, msg.getSessionAsUUID());
         Assert.assertTrue(msg.hasSession());
@@ -26,18 +26,18 @@ public class ScriptResponseMessageTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void constructCopyRexProMessageWrongType() throws IOException {
-        RexProMessage msgToConvert = new ScriptResponseMessage(this.sessionKey,
-                ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, "test".getBytes(), new RexsterBindings());
+        RexProMessage msgToConvert = new com.tinkerpop.rexster.protocol.message.ScriptResponseMessage(this.sessionKey,
+                com.tinkerpop.rexster.protocol.message.ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, "test".getBytes(), new RexsterBindings());
         msgToConvert.setType(MessageType.SESSION_RESPONSE);
 
-        new SessionRequestMessage(msgToConvert);
+        new com.tinkerpop.rexster.protocol.message.SessionRequestMessage(msgToConvert);
     }
 
     @Test
     public void constructCopyRexProMessage() throws IOException {
-        RexProMessage msgToConvert = new ScriptResponseMessage(this.sessionKey,
-                ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, "test".getBytes(), new RexsterBindings());
-        RexProMessage convertedMsg = new ScriptResponseMessage(msgToConvert);
+        RexProMessage msgToConvert = new com.tinkerpop.rexster.protocol.message.ScriptResponseMessage(this.sessionKey,
+                com.tinkerpop.rexster.protocol.message.ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, "test".getBytes(), new RexsterBindings());
+        RexProMessage convertedMsg = new com.tinkerpop.rexster.protocol.message.ScriptResponseMessage(msgToConvert);
 
         Assert.assertNotNull(convertedMsg);
         Assert.assertTrue(Arrays.equals(msgToConvert.getSession(), convertedMsg.getSession()));

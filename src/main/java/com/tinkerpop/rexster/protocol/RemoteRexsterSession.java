@@ -1,16 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
-import org.glassfish.grizzly.Connection;
-import org.glassfish.grizzly.GrizzlyFuture;
-import org.glassfish.grizzly.filterchain.*;
-import org.glassfish.grizzly.impl.FutureImpl;
-import org.glassfish.grizzly.impl.SafeFutureImpl;
-import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
-import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
-
-import java.io.IOException;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class RemoteRexsterSession {
 
@@ -26,7 +16,7 @@ public class RemoteRexsterSession {
 
     public void open() {
         if (sessionKey == RexProMessage.EMPTY_SESSION) {
-            RexProMessage sessionRequestMessageToSend = new SessionRequestMessage();
+            RexProMessage sessionRequestMessageToSend = new com.tinkerpop.rexster.protocol.message.SessionRequestMessage();
             final RexProMessage rcvMessage = RexPro.sendMessage(this.rexProHost, this.rexProPort, sessionRequestMessageToSend);
             this.sessionKey = rcvMessage.getSessionAsUUID();
         }

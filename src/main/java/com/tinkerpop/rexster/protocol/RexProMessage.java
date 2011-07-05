@@ -14,7 +14,7 @@ public class RexProMessage {
 
     public static final byte CURRENT_VERSION = (byte) 0;
 
-    protected static final UUID EMPTY_SESSION = new UUID(0, 0);
+    public static final UUID EMPTY_SESSION = new UUID(0, 0);
 
     private byte r;
     private byte e;
