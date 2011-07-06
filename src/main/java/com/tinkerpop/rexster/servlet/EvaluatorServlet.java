@@ -44,7 +44,7 @@ public class EvaluatorServlet extends HttpServlet {
 
         String sessionId = request.getSession(true).getId();
 
-        response.setContentType("text/plain");
+        response.setContentType("text/plain;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_OK);
 
         // log request

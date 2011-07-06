@@ -8,8 +8,6 @@ import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
 import java.util.*;
 
 /**

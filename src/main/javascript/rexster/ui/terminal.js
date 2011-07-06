@@ -69,19 +69,25 @@ var ReadLine = function(options, api) {
     }
 
     var state = api.getApplicationState();
-    $.post('/exec', { code : req, "g" : state.graph }, function(value) { 
-      h.insertResponse(value.replace(/\n/g, "<br />"));
+    $.ajax({
+            data: { code : req, "g" : state.graph },
+            type: "POST",
+            url: '/exec',
+            contentType: "application/x-www-form-urlencoded;charset=UTF-8",
+            success: function(value) {
+              h.insertResponse(value.replace(/\n/g, "<br />"));
 
-      // Save to the command history...
-      if((lineValue = $.trim(v)) !== "") {
-        h.history.push(lineValue);
-        h.historyPtr = h.history.length;
-      }
+              // Save to the command history...
+              if((lineValue = $.trim(v)) !== "") {
+                h.history.push(lineValue);
+                h.historyPtr = h.history.length;
+              }
 
-      h.scopeHistory = [];
-      h.newPromptLine();
-    });
+              h.scopeHistory = [];
+              h.newPromptLine();
+            }});
   };
+
   this.terminal     = $(this.options.terminalId || "#terminal");
   this.lineClass    = this.options.lineClass || '.readLine';
   this.history      = [];
