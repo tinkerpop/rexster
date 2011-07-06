@@ -15,6 +15,7 @@ h3. Version 0.5 (* -- NOT OFFICIALLY RELEASED)
 * It is now possible to mix and match root level extensions with pathed extensions in the same extension class.
 * Support the @Accept-Charset@ request header.
 * The Dog House Gremlin Console now handles UTF-8.
+* The HTTP method is now displayed in the hypermedia for extensions.
 
 ==<hr/>==
 
