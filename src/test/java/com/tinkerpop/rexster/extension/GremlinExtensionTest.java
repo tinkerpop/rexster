@@ -36,7 +36,7 @@ public class GremlinExtensionTest {
     private ExtensionMethod extensionMethodNoApi = new ExtensionMethod(null, null, null);
 
     private RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(null, uriInfo,
-            httpServletRequest, null, extensionMethodNoApi);
+            httpServletRequest, null, null, extensionMethodNoApi);
 
     /**
      * Choosing not to mock Graph instance for these tests as GremlinScriptEngine is

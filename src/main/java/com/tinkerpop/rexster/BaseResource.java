@@ -26,7 +26,15 @@ public abstract class BaseResource {
 
     protected final StatisticsHelper sh = new StatisticsHelper();
 
+    /**
+     * This request object goes through the mapping of a URI to JSON.
+     */
     private JSONObject requestObject = null;
+
+    /**
+     * This request object is just a single layered map of keys/values.
+     */
+    private JSONObject requestObjectFlat = null;
 
     protected JSONObject resultObject = new JSONObject();
 
@@ -100,6 +108,15 @@ public abstract class BaseResource {
      */
     protected void setRequestObject(JSONObject jsonObject) {
         this.requestObject = jsonObject;
+        this.requestObjectFlat = jsonObject;
+    }
+
+    public JSONObject getRequestObject() {
+        return this.getRequestObject(true);
+    }
+
+    public JSONObject getRequestObjectFlat() {
+        return this.getRequestObject(false);
     }
 
     /**
@@ -111,10 +128,11 @@ public abstract class BaseResource {
      *
      * @return The request object.
      */
-    public JSONObject getRequestObject() {
+    public JSONObject getRequestObject(boolean parseToJson) {
         if (this.requestObject == null) {
             try {
                 this.requestObject = new JSONObject();
+                this.requestObjectFlat = new JSONObject();
 
                 if (this.httpServletRequest != null) {
                     Map<String, String[]> queryParameters = this.httpServletRequest.getParameterMap();
@@ -130,10 +148,17 @@ public abstract class BaseResource {
             }
         }
 
-        return this.requestObject;
+        if (parseToJson) {
+            return this.requestObject;
+        } else {
+            return this.requestObjectFlat;
+        }
     }
 
     private void buildRequestObject(final Map queryParameters) throws JSONException {
+
+        Map<String, Object> flatMap = new HashMap<String, Object>();
+
         for (String key : (Set<String>) queryParameters.keySet()) {
             String[] keys = key.split(Tokens.PERIOD_REGEX);
             JSONObject embeddedObject = this.requestObject;
@@ -146,15 +171,17 @@ public abstract class BaseResource {
                 embeddedObject = tempEmbeddedObject;
             }
 
-            // grrr...why do i have to do this?
             String rawValue;
             Object val = queryParameters.get(key);
             if (val instanceof String) {
                 rawValue = (String) val;
             } else {
+                // supports multiple parameters on the same key...just take the first?
                 String[] values = (String[]) val;
                 rawValue = values[0];
             }
+
+            flatMap.put(key, rawValue);
 
             try {
                 if (rawValue.startsWith(Tokens.LEFT_BRACKET) && rawValue.endsWith(Tokens.RIGHT_BRACKET)) {
@@ -173,6 +200,8 @@ public abstract class BaseResource {
                 embeddedObject.put(keys[keys.length - 1], rawValue);
             }
         }
+
+        this.requestObjectFlat = new JSONObject(flatMap);
     }
 
     protected void buildRequestObject(final MultivaluedMap<String, String> formParams) {
@@ -189,7 +218,10 @@ public abstract class BaseResource {
         }
 
         try {
+            // need to reset the request object b/c it maybe have been initialized by query parameters
+            // or some other method.
             this.requestObject = new JSONObject();
+            this.requestObjectFlat = new JSONObject();
             this.buildRequestObject(map);
         } catch (JSONException jsonException) {
             this.setRequestObject(null);

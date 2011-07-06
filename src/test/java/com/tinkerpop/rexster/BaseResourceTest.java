@@ -46,6 +46,25 @@ public class BaseResourceTest {
     }
 
     @Test
+    public void testQueryParametersToFlat() throws JSONException {
+        Map<String, String> qp = new HashMap<String, String>();
+        qp.put("a", "true");
+        qp.put("b", "false");
+        qp.put("c.a", "12.0");
+        qp.put("c.b", "\"marko\"");
+
+        qp.put("c.c", "peter");
+
+        BaseResource tt = new MockResource(qp);
+
+        Assert.assertTrue(tt.getRequestObjectFlat().optBoolean("a"));
+        Assert.assertFalse(tt.getRequestObjectFlat().optBoolean("b"));
+        Assert.assertEquals(12.0, tt.getRequestObjectFlat().optDouble("c.a"), 0);
+        Assert.assertEquals("\"marko\"", tt.getRequestObjectFlat().optString("c.b"));
+        Assert.assertEquals("peter", tt.getRequestObjectFlat().optString("c.c"));
+    }
+
+    @Test
     public void getReturnKeysNoKeys() throws Exception {
         BaseResource tt = new MockResource();
         JSONTokener tokener = new JSONTokener("{\"rexster\": { \"someproperty\": [ \"key\" ]}}");

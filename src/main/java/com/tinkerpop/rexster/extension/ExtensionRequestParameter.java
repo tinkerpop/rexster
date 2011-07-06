@@ -14,4 +14,6 @@ public @interface ExtensionRequestParameter {
     String name();
 
     String description() default "";
+
+    boolean parseToJson() default true;
 }

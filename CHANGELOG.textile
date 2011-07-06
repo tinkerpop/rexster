@@ -16,6 +16,7 @@ h3. Version 0.5 (* -- NOT OFFICIALLY RELEASED)
 * Support the @Accept-Charset@ request header.
 * The Dog House Gremlin Console now handles UTF-8.
 * The HTTP method is now displayed in the hypermedia for extensions.
+* Added the @parseToJson@ parameter to the @@ExtensionRequestParameter@ so that it is possible for extensions to control whether or not a specific parameter's value is parsed to JSON or not.
 
 ==<hr/>==
 

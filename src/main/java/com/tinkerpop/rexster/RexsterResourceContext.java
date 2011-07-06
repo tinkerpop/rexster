@@ -15,19 +15,25 @@ public class RexsterResourceContext {
     private UriInfo uriInfo;
     private HttpServletRequest request;
     private JSONObject requestObject;
+    private JSONObject requestObjectFlat;
     private ExtensionMethod extensionMethod;
 
     public RexsterResourceContext(RexsterApplicationGraph rag, UriInfo uriInfo, HttpServletRequest request,
-                                  JSONObject requestObject, ExtensionMethod extensionMethod) {
+                                  JSONObject requestObject, JSONObject requestObjectFlat, ExtensionMethod extensionMethod) {
         this.rag = rag;
         this.uriInfo = uriInfo;
         this.request = request;
         this.requestObject = requestObject;
         this.extensionMethod = extensionMethod;
+        this.requestObjectFlat = requestObjectFlat;
     }
 
     public JSONObject getRequestObject() {
         return this.requestObject;
+    }
+
+    public JSONObject getRequestObjectFlat() {
+        return this.requestObjectFlat;
     }
 
     public UriInfo getUriInfo() {

@@ -52,7 +52,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
     public ExtensionResponse evaluateGetOnEdge(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                                @RexsterContext Graph graph,
                                                @RexsterContext Edge edge,
-                                               @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script) {
+                                               @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT, parseToJson = false) String script) {
         return tryExecuteGremlinScript(rexsterResourceContext, graph, null, edge, script);
     }
 
@@ -67,7 +67,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
     public ExtensionResponse evaluatePostOnEdge(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                                 @RexsterContext Graph graph,
                                                 @RexsterContext Edge edge,
-                                                @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script) {
+                                                @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT, parseToJson = false) String script) {
         return tryExecuteGremlinScript(rexsterResourceContext, graph, null, edge, script);
     }
 
@@ -82,7 +82,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
     public ExtensionResponse evaluateGetOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                                  @RexsterContext Graph graph,
                                                  @RexsterContext Vertex vertex,
-                                                 @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script) {
+                                                 @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT, parseToJson = false) String script) {
         return tryExecuteGremlinScript(rexsterResourceContext, graph, vertex, null, script);
     }
 
@@ -97,7 +97,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
     public ExtensionResponse evaluatePostOnVertex(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                                   @RexsterContext Graph graph,
                                                   @RexsterContext Vertex vertex,
-                                                  @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script) {
+                                                  @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT, parseToJson = false) String script) {
         return tryExecuteGremlinScript(rexsterResourceContext, graph, vertex, null, script);
     }
 
@@ -111,7 +111,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
             })
     public ExtensionResponse evaluateGetOnGraph(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                                 @RexsterContext Graph graph,
-                                                @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script) {
+                                                @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT, parseToJson = false) String script) {
         return tryExecuteGremlinScript(rexsterResourceContext, graph, null, null, script);
     }
 
@@ -125,7 +125,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
             })
     public ExtensionResponse evaluatePostOnGraph(@RexsterContext RexsterResourceContext rexsterResourceContext,
                                                  @RexsterContext Graph graph,
-                                                 @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT) String script) {
+                                                 @ExtensionRequestParameter(name = SCRIPT, description = API_SCRIPT, parseToJson = false) String script) {
         return tryExecuteGremlinScript(rexsterResourceContext, graph, null, null, script);
     }
 
