@@ -1,5 +1,9 @@
 package com.tinkerpop.rexster.protocol.message;
 
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.RexsterBindings;
 
@@ -63,7 +67,7 @@ public class ScriptResponseMessage extends RexProMessage {
         if (result instanceof Iterable) {
             ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
             for (Object o : (Iterable) result) {
-                byte[] bytesToWrite = getBytes(o);
+                byte[] bytesToWrite = BitWorks.getBytesWithLength(o);
                 byteOuputStream.write(bytesToWrite, 0, bytesToWrite.length);
             }
 
@@ -72,33 +76,13 @@ public class ScriptResponseMessage extends RexProMessage {
             ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
             Iterator itty = (Iterator) result;
             while (itty.hasNext()) {
-               byte[] bytesToWrite = getBytes(itty.next());
+               byte[] bytesToWrite = BitWorks.getBytesWithLength(itty.next());
                 byteOuputStream.write(bytesToWrite, 0, bytesToWrite.length);
             }
 
             return byteOuputStream.toByteArray();
         } else {
-            return getBytes(result);
-        }
-    }
-
-    private static byte[] getBytes(Object result) throws IOException {
-
-        if (result == null) {
-            return null;
-        } else if (result instanceof Serializable) {
-            ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);
-            objectOutputStream.writeObject(result);
-            objectOutputStream.close();
-
-            ByteBuffer bb = ByteBuffer.allocate(4 + byteOuputStream.size());
-            bb.putInt(byteOuputStream.size());
-            bb.put(byteOuputStream.toByteArray());
-
-            return bb.array();
-        } else {
-            return result.toString().getBytes();
+            return BitWorks.getBytesWithLength(result);
         }
     }
 }

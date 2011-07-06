@@ -1,5 +1,9 @@
 package com.tinkerpop.rexster.protocol;
 
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.Tokens;
 
 import javax.script.Bindings;
@@ -42,7 +46,11 @@ public class BitWorks {
             // as it is a server side resource
             if (!key.equals(Tokens.REXPRO_REXSTER_CONTEXT)) {
                 Object objectToSerialize = bindings.get(key);
-                if (objectToSerialize instanceof Serializable) {
+                if (objectToSerialize instanceof Serializable
+                    && !(objectToSerialize instanceof Graph)
+                    && !(objectToSerialize instanceof Edge)
+                    && !(objectToSerialize instanceof Vertex)
+                    && !(objectToSerialize instanceof Index)) {
                     stream.write(ByteBuffer.allocate(4).putInt(key.length()).array());
                     stream.write(key.getBytes());
 
@@ -84,7 +92,12 @@ public class BitWorks {
 
         if (result == null) {
             return null;
-        } else if (result instanceof Serializable) {
+        } else if (result instanceof Serializable
+                && !(result instanceof Graph)
+                && !(result instanceof Edge)
+                && !(result instanceof Vertex)
+                && !(result instanceof Index)) {
+
             ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);
             objectOutputStream.writeObject(result);
@@ -96,10 +109,14 @@ public class BitWorks {
 
             return bb.array();
         } else {
-            byte[] bytes = result.toString().getBytes();
-            ByteBuffer bb = ByteBuffer.allocate(4 + bytes.length);
-            bb.putInt(bytes.length);
-            bb.put(bytes);
+            ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);
+            objectOutputStream.writeObject(result.toString());
+            objectOutputStream.close();
+
+            ByteBuffer bb = ByteBuffer.allocate(4 + byteOuputStream.size());
+            bb.putInt(byteOuputStream.size());
+            bb.put(byteOuputStream.toByteArray());
             return bb.array();
         }
     }
