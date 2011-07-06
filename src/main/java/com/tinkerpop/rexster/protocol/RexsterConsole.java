@@ -21,7 +21,12 @@ public class RexsterConsole {
     private static final String REXSTER_HISTORY = ".rexster_history";
 
     public RexsterConsole(String host, int port, String language) throws Exception {
-        this.output.println("\n" + "      //\n" + "     oO ~~-_\n" + "___m(___m___~.___  reXster " + Tokens.VERSION + "\n" + "_|__|__|__|__|__|     [ " + Tokens.REXSTER_CONSOLE_HELP + " = help ]\n");
+
+        this.output.println("        (l_(l");
+        this.output.println("(_______( 0 0");
+        this.output.println("(        (-Y-)");
+        this.output.println("l l-----l l");
+        this.output.println("l l,,   l l,,");
 
         this.rexster.put(RexsterScriptEngine.CONFIG_SCOPE_HOST, host);
         this.rexster.put(RexsterScriptEngine.CONFIG_SCOPE_PORT, port);
