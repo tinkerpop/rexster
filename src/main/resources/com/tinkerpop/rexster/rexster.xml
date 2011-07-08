@@ -54,7 +54,7 @@
             <graph-type>memorystoresailgraph</graph-type>
         </graph>
         <graph>
-            <graph-enabled>true</graph-enabled>
+            <graph-enabled>false</graph-enabled>
             <graph-name>sailgraph</graph-name>
             <graph-type>nativestoresailgraph</graph-type>
             <graph-file>data/sailgraph</graph-file>
