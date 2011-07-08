@@ -9,10 +9,9 @@ public class TinkerGraphGraphConfigurationTest {
 
     private GraphConfiguration configuration = new TinkerGraphGraphConfiguration();
 
-    @Test(expected = GraphConfigurationException.class)
-    public void configureGraphInstanceMissingGraphFileConfig() throws GraphConfigurationException {
+    @Test
+    public void configureGraphInstanceNoFileConfig() throws GraphConfigurationException {
         Configuration graphConfig = new HierarchicalConfiguration();
-        graphConfig.addProperty(Tokens.REXSTER_GRAPH_FILE, "some-file-that-does-not-exist");
         configuration.configureGraphInstance(graphConfig);
     }
 

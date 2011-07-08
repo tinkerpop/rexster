@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyIndexableGraph;
 import com.tinkerpop.rexster.Tokens;
 import junit.framework.Assert;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.junit.Before;
 import org.junit.Test;
@@ -73,7 +74,7 @@ public class GraphConfigurationContainerTest {
     @Test
     public void getApplicationGraphsBadGraphs() {
         configList.add(constructDefaultTinkerGraphHierarchicalConfiguration("test1"));
-        configList.add(constructTinkerGraphHierarchicalConfiguration("bad", "some-file-that-does-not-exist"));
+        configList.add(constructBadHierarchicalConfiguration());
 
         try {
             GraphConfigurationContainer container = new GraphConfigurationContainer(configList);
@@ -144,8 +145,18 @@ public class GraphConfigurationContainerTest {
         }
     }
 
+    private HierarchicalConfiguration constructBadHierarchicalConfiguration() {
+        HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
+        graphConfig.addProperty(Tokens.REXSTER_GRAPH_FILE, "bad");
+        graphConfig.addProperty(Tokens.REXSTER_GRAPH_NAME, "junk");
+        graphConfig.addProperty(Tokens.REXSTER_GRAPH_TYPE, "com.tinkerpop.rexster.config.MockBadGraphConfiguration");
+        graphConfig.addProperty(Tokens.REXSTER_GRAPH_READ_ONLY, false);
+
+        return graphConfig;
+    }
+
     private HierarchicalConfiguration constructDefaultTinkerGraphHierarchicalConfiguration(String graphName) {
-        return constructHierarchicalConfiguration(graphName, "data/graph-example-1.xml", "tinkergraph", false);
+        return constructHierarchicalConfiguration(graphName, "data/graph-example-1", "tinkergraph", false);
     }
 
     private HierarchicalConfiguration constructTinkerGraphHierarchicalConfiguration(String graphName, String fileName) {

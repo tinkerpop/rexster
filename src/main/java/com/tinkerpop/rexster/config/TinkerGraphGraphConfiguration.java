@@ -15,13 +15,12 @@ public class TinkerGraphGraphConfiguration implements GraphConfiguration {
         String graphFile = properties.getString(Tokens.REXSTER_GRAPH_FILE, null);
 
         try {
-            TinkerGraph graph = new TinkerGraph();
-
-            if (graphFile != null && graphFile.trim().length() > 0) {
-                GraphMLReader.inputGraph(graph, new FileInputStream(graphFile));
+            if (graphFile == null || graphFile.length() == 0) {
+                // pure in memory if graph file is specified
+                return new TinkerGraph();
+            } else {
+                return new TinkerGraph(graphFile);
             }
-
-            return graph;
         } catch (Exception ex) {
             throw new GraphConfigurationException(ex);
         }
