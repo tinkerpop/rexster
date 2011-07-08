@@ -142,15 +142,13 @@ public class IndexResource extends AbstractSubResource {
             // return info about the index itself
             HashMap map = new HashMap();
             map.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-            map.put("name", index.getIndexName());
 
-            if (index.getIndexType().equals(Index.Type.AUTOMATIC)) {
-                map.put("type", "automatic");
-            } else if (index.getIndexType().equals(Index.Type.MANUAL)) {
-                map.put("type", "manual");
+            try {
+                IndexJSONObject indexJSONObject = new IndexJSONObject(index);
+                map.put(Tokens.RESULTS, indexJSONObject);
+            } catch (JSONException jsone) {
+
             }
-
-            map.put("class", index.getIndexClass().getName());
 
             this.resultObject = new JSONObject(map);
         }
