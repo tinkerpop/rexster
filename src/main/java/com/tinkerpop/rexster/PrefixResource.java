@@ -146,6 +146,8 @@ public class PrefixResource extends AbstractSubResource {
             logger.error(ex);
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } catch (WebApplicationException wae) {
+            throw wae;
         } catch (RuntimeException re) {
             logger.error(re);
             JSONObject error = generateErrorObject(re.getMessage(), re);
