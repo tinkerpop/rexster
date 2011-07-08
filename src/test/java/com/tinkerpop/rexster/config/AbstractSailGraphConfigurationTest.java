@@ -52,6 +52,4 @@ public class AbstractSailGraphConfigurationTest {
         Assert.assertNotNull(graph);
         Assert.assertTrue(graph instanceof MemoryStoreSailGraph);
     }
-
-    // TODO: implement tests for all sail graph types.  need some sail data or a way to test without it.
 }

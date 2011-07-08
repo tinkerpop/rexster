@@ -50,9 +50,14 @@
         </graph>
         <graph>
             <graph-enabled>false</graph-enabled>
-            <graph-name>sailgraph</graph-name>
+            <graph-name>emptysailgraph</graph-name>
             <graph-type>memorystoresailgraph</graph-type>
-            <graph-file>data/graph-example-1.ntriple</graph-file>
+        </graph>
+        <graph>
+            <graph-enabled>true</graph-enabled>
+            <graph-name>sailgraph</graph-name>
+            <graph-type>nativestoresailgraph</graph-type>
+            <graph-file>data/sailgraph</graph-file>
         </graph>
         <graph>
             <graph-enabled>false</graph-enabled>

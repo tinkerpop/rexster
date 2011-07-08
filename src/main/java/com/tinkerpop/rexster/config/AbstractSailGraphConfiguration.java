@@ -11,8 +11,10 @@ import org.apache.commons.configuration.SubnodeConfiguration;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import org.apache.log4j.Logger;
 
 public abstract class AbstractSailGraphConfiguration implements GraphConfiguration {
+    private static final Logger logger = Logger.getLogger(AbstractSailGraphConfiguration.class);
 
     public static final String SAIL_TYPE_MEMORY = "memory";
     public static final String SAIL_TYPE_NATIVE = "native";
@@ -42,12 +44,12 @@ public abstract class AbstractSailGraphConfiguration implements GraphConfigurati
             SailGraph graph = null;
 
             if (this.sailType.equals(SAIL_TYPE_MEMORY)) {
-                graph = new MemoryStoreSailGraph();
 
-                if (graphFile != null && graphFile.trim().length() > 0) {
-                    InputStream stream = new FileInputStream(graphFile);
-                    graph.loadRDF(stream, "", "n-triples", null);
+                if (graphFile != null && !graphFile.isEmpty()) {
+                    logger.warn("[" + MemoryStoreSailGraph.class.getSimpleName() + "] doesn't support the graph-file parameter.  It will be ignored.");
                 }
+
+                graph = new MemoryStoreSailGraph();
 
             } else if (this.sailType.equals(SAIL_TYPE_NATIVE)) {
                 String configTripleIndices = "";
