@@ -241,35 +241,39 @@ public class WebServer {
 
     @SuppressWarnings("static-access")
     private static Options getCliOptions() {
-        Option help = new Option("help", "print this message");
+        Option help = new Option("h", "help", false, "print this message");
 
         Option rexsterFile = OptionBuilder.withArgName("file")
                 .hasArg()
                 .withDescription("use given file for rexster.xml")
-                .create("configuration");
+                .withLongOpt("configuration")
+                .create("c");
 
         Option webServerPort = OptionBuilder.withArgName("port")
                 .hasArg()
                 .withDescription("override port used for rexster-server-port in rexster.xml")
-                .create("rexsterport");
+                .withLongOpt("rexsterport")
+                .create("rp");
 
-        Option adminServerPort = OptionBuilder.withArgName("port")
+        Option dogHousePort = OptionBuilder.withArgName("port")
                 .hasArg()
                 .withDescription("override port used for doghouse-server-port in rexster.xml")
-                .create("doghouseport");
+                .withLongOpt("doghouseport")
+                .create("dp");
 
         Option webRoot = OptionBuilder.withArgName("path")
                 .hasArg()
                 .withDescription("override web-root in rexster.xml")
-                .create("webroot");
+                .withLongOpt("webroot")
+                .create("wr");
 
-        Option debug = new Option("debug", "run rexster with full console logging output from jersey");
+        Option debug = new Option("d", "debug", false, "run rexster with full console logging output from jersey");
 
         Options options = new Options();
         options.addOption(help);
         options.addOption(rexsterFile);
         options.addOption(webServerPort);
-        options.addOption(adminServerPort);
+        options.addOption(dogHousePort);
         options.addOption(webRoot);
         options.addOption(debug);
 
