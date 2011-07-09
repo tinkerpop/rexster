@@ -83,7 +83,9 @@ public class RexsterConsole {
                     this.printHelp();
                 else if (line.equals(Tokens.REXSTER_CONSOLE_BINDINGS))
                     this.printBindings(this.rexster.getBindings(ScriptContext.ENGINE_SCOPE));
-                else {
+                else if (line.startsWith(Tokens.REXSTER_CONSOLE_LANGUAGE)) {
+                    this.rexster.put(RexsterScriptEngine.CONFIG_SCOPE_LANGUAGE, line.substring(1));
+                } else {
                     Object result = this.rexster.eval(line);
                     Iterator itty;
                     if (result instanceof Iterator) {
@@ -109,6 +111,7 @@ public class RexsterConsole {
 
     public void printHelp() {
         this.output.println("-= Console Specific =-");
+        this.output.println("?<lang-name>: jump to engine");
         this.output.println(Tokens.REXSTER_CONSOLE_QUIT + ": quit");
     }
 
@@ -119,7 +122,7 @@ public class RexsterConsole {
     }
 
     public String getPrompt() {
-        return "rexster> ";
+        return "rexster[" + this.rexster.get(RexsterScriptEngine.CONFIG_SCOPE_LANGUAGE) +  "]> ";
     }
 
     public static String makeSpace(int number) {
@@ -132,10 +135,22 @@ public class RexsterConsole {
 
     public static void main(String[] args) throws Exception {
 
-        String host = args[0];
-        int port = Integer.parseInt(args[1]);
-        String language = args[2];
+        if (args.length < 3) {
+            System.out.println("Rexster Console expects three parameters in the following order: host port language");
+        } else {
 
-        new RexsterConsole(host, port, language);
+            String host = args[0];
+
+            int port = 0;
+            try {
+                port = Integer.parseInt(args[1]);
+            } catch (NumberFormatException nfe) {
+                System.out.println("The port parameter must be an integer value.");
+            }
+
+            String language = args[2];
+
+            new RexsterConsole(host, port, language);
+        }
     }
 }
