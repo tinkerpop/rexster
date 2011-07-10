@@ -312,8 +312,8 @@ public class AbstractSubResourceTest {
         this.mockery = new JUnit4Mockery();
         UriInfo uri = this.mockTheUri("not", "here", "");
 
-        RexsterExtension extension = this.mockResource.findExtensionExposed(new ExtensionSegmentSet(uri, ExtensionPoint.GRAPH));
-        Assert.assertNull(extension);
+        List<RexsterExtension> extensions = this.mockResource.findExtensionExposed(new ExtensionSegmentSet(uri, ExtensionPoint.GRAPH));
+        Assert.assertNull(extensions);
     }
 
     @Test
@@ -322,22 +322,24 @@ public class AbstractSubResourceTest {
         this.mockery = new JUnit4Mockery();
         UriInfo uri = this.mockTheUri("tp", "gremlin", "");
 
-        RexsterExtension extension = this.mockResource.findExtensionExposed(new ExtensionSegmentSet(uri, ExtensionPoint.GRAPH));
-        Assert.assertNotNull(extension);
-        Assert.assertTrue(extension instanceof GremlinExtension);
+        List<RexsterExtension> extensions = this.mockResource.findExtensionExposed(new ExtensionSegmentSet(uri, ExtensionPoint.GRAPH));
+        Assert.assertNotNull(extensions);
+        Assert.assertTrue(extensions.get(0) instanceof GremlinExtension);
     }
 
     @Test
     public void findExtensionMethodNotPresent() {
-        MockRexsterExtension ext = new MockRexsterExtension();
-        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.VERTEX, "action", HttpMethod.ANY);
+        List<RexsterExtension> rexsterExtensions = new ArrayList<RexsterExtension>();
+        rexsterExtensions.add(new MockRexsterExtension());
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(rexsterExtensions, ExtensionPoint.VERTEX, "action", HttpMethod.ANY);
         Assert.assertNull(m);
     }
 
     @Test
     public void findExtensionMethodFoundRoot() {
-        MockRexsterExtension ext = new MockRexsterExtension();
-        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "", HttpMethod.ANY);
+        List<RexsterExtension> rexsterExtensions = new ArrayList<RexsterExtension>();
+        rexsterExtensions.add(new MockRexsterExtension());
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(rexsterExtensions, ExtensionPoint.GRAPH, "", HttpMethod.ANY);
         Assert.assertNotNull(m);
 
         Method methodFound = m.getMethod();
@@ -347,8 +349,9 @@ public class AbstractSubResourceTest {
 
     @Test
     public void findExtensionMethodFoundSpecificAction() {
-        MockRexsterExtension ext = new MockRexsterExtension();
-        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "action", HttpMethod.ANY);
+        List<RexsterExtension> rexsterExtensions = new ArrayList<RexsterExtension>();
+        rexsterExtensions.add(new MockRexsterExtension());
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(rexsterExtensions, ExtensionPoint.GRAPH, "action", HttpMethod.ANY);
         Assert.assertNotNull(m);
 
         Method methodFound = m.getMethod();
@@ -357,16 +360,38 @@ public class AbstractSubResourceTest {
     }
 
     @Test
+    public void findExtensionMethodFoundSpecificActionMultipleExtensionClasses() {
+        List<RexsterExtension> rexsterExtensions = new ArrayList<RexsterExtension>();
+        rexsterExtensions.add(new MockRexsterExtension());
+        rexsterExtensions.add(new MockAddOnRexsterExtension());
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(rexsterExtensions, ExtensionPoint.GRAPH, "action", HttpMethod.ANY);
+        Assert.assertNotNull(m);
+
+        Method methodFound = m.getMethod();
+        Assert.assertNotNull(methodFound);
+        Assert.assertEquals("doAction", methodFound.getName());
+
+        m = this.mockResource.findExtensionMethodExposed(rexsterExtensions, ExtensionPoint.GRAPH, "addon", HttpMethod.ANY);
+        Assert.assertNotNull(m);
+
+        methodFound = m.getMethod();
+        Assert.assertNotNull(methodFound);
+        Assert.assertEquals("doAddOnAction", methodFound.getName());
+    }
+
+    @Test
     public void findExtensionMethodNotFoundSpecificActionAndMethod() {
-        MockRexsterExtension ext = new MockRexsterExtension();
-        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "headonly", HttpMethod.POST);
+        List<RexsterExtension> rexsterExtensions = new ArrayList<RexsterExtension>();
+        rexsterExtensions.add(new MockRexsterExtension());
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(rexsterExtensions, ExtensionPoint.GRAPH, "headonly", HttpMethod.POST);
         Assert.assertNull(m);
     }
 
     @Test
     public void findExtensionMethodMultipleRootCheck() {
-        MockMultiRootRexsterExtension ext = new MockMultiRootRexsterExtension();
-        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "", HttpMethod.GET);
+        List<RexsterExtension> rexsterExtensions = new ArrayList<RexsterExtension>();
+        rexsterExtensions.add(new MockMultiRootRexsterExtension());
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(rexsterExtensions, ExtensionPoint.GRAPH, "", HttpMethod.GET);
         Assert.assertNotNull(m);
 
         Method methodFound = m.getMethod();
@@ -374,7 +399,7 @@ public class AbstractSubResourceTest {
         Assert.assertEquals("doRootGet", methodFound.getName());
 
         // validates that the second method will get found
-        m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "", HttpMethod.POST);
+        m = this.mockResource.findExtensionMethodExposed(rexsterExtensions, ExtensionPoint.GRAPH, "", HttpMethod.POST);
         Assert.assertNotNull(m);
 
         methodFound = m.getMethod();
@@ -384,8 +409,9 @@ public class AbstractSubResourceTest {
 
     @Test
     public void findExtensionMethodFoundSpecificActionAndMethod() {
-        MockRexsterExtension ext = new MockRexsterExtension();
-        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(ext, ExtensionPoint.GRAPH, "headonly", HttpMethod.HEAD);
+        List<RexsterExtension> rexsterExtensions = new ArrayList<RexsterExtension>();
+        rexsterExtensions.add(new MockRexsterExtension());
+        ExtensionMethod m = this.mockResource.findExtensionMethodExposed(rexsterExtensions, ExtensionPoint.GRAPH, "headonly", HttpMethod.HEAD);
         Assert.assertNotNull(m);
 
         Method methodFound = m.getMethod();
@@ -413,7 +439,7 @@ public class AbstractSubResourceTest {
             will(returnValue(false));
         }});
 
-        ExtensionMethod extensionMethod = new ExtensionMethod(null, extensionDefinition, null);
+        ExtensionMethod extensionMethod = new ExtensionMethod(null, extensionDefinition, null, new MockRexsterExtension());
         ExtensionResponse extResponse = this.mockResource.tryAppendRexsterAttributesIfJsonExposed(
                 responseFromExtension, extensionMethod, MediaType.APPLICATION_JSON);
 
@@ -431,7 +457,7 @@ public class AbstractSubResourceTest {
             will(returnValue(true));
         }});
 
-        ExtensionMethod extensionMethod = new ExtensionMethod(null, extensionDefinition, null);
+        ExtensionMethod extensionMethod = new ExtensionMethod(null, extensionDefinition, null, new MockRexsterExtension());
         ExtensionResponse extResponse = this.mockResource.tryAppendRexsterAttributesIfJsonExposed(
                 responseFromExtension, extensionMethod, MediaType.APPLICATION_JSON);
 
@@ -453,7 +479,7 @@ public class AbstractSubResourceTest {
             will(returnValue(true));
         }});
 
-        ExtensionMethod extensionMethod = new ExtensionMethod(null, extensionDefinition, null);
+        ExtensionMethod extensionMethod = new ExtensionMethod(null, extensionDefinition, null, new MockRexsterExtension());
         ExtensionResponse extResponse = this.mockResource.tryAppendRexsterAttributesIfJsonExposed(
                 responseFromExtension, extensionMethod, MediaType.APPLICATION_JSON);
 
@@ -499,19 +525,21 @@ public class AbstractSubResourceTest {
             super(rap);
             this.httpServletRequest = req;
             this.uriInfo = ui;
+
+            extensionCache.clear();
         }
 
         public Object getTypedPropertyValue(String propertyValue) {
             return super.getTypedPropertyValue(propertyValue);
         }
 
-        public RexsterExtension findExtensionExposed(ExtensionSegmentSet extensionSegmentSet) {
-            return findExtension(extensionSegmentSet);
+        public List<RexsterExtension> findExtensionExposed(ExtensionSegmentSet extensionSegmentSet) {
+            return findExtensionClasses(extensionSegmentSet);
         }
 
         public ExtensionMethod findExtensionMethodExposed(
-                RexsterExtension rexsterExtension, ExtensionPoint extensionPoint, String extensionAction, HttpMethod httpMethodRequested) {
-            return findExtensionMethod(rexsterExtension, extensionPoint, extensionAction, httpMethodRequested);
+                List<RexsterExtension> rexsterExtensions, ExtensionPoint extensionPoint, String extensionAction, HttpMethod httpMethodRequested) {
+            return findExtensionMethod(rexsterExtensions, extensionPoint, extensionAction, httpMethodRequested);
         }
 
         public ExtensionSegmentSet parseUriForExtensionSegmentExposed(String graphName, ExtensionPoint extensionPoint) {
@@ -542,6 +570,17 @@ public class AbstractSubResourceTest {
 
         public void justIgnoreMe() {
             // ensuring no fails when no ExtensionDefinition annotation is supplied
+        }
+
+        public boolean isConfigurationValid(ExtensionConfiguration extensionConfiguration) {
+            return true;
+        }
+    }
+
+    private class MockAddOnRexsterExtension implements RexsterExtension {
+        @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "addon")
+        public ExtensionResponse doAddOnAction() {
+            return null;
         }
 
         public boolean isConfigurationValid(ExtensionConfiguration extensionConfiguration) {

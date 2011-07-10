@@ -13,9 +13,29 @@ public class ExtensionSegmentSet {
     private String extensionMethod;
 
     public ExtensionSegmentSet(String namespace, String extension) {
+
+        if (namespace == null) {
+            throw new IllegalArgumentException("namespace");
+        }
+
+        if (extension == null) {
+            throw new IllegalArgumentException("extension");
+        }
+
         this.namespace = namespace;
         this.extension = extension;
         this.extensionMethod = "";
+    }
+
+    public ExtensionSegmentSet(String namespace, String extension, String extensionMethod) {
+
+        this(namespace, extension);
+
+        if (extensionMethod == null) {
+            throw new IllegalArgumentException("extensionMethod");
+        }
+
+        this.extensionMethod = extensionMethod;
     }
 
     public ExtensionSegmentSet(UriInfo uriInfo, ExtensionPoint extensionPoint) {
@@ -68,6 +88,28 @@ public class ExtensionSegmentSet {
         return (this.getNamespace().isEmpty() ? "[parse error]" : this.getNamespace()) + ":" +
                 (this.getExtension().isEmpty() ? "[parse error]" : this.getExtension()) + "+"
                 + (this.getExtensionMethod().isEmpty() ? "*" : this.getExtensionMethod());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ExtensionSegmentSet that = (ExtensionSegmentSet) o;
+
+        if (!extension.equals(that.extension)) return false;
+        if (!extensionMethod.equals(that.extensionMethod)) return false;
+        if (!namespace.equals(that.namespace)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = namespace.hashCode();
+        result = 31 * result + extension.hashCode();
+        result = 31 * result + extensionMethod.hashCode();
+        return result;
     }
 
     public String getNamespace() {

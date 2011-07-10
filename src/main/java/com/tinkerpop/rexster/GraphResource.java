@@ -16,6 +16,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import java.util.List;
 import java.util.ServiceConfigurationError;
 
 @Path("/{graphname}")
@@ -223,9 +224,9 @@ public class GraphResource extends AbstractSubResource {
             try {
 
                 // look for the extension as loaded through serviceloader
-                RexsterExtension rexsterExtension = null;
+                List<RexsterExtension> rexsterExtensions = null;
                 try {
-                    rexsterExtension = findExtension(extensionSegmentSet);
+                    rexsterExtensions = findExtensionClasses(extensionSegmentSet);
                 } catch (ServiceConfigurationError sce) {
                     logger.error("ServiceLoader could not find a class referenced in com.tinkerpop.rexster.extension.RexsterExtension.");
                     JSONObject error = generateErrorObject(
@@ -234,7 +235,7 @@ public class GraphResource extends AbstractSubResource {
                     throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
                 }
 
-                if (rexsterExtension == null) {
+                if (rexsterExtensions == null && rexsterExtensions.size() == 0) {
                     // extension was not found for some reason
                     logger.error("The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
                     JSONObject error = generateErrorObject(
@@ -243,7 +244,7 @@ public class GraphResource extends AbstractSubResource {
                 }
 
                 // look up the method on the extension that needs to be called.
-                methodToCall = findExtensionMethod(rexsterExtension, ExtensionPoint.GRAPH, extensionSegmentSet.getExtensionMethod(), httpMethodRequested);
+                methodToCall = findExtensionMethod(rexsterExtensions, ExtensionPoint.GRAPH, extensionSegmentSet.getExtensionMethod(), httpMethodRequested);
 
                 if (methodToCall == null) {
                     // extension method was not found for some reason
@@ -254,7 +255,7 @@ public class GraphResource extends AbstractSubResource {
                 }
 
                 // found the method...time to do work
-                returnValue = invokeExtension(graphName, rexsterExtension, methodToCall);
+                returnValue = invokeExtension(graphName, methodToCall);
 
             } catch (WebApplicationException wae) {
                 // already logged this...just throw it  up.

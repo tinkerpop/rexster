@@ -267,9 +267,9 @@ public class VertexResource extends AbstractSubResource {
             try {
 
                 // look for the extension as loaded through serviceloader
-                RexsterExtension rexsterExtension = null;
+                List<RexsterExtension> rexsterExtensions = null;
                 try {
-                    rexsterExtension = findExtension(extensionSegmentSet);
+                    rexsterExtensions = findExtensionClasses(extensionSegmentSet);
                 } catch (ServiceConfigurationError sce) {
                     logger.error("ServiceLoader could not find a class referenced in com.tinkerpop.rexster.extension.RexsterExtension.");
                     JSONObject error = generateErrorObject(
@@ -278,7 +278,7 @@ public class VertexResource extends AbstractSubResource {
                     throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
                 }
 
-                if (rexsterExtension == null) {
+                if (rexsterExtensions == null && rexsterExtensions.size() == 0) {
                     // extension was not found for some reason
                     logger.error("The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
                     JSONObject error = generateErrorObject(
@@ -287,7 +287,7 @@ public class VertexResource extends AbstractSubResource {
                 }
 
                 // look up the method on the extension that needs to be called.
-                methodToCall = findExtensionMethod(rexsterExtension, ExtensionPoint.VERTEX, extensionSegmentSet.getExtensionMethod(), httpMethodRequested);
+                methodToCall = findExtensionMethod(rexsterExtensions, ExtensionPoint.VERTEX, extensionSegmentSet.getExtensionMethod(), httpMethodRequested);
 
                 if (methodToCall == null) {
                     // extension method was not found for some reason
@@ -298,7 +298,7 @@ public class VertexResource extends AbstractSubResource {
                 }
 
                 // found the method...time to do work
-                returnValue = invokeExtension(graphName, rexsterExtension, methodToCall, vertex);
+                returnValue = invokeExtension(graphName, methodToCall, vertex);
 
             } catch (WebApplicationException wae) {
                 // already logged this...just throw it  up.

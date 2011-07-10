@@ -399,4 +399,35 @@ public class ExtensionSegmentSetTest {
         Assert.assertEquals("ns:ext", extensionSegmentSet.getNamespaceAndExtension());
         Assert.assertEquals("ns:ext+meth", extensionSegmentSet.toString());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void constructorNullMethod() {
+        new ExtensionSegmentSet("ns", "ext", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void constructorNullExtensions() {
+        new ExtensionSegmentSet("ns", null, "meth");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void constructorNullNamespace() {
+        new ExtensionSegmentSet(null, "ext", "meth");
+    }
+
+    @Test
+    public void equalsValid() {
+        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet("ns", "ext", "meth");
+        ExtensionSegmentSet extensionSegmentSetSame = new ExtensionSegmentSet("ns", "ext", "meth");
+
+        Assert.assertTrue(extensionSegmentSet.equals(extensionSegmentSetSame));
+    }
+
+    @Test
+    public void equalsInvalid() {
+        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet("ns", "ext", "meth");
+        ExtensionSegmentSet extensionSegmentSetSame = new ExtensionSegmentSet("ns", "ext", "different method");
+
+        Assert.assertFalse(extensionSegmentSet.equals(extensionSegmentSetSame));
+    }
 }

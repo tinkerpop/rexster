@@ -15,7 +15,7 @@ public class ExtensionMethodTest {
 
     @Test
     public void getExtensionApiAsJsonNullDescriptor() {
-        ExtensionMethod method = new ExtensionMethod(null, null, null);
+        ExtensionMethod method = new ExtensionMethod(null, null, null, null);
         JSONObject api = method.getExtensionApiAsJson();
 
         Assert.assertNull(api);
@@ -36,7 +36,7 @@ public class ExtensionMethodTest {
             will(returnValue(ExtensionApiBehavior.EXTENSION_DESCRIPTOR_ONLY));
         }});
 
-        ExtensionMethod extensionMethod = new ExtensionMethod(null, null, extensionDescriptor);
+        ExtensionMethod extensionMethod = new ExtensionMethod(null, null, extensionDescriptor, null);
         JSONObject api = extensionMethod.getExtensionApiAsJson();
 
         Assert.assertNotNull(api);
@@ -63,7 +63,7 @@ public class ExtensionMethodTest {
         // just need a method that doesn't have any annotations
         Method[] methods = ExtensionMethodTest.class.getMethods();
 
-        ExtensionMethod extensionMethod = new ExtensionMethod(methods[0], null, extensionDescriptor);
+        ExtensionMethod extensionMethod = new ExtensionMethod(methods[0], null, extensionDescriptor, null);
         JSONObject api = extensionMethod.getExtensionApiAsJson();
 
         Assert.assertNotNull(api);
@@ -90,7 +90,7 @@ public class ExtensionMethodTest {
         // just need a method that doesn't have any annotations
         Method[] methods = ExtensionMethodTest.class.getMethods();
 
-        ExtensionMethod extensionMethod = new ExtensionMethod(methods[0], null, extensionDescriptor);
+        ExtensionMethod extensionMethod = new ExtensionMethod(methods[0], null, extensionDescriptor, null);
         JSONObject api = extensionMethod.getExtensionApiAsJson();
 
         Assert.assertNotNull(api);
@@ -119,7 +119,7 @@ public class ExtensionMethodTest {
             will(returnValue("value1"));
         }});
 
-        ExtensionMethod extensionMethod = new ExtensionMethod(null, null, extensionDescriptor);
+        ExtensionMethod extensionMethod = new ExtensionMethod(null, null, extensionDescriptor, null);
         JSONObject api = extensionMethod.getExtensionApiAsJson();
 
         Assert.assertNotNull(api);
@@ -152,7 +152,7 @@ public class ExtensionMethodTest {
 
         Method[] methods = MockMethodHelper.class.getDeclaredMethods();
 
-        ExtensionMethod extensionMethod = new ExtensionMethod(methods[0], null, extensionDescriptor);
+        ExtensionMethod extensionMethod = new ExtensionMethod(methods[0], null, extensionDescriptor, null);
         JSONObject api = extensionMethod.getExtensionApiAsJson();
 
         Assert.assertNotNull(api);
@@ -189,7 +189,7 @@ public class ExtensionMethodTest {
 
         Method[] methods = MockMethodHelper.class.getDeclaredMethods();
 
-        ExtensionMethod extensionMethod = new ExtensionMethod(methods[0], null, extensionDescriptor);
+        ExtensionMethod extensionMethod = new ExtensionMethod(methods[0], null, extensionDescriptor, null);
         JSONObject api = extensionMethod.getExtensionApiAsJson();
 
         Assert.assertNotNull(api);

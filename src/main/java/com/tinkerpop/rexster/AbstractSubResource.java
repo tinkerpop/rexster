@@ -18,14 +18,13 @@ import javax.ws.rs.core.UriInfo;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ServiceLoader;
+import java.util.*;
 
 public abstract class AbstractSubResource extends BaseResource {
 
     private static final Logger logger = Logger.getLogger(AbstractSubResource.class);
+
+    protected static final Map<ExtensionSegmentSet, List<RexsterExtension>> extensionCache = new HashMap<ExtensionSegmentSet, List<RexsterExtension>>();
 
     protected AbstractSubResource(RexsterApplicationProvider rap) {
         super(rap);
@@ -152,41 +151,51 @@ public abstract class AbstractSubResource extends BaseResource {
      *
      * @return The found extension instance or null if one cannot be found.
      */
-    protected static RexsterExtension findExtension(ExtensionSegmentSet extensionSegmentSet) {
-        ServiceLoader<? extends RexsterExtension> extensions = ServiceLoader.load(RexsterExtension.class);
-        RexsterExtension rexsterExtension = null;
-        for (RexsterExtension extension : extensions) {
-            Class clazz = extension.getClass();
-            ExtensionNaming extensionNaming = (ExtensionNaming) clazz.getAnnotation(ExtensionNaming.class);
+    protected static List<RexsterExtension> findExtensionClasses(ExtensionSegmentSet extensionSegmentSet) {
 
-            // initialize the defaults
-            String currentExtensionNamespace = "g";
-            String currentExtensionName = clazz.getName();
+        List<RexsterExtension> extensionsForSegmentSet = extensionCache.get(extensionSegmentSet);
+        if (extensionsForSegmentSet == null) {
+            ServiceLoader<? extends RexsterExtension> extensions = ServiceLoader.load(RexsterExtension.class);
+            extensionsForSegmentSet = new ArrayList<RexsterExtension>();
+            for (RexsterExtension extension : extensions) {
+                Class clazz = extension.getClass();
+                ExtensionNaming extensionNaming = (ExtensionNaming) clazz.getAnnotation(ExtensionNaming.class);
 
-            if (extensionNaming != null) {
+                // initialize the defaults
+                String currentExtensionNamespace = "g";
+                String currentExtensionName = clazz.getName();
 
-                // naming annotation is present to try to override the defaults
-                // if the values are valid.
-                if (extensionNaming.name() != null && !extensionNaming.name().isEmpty()) {
-                    currentExtensionName = extensionNaming.name();
+                if (extensionNaming != null) {
+
+                    // naming annotation is present to try to override the defaults
+                    // if the values are valid.
+                    if (extensionNaming.name() != null && !extensionNaming.name().isEmpty()) {
+                        currentExtensionName = extensionNaming.name();
+                    }
+
+                    // naming annotation is defaulted to "g" anyway but checking anyway to make sure
+                    // no one tries to pull any funny business.
+                    if (extensionNaming.namespace() != null && !extensionNaming.namespace().isEmpty()) {
+                        currentExtensionNamespace = extensionNaming.namespace();
+                    }
                 }
 
-                // naming annotation is defaulted to "g" anyway but checking anyway to make sure
-                // no one tries to pull any funny business.
-                if (extensionNaming.namespace() != null && !extensionNaming.namespace().isEmpty()) {
-                    currentExtensionNamespace = extensionNaming.namespace();
+                if (extensionSegmentSet.getNamespace().equals(currentExtensionNamespace)
+                        && extensionSegmentSet.getExtension().equals(currentExtensionName)) {
+                    // found what we're looking for
+                    extensionsForSegmentSet.add(extension);
                 }
             }
 
-            if (extensionSegmentSet.getNamespace().equals(currentExtensionNamespace)
-                    && extensionSegmentSet.getExtension().equals(currentExtensionName)) {
-                // found what we're looking for
-                rexsterExtension = extension;
-                break;
+            if (extensionsForSegmentSet.size() == 0) {
+                extensionsForSegmentSet = null;
+                extensionCache.put(extensionSegmentSet, null);
+            } else {
+                extensionCache.put(extensionSegmentSet, extensionsForSegmentSet);
             }
         }
 
-        return rexsterExtension;
+        return extensionsForSegmentSet;
     }
 
     /**
@@ -214,7 +223,7 @@ public abstract class AbstractSubResource extends BaseResource {
      * This method will find the first matching extension method.  If multiple extension method matches then
      * the remainder will be ignored.
      *
-     * @param rexsterExtension    The extension instance to be called.
+     * @param rexsterExtensions   The extension instance to be called.
      * @param extensionPoint      One of the extension points (graph, edge, vertex).
      * @param extensionAction     This value may be null or empty if the RexsterExtension is being exposed as a
      *                            root level call (ie. the ExtensionDefinition annotation does not specify a
@@ -222,28 +231,30 @@ public abstract class AbstractSubResource extends BaseResource {
      * @param httpMethodRequested The HTTP method made on the request.
      * @return The method to call or null if it cannot be found.
      */
-    protected static ExtensionMethod findExtensionMethod(RexsterExtension rexsterExtension,
+    protected static ExtensionMethod findExtensionMethod(List<RexsterExtension> rexsterExtensions,
                                                          ExtensionPoint extensionPoint,
                                                          String extensionAction, HttpMethod httpMethodRequested) {
-        Class rexsterExtensionClass = rexsterExtension.getClass();
-        Method[] methods = rexsterExtensionClass.getMethods();
-
         ExtensionMethod methodToCall = null;
-        for (Method method : methods) {
-            // looks for the first method that matches.  methods that multi-match will be ignored right now
-            // todo: we probably need to add some kind of up-front validation of extensions.
-            ExtensionDefinition extensionDefinition = method.getAnnotation(ExtensionDefinition.class);
-            ExtensionDescriptor extensionDescriptor = method.getAnnotation(ExtensionDescriptor.class);
+        for (RexsterExtension rexsterExtension : rexsterExtensions) {
+            Class rexsterExtensionClass = rexsterExtension.getClass();
+            Method[] methods = rexsterExtensionClass.getMethods();
 
-            // checks if the extension point is graph, and if the method path matches the specified action on
-            // the uri (if it exists) or if the method has no path.
-            if (extensionDefinition != null && extensionDefinition.extensionPoint() == extensionPoint
-                    && (extensionDefinition.method() == HttpMethod.ANY || extensionDefinition.method() == httpMethodRequested)) {
+            for (Method method : methods) {
+                // looks for the first method that matches.  methods that multi-match will be ignored right now
+                // todo: we probably need to add some kind of up-front validation of extensions.
+                ExtensionDefinition extensionDefinition = method.getAnnotation(ExtensionDefinition.class);
+                ExtensionDescriptor extensionDescriptor = method.getAnnotation(ExtensionDescriptor.class);
 
-                if ((!extensionAction.isEmpty() && extensionDefinition.path().equals(extensionAction))
-                        || (extensionAction.isEmpty() && extensionDefinition.path().isEmpty())) {
-                    methodToCall = new ExtensionMethod(method, extensionDefinition, extensionDescriptor);
-                    break;
+                // checks if the extension point is graph, and if the method path matches the specified action on
+                // the uri (if it exists) or if the method has no path.
+                if (extensionDefinition != null && extensionDefinition.extensionPoint() == extensionPoint
+                        && (extensionDefinition.method() == HttpMethod.ANY || extensionDefinition.method() == httpMethodRequested)) {
+
+                    if ((!extensionAction.isEmpty() && extensionDefinition.path().equals(extensionAction))
+                            || (extensionAction.isEmpty() && extensionDefinition.path().isEmpty())) {
+                        methodToCall = new ExtensionMethod(method, extensionDefinition, extensionDescriptor, rexsterExtension);
+                        break;
+                    }
                 }
             }
         }
@@ -251,26 +262,27 @@ public abstract class AbstractSubResource extends BaseResource {
         return methodToCall;
     }
 
-    protected Object invokeExtension(String graphName, RexsterExtension rexsterExtension, ExtensionMethod methodToCall)
+    protected Object invokeExtension(String graphName, ExtensionMethod methodToCall)
             throws IllegalAccessException, InvocationTargetException {
-        return this.invokeExtension(graphName, rexsterExtension, methodToCall, null, null);
+        return this.invokeExtension(graphName, methodToCall, null, null);
     }
 
-    protected Object invokeExtension(String graphName, RexsterExtension rexsterExtension, ExtensionMethod methodToCall, Vertex vertexContext)
+    protected Object invokeExtension(String graphName, ExtensionMethod methodToCall, Vertex vertexContext)
             throws IllegalAccessException, InvocationTargetException {
-        return this.invokeExtension(graphName, rexsterExtension, methodToCall, null, vertexContext);
+        return this.invokeExtension(graphName, methodToCall, null, vertexContext);
     }
 
-    protected Object invokeExtension(String graphName, RexsterExtension rexsterExtension, ExtensionMethod methodToCall, Edge edgeContext)
+    protected Object invokeExtension(String graphName, ExtensionMethod methodToCall, Edge edgeContext)
             throws IllegalAccessException, InvocationTargetException {
-        return this.invokeExtension(graphName, rexsterExtension, methodToCall, edgeContext, null);
+        return this.invokeExtension(graphName, methodToCall, edgeContext, null);
     }
 
-    protected Object invokeExtension(String graphName, RexsterExtension rexsterExtension, ExtensionMethod methodToCall, Edge edgeContext, Vertex vertexContext)
+    protected Object invokeExtension(String graphName, ExtensionMethod methodToCall, Edge edgeContext, Vertex vertexContext)
             throws IllegalAccessException, InvocationTargetException {
         RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         rag.trySetTransactionalModeAutomatic();
 
+        RexsterExtension rexsterExtension = methodToCall.getRexsterExtension();
         Method method = methodToCall.getMethod();
 
         RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(

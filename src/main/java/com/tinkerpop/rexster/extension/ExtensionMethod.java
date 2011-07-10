@@ -14,10 +14,13 @@ public class ExtensionMethod {
 
     private ExtensionDescriptor extensionDescriptor;
 
-    public ExtensionMethod(Method method, ExtensionDefinition extensionDefinition, ExtensionDescriptor extensionDescriptor) {
+    private RexsterExtension rexsterExtension;
+
+    public ExtensionMethod(Method method, ExtensionDefinition extensionDefinition, ExtensionDescriptor extensionDescriptor, RexsterExtension rexsterExtension) {
         this.method = method;
         this.extensionDefinition = extensionDefinition;
         this.extensionDescriptor = extensionDescriptor;
+        this.rexsterExtension = rexsterExtension;
     }
 
     public Method getMethod() {
@@ -30,6 +33,10 @@ public class ExtensionMethod {
 
     public ExtensionDescriptor getExtensionDescriptor() {
         return this.extensionDescriptor;
+    }
+
+    public RexsterExtension getRexsterExtension() {
+        return this.rexsterExtension;
     }
 
     public JSONObject getExtensionApiAsJson() {

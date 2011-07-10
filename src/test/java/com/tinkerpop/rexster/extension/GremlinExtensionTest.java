@@ -33,7 +33,7 @@ public class GremlinExtensionTest {
     /**
      * a null constructed extension method creates no API documentation on error
      */
-    private ExtensionMethod extensionMethodNoApi = new ExtensionMethod(null, null, null);
+    private ExtensionMethod extensionMethodNoApi = new ExtensionMethod(null, null, null, null);
 
     private RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(null, uriInfo,
             httpServletRequest, null, null, extensionMethodNoApi);
