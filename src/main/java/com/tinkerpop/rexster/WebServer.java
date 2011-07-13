@@ -6,7 +6,8 @@ import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
 import com.tinkerpop.rexster.protocol.filter.ScriptFilter;
 import com.tinkerpop.rexster.protocol.filter.SessionFilter;
 import com.tinkerpop.rexster.servlet.EvaluatorServlet;
-import com.tinkerpop.rexster.servlet.ToolServlet;
+import com.tinkerpop.rexster.servlet.DogHouseServlet;
+import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
 import com.tinkerpop.rexster.servlet.VisualizationServlet;
 import org.apache.commons.cli.*;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -16,6 +17,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
 import org.glassfish.grizzly.http.server.*;
+import org.glassfish.grizzly.http.server.util.MimeType;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
@@ -138,7 +140,7 @@ public class WebServer {
         // state given the uri
         ServletHandler dogHouseHandler = new ServletHandler();
         dogHouseHandler.setContextPath("/main");
-        dogHouseHandler.setServletInstance(new ToolServlet());
+        dogHouseHandler.setServletInstance(new DogHouseServlet());
 
         final Map<String, String> adminInitParameters = getServletInitParameters("admin-server-configuration", properties);
 
@@ -163,13 +165,16 @@ public class WebServer {
         dogHouseHandler.addInitParameter("com.tinkerpop.rexster.config.root", "/" + webRootPath);
         dogHouseHandler.addInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri", baseUri + ":" + rexsterServerPort.toString());
 
-        this.doghouseServer = GrizzlyServerFactory.createHttpServer(
-                UriBuilder.fromUri(baseUri).port(doghouseServerPort).build(),
-                new StaticHttpHandler(absoluteWebRootPath));
+        this.doghouseServer = new HttpServer();
         final ServerConfiguration config = this.doghouseServer.getServerConfiguration();
+        config.addHttpHandler(new RexsterStaticHttpHandler(absoluteWebRootPath), "/");
         config.addHttpHandler(dogHouseHandler, "/main");
         config.addHttpHandler(visualizationHandler, "/visualize");
         config.addHttpHandler(evaluatorHandler, "/exec");
+
+        final NetworkListener listener = new NetworkListener("grizzly", "0.0.0.0", doghouseServerPort);
+        this.doghouseServer.addListener(listener);
+
         this.doghouseServer.start();
 
         logger.info("Dog House Server running on: [" + baseUri + ":" + doghouseServerPort + "]");

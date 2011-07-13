@@ -17,7 +17,7 @@ import java.net.URL;
  * Simply pushes main.html on all paths requested from the "/main" context. There might
  * be an easier and more direct way to do this.
  */
-public class ToolServlet extends HttpServlet {
+public class DogHouseServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
