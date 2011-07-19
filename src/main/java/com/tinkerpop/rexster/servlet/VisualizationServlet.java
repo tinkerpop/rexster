@@ -41,7 +41,7 @@ public class VisualizationServlet extends HttpServlet {
             RexsterApplicationProvider rap = new WebServerRexsterApplicationProvider(this.getServletContext());
 
             GremlinEvaluationJob job = GremlinSessions.getSession(sessionId, graphName, rap).evaluate(code);
-            List<String> result = new ConsoleResultConverter().convert(job.getResult(), job.getOutputWriter());
+            List<String> result = new ConsoleResultConverter(job.getOutputWriter()).convert(job.getResult());
             response.getWriter().println(((result.size() == 1) ? result.get(0) : result));
         } catch (Exception e) {
             response.getWriter().println(e.getMessage());

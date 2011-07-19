@@ -58,7 +58,7 @@ public class EvaluatorServlet extends HttpServlet {
         try {
             RexsterApplicationProvider rap = new WebServerRexsterApplicationProvider(this.getServletContext());
             GremlinEvaluationJob job = GremlinSessions.getSession(sessionId, graphName, rap).evaluate(code);
-            List<String> lines = new ConsoleResultConverter().convert(job.getResult(), job.getOutputWriter());
+            List<String> lines = new ConsoleResultConverter(job.getOutputWriter()).convert(job.getResult());
             for (String line : lines) {
                 out.println("==>" + line);
             }

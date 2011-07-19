@@ -8,9 +8,8 @@ import org.junit.Test;
 
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.lang.reflect.MalformedParameterizedTypeException;
+import java.util.*;
 
 public class JSONResultConverterTest {
 
@@ -19,7 +18,7 @@ public class JSONResultConverterTest {
 
     @Test
     public void convertNullResultReturnsNull() throws Exception {
-        JSONArray results = this.converterNotPaged.convert(null, new StringWriter());
+        JSONArray results = this.converterNotPaged.convert(null);
         Assert.assertNull(results);
     }
 
@@ -29,7 +28,7 @@ public class JSONResultConverterTest {
         table.addRow("x1", "x2");
         table.addRow("y1", "y2");
 
-        JSONArray results = this.converterNotPaged.convert(table, new StringWriter());
+        JSONArray results = this.converterNotPaged.convert(table);
 
         Assert.assertNotNull(results);
         Assert.assertEquals(2, results.length());
@@ -63,7 +62,7 @@ public class JSONResultConverterTest {
         table.addRow("z1", "z2");
         table.addRow("a1", "a2");
 
-        JSONArray results = this.converterPaged.convert(table, new StringWriter());
+        JSONArray results = this.converterPaged.convert(table);
 
         Assert.assertNotNull(results);
         Assert.assertEquals(2, results.length());
@@ -91,14 +90,13 @@ public class JSONResultConverterTest {
 
     @Test
     public void convertIterableNotPaged() throws Exception {
-        Writer writer = new StringWriter();
 
         ArrayList<FunObject> funList = new ArrayList<FunObject>();
         funList.add(new FunObject("x"));
         funList.add(new FunObject("y"));
         Iterable<FunObject> iterable = funList;
 
-        JSONArray converted = this.converterNotPaged.convert(iterable, writer);
+        JSONArray converted = this.converterNotPaged.convert(iterable);
 
         Assert.assertNotNull(converted);
         Assert.assertEquals(2, converted.length());
@@ -109,7 +107,6 @@ public class JSONResultConverterTest {
 
     @Test
     public void convertIterablePaged() throws Exception {
-        Writer writer = new StringWriter();
 
         ArrayList<FunObject> funList = new ArrayList<FunObject>();
         funList.add(new FunObject("x"));
@@ -118,7 +115,7 @@ public class JSONResultConverterTest {
         funList.add(new FunObject("a"));
         Iterable<FunObject> iterable = funList;
 
-        JSONArray converted = this.converterPaged.convert(iterable, writer);
+        JSONArray converted = this.converterPaged.convert(iterable);
 
         Assert.assertNotNull(converted);
         Assert.assertEquals(2, converted.length());
@@ -129,14 +126,13 @@ public class JSONResultConverterTest {
 
     @Test
     public void convertIteratorNotPaged() throws Exception {
-        Writer writer = new StringWriter();
 
         ArrayList<FunObject> funList = new ArrayList<FunObject>();
         funList.add(new FunObject("x"));
         funList.add(new FunObject("y"));
         Iterator<FunObject> iterable = funList.iterator();
 
-        JSONArray converted = this.converterNotPaged.convert(iterable, writer);
+        JSONArray converted = this.converterNotPaged.convert(iterable);
 
         Assert.assertNotNull(converted);
         Assert.assertEquals(2, converted.length());
@@ -147,7 +143,6 @@ public class JSONResultConverterTest {
 
     @Test
     public void convertIteratorPaged() throws Exception {
-        Writer writer = new StringWriter();
 
         ArrayList<FunObject> funList = new ArrayList<FunObject>();
         funList.add(new FunObject("x"));
@@ -156,10 +151,35 @@ public class JSONResultConverterTest {
         funList.add(new FunObject("a"));
         Iterator<FunObject> iterable = funList.iterator();
 
-        JSONArray converted = this.converterPaged.convert(iterable, writer);
+        JSONArray converted = this.converterPaged.convert(iterable);
 
         Assert.assertNotNull(converted);
         Assert.assertEquals(2, converted.length());
+    }
+
+    @Test
+    public void convertMap() throws Exception {
+        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, String> innerMap = new HashMap<String, String>();
+        innerMap.put("a", "b");
+
+        map.put("x", new FunObject("x"));
+        map.put("y", "some");
+        map.put("z", innerMap);
+
+        JSONArray converted = this.converterNotPaged.convert(map);
+
+        Assert.assertNotNull(converted);
+        Assert.assertEquals(1, converted.length());
+
+        JSONObject jsonObject = converted.getJSONObject(0);
+        Assert.assertNotNull(jsonObject);
+        Assert.assertEquals("some", jsonObject.optString("y"));
+        Assert.assertEquals("x", jsonObject.optString("x"));
+
+        JSONObject innerJsonObject = jsonObject.optJSONObject("z");
+        Assert.assertNotNull(innerJsonObject);
+        Assert.assertEquals("b", innerJsonObject.optString("a"));
     }
 
     private class FunObject {

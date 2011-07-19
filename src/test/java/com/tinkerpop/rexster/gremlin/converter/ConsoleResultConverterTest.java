@@ -10,12 +10,19 @@ import java.util.*;
 
 public class ConsoleResultConverterTest {
 
-    private ConsoleResultConverter converter = new ConsoleResultConverter();
+    private Writer writer;
+    private ConsoleResultConverter converter;
+
+    @Before
+    public void setUp() {
+        this.writer = new StringWriter();
+        this.converter = new ConsoleResultConverter(writer);
+    }
 
     @Test
     public void convertNullResultReturnsEmptyList() throws Exception {
-        Writer writer = new StringWriter();
-        List<String> converted = this.converter.convert(null, writer);
+
+        List<String> converted = this.converter.convert(null);
 
         Assert.assertNotNull(converted);
         Assert.assertEquals(1, converted.size());
@@ -25,14 +32,13 @@ public class ConsoleResultConverterTest {
 
     @Test
     public void convertIterable() throws Exception {
-        Writer writer = new StringWriter();
 
         ArrayList<FunObject> funList = new ArrayList<FunObject>();
         funList.add(new FunObject("x"));
         funList.add(new FunObject("y"));
         Iterable<FunObject> iterable = funList;
 
-        List<String> converted = this.converter.convert(iterable, writer);
+        List<String> converted = this.converter.convert(iterable);
 
         Assert.assertNotNull(converted);
         Assert.assertEquals(2, converted.size());
@@ -42,15 +48,33 @@ public class ConsoleResultConverterTest {
     }
 
     @Test
+    public void convertIterableWithNull() throws Exception {
+
+        ArrayList<FunObject> funList = new ArrayList<FunObject>();
+        funList.add(new FunObject("x"));
+        funList.add(null);
+        funList.add(new FunObject("y"));
+        Iterable<FunObject> iterable = funList;
+
+        List<String> converted = this.converter.convert(iterable);
+
+        Assert.assertNotNull(converted);
+        Assert.assertEquals(3, converted.size());
+
+        Assert.assertEquals("x", converted.get(0));
+        Assert.assertEquals("null", converted.get(1));
+        Assert.assertEquals("y", converted.get(2));
+    }
+
+    @Test
     public void convertIterator() throws Exception {
-        Writer writer = new StringWriter();
 
         ArrayList<FunObject> funList = new ArrayList<FunObject>();
         funList.add(new FunObject("x"));
         funList.add(new FunObject("y"));
         Iterator<FunObject> iterable = funList.iterator();
 
-        List<String> converted = this.converter.convert(iterable, writer);
+        List<String> converted = this.converter.convert(iterable);
 
         Assert.assertNotNull(converted);
         Assert.assertEquals(2, converted.size());
@@ -61,13 +85,12 @@ public class ConsoleResultConverterTest {
 
     @Test
     public void convertMap() throws Exception {
-        Writer writer = new StringWriter();
 
         Map<String, FunObject> map = new HashMap<String, FunObject>();
         map.put("X", new FunObject("x"));
         map.put("Y", new FunObject("y"));
 
-        List<String> converted = this.converter.convert(map, writer);
+        List<String> converted = this.converter.convert(map);
 
         Assert.assertNotNull(converted);
         Assert.assertEquals(2, converted.size());
@@ -88,10 +111,9 @@ public class ConsoleResultConverterTest {
 
     @Test
     public void convertThrowable() throws Exception {
-        Writer writer = new StringWriter();
 
         Throwable throwable = new Exception("message");
-        List<String> converted = this.converter.convert(throwable, writer);
+        List<String> converted = this.converter.convert(throwable);
 
         Assert.assertNotNull(converted);
         Assert.assertEquals(1, converted.size());
@@ -100,11 +122,10 @@ public class ConsoleResultConverterTest {
 
     @Test
     public void convertWriter() throws Exception {
-        Writer writer = new StringWriter();
-        writer.write("x\n");
-        writer.write("y");
+        this.writer.write("x\n");
+        this.writer.write("y");
 
-        List<String> converted = this.converter.convert(null, writer);
+        List<String> converted = this.converter.convert(null);
 
         Assert.assertNotNull(converted);
         Assert.assertEquals(2, converted.size());

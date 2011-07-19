@@ -6,7 +6,6 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
 import com.tinkerpop.gremlin.pipes.util.Table;
-import com.tinkerpop.rexster.ElementJSONObject;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.gremlin.converter.JSONResultConverter;
@@ -154,7 +153,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
             if (script != null && !script.isEmpty()) {
 
                 Object result = engine.eval(script, bindings);
-                JSONArray results = new JSONResultConverter(showTypes, offsetStart, offsetEnd, returnKeys).convert(result, null);
+                JSONArray results = new JSONResultConverter(showTypes, offsetStart, offsetEnd, returnKeys).convert(result);
 
                 HashMap<String, Object> resultMap = new HashMap<String, Object>();
                 resultMap.put(Tokens.SUCCESS, true);

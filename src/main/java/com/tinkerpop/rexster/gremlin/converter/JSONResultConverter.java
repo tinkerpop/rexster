@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster.gremlin.converter;
 
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.util.json.JSONWriter;
 import com.tinkerpop.gremlin.pipes.util.Table;
-import com.tinkerpop.rexster.ElementJSONObject;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -25,11 +25,12 @@ public class JSONResultConverter implements ResultConverter<JSONArray>{
         this.returnKeys = returnKeys;
     }
 
-    public JSONArray convert(Object result, Writer outputWriter) throws Exception {
+    public JSONArray convert(Object result) throws Exception {
         JSONArray results = new JSONArray();
         if (result == null) {
             // for example a script like g.clear()
             results = null;
+
         } else if (result instanceof Table) {
             Table table = (Table) result;
             Iterator<Table.Row> rows = table.iterator();
@@ -42,7 +43,7 @@ public class JSONResultConverter implements ResultConverter<JSONArray>{
                 if (counter >= this.offsetStart && counter < this.offsetEnd) {
                     Map<String, Object> map = new HashMap<String, Object>();
                     for (String columnName : columnNames) {
-                        map.put(columnName, prepareOutput(row.getColumn(columnName), this.returnKeys, this.showTypes));
+                        map.put(columnName, prepareOutput(row.getColumn(columnName)));
                     }
 
                     results.put(new JSONObject(map));
@@ -58,7 +59,7 @@ public class JSONResultConverter implements ResultConverter<JSONArray>{
             long counter = 0;
             for (Object o : (Iterable) result) {
                 if (counter >= this.offsetStart && counter < this.offsetEnd) {
-                    results.put(prepareOutput(o, this.returnKeys, this.showTypes));
+                    results.put(prepareOutput(o));
                 }
 
                 if (counter >= this.offsetEnd) {
@@ -73,7 +74,7 @@ public class JSONResultConverter implements ResultConverter<JSONArray>{
             long counter = 0;
             while (itty.hasNext()) {
                 if (counter >= this.offsetStart && counter < this.offsetEnd) {
-                    results.put(prepareOutput(itty.next(), this.returnKeys, this.showTypes));
+                    results.put(prepareOutput(itty.next()));
                 }
 
                 if (counter >= this.offsetEnd) {
@@ -83,19 +84,29 @@ public class JSONResultConverter implements ResultConverter<JSONArray>{
                 counter++;
             }
         } else {
-            results.put(prepareOutput(result, this.returnKeys, this.showTypes));
+            results.put(prepareOutput(result));
         }
 
         return results;
     }
 
-    private Object prepareOutput(Object object, List<String> returnKeys, boolean showTypes) throws JSONException {
+    private Object prepareOutput(Object object) throws Exception {
         if (object instanceof Element) {
             if (returnKeys == null) {
-                return new ElementJSONObject((Element) object, showTypes);
+                return JSONWriter.createJSONElement((Element) object, null, showTypes);
             } else {
-                return new ElementJSONObject((Element) object, returnKeys, showTypes);
+                return JSONWriter.createJSONElement((Element) object, returnKeys, showTypes);
             }
+        } else if (object instanceof Map) {
+            JSONObject jsonObject = new JSONObject();
+            Map map = (Map) object;
+            for (Object key : map.keySet()) {
+                jsonObject.put(key.toString(), this.prepareOutput(map.get(key)));
+            }
+
+            return jsonObject;
+        } else if (object instanceof Table || object instanceof Iterable || object instanceof Iterator) {
+            return this.convert(object);
         } else if (object instanceof Number || object instanceof Boolean) {
             return object;
         } else {

@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.util.json.JSONWriter;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -116,7 +117,7 @@ public class IndexResource extends AbstractSubResource {
                 JSONArray elementArray = new JSONArray();
                 for (Element element : (Iterable<Element>) index.get(key, value)) {
                     if (counter >= start && counter < end) {
-                        elementArray.put(new ElementJSONObject(element, this.getReturnKeys(), this.hasShowTypes()));
+                        elementArray.put(JSONWriter.createJSONElement(element, this.getReturnKeys(), this.hasShowTypes()));
                     }
                     counter++;
                 }

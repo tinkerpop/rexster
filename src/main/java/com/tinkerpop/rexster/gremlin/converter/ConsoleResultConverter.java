@@ -7,7 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 public class ConsoleResultConverter implements ResultConverter<List<String>> {
-    public List<String> convert(final Object result, final Writer outputWriter) throws Exception {
+
+    private final Writer outputWriter;
+
+    public ConsoleResultConverter(final Writer outputWriter) {
+        this.outputWriter = outputWriter;
+    }
+
+    public List<String> convert(final Object result) throws Exception {
         try {
             List<Object> resultLines = new ArrayList<Object>();
             if (result == null) {
@@ -37,7 +44,7 @@ public class ConsoleResultConverter implements ResultConverter<List<String>> {
             List<String> outputLines = new ArrayList<String>();
 
             // Handle eval() result
-            String[] printLines = outputWriter.toString().split("\n");
+            String[] printLines = this.outputWriter.toString().split("\n");
 
             if (printLines.length > 0 && printLines[0].length() > 0) {
                 for (String printLine : printLines) {
