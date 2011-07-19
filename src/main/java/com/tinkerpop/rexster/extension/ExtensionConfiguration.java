@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.extension;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,6 +11,8 @@ import java.util.Map;
  * Holds information that details the configuration of an extension.
  */
 public class ExtensionConfiguration {
+    private static Logger logger = Logger.getLogger(ExtensionConfiguration.class);
+
     private String namespace;
 
     private String extensionName;
@@ -76,6 +79,8 @@ public class ExtensionConfiguration {
                 map.put(key, this.configuration.getString(key));
             }
         } catch (Exception ex) {
+            logger.error("There is an error in the configuration of this extension [" + this.namespace + ":" + this.extensionName + "].  All values must be of a String data type.");
+
             // ignore and return null
             map = null;
         }
