@@ -91,6 +91,9 @@ public class JSONResultConverter implements ResultConverter<JSONArray>{
     }
 
     private Object prepareOutput(Object object) throws Exception {
+        if (object == null) {
+            return null;
+        }
         if (object instanceof Element) {
             if (returnKeys == null) {
                 return JSONWriter.createJSONElement((Element) object, null, showTypes);

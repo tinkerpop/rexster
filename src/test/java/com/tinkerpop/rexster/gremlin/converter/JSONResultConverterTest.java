@@ -142,6 +142,25 @@ public class JSONResultConverterTest {
     }
 
     @Test
+    public void convertIteratorNotPagedNullElement() throws Exception {
+
+        ArrayList<FunObject> funList = new ArrayList<FunObject>();
+        funList.add(new FunObject("x"));
+        funList.add(null);
+        funList.add(new FunObject("y"));
+        Iterator<FunObject> iterable = funList.iterator();
+
+        JSONArray converted = this.converterNotPaged.convert(iterable);
+
+        Assert.assertNotNull(converted);
+        Assert.assertEquals(3, converted.length());
+
+        Assert.assertEquals("x", converted.get(0));
+        Assert.assertNull(converted.opt(1));
+        Assert.assertEquals("y", converted.get(2));
+    }
+
+    @Test
     public void convertIteratorPaged() throws Exception {
 
         ArrayList<FunObject> funList = new ArrayList<FunObject>();
