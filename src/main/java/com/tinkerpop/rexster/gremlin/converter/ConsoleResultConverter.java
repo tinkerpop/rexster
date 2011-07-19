@@ -57,7 +57,7 @@ public class ConsoleResultConverter implements ResultConverter<List<String>> {
             } else {
                 // Make sure all lines are strings
                 for (Object resultLine : resultLines) {
-                    outputLines.add(resultLine.toString());
+                    outputLines.add(resultLine != null ? resultLine.toString() : "null");
                 }
             }
 
