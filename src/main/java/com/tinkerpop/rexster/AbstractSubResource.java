@@ -103,29 +103,33 @@ public abstract class AbstractSubResource extends BaseResource {
                             + currentExtensionName + "on graph " + graphName);
                 }
 
-                if (rexsterExtension != null && rexsterExtension.isConfigurationValid(extensionConfig)) {
-                    Method[] methods = clazz.getMethods();
-                    for (Method method : methods) {
-                        ExtensionDescriptor descriptor = method.getAnnotation(ExtensionDescriptor.class);
-                        ExtensionDefinition definition = method.getAnnotation(ExtensionDefinition.class);
+                if (rexsterExtension != null) {
+                    if (rexsterExtension.isConfigurationValid(extensionConfig)) {
+                        Method[] methods = clazz.getMethods();
+                        for (Method method : methods) {
+                            ExtensionDescriptor descriptor = method.getAnnotation(ExtensionDescriptor.class);
+                            ExtensionDefinition definition = method.getAnnotation(ExtensionDefinition.class);
 
-                        if (definition != null && definition.extensionPoint() == extensionPoint) {
-                            String href = currentExtensionNamespace + "/" + currentExtensionName;
-                            if (!definition.path().isEmpty()) {
-                                href = href + "/" + definition.path();
+                            if (definition != null && definition.extensionPoint() == extensionPoint) {
+                                String href = currentExtensionNamespace + "/" + currentExtensionName;
+                                if (!definition.path().isEmpty()) {
+                                    href = href + "/" + definition.path();
+                                }
+
+                                HashMap hypermediaLink = new HashMap();
+                                hypermediaLink.put("href", href);
+                                hypermediaLink.put("method", definition.method().name());
+
+                                // descriptor is not a required annotation for extensions.
+                                if (descriptor != null) {
+                                    hypermediaLink.put("title", descriptor.description());
+                                }
+
+                                hypermediaLinks.put(new JSONObject(hypermediaLink));
                             }
-
-                            HashMap hypermediaLink = new HashMap();
-                            hypermediaLink.put("href", href);
-                            hypermediaLink.put("method", definition.method().name());
-
-                            // descriptor is not a required annotation for extensions.
-                            if (descriptor != null) {
-                                hypermediaLink.put("title", descriptor.description());
-                            }
-
-                            hypermediaLinks.put(new JSONObject(hypermediaLink));
                         }
+                    } else {
+                        logger.warn("An extension [" + currentExtensionNamespace + ":" +  currentExtensionName + "] does not have a valid configuration.  Check rexster.xml and ensure that the configuration section matches what the extension expects.");
                     }
                 }
             }

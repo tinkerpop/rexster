@@ -276,7 +276,7 @@ public class VertexResource extends AbstractSubResource {
                     JSONObject error = generateErrorObject(
                             "Class specified in com.tinkerpop.rexster.extension.RexsterExtension could not be found.",
                             sce);
-                    throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+                    throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
                 }
 
                 if (rexsterExtensions == null && rexsterExtensions.size() == 0) {
@@ -284,7 +284,7 @@ public class VertexResource extends AbstractSubResource {
                     logger.error("The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
                     JSONObject error = generateErrorObject(
                             "The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "]");
-                    throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+                    throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
                 }
 
                 // look up the method on the extension that needs to be called.
@@ -295,7 +295,7 @@ public class VertexResource extends AbstractSubResource {
                     logger.error("The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "] with a HTTP method of [" + httpMethodRequested.name() + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
                     JSONObject error = generateErrorObject(
                             "The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "] with a HTTP method of [" + httpMethodRequested.name() + "]");
-                    throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+                    throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
                 }
 
                 // found the method...time to do work
