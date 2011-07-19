@@ -22,6 +22,8 @@ h3. Version 0.5 (* -- NOT OFFICIALLY RELEASED)
 * Indices returned from @http://localhost/graph/indices@ or when requested by name have their class value set to @edge@ or @vertex@ as opposed to the full canonical class name.
 * Short-hand command line options.
 * Extensions can be broken up across multiple classes within the same namespace and name.
+* Used the Blueprints JSONWriter to serialize to JSON which fixed a number of problems related to serialization of multi-layered hashes and lists.
+* Nulls in iterators returned through Dog House are displayed as "null".
 
 ==<hr/>==
 
