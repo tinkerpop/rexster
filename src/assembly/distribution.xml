@@ -16,6 +16,7 @@
                 <include>rexster-stop.sh</include>
                 <include>rexster-stop.bat</include>
                 <include>rexster-console.sh</include>
+                <include>rexster-console.bat</include>
             </includes>
         </fileSet>
         <!-- PUBLIC -->
