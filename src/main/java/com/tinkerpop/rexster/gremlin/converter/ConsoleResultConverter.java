@@ -1,10 +1,8 @@
 package com.tinkerpop.rexster.gremlin.converter;
 
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class ConsoleResultConverter implements ResultConverter<List<String>> {
 
@@ -28,6 +26,11 @@ public class ConsoleResultConverter implements ResultConverter<List<String>> {
                 Iterator itty = (Iterator) result;
                 while (itty.hasNext()) {
                     resultLines.add(itty.next());
+                }
+            } else if (result.getClass().isArray()) {
+                int length = Array.getLength(result);
+                for (int ix = 0; ix < length; ix++) {
+                    resultLines.add(Array.get(result, ix).toString());
                 }
             } else if (result instanceof Map) {
                 Map map = (Map) result;

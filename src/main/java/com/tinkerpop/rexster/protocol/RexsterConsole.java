@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.protocol;
 import com.tinkerpop.pipes.SingleIterator;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.message.ConsoleScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.message.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.message.RexProMessage;
 import com.tinkerpop.rexster.protocol.message.ScriptRequestMessage;
 import jline.ConsoleReader;
@@ -158,30 +159,26 @@ public class RexsterConsole {
             final RexProMessage resultMessage = RexPro.sendMessage(
                     session.getRexProHost(), session.getRexProPort(), scriptMessage);
 
-            final ConsoleScriptResponseMessage responseMessage = new ConsoleScriptResponseMessage(resultMessage);
-
-            /*
-            RexsterBindings bindingsFromServer = responseMessage.getBindings();
-
-            // apply bindings from server to local bindings so that they are in synch
-            if (bindingsFromServer != null) {
-                bindings.putAll(bindingsFromServer);
-            }
-            */
-
             ArrayList<String> lines = new ArrayList<String>();
-            ByteBuffer bb = ByteBuffer.wrap(responseMessage.getBody());
+            try {
+                ConsoleScriptResponseMessage responseMessage = new ConsoleScriptResponseMessage(resultMessage);
+                ByteBuffer bb = ByteBuffer.wrap(responseMessage.getBody());
 
-            // navigate to the start of the results
-            int lengthOfBindings = bb.getInt();
-            bb.position(lengthOfBindings + 4);
+                // navigate to the start of the results...bindings are attached if there is no error present
+                int lengthOfBindings = bb.getInt();
+                bb.position(lengthOfBindings + 4);
 
-            while (bb.hasRemaining()) {
-                int segmentLength = bb.getInt();
-                byte[] resultObjectBytes = new byte[segmentLength];
-                bb.get(resultObjectBytes);
+                while (bb.hasRemaining()) {
+                    int segmentLength = bb.getInt();
+                    byte[] resultObjectBytes = new byte[segmentLength];
+                    bb.get(resultObjectBytes);
 
-                lines.add(new String(resultObjectBytes));
+                    lines.add(new String(resultObjectBytes));
+                }
+
+            } catch (IllegalArgumentException iae) {
+                ErrorResponseMessage errorMessage = new ErrorResponseMessage(resultMessage);
+                lines.add(errorMessage.getErrorMessage());
             }
 
             returnValue = lines.iterator();
