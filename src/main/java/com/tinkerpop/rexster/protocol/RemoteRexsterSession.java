@@ -23,7 +23,7 @@ public class RemoteRexsterSession {
 
     public void open() {
         if (sessionKey == RexProMessage.EMPTY_SESSION) {
-            RexProMessage sessionRequestMessageToSend = new SessionRequestMessage(SessionRequestMessage.FLAG_NEW);
+            RexProMessage sessionRequestMessageToSend = new SessionRequestMessage(SessionRequestMessage.FLAG_NEW_CONSOLE_SESSION);
             final RexProMessage rcvMessage = RexPro.sendMessage(this.rexProHost, this.rexProPort, sessionRequestMessageToSend);
             this.sessionKey = rcvMessage.getSessionAsUUID();
         }
@@ -32,7 +32,7 @@ public class RemoteRexsterSession {
     public void close() {
 
         if (sessionKey != RexProMessage.EMPTY_SESSION) {
-            RexProMessage sessionKillMessageToSend = new SessionRequestMessage(SessionRequestMessage.FLAG_KILL);
+            RexProMessage sessionKillMessageToSend = new SessionRequestMessage(SessionRequestMessage.FLAG_KILL_SESSION);
 
             // need to set the session here so that the server knows which one to delete.
             sessionKillMessageToSend.setSession(BitWorks.convertUUIDToByteArray(this.sessionKey));

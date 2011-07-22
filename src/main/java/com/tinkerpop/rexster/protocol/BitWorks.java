@@ -9,6 +9,7 @@ import com.tinkerpop.rexster.Tokens;
 import javax.script.Bindings;
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.UUID;
 
 public class BitWorks {
@@ -32,7 +33,7 @@ public class BitWorks {
 
         for (String value : values) {
             stream.write(ByteBuffer.allocate(4).putInt(value.length()).array());
-            stream.write(value.getBytes());
+            stream.write(value.getBytes(Charset.forName("UTF-8")));
         }
 
         return stream.toByteArray();
@@ -97,17 +98,29 @@ public class BitWorks {
                 && !(result instanceof Edge)
                 && !(result instanceof Vertex)
                 && !(result instanceof Index)) {
+            try {
+                ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);
+                objectOutputStream.writeObject(result);
+                objectOutputStream.close();
 
-            ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);
-            objectOutputStream.writeObject(result);
-            objectOutputStream.close();
+                ByteBuffer bb = ByteBuffer.allocate(4 + byteOuputStream.size());
+                bb.putInt(byteOuputStream.size());
+                bb.put(byteOuputStream.toByteArray());
 
-            ByteBuffer bb = ByteBuffer.allocate(4 + byteOuputStream.size());
-            bb.putInt(byteOuputStream.size());
-            bb.put(byteOuputStream.toByteArray());
+                return bb.array();
+            } catch (NotSerializableException nse) {
+                // com.sun.script.javascript.ExternalScriptable throws this sometimes...just toString() it
+                ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);
+                objectOutputStream.writeObject(result.toString());
+                objectOutputStream.close();
 
-            return bb.array();
+                ByteBuffer bb = ByteBuffer.allocate(4 + byteOuputStream.size());
+                bb.putInt(byteOuputStream.size());
+                bb.put(byteOuputStream.toByteArray());
+                return bb.array();
+            }
         } else {
             ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);

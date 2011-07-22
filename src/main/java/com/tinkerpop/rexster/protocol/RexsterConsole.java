@@ -2,20 +2,28 @@ package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.pipes.SingleIterator;
 import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.protocol.message.ConsoleScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.message.RexProMessage;
+import com.tinkerpop.rexster.protocol.message.ScriptRequestMessage;
 import jline.ConsoleReader;
 import jline.History;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
+import javax.script.SimpleBindings;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
 public class RexsterConsole {
 
-    private final RexsterScriptEngine rexster = (RexsterScriptEngine) new RexsterScriptEngineFactory().getScriptEngine();
+    private RemoteRexsterSession session = null;
+    private String host;
+    private String language;
+    private int port;
+
     private final PrintStream output = System.out;
 
     private static final String REXSTER_HISTORY = ".rexster_history";
@@ -28,12 +36,11 @@ public class RexsterConsole {
         this.output.println("l l-----l l");
         this.output.println("l l,,   l l,,");
 
-        this.rexster.put(RexsterScriptEngine.CONFIG_SCOPE_HOST, host);
-        this.rexster.put(RexsterScriptEngine.CONFIG_SCOPE_PORT, port);
-        this.rexster.put(RexsterScriptEngine.CONFIG_SCOPE_LANGUAGE, language);
+        this.host = host;
+        this.port = port;
+        this.language = language;
 
-        this.rexster.setBindings(this.rexster.createBindings(), ScriptContext.ENGINE_SCOPE);
-        this.rexster.setBindings(this.rexster.createBindings(), ScriptContext.GLOBAL_SCOPE);
+        this.session = new RemoteRexsterSession(this.host, this.port);
 
         this.primaryLoop();
     }
@@ -77,16 +84,20 @@ public class RexsterConsole {
 
                 if (line.isEmpty())
                     continue;
-                if (line.equals(Tokens.REXSTER_CONSOLE_QUIT))
+                if (line.equals(Tokens.REXSTER_CONSOLE_QUIT)) {
+                    if (this.session != null) {
+                        this.session.close();
+                        this.session = null;
+                    }
                     return;
-                else if (line.equals(Tokens.REXSTER_CONSOLE_HELP))
+                } else if (line.equals(Tokens.REXSTER_CONSOLE_HELP))
                     this.printHelp();
-                else if (line.equals(Tokens.REXSTER_CONSOLE_BINDINGS))
-                    this.printBindings(this.rexster.getBindings(ScriptContext.ENGINE_SCOPE));
-                else if (line.startsWith(Tokens.REXSTER_CONSOLE_LANGUAGE)) {
-                    this.rexster.put(RexsterScriptEngine.CONFIG_SCOPE_LANGUAGE, line.substring(1));
+                else if (line.equals(Tokens.REXSTER_CONSOLE_BINDINGS)) {
+                    //this.printBindings(this.rexster.getBindings(ScriptContext.ENGINE_SCOPE));
+                } else if (line.startsWith(Tokens.REXSTER_CONSOLE_LANGUAGE)) {
+                    this.language = line.substring(1);
                 } else {
-                    Object result = this.rexster.eval(line);
+                    Object result = eval(line, this.language, this.session);
                     Iterator itty;
                     if (result instanceof Iterator) {
                         itty = (Iterator) result;
@@ -122,7 +133,7 @@ public class RexsterConsole {
     }
 
     public String getPrompt() {
-        return "rexster[" + this.rexster.get(RexsterScriptEngine.CONFIG_SCOPE_LANGUAGE) +  "]> ";
+        return "rexster[" + this.language +  "]> ";
     }
 
     public static String makeSpace(int number) {
@@ -131,6 +142,59 @@ public class RexsterConsole {
             space = space + " ";
         }
         return space;
+    }
+
+    private static Object eval(String script, String scriptEngineName, RemoteRexsterSession session) {
+
+        Object returnValue = null;
+
+        try {
+            session.open();
+
+            // pass in some dummy rexster bindings...not really fully working quite right for scriptengine usage
+            final RexProMessage scriptMessage = new ScriptRequestMessage(
+                    session.getSessionKey(), scriptEngineName, new RexsterBindings(), script);
+
+            final RexProMessage resultMessage = RexPro.sendMessage(
+                    session.getRexProHost(), session.getRexProPort(), scriptMessage);
+
+            final ConsoleScriptResponseMessage responseMessage = new ConsoleScriptResponseMessage(resultMessage);
+
+            /*
+            RexsterBindings bindingsFromServer = responseMessage.getBindings();
+
+            // apply bindings from server to local bindings so that they are in synch
+            if (bindingsFromServer != null) {
+                bindings.putAll(bindingsFromServer);
+            }
+            */
+
+            ArrayList<String> lines = new ArrayList<String>();
+            ByteBuffer bb = ByteBuffer.wrap(responseMessage.getBody());
+
+            // navigate to the start of the results
+            int lengthOfBindings = bb.getInt();
+            bb.position(lengthOfBindings + 4);
+
+            while (bb.hasRemaining()) {
+                int segmentLength = bb.getInt();
+                byte[] resultObjectBytes = new byte[segmentLength];
+                bb.get(resultObjectBytes);
+
+                lines.add(new String(resultObjectBytes));
+            }
+
+            returnValue = lines.iterator();
+
+            if (lines.size() == 1) {
+                returnValue = lines.get(0);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
+
+        return returnValue;
     }
 
     public static void main(String[] args) throws Exception {

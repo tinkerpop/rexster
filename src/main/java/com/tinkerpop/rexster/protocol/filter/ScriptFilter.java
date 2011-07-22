@@ -25,7 +25,7 @@ public class ScriptFilter extends BaseFilter {
                 Object result = session.evaluate(specificMessage.getScript(),
                         specificMessage.getLanguageName(), specificMessage.getBindings());
 
-                ScriptResponseMessage resultMessage = new ScriptResponseMessage(message.getSessionAsUUID(),
+                ConsoleScriptResponseMessage resultMessage = new ConsoleScriptResponseMessage(message.getSessionAsUUID(),
                         ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, result, session.getBindings());
 
                 ctx.write(resultMessage);
@@ -40,6 +40,8 @@ public class ScriptFilter extends BaseFilter {
                         "An error occurred while processing the script for language [" + specificMessage.getLanguageName() + "]: " + se.getMessage()));
 
                 return ctx.getStopAction();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
 
             return ctx.getStopAction();

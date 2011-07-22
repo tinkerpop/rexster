@@ -6,8 +6,16 @@ import java.util.UUID;
 
 public class SessionRequestMessage extends RexProMessage {
 
-    public static final byte FLAG_NEW = 0;
-    public static final byte FLAG_KILL = 1;
+    /**
+     * The console session is one that returns all values as string representations,
+     * with its primary expected use being a remote console application.
+     */
+    public static final byte FLAG_NEW_CONSOLE_SESSION = 0;
+
+    /**
+     * Destroy a session.
+     */
+    public static final byte FLAG_KILL_SESSION = 1;
 
     public SessionRequestMessage(RexProMessage message) {
         super(message.getVersion(), message.getType(), message.getFlag(),

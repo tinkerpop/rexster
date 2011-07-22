@@ -24,12 +24,12 @@ public class SessionFilter extends BaseFilter {
         if (message.getType() == MessageType.SESSION_REQUEST) {
             SessionRequestMessage specificMessage = new SessionRequestMessage(message);
 
-            if (specificMessage.getFlag() == SessionRequestMessage.FLAG_NEW) {
+            if (specificMessage.getFlag() == SessionRequestMessage.FLAG_NEW_CONSOLE_SESSION) {
                 UUID sessionKey = UUID.randomUUID();
                 RexProSessions.ensureSessionExists(sessionKey, this.rexsterApplication);
 
                 ctx.write(new SessionResponseMessage(sessionKey, specificMessage.getRequestAsUUID()));
-            } else if (specificMessage.getFlag() == SessionRequestMessage.FLAG_KILL) {
+            } else if (specificMessage.getFlag() == SessionRequestMessage.FLAG_KILL_SESSION) {
                 RexProSessions.destroySession(specificMessage.getSessionAsUUID());
                 ctx.write(new SessionResponseMessage(RexProMessage.EMPTY_SESSION, specificMessage.getRequestAsUUID()));
             } else {
