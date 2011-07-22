@@ -10,8 +10,6 @@ import jline.ConsoleReader;
 import jline.History;
 
 import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.SimpleBindings;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -41,7 +39,12 @@ public class RexsterConsole {
         this.port = port;
         this.language = language;
 
+        this.output.print("opening session with Rexster [" + this.host + ":" + this.port + "]");
         this.session = new RemoteRexsterSession(this.host, this.port);
+        this.session.open();
+        this.output.println("--> ready");
+
+        this.output.println("?h for help");
 
         this.primaryLoop();
     }
@@ -93,10 +96,19 @@ public class RexsterConsole {
                     return;
                 } else if (line.equals(Tokens.REXSTER_CONSOLE_HELP))
                     this.printHelp();
-                else if (line.equals(Tokens.REXSTER_CONSOLE_BINDINGS)) {
-                    //this.printBindings(this.rexster.getBindings(ScriptContext.ENGINE_SCOPE));
+                else if (line.equals(Tokens.REXSTER_CONSOLE_LANGUAGES)) {
+                    this.printAvailableLanguages();
                 } else if (line.startsWith(Tokens.REXSTER_CONSOLE_LANGUAGE)) {
-                    this.language = line.substring(1);
+                    String langToChangeTo = line.substring(1);
+                    if (langToChangeTo == null || langToChangeTo.isEmpty()) {
+                        this.output.println("specify a language on Rexster ?<language-name>");
+                        this.printAvailableLanguages();
+                    } else if (this.session.isAvailableLanguage(langToChangeTo)) {
+                        this.language = langToChangeTo;
+                    } else {
+                        this.output.println("not a valid language on Rexster: [" + langToChangeTo + "].");
+                        this.printAvailableLanguages();
+                    }
                 } else {
                     Object result = eval(line, this.language, this.session);
                     Iterator itty;
@@ -121,10 +133,29 @@ public class RexsterConsole {
         }
     }
 
+    private void printAvailableLanguages() {
+        this.output.println("-= Available Languages =-");
+
+        Iterator<String> languages = this.session.getAvailableLanguages();
+        while(languages.hasNext()) {
+            this.output.println("?" + languages.next());
+        }
+    }
+
     public void printHelp() {
         this.output.println("-= Console Specific =-");
-        this.output.println("?<lang-name>: jump to engine");
+        this.output.println("?<language-name>: jump to engine");
+        this.output.println(Tokens.REXSTER_CONSOLE_LANGUAGES + ": list of available languages on Rexster");
         this.output.println(Tokens.REXSTER_CONSOLE_QUIT + ": quit");
+
+        this.output.println("");
+        this.output.println("-= Rexster Administration =-");
+        this.output.println("rexster");
+        this.output.println(" -getGraph(graphName) - gets a Graph instance");
+        this.output.println("   :graphName - [String] - the name of a graph configured within Rexster");
+        this.output.println(" -getGraphNames() - gets the list of graph names configured within Rexster");
+        this.output.println(" -getVersion() - gets the version of Rexster server");
+
     }
 
     public void printBindings(final Bindings bindings) {

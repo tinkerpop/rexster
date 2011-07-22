@@ -4,6 +4,7 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -29,6 +30,15 @@ public class EngineController {
         }
 
         return engineController;
+    }
+
+    public Iterator getAvailableEngineLanguages() {
+        List<String> languages = new ArrayList<String>();
+        for (EngineHolder engine : this.engines) {
+            languages.add(engine.getLanguageName());
+        }
+
+        return languages.iterator();
     }
 
     public EngineHolder getEngineByLanguageName(String languageName) throws ScriptException {

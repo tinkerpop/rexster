@@ -3,7 +3,10 @@ package com.tinkerpop.rexster.protocol;
 import com.tinkerpop.rexster.protocol.message.MessageType;
 import com.tinkerpop.rexster.protocol.message.RexProMessage;
 import com.tinkerpop.rexster.protocol.message.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.message.SessionResponseMessage;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -16,6 +19,8 @@ public class RemoteRexsterSession {
 
     private UUID sessionKey = RexProMessage.EMPTY_SESSION;
 
+    private List<String> availableLanguages;
+
     public RemoteRexsterSession(String rexProHost, int rexProPort) {
         this.rexProHost = rexProHost;
         this.rexProPort = rexProPort;
@@ -25,8 +30,38 @@ public class RemoteRexsterSession {
         if (sessionKey == RexProMessage.EMPTY_SESSION) {
             RexProMessage sessionRequestMessageToSend = new SessionRequestMessage(SessionRequestMessage.FLAG_NEW_CONSOLE_SESSION);
             final RexProMessage rcvMessage = RexPro.sendMessage(this.rexProHost, this.rexProPort, sessionRequestMessageToSend);
+
+            final SessionResponseMessage sessionResponseMessage = new SessionResponseMessage(rcvMessage);
+
+            this.availableLanguages = sessionResponseMessage.getLanguages();
+
             this.sessionKey = rcvMessage.getSessionAsUUID();
         }
+    }
+
+    public Iterator<String> getAvailableLanguages() {
+        if (sessionKey == RexProMessage.EMPTY_SESSION) {
+            return null;
+        }
+
+        return this.availableLanguages.iterator();
+    }
+
+    public boolean isAvailableLanguage(String language) {
+
+        if (sessionKey == RexProMessage.EMPTY_SESSION) {
+            return false;
+        }
+
+        boolean found = false;
+        Iterator<String> languageIterator = this.availableLanguages.iterator();
+        while (languageIterator.hasNext()) {
+            if (languageIterator.next().equals(language)) {
+                found = true;
+            }
+        }
+
+        return found;
     }
 
     public void close() {

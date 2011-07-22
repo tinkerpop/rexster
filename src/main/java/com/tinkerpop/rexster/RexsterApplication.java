@@ -58,19 +58,19 @@ public class RexsterApplication {
         return this.graphs.get(graphName).getGraph();
     }
 
-    public RexsterApplicationGraph getApplicationGraph(String graphName) {
+    RexsterApplicationGraph getApplicationGraph(String graphName) {
         return this.graphs.get(graphName);
     }
 
-    public Set<String> getGraphsNames() {
+    public Set<String> getGraphNames() {
         return this.graphs.keySet();
     }
 
-    public long getStartTime() {
+    long getStartTime() {
         return this.startTime;
     }
 
-    public void stop() throws Exception {
+    void stop() throws Exception {
 
         // need to shutdown all the graphs that were started with the web server
         for (RexsterApplicationGraph rag : this.graphs.values()) {

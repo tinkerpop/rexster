@@ -52,7 +52,7 @@ public class WebServerRexsterApplicationProvider implements RexsterApplicationPr
     }
 
     public Set<String> getGraphsNames() {
-        return this.getRexsterApplication().getGraphsNames();
+        return this.getRexsterApplication().getGraphNames();
     }
 
     public long getStartTime() {

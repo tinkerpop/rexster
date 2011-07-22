@@ -13,7 +13,7 @@ public class SessionResponseMessageTest {
 
     @Test
     public void constructEmptyConstructorEnsureFormat() {
-        RexProMessage msg = new com.tinkerpop.rexster.protocol.message.SessionResponseMessage(sessionKey, requestKey);
+        RexProMessage msg = new SessionResponseMessage(sessionKey, requestKey, null);
 
         Assert.assertEquals(sessionKey, msg.getSessionAsUUID());
         Assert.assertTrue(msg.hasSession());
@@ -24,7 +24,7 @@ public class SessionResponseMessageTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void constructCopyRexProMessageWrongType() {
-        RexProMessage msgToConvert = new com.tinkerpop.rexster.protocol.message.SessionResponseMessage(sessionKey, requestKey);
+        RexProMessage msgToConvert = new SessionResponseMessage(sessionKey, requestKey, null);
         msgToConvert.setType(MessageType.SESSION_REQUEST);
 
         new com.tinkerpop.rexster.protocol.message.SessionResponseMessage(msgToConvert);
@@ -32,8 +32,8 @@ public class SessionResponseMessageTest {
 
     @Test
     public void constructCopyRexProMessage() {
-        RexProMessage msgToConvert = new com.tinkerpop.rexster.protocol.message.SessionResponseMessage(sessionKey, requestKey);
-        RexProMessage convertedMsg = new com.tinkerpop.rexster.protocol.message.SessionResponseMessage(msgToConvert);
+        RexProMessage msgToConvert = new SessionResponseMessage(sessionKey, requestKey, null);
+        RexProMessage convertedMsg = new SessionResponseMessage(msgToConvert);
 
         Assert.assertNotNull(convertedMsg);
         Assert.assertTrue(Arrays.equals(msgToConvert.getSession(), convertedMsg.getSession()));

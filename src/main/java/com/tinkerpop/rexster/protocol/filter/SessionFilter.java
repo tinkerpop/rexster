@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.protocol.filter;
 
 import com.tinkerpop.rexster.RexsterApplication;
+import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.RexProSessions;
 import com.tinkerpop.rexster.protocol.message.*;
 import org.glassfish.grizzly.filterchain.BaseFilter;
@@ -28,10 +29,14 @@ public class SessionFilter extends BaseFilter {
                 UUID sessionKey = UUID.randomUUID();
                 RexProSessions.ensureSessionExists(sessionKey, this.rexsterApplication);
 
-                ctx.write(new SessionResponseMessage(sessionKey, specificMessage.getRequestAsUUID()));
+                EngineController engineController = EngineController.getInstance();
+
+                ctx.write(new SessionResponseMessage(sessionKey, specificMessage.getRequestAsUUID(),
+                        engineController.getAvailableEngineLanguages()));
+
             } else if (specificMessage.getFlag() == SessionRequestMessage.FLAG_KILL_SESSION) {
                 RexProSessions.destroySession(specificMessage.getSessionAsUUID());
-                ctx.write(new SessionResponseMessage(RexProMessage.EMPTY_SESSION, specificMessage.getRequestAsUUID()));
+                ctx.write(new SessionResponseMessage(RexProMessage.EMPTY_SESSION, specificMessage.getRequestAsUUID(), null));
             } else {
                 // there is no session to this message...that's a problem
                 ctx.write(new ErrorResponseMessage(RexProMessage.EMPTY_SESSION, message.getRequestAsUUID(),
