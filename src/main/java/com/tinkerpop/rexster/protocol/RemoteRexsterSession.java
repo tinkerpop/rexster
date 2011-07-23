@@ -72,9 +72,6 @@ public class RemoteRexsterSession {
 
     public void reset() {
         this.close();
-
-        this.sessionKey = RexProMessage.EMPTY_SESSION;
-
         this.open();
     }
 
@@ -93,6 +90,8 @@ public class RemoteRexsterSession {
             } else {
                 // TODO: an error message
             }
+
+            this.sessionKey = RexProMessage.EMPTY_SESSION;
 
         }
     }

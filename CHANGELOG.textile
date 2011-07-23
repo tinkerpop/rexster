@@ -10,7 +10,7 @@ All releases can be accessed through the TinkerPop Maven2 repository identified 
 
 ==<hr/>==
 
-h3. Version 0.5 (* -- NOT OFFICIALLY RELEASED)
+h3. Version 0.5 (Dog Star -- NOT OFFICIALLY RELEASED)
 
 * It is now possible to mix and match root level extensions with pathed extensions in the same extension class.
 * Support the @Accept-Charset@ request header.
@@ -24,6 +24,7 @@ h3. Version 0.5 (* -- NOT OFFICIALLY RELEASED)
 * Extensions can be broken up across multiple classes within the same namespace and name.
 * Used the Blueprints JSONWriter to serialize to JSON which fixed a number of problems related to serialization of multi-layered hashes and lists.
 * Nulls in iterators returned through Dog House are displayed as "null".
+* Rexster Console for evaluating scripts remotely on a Rexster server.
 
 ==<hr/>==
 
