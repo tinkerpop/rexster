@@ -14,7 +14,13 @@ import java.util.concurrent.TimeUnit;
 
 final class RexPro {
 
+    public static final int DEFAULT_TIMEOUT_SECONDS = 100;
+
     public static RexProMessage sendMessage(String rexProHost, int rexProPort, RexProMessage messageToSend) {
+        return sendMessage(rexProHost, rexProPort, messageToSend, DEFAULT_TIMEOUT_SECONDS);
+    }
+
+    public static RexProMessage sendMessage(String rexProHost, int rexProPort, RexProMessage messageToSend, int timeoutSeconds) {
         final FutureImpl<RexProMessage> sessionMessageFuture = SafeFutureImpl.create();
 
         Connection connection = null;
@@ -27,11 +33,11 @@ final class RexPro {
             // Connect client to the server
             GrizzlyFuture<Connection> future = transport.connect(rexProHost, rexProPort);
 
-            connection = future.get(10, TimeUnit.SECONDS);
+            connection = future.get(timeoutSeconds, TimeUnit.SECONDS);
 
             connection.write(messageToSend);
 
-            return sessionMessageFuture.get(10, TimeUnit.SECONDS);
+            return sessionMessageFuture.get(timeoutSeconds, TimeUnit.SECONDS);
 
         } catch (Exception e) {
             throw new RuntimeException("Could not open session with Rexster at " + rexProHost + ":" + rexProPort, e);

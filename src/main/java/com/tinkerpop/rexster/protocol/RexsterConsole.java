@@ -8,6 +8,7 @@ import com.tinkerpop.rexster.protocol.message.RexProMessage;
 import com.tinkerpop.rexster.protocol.message.ScriptRequestMessage;
 import jline.ConsoleReader;
 import jline.History;
+import org.apache.commons.cli.*;
 
 import javax.script.Bindings;
 import java.io.*;
@@ -22,12 +23,13 @@ public class RexsterConsole {
     private String host;
     private String language;
     private int port;
+    private int timeout;
 
     private final PrintStream output = System.out;
 
     private static final String REXSTER_HISTORY = ".rexster_history";
 
-    public RexsterConsole(String host, int port, String language) throws Exception {
+    public RexsterConsole(String host, int port, String language, int timeout) throws Exception {
 
         this.output.println("        (l_(l");
         this.output.println("(_______( 0 0");
@@ -38,9 +40,10 @@ public class RexsterConsole {
         this.host = host;
         this.port = port;
         this.language = language;
+        this.timeout = timeout;
 
         this.output.print("opening session with Rexster [" + this.host + ":" + this.port + "] requesting [" + this.language + "]");
-        this.session = new RemoteRexsterSession(this.host, this.port);
+        this.session = new RemoteRexsterSession(this.host, this.port, this.timeout);
         this.session.open();
         this.output.println("--> ready");
 
@@ -227,24 +230,99 @@ public class RexsterConsole {
         return returnValue;
     }
 
+    @SuppressWarnings("static-access")
+    private static Options getCliOptions() {
+        Option help = new Option("h", "help", false, "print this message");
+
+        Option hostName = OptionBuilder.withArgName("host-name")
+                .hasArg()
+                .withDescription("the rexster server to connect to")
+                .withLongOpt("rexsterhost")
+                .create("rh");
+
+        Option port = OptionBuilder.withArgName("port")
+                .hasArg()
+                .withDescription("the port of the rexster server that is serving rexpro")
+                .withLongOpt("rexsterport")
+                .create("rp");
+
+        Option language = OptionBuilder.withArgName("language")
+                .hasArg()
+                .withDescription("the script engine language to use by default")
+                .withLongOpt("language")
+                .create("l");
+
+        Option timeout = OptionBuilder.withArgName("seconds")
+                .hasArg()
+                .withDescription("time allowed when waiting for results from server (default 100 seconds)")
+                .withLongOpt("timeout")
+                .create("t");
+
+        Options options = new Options();
+        options.addOption(help);
+        options.addOption(hostName);
+        options.addOption(port);
+        options.addOption(language);
+        options.addOption(timeout);
+
+        return options;
+    }
+
+    private static CommandLine getCliInput(final String[] args) throws Exception {
+        Options options = getCliOptions();
+        CommandLineParser parser = new GnuParser();
+        CommandLine line = null;
+
+        try {
+            line = parser.parse(options, args);
+        } catch (ParseException exp) {
+            throw new Exception("Parsing failed.  Reason: " + exp.getMessage());
+        }
+
+        if (line.hasOption("help")) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("rexster console", options);
+            System.exit(0);
+        }
+
+        return line;
+    }
+
     public static void main(String[] args) throws Exception {
 
-        if (args.length < 3) {
-            System.out.println("Rexster Console expects three parameters in the following order: host port language");
-        } else {
+        CommandLine line = getCliInput(args);
 
-            String host = args[0];
+        String host = "localhost";
+        int port = 8185;
+        String language = "gremlin";
+        int timeout = RexPro.DEFAULT_TIMEOUT_SECONDS;
 
-            int port = 0;
-            try {
-                port = Integer.parseInt(args[1]);
-            } catch (NumberFormatException nfe) {
-                System.out.println("The port parameter must be an integer value.");
-            }
-
-            String language = args[2];
-
-            new RexsterConsole(host, port, language);
+        if (line.hasOption("rexsterhost")) {
+            host = line.getOptionValue("rexsterhost");
         }
+
+        if (line.hasOption("rexsterport")) {
+            String portString = line.getOptionValue("rexsterport");
+            try {
+                port = Integer.parseInt(portString);
+            } catch (NumberFormatException nfe) {
+                System.out.println("the rexsterport parameter must be an integer value. Defaulting to: [" + port + "]");
+            }
+        }
+
+        if (line.hasOption("language")) {
+            language = line.getOptionValue("language");
+        }
+
+        if (line.hasOption("timeout")) {
+            String timeoutString = line.getOptionValue("timeout");
+            try {
+                port = Integer.parseInt(timeoutString);
+            } catch (NumberFormatException nfe) {
+                System.out.println("the timeout parameter must be an integer value. Defaulting to: " + timeout);
+            }
+        }
+
+        new RexsterConsole(host, port, language, timeout);
     }
 }

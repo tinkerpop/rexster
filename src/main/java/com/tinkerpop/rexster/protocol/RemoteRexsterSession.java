@@ -15,6 +15,7 @@ import java.util.UUID;
 public class RemoteRexsterSession {
 
     private int rexProPort = 8185;
+    private int timeout;
     private String rexProHost = "localhost";
 
     private UUID sessionKey = RexProMessage.EMPTY_SESSION;
@@ -22,8 +23,13 @@ public class RemoteRexsterSession {
     private List<String> availableLanguages;
 
     public RemoteRexsterSession(String rexProHost, int rexProPort) {
+        this(rexProHost, rexProPort, RexPro.DEFAULT_TIMEOUT_SECONDS);
+    }
+
+    public RemoteRexsterSession(String rexProHost, int rexProPort, int timeout) {
         this.rexProHost = rexProHost;
         this.rexProPort = rexProPort;
+        this.timeout = timeout;
     }
 
     public void open() {
