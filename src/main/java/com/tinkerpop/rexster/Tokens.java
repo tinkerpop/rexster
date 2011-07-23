@@ -31,6 +31,7 @@ public class Tokens {
 
     public static final String REXPRO_REXSTER_CONTEXT = "rexster";
 
+    public static final String REXSTER_CONSOLE_BINDINGS = "?b";
     public static final String REXSTER_CONSOLE_HELP = "?h";
     public static final String REXSTER_CONSOLE_LANGUAGES = "?l";
     public static final String REXSTER_CONSOLE_LANGUAGE = "?";

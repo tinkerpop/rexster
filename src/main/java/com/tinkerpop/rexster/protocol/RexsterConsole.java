@@ -16,6 +16,7 @@ import java.nio.ByteBuffer;
 import java.rmi.Remote;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class RexsterConsole {
@@ -25,6 +26,7 @@ public class RexsterConsole {
     private String language;
     private int port;
     private int timeout;
+    private List<String> currentBindings = new ArrayList<String>();
 
     private final PrintStream output = System.out;
 
@@ -102,6 +104,8 @@ public class RexsterConsole {
                     return;
                 } else if (line.equals(Tokens.REXSTER_CONSOLE_HELP)) {
                     this.printHelp();
+                } else if (line.equals(Tokens.REXSTER_CONSOLE_BINDINGS)) {
+                    this.printBindings();
                 } else if (line.equals(Tokens.REXSTER_CONSOLE_RESET)) {
                     this.output.print("resetting session with Rexster [" + this.host + ":" + this.port + "]");
                     if (this.session != null) {
@@ -124,21 +128,23 @@ public class RexsterConsole {
                         this.printAvailableLanguages();
                     }
                 } else {
-                    Object result = eval(line, this.language, this.session);
+                    ResultAndBindings result = eval(line, this.language, this.session);
                     Iterator itty;
-                    if (result instanceof Iterator) {
-                        itty = (Iterator) result;
-                    } else if (result instanceof Iterable) {
-                        itty = ((Iterable) result).iterator();
-                    } else if (result instanceof Map) {
-                        itty = ((Map) result).entrySet().iterator();
+                    if (result.getResult() instanceof Iterator) {
+                        itty = (Iterator) result.getResult();
+                    } else if (result.getResult() instanceof Iterable) {
+                        itty = ((Iterable) result.getResult()).iterator();
+                    } else if (result.getResult() instanceof Map) {
+                        itty = ((Map) result.getResult()).entrySet().iterator();
                     } else {
-                        itty = new SingleIterator<Object>(result);
+                        itty = new SingleIterator<Object>(result.getResult());
                     }
 
                     while (itty.hasNext()) {
                         this.output.println("==>" + itty.next());
                     }
+
+                    this.currentBindings = result.getBindings();
                 }
 
             } catch (Exception e) {
@@ -173,9 +179,9 @@ public class RexsterConsole {
         this.output.println("");
     }
 
-    public void printBindings(final Bindings bindings) {
-        for (Map.Entry<String, Object> entry : bindings.entrySet()) {
-            this.output.println(entry);
+    public void printBindings() {
+        for (String binding : this.currentBindings) {
+            this.output.println("==>" + binding);
         }
     }
 
@@ -191,9 +197,9 @@ public class RexsterConsole {
         return space;
     }
 
-    private static Object eval(String script, String scriptEngineName, RemoteRexsterSession session) {
+    private static ResultAndBindings eval(String script, String scriptEngineName, RemoteRexsterSession session) {
 
-        Object returnValue = null;
+        ResultAndBindings returnValue = null;
 
         try {
             session.open();
@@ -206,13 +212,18 @@ public class RexsterConsole {
                     session.getRexProHost(), session.getRexProPort(), scriptMessage);
 
             ArrayList<String> lines = new ArrayList<String>();
+            List<String> bindings = new ArrayList<String>();
             try {
                 ConsoleScriptResponseMessage responseMessage = new ConsoleScriptResponseMessage(resultMessage);
+
+                bindings = responseMessage.getBindings();
+
                 ByteBuffer bb = ByteBuffer.wrap(responseMessage.getBody());
 
                 // navigate to the start of the results...bindings are attached if there is no error present
                 int lengthOfBindings = bb.getInt();
                 bb.position(lengthOfBindings + 4);
+
 
                 while (bb.hasRemaining()) {
                     int segmentLength = bb.getInt();
@@ -227,11 +238,14 @@ public class RexsterConsole {
                 lines.add(errorMessage.getErrorMessage());
             }
 
-            returnValue = lines.iterator();
+            Object result = lines.iterator();
 
             if (lines.size() == 1) {
-                returnValue = lines.get(0);
+                result = lines.get(0);
             }
+
+            returnValue = new ResultAndBindings(result, bindings);
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

@@ -28,7 +28,7 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
         super(RexProMessage.CURRENT_VERSION, MessageType.SCRIPT_RESPONSE, flag,
                 BitWorks.convertUUIDToByteArray(sessionKey),
                 BitWorks.convertUUIDToByteArray(UUID.randomUUID()),
-                buildBody(BitWorks.convertSerializableBindingsToByteArray(bindings), convertResultToConsoleLineBytes(result)));
+                buildBody(convertBindingsToByteArray(bindings), convertResultToConsoleLineBytes(result)));
     }
 
 
@@ -41,22 +41,46 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
         return bb.array();
     }
 
-    public RexsterBindings getBindings() {
+    public List<String> getBindings() {
         ByteBuffer buffer = ByteBuffer.wrap(this.body);
         int bindingsLength = buffer.getInt();
 
-        RexsterBindings bindings = null;
+        List<String> bindings = new ArrayList<String>();
 
         try {
             byte[] bindingsBytes = new byte[bindingsLength];
             buffer.get(bindingsBytes);
-            bindings = BitWorks.convertByteArrayToRexsterBindings(bindingsBytes);
+
+            ByteBuffer bb = ByteBuffer.wrap(bindingsBytes);
+
+            while (bb.hasRemaining()) {
+                int segmentLength = bb.getInt();
+                byte[] segmentBytes = new byte[segmentLength];
+                bb.get(segmentBytes);
+
+                bindings.add(new String(segmentBytes));
+            }
+
         } catch (Exception e) {
             // TODO: clean up
             e.printStackTrace();
         }
 
         return bindings;
+    }
+
+    private static byte[] convertBindingsToByteArray(Bindings bindings) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            for (String key : bindings.keySet()) {
+                baos.write(BitWorks.convertStringsToByteArray(key + "=" + bindings.get(key).toString()));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return baos.toByteArray();
     }
 
 

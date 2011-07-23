@@ -140,7 +140,7 @@ public class RexsterScriptEngine extends AbstractScriptEngine {
             final RexProMessage resultMessage = RexPro.sendMessage(
                     session.getRexProHost(), session.getRexProPort(), scriptMessage);
 
-            final ConsoleScriptResponseMessage responseMessage = new ConsoleScriptResponseMessage(resultMessage);
+            final ScriptResponseMessage responseMessage = new ScriptResponseMessage(resultMessage);
             RexsterBindings bindingsFromServer = responseMessage.getBindings();
 
             // apply bindings from server to local bindings so that they are in synch
