@@ -39,7 +39,7 @@ public class RexsterConsole {
         this.port = port;
         this.language = language;
 
-        this.output.print("opening session with Rexster [" + this.host + ":" + this.port + "]");
+        this.output.print("opening session with Rexster [" + this.host + ":" + this.port + "] requesting [" + this.language + "]");
         this.session = new RemoteRexsterSession(this.host, this.port);
         this.session.open();
         this.output.println("--> ready");
@@ -89,10 +89,12 @@ public class RexsterConsole {
                 if (line.isEmpty())
                     continue;
                 if (line.equals(Tokens.REXSTER_CONSOLE_QUIT)) {
+                    this.output.print("closing session with Rexster [" + this.host + ":" + this.port + "]");
                     if (this.session != null) {
                         this.session.close();
                         this.session = null;
                     }
+                    this.output.println("--> done");
                     return;
                 } else if (line.equals(Tokens.REXSTER_CONSOLE_HELP))
                     this.printHelp();
@@ -147,15 +149,15 @@ public class RexsterConsole {
         this.output.println("?<language-name>: jump to engine");
         this.output.println(Tokens.REXSTER_CONSOLE_LANGUAGES + ": list of available languages on Rexster");
         this.output.println(Tokens.REXSTER_CONSOLE_QUIT + ": quit");
+        this.output.println(Tokens.REXSTER_CONSOLE_HELP + ": displays this message");
 
         this.output.println("");
-        this.output.println("-= Rexster Administration =-");
-        this.output.println("rexster");
-        this.output.println(" -getGraph(graphName) - gets a Graph instance");
+        this.output.println("-= Rexster Context =-");
+        this.output.println("rexster.getGraph(graphName) - gets a Graph instance");
         this.output.println("   :graphName - [String] - the name of a graph configured within Rexster");
-        this.output.println(" -getGraphNames() - gets the list of graph names configured within Rexster");
-        this.output.println(" -getVersion() - gets the version of Rexster server");
-
+        this.output.println("rexster.getGraphNames() - gets the set of graph names configured within Rexster");
+        this.output.println("rexster.getVersion() - gets the version of Rexster server");
+        this.output.println("");
     }
 
     public void printBindings(final Bindings bindings) {
