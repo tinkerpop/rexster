@@ -31,7 +31,7 @@ public class RexsterConsole {
 
         this.output.println("        (l_(l");
         this.output.println("(_______( 0 0");
-        this.output.println("(        (-Y-)");
+        this.output.println("(        (-Y-) <woof>");
         this.output.println("l l-----l l");
         this.output.println("l l,,   l l,,");
 
