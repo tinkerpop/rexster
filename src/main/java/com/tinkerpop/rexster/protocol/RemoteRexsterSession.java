@@ -70,6 +70,14 @@ public class RemoteRexsterSession {
         return found;
     }
 
+    public void reset() {
+        this.close();
+
+        this.sessionKey = RexProMessage.EMPTY_SESSION;
+
+        this.open();
+    }
+
     public void close() {
 
         if (sessionKey != RexProMessage.EMPTY_SESSION) {

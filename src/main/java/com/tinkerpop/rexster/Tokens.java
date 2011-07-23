@@ -32,9 +32,10 @@ public class Tokens {
     public static final String REXPRO_REXSTER_CONTEXT = "rexster";
 
     public static final String REXSTER_CONSOLE_HELP = "?h";
-    public static final String REXSTER_CONSOLE_QUIT = "?q";
     public static final String REXSTER_CONSOLE_LANGUAGES = "?l";
     public static final String REXSTER_CONSOLE_LANGUAGE = "?";
+    public static final String REXSTER_CONSOLE_QUIT = "?q";
+    public static final String REXSTER_CONSOLE_RESET = "?r";
 
     public static final String DESCRIPTION = "description";
     public static final String PARAMETERS = "parameters";

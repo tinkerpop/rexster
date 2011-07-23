@@ -13,6 +13,7 @@ import org.apache.commons.cli.*;
 import javax.script.Bindings;
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.rmi.Remote;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -99,9 +100,17 @@ public class RexsterConsole {
                     }
                     this.output.println("--> done");
                     return;
-                } else if (line.equals(Tokens.REXSTER_CONSOLE_HELP))
+                } else if (line.equals(Tokens.REXSTER_CONSOLE_HELP)) {
                     this.printHelp();
-                else if (line.equals(Tokens.REXSTER_CONSOLE_LANGUAGES)) {
+                } else if (line.equals(Tokens.REXSTER_CONSOLE_RESET)) {
+                    this.output.print("resetting session with Rexster [" + this.host + ":" + this.port + "]");
+                    if (this.session != null) {
+                        this.session.reset();
+                    } else {
+                        this.session = new RemoteRexsterSession(this.host, this.port, this.timeout);
+                    }
+                    this.output.println("--> done");
+                } else if (line.equals(Tokens.REXSTER_CONSOLE_LANGUAGES)) {
                     this.printAvailableLanguages();
                 } else if (line.startsWith(Tokens.REXSTER_CONSOLE_LANGUAGE)) {
                     String langToChangeTo = line.substring(1);
@@ -151,6 +160,7 @@ public class RexsterConsole {
         this.output.println("-= Console Specific =-");
         this.output.println("?<language-name>: jump to engine");
         this.output.println(Tokens.REXSTER_CONSOLE_LANGUAGES + ": list of available languages on Rexster");
+        this.output.println(Tokens.REXSTER_CONSOLE_RESET + ": reset the rexster session");
         this.output.println(Tokens.REXSTER_CONSOLE_QUIT + ": quit");
         this.output.println(Tokens.REXSTER_CONSOLE_HELP + ": displays this message");
 
