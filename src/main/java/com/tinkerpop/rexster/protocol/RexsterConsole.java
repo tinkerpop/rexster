@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
-import com.tinkerpop.pipes.SingleIterator;
+import com.tinkerpop.pipes.util.SingleIterator;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.message.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.message.ErrorResponseMessage;

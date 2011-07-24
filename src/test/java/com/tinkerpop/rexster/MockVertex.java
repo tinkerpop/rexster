@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.pipes.Pipe;
 import com.tinkerpop.pipes.filter.ComparisonFilterPipe;
-import com.tinkerpop.pipes.pgm.LabelFilterPipe;
+import com.tinkerpop.pipes.filter.LabelFilterPipe;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
