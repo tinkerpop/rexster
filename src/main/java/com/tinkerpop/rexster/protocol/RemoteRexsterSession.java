@@ -4,6 +4,7 @@ import com.tinkerpop.rexster.protocol.message.MessageType;
 import com.tinkerpop.rexster.protocol.message.RexProMessage;
 import com.tinkerpop.rexster.protocol.message.SessionRequestMessage;
 import com.tinkerpop.rexster.protocol.message.SessionResponseMessage;
+import org.apache.log4j.Logger;
 
 import java.util.Iterator;
 import java.util.List;
@@ -35,14 +36,20 @@ public class RemoteRexsterSession {
     public void open() {
         if (sessionKey == RexProMessage.EMPTY_SESSION) {
             RexProMessage sessionRequestMessageToSend = new SessionRequestMessage(SessionRequestMessage.FLAG_NEW_CONSOLE_SESSION);
-            final RexProMessage rcvMessage = RexPro.sendMessage(this.rexProHost, this.rexProPort, sessionRequestMessageToSend);
+            final RexProMessage rcvMessage = sendRequest(sessionRequestMessageToSend, 3);
 
-            final SessionResponseMessage sessionResponseMessage = new SessionResponseMessage(rcvMessage);
+            if (rcvMessage != null) {
+                final SessionResponseMessage sessionResponseMessage = new SessionResponseMessage(rcvMessage);
 
-            this.availableLanguages = sessionResponseMessage.getLanguages();
+                this.availableLanguages = sessionResponseMessage.getLanguages();
 
-            this.sessionKey = rcvMessage.getSessionAsUUID();
+                this.sessionKey = rcvMessage.getSessionAsUUID();
+            }
         }
+    }
+
+    public boolean isOpen() {
+        return this.sessionKey != RexProMessage.EMPTY_SESSION;
     }
 
     public Iterator<String> getAvailableLanguages() {
@@ -70,6 +77,43 @@ public class RemoteRexsterSession {
         return found;
     }
 
+    public RexProMessage sendRequest(RexProMessage request, int maxRetries) {
+        return sendRequest(request, maxRetries, 3000);
+    }
+
+    public RexProMessage sendRequest(RexProMessage request, int maxRetries, int waitMsBetweenTries) {
+        int tries = 0;
+        RexProMessage rcvMessage = null;
+
+        while (rcvMessage == null && tries < maxRetries) {
+            tries++;
+
+            try {
+                rcvMessage = RexPro.sendMessage(this.rexProHost, this.rexProPort, request);
+            } catch (Exception ex) {
+
+                String logMessage = "Failure sending message via RexPro. Attempt [" + tries + "] of ["  + maxRetries + "].";
+
+                if (tries < maxRetries) {
+                    logMessage = logMessage + " Trying again in " + waitMsBetweenTries + " (ms)";
+                }
+
+                //logger.warn(logMessage, ex);
+
+                rcvMessage = null;
+
+                // wait
+                try {
+                    Thread.sleep(waitMsBetweenTries);
+                } catch (InterruptedException ie) {
+                    // carry on
+                }
+            }
+        }
+
+        return rcvMessage;
+    }
+
     public void reset() {
         this.close();
         this.open();
@@ -82,7 +126,7 @@ public class RemoteRexsterSession {
 
             // need to set the session here so that the server knows which one to delete.
             sessionKillMessageToSend.setSession(BitWorks.convertUUIDToByteArray(this.sessionKey));
-            final RexProMessage rcvMessage = RexPro.sendMessage(this.rexProHost, this.rexProPort, sessionKillMessageToSend);
+            final RexProMessage rcvMessage = sendRequest(sessionKillMessageToSend, 3);
 
             // response message will have an EMPTY_SESSION
             if (rcvMessage.getType() == MessageType.SESSION_RESPONSE) {

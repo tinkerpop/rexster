@@ -48,11 +48,17 @@ public class RexsterConsole {
         this.output.print("opening session with Rexster [" + this.host + ":" + this.port + "] requesting [" + this.language + "]");
         this.session = new RemoteRexsterSession(this.host, this.port, this.timeout);
         this.session.open();
-        this.output.println("--> ready");
 
-        this.output.println("?h for help");
+        if (this.session.isOpen()) {
+            this.output.println("--> ready");
+            this.output.println("?h for help");
 
-        this.primaryLoop();
+            this.primaryLoop();
+        } else {
+            this.output.println("--> session not established");
+            this.output.println("could not connect to the Rexster server");
+        }
+
     }
 
     public void primaryLoop() throws Exception {
@@ -208,8 +214,7 @@ public class RexsterConsole {
             final RexProMessage scriptMessage = new ScriptRequestMessage(
                     session.getSessionKey(), scriptEngineName, new RexsterBindings(), script);
 
-            final RexProMessage resultMessage = RexPro.sendMessage(
-                    session.getRexProHost(), session.getRexProPort(), scriptMessage);
+            final RexProMessage resultMessage = session.sendRequest(scriptMessage, 3, 500);
 
             ArrayList<String> lines = new ArrayList<String>();
             List<String> bindings = new ArrayList<String>();
