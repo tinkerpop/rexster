@@ -55,7 +55,7 @@ public class MockVertex implements Vertex {
         if (labels.length == 0) {
             return this.outEdges;
         } else {
-            Pipe pipe = new LabelFilterPipe(labels[0], ComparisonFilterPipe.Filter.NOT_EQUAL);
+            Pipe pipe = new LabelFilterPipe(labels[0], ComparisonFilterPipe.Filter.EQUAL);
             pipe.setStarts(this.outEdges);
             return pipe;
         }
@@ -65,7 +65,7 @@ public class MockVertex implements Vertex {
         if (labels.length == 0) {
             return this.inEdges;
         } else {
-            Pipe pipe = new LabelFilterPipe(labels[0], ComparisonFilterPipe.Filter.NOT_EQUAL);
+            Pipe pipe = new LabelFilterPipe(labels[0], ComparisonFilterPipe.Filter.EQUAL);
             pipe.setStarts(this.inEdges);
             return pipe;
         }
