@@ -10,6 +10,8 @@ All releases can be accessed through the TinkerPop Maven2 repository identified 
 
 ==<hr/>==
 
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dogstar.png!
+
 h3. Version 0.5 (Dog Star -- NOT OFFICIALLY RELEASED)
 
 * It is now possible to mix and match root level extensions with pathed extensions in the same extension class.
@@ -17,12 +19,12 @@ h3. Version 0.5 (Dog Star -- NOT OFFICIALLY RELEASED)
 * The Dog House Gremlin Console now handles UTF-8.
 * The HTTP method is now displayed in the hypermedia for extensions.
 * Added the @parseToJson@ parameter to the @@ExtensionRequestParameter@ so that it is possible for extensions to control whether or not a specific parameter's value is parsed to JSON or not.
-* The @<graph-file>@ parameter rexster.xml is now used to locate a graph, not to initialize it.  Affects @TinkerGraph@ and @MemoryStoreSailGraph@ implementations.
+* The @<graph-file>@ parameter @rexster.xml@ is now used to locate a graph, not to initialize it.  Affects @TinkerGraph@ and @MemoryStoreSailGraph@ implementations.
 * When requesting an index by name @http://localhost/graph/indices/edge@ the index is wrapped in a @results@ key in the return JSON.  This is more consistent with other return values.
 * Indices returned from @http://localhost/graph/indices@ or when requested by name have their class value set to @edge@ or @vertex@ as opposed to the full canonical class name.
 * Short-hand command line options.
 * Extensions can be broken up across multiple classes within the same namespace and name.
-* Used the Blueprints JSONWriter to serialize to JSON which fixed a number of problems related to serialization of multi-layered hashes and lists.
+* Used the Blueprints @JSONWriter@ to serialize to JSON which fixed a number of problems related to serialization of multi-layered hashes and lists.
 * Nulls in iterators returned through Dog House are displayed as "null".
 * Rexster Console for evaluating scripts remotely on a Rexster server.
 
