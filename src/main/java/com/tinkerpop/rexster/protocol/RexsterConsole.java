@@ -45,17 +45,15 @@ public class RexsterConsole {
         this.language = language;
         this.timeout = timeout;
 
-        this.output.print("opening session with Rexster [" + this.host + ":" + this.port + "] requesting [" + this.language + "]");
+        this.output.println("opening session [" + this.host + ":" + this.port + "]");
         this.session = new RemoteRexsterSession(this.host, this.port, this.timeout);
         this.session.open();
 
         if (this.session.isOpen()) {
-            this.output.println("--> ready");
             this.output.println("?h for help");
 
             this.primaryLoop();
         } else {
-            this.output.println("--> session not established");
             this.output.println("could not connect to the Rexster server");
         }
 
