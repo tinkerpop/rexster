@@ -250,7 +250,7 @@ public class RexsterConsole {
             returnValue = new ResultAndBindings(result, bindings);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("The session with Rexster Server may have been lost.  Please try again or refresh your session with ?r");
         } finally {
         }
 

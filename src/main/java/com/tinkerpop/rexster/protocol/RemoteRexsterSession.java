@@ -121,22 +121,25 @@ public class RemoteRexsterSession {
 
     public void close() {
 
-        if (sessionKey != RexProMessage.EMPTY_SESSION) {
-            RexProMessage sessionKillMessageToSend = new SessionRequestMessage(SessionRequestMessage.FLAG_KILL_SESSION);
+        try {
+            if (sessionKey != RexProMessage.EMPTY_SESSION) {
+                RexProMessage sessionKillMessageToSend = new SessionRequestMessage(SessionRequestMessage.FLAG_KILL_SESSION);
 
-            // need to set the session here so that the server knows which one to delete.
-            sessionKillMessageToSend.setSession(BitWorks.convertUUIDToByteArray(this.sessionKey));
-            final RexProMessage rcvMessage = sendRequest(sessionKillMessageToSend, 3);
+                // need to set the session here so that the server knows which one to delete.
+                sessionKillMessageToSend.setSession(BitWorks.convertUUIDToByteArray(this.sessionKey));
+                final RexProMessage rcvMessage = sendRequest(sessionKillMessageToSend, 3);
 
-            // response message will have an EMPTY_SESSION
-            if (rcvMessage.getType() == MessageType.SESSION_RESPONSE) {
-                this.sessionKey = rcvMessage.getSessionAsUUID();
-            } else {
-                // TODO: an error message
+                // response message will have an EMPTY_SESSION
+                if (rcvMessage.getType() == MessageType.SESSION_RESPONSE) {
+                    this.sessionKey = rcvMessage.getSessionAsUUID();
+                } else {
+                    // TODO: an error message
+                }
             }
-
+        } catch (Exception ex) {
+            // likely fail is a null pointer on the session
+        } finally {
             this.sessionKey = RexProMessage.EMPTY_SESSION;
-
         }
     }
 
