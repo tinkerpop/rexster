@@ -1,6 +1,6 @@
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-logo.png!
 
-Rexster is a RESTful graph shell that exposes any "Blueprints":http://blueprints.tinkerpop.com graph through a standalone HTTP server. Extensions support standard traversal goals such as search, score, rank, and, in concert, recommendation. Rexster makes extensive use of "Blueprints":http://blueprints.tinkerpop.com, "Pipes":http://pipes.tinkerpop.com, and "Gremlin":http://gremlin.tinkerpop.com. In this way its possible to run Rexster over various graph systems including:
+Rexster is a multi-faceted graph server that exposes any "Blueprints":http://blueprints.tinkerpop.com graph through several mechanisms with a general focus on REST. Extensions support standard traversal goals such as search, score, rank, and, in concert, recommendation. Rexster makes extensive use of "Blueprints":http://blueprints.tinkerpop.com, "Pipes":http://pipes.tinkerpop.com, and "Gremlin":http://gremlin.tinkerpop.com. In this way its possible to run Rexster over various graph systems including:
 
   * Implementations:
   ** "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory graph
@@ -11,5 +11,7 @@ Rexster is a RESTful graph shell that exposes any "Blueprints":http://blueprints
   **** "MemoryStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e705, "NativeStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e746, "LinkedDataSail":http://code.google.com/p/ripple/wiki/LinkedDataSail
 
 Rexster provides a browser-based user interface known as "The Dog House":https://github.com/tinkerpop/rexster/wiki/The-Dog-House. This interface allows for viewing vertices, edges, and their related properties. It also includes a console for executing "Gremlin":http://gremlin.tinkerpop.com scripts.
+
+Rexster also includes "Rexster Console":https://github.com/tinkerpop/rexster/wiki/Rexster-Console which allows remote evaluation of scripts within the Rexster Server context.
 
 The documentation for Rexster can be found at this "location":http://rexster.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.
