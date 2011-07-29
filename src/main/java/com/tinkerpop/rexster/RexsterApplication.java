@@ -93,4 +93,10 @@ public class RexsterApplication {
         }
 
     }
+
+    @Override
+    public String toString() {
+        return "RexsterServerContext{" +
+                "configured graphs=" + graphs.size() + '}';
+    }
 }
