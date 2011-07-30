@@ -135,6 +135,17 @@ public class RexsterConsole {
                         this.session = new RemoteRexsterSession(this.host, this.port, this.timeout);
                     }
                     this.output.println("--> done");
+                } else if (line.startsWith(Tokens.REXSTER_CONSOLE_EXECUTE)) {
+                    String fileToExecute = line.substring(Tokens.REXSTER_CONSOLE_EXECUTE.length()).trim();
+                    if (fileToExecute == null || fileToExecute.isEmpty()) {
+                        this.output.print("specify the file to execute");
+                    } else {
+                        try {
+                            this.executeScript(readFile(fileToExecute));
+                        } catch (IOException ioe) {
+                            this.output.println("could not read the file specified");
+                        }
+                    }
                 } else if (line.equals(Tokens.REXSTER_CONSOLE_LANGUAGES)) {
                     this.printAvailableLanguages();
                 } else if (line.startsWith(Tokens.REXSTER_CONSOLE_LANGUAGE)) {
@@ -200,6 +211,7 @@ public class RexsterConsole {
         this.output.println("?<language-name>: jump to engine");
         this.output.println(Tokens.REXSTER_CONSOLE_LANGUAGES + ": list of available languages on Rexster");
         this.output.println(Tokens.REXSTER_CONSOLE_RESET + ": reset the rexster session");
+        this.output.println(Tokens.REXSTER_CONSOLE_EXECUTE + " <file-name>: execute a script file");
         this.output.println(Tokens.REXSTER_CONSOLE_QUIT + ": quit");
         this.output.println(Tokens.REXSTER_CONSOLE_HELP + ": displays this message");
 
