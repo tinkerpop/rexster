@@ -9,6 +9,7 @@ import com.tinkerpop.rexster.protocol.message.ScriptRequestMessage;
 import jline.ConsoleReader;
 import jline.History;
 import org.apache.commons.cli.*;
+import org.restlet.data.Language;
 
 import javax.script.Bindings;
 import java.io.*;
@@ -57,6 +58,22 @@ public class RexsterConsole {
             this.output.println("could not connect to the Rexster server");
         }
 
+    }
+
+    public RexsterConsole(String host, int port, String language, int timeout, String script) throws Exception {
+        this.host = host;
+        this.port = port;
+        this.language = language;
+        this.timeout = timeout;
+
+        this.session = new RemoteRexsterSession(this.host, this.port, this.timeout);
+        this.session.open();
+
+        if (!this.session.isOpen()) {
+            this.output.println("could not connect to the Rexster server");
+        } else {
+            this.executeScript(script, false);
+        }
     }
 
     public void primaryLoop() throws Exception {
@@ -132,29 +149,41 @@ public class RexsterConsole {
                         this.printAvailableLanguages();
                     }
                 } else {
-                    ResultAndBindings result = eval(line, this.language, this.session);
-                    Iterator itty;
-                    if (result.getResult() instanceof Iterator) {
-                        itty = (Iterator) result.getResult();
-                    } else if (result.getResult() instanceof Iterable) {
-                        itty = ((Iterable) result.getResult()).iterator();
-                    } else if (result.getResult() instanceof Map) {
-                        itty = ((Map) result.getResult()).entrySet().iterator();
-                    } else {
-                        itty = new SingleIterator<Object>(result.getResult());
-                    }
-
-                    while (itty.hasNext()) {
-                        this.output.println("==>" + itty.next());
-                    }
-
-                    this.currentBindings = result.getBindings();
+                    executeScript(line);
                 }
 
             } catch (Exception e) {
                 this.output.println("Evaluation error: " + e.getMessage());
             }
         }
+    }
+
+    private void executeScript(String line) {
+        executeScript(line, true);
+    }
+
+    private void executeScript(String line, boolean showPrefix) {
+        ResultAndBindings result = eval(line, this.language, this.session);
+        Iterator itty;
+        if (result.getResult() instanceof Iterator) {
+            itty = (Iterator) result.getResult();
+        } else if (result.getResult() instanceof Iterable) {
+            itty = ((Iterable) result.getResult()).iterator();
+        } else if (result.getResult() instanceof Map) {
+            itty = ((Map) result.getResult()).entrySet().iterator();
+        } else {
+            itty = new SingleIterator<Object>(result.getResult());
+        }
+
+        while (itty.hasNext()) {
+            if (showPrefix) {
+                this.output.println("==>" + itty.next());
+            } else {
+                this.output.println(itty.next());
+            }
+        }
+
+        this.currentBindings = result.getBindings();
     }
 
     private void printAvailableLanguages() {
@@ -257,6 +286,18 @@ public class RexsterConsole {
         return returnValue;
     }
 
+    private static String readFile(String file) throws IOException {
+        BufferedReader reader = new BufferedReader( new FileReader (file));
+        String line  = null;
+        StringBuilder stringBuilder = new StringBuilder();
+        String ls = System.getProperty("line.separator");
+        while( ( line = reader.readLine() ) != null ) {
+            stringBuilder.append( line );
+            stringBuilder.append( ls );
+        }
+        return stringBuilder.toString();
+     }
+
     @SuppressWarnings("static-access")
     private static Options getCliOptions() {
         Option help = new Option("h", "help", false, "print this message");
@@ -285,12 +326,19 @@ public class RexsterConsole {
                 .withLongOpt("timeout")
                 .create("t");
 
+        Option scriptFile = OptionBuilder.withArgName("file")
+                .hasArg()
+                .withDescription("script to execute remotely")
+                .withLongOpt("execute")
+                .create("e");
+
         Options options = new Options();
         options.addOption(help);
         options.addOption(hostName);
         options.addOption(port);
         options.addOption(language);
         options.addOption(timeout);
+        options.addOption(scriptFile);
 
         return options;
     }
@@ -350,6 +398,18 @@ public class RexsterConsole {
             }
         }
 
-        new RexsterConsole(host, port, language, timeout);
+        String fileToExecute = null;
+        if (line.hasOption("execute")) {
+            fileToExecute = line.getOptionValue("execute");
+
+            try {
+                new RexsterConsole(host, port, language, timeout, readFile(fileToExecute));
+            } catch (IOException ioe) {
+                System.out.println("could not read the file specified");
+            }
+
+        } else {
+            new RexsterConsole(host, port, language, timeout);
+        }
     }
 }
