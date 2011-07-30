@@ -226,6 +226,11 @@ public abstract class AbstractSubResource extends BaseResource {
      * <p/>
      * This method will find the first matching extension method.  If multiple extension method matches then
      * the remainder will be ignored.
+     * <p/>
+     * The logic of this method takes the following approach: match a method on the extension point and extension
+     * method.  Then match the method that has an action and matches an definition path or has no action and
+     * and has no definition path.  If no match is found there then the methods are cycled again to find a
+     * match where there is an action and no definition path.
      *
      * @param rexsterExtensions   The extension instance to be called.
      * @param extensionPoint      One of the extension points (graph, edge, vertex).
@@ -258,6 +263,22 @@ public abstract class AbstractSubResource extends BaseResource {
                             || (extensionAction.isEmpty() && extensionDefinition.path().isEmpty())) {
                         methodToCall = new ExtensionMethod(method, extensionDefinition, extensionDescriptor, rexsterExtension);
                         break;
+                    }
+                }
+            }
+
+            if (methodToCall == null) {
+                for (Method method : methods) {
+                    ExtensionDefinition extensionDefinition = method.getAnnotation(ExtensionDefinition.class);
+                    ExtensionDescriptor extensionDescriptor = method.getAnnotation(ExtensionDescriptor.class);
+
+                    if (extensionDefinition != null && extensionDefinition.extensionPoint() == extensionPoint
+                            && (extensionDefinition.method() == HttpMethod.ANY || extensionDefinition.method() == httpMethodRequested)) {
+
+                        if (!extensionAction.isEmpty() && extensionDefinition.path().isEmpty()) {
+                            methodToCall = new ExtensionMethod(method, extensionDefinition, extensionDescriptor, rexsterExtension);
+                            break;
+                        }
                     }
                 }
             }

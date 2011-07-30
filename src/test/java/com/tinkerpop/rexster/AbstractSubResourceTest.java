@@ -380,11 +380,15 @@ public class AbstractSubResourceTest {
     }
 
     @Test
-    public void findExtensionMethodNotFoundSpecificActionAndMethod() {
+    public void findExtensionMethodFoundUseRootMethod() {
         List<RexsterExtension> rexsterExtensions = new ArrayList<RexsterExtension>();
         rexsterExtensions.add(new MockRexsterExtension());
         ExtensionMethod m = this.mockResource.findExtensionMethodExposed(rexsterExtensions, ExtensionPoint.GRAPH, "headonly", HttpMethod.POST);
-        Assert.assertNull(m);
+        Assert.assertNotNull(m);
+
+        Method methodFound = m.getMethod();
+        Assert.assertNotNull(methodFound);
+        Assert.assertEquals("doRoot", methodFound.getName());
     }
 
     @Test
