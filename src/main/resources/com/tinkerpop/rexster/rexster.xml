@@ -29,7 +29,7 @@
         </graph>
         <graph>
             <graph-name>tinkergraph-readonly</graph-name>
-            <graph-read-only>false</graph-read-only>
+            <graph-read-only>true</graph-read-only>
             <graph-type>tinkergraph</graph-type>
             <graph-file>data/graph-example-1</graph-file>
             <extensions>
