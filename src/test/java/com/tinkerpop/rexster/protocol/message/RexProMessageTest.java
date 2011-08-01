@@ -1,12 +1,12 @@
 package com.tinkerpop.rexster.protocol.message;
 
 import com.tinkerpop.rexster.protocol.BitWorks;
-import org.junit.Assert;
 import org.glassfish.grizzly.Buffer;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.Sequence;
 import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.UUID;
@@ -47,7 +47,7 @@ public class RexProMessageTest {
             will(returnValue((byte) 'P'));
             inSequence(sequence);
 
-             // checksum
+            // checksum
             byte[] bytesChecksum = new byte[4];
             oneOf(sourceBuffer).get(with(any(bytesChecksum.getClass())));
             inSequence(sequence);

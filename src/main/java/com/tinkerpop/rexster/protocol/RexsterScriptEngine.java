@@ -1,12 +1,19 @@
 package com.tinkerpop.rexster.protocol;
 
-import com.tinkerpop.rexster.protocol.message.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.message.RexProMessage;
 import com.tinkerpop.rexster.protocol.message.ScriptRequestMessage;
 import com.tinkerpop.rexster.protocol.message.ScriptResponseMessage;
 
-import javax.script.*;
-import java.io.*;
+import javax.script.AbstractScriptEngine;
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptException;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 

@@ -15,7 +15,7 @@ import java.io.IOException;
  * This class is a near replica of the StaticHttpHandler.  The only difference is that it does not cache resources.
  * Caching (at least in how it was implemented by Grizzly) caused problems in Dog House as mime-types for
  * all resources were being returned as "text/html" even if they were clearly css/png/etc.
- *
+ * <p/>
  * Will drop this class when problem with StaticHttpHandler is resolved.
  */
 public class RexsterStaticHttpHandler extends StaticHttpHandler {

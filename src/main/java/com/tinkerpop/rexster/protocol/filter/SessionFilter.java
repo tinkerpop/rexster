@@ -3,7 +3,11 @@ package com.tinkerpop.rexster.protocol.filter;
 import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.RexProSessions;
-import com.tinkerpop.rexster.protocol.message.*;
+import com.tinkerpop.rexster.protocol.message.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.message.MessageType;
+import com.tinkerpop.rexster.protocol.message.RexProMessage;
+import com.tinkerpop.rexster.protocol.message.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.message.SessionResponseMessage;
 import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;
@@ -40,8 +44,8 @@ public class SessionFilter extends BaseFilter {
             } else {
                 // there is no session to this message...that's a problem
                 ctx.write(new ErrorResponseMessage(RexProMessage.EMPTY_SESSION, message.getRequestAsUUID(),
-                    ErrorResponseMessage.FLAG_ERROR_MESSAGE_VALIDATION,
-                    "The message has an invalid flag."));
+                        ErrorResponseMessage.FLAG_ERROR_MESSAGE_VALIDATION,
+                        "The message has an invalid flag."));
             }
 
             // nothing left to do...session was created

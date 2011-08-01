@@ -1,17 +1,11 @@
 package com.tinkerpop.rexster.protocol.message;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.RexsterBindings;
 
 import javax.script.Bindings;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.UUID;
@@ -76,7 +70,7 @@ public class ScriptResponseMessage extends RexProMessage {
             ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
             Iterator itty = (Iterator) result;
             while (itty.hasNext()) {
-               byte[] bytesToWrite = BitWorks.getBytesWithLength(itty.next());
+                byte[] bytesToWrite = BitWorks.getBytesWithLength(itty.next());
                 byteOuputStream.write(bytesToWrite, 0, bytesToWrite.length);
             }
 

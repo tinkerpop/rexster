@@ -4,7 +4,6 @@ import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyIndexableGraph;
 import com.tinkerpop.rexster.Tokens;
 import junit.framework.Assert;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.junit.Before;
 import org.junit.Test;

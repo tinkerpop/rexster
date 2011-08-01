@@ -3,7 +3,11 @@ package com.tinkerpop.rexster.protocol;
 import com.tinkerpop.rexster.protocol.message.RexProMessage;
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.GrizzlyFuture;
-import org.glassfish.grizzly.filterchain.*;
+import org.glassfish.grizzly.filterchain.BaseFilter;
+import org.glassfish.grizzly.filterchain.FilterChainBuilder;
+import org.glassfish.grizzly.filterchain.FilterChainContext;
+import org.glassfish.grizzly.filterchain.NextAction;
+import org.glassfish.grizzly.filterchain.TransportFilter;
 import org.glassfish.grizzly.impl.FutureImpl;
 import org.glassfish.grizzly.impl.SafeFutureImpl;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
@@ -41,7 +45,7 @@ final class RexPro {
 
         } catch (Exception e) {
             throw new RuntimeException("Could not open session with Rexster at " + rexProHost + ":" + rexProPort, e);
-        }finally {
+        } finally {
             try {
                 if (connection != null) {
                     connection.close();
@@ -76,7 +80,7 @@ final class RexPro {
 
         public CustomClientFilter(FutureImpl<RexProMessage> resultFuture) {
             this.resultFuture = resultFuture;
-}
+        }
 
         @Override
         public NextAction handleRead(FilterChainContext ctx) throws IOException {

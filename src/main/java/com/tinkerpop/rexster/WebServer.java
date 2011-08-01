@@ -1,31 +1,38 @@
 package com.tinkerpop.rexster;
 
-import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
 import com.tinkerpop.rexster.protocol.filter.ScriptFilter;
 import com.tinkerpop.rexster.protocol.filter.SessionFilter;
-import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.DogHouseServlet;
+import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
 import com.tinkerpop.rexster.servlet.VisualizationServlet;
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
-import org.glassfish.grizzly.http.server.*;
-import org.glassfish.grizzly.http.server.util.MimeType;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.NetworkListener;
+import org.glassfish.grizzly.http.server.ServerConfiguration;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
+import org.glassfish.grizzly.servlet.ServletHandler;
 import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
 import org.glassfish.grizzly.utils.EchoFilter;
-import org.glassfish.grizzly.servlet.ServletHandler;
 
 import javax.ws.rs.core.UriBuilder;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -110,7 +117,7 @@ public class WebServer {
     }
 
     private void startRexsterServer(final XMLConfiguration properties,
-                                    final String baseUri, final Integer rexsterServerPort) throws Exception{
+                                    final String baseUri, final Integer rexsterServerPort) throws Exception {
         final Map<String, String> jerseyInitParameters = this.getServletInitParameters("web-server-configuration", properties);
 
         ServletHandler jerseyHandler = new ServletHandler();

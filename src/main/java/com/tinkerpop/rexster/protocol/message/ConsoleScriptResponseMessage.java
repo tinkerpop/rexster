@@ -2,7 +2,6 @@ package com.tinkerpop.rexster.protocol.message;
 
 import com.tinkerpop.rexster.gremlin.converter.ConsoleResultConverter;
 import com.tinkerpop.rexster.protocol.BitWorks;
-import com.tinkerpop.rexster.protocol.RexsterBindings;
 
 import javax.script.Bindings;
 import java.io.ByteArrayOutputStream;

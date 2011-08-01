@@ -6,10 +6,10 @@ import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.StringWriter;
-import java.io.Writer;
-import java.lang.reflect.MalformedParameterizedTypeException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class JSONResultConverterTest {
 

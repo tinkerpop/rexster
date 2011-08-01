@@ -1,8 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.RexsterApplication;
-import com.tinkerpop.rexster.RexsterApplicationProvider;
-import com.tinkerpop.rexster.gremlin.GremlinSession;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;

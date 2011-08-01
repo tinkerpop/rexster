@@ -2,9 +2,6 @@ package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.WebServer;
-import com.tinkerpop.rexster.WebServerRexsterApplicationProvider;
-import org.apache.log4j.Logger;
 
 import javax.script.Bindings;
 import javax.script.ScriptException;
@@ -41,7 +38,7 @@ public class RexProSession {
         return (new Date()).getTime() - this.lastTimeUsed.getTime();
     }
 
-    public Object evaluate(String script, String languageName, RexsterBindings rexsterBindings) throws ScriptException{
+    public Object evaluate(String script, String languageName, RexsterBindings rexsterBindings) throws ScriptException {
         EngineController controller = EngineController.getInstance();
 
         Object result = null;

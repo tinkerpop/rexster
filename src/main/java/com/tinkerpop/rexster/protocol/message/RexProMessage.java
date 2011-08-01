@@ -149,7 +149,7 @@ public class RexProMessage {
     }
 
     public byte[] getRequest() {
-            return this.request;
+        return this.request;
     }
 
     public void setRequest(byte[] request) {
@@ -205,8 +205,8 @@ public class RexProMessage {
             bb.put(this.body);
         }
 
-		checksum.update(bb.array(), 0, length);
-		long lngChecksum = checksum.getValue();
+        checksum.update(bb.array(), 0, length);
+        long lngChecksum = checksum.getValue();
 
         return ByteBuffer.allocate(8).putLong(lngChecksum).array();
     }

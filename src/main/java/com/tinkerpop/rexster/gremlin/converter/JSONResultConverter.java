@@ -4,13 +4,15 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.util.json.JSONWriter;
 import com.tinkerpop.gremlin.pipes.util.Table;
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-public class JSONResultConverter implements ResultConverter<JSONArray>{
+public class JSONResultConverter implements ResultConverter<JSONArray> {
 
     private boolean showTypes = false;
     private long offsetStart = 0L;

@@ -2,7 +2,10 @@ package com.tinkerpop.rexster.gremlin.converter;
 
 import java.io.Writer;
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class ConsoleResultConverter implements ResultConverter<List<String>> {
 
@@ -16,7 +19,7 @@ public class ConsoleResultConverter implements ResultConverter<List<String>> {
         try {
             List<Object> resultLines = new ArrayList<Object>();
             if (result == null) {
-              resultLines = new ArrayList<Object>();
+                resultLines = new ArrayList<Object>();
             } else if (result instanceof Iterable) {
                 for (Object o : (Iterable) result) {
                     resultLines.add(o);

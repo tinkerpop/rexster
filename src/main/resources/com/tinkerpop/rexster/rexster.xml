@@ -10,7 +10,8 @@
     <character-set>UTF-8</character-set>
     <web-server-configuration>
         <com.sun.jersey.config.property.packages>com.tinkerpop.rexster</com.sun.jersey.config.property.packages>
-        <com.sun.jersey.spi.container.ContainerResponseFilters>com.tinkerpop.rexster.HeaderResponseFilter</com.sun.jersey.spi.container.ContainerResponseFilters>
+        <com.sun.jersey.spi.container.ContainerResponseFilters>com.tinkerpop.rexster.HeaderResponseFilter
+        </com.sun.jersey.spi.container.ContainerResponseFilters>
     </web-server-configuration>
     <graphs>
         <graph>

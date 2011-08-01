@@ -5,7 +5,11 @@ import org.apache.log4j.Logger;
 
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
 
 public class CharsetHolder implements Comparable<CharsetHolder> {
     private static Logger logger = Logger.getLogger(CharsetHolder.class);
@@ -88,7 +92,8 @@ public class CharsetHolder implements Comparable<CharsetHolder> {
         if (asteriskCharset == null) {
             for (Map.Entry<String, Charset> availableCharset : availableCharsets.entrySet()) {
 
-                CharsetHolder otherCharsetHolder = new CharsetHolder(availableCharset.getKey(), 0, Integer.MAX_VALUE);;
+                CharsetHolder otherCharsetHolder = new CharsetHolder(availableCharset.getKey(), 0, Integer.MAX_VALUE);
+                ;
                 if (availableCharset.getKey().equals("ISO-8859-1")) {
                     otherCharsetHolder = new CharsetHolder(availableCharset.getKey(), 1, Integer.MAX_VALUE);
                 }

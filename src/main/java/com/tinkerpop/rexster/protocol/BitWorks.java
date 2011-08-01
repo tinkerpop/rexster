@@ -7,7 +7,13 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.rexster.Tokens;
 
 import javax.script.Bindings;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.UUID;
@@ -48,10 +54,10 @@ public class BitWorks {
             if (!key.equals(Tokens.REXPRO_REXSTER_CONTEXT)) {
                 Object objectToSerialize = bindings.get(key);
                 if (objectToSerialize instanceof Serializable
-                    && !(objectToSerialize instanceof Graph)
-                    && !(objectToSerialize instanceof Edge)
-                    && !(objectToSerialize instanceof Vertex)
-                    && !(objectToSerialize instanceof Index)) {
+                        && !(objectToSerialize instanceof Graph)
+                        && !(objectToSerialize instanceof Edge)
+                        && !(objectToSerialize instanceof Vertex)
+                        && !(objectToSerialize instanceof Index)) {
                     stream.write(ByteBuffer.allocate(4).putInt(key.length()).array());
                     stream.write(key.getBytes());
 

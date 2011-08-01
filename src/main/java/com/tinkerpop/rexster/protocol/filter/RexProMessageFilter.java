@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster.protocol.filter;
 
+import com.tinkerpop.rexster.protocol.RexProSession;
 import com.tinkerpop.rexster.protocol.message.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.message.RexProMessage;
-import com.tinkerpop.rexster.protocol.RexProSession;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.filterchain.BaseFilter;
@@ -47,13 +47,13 @@ public class RexProMessageFilter extends BaseFilter {
         // Check if the source buffer has more than 1 complete message
         // If yes - split up the first message and the remainder
         final Buffer remainder = sourceBufferLength > completeMessageLength ?
-            sourceBuffer.split(completeMessageLength) : null;
+                sourceBuffer.split(completeMessageLength) : null;
 
         // Construct a message
         final RexProMessage message = RexProMessage.read(sourceBuffer);
         if (!message.isValid()) {
             logger.warn("Checksum failure - Message was not valid for session [" + message.getSessionAsUUID()
-                        + "] and request [" + message.getRequestAsUUID() + "]");
+                    + "] and request [" + message.getRequestAsUUID() + "]");
 
             ctx.write(new ErrorResponseMessage(message.getSessionAsUUID(), message.getRequestAsUUID(),
                     com.tinkerpop.rexster.protocol.message.ErrorResponseMessage.FLAG_ERROR_MESSAGE_VALIDATION,

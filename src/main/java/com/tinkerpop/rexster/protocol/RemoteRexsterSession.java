@@ -4,7 +4,6 @@ import com.tinkerpop.rexster.protocol.message.MessageType;
 import com.tinkerpop.rexster.protocol.message.RexProMessage;
 import com.tinkerpop.rexster.protocol.message.SessionRequestMessage;
 import com.tinkerpop.rexster.protocol.message.SessionResponseMessage;
-import org.apache.log4j.Logger;
 
 import java.util.Iterator;
 import java.util.List;
@@ -92,7 +91,7 @@ public class RemoteRexsterSession {
                 rcvMessage = RexPro.sendMessage(this.rexProHost, this.rexProPort, request);
             } catch (Exception ex) {
 
-                String logMessage = "Failure sending message via RexPro. Attempt [" + tries + "] of ["  + maxRetries + "].";
+                String logMessage = "Failure sending message via RexPro. Attempt [" + tries + "] of [" + maxRetries + "].";
 
                 if (tries < maxRetries) {
                     logMessage = logMessage + " Trying again in " + waitMsBetweenTries + " (ms)";

@@ -8,9 +8,6 @@ import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
-
-import java.io.FileInputStream;
-import java.io.InputStream;
 import org.apache.log4j.Logger;
 
 public abstract class AbstractSailGraphConfiguration implements GraphConfiguration {

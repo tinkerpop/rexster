@@ -8,13 +8,21 @@ import com.tinkerpop.rexster.protocol.message.RexProMessage;
 import com.tinkerpop.rexster.protocol.message.ScriptRequestMessage;
 import jline.ConsoleReader;
 import jline.History;
-import org.apache.commons.cli.*;
-import org.restlet.data.Language;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
-import javax.script.Bindings;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.ByteBuffer;
-import java.rmi.Remote;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -201,7 +209,7 @@ public class RexsterConsole {
         this.output.println("-= Available Languages =-");
 
         Iterator<String> languages = this.session.getAvailableLanguages();
-        while(languages.hasNext()) {
+        while (languages.hasNext()) {
             this.output.println("?" + languages.next());
         }
     }
@@ -231,7 +239,7 @@ public class RexsterConsole {
     }
 
     public String getPrompt() {
-        return "rexster[" + this.language +  "]> ";
+        return "rexster[" + this.language + "]> ";
     }
 
     public static String makeSpace(int number) {
@@ -299,16 +307,16 @@ public class RexsterConsole {
     }
 
     private static String readFile(String file) throws IOException {
-        BufferedReader reader = new BufferedReader( new FileReader (file));
-        String line  = null;
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        String line = null;
         StringBuilder stringBuilder = new StringBuilder();
         String ls = System.getProperty("line.separator");
-        while( ( line = reader.readLine() ) != null ) {
-            stringBuilder.append( line );
-            stringBuilder.append( ls );
+        while ((line = reader.readLine()) != null) {
+            stringBuilder.append(line);
+            stringBuilder.append(ls);
         }
         return stringBuilder.toString();
-     }
+    }
 
     @SuppressWarnings("static-access")
     private static Options getCliOptions() {

@@ -1,27 +1,22 @@
 package com.tinkerpop.rexster.extension;
 
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
-import com.tinkerpop.gremlin.pipes.util.Table;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.gremlin.converter.JSONResultConverter;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.SimpleBindings;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 @ExtensionNaming(namespace = "tp", name = "gremlin")
 public class GremlinExtension extends AbstractRexsterExtension {
