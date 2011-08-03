@@ -10,9 +10,30 @@ All releases can be accessed through the TinkerPop Maven2 repository identified 
 
 ==<hr/>==
 
+
+h3. Version 0.6 (NOT OFFICIALLY RELEASED YET)
+
+```xml
+ <dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>rexster</artifactId>
+  <version>0.6-SNAPSHOT</version>
+</dependency>
+```
+
+==<hr/>==
+
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dogstar.png!
 
 h3. Version 0.5 (Dog Star -- August 1, 2011)
+
+```xml
+ <dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>rexster</artifactId>
+  <version>0.5</version>
+</dependency>
+```
 
 * It is now possible to mix and match root level extensions with pathed extensions in the same extension class.
 * Support the @Accept-Charset@ request header.
