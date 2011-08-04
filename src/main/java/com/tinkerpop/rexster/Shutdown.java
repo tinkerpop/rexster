@@ -10,6 +10,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,23 +28,30 @@ public class Shutdown {
 
     protected static Logger logger = Logger.getLogger(Shutdown.class);
 
+    static {
+        PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
+    }
+
     @SuppressWarnings("static-access")
     private static Options getCliOptions() {
-        Option help = new Option("help", "print this message");
+        Option help = new Option("h", "help", false, "print this message");
 
-        Option rexsterFile = OptionBuilder.withArgName("host")
+        Option rexsterFile = OptionBuilder.withArgName("host-name")
                 .hasArg()
                 .withDescription("rexster web server hostname or ip address (default is 127.0.0.1)")
-                .create("host");
+                .withLongOpt("rexsterhost")
+                .create("rh");
 
         Option webServerPort = OptionBuilder.withArgName("port")
                 .hasArg()
                 .withDescription("rexster web server shutdown port (default is 8184)")
-                .create("port");
+                .withLongOpt("rexsterport")
+                .create("rp");
 
-        Option serverCommand = OptionBuilder.withArgName("command")
+        Option serverCommand = OptionBuilder.withArgName("option")
                 .hasArg()
                 .withDescription("command to issue to rexster web server (-s for shutdown)")
+                .withLongOpt("command")
                 .create("cmd");
 
         Options options = new Options();
