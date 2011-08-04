@@ -28,6 +28,7 @@ public class Tokens {
     public static final String REXSTER_GRAPH_ENABLED = "graph-enabled";
     public static final String REXSTER_GRAPH_PROPERTIES = "properties";
     public static final String REXSTER_GRAPH_BUFFER_SIZE = "graph-buffer-size";
+    public static final String REXSTER_GRAPH_HA = "graph-high-availability";
 
     public static final String REXPRO_REXSTER_CONTEXT = "rexster";
 
