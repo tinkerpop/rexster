@@ -21,6 +21,9 @@ h3. Version 0.6 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Support for High Availability mode of Neo4j
+* The @rexster-stop.sh@ command is now consistent with the @rexster-stop.sh@ in terms of parameter naming and shorthand.
+
 ==<hr/>==
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dogstar.png!
