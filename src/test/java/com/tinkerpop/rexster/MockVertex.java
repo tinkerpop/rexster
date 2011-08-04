@@ -3,7 +3,7 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.pipes.Pipe;
-import com.tinkerpop.pipes.filter.ComparisonFilterPipe;
+import com.tinkerpop.pipes.filter.FilterPipe;
 import com.tinkerpop.pipes.filter.LabelFilterPipe;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class MockVertex implements Vertex {
         if (labels.length == 0) {
             return this.outEdges;
         } else {
-            Pipe pipe = new LabelFilterPipe(labels[0], ComparisonFilterPipe.Filter.EQUAL);
+            Pipe pipe = new LabelFilterPipe(labels[0], FilterPipe.Filter.EQUAL);
             pipe.setStarts(this.outEdges);
             return pipe;
         }
@@ -65,7 +65,7 @@ public class MockVertex implements Vertex {
         if (labels.length == 0) {
             return this.inEdges;
         } else {
-            Pipe pipe = new LabelFilterPipe(labels[0], ComparisonFilterPipe.Filter.EQUAL);
+            Pipe pipe = new LabelFilterPipe(labels[0], FilterPipe.Filter.EQUAL);
             pipe.setStarts(this.inEdges);
             return pipe;
         }
