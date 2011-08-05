@@ -26,15 +26,9 @@ public class ScriptFilter extends BaseFilter {
             ScriptRequestMessage specificMessage = new ScriptRequestMessage(message);
 
             RexProSession session = RexProSessions.getSession(specificMessage.getSessionAsUUID());
+
             try {
-                Object result = session.evaluate(specificMessage.getScript(),
-                        specificMessage.getLanguageName(), specificMessage.getBindings());
-
-                ConsoleScriptResponseMessage resultMessage = new ConsoleScriptResponseMessage(message.getSessionAsUUID(),
-                        ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, result, session.getBindings());
-
-                ctx.write(resultMessage);
-
+                ctx.write(session.evaluateToRexProMessage(specificMessage));
             } catch (ScriptException se) {
                 logger.warn("Could not process script [" + specificMessage.getScript() + "] for language ["
                         + specificMessage.getLanguageName() + "] on session [" + message.getSessionAsUUID()
@@ -45,8 +39,8 @@ public class ScriptFilter extends BaseFilter {
                         "An error occurred while processing the script for language [" + specificMessage.getLanguageName() + "]: " + se.getMessage()));
 
                 return ctx.getStopAction();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (IOException ioe) {
+                logger.error(ioe);
             }
 
             return ctx.getStopAction();

@@ -39,9 +39,16 @@ public class RexProSessions {
         return sessions.keySet();
     }
 
-    public static void ensureSessionExists(UUID sessionKey, RexsterApplication rexsterApplication) {
+    public static void ensureSessionExists(UUID sessionKey, RexsterApplication rexsterApplication, byte sessionChannel) {
         if (!sessions.containsKey(sessionKey)) {
-            sessions.put(sessionKey, new RexProSession(sessionKey, rexsterApplication));
+
+            RexProSession session = RexProSessionFactory.createInstance(sessionKey, rexsterApplication, sessionChannel);
+            if (session == null) {
+                logger.warn("A RexPro Session could not be created because the requested channel is not valid.");
+                throw new RuntimeException("Requested channel is not valid.");
+            }
+
+            sessions.put(sessionKey, session);
             logger.info("RexPro Session created: " + sessionKey.toString());
         }
     }

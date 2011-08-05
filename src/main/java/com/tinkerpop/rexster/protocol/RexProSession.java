@@ -2,21 +2,24 @@ package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.protocol.message.RexProMessage;
+import com.tinkerpop.rexster.protocol.message.ScriptRequestMessage;
 
 import javax.script.Bindings;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
+import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
 
 /**
  * Server-side rexster session.
  */
-public class RexProSession {
+public abstract class RexProSession {
 
     private final Bindings bindings = new SimpleBindings();
 
-    private final UUID sessionKey;
+    private UUID sessionKey;
 
     protected Date lastTimeUsed = new Date();
 
@@ -58,4 +61,6 @@ public class RexProSession {
 
         return result;
     }
+
+    public abstract RexProMessage evaluateToRexProMessage(ScriptRequestMessage request) throws ScriptException, IOException;
 }
