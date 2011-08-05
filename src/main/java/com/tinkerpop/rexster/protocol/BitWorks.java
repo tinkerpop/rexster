@@ -61,7 +61,7 @@ public class BitWorks {
                     stream.write(ByteBuffer.allocate(4).putInt(key.length()).array());
                     stream.write(key.getBytes());
 
-                    byte[] objectBytes = getBytesWithLength(objectToSerialize);
+                    byte[] objectBytes = getFilteredBytesWithLength(objectToSerialize);
                     stream.write(objectBytes);
                 }
             }
@@ -95,48 +95,39 @@ public class BitWorks {
         return bindings;
     }
 
-    public static byte[] getBytesWithLength(Object result) throws IOException {
+    public static byte[] getFilteredBytesWithLength(Object result) throws IOException {
 
-        if (result == null) {
-            return null;
-        } else if (result instanceof Serializable
-                && !(result instanceof Graph)
-                && !(result instanceof Edge)
-                && !(result instanceof Vertex)
-                && !(result instanceof Index)) {
+        if (result instanceof Serializable
+            && !(result instanceof Graph)
+            && !(result instanceof Edge)
+            && !(result instanceof Vertex)
+            && !(result instanceof Index)) {
+
             try {
-                ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
-                ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);
-                objectOutputStream.writeObject(result);
-                objectOutputStream.close();
-
-                ByteBuffer bb = ByteBuffer.allocate(4 + byteOuputStream.size());
-                bb.putInt(byteOuputStream.size());
-                bb.put(byteOuputStream.toByteArray());
-
-                return bb.array();
+                return getBytesWithLength(result);
             } catch (NotSerializableException nse) {
                 // com.sun.script.javascript.ExternalScriptable throws this sometimes...just toString() it
-                ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
-                ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);
-                objectOutputStream.writeObject(result.toString());
-                objectOutputStream.close();
-
-                ByteBuffer bb = ByteBuffer.allocate(4 + byteOuputStream.size());
-                bb.putInt(byteOuputStream.size());
-                bb.put(byteOuputStream.toByteArray());
-                return bb.array();
+                return getBytesWithLength(result.toString());
             }
         } else {
-            ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);
-            objectOutputStream.writeObject(result.toString());
-            objectOutputStream.close();
-
-            ByteBuffer bb = ByteBuffer.allocate(4 + byteOuputStream.size());
-            bb.putInt(byteOuputStream.size());
-            bb.put(byteOuputStream.toByteArray());
-            return bb.array();
+            return getBytesWithLength(result.toString());
         }
+    }
+
+    public static byte[] getBytesWithLength(Object result) throws IOException {
+        if (result == null) {
+            return null;
+        }
+
+        ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);
+        objectOutputStream.writeObject(result);
+        objectOutputStream.close();
+
+        ByteBuffer bb = ByteBuffer.allocate(4 + byteOuputStream.size());
+        bb.putInt(byteOuputStream.size());
+        bb.put(byteOuputStream.toByteArray());
+
+        return bb.array();
     }
 }

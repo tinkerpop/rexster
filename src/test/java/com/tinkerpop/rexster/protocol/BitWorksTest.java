@@ -1,9 +1,12 @@
 package com.tinkerpop.rexster.protocol;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
@@ -55,5 +58,31 @@ public class BitWorksTest {
         byte[] yBytes = new byte[y.length()];
         buffer.get(yBytes);
         Assert.assertEquals(y, new String(yBytes));
+    }
+
+    @Test
+    public void getBytesWithLengthNull() throws IOException {
+        Assert.assertNull(BitWorks.getBytesWithLength(null));
+    }
+
+    @Test
+    public void getBytesWithLengthValid() throws IOException, ClassNotFoundException {
+        String convertMe = "convertMe";
+        byte[] bytes = BitWorks.getBytesWithLength(convertMe);
+
+        Assert.assertNotNull(bytes);
+        Assert.assertEquals(20, bytes.length);
+
+        ByteBuffer bb = ByteBuffer.wrap(bytes);
+        Assert.assertEquals(16, bb.getInt());
+
+        byte[] stringPartInBytes = new byte[16];
+        bb.get(stringPartInBytes);
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(stringPartInBytes);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        String stringPart = (String) ois.readObject();
+
+        Assert.assertEquals(convertMe, new String(stringPart));
     }
 }

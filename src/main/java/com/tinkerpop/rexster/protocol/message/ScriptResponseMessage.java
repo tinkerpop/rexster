@@ -61,7 +61,7 @@ public class ScriptResponseMessage extends RexProMessage {
         if (result instanceof Iterable) {
             ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
             for (Object o : (Iterable) result) {
-                byte[] bytesToWrite = BitWorks.getBytesWithLength(o);
+                byte[] bytesToWrite = BitWorks.getFilteredBytesWithLength(o);
                 byteOuputStream.write(bytesToWrite, 0, bytesToWrite.length);
             }
 
@@ -70,13 +70,13 @@ public class ScriptResponseMessage extends RexProMessage {
             ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
             Iterator itty = (Iterator) result;
             while (itty.hasNext()) {
-                byte[] bytesToWrite = BitWorks.getBytesWithLength(itty.next());
+                byte[] bytesToWrite = BitWorks.getFilteredBytesWithLength(itty.next());
                 byteOuputStream.write(bytesToWrite, 0, bytesToWrite.length);
             }
 
             return byteOuputStream.toByteArray();
         } else {
-            return BitWorks.getBytesWithLength(result);
+            return BitWorks.getFilteredBytesWithLength(result);
         }
     }
 }
