@@ -10,6 +10,8 @@ import org.glassfish.grizzly.filterchain.NextAction;
 
 import javax.script.ScriptException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ScriptFilter extends BaseFilter {
     private static final Logger logger = Logger.getLogger(RexProSession.class);
@@ -25,8 +27,17 @@ public class ScriptFilter extends BaseFilter {
             try {
                 Object result = session.evaluate(specificMessage.getScript(), specificMessage.getLanguageName(), specificMessage.getBindings());
 
-                ctx.write(new ConsoleScriptResponseMessage(specificMessage.getSessionAsUUID(),
-                    ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, result, session.getBindings()));
+                List<RexProMessage> messageList = new ArrayList<RexProMessage>();
+                if (session.getChannel() == SessionRequestMessage.CHANNEL_CONSOLE) {
+                    messageList.add(new ConsoleScriptResponseMessage(specificMessage.getSessionAsUUID(),
+                        ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, result, session.getBindings()));
+
+                    //***************DOUBLE THE MESSAGE FOR TESTING*************************************
+                    //messageList.add(new ConsoleScriptResponseMessage(specificMessage.getSessionAsUUID(),
+                    //    ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, result, session.getBindings()));
+                }
+
+                ctx.write(messageList);
 
             } catch (ScriptException se) {
                 logger.warn("Could not process script [" + specificMessage.getScript() + "] for language ["

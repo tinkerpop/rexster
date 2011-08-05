@@ -4,6 +4,7 @@ import com.tinkerpop.rexster.protocol.RexProSession;
 import com.tinkerpop.rexster.protocol.message.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.message.RexProMessage;
 import org.apache.log4j.Logger;
+import org.codehaus.groovy.util.Finalizable;
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
@@ -11,6 +12,8 @@ import org.glassfish.grizzly.filterchain.NextAction;
 import org.glassfish.grizzly.memory.MemoryManager;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RexProMessageFilter extends BaseFilter {
 
@@ -70,7 +73,21 @@ public class RexProMessageFilter extends BaseFilter {
 
     public NextAction handleWrite(final FilterChainContext ctx) throws IOException {
         // Get the source message to be written
-        final RexProMessage message = ctx.getMessage();
+        final List<RexProMessage> messages = new ArrayList<RexProMessage>();
+        try {
+            List<RexProMessage> msgs = ctx.getMessage();
+            messages.addAll(msgs);
+        } catch (ClassCastException cce) {
+            RexProMessage msg = ctx.getMessage();
+            messages.add(msg);
+        }
+
+        final RexProMessage message = messages.get(0);
+
+        List<RexProMessage> remainingMessages = null;
+        if (messages.size() > 1) {
+             remainingMessages = messages.subList(1, messages.size());
+        }
 
         final int size = RexProMessage.HEADER_SIZE + message.getBodyLength();
 
@@ -90,6 +107,6 @@ public class RexProMessageFilter extends BaseFilter {
         ctx.setMessage(output.flip());
 
         // Instruct the FilterChain to call the next filter
-        return ctx.getInvokeAction();
+        return ctx.getInvokeAction(remainingMessages);
     }
 }
