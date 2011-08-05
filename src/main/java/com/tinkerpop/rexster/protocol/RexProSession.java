@@ -15,16 +15,22 @@ import java.util.UUID;
 /**
  * Server-side rexster session.
  */
-public abstract class AbstractRexProSession {
+public class RexProSession {
 
     private final Bindings bindings = new SimpleBindings();
 
-    private UUID sessionKey;
+    private final UUID sessionKey;
+
+    private final byte channel;
+
+    private final int chunkSize;
 
     protected Date lastTimeUsed = new Date();
 
-    public AbstractRexProSession(final UUID sessionKey, final RexsterApplication rexsterApplication) {
+    public RexProSession(final UUID sessionKey, final RexsterApplication rexsterApplication, final byte channel, final int chunkSize) {
         this.sessionKey = sessionKey;
+        this.channel = channel;
+        this.chunkSize = chunkSize;
 
         this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, rexsterApplication);
     }
@@ -35,6 +41,10 @@ public abstract class AbstractRexProSession {
 
     public Bindings getBindings() {
         return this.bindings;
+    }
+
+    public byte getChannel() {
+        return this.channel;
     }
 
     public long getIdleTime() {
@@ -61,6 +71,4 @@ public abstract class AbstractRexProSession {
 
         return result;
     }
-
-    public abstract RexProMessage evaluateToRexProMessage(ScriptRequestMessage request) throws ScriptException, IOException;
 }

@@ -1,9 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
-import com.tinkerpop.rexster.protocol.message.MessageType;
-import com.tinkerpop.rexster.protocol.message.RexProMessage;
-import com.tinkerpop.rexster.protocol.message.SessionRequestMessage;
-import com.tinkerpop.rexster.protocol.message.SessionResponseMessage;
+import com.tinkerpop.rexster.protocol.message.*;
 
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +31,7 @@ public class RemoteRexsterSession {
 
     public void open() {
         if (sessionKey == RexProMessage.EMPTY_SESSION) {
-            RexProMessage sessionRequestMessageToSend = new SessionRequestMessage(SessionRequestMessage.FLAG_NEW_CONSOLE_SESSION);
+            RexProMessage sessionRequestMessageToSend = new SessionRequestMessage(SessionRequestMessage.FLAG_NEW_SESSION, SessionRequestMessage.CHANNEL_CONSOLE);
             final RexProMessage rcvMessage = sendRequest(sessionRequestMessageToSend, 3);
 
             if (rcvMessage != null) {
@@ -122,7 +119,7 @@ public class RemoteRexsterSession {
 
         try {
             if (sessionKey != RexProMessage.EMPTY_SESSION) {
-                RexProMessage sessionKillMessageToSend = new SessionRequestMessage(SessionRequestMessage.FLAG_KILL_SESSION);
+                RexProMessage sessionKillMessageToSend = new KillSessionRequestMessage();
 
                 // need to set the session here so that the server knows which one to delete.
                 sessionKillMessageToSend.setSession(BitWorks.convertUUIDToByteArray(this.sessionKey));

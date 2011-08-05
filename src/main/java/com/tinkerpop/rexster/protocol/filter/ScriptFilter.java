@@ -1,11 +1,8 @@
 package com.tinkerpop.rexster.protocol.filter;
 
-import com.tinkerpop.rexster.protocol.AbstractRexProSession;
+import com.tinkerpop.rexster.protocol.RexProSession;
 import com.tinkerpop.rexster.protocol.RexProSessions;
-import com.tinkerpop.rexster.protocol.message.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.message.MessageType;
-import com.tinkerpop.rexster.protocol.message.RexProMessage;
-import com.tinkerpop.rexster.protocol.message.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.message.*;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
@@ -15,7 +12,7 @@ import javax.script.ScriptException;
 import java.io.IOException;
 
 public class ScriptFilter extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(AbstractRexProSession.class);
+    private static final Logger logger = Logger.getLogger(RexProSession.class);
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
         final RexProMessage message = ctx.getMessage();
@@ -23,10 +20,14 @@ public class ScriptFilter extends BaseFilter {
         if (message.getType() == MessageType.SCRIPT_REQUEST) {
             ScriptRequestMessage specificMessage = new ScriptRequestMessage(message);
 
-            AbstractRexProSession session = RexProSessions.getSession(specificMessage.getSessionAsUUID());
+            RexProSession session = RexProSessions.getSession(specificMessage.getSessionAsUUID());
 
             try {
-                ctx.write(session.evaluateToRexProMessage(specificMessage));
+                Object result = session.evaluate(specificMessage.getScript(), specificMessage.getLanguageName(), specificMessage.getBindings());
+
+                ctx.write(new ConsoleScriptResponseMessage(specificMessage.getSessionAsUUID(),
+                    ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, result, session.getBindings()));
+
             } catch (ScriptException se) {
                 logger.warn("Could not process script [" + specificMessage.getScript() + "] for language ["
                         + specificMessage.getLanguageName() + "] on session [" + message.getSessionAsUUID()

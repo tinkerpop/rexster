@@ -2,7 +2,6 @@ package com.tinkerpop.rexster.protocol.filter;
 
 import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.protocol.EngineController;
-import com.tinkerpop.rexster.protocol.RexProSessionFactory;
 import com.tinkerpop.rexster.protocol.RexProSessions;
 import com.tinkerpop.rexster.protocol.message.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.message.MessageType;
@@ -14,18 +13,11 @@ import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class SessionFilter extends BaseFilter {
 
     private final RexsterApplication rexsterApplication;
-
-    private static final Map<Byte, Byte> flagToChannel = new HashMap<Byte, Byte>(){{
-       put(SessionRequestMessage.FLAG_NEW_CONSOLE_SESSION, RexProSessionFactory.CHANNEL_CONSOLE);
-    }};
-
 
     public SessionFilter(final RexsterApplication rexsterApplication) {
         this.rexsterApplication = rexsterApplication;
@@ -37,11 +29,12 @@ public class SessionFilter extends BaseFilter {
         if (message.getType() == MessageType.SESSION_REQUEST) {
             SessionRequestMessage specificMessage = new SessionRequestMessage(message);
 
-            if (specificMessage.getFlag() == SessionRequestMessage.FLAG_NEW_CONSOLE_SESSION) {
+            if (specificMessage.getFlag() == SessionRequestMessage.FLAG_NEW_SESSION) {
                 UUID sessionKey = UUID.randomUUID();
 
                 // construct a session with the right channel
-                RexProSessions.ensureSessionExists(sessionKey, this.rexsterApplication, flagToChannel.get(specificMessage.getFlag()));
+                RexProSessions.ensureSessionExists(sessionKey, this.rexsterApplication,
+                        specificMessage.getChannel(), specificMessage.getChunkSize());
 
                 EngineController engineController = EngineController.getInstance();
 
