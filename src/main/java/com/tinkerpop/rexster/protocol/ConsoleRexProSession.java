@@ -13,7 +13,7 @@ import java.util.UUID;
 /**
  * Server-side RexPro session representing a Console Channel.
  */
-public class ConsoleRexProSession extends RexProSession {
+public class ConsoleRexProSession extends AbstractRexProSession {
 
     public ConsoleRexProSession(final UUID sessionKey, final RexsterApplication rexsterApplication) {
         super(sessionKey, rexsterApplication);

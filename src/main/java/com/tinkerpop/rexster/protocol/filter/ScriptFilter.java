@@ -1,13 +1,11 @@
 package com.tinkerpop.rexster.protocol.filter;
 
-import com.tinkerpop.rexster.protocol.RexProSession;
+import com.tinkerpop.rexster.protocol.AbstractRexProSession;
 import com.tinkerpop.rexster.protocol.RexProSessions;
-import com.tinkerpop.rexster.protocol.message.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.message.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.message.MessageType;
 import com.tinkerpop.rexster.protocol.message.RexProMessage;
 import com.tinkerpop.rexster.protocol.message.ScriptRequestMessage;
-import com.tinkerpop.rexster.protocol.message.ScriptResponseMessage;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
@@ -17,7 +15,7 @@ import javax.script.ScriptException;
 import java.io.IOException;
 
 public class ScriptFilter extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(RexProSession.class);
+    private static final Logger logger = Logger.getLogger(AbstractRexProSession.class);
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
         final RexProMessage message = ctx.getMessage();
@@ -25,7 +23,7 @@ public class ScriptFilter extends BaseFilter {
         if (message.getType() == MessageType.SCRIPT_REQUEST) {
             ScriptRequestMessage specificMessage = new ScriptRequestMessage(message);
 
-            RexProSession session = RexProSessions.getSession(specificMessage.getSessionAsUUID());
+            AbstractRexProSession session = RexProSessions.getSession(specificMessage.getSessionAsUUID());
 
             try {
                 ctx.write(session.evaluateToRexProMessage(specificMessage));

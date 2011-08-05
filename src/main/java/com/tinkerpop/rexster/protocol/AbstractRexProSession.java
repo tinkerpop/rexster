@@ -15,7 +15,7 @@ import java.util.UUID;
 /**
  * Server-side rexster session.
  */
-public abstract class RexProSession {
+public abstract class AbstractRexProSession {
 
     private final Bindings bindings = new SimpleBindings();
 
@@ -23,7 +23,7 @@ public abstract class RexProSession {
 
     protected Date lastTimeUsed = new Date();
 
-    public RexProSession(final UUID sessionKey, final RexsterApplication rexsterApplication) {
+    public AbstractRexProSession(final UUID sessionKey, final RexsterApplication rexsterApplication) {
         this.sessionKey = sessionKey;
 
         this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, rexsterApplication);

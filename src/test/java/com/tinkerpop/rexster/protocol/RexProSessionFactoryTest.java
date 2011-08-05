@@ -11,7 +11,7 @@ public class RexProSessionFactoryTest {
     @Test
     public void createInstanceConsoleSession() {
         UUID sessionKey = UUID.randomUUID();
-        RexProSession session = RexProSessionFactory.createInstance(sessionKey, new RexsterApplication("graph", new TinkerGraph()), RexProSessionFactory.CHANNEL_CONSOLE);
+        AbstractRexProSession session = RexProSessionFactory.createInstance(sessionKey, new RexsterApplication("graph", new TinkerGraph()), RexProSessionFactory.CHANNEL_CONSOLE);
 
         Assert.assertNotNull(session);
         Assert.assertTrue(session instanceof ConsoleRexProSession);

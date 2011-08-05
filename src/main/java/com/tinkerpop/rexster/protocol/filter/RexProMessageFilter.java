@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.protocol.filter;
 
-import com.tinkerpop.rexster.protocol.RexProSession;
+import com.tinkerpop.rexster.protocol.AbstractRexProSession;
 import com.tinkerpop.rexster.protocol.message.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.message.RexProMessage;
 import org.apache.log4j.Logger;
@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public class RexProMessageFilter extends BaseFilter {
 
-    private static final Logger logger = Logger.getLogger(RexProSession.class);
+    private static final Logger logger = Logger.getLogger(AbstractRexProSession.class);
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
         // Get the source buffer from the context

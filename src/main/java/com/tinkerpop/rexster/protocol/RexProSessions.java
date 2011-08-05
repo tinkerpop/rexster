@@ -9,11 +9,11 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RexProSessions {
-    private static final Logger logger = Logger.getLogger(RexProSession.class);
+    private static final Logger logger = Logger.getLogger(AbstractRexProSession.class);
 
-    protected static ConcurrentHashMap<UUID, RexProSession> sessions = new ConcurrentHashMap<UUID, RexProSession>();
+    protected static ConcurrentHashMap<UUID, AbstractRexProSession> sessions = new ConcurrentHashMap<UUID, AbstractRexProSession>();
 
-    public static RexProSession getSession(UUID sessionKey) {
+    public static AbstractRexProSession getSession(UUID sessionKey) {
         return sessions.get(sessionKey);
     }
 
@@ -42,7 +42,7 @@ public class RexProSessions {
     public static void ensureSessionExists(UUID sessionKey, RexsterApplication rexsterApplication, byte sessionChannel) {
         if (!sessions.containsKey(sessionKey)) {
 
-            RexProSession session = RexProSessionFactory.createInstance(sessionKey, rexsterApplication, sessionChannel);
+            AbstractRexProSession session = RexProSessionFactory.createInstance(sessionKey, rexsterApplication, sessionChannel);
             if (session == null) {
                 logger.warn("A RexPro Session could not be created because the requested channel is not valid.");
                 throw new RuntimeException("Requested channel is not valid.");
