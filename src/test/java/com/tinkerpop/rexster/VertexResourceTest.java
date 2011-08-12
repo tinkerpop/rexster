@@ -152,13 +152,30 @@ public class VertexResourceTest {
     }
 
     @Test
+    public void getVertexEdgesFoundVertexReturnInVerticesNoOffset() {
+        VertexResource resource = this.constructMockSimpleGraphScenario();
+
+        Response response = resource.getVertexEdges("graph", "1", Tokens.IN);
+        JSONObject json = assertEdgesOkResponseJsonStructure(response, 1);
+
+        JSONArray jsonResultArray = json.optJSONArray(Tokens.RESULTS);
+        Assert.assertNotNull(jsonResultArray);
+        Assert.assertEquals(1, jsonResultArray.length());
+
+        JSONObject jsonResult = jsonResultArray.optJSONObject(0);
+        Assert.assertNotNull(jsonResult);
+        Assert.assertTrue(jsonResult.has(Tokens._ID));
+        Assert.assertEquals("2", jsonResult.optString(Tokens._ID));
+    }
+
+    @Test
     public void getVertexEdgesFoundVertexOutEdgesNoOffset() {
         VertexResource resource = this.constructMockSimpleGraphScenario();
 
         Response response = resource.getVertexEdges("graph", "1", Tokens.OUT_E);
         JSONObject json = assertEdgesOkResponseJsonStructure(response, 1);
 
-        JSONArray jsonResultArray = (JSONArray) json.optJSONArray(Tokens.RESULTS);
+        JSONArray jsonResultArray = json.optJSONArray(Tokens.RESULTS);
         Assert.assertNotNull(jsonResultArray);
         Assert.assertEquals(1, jsonResultArray.length());
 
@@ -169,6 +186,23 @@ public class VertexResourceTest {
     }
 
     @Test
+    public void getVertexEdgesFoundVertexOutVerticesNoOffset() {
+        VertexResource resource = this.constructMockSimpleGraphScenario();
+
+        Response response = resource.getVertexEdges("graph", "1", Tokens.OUT);
+        JSONObject json = assertEdgesOkResponseJsonStructure(response, 1);
+
+        JSONArray jsonResultArray = json.optJSONArray(Tokens.RESULTS);
+        Assert.assertNotNull(jsonResultArray);
+        Assert.assertEquals(1, jsonResultArray.length());
+
+        JSONObject jsonResult = jsonResultArray.optJSONObject(0);
+        Assert.assertNotNull(jsonResult);
+        Assert.assertTrue(jsonResult.has(Tokens._ID));
+        Assert.assertEquals("3", jsonResult.optString(Tokens._ID));
+    }
+
+    @Test
     public void getVertexEdgesFoundVertexBothEdgesNoOffset() {
         VertexResource resource = this.constructMockSimpleGraphScenario();
 
@@ -176,6 +210,18 @@ public class VertexResourceTest {
         JSONObject json = assertEdgesOkResponseJsonStructure(response, 2);
 
         JSONArray jsonResultArray = (JSONArray) json.optJSONArray(Tokens.RESULTS);
+        Assert.assertNotNull(jsonResultArray);
+        Assert.assertEquals(2, jsonResultArray.length());
+    }
+
+    @Test
+    public void getVertexEdgesFoundVertexBothVerticesNoOffset() {
+        VertexResource resource = this.constructMockSimpleGraphScenario();
+
+        Response response = resource.getVertexEdges("graph", "1", Tokens.BOTH);
+        JSONObject json = assertEdgesOkResponseJsonStructure(response, 2);
+
+        JSONArray jsonResultArray = json.optJSONArray(Tokens.RESULTS);
         Assert.assertNotNull(jsonResultArray);
         Assert.assertEquals(2, jsonResultArray.length());
     }

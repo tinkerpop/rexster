@@ -133,7 +133,7 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @HEAD
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response headVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
@@ -144,7 +144,7 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @HEAD
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response headVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -152,13 +152,13 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @HEAD
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     public Response headVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.HEAD);
     }
 
     @PUT
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response putVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
@@ -169,7 +169,7 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @PUT
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response putVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -177,13 +177,13 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @PUT
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     public Response putVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.PUT);
     }
 
     @OPTIONS
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response optionsVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
@@ -194,7 +194,7 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @OPTIONS
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response optionsVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -202,13 +202,13 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @OPTIONS
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     public Response optionsVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.OPTIONS);
     }
 
     @DELETE
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
@@ -219,7 +219,7 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @DELETE
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -227,13 +227,13 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @DELETE
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     public Response deleteVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.DELETE);
     }
 
     @POST
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response postVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
@@ -244,7 +244,7 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @POST
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response postVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -252,13 +252,13 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @POST
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     public Response postVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.POST);
     }
 
     @GET
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     public Response getVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.GET);
     }
@@ -386,6 +386,7 @@ public class VertexResource extends AbstractSubResource {
                         }
                     }
                 }
+
                 if (direction.equals(Tokens.IN_E) || direction.equals(Tokens.BOTH_E)) {
                     for (Edge edge : vertex.getInEdges()) {
                         if (this.hasPropertyValues(edge, tempRequest)) {
@@ -396,6 +397,30 @@ public class VertexResource extends AbstractSubResource {
                         }
                     }
                 }
+
+                if (direction.equals(Tokens.OUT) || direction.equals(Tokens.BOTH)) {
+                    for (Edge edge : vertex.getOutEdges()) {
+                        if (this.hasPropertyValues(edge, tempRequest)) {
+                            if (counter >= start && counter < end) {
+                                edgeArray.put(JSONWriter.createJSONElement(edge.getInVertex(), this.getReturnKeys(), this.hasShowTypes()));
+                            }
+                            counter++;
+                        }
+                    }
+                }
+
+                if (direction.equals(Tokens.IN) || direction.equals(Tokens.BOTH)) {
+                    for (Edge edge : vertex.getInEdges()) {
+                        if (this.hasPropertyValues(edge, tempRequest)) {
+                            if (counter >= start && counter < end) {
+                                edgeArray.put(JSONWriter.createJSONElement(edge.getOutVertex(), this.getReturnKeys(), this.hasShowTypes()));
+                            }
+                            counter++;
+                        }
+                    }
+                }
+
+
             } else {
                 String msg = "Could not find vertex [" + vertexId + "] on graph [" + graphName + "]";
                 logger.info(msg);
