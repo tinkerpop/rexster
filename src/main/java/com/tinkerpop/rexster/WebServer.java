@@ -118,12 +118,11 @@ public class WebServer {
 
     private void startRexsterServer(final XMLConfiguration properties,
                                     final String baseUri, final Integer rexsterServerPort) throws Exception {
-        final Map<String, String> jerseyInitParameters = this.getServletInitParameters("web-server-configuration", properties);
 
         ServletHandler jerseyHandler = new ServletHandler();
-        for (Map.Entry<String, String> entry : jerseyInitParameters.entrySet()) {
-            jerseyHandler.addInitParameter(entry.getKey(), entry.getValue());
-        }
+        jerseyHandler.addInitParameter("com.sun.jersey.config.property.packages", "com.tinkerpop.rexster");
+        jerseyHandler.addInitParameter("com.sun.jersey.spi.container.ContainerResponseFilters", "com.tinkerpop.rexster.HeaderResponseFilter");
+        jerseyHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
 
         jerseyHandler.setContextPath("/");
         jerseyHandler.setServletInstance(new ServletContainer());
@@ -149,22 +148,17 @@ public class WebServer {
         dogHouseHandler.setContextPath("/main");
         dogHouseHandler.setServletInstance(new DogHouseServlet());
 
-        final Map<String, String> adminInitParameters = getServletInitParameters("admin-server-configuration", properties);
-
         // servlet for gremlin console
         ServletHandler visualizationHandler = new ServletHandler();
-        for (Map.Entry<String, String> entry : adminInitParameters.entrySet()) {
-            visualizationHandler.addInitParameter(entry.getKey(), entry.getValue());
-        }
+        visualizationHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
 
         visualizationHandler.setContextPath("/visualize");
         visualizationHandler.setServletInstance(new VisualizationServlet());
 
         // servlet for gremlin console
         ServletHandler evaluatorHandler = new ServletHandler();
-        for (Map.Entry<String, String> entry : adminInitParameters.entrySet()) {
-            evaluatorHandler.addInitParameter(entry.getKey(), entry.getValue());
-        }
+        evaluatorHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
+
         evaluatorHandler.setContextPath("/exec");
         evaluatorHandler.setServletInstance(new EvaluatorServlet());
 
@@ -203,45 +197,6 @@ public class WebServer {
         this.rexproServer.start();
 
         logger.info("RexPro serving on port: [" + rexproServerPort + "]");
-    }
-
-    /**
-     * Extracts servlet configuration parameters from rexster.xml
-     */
-    private Map<String, String> getServletInitParameters(
-            String webServerConfigKey, XMLConfiguration properties) {
-
-        final Map<String, String> initParams = new HashMap<String, String>();
-
-        HierarchicalConfiguration webServerConfig = null;
-        try {
-            webServerConfig = properties.configurationAt(webServerConfigKey);
-        } catch (IllegalArgumentException iae) {
-            logger.info("No servlet initialization parameters passed for configuration: " + webServerConfigKey);
-        }
-
-        if (webServerConfig != null) {
-            Iterator keys = webServerConfig.getKeys();
-            while (keys.hasNext()) {
-                String key = keys.next().toString();
-
-                // commons config double dots keys with just one period in it.
-                // as that represents a path statement for that lib.  need to remove
-                // the double dot so that it can pass directly to grizzly.  hopefully
-                // there are no cases where this will cause a problem and a double dot
-                // is always expected
-                String grizzlyKey = key.replace("..", ".");
-                String configValue = webServerConfig.getString(key);
-                initParams.put(grizzlyKey, configValue);
-
-                logger.info("Web Server configured with " + key + ": " + configValue);
-            }
-        }
-
-        // give all servlets access to rexster.xml location
-        initParams.put("com.tinkerpop.rexster.config", properties.getString("self-xml"));
-
-        return initParams;
     }
 
     protected void stop() throws Exception {
