@@ -273,7 +273,7 @@
                             <insertNewLine>true</insertNewLine>
 
                             <inputDir>${project.build.directory}/javascript</inputDir>
-                            <output>${project.build.directory}/generated-sources/web/rexster.js</output>
+                            <output>${project.build.directory}/generated-sources/web/rexster-lib.js</output>
 
                             <includes>
                                 <include>lib/jquery-1.4.4-min.js</include>
@@ -287,16 +287,6 @@
                                 <include>lib/jquery-url-min.js</include>
                                 <include>lib/jquery-jsonviewer-min.js</include>
                                 <include>lib/protovis-r3.2-min.js</include>
-
-                                <include>rexster-min.js</include>
-                                <include>rexster/history-min.js</include>
-                                <include>rexster/server-min.js</include>
-                                <include>rexster/ajax-min.js</include>
-                                <include>rexster/template/template-min.js</include>
-                                <include>rexster/ui/main-menu-min.js</include>
-                                <include>rexster/ui/graph-min.js</include>
-                                <include>rexster/ui/info-min.js</include>
-                                <include>rexster/ui/terminal-min.js</include>
                             </includes>
                         </aggregation>
                     </aggregations>

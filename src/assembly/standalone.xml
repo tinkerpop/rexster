@@ -39,6 +39,13 @@
             <outputDirectory>/bin/public/javascript</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>src/main/javascript</directory>
+            <outputDirectory>/bin/public/javascript</outputDirectory>
+            <excludes>
+                <exclude>lib/**</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
             <directory>data</directory>
             <outputDirectory>/bin/data</outputDirectory>
         </fileSet>
