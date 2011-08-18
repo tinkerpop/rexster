@@ -278,6 +278,10 @@ public abstract class BaseResource {
         return RequestObjectHelper.getReturnKeys(this.getRequestObject());
     }
 
+    /*
+     * NOT SURE WHAT THIS CODE WAS EVERY DOING. it was being called within VertexResource and was filtering
+     * each element for some reason in the getVertexEdges method.  wasn't used anywhere else.  its only purpose
+     * seemed to be related to the filtering of elements by label...not sure if this is safe to remove yet.
     protected boolean hasPropertyValues(Element element, JSONObject properties) throws JSONException {
         Iterator keys = properties.keys();
         while (keys.hasNext()) {
@@ -303,6 +307,7 @@ public abstract class BaseResource {
         }
         return true;
     }
+    */
 
     protected boolean hasElementProperties(JSONObject requestObject) {
         Iterator keys = requestObject.keys();

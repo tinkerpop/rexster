@@ -371,52 +371,82 @@ public class VertexResource extends AbstractSubResource {
             Long start = this.getStartOffset();
             Long end = this.getEndOffset();
 
+            Object temp = this.getRequestObject().opt(Tokens._LABEL);
+            String labelSet = null;
+            if (temp != null) {
+                labelSet = temp.toString();
+            }
+
+            String[] labels = null;
+            if (labelSet != null) {
+                labels = labelSet.split(",");
+            }
+
             long counter = 0l;
             JSONArray edgeArray = new JSONArray();
 
             if (null != vertex) {
-                JSONObject tempRequest = this.getNonRexsterRequest();
                 if (direction.equals(Tokens.OUT_E) || direction.equals(Tokens.BOTH_E)) {
-                    for (Edge edge : vertex.getOutEdges()) {
-                        if (this.hasPropertyValues(edge, tempRequest)) {
-                            if (counter >= start && counter < end) {
-                                edgeArray.put(JSONWriter.createJSONElement(edge, this.getReturnKeys(), this.hasShowTypes()));
-                            }
-                            counter++;
+                    Iterable<Edge> itty;
+                    if (labels != null && labels.length > 0) {
+                        itty = vertex.getOutEdges(labels);
+                    } else {
+                        itty = vertex.getOutEdges();
+                    }
+
+                    for (Edge edge : itty) {
+                        if (counter >= start && counter < end) {
+                            edgeArray.put(JSONWriter.createJSONElement(edge, this.getReturnKeys(), this.hasShowTypes()));
                         }
+                        counter++;
                     }
                 }
 
                 if (direction.equals(Tokens.IN_E) || direction.equals(Tokens.BOTH_E)) {
-                    for (Edge edge : vertex.getInEdges()) {
-                        if (this.hasPropertyValues(edge, tempRequest)) {
-                            if (counter >= start && counter < end) {
-                                edgeArray.put(JSONWriter.createJSONElement(edge, this.getReturnKeys(), this.hasShowTypes()));
-                            }
-                            counter++;
+                    Iterable<Edge> itty;
+                    if (labels != null && labels.length > 0) {
+                        itty = vertex.getInEdges(labels);
+                    } else {
+                        itty = vertex.getInEdges();
+                    }
+
+                    for (Edge edge : itty) {
+                        if (counter >= start && counter < end) {
+                            edgeArray.put(JSONWriter.createJSONElement(edge, this.getReturnKeys(), this.hasShowTypes()));
                         }
+                        counter++;
                     }
                 }
 
                 if (direction.equals(Tokens.OUT) || direction.equals(Tokens.BOTH)) {
-                    for (Edge edge : vertex.getOutEdges()) {
-                        if (this.hasPropertyValues(edge, tempRequest)) {
-                            if (counter >= start && counter < end) {
-                                edgeArray.put(JSONWriter.createJSONElement(edge.getInVertex(), this.getReturnKeys(), this.hasShowTypes()));
-                            }
-                            counter++;
+                    Iterable<Edge> itty;
+                    if (labels != null && labels.length > 0) {
+                        itty = vertex.getOutEdges(labels);
+                    } else {
+                        itty = vertex.getOutEdges();
+                    }
+
+                    for (Edge edge : itty) {
+                        if (counter >= start && counter < end) {
+                            edgeArray.put(JSONWriter.createJSONElement(edge.getInVertex(), this.getReturnKeys(), this.hasShowTypes()));
                         }
+                        counter++;
                     }
                 }
 
                 if (direction.equals(Tokens.IN) || direction.equals(Tokens.BOTH)) {
-                    for (Edge edge : vertex.getInEdges()) {
-                        if (this.hasPropertyValues(edge, tempRequest)) {
-                            if (counter >= start && counter < end) {
-                                edgeArray.put(JSONWriter.createJSONElement(edge.getOutVertex(), this.getReturnKeys(), this.hasShowTypes()));
-                            }
-                            counter++;
+                    Iterable<Edge> itty;
+                    if (labels != null && labels.length > 0) {
+                        itty = vertex.getInEdges(labels);
+                    } else {
+                        itty = vertex.getInEdges();
+                    }
+
+                    for (Edge edge : itty) {
+                        if (counter >= start && counter < end) {
+                            edgeArray.put(JSONWriter.createJSONElement(edge.getOutVertex(), this.getReturnKeys(), this.hasShowTypes()));
                         }
+                        counter++;
                     }
                 }
 

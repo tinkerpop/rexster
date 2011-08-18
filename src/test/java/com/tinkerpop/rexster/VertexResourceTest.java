@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.PUT;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -152,8 +153,50 @@ public class VertexResourceTest {
     }
 
     @Test
+    public void getVertexEdgesFoundVertexReturnOutEdgesNoOffsetWithLabel() {
+        HashMap<String, String> map = new HashMap<String, String>() {{
+            put(Tokens._LABEL, "label31");
+        }};
+
+        VertexResource resource = this.constructMockSimpleGraphScenario(map);
+
+        Response response = resource.getVertexEdges("graph", "3", Tokens.OUT_E);
+        JSONObject json = assertEdgesOkResponseJsonStructure(response, 1);
+
+        JSONArray jsonResultArray = json.optJSONArray(Tokens.RESULTS);
+        Assert.assertNotNull(jsonResultArray);
+        Assert.assertEquals(1, jsonResultArray.length());
+
+        JSONObject jsonResult = jsonResultArray.optJSONObject(0);
+        Assert.assertNotNull(jsonResult);
+        Assert.assertTrue(jsonResult.has(Tokens._ID));
+        Assert.assertEquals("3-1", jsonResult.optString(Tokens._ID));
+    }
+
+    @Test
     public void getVertexEdgesFoundVertexReturnInVerticesNoOffset() {
         VertexResource resource = this.constructMockSimpleGraphScenario();
+
+        Response response = resource.getVertexEdges("graph", "1", Tokens.IN);
+        JSONObject json = assertEdgesOkResponseJsonStructure(response, 1);
+
+        JSONArray jsonResultArray = json.optJSONArray(Tokens.RESULTS);
+        Assert.assertNotNull(jsonResultArray);
+        Assert.assertEquals(1, jsonResultArray.length());
+
+        JSONObject jsonResult = jsonResultArray.optJSONObject(0);
+        Assert.assertNotNull(jsonResult);
+        Assert.assertTrue(jsonResult.has(Tokens._ID));
+        Assert.assertEquals("2", jsonResult.optString(Tokens._ID));
+    }
+
+    @Test
+    public void getVertexEdgesFoundVertexReturnInVerticesNoOffsetWithLabel() {
+        HashMap<String, String> map = new HashMap<String, String>() {{
+            put(Tokens._LABEL, "label12");
+        }};
+
+        VertexResource resource = this.constructMockSimpleGraphScenario(map);
 
         Response response = resource.getVertexEdges("graph", "1", Tokens.IN);
         JSONObject json = assertEdgesOkResponseJsonStructure(response, 1);
@@ -510,18 +553,22 @@ public class VertexResourceTest {
         return resource;
     }
 
+    private VertexResource constructMockSimpleGraphScenario() {
+        return constructMockSimpleGraphScenario(new HashMap<String, String>());
+    }
+
     /**
      * Creates a simple graph with two vertices and an edge between them.
      *
      * @return
      */
-    private VertexResource constructMockSimpleGraphScenario() {
+    private VertexResource constructMockSimpleGraphScenario(HashMap parameters) {
         MockVertex v1 = new MockVertex("1");
         MockVertex v2 = new MockVertex("2");
         MockVertex v3 = new MockVertex("3");
 
         MockEdge edge1 = new MockEdge("1-2", "label12", new Hashtable<String, Object>(), v1, v2);
-        MockEdge edge2 = new MockEdge("3-1", "label12", new Hashtable<String, Object>(), v3, v1);
+        MockEdge edge2 = new MockEdge("3-1", "label31", new Hashtable<String, Object>(), v3, v1);
 
         ArrayList<Edge> v1InEdges = new ArrayList<Edge>();
         v1InEdges.add(edge1);
@@ -540,7 +587,7 @@ public class VertexResourceTest {
         v2.setOutEdges(v2OutEdges);
         v3.setInEdges(v3InEdges);
 
-        VertexResource resource = this.constructMockGetSingleVertexScenario(v1, new HashMap<String, String>());
+        VertexResource resource = this.constructMockGetSingleVertexScenario(v1, parameters);
         return resource;
     }
 
