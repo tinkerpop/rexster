@@ -187,6 +187,52 @@ public class EdgeResourceTest {
     }
 
     @Test
+    public void putEdgeValid() {
+        final HashMap<String, String> parameters = new HashMap<String, String>();
+        parameters.put("newProperty", "NEW");
+
+        final Vertex v1 = new MockVertex("1");
+        final Vertex v2 = new MockVertex("2");
+
+        Hashtable<String, Object> properties = new Hashtable<String, Object>();
+        properties.put("oldProperty", "OLD");
+
+        final Edge returnEdge = new MockEdge("1", "label-1", properties, v1, v2);
+
+        final Graph graph = this.mockery.mock(Graph.class);
+        final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+
+        final UriInfo uri = this.mockery.mock(UriInfo.class);
+        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+
+        this.mockery.checking(new Expectations() {{
+            allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getEdge(with(any(Object.class)));
+            will(returnValue(returnEdge));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
+        }});
+
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        Response response = resource.putEdge("graph", "1");
+
+        Assert.assertNotNull(response);
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertNotNull(response.getEntity());
+        Assert.assertTrue(response.getEntity() instanceof JSONObject);
+
+        JSONObject json = (JSONObject) response.getEntity();
+        Assert.assertTrue(json.has(Tokens.QUERY_TIME));
+        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
+        Assert.assertTrue(json.has(Tokens.RESULTS));
+
+        Assert.assertEquals("NEW", returnEdge.getProperty("newProperty"));
+        Assert.assertFalse(returnEdge.getPropertyKeys().contains("oldProperty"));
+    }
+
+    @Test
     public void postEdgeWithIdThatIsNewEdge() {
         final HashMap<String, String> parameters = new HashMap<String, String>();
         parameters.put(Tokens._IN_V, "1");

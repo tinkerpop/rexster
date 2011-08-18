@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.sun.jersey.spi.container.WebApplication;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
@@ -392,6 +393,75 @@ public class VertexResourceTest {
         Assert.assertFalse(json.isNull(Tokens.RESULTS));
 
         Assert.assertEquals("300a", v.getProperty("some-property"));
+    }
+
+    @Test
+    public void putVertexValid() {
+        final HashMap<String, String> parameters = new HashMap<String, String>();
+        parameters.put("some-property", "300a");
+
+        final Graph graph = this.mockery.mock(Graph.class);
+        final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+
+        final UriInfo uri = this.mockery.mock(UriInfo.class);
+        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+        final Vertex v = new MockVertex("1");
+        v.setProperty("property-to-remove", "bye");
+
+        this.mockery.checking(new Expectations() {{
+            allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getVertex(with(any(Object.class)));
+            will(returnValue(v));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
+        }});
+
+        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        Response response = resource.putVertex("graph", "1");
+
+        Assert.assertNotNull(response);
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertNotNull(response.getEntity());
+        Assert.assertTrue(response.getEntity() instanceof JSONObject);
+
+        JSONObject json = (JSONObject) response.getEntity();
+        Assert.assertTrue(json.has(Tokens.QUERY_TIME));
+        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
+
+        Assert.assertTrue(json.has(Tokens.RESULTS));
+        Assert.assertFalse(json.isNull(Tokens.RESULTS));
+
+        Assert.assertEquals("300a", v.getProperty("some-property"));
+
+        Assert.assertFalse(v.getPropertyKeys().contains("property-to-remove"));
+    }
+
+    @Test(expected = WebApplicationException.class)
+    public void putVertexNoVertexFound() {
+        final HashMap<String, String> parameters = new HashMap<String, String>();
+        parameters.put("some-property", "300a");
+
+        final Graph graph = this.mockery.mock(Graph.class);
+        final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+
+        final UriInfo uri = this.mockery.mock(UriInfo.class);
+        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+
+        this.mockery.checking(new Expectations() {{
+            allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(graph).getVertex(with(any(Object.class)));
+            will(returnValue(null));
+            allowing(rap).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
+        }});
+
+        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        resource.putVertex("graph", "1");
+
     }
 
     @Test(expected = WebApplicationException.class)

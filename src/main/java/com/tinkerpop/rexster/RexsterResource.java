@@ -37,7 +37,7 @@ public class RexsterResource extends BaseResource {
             Set<String> graphNames = this.getRexsterApplicationProvider().getGraphsNames();
             JSONArray jsonArrayNames = new JSONArray(graphNames);
 
-            this.resultObject.put("name", "Rexster: A RESTful Graph Shell");
+            this.resultObject.put("name", "Rexster: A Graph Server");
             this.resultObject.put("graphs", jsonArrayNames);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             this.resultObject.put(Tokens.UP_TIME, this.getTimeAlive());

@@ -25,6 +25,7 @@ h3. Version 0.6 (NOT OFFICIALLY RELEASED YET)
 * The @rexster-stop.sh@ command is now consistent with the @rexster-stop.sh@ in terms of parameter naming and shorthand.
 * Retrieve adjacent vertices through REST API of the vertex resource.
 * Filter by multiple edge labels in the REST API of the vertex resource.
+* PUT on vertex and edge resources in the REST API replaces all graph element properties with the specified set.
 
 ==<hr/>==
 

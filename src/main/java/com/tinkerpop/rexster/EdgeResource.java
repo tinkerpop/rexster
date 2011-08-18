@@ -513,6 +513,91 @@ public class EdgeResource extends AbstractSubResource {
     }
 
     /**
+     * PUT http://host/graph/edge/id
+     * Edge e = graph.addEdge(id,graph.getVertex(id1),graph.getVertex(id2),label);
+     * e.setProperty(key,value);
+     */
+    @PUT
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response putEdge(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(formParams);
+        return this.putEdge(graphName, id);
+    }
+
+    /**
+     * PUT http://host/graph/edge/id
+     * Edge e = graph.addEdge(id,graph.getVertex(id1),graph.getVertex(id2),label);
+     * e.setProperty(key,value);
+     */
+    @PUT
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response putEdge(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.setRequestObject(json);
+        return this.putEdge(graphName, id);
+    }
+
+    /**
+     * PUT http://host/graph/edge/id?key=value
+     * remove all properties
+     * e.setProperty(key,value);
+     */
+    @PUT
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response putEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final Graph graph = rag.getGraph();
+
+        rag.tryStartTransaction();
+        try {
+            Edge edge = graph.getEdge(id);
+            if (edge == null) {
+                JSONObject error = generateErrorObjectJsonFail(new Exception("Edge with id " + id + " cannot be found."));
+                throw new WebApplicationException(Response.status(Status.CONFLICT).entity(error).build());
+            }
+
+            // remove all properties as this is a replace operation
+            for (String propertyKey : edge.getPropertyKeys()) {
+                edge.removeProperty(propertyKey);
+            }
+
+            Iterator keys = this.getRequestObject().keys();
+            while (keys.hasNext()) {
+                String key = keys.next().toString();
+                if (!key.startsWith(Tokens.UNDERSCORE)) {
+                    edge.setProperty(key, this.getTypedPropertyValue(this.getRequestObject().getString(key)));
+                }
+            }
+            this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(edge, this.getReturnKeys(), this.hasShowTypes()));
+
+            rag.tryStopTransactionSuccess();
+
+            this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
+
+        } catch (Exception ex) {
+            rag.tryStopTransactionFailure();
+
+            logger.error(ex);
+
+            JSONObject error = generateErrorObject(ex.getMessage(), ex);
+            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        }
+
+        return Response.ok(this.resultObject).build();
+    }
+
+    /**
      * DELETE http://host/graph/edge/id
      * graph.removeEdge(graph.getEdge(id));
      * <p/>
