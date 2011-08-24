@@ -569,7 +569,7 @@ public class EdgeResource extends AbstractSubResource {
             Edge edge = graph.getEdge(id);
             if (edge == null) {
                 JSONObject error = generateErrorObjectJsonFail(new Exception("Edge with id " + id + " cannot be found."));
-                throw new WebApplicationException(Response.status(Status.CONFLICT).entity(error).build());
+                throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
             }
 
             // remove all properties as this is a replace operation
@@ -590,6 +590,9 @@ public class EdgeResource extends AbstractSubResource {
 
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
 
+        } catch (WebApplicationException wae) {
+            rag.tryStopTransactionFailure();
+            throw wae;
         } catch (Exception ex) {
             rag.tryStopTransactionFailure();
 

@@ -63,12 +63,24 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
         return doGraphPost(testGraph, path, null);
     }
 
+    protected ClientResponse doGraphPut(GraphTestHolder testGraph, String path) {
+        return doGraphPut(testGraph, path, null);
+    }
+
     protected ClientResponse doGraphPostOfJson(GraphTestHolder testGraph, String path, JSONObject jsontoPost) {
         return doGraphPostOfJson(testGraph, path, null, jsontoPost);
     }
 
+    protected ClientResponse doGraphPutOfJson(GraphTestHolder testGraph, String path, JSONObject jsontoPut) {
+        return doGraphPutOfJson(testGraph, path, null, jsontoPut);
+    }
+
     protected ClientResponse doGraphPostOfForm(GraphTestHolder testGraph, String path, MultivaluedMap<String, String> mapToPost) {
         return doGraphPostOfForm(testGraph, path, null, mapToPost);
+    }
+
+    protected ClientResponse doGraphPutOfForm(GraphTestHolder testGraph, String path, MultivaluedMap<String, String> mapToPut) {
+        return doGraphPutOfForm(testGraph, path, null, mapToPut);
     }
 
     protected ClientResponse doGraphGet(GraphTestHolder testGraph, String path, String query) {
@@ -83,16 +95,34 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
         return doPost(uri, query);
     }
 
+    protected ClientResponse doGraphPut(GraphTestHolder testGraph, String path, String query) {
+        String uri = makeGraphUriString(testGraph, path);
+
+        return doPut(uri, query);
+    }
+
     protected ClientResponse doGraphPostOfJson(GraphTestHolder testGraph, String path, String query, JSONObject jsonToPost) {
         String uri = makeGraphUriString(testGraph, path);
 
         return doPostOfJson(uri, query,jsonToPost);
     }
 
+    protected ClientResponse doGraphPutOfJson(GraphTestHolder testGraph, String path, String query, JSONObject jsonToPut) {
+        String uri = makeGraphUriString(testGraph, path);
+
+        return doPutOfJson(uri, query, jsonToPut);
+    }
+
     protected ClientResponse doGraphPostOfForm(GraphTestHolder testGraph, String path, String query, MultivaluedMap<String, String> mapToPost) {
         String uri = makeGraphUriString(testGraph, path);
 
         return doPostOfForm(uri, query, mapToPost);
+    }
+
+    protected ClientResponse doGraphPutOfForm(GraphTestHolder testGraph, String path, String query, MultivaluedMap<String, String> mapToPut) {
+        String uri = makeGraphUriString(testGraph, path);
+
+        return doPutOfForm(uri, query, mapToPut);
     }
 
     protected ClientResponse doGet(String path, String query) {
@@ -109,6 +139,13 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
         return this.client().handle(graphRequest);
     }
 
+    protected ClientResponse doPut(String path, String query) {
+        String uri = makeUriString(path, query);
+
+        ClientRequest graphRequest = ClientRequest.create().build(createUri("/" + uri), "PUT");
+        return this.client().handle(graphRequest);
+    }
+
     protected ClientResponse doPostOfJson(String path, String query, JSONObject jsonToPost) {
         String uri = makeUriString(path, query);
 
@@ -118,10 +155,28 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
         return this.client().handle(graphRequest);
     }
 
+    protected ClientResponse doPutOfJson(String path, String query, JSONObject jsonToPost) {
+        String uri = makeUriString(path, query);
+
+        ClientRequest graphRequest = ClientRequest.create().type(MediaType.APPLICATION_JSON_TYPE).build(createUri("/" + uri), "PUT");
+        graphRequest.setEntity(jsonToPost);
+
+        return this.client().handle(graphRequest);
+    }
+
     protected ClientResponse doPostOfForm(String path, String query, MultivaluedMap<String, String> mapToPost) {
         String uri = makeUriString(path, query);
 
         ClientRequest graphRequest = ClientRequest.create().type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).build(createUri("/" + uri), "POST");
+        graphRequest.setEntity(mapToPost);
+
+        return this.client().handle(graphRequest);
+    }
+
+    protected ClientResponse doPutOfForm(String path, String query, MultivaluedMap<String, String> mapToPost) {
+        String uri = makeUriString(path, query);
+
+        ClientRequest graphRequest = ClientRequest.create().type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).build(createUri("/" + uri), "PUT");
         graphRequest.setEntity(mapToPost);
 
         return this.client().handle(graphRequest);
