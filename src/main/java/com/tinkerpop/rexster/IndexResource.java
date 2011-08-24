@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -75,7 +76,7 @@ public class IndexResource extends AbstractSubResource {
             JSONArray indexArray = new JSONArray();
             for (Index index : idxGraph.getIndices()) {
                 if (counter >= start && counter < end) {
-                    indexArray.put(new IndexJSONObject(index));
+                    indexArray.put(createJSONObject(index));
                 }
                 counter++;
             }
@@ -155,13 +156,7 @@ public class IndexResource extends AbstractSubResource {
             // return info about the index itself
             HashMap map = new HashMap();
             map.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-
-            try {
-                IndexJSONObject indexJSONObject = new IndexJSONObject(index);
-                map.put(Tokens.RESULTS, indexJSONObject);
-            } catch (JSONException jsone) {
-
-            }
+            map.put(Tokens.RESULTS, createJSONObject(index));
 
             this.resultObject = new JSONObject(map);
         }
@@ -501,7 +496,7 @@ public class IndexResource extends AbstractSubResource {
                 }
                 try {
                     this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-                    this.resultObject.put(Tokens.RESULTS, new IndexJSONObject(i));
+                    this.resultObject.put(Tokens.RESULTS, createJSONObject(index));
                 } catch (JSONException ex) {
                     logger.error(ex);
 
@@ -526,6 +521,19 @@ public class IndexResource extends AbstractSubResource {
         }
 
         return Response.ok(this.resultObject).build();
+    }
+
+    private static JSONObject createJSONObject(Index index) {
+        Map<String, String> mapIndex = new HashMap<String, String>();
+        mapIndex.put("name", index.getIndexName());
+        if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
+            mapIndex.put("class", "vertex");
+        } else if (Edge.class.isAssignableFrom(index.getIndexClass())) {
+            mapIndex.put("class", "edge");
+        }
+
+        mapIndex.put("type", index.getIndexType().toString().toLowerCase());
+        return new JSONObject(mapIndex);
     }
 
     private Index getIndexFromGraph(String graphName, final String name) {
