@@ -122,7 +122,7 @@ public class VertexResource extends AbstractSubResource {
                 throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
         } else {
-            String msg = "Could not find vertex [" + id + "] on graph [" + graphName + "]";
+            String msg = "Vertex with [" + id + "] cannot be found.";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
@@ -452,7 +452,7 @@ public class VertexResource extends AbstractSubResource {
 
 
             } else {
-                String msg = "Could not find vertex [" + vertexId + "] on graph [" + graphName + "]";
+                String msg = "Vertex with [" + vertexId + "] cannot be found.";
                 logger.info(msg);
 
                 JSONObject error = generateErrorObject(msg);
@@ -659,7 +659,10 @@ public class VertexResource extends AbstractSubResource {
             Vertex vertex = graph.getVertex(id);
 
             if (null == vertex) {
-                JSONObject error = generateErrorObjectJsonFail(new Exception("Vertex with id " + id + " cannot be found"));
+                String msg = "Vertex with [" + id + "] cannot be found.";
+                logger.info(msg);
+
+                JSONObject error = generateErrorObject(msg);
                 throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
             }
 
@@ -731,7 +734,7 @@ public class VertexResource extends AbstractSubResource {
                     graph.removeVertex(vertex);
                 }
             } else {
-                final String msg = "Could not find vertex [" + id + "] on graph [" + graphName + "]";
+                final String msg = "Vertex with [" + id + "] cannot be found.";
                 logger.info(msg);
 
                 JSONObject error = generateErrorObject(msg);

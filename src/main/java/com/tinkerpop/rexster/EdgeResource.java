@@ -118,9 +118,8 @@ public class EdgeResource extends AbstractSubResource {
                 throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
         } else {
-            String msg = "Could not find edge [" + id + "] on graph [" + this.getRexsterApplicationGraph(graphName).getGraphName() + "]";
+            String msg = "Edge with id [" + id + "] cannot be found.";
             logger.info(msg);
-
             JSONObject error = generateErrorObject(msg);
             throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
         }
@@ -568,7 +567,9 @@ public class EdgeResource extends AbstractSubResource {
         try {
             Edge edge = graph.getEdge(id);
             if (edge == null) {
-                JSONObject error = generateErrorObjectJsonFail(new Exception("Edge with id " + id + " cannot be found."));
+                String msg = "Edge with id [" + id + "] cannot be found.";
+                logger.info(msg);
+                JSONObject error = generateErrorObject(msg);
                 throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
             }
 
@@ -637,7 +638,7 @@ public class EdgeResource extends AbstractSubResource {
                     graph.removeEdge(edge);
                 }
             } else {
-                String msg = "Could not find edge [" + id + "] on graph [" + this.getRexsterApplicationGraph(graphName).getGraphName() + "]";
+                String msg = "Edge with id [" + id + "] cannot be found.";
                 logger.info(msg);
                 JSONObject error = generateErrorObject(msg);
                 throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
