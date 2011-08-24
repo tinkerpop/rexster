@@ -464,10 +464,15 @@ public class EdgeResource extends AbstractSubResource {
                 if (null != out && null != in) {
                     // in/out vertexes are found so edge can be created
                     edge = graph.addEdge(id, out, in, label);
+                } else {
+                    JSONObject error = generateErrorObjectJsonFail(new Exception("One or both of the vertices for the edge does not exist in the graph."));
+                    throw new WebApplicationException(Response.status(Status.CONFLICT).entity(error).build());
                 }
 
             } else if (edge != null) {
                 if (!this.hasElementProperties(this.getRequestObject())) {
+                    // if the edge exists there better be some properties to assign
+                    // this really isn't a BAD_REQUEST, but CONFLICT isn't much better...bah
                     JSONObject error = generateErrorObjectJsonFail(new Exception("Edge with id " + id + " already exists"));
                     throw new WebApplicationException(Response.status(Status.CONFLICT).entity(error).build());
                 }
