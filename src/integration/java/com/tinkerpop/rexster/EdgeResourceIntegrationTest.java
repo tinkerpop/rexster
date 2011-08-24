@@ -2,6 +2,7 @@ package com.tinkerpop.rexster;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+import com.sun.jersey.core.util.StringIgnoreCaseKeyComparator;
 import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -10,8 +11,10 @@ import org.junit.Test;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegrationTest {
@@ -251,6 +254,57 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
 
             response = this.doGraphPutOfForm(testGraph, "edges/" + thirdEdgeId, mapToPost);
             assertPuttedEdge(thirdEdgeId, response);
+        }
+    }
+
+    @Test
+    public void deleteEdgeStatusNotFound() {
+        for (GraphTestHolder testGraph : this.testGraphs) {
+            ClientResponse response = this.doGraphDelete(testGraph, "edges/1000notreal");
+
+            Assert.assertEquals(ClientResponse.Status.NOT_FOUND, response.getClientResponseStatus());
+        }
+    }
+
+    @Test
+    public void deleteEdgeStatusOk() {
+        for (GraphTestHolder testGraph : this.testGraphs) {
+            Iterator<String> itty = testGraph.getEdgeIdSet().keySet().iterator();
+            String edgeToDelete = itty.next();
+
+            ClientResponse responseGetEdge = this.doGraphGet(testGraph, "edges/" + edgeToDelete);
+            Assert.assertEquals(ClientResponse.Status.OK, responseGetEdge.getClientResponseStatus());
+            JSONObject edgeJson = responseGetEdge.getEntity(JSONObject.class);
+
+            List<String> keysToRemove = new ArrayList<String>();
+            Iterator<String> propertyItty = edgeJson.optJSONObject(Tokens.RESULTS).keys();
+            String keysToDeleteQueryString = "";
+            while (propertyItty.hasNext()) {
+                String key = propertyItty.next();
+                if (!key.startsWith(Tokens.UNDERSCORE)) {
+                    keysToRemove.add(key);
+                    keysToDeleteQueryString = keysToDeleteQueryString + "&" + key;
+                }
+            }
+
+            // delete the properties first
+            ClientResponse responsePropertyDelete = this.doGraphDelete(testGraph, "edges/" + edgeToDelete, keysToDeleteQueryString);
+            Assert.assertEquals(ClientResponse.Status.OK, responsePropertyDelete.getClientResponseStatus());
+
+            responseGetEdge = this.doGraphGet(testGraph, "edges/" + edgeToDelete);
+            Assert.assertEquals(ClientResponse.Status.OK, responseGetEdge.getClientResponseStatus());
+            edgeJson = responseGetEdge.getEntity(JSONObject.class).optJSONObject(Tokens.RESULTS);
+
+            for (String key : keysToRemove) {
+                Assert.assertFalse(edgeJson.has(key));
+            }
+
+            // delete the edge itself
+            responsePropertyDelete = this.doGraphDelete(testGraph, "edges/" + edgeToDelete);
+            Assert.assertEquals(ClientResponse.Status.OK, responsePropertyDelete.getClientResponseStatus());
+
+            responseGetEdge = this.doGraphGet(testGraph, "edges/" + edgeToDelete);
+            Assert.assertEquals(ClientResponse.Status.NOT_FOUND, responseGetEdge.getClientResponseStatus());
         }
     }
 
