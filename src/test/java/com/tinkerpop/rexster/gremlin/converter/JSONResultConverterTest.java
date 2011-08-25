@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.gremlin.converter;
 
-import com.tinkerpop.gremlin.pipes.util.Table;
+import com.tinkerpop.pipes.util.Table;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
