@@ -4,7 +4,6 @@
 # eclipse project files and local rexster.xml
 *.classpath
 *.project
-rexster.xml
 .idea/
 rexster.iml
 .rexster_history

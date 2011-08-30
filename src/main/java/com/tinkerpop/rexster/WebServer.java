@@ -461,8 +461,12 @@ public class WebServer {
                     throw new Exception("Could not locate " + rexsterXmlFile + " properties file.");
                 }
             } else {
-                // no arguments to parse
-                properties.load(RexsterApplication.class.getResourceAsStream(rexsterXmlFile));
+                // no arguments to parse...check the default rexster.xml in the root of the working directory
+                try {
+                    properties.load(new FileReader(rexsterXmlFile));
+                } catch (IOException e) {
+                    properties.load(RexsterApplication.class.getResourceAsStream(rexsterXmlFile));
+                }
             }
 
             // reference the location of the xml file used to configure the server.
