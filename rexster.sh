@@ -1,5 +1,4 @@
 #!/bin/bash
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-cd $DIR/target/rexster-*-standalone/bin/
-bash rexster.sh $@
+$DIR/target/rexster-*-standalone/bin/rexster.sh $@ -webroot $DIR/target/rexster-*-standalone/bin/public

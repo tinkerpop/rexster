@@ -39,8 +39,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -398,11 +401,40 @@ public class WebServer {
         return new RexsterCommandLine(line, innerLine, options);
     }
 
+    private static String[] cleanArguments(String[] arguments) {
+
+        // this method is a bit of a hack to get around the global argument of
+        // -webroot which only applies to the -start command.  it pulls out -webroot
+        // of the argument list so the parser doesn't fail...kinda gross
+        ArrayList<String> cleanedArguments = new ArrayList<String>();
+
+        if (arguments != null && arguments.length > 0) {
+
+            if (!arguments[0].equals("-start") && !arguments[0].equals("--start") && !arguments[0].equals("-s")) {
+                for (int ix = 0; ix < arguments.length; ix++) {
+                    if (!arguments[ix].equals("-webroot")) {
+                        cleanedArguments.add(arguments[ix]);
+                    } else {
+                        ix++;
+                    }
+                }
+            } else {
+                for (String argument : arguments) {
+                    cleanedArguments.add(argument);
+                }
+            }
+        }
+
+        String[] cleanedArgumentsAsArray = new String[cleanedArguments.size()];
+        cleanedArguments.toArray(cleanedArgumentsAsArray);
+        return cleanedArgumentsAsArray;
+    }
+
     public static void main(final String[] args) throws Exception {
 
         XMLConfiguration properties = new XMLConfiguration();
 
-        RexsterCommandLine line = getCliInput(args);
+        RexsterCommandLine line = getCliInput(cleanArguments(args));
 
         if (line.getCommand().hasOption("start")) {
             if (line.getCommand().hasOption("debug")) {
