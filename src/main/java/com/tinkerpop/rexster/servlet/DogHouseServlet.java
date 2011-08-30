@@ -29,7 +29,6 @@ public class DogHouseServlet extends HttpServlet {
             baseRexsterApiUri = baseRexsterApiUri + "/";
         }
 
-        String rootPath = this.getInitParameter("com.tinkerpop.rexster.config.root");
         ServletContext ctx = this.getServletContext();
 
         // set the MIME type of the response, "text/html"

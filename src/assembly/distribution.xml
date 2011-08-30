@@ -11,10 +11,8 @@
         <fileSet>
             <fileMode>0775</fileMode>
             <includes>
-                <include>rexster-start.sh</include>
-                <include>rexster-start.bat</include>
-                <include>rexster-stop.sh</include>
-                <include>rexster-stop.bat</include>
+                <include>rexster.sh</include>
+                <include>rexster.bat</include>
                 <include>rexster-console.sh</include>
                 <include>rexster-console.bat</include>
             </includes>

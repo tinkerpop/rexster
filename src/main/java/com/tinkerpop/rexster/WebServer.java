@@ -17,8 +17,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
@@ -33,13 +33,15 @@ import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
 import org.glassfish.grizzly.utils.EchoFilter;
 
 import javax.ws.rs.core.UriBuilder;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 
@@ -163,7 +165,6 @@ public class WebServer {
         evaluatorHandler.setServletInstance(new EvaluatorServlet());
 
         String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
-        dogHouseHandler.addInitParameter("com.tinkerpop.rexster.config.root", "/" + webRootPath);
         dogHouseHandler.addInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri", baseUri + ":" + rexsterServerPort.toString());
 
         this.doghouseServer = new HttpServer();
@@ -210,6 +211,40 @@ public class WebServer {
     private static Options getCliOptions() {
         Option help = new Option("h", "help", false, "print this message");
 
+        Option rexsterStart = OptionBuilder.withArgName("parameters")
+                .hasOptionalArgs()
+                .withDescription("start rexster (learn more with start -h)")
+                .withLongOpt("start")
+                .create("s");
+
+        Option rexsterStop = OptionBuilder.withArgName("parameters")
+                .hasOptionalArgs()
+                .withDescription("stop rexster (learn more with stop -h)")
+                .withLongOpt("stop")
+                .create("x");
+
+        Option rexsterStatus = OptionBuilder.withArgName("parameters")
+                .hasOptionalArgs()
+                .withDescription("status of rexster (learn more with stop -h)")
+                .withLongOpt("status")
+                .create("u");
+
+        Option rexsterVersion = new Option("v", "version", false, "print the version of rexster server");
+
+        Options options = new Options();
+        options.addOption(rexsterStart);
+        options.addOption(rexsterStop);
+        options.addOption(rexsterStatus);
+        options.addOption(rexsterVersion);
+        options.addOption(help);
+
+        return options;
+    }
+
+    @SuppressWarnings("static-access")
+    private static Options getStartCliOptions() {
+        Option help = new Option("h", "help", false, "print this message");
+
         Option rexsterFile = OptionBuilder.withArgName("file")
                 .hasArg()
                 .withDescription("use given file for rexster.xml")
@@ -247,15 +282,105 @@ public class WebServer {
         return options;
     }
 
-    private static CommandLine getCliInput(final String[] args) throws Exception {
+    @SuppressWarnings("static-access")
+    private static Options getStopCliOptions() {
+        Option help = new Option("h", "help", false, "print this message");
+
+        Option rexsterFile = OptionBuilder.withArgName("host-name")
+                .hasArg()
+                .withDescription("rexster web server hostname or ip address (default is 127.0.0.1)")
+                .withLongOpt("rexsterhost")
+                .create("rh");
+
+        Option webServerPort = OptionBuilder.withArgName("port")
+                .hasArg()
+                .withDescription("rexster web server shutdown port (default is 8184)")
+                .withLongOpt("rexsterport")
+                .create("rp");
+
+        Option serverCommand = OptionBuilder.withArgName("option")
+                .hasArg()
+                .withDescription("command to issue to rexster web server (-s for shutdown)")
+                .withLongOpt("command")
+                .create("cmd");
+
+        Options options = new Options();
+        options.addOption(help);
+        options.addOption(rexsterFile);
+        options.addOption(webServerPort);
+        options.addOption(serverCommand);
+
+        return options;
+    }
+
+    @SuppressWarnings("static-access")
+    private static Options getStatusCliOptions() {
+        Option help = new Option("h", "help", false, "print this message");
+
+        Option rexsterFile = OptionBuilder.withArgName("host-name")
+                .hasArg()
+                .withDescription("rexster web server hostname or ip address (default is 127.0.0.1)")
+                .withLongOpt("rexsterhost")
+                .create("rh");
+
+        Option webServerPort = OptionBuilder.withArgName("port")
+                .hasArg()
+                .withDescription("rexster web server shutdown port (default is 8184)")
+                .withLongOpt("rexsterport")
+                .create("rp");
+
+        Option serverCommand = OptionBuilder.withArgName("option")
+                .hasArg()
+                .withDescription("command to issue to rexster web server (-s for shutdown)")
+                .withLongOpt("command")
+                .create("cmd");
+
+        Options options = new Options();
+        options.addOption(help);
+        options.addOption(rexsterFile);
+        options.addOption(webServerPort);
+        options.addOption(serverCommand);
+
+        return options;
+    }
+
+    private static RexsterCommandLine getCliInput(final String[] args) throws Exception {
         Options options = getCliOptions();
+        Options innerOptions = null;
         CommandLineParser parser = new GnuParser();
         CommandLine line = null;
+        CommandLine innerLine = null;
 
         try {
             line = parser.parse(options, args);
+
+            if (line.hasOption("start")) {
+                innerOptions = getStartCliOptions();
+                String[] optionValues = line.getOptionValues("start");
+
+                if (optionValues != null && optionValues.length > 0) {
+                    innerLine = parser.parse(innerOptions, optionValues);
+                }
+            } else if (line.hasOption("stop")) {
+                innerOptions = getStopCliOptions();
+                String[] optionValues = line.getOptionValues("stop");
+
+                if (optionValues != null && optionValues.length > 0) {
+                    innerLine = parser.parse(innerOptions, optionValues);
+                }
+            } else if (line.hasOption("status")) {
+                innerOptions = getStatusCliOptions();
+                String[] optionValues = line.getOptionValues("status");
+
+                if (optionValues != null && optionValues.length > 0) {
+                    innerLine = parser.parse(innerOptions, optionValues);
+                }
+            }
+
         } catch (ParseException exp) {
-            throw new Exception("Parsing failed.  Reason: " + exp.getMessage());
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("rexster", options);
+            System.exit(0);
         }
 
         if (line.hasOption("help")) {
@@ -264,67 +389,138 @@ public class WebServer {
             System.exit(0);
         }
 
-        return line;
+        if (innerLine != null && innerLine.hasOption("help")) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("rexster", innerOptions);
+            System.exit(0);
+        }
+
+        return new RexsterCommandLine(line, innerLine, options);
     }
 
     public static void main(final String[] args) throws Exception {
 
         XMLConfiguration properties = new XMLConfiguration();
 
-        CommandLine line = getCliInput(args);
+        RexsterCommandLine line = getCliInput(args);
 
-        if (line.hasOption("debug")) {
-            // turn on all logging for jersey
-            for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
-                java.util.logging.Logger.getLogger(l).setLevel(Level.ALL);
+        if (line.getCommand().hasOption("start")) {
+            if (line.getCommand().hasOption("debug")) {
+                // turn on all logging for jersey
+                for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
+                    java.util.logging.Logger.getLogger(l).setLevel(Level.ALL);
+                }
+            } else {
+                // turn off all logging for jersey
+                for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
+                    java.util.logging.Logger.getLogger(l).setLevel(Level.OFF);
+                }
             }
+
+            String rexsterXmlFile = "rexster.xml";
+
+            if (line.hasCommandParameters() && line.getCommandParameters().hasOption("configuration")) {
+
+                rexsterXmlFile = line.getCommandParameters().getOptionValue("configuration");
+
+                try {
+                    properties.load(new FileReader(rexsterXmlFile));
+                } catch (IOException e) {
+                    throw new Exception("Could not locate " + rexsterXmlFile + " properties file.");
+                }
+            } else {
+                // no arguments to parse
+                properties.load(RexsterApplication.class.getResourceAsStream(rexsterXmlFile));
+            }
+
+            // reference the location of the xml file used to configure the server.
+            // this will allow the configuration to be passed into components that
+            // do not have access to the configuration file and need it for graph
+            // initialization preventing it from having to be explicitly defined
+            // in rexster.xml itself.  there's probably an even better way to do
+            // this *sigh*
+            properties.addProperty("self-xml", rexsterXmlFile);
+
+            // overrides rexster-server-port from command line
+            if (line.hasCommandParameters() && line.getCommandParameters().hasOption("rexsterport")) {
+                properties.setProperty("rexster-server-port", line.getCommandParameters().getOptionValue("rexsterport"));
+            }
+
+            // overrides doghouse-server-port from command line
+            if (line.hasCommandParameters() && line.getCommandParameters().hasOption("doghouseport")) {
+                properties.setProperty("doghouse-server-port", line.getCommandParameters().getOptionValue("doghouseport"));
+            }
+
+            // overrides web-root from command line
+            if (line.hasCommandParameters() && line.getCommandParameters().hasOption("webroot")) {
+                properties.setProperty("web-root", line.getCommandParameters().getOptionValue("webroot"));
+            }
+
+            new WebServer(properties, true);
+        } else if (line.getCommand().hasOption("version")) {
+            System.out.println("Rexster version [" + RexsterApplication.getVersion() + "]");
+        } else if (line.getCommand().hasOption("stop")) {
+            issueControlCommand(line, ShutdownManager.COMMAND_SHUTDOWN_NO_WAIT);
+        } else if (line.getCommand().hasOption("status")) {
+            issueControlCommand(line, ShutdownManager.COMMAND_STATUS);
         } else {
-            // turn off all logging for jersey
-            for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
-                java.util.logging.Logger.getLogger(l).setLevel(Level.OFF);
-            }
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("rexster", line.getCommandOptions());
+        }
+    }
+
+    private static void issueControlCommand(RexsterCommandLine line, String command) throws IOException {
+        String host = "127.0.0.1";
+        int port = 8184;
+
+        if (line.hasCommandParameters() && line.getCommandParameters().hasOption("host")) {
+            host = line.getCommandParameters().getOptionValue("host");
         }
 
-        String rexsterXmlFile = "rexster.xml";
-
-        if (line.hasOption("configuration")) {
-
-            rexsterXmlFile = line.getOptionValue("configuration");
+        if (line.hasCommandParameters() && line.getCommandParameters().hasOption("port")) {
+            String portString = line.getCommandParameters().getOptionValue("port");
 
             try {
-                properties.load(new FileReader(rexsterXmlFile));
-            } catch (IOException e) {
-                throw new Exception("Could not locate " + rexsterXmlFile + " properties file.");
+                port = Integer.parseInt(portString);
+            } catch (NumberFormatException nfe) {
+                logger.warn("The value of the <port> parameter was not a valid value.  Utilizing the default port of " + port + ".");
             }
-        } else {
-            // no arguments to parse
-            properties.load(RexsterApplication.class.getResourceAsStream(rexsterXmlFile));
         }
 
-        // reference the location of the xml file used to configure the server.
-        // this will allow the configuration to be passed into components that 
-        // do not have access to the configuration file and need it for graph
-        // initialization preventing it from having to be explicitly defined
-        // in rexster.xml itself.  there's probably an even better way to do
-        // this *sigh*
-        properties.addProperty("self-xml", rexsterXmlFile);
-
-        // overrides rexster-server-port from command line
-        if (line.hasOption("rexsterport")) {
-            properties.setProperty("rexster-server-port", line.getOptionValue("rexsterport"));
+        if (line.hasCommandParameters() && line.getCommandParameters().hasOption("cmd")) {
+            command = line.getCommandParameters().getOptionValue("cmd");
         }
 
-        // overrides doghouse-server-port from command line
-        if (line.hasOption("doghouseport")) {
-            properties.setProperty("doghouse-server-port", line.getOptionValue("doghouseport"));
-        }
+        final InetAddress hostAddress = InetAddress.getByName(host);
+        final Socket shutdownConnection = new Socket(hostAddress, port);
+        try {
+            shutdownConnection.setSoTimeout(5000);
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(shutdownConnection.getInputStream()));
+            final PrintStream writer = new PrintStream(shutdownConnection.getOutputStream());
+            try {
+                writer.println(command);
+                writer.flush();
 
-        // overrides web-root from command line	
-        if (line.hasOption("webroot")) {
-            properties.setProperty("web-root", line.getOptionValue("webroot"));
-        }
+                System.out.println("Rexster " + command + " command issued");
+                while (true) {
+                    final String theLine = reader.readLine();
+                    if (theLine == null) {
+                        break;
+                    }
 
-        new WebServer(properties, true);
+                    System.out.println(theLine);
+                }
+
+            } finally {
+                IOUtils.closeQuietly(reader);
+                IOUtils.closeQuietly(writer);
+            }
+        } finally {
+            try {
+                shutdownConnection.close();
+            } catch (IOException ioe) {
+            }
+        }
     }
 
 
