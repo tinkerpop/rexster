@@ -26,6 +26,7 @@ h3. Version 0.6 (NOT OFFICIALLY RELEASED YET)
 * Retrieve adjacent vertices through REST API of the vertex resource.
 * Filter by multiple edge labels in the REST API of the vertex resource.
 * PUT on vertex and edge resources in the REST API replaces all graph element properties with the specified set.
+* Combine rexster-start.sh and rexster-stop.sh into rexster.sh with new @-version@ and @-status@ commands.
 
 ==<hr/>==
 
