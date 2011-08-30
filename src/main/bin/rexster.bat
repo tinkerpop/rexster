@@ -7,7 +7,7 @@ set LIBDIR=%CD%
 cd ..\ext
 set EXTDIR=%CD%
 
-cd ..\..\..\
+cd ..\bin
 
 set JAVA_OPTIONS=-Xms32M -Xmx512M
 
