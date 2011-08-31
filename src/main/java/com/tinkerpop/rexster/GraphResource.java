@@ -33,7 +33,7 @@ import javax.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 
-@Path("/{graphname}")
+@Path("/graphs/{graphname}")
 public class GraphResource extends AbstractSubResource {
 
     private static Logger logger = Logger.getLogger(GraphResource.class);

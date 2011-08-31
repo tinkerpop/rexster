@@ -58,7 +58,7 @@ $(function(){
     	var state = api.getApplicationState();
     	if (!state.hasOwnProperty("menu")) {
     		// since there is no menu selected initialized the graph page first.
-	    	api.historyPush("/main/graph");
+	    	api.historyPush("/doghouse/main/graph");
 	    	
 	    	if (!has("native-history-state")) {
     			restoreApplication()

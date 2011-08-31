@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.util.Set;
 
-@Path("/")
+@Path("/graphs")
 @Produces({MediaType.APPLICATION_JSON})
 public class RexsterResource extends BaseResource {
 

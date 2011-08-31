@@ -17,7 +17,7 @@ Rexster.modules.template = function(api) {
 		$.template(templater.templateNameMainMenuItem, templateMainMenuMarkup);
 		
 		// expects {menuName, panel}
-		var templateMenuGraph = '<div id="graphItem${panel}${menuName}" class="graph-item ui-state-default ui-corner-all" style="cursor:pointer;padding:2px;margin:1px"><a href="/main/${panel}/${menuName}">${menuName}</a></div>';
+		var templateMenuGraph = '<div id="graphItem${panel}${menuName}" class="graph-item ui-state-default ui-corner-all" style="cursor:pointer;padding:2px;margin:1px"><a href="/doghouse/main/${panel}/${menuName}">${menuName}</a></div>';
 		$.template(templater.templateNameMenuGraph, templateMenuGraph);
 		
 		// expects {_id}
@@ -25,11 +25,11 @@ Rexster.modules.template = function(api) {
 		$.template(templater.templateNameListVertices, templateListVertices);
 		
 		// expects {_label, _inV, _outV, _id, currentGraphName}
-		var templateListVertexViewInEdgeList = '<li>${_outV} - <a href="/main/graph/${currentGraphName}/edges/${_id}">${_label}</a> - <a href="/main/graph/${currentGraphName}/vertices/${_inV}">${_inV}</a></li>';
+		var templateListVertexViewInEdgeList = '<li>${_outV} - <a href="/doghouse/main/graph/${currentGraphName}/edges/${_id}">${_label}</a> - <a href="/doghouse/main/graph/${currentGraphName}/vertices/${_inV}">${_inV}</a></li>';
 		$.template(templater.templateNameListVertexViewInEdgeList, templateListVertexViewInEdgeList);
 		
 		// expects {_label, _outV, _inV, _id, currentGraphName}
-		var templateListVertexViewOutEdgeList = '<li><a href="/main/graph/${currentGraphName}/vertices/${_outV}">${_outV}</a> - <a href="/main/graph/${currentGraphName}/edges/${_id}">${_label}</a> - ${_inV}</li>';
+		var templateListVertexViewOutEdgeList = '<li><a href="/doghouse/main/graph/${currentGraphName}/vertices/${_outV}">${_outV}</a> - <a href="/doghouse/main/graph/${currentGraphName}/edges/${_id}">${_label}</a> - ${_inV}</li>';
 		$.template(templater.templateNameListVertexViewOutEdgeList, templateListVertexViewOutEdgeList);
 	}
 	

@@ -36,7 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 
-@Path("/{graphname}/edges")
+@Path("/graphs/{graphname}/edges")
 public class EdgeResource extends AbstractSubResource {
 
     private static Logger logger = Logger.getLogger(EdgeResource.class);

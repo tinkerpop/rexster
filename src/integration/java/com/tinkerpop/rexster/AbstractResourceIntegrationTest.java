@@ -26,7 +26,7 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
     }
 
     protected URI createUri(String path) {
-        return URI.create(BASE_URI + path);
+        return URI.create(BASE_URI + "/graphs" + path);
     }
 
     @Override

@@ -11,13 +11,13 @@ Rexster.modules.history = function(api) {
 			encodedState = jQuery.url.setUrl(Rexster.currentState);
 		}
 		
-		if (encodedState.segment() >= 5) {
-			state.objectId = encodedState.segment(4);
+		if (encodedState.segment() >= 6) {
+			state.objectId = encodedState.segment(5);
 		}
 		
-		if (encodedState.segment() >= 4) {
+		if (encodedState.segment() >= 5) {
 			state.browse = {
-				element : encodedState.segment(3),
+				element : encodedState.segment(4),
 				start : 0,
 				end : 10 
 			};
@@ -28,12 +28,12 @@ Rexster.modules.history = function(api) {
 			}
 		}
 		
-		if (encodedState.segment() >= 3) {
-			state.graph = encodedState.segment(2);
+		if (encodedState.segment() >= 4) {
+			state.graph = encodedState.segment(3);
 		}
 		
-		if (encodedState.segment() >= 2) {
-			state.menu = encodedState.segment(1);
+		if (encodedState.segment() >= 3) {
+			state.menu = encodedState.segment(2);
 		} 
 		
 		return state;

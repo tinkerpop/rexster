@@ -38,7 +38,7 @@ var ReadLine = function(options, api) {
         vertex = parts[1];
       }
 
-      $.get('/visualize', { v : vertex, "g" : state.graph }, function(value) {
+      $.get('/doghouse/visualize', { v : vertex, "g" : state.graph }, function(value) {
         if(/Could not/.test(value)) {
           h.insertResponse(value);   
         } else {
@@ -72,7 +72,7 @@ var ReadLine = function(options, api) {
     $.ajax({
             data: { code : req, "g" : state.graph },
             type: "POST",
-            url: '/exec',
+            url: '/doghouse/exec',
             contentType: "application/x-www-form-urlencoded;charset=UTF-8",
             success: function(value) {
               h.insertResponse(value.replace(/\n/g, "<br />"));
@@ -210,7 +210,7 @@ var DefaultInputHtml = function(stack) {
     return "<div class='line'>" +
            linePrompt +
            "<input type='text' class='readLine active' />" +
-           "<img class='spinner' src='/img/spinner.gif' style='display:none;' /></div>";
+           "<img class='spinner' src='/doghouse/img/spinner.gif' style='display:none;' /></div>";
 }
 
 var EnterKeyCode      = 13;

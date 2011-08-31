@@ -29,6 +29,8 @@ public class DogHouseServlet extends HttpServlet {
             baseRexsterApiUri = baseRexsterApiUri + "/";
         }
 
+        baseRexsterApiUri = baseRexsterApiUri + "graphs/";
+
         ServletContext ctx = this.getServletContext();
 
         // set the MIME type of the response, "text/html"

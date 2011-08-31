@@ -40,9 +40,9 @@ public class ExtensionSegmentSet {
 
     public ExtensionSegmentSet(UriInfo uriInfo, ExtensionPoint extensionPoint) {
 
-        int start = 1;
+        int start = 2;
         if (extensionPoint != ExtensionPoint.GRAPH) {
-            start = 3;
+            start = 4;
         }
 
         List<PathSegment> pathSegments = uriInfo.getPathSegments();

@@ -66,10 +66,12 @@ public class RexsterApplicationGraphTest {
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
+        final PathSegment graphsPathSegment = this.mockery.mock(PathSegment.class, "graphsSegment");
         final PathSegment graphPathSegment = this.mockery.mock(PathSegment.class, "graphPathSegment");
         final PathSegment namespacePathSegment = this.mockery.mock(PathSegment.class, "namespacePathSegment");
         final PathSegment extensionPathSegment = this.mockery.mock(PathSegment.class, "extensionPathSegment");
 
+        pathSegments.add(graphsPathSegment);
         pathSegments.add(graphPathSegment);
         pathSegments.add(namespacePathSegment);
         pathSegments.add(extensionPathSegment);

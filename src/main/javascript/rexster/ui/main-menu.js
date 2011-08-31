@@ -104,13 +104,13 @@ Rexster.modules.mainMenu = function(api) {
 		
 		$("#radioMenuGraph").unbind("click");
 		$("#radioMenuGraph").click(function() {
-			slideGraphPanel("/main/graph");
+			slideGraphPanel("/doghouse/main/graph");
 			return false;
 		});
 
 		$("#radioMenuGremlin").unbind("click");
 		$("#radioMenuGremlin").click(function() {
-			slideGremlinPanel("/main/gremlin");
+			slideGremlinPanel("/doghouse/main/gremlin");
             return false;
 		});
 		

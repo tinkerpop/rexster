@@ -36,7 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 
-@Path("/{graphname}/vertices")
+@Path("/graphs/{graphname}/vertices")
 public class VertexResource extends AbstractSubResource {
 
     private static Logger logger = Logger.getLogger(VertexResource.class);

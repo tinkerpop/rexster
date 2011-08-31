@@ -66,8 +66,8 @@ Rexster.modules.graph = function(api) {
 			containerMenuGraph.find("#graphItemgraph" + currentGraphName).addClass("ui-state-active");
 
 			// modify the links on the browse menus to match current state
-			containerPanelGraphMenu.find("a[_type='vertices']").attr("href", "/main/graph/" + currentGraphName + "/vertices?rexster.offset.start=0&rexster.offset.end=10");
-			containerPanelGraphMenu.find("a[_type='edges']").attr("href", "/main/graph/" + currentGraphName + "/edges?rexster.offset.start=0&rexster.offset.end=10");
+			containerPanelGraphMenu.find("a[_type='vertices']").attr("href", "/doghouse/main/graph/" + currentGraphName + "/vertices?rexster.offset.start=0&rexster.offset.end=10");
+			containerPanelGraphMenu.find("a[_type='edges']").attr("href", "/doghouse/main/graph/" + currentGraphName + "/edges?rexster.offset.start=0&rexster.offset.end=10");
 
 			// load the graph profile
 			api.getGraph(currentGraphName, function(graphResult) {
@@ -223,7 +223,7 @@ Rexster.modules.graph = function(api) {
 					});
 					
 					var toolbarButtonGraphLink = toolbarButtonGraph.append("<a/>").children().first();
-					toolbarButtonGraphLink.attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "/" + results[ix]._id);
+					toolbarButtonGraphLink.attr("href", "/doghouse/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "/" + results[ix]._id);
 					toolbarButtonGraphLink.addClass("ui-icon ui-icon-arrow-4-diag");
 					
 					$(toolbarButtonGraphLink).click(function(event) {
@@ -232,7 +232,7 @@ Rexster.modules.graph = function(api) {
 						var split = uri.split("/");
 	                	api.historyPush(uri);
 						
-						that.panelGraphElementViewSelected(api, split[4], split[5]);
+						that.panelGraphElementViewSelected(api, split[5], split[6]);
 						
 						/* bah...visualization is not working nicely
 						var split = $(this).attr("href").split("/");
@@ -321,9 +321,9 @@ Rexster.modules.graph = function(api) {
 			nextRange = that.calculateNextPageRange();
 			previousRange = that.calculatePreviousPageRange();
 			
-			containerPanelBrowser.find(".ui-icon-seek-first").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=0&rexster.offset.end=" + pageSize);
-			containerPanelBrowser.find(".ui-icon-seek-prev").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=" + previousRange.start + "&rexster.offset.end=" + previousRange.end);
-			containerPanelBrowser.find(".ui-icon-seek-next").attr("href", "/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=" + nextRange.start + "&rexster.offset.end=" + nextRange.end);
+			containerPanelBrowser.find(".ui-icon-seek-first").attr("href", "/doghouse/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=0&rexster.offset.end=" + pageSize);
+			containerPanelBrowser.find(".ui-icon-seek-prev").attr("href", "/doghouse/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=" + previousRange.start + "&rexster.offset.end=" + previousRange.end);
+			containerPanelBrowser.find(".ui-icon-seek-next").attr("href", "/doghouse/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=" + nextRange.start + "&rexster.offset.end=" + nextRange.end);
 			
 			if (onPageChangeComplete != undefined) {
 				onPageChangeComplete();
@@ -472,7 +472,7 @@ Rexster.modules.graph = function(api) {
                 	api.historyPush(uri);
                 	
                 	// don't want the refresh to be called so pass an empty function
-					that.panelGraphElementViewSelected(api, split[4], split[5]);
+					that.panelGraphElementViewSelected(api, split[5], split[6]);
 				});
 			} else {
 
@@ -527,7 +527,7 @@ Rexster.modules.graph = function(api) {
 						});
 						
 						var toolbarButtonGraphLink = toolbarButtonGraph.append("<a/>").children().first();
-						toolbarButtonGraphLink.attr("href", "/main/graph/" + currentGraphName + "/vertices/" + element._id);
+						toolbarButtonGraphLink.attr("href", "/doghouse/main/graph/" + currentGraphName + "/vertices/" + element._id);
 						toolbarButtonGraphLink.addClass("ui-icon ui-icon-arrow-4-diag");
 						
 						$(toolbarButtonGraphLink).click(function(event) {
@@ -536,7 +536,7 @@ Rexster.modules.graph = function(api) {
 							var split = uri.split("/");
 		                	api.historyPush(uri);
 							
-						    that.panelGraphElementViewSelected(api, split[4], split[5]);
+						    that.panelGraphElementViewSelected(api, split[5], split[6]);
 						});
 						
 						$("#panelElementViewerRight > ul").jsonviewer({ 
@@ -582,7 +582,7 @@ Rexster.modules.graph = function(api) {
 						});
 						
 						var toolbarButtonGraphLink = toolbarButtonGraph.append("<a/>").children().first();
-						toolbarButtonGraphLink.attr("href", "/main/graph/" + currentGraphName + "/vertices/" + element._id);
+						toolbarButtonGraphLink.attr("href", "/doghouse/main/graph/" + currentGraphName + "/vertices/" + element._id);
 						toolbarButtonGraphLink.addClass("ui-icon ui-icon-arrow-4-diag");
 						
 						$(toolbarButtonGraphLink).click(function(event) {
@@ -591,7 +591,7 @@ Rexster.modules.graph = function(api) {
 							var split = uri.split("/");
 		                	api.historyPush(uri);
 								
-							that.panelGraphElementViewSelected(api, split[4], split[5]);
+							that.panelGraphElementViewSelected(api, split[5], split[6]);
 						});
 						
 						$("#panelElementViewerLeft > ul").jsonviewer({ 

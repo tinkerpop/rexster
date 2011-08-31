@@ -33,7 +33,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-@Path("/{graphname}/indices")
+@Path("/graphs/{graphname}/indices")
 public class IndexResource extends AbstractSubResource {
 
     private static Logger logger = Logger.getLogger(EdgeResource.class);

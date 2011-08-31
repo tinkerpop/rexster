@@ -43,9 +43,11 @@ public class ExtensionSegmentSetTest {
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
+        final PathSegment graphsPathSegment = this.mockery.mock(PathSegment.class, "graphsSegment");
         final PathSegment graphPathSegment = this.mockery.mock(PathSegment.class, "graphPathSegment");
         final PathSegment namespacePathSegment = this.mockery.mock(PathSegment.class, "namespacePathSegment");
 
+        pathSegments.add(graphsPathSegment);
         pathSegments.add(graphPathSegment);
         pathSegments.add(namespacePathSegment);
 
@@ -71,10 +73,12 @@ public class ExtensionSegmentSetTest {
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
+        final PathSegment graphsPathSegment = this.mockery.mock(PathSegment.class, "graphsSegment");
         final PathSegment graphPathSegment = this.mockery.mock(PathSegment.class, "graphPathSegment");
         final PathSegment namespacePathSegment = this.mockery.mock(PathSegment.class, "namespacePathSegment");
         final PathSegment extensionPathSegment = this.mockery.mock(PathSegment.class, "extensionPathSegment");
 
+        pathSegments.add(graphsPathSegment);
         pathSegments.add(graphPathSegment);
         pathSegments.add(namespacePathSegment);
         pathSegments.add(extensionPathSegment);
@@ -102,11 +106,13 @@ public class ExtensionSegmentSetTest {
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
+        final PathSegment graphsPathSegment = this.mockery.mock(PathSegment.class, "graphsSegment");
         final PathSegment graphPathSegment = this.mockery.mock(PathSegment.class, "graphPathSegment");
         final PathSegment namespacePathSegment = this.mockery.mock(PathSegment.class, "namespacePathSegment");
         final PathSegment extensionPathSegment = this.mockery.mock(PathSegment.class, "extensionPathSegment");
         final PathSegment methodPathSegment = this.mockery.mock(PathSegment.class, "methodPathSegment");
 
+        pathSegments.add(graphsPathSegment);
         pathSegments.add(graphPathSegment);
         pathSegments.add(namespacePathSegment);
         pathSegments.add(extensionPathSegment);
@@ -137,10 +143,12 @@ public class ExtensionSegmentSetTest {
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
+        final PathSegment graphsPathSegment = this.mockery.mock(PathSegment.class, "graphsSegment");
         final PathSegment graphPathSegment = this.mockery.mock(PathSegment.class, "graphPathSegment");
         final PathSegment elementPathSegment = this.mockery.mock(PathSegment.class, "elementPathSegment");
         final PathSegment idPathSegment = this.mockery.mock(PathSegment.class, "idPathSegment");
 
+        pathSegments.add(graphsPathSegment);
         pathSegments.add(graphPathSegment);
         pathSegments.add(elementPathSegment);
         pathSegments.add(idPathSegment);
@@ -165,11 +173,13 @@ public class ExtensionSegmentSetTest {
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
+        final PathSegment graphsPathSegment = this.mockery.mock(PathSegment.class, "graphsSegment");
         final PathSegment graphPathSegment = this.mockery.mock(PathSegment.class, "graphPathSegment");
         final PathSegment elementPathSegment = this.mockery.mock(PathSegment.class, "elementPathSegment");
         final PathSegment idPathSegment = this.mockery.mock(PathSegment.class, "idPathSegment");
         final PathSegment namespacePathSegment = this.mockery.mock(PathSegment.class, "namespacePathSegment");
 
+        pathSegments.add(graphsPathSegment);
         pathSegments.add(graphPathSegment);
         pathSegments.add(elementPathSegment);
         pathSegments.add(idPathSegment);
@@ -197,12 +207,14 @@ public class ExtensionSegmentSetTest {
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
+        final PathSegment graphsPathSegment = this.mockery.mock(PathSegment.class, "graphsSegment");
         final PathSegment graphPathSegment = this.mockery.mock(PathSegment.class, "graphPathSegment");
         final PathSegment elementPathSegment = this.mockery.mock(PathSegment.class, "elementPathSegment");
         final PathSegment idPathSegment = this.mockery.mock(PathSegment.class, "idPathSegment");
         final PathSegment namespacePathSegment = this.mockery.mock(PathSegment.class, "namespacePathSegment");
         final PathSegment extensionPathSegment = this.mockery.mock(PathSegment.class, "extensionPathSegment");
 
+        pathSegments.add(graphsPathSegment);
         pathSegments.add(graphPathSegment);
         pathSegments.add(elementPathSegment);
         pathSegments.add(idPathSegment);
@@ -232,6 +244,7 @@ public class ExtensionSegmentSetTest {
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
+        final PathSegment graphsPathSegment = this.mockery.mock(PathSegment.class, "graphsSegment");
         final PathSegment graphPathSegment = this.mockery.mock(PathSegment.class, "graphPathSegment");
         final PathSegment elementPathSegment = this.mockery.mock(PathSegment.class, "elementPathSegment");
         final PathSegment idPathSegment = this.mockery.mock(PathSegment.class, "idPathSegment");
@@ -239,6 +252,7 @@ public class ExtensionSegmentSetTest {
         final PathSegment extensionPathSegment = this.mockery.mock(PathSegment.class, "extensionPathSegment");
         final PathSegment methodPathSegment = this.mockery.mock(PathSegment.class, "methodPathSegment");
 
+        pathSegments.add(graphsPathSegment);
         pathSegments.add(graphPathSegment);
         pathSegments.add(elementPathSegment);
         pathSegments.add(idPathSegment);
@@ -271,10 +285,12 @@ public class ExtensionSegmentSetTest {
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
+        final PathSegment graphsPathSegment = this.mockery.mock(PathSegment.class, "graphsSegment");
         final PathSegment graphPathSegment = this.mockery.mock(PathSegment.class, "graphPathSegment");
         final PathSegment elementPathSegment = this.mockery.mock(PathSegment.class, "elementPathSegment");
         final PathSegment idPathSegment = this.mockery.mock(PathSegment.class, "idPathSegment");
 
+        pathSegments.add(graphsPathSegment);
         pathSegments.add(graphPathSegment);
         pathSegments.add(elementPathSegment);
         pathSegments.add(idPathSegment);
@@ -299,11 +315,13 @@ public class ExtensionSegmentSetTest {
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
+        final PathSegment graphsPathSegment = this.mockery.mock(PathSegment.class, "graphsSegment");
         final PathSegment graphPathSegment = this.mockery.mock(PathSegment.class, "graphPathSegment");
         final PathSegment elementPathSegment = this.mockery.mock(PathSegment.class, "elementPathSegment");
         final PathSegment idPathSegment = this.mockery.mock(PathSegment.class, "idPathSegment");
         final PathSegment namespacePathSegment = this.mockery.mock(PathSegment.class, "namespacePathSegment");
 
+        pathSegments.add(graphsPathSegment);
         pathSegments.add(graphPathSegment);
         pathSegments.add(elementPathSegment);
         pathSegments.add(idPathSegment);
@@ -331,12 +349,14 @@ public class ExtensionSegmentSetTest {
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
+        final PathSegment graphsPathSegment = this.mockery.mock(PathSegment.class, "graphsSegment");
         final PathSegment graphPathSegment = this.mockery.mock(PathSegment.class, "graphPathSegment");
         final PathSegment elementPathSegment = this.mockery.mock(PathSegment.class, "elementPathSegment");
         final PathSegment idPathSegment = this.mockery.mock(PathSegment.class, "idPathSegment");
         final PathSegment namespacePathSegment = this.mockery.mock(PathSegment.class, "namespacePathSegment");
         final PathSegment extensionPathSegment = this.mockery.mock(PathSegment.class, "extensionPathSegment");
 
+        pathSegments.add(graphsPathSegment);
         pathSegments.add(graphPathSegment);
         pathSegments.add(elementPathSegment);
         pathSegments.add(idPathSegment);
@@ -366,6 +386,7 @@ public class ExtensionSegmentSetTest {
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final List<PathSegment> pathSegments = new ArrayList<PathSegment>();
+        final PathSegment graphsPathSegment = this.mockery.mock(PathSegment.class, "graphsSegment");
         final PathSegment graphPathSegment = this.mockery.mock(PathSegment.class, "graphPathSegment");
         final PathSegment elementPathSegment = this.mockery.mock(PathSegment.class, "elementPathSegment");
         final PathSegment idPathSegment = this.mockery.mock(PathSegment.class, "idPathSegment");
@@ -373,6 +394,7 @@ public class ExtensionSegmentSetTest {
         final PathSegment extensionPathSegment = this.mockery.mock(PathSegment.class, "extensionPathSegment");
         final PathSegment methodPathSegment = this.mockery.mock(PathSegment.class, "methodPathSegment");
 
+        pathSegments.add(graphsPathSegment);
         pathSegments.add(graphPathSegment);
         pathSegments.add(elementPathSegment);
         pathSegments.add(idPathSegment);

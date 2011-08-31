@@ -109,20 +109,20 @@ public class WebServer {
     private void start(final XMLConfiguration properties) throws Exception {
         RexsterApplication rexsterApplication = WebServerRexsterApplicationProvider.start(properties);
         Integer rexsterServerPort = properties.getInteger("rexster-server-port", new Integer(8182));
-        Integer doghouseServerPort = properties.getInteger("doghouse-server-port", new Integer(8183));
         Integer rexproServerPort = properties.getInteger("rexpro-server-port", new Integer(8185));
         String webRootPath = properties.getString("web-root", DEFAULT_WEB_ROOT_PATH);
         String baseUri = properties.getString("base-uri", DEFAULT_BASE_URI);
         characterEncoding = properties.getString("character-set", "ISO-8859-1");
 
-        this.startRexsterServer(properties, baseUri, rexsterServerPort);
-        this.startDogHouseServer(properties, webRootPath, doghouseServerPort, baseUri, rexsterServerPort);
+        this.startRexsterServer(properties, baseUri, rexsterServerPort, webRootPath);
         this.startRexProServer(rexproServerPort, rexsterApplication);
 
     }
 
     private void startRexsterServer(final XMLConfiguration properties,
-                                    final String baseUri, final Integer rexsterServerPort) throws Exception {
+                                    final String baseUri,
+                                    final Integer rexsterServerPort,
+                                    final String webRootPath) throws Exception {
 
         ServletHandler jerseyHandler = new ServletHandler();
         jerseyHandler.addInitParameter("com.sun.jersey.config.property.packages", "com.tinkerpop.rexster");
@@ -132,57 +132,44 @@ public class WebServer {
         jerseyHandler.setContextPath("/");
         jerseyHandler.setServletInstance(new ServletContainer());
 
-
-        this.rexsterServer = GrizzlyServerFactory.createHttpServer(
-                UriBuilder.fromUri(baseUri).port(rexsterServerPort).build(),
-                jerseyHandler);
-        this.rexsterServer.start();
-
-        logger.info("Rexster Server running on: [" + baseUri + ":" + rexsterServerPort + "]");
-    }
-
-    private void startDogHouseServer(final XMLConfiguration properties,
-                                     final String webRootPath,
-                                     final Integer doghouseServerPort,
-                                     final String baseUri,
-                                     final Integer rexsterServerPort) throws Exception {
         // servlet that services all url from "main" by simply sending
         // main.html back to the calling client.  main.html handles its own
         // state given the uri
         ServletHandler dogHouseHandler = new ServletHandler();
-        dogHouseHandler.setContextPath("/main");
+        dogHouseHandler.setContextPath("/doghouse/main");
         dogHouseHandler.setServletInstance(new DogHouseServlet());
 
         // servlet for gremlin console
         ServletHandler visualizationHandler = new ServletHandler();
         visualizationHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
 
-        visualizationHandler.setContextPath("/visualize");
+        visualizationHandler.setContextPath("/doghouse/visualize");
         visualizationHandler.setServletInstance(new VisualizationServlet());
 
         // servlet for gremlin console
         ServletHandler evaluatorHandler = new ServletHandler();
         evaluatorHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
 
-        evaluatorHandler.setContextPath("/exec");
+        evaluatorHandler.setContextPath("/doghouse/exec");
         evaluatorHandler.setServletInstance(new EvaluatorServlet());
 
         String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
         dogHouseHandler.addInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri", baseUri + ":" + rexsterServerPort.toString());
 
-        this.doghouseServer = new HttpServer();
-        final ServerConfiguration config = this.doghouseServer.getServerConfiguration();
-        config.addHttpHandler(new RexsterStaticHttpHandler(absoluteWebRootPath), "/");
-        config.addHttpHandler(dogHouseHandler, "/main");
-        config.addHttpHandler(visualizationHandler, "/visualize");
-        config.addHttpHandler(evaluatorHandler, "/exec");
+        this.rexsterServer = new HttpServer();
+        final ServerConfiguration config = this.rexsterServer.getServerConfiguration();
+        config.addHttpHandler(jerseyHandler, "/");
+        config.addHttpHandler(new RexsterStaticHttpHandler(absoluteWebRootPath), "/doghouse");
+        config.addHttpHandler(dogHouseHandler, "/doghouse/main");
+        config.addHttpHandler(visualizationHandler, "/doghouse/visualize");
+        config.addHttpHandler(evaluatorHandler, "/doghouse/exec");
 
-        final NetworkListener listener = new NetworkListener("grizzly", "0.0.0.0", doghouseServerPort);
-        this.doghouseServer.addListener(listener);
+        final NetworkListener listener = new NetworkListener("grizzly", "0.0.0.0", rexsterServerPort);
+        this.rexsterServer.addListener(listener);
 
-        this.doghouseServer.start();
+        this.rexsterServer.start();
 
-        logger.info("Dog House Server running on: [" + baseUri + ":" + doghouseServerPort + "]");
+        logger.info("Rexster Server running on: [" + baseUri + ":" + rexsterServerPort + "]");
     }
 
     private void startRexProServer(final Integer rexproServerPort, final RexsterApplication rexsterApplication) throws Exception {

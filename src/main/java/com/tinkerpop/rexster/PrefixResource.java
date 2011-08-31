@@ -25,7 +25,7 @@ import java.util.Map;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 
-@Path("/{graphname}/prefixes")
+@Path("/graphs/{graphname}/prefixes")
 public class PrefixResource extends AbstractSubResource {
 
     private static Logger logger = Logger.getLogger(PrefixResource.class);

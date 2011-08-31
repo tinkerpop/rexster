@@ -28,6 +28,9 @@ h3. Version 0.6 (NOT OFFICIALLY RELEASED YET)
 * PUT on vertex and edge resources in the REST API replaces all graph element properties with the specified set.
 * Combine rexster-start.sh and rexster-stop.sh into rexster.sh with new @-version@ and @-status@ commands.
 * If the @-c@ argument is not passed at startup, Rexster first tries to read @rexster.xml@ from the root of the working directory.  If it cannot be found then it tries to read from a resource.
+* Dog House and REST API both serve from port 8182
+** Dog House is at @http://localhost:8182/doghouse@
+** The REST URI scheme has changed slightly to include a @graphs@ segment, as in: @http://localhost:8182/graphs/tinkergraph@
 
 ==<hr/>==
 
