@@ -215,7 +215,7 @@ public class WebServer {
 
         Option rexsterStatus = OptionBuilder.withArgName("parameters")
                 .hasOptionalArgs()
-                .withDescription("status of rexster (learn more with stop -h)")
+                .withDescription("status of rexster (learn more with status -h)")
                 .withLongOpt("status")
                 .create("u");
 
@@ -247,12 +247,6 @@ public class WebServer {
                 .withLongOpt("rexsterport")
                 .create("rp");
 
-        Option dogHousePort = OptionBuilder.withArgName("port")
-                .hasArg()
-                .withDescription("override port used for doghouse-server-port in rexster.xml")
-                .withLongOpt("doghouseport")
-                .create("dp");
-
         Option webRoot = OptionBuilder.withArgName("path")
                 .hasArg()
                 .withDescription("override web-root in rexster.xml")
@@ -265,7 +259,6 @@ public class WebServer {
         options.addOption(help);
         options.addOption(rexsterFile);
         options.addOption(webServerPort);
-        options.addOption(dogHousePort);
         options.addOption(webRoot);
         options.addOption(debug);
 
@@ -340,11 +333,13 @@ public class WebServer {
         CommandLineParser parser = new GnuParser();
         CommandLine line = null;
         CommandLine innerLine = null;
+        String commandText = "";
 
         try {
             line = parser.parse(options, args);
 
             if (line.hasOption("start")) {
+                commandText = "start";
                 innerOptions = getStartCliOptions();
                 String[] optionValues = line.getOptionValues("start");
 
@@ -352,6 +347,7 @@ public class WebServer {
                     innerLine = parser.parse(innerOptions, optionValues);
                 }
             } else if (line.hasOption("stop")) {
+                commandText = "stop";
                 innerOptions = getStopCliOptions();
                 String[] optionValues = line.getOptionValues("stop");
 
@@ -359,6 +355,7 @@ public class WebServer {
                     innerLine = parser.parse(innerOptions, optionValues);
                 }
             } else if (line.hasOption("status")) {
+                commandText = "status";
                 innerOptions = getStatusCliOptions();
                 String[] optionValues = line.getOptionValues("status");
 
@@ -373,15 +370,13 @@ public class WebServer {
             System.exit(0);
         }
 
-        if (line.hasOption("help")) {
+        if (line.hasOption("help") && (line.hasOption("start") || line.hasOption("status") || line.hasOption("stop"))) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("rexster - " + commandText, innerOptions);
+            System.exit(0);
+        } else if (line.hasOption("help")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("rexster", options);
-            System.exit(0);
-        }
-
-        if (innerLine != null && innerLine.hasOption("help")) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("rexster", innerOptions);
             System.exit(0);
         }
 
@@ -467,11 +462,6 @@ public class WebServer {
             // overrides rexster-server-port from command line
             if (line.hasCommandParameters() && line.getCommandParameters().hasOption("rexsterport")) {
                 properties.setProperty("rexster-server-port", line.getCommandParameters().getOptionValue("rexsterport"));
-            }
-
-            // overrides doghouse-server-port from command line
-            if (line.hasCommandParameters() && line.getCommandParameters().hasOption("doghouseport")) {
-                properties.setProperty("doghouse-server-port", line.getCommandParameters().getOptionValue("doghouseport"));
             }
 
             // overrides web-root from command line
