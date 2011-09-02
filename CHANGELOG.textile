@@ -12,7 +12,7 @@ All releases can be accessed through the TinkerPop Maven2 repository identified 
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dalmatian.png!
 
-h3. Version 0.6 (Dalmation - NOT OFFICIALLY RELEASED YET)
+h3. Version 0.6 (Dalmatian - NOT OFFICIALLY RELEASED YET)
 
 ```xml
  <dependency>
