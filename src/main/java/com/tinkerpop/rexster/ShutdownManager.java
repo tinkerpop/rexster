@@ -254,20 +254,20 @@ public class ShutdownManager {
 
                     if (ShutdownManager.COMMAND_SHUTDOWN_WAIT.equals(receivedCommand)) {
                         logger.info("Received request for shutdown");
-                        writer.println(new Date() + ": Starting Shutdown and waiting");
+                        writer.println("Rexster Server shutting down...");
                         writer.flush();
                         shutdown();
-                        writer.println(new Date() + ": Shutdown Complete");
+                        writer.println("Rexster Server shutdown complete");
                     } else if (ShutdownManager.COMMAND_SHUTDOWN_NO_WAIT.equals(receivedCommand)) {
                         logger.info("Received request for shutdown");
-                        writer.println(new Date() + ": Starting Shutdown and disconnecting shutdown socket");
+                        writer.println("Rexster Server is starting shutdown (check status of shutdown with --status option)");
                         shutdownNoWait = true;
                     } else if (ShutdownManager.COMMAND_STATUS.equals(receivedCommand)) {
                         logger.debug("Received request for status");
                         if (shutdownRequested.get()) {
-                            writer.println(new Date() + ": Shutting down");
+                            writer.println("Rexster Server is shutting down");
                         } else {
-                            writer.println(new Date() + ": Running");
+                            writer.println("Rexster Server is running");
                         }
                     } else {
                         writer.println(new Date() + ": Unknown command '" + receivedCommand + "'");

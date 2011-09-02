@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.lang.reflect.Array;
+import java.net.BindException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -281,17 +282,13 @@ public class WebServer {
                 .withLongOpt("rexsterport")
                 .create("rp");
 
-        Option serverCommand = OptionBuilder.withArgName("option")
-                .hasArg()
-                .withDescription("command to issue to rexster web server (-s for shutdown)")
-                .withLongOpt("command")
-                .create("cmd");
+        Option stopAndWait = new Option("w", "wait", false, "wait for server confirmation of shutdown");
 
         Options options = new Options();
         options.addOption(help);
         options.addOption(rexsterFile);
         options.addOption(webServerPort);
-        options.addOption(serverCommand);
+        options.addOption(stopAndWait);
 
         return options;
     }
@@ -312,17 +309,10 @@ public class WebServer {
                 .withLongOpt("rexsterport")
                 .create("rp");
 
-        Option serverCommand = OptionBuilder.withArgName("option")
-                .hasArg()
-                .withDescription("command to issue to rexster web server (-s for shutdown)")
-                .withLongOpt("command")
-                .create("cmd");
-
         Options options = new Options();
         options.addOption(help);
         options.addOption(rexsterFile);
         options.addOption(webServerPort);
-        options.addOption(serverCommand);
 
         return options;
     }
@@ -330,13 +320,15 @@ public class WebServer {
     private static RexsterCommandLine getCliInput(final String[] args) throws Exception {
         Options options = getCliOptions();
         Options innerOptions = null;
-        CommandLineParser parser = new GnuParser();
+        GnuParser parser = new GnuParser();
         CommandLine line = null;
         CommandLine innerLine = null;
         String commandText = "";
 
         try {
-            line = parser.parse(options, args);
+            // not sure why the stopAtNonOption should be set to true for the parse methods.
+            // would seem like the opposite setting makes more sense.
+            line = parser.parse(options, args, true);
 
             if (line.hasOption("start")) {
                 commandText = "start";
@@ -344,7 +336,7 @@ public class WebServer {
                 String[] optionValues = line.getOptionValues("start");
 
                 if (optionValues != null && optionValues.length > 0) {
-                    innerLine = parser.parse(innerOptions, optionValues);
+                    innerLine = parser.parse(innerOptions, optionValues, true);
                 }
             } else if (line.hasOption("stop")) {
                 commandText = "stop";
@@ -352,7 +344,7 @@ public class WebServer {
                 String[] optionValues = line.getOptionValues("stop");
 
                 if (optionValues != null && optionValues.length > 0) {
-                    innerLine = parser.parse(innerOptions, optionValues);
+                    innerLine = parser.parse(innerOptions, optionValues, true);
                 }
             } else if (line.hasOption("status")) {
                 commandText = "status";
@@ -360,7 +352,7 @@ public class WebServer {
                 String[] optionValues = line.getOptionValues("status");
 
                 if (optionValues != null && optionValues.length > 0) {
-                    innerLine = parser.parse(innerOptions, optionValues);
+                    innerLine = parser.parse(innerOptions, optionValues, true);
                 }
             }
 
@@ -469,11 +461,19 @@ public class WebServer {
                 properties.setProperty("web-root", line.getCommandParameters().getOptionValue("webroot"));
             }
 
-            new WebServer(properties, true);
+            try {
+                new WebServer(properties, true);
+            } catch (BindException be) {
+                logger.error("Could not start Rexster Server.  A port that Rexster needs is in use.");
+            }
         } else if (line.getCommand().hasOption("version")) {
             System.out.println("Rexster version [" + RexsterApplication.getVersion() + "]");
         } else if (line.getCommand().hasOption("stop")) {
-            issueControlCommand(line, ShutdownManager.COMMAND_SHUTDOWN_NO_WAIT);
+            if (line.hasCommandParameters() && line.getCommandParameters().hasOption("wait")) {
+                issueControlCommand(line, ShutdownManager.COMMAND_SHUTDOWN_WAIT);
+            } else {
+                issueControlCommand(line, ShutdownManager.COMMAND_SHUTDOWN_NO_WAIT);
+            }
         } else if (line.getCommand().hasOption("status")) {
             issueControlCommand(line, ShutdownManager.COMMAND_STATUS);
         } else {
@@ -482,7 +482,7 @@ public class WebServer {
         }
     }
 
-    private static void issueControlCommand(RexsterCommandLine line, String command) throws IOException {
+    private static void issueControlCommand(RexsterCommandLine line, String command) {
         String host = "127.0.0.1";
         int port = 8184;
 
@@ -504,9 +504,11 @@ public class WebServer {
             command = line.getCommandParameters().getOptionValue("cmd");
         }
 
-        final InetAddress hostAddress = InetAddress.getByName(host);
-        final Socket shutdownConnection = new Socket(hostAddress, port);
+        Socket shutdownConnection = null;
         try {
+            final InetAddress hostAddress = InetAddress.getByName(host);
+            shutdownConnection = new Socket(hostAddress, port);
+
             shutdownConnection.setSoTimeout(5000);
             final BufferedReader reader = new BufferedReader(new InputStreamReader(shutdownConnection.getInputStream()));
             final PrintStream writer = new PrintStream(shutdownConnection.getOutputStream());
@@ -514,7 +516,6 @@ public class WebServer {
                 writer.println(command);
                 writer.flush();
 
-                System.out.println("Rexster " + command + " command issued");
                 while (true) {
                     final String theLine = reader.readLine();
                     if (theLine == null) {
@@ -528,9 +529,13 @@ public class WebServer {
                 IOUtils.closeQuietly(reader);
                 IOUtils.closeQuietly(writer);
             }
+        } catch (IOException ioe) {
+            System.out.println("Cannot connect to Rexster Server to issue command.  It may not be running.");
         } finally {
             try {
-                shutdownConnection.close();
+                if (shutdownConnection != null) {
+                    shutdownConnection.close();
+                }
             } catch (IOException ioe) {
             }
         }
