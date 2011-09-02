@@ -160,7 +160,7 @@ public class WebServer {
         final ServerConfiguration config = this.rexsterServer.getServerConfiguration();
         config.addHttpHandler(jerseyHandler, "/");
         config.addHttpHandler(new RexsterStaticHttpHandler(absoluteWebRootPath), "/doghouse");
-        config.addHttpHandler(dogHouseHandler, "/doghouse/main");
+        config.addHttpHandler(dogHouseHandler, "/doghouse/main/*");
         config.addHttpHandler(visualizationHandler, "/doghouse/visualize");
         config.addHttpHandler(evaluatorHandler, "/doghouse/exec");
 
