@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rexster>
     <rexster-server-port>8182</rexster-server-port>
-    <doghouse-server-port>8183</doghouse-server-port>
-    <rexster-shutdown-port>8184</rexster-shutdown-port>
+    <rexster-shutdown-port>8183</rexster-shutdown-port>
     <rexster-shutdown-host>127.0.0.1</rexster-shutdown-host>
-    <rexpro-server-port>8185</rexpro-server-port>
+    <rexpro-server-port>8184</rexpro-server-port>
     <base-uri>http://localhost</base-uri>
     <web-root>public</web-root>
     <character-set>UTF-8</character-set>

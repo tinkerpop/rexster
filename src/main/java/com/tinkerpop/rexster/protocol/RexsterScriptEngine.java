@@ -26,7 +26,7 @@ public class RexsterScriptEngine extends AbstractScriptEngine {
     private RemoteRexsterSession session = null;
     private String scriptEngineName;
 
-    private int port = 8185;
+    private int port = 8184;
     private String host = "localhost";
 
     private boolean isSessionChanged = true;

@@ -39,7 +39,7 @@ public class ShutdownManager {
     public static final String COMMAND_SHUTDOWN_NO_WAIT = "s";
     public static final String COMMAND_STATUS = "status";
 
-    private int port = 8184;
+    private int port = 8183;
     private String host = "127.0.0.1";
 
     static {

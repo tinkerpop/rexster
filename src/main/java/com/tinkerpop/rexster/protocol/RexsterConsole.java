@@ -388,7 +388,7 @@ public class RexsterConsole {
         CommandLine line = getCliInput(args);
 
         String host = "localhost";
-        int port = 8185;
+        int port = 8184;
         String language = "gremlin";
         int timeout = RexPro.DEFAULT_TIMEOUT_SECONDS;
 

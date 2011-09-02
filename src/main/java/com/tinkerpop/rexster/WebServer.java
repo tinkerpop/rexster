@@ -77,7 +77,7 @@ public class WebServer {
             this.start(properties);
         }
 
-        Integer shutdownServerPort = properties.getInteger("rexster-shutdown-port", new Integer(8184));
+        Integer shutdownServerPort = properties.getInteger("rexster-shutdown-port", new Integer(8183));
         String shutdownServerHost = properties.getString("rexster-shutdown-host", "127.0.0.1");
         final ShutdownManager shutdownManager = new ShutdownManager(shutdownServerHost, shutdownServerPort);
 
@@ -110,7 +110,7 @@ public class WebServer {
     private void start(final XMLConfiguration properties) throws Exception {
         RexsterApplication rexsterApplication = WebServerRexsterApplicationProvider.start(properties);
         Integer rexsterServerPort = properties.getInteger("rexster-server-port", new Integer(8182));
-        Integer rexproServerPort = properties.getInteger("rexpro-server-port", new Integer(8185));
+        Integer rexproServerPort = properties.getInteger("rexpro-server-port", new Integer(8184));
         String webRootPath = properties.getString("web-root", DEFAULT_WEB_ROOT_PATH);
         String baseUri = properties.getString("base-uri", DEFAULT_BASE_URI);
         characterEncoding = properties.getString("character-set", "ISO-8859-1");
@@ -278,7 +278,7 @@ public class WebServer {
 
         Option webServerPort = OptionBuilder.withArgName("port")
                 .hasArg()
-                .withDescription("rexster web server shutdown port (default is 8184)")
+                .withDescription("rexster web server shutdown port (default is 8183)")
                 .withLongOpt("rexsterport")
                 .create("rp");
 
@@ -305,7 +305,7 @@ public class WebServer {
 
         Option webServerPort = OptionBuilder.withArgName("port")
                 .hasArg()
-                .withDescription("rexster web server shutdown port (default is 8184)")
+                .withDescription("rexster web server status port (default is 8183)")
                 .withLongOpt("rexsterport")
                 .create("rp");
 
@@ -484,7 +484,7 @@ public class WebServer {
 
     private static void issueControlCommand(RexsterCommandLine line, String command) {
         String host = "127.0.0.1";
-        int port = 8184;
+        int port = 8183;
 
         if (line.hasCommandParameters() && line.getCommandParameters().hasOption("host")) {
             host = line.getCommandParameters().getOptionValue("host");

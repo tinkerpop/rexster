@@ -10,6 +10,6 @@ if exist "%%a\bin\rexster-console.bat" set TARGET=%%a
 )
 
 cd %TARGET%\bin\
-call rexster-console.bat localhost 8185 gremlin %*
+call rexster-console.bat localhost 8184 gremlin %*
 
 target/rexster-*-standalone/bin/rexster-console.bat $@

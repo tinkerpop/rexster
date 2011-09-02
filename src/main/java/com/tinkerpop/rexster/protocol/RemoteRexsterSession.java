@@ -11,7 +11,7 @@ import java.util.UUID;
  */
 public class RemoteRexsterSession {
 
-    private int rexProPort = 8185;
+    private int rexProPort = 8184;
     private int timeout;
     private String rexProHost = "localhost";
 
