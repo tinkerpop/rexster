@@ -293,7 +293,7 @@ public class VertexResource extends AbstractSubResource {
                     throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
                 }
 
-                if (rexsterExtensions == null && rexsterExtensions.size() == 0) {
+                if (rexsterExtensions == null || rexsterExtensions.size() == 0) {
                     // extension was not found for some reason
                     logger.error("The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
                     JSONObject error = generateErrorObject(
