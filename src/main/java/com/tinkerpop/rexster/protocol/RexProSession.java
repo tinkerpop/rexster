@@ -19,7 +19,7 @@ public class RexProSession {
 
     private final Bindings bindings = new SimpleBindings();
 
-    private final UUID sessionKey;
+    private final String sessionKey;
 
     private final byte channel;
 
@@ -27,7 +27,7 @@ public class RexProSession {
 
     protected Date lastTimeUsed = new Date();
 
-    public RexProSession(final UUID sessionKey, final RexsterApplication rexsterApplication, final byte channel, final int chunkSize) {
+    public RexProSession(final String sessionKey, final RexsterApplication rexsterApplication, final byte channel, final int chunkSize) {
         this.sessionKey = sessionKey;
         this.channel = channel;
         this.chunkSize = chunkSize;
@@ -35,7 +35,7 @@ public class RexProSession {
         this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, rexsterApplication);
     }
 
-    public UUID getSessionKey() {
+    public String getSessionKey() {
         return this.sessionKey;
     }
 

@@ -22,7 +22,7 @@ public class ScriptFilter extends BaseFilter {
         if (message.getType() == MessageType.SCRIPT_REQUEST) {
             ScriptRequestMessage specificMessage = new ScriptRequestMessage(message);
 
-            RexProSession session = RexProSessions.getSession(specificMessage.getSessionAsUUID());
+            RexProSession session = RexProSessions.getSession(specificMessage.getSessionAsUUID().toString());
 
             try {
                 Object result = session.evaluate(specificMessage.getScript(), specificMessage.getLanguageName(), specificMessage.getBindings());
@@ -31,10 +31,6 @@ public class ScriptFilter extends BaseFilter {
                 if (session.getChannel() == SessionRequestMessage.CHANNEL_CONSOLE) {
                     messageList.add(new ConsoleScriptResponseMessage(specificMessage.getSessionAsUUID(),
                         ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, result, session.getBindings()));
-
-                    //***************DOUBLE THE MESSAGE FOR TESTING*************************************
-                    //messageList.add(new ConsoleScriptResponseMessage(specificMessage.getSessionAsUUID(),
-                    //    ScriptResponseMessage.FLAG_COMPLETE_MESSAGE, result, session.getBindings()));
                 }
 
                 ctx.write(messageList);

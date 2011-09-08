@@ -33,7 +33,7 @@ public class SessionFilter extends BaseFilter {
                 UUID sessionKey = UUID.randomUUID();
 
                 // construct a session with the right channel
-                RexProSessions.ensureSessionExists(sessionKey, this.rexsterApplication,
+                RexProSessions.ensureSessionExists(sessionKey.toString(), this.rexsterApplication,
                         specificMessage.getChannel(), specificMessage.getChunkSize());
 
                 EngineController engineController = EngineController.getInstance();
@@ -42,7 +42,7 @@ public class SessionFilter extends BaseFilter {
                         engineController.getAvailableEngineLanguages()));
 
             } else if (specificMessage.getFlag() == SessionRequestMessage.FLAG_KILL_SESSION) {
-                RexProSessions.destroySession(specificMessage.getSessionAsUUID());
+                RexProSessions.destroySession(specificMessage.getSessionAsUUID().toString());
                 ctx.write(new SessionResponseMessage(RexProMessage.EMPTY_SESSION, specificMessage.getRequestAsUUID(), null));
             } else {
                 // there is no session to this message...that's a problem
@@ -64,7 +64,7 @@ public class SessionFilter extends BaseFilter {
             return ctx.getStopAction();
         }
 
-        if (!RexProSessions.hasSessionKey(message.getSessionAsUUID())) {
+        if (!RexProSessions.hasSessionKey(message.getSessionAsUUID().toString())) {
             // the message is assigned a session that does not exist on the server
             ctx.write(new ErrorResponseMessage(RexProMessage.EMPTY_SESSION, message.getRequestAsUUID(),
                     ErrorResponseMessage.FLAG_ERROR_INVALID_SESSION,

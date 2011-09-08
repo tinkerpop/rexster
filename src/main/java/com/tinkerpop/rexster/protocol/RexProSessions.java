@@ -5,41 +5,40 @@ import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RexProSessions {
     private static final Logger logger = Logger.getLogger(RexProSession.class);
 
-    protected static ConcurrentHashMap<UUID, RexProSession> sessions = new ConcurrentHashMap<UUID, RexProSession>();
+    protected static ConcurrentHashMap<String, RexProSession> sessions = new ConcurrentHashMap<String, RexProSession>();
 
-    public static RexProSession getSession(UUID sessionKey) {
+    public static RexProSession getSession(String sessionKey) {
         return sessions.get(sessionKey);
     }
 
-    public static void destroySession(UUID sessionKey) {
+    public static void destroySession(String sessionKey) {
         sessions.remove(sessionKey);
-        logger.info("RexPro Session destroyed: " + sessionKey.toString());
+        logger.info("RexPro Session destroyed: " + sessionKey);
     }
 
     public static void destroyAllSessions() {
-        Iterator<UUID> keys = sessions.keySet().iterator();
+        Iterator<String> keys = sessions.keySet().iterator();
         while (keys.hasNext()) {
-            UUID keyToRemove = keys.next();
+            String keyToRemove = keys.next();
             destroySession(keyToRemove);
-            logger.info("RexPro Session destroyed: " + keyToRemove.toString());
+            logger.info("RexPro Session destroyed: " + keyToRemove);
         }
     }
 
-    public static boolean hasSessionKey(UUID sessionKey) {
+    public static boolean hasSessionKey(String sessionKey) {
         return sessions.containsKey(sessionKey);
     }
 
-    public static Collection<UUID> getSessionKeys() {
+    public static Collection<String> getSessionKeys() {
         return sessions.keySet();
     }
 
-    public static void ensureSessionExists(UUID sessionKey, RexsterApplication rexsterApplication, byte sessionChannel, int chunkSize) {
+    public static void ensureSessionExists(String sessionKey, RexsterApplication rexsterApplication, byte sessionChannel, int chunkSize) {
         if (!sessions.containsKey(sessionKey)) {
 
             RexProSession session = new RexProSession(sessionKey, rexsterApplication, sessionChannel, chunkSize);
