@@ -32,6 +32,7 @@ h3. Version 0.6 (Dalmatian - NOT OFFICIALLY RELEASED YET)
 * Dog House and REST API both serve from port 8182
 ** Dog House is at @http://localhost:8182/doghouse@
 ** The REST URI scheme has changed slightly to include a @graphs@ segment, as in: @http://localhost:8182/graphs/tinkergraph@
+* RexPro sessions that remain idle for a configurable amount of time are destroyed.
 
 ==<hr/>==
 
