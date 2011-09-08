@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RexProSessions {
-    private static final Logger logger = Logger.getLogger(RexProSession.class);
+    private static final Logger logger = Logger.getLogger(RexProSessions.class);
 
     protected static ConcurrentHashMap<String, RexProSession> sessions = new ConcurrentHashMap<String, RexProSession>();
 
@@ -26,7 +26,6 @@ public class RexProSessions {
         while (keys.hasNext()) {
             String keyToRemove = keys.next();
             destroySession(keyToRemove);
-            logger.info("RexPro Session destroyed: " + keyToRemove);
         }
     }
 

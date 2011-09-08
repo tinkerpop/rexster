@@ -2,6 +2,7 @@ package com.tinkerpop.rexster;
 
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.tinkerpop.rexster.protocol.RexProSessionMonitor;
 import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
 import com.tinkerpop.rexster.protocol.filter.ScriptFilter;
 import com.tinkerpop.rexster.protocol.filter.SessionFilter;
@@ -76,6 +77,11 @@ public class WebServer {
         } else {
             this.start(properties);
         }
+
+        // initialize teh session monitor for rexpro to clean up dead sessions.
+        Long rexProSessionMaxIdle = properties.getLong("rexpro-session-max-idle", new Long(1790000));
+        Long rexProSessionCheckInterval = properties.getLong("rexpro-session-check-interval", new Long(3000000));
+        new RexProSessionMonitor(rexProSessionMaxIdle, rexProSessionCheckInterval);
 
         Integer shutdownServerPort = properties.getInteger("rexster-shutdown-port", new Integer(8183));
         String shutdownServerHost = properties.getString("rexster-shutdown-host", "127.0.0.1");
