@@ -48,6 +48,12 @@ public class GraphResource extends AbstractSubResource {
         this.uriInfo = ui;
     }
 
+    @OPTIONS
+    public Response optionsGraph() {
+        return buildOptionsResponse(HttpMethod.GET.toString(),
+                HttpMethod.DELETE.toString());
+    }
+
     /**
      * GET http://host/graph
      * graph.toString();

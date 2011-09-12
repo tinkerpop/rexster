@@ -51,6 +51,12 @@ public class EdgeResource extends AbstractSubResource {
         this.uriInfo = ui;
     }
 
+    @OPTIONS
+    public Response optionsAllEdges() {
+        return buildOptionsResponse(HttpMethod.GET.toString(),
+                HttpMethod.POST.toString());
+    }
+
     /**
      * GET http://host/graph/edges
      * graph.getEdges();
@@ -90,6 +96,12 @@ public class EdgeResource extends AbstractSubResource {
 
         return Response.ok(this.resultObject).build();
 
+    }
+
+    @OPTIONS
+    @Path("/{id}")
+    public Response optionsSingleEdge() {
+        return buildOptionsResponse();
     }
 
     /**

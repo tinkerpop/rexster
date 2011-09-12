@@ -1,9 +1,8 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -344,5 +343,22 @@ public abstract class BaseResource {
             }
         }
         return days + "[d]:" + hours + "[h]:" + minutes + "[m]:" + seconds + "[s]";
+    }
+
+    /**
+     * Includes all HTTP Methods in allowable options.
+     */
+    protected Response buildOptionsResponse() {
+        return buildOptionsResponse(HttpMethod.DELETE.toString(),
+                HttpMethod.GET.toString(),
+                HttpMethod.POST.toString(),
+                HttpMethod.PUT.toString());
+    }
+
+    protected Response buildOptionsResponse(String ... methods) {
+        return Response.noContent()
+                .header("Access-Control-Allow-Methods", StringUtils.join(methods, ","))
+                .header("Access-Control-Allow-Headers", "*")
+                .header("Access-Control-Max-Age", "1728000").build();
     }
 }

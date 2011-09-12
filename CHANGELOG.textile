@@ -33,6 +33,7 @@ h3. Version 0.6 (Dalmatian - NOT OFFICIALLY RELEASED YET)
 ** Dog House is at @http://localhost:8182/doghouse@
 ** The REST URI scheme has changed slightly to include a @graphs@ segment, as in: @http://localhost:8182/graphs/tinkergraph@
 * RexPro sessions that remain idle for a configurable amount of time are destroyed.
+* Support OPTIONS HTTP method for all REST resources so that HTTP Access Control works properly when used (eg. jquery).
 
 ==<hr/>==
 

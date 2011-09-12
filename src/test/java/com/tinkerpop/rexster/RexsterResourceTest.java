@@ -46,7 +46,7 @@ public class RexsterResourceTest {
         }});
 
         RexsterResource resource = new RexsterResource(rap);
-        Response response = resource.evaluate();
+        Response response = resource.getRexsterRoot();
 
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -83,7 +83,7 @@ public class RexsterResourceTest {
         }});
 
         RexsterResource resource = new RexsterResource(rap);
-        Response response = resource.evaluate();
+        Response response = resource.getRexsterRoot();
 
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());

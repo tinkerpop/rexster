@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
+import com.tinkerpop.rexster.extension.HttpMethod;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -40,6 +42,12 @@ public class PrefixResource extends AbstractSubResource {
         this.uriInfo = ui;
     }
 
+    @OPTIONS
+    public Response optionsPrefixes() {
+        return buildOptionsResponse(HttpMethod.GET.toString(),
+                HttpMethod.POST.toString());
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPrefixes(@PathParam("graphname") String graphName) {
@@ -67,6 +75,13 @@ public class PrefixResource extends AbstractSubResource {
             JSONObject error = generateErrorObject(re.getMessage(), re);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
+    }
+
+    @OPTIONS
+    @Path("/{prefix}")
+    public Response optionsSinglePrefix() {
+        return buildOptionsResponse(HttpMethod.GET.toString(),
+                HttpMethod.DELETE.toString());
     }
 
     @GET

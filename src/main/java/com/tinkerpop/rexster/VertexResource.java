@@ -51,6 +51,12 @@ public class VertexResource extends AbstractSubResource {
         this.uriInfo = ui;
     }
 
+    @OPTIONS
+    public Response optionsVertices() {
+        return buildOptionsResponse(HttpMethod.GET.toString(),
+                HttpMethod.POST.toString());
+    }
+
     /**
      * GET http://host/graph/vertices
      * graph.getVertices();
@@ -93,6 +99,12 @@ public class VertexResource extends AbstractSubResource {
         }
 
         return Response.ok(this.resultObject).build();
+    }
+
+    @OPTIONS
+    @Path("/{id}")
+    public Response optionsSingleVertex() {
+        return buildOptionsResponse();
     }
 
     /**
@@ -355,6 +367,12 @@ public class VertexResource extends AbstractSubResource {
         }
 
         return Response.fromResponse(extResponse.getJerseyResponse()).type(mediaType).build();
+    }
+
+    @OPTIONS
+    @Path("/{id}/{direction}")
+    public Response optionsVertexEdges() {
+        return buildOptionsResponse();
     }
 
     /**

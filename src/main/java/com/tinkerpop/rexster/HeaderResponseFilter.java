@@ -56,8 +56,6 @@ public class HeaderResponseFilter implements ContainerResponseFilter {
             }
 
             contentTypeSpecifiedByService = response.getMediaType();
-
-            response.getHttpHeaders().putSingle(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
         } else {
             response.setStatus(Response.Status.NOT_ACCEPTABLE.getStatusCode());
 
@@ -67,6 +65,8 @@ public class HeaderResponseFilter implements ContainerResponseFilter {
             JSONObject jsonError = new JSONObject(m);
             response.setEntity(jsonError);
         }
+
+        response.getHttpHeaders().putSingle(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
 
         return response;
     }

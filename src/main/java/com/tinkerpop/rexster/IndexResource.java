@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.json.JSONWriter;
+import com.tinkerpop.rexster.extension.HttpMethod;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -46,6 +48,11 @@ public class IndexResource extends AbstractSubResource {
         super(rap);
         this.httpServletRequest = req;
         this.uriInfo = ui;
+    }
+
+    @OPTIONS
+    public Response optionsAllIndices() {
+        return buildOptionsResponse(HttpMethod.GET.toString());
     }
 
     /**
@@ -94,6 +101,14 @@ public class IndexResource extends AbstractSubResource {
 
         return Response.ok(this.resultObject).build();
 
+    }
+
+    @OPTIONS
+    @Path("/{indexName}")
+    public Response optionsElementsFromIndex() {
+        return buildOptionsResponse(HttpMethod.GET.toString(),
+                HttpMethod.DELETE.toString(),
+                HttpMethod.POST.toString());
     }
 
     /**
@@ -164,6 +179,12 @@ public class IndexResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
     }
 
+    @OPTIONS
+    @Path("/{indexName}/keys")
+    public Response optionsAutomaticIndexKeys() {
+        return buildOptionsResponse(HttpMethod.GET.toString());
+    }
+
     /**
      * GET http://host/graph/indices/indexName/keys
      * AutomaticIndex index = (AutomaticIndex) graph.getIndex(indexName,...);
@@ -209,6 +230,12 @@ public class IndexResource extends AbstractSubResource {
         }
 
         return Response.ok(this.resultObject).build();
+    }
+
+    @OPTIONS
+    @Path("/{indexName}/count")
+    public Response optionsIndexCount() {
+        return buildOptionsResponse(HttpMethod.GET.toString());
     }
 
     /**

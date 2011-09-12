@@ -1,11 +1,13 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.extension.HttpMethod;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -30,8 +32,13 @@ public class RexsterResource extends BaseResource {
         super(rap);
     }
 
+    @OPTIONS
+    public Response optionsRexsterRoot() {
+        return buildOptionsResponse(HttpMethod.GET.toString());
+    }
+
     @GET
-    public Response evaluate() {
+    public Response getRexsterRoot() {
         try {
 
             Set<String> graphNames = this.getRexsterApplicationProvider().getGraphsNames();

@@ -1,6 +1,9 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.extension.HttpMethod;
+
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -16,9 +19,14 @@ public class RootResource extends BaseResource {
         super(rap);
     }
 
+    @OPTIONS
+    public Response optionsRoot() {
+        return buildOptionsResponse(HttpMethod.GET.toString());
+    }
+
     @GET
     @Produces({MediaType.TEXT_HTML})
-    public Response evaluate() {
+    public Response getRoot() {
         StringBuffer sb = new StringBuffer();
         sb.append("<html style=\"background-color:#111111\">");
         sb.append("<head><meta charset=\"UTF-8\"><title>Rexster</title><link rel=\"shortcut icon\" type=\"image/x-icon\" href=\"/doghouse/favicon.ico\"></head>");
