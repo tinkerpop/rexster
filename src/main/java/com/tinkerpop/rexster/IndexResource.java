@@ -510,6 +510,7 @@ public class IndexResource extends AbstractSubResource {
                     throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
                 }
 
+                // why do we need this local "i" variable?
                 Index i;
                 try {
                     if (t == Index.Type.MANUAL)
@@ -523,7 +524,7 @@ public class IndexResource extends AbstractSubResource {
                 }
                 try {
                     this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-                    this.resultObject.put(Tokens.RESULTS, createJSONObject(index));
+                    this.resultObject.put(Tokens.RESULTS, createJSONObject(i));
                 } catch (JSONException ex) {
                     logger.error(ex);
 
