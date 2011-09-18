@@ -2,14 +2,9 @@ package com.tinkerpop.rexster;
 
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GraphResourceIntegrationTest extends AbstractGraphResourceIntegrationTest {
 

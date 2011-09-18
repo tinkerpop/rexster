@@ -98,10 +98,10 @@ public class BitWorks {
     public static byte[] getFilteredBytesWithLength(Object result) throws IOException {
 
         if (result instanceof Serializable
-            && !(result instanceof Graph)
-            && !(result instanceof Edge)
-            && !(result instanceof Vertex)
-            && !(result instanceof Index)) {
+                && !(result instanceof Graph)
+                && !(result instanceof Edge)
+                && !(result instanceof Vertex)
+                && !(result instanceof Index)) {
 
             try {
                 return getBytesWithLength(result);

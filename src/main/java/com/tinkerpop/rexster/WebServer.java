@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster;
 
-import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.tinkerpop.rexster.protocol.RexProSessionMonitor;
 import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
@@ -11,7 +10,6 @@ import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
 import com.tinkerpop.rexster.servlet.VisualizationServlet;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
@@ -33,19 +31,16 @@ import org.glassfish.grizzly.servlet.ServletHandler;
 import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
 import org.glassfish.grizzly.utils.EchoFilter;
 
-import javax.ws.rs.core.UriBuilder;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.lang.reflect.Array;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.LogManager;

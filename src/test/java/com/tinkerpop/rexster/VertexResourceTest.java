@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster;
 
-import com.sun.jersey.spi.container.WebApplication;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
@@ -14,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.PUT;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;

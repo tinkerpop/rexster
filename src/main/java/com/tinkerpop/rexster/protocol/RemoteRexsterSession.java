@@ -1,6 +1,10 @@
 package com.tinkerpop.rexster.protocol;
 
-import com.tinkerpop.rexster.protocol.message.*;
+import com.tinkerpop.rexster.protocol.message.KillSessionRequestMessage;
+import com.tinkerpop.rexster.protocol.message.MessageType;
+import com.tinkerpop.rexster.protocol.message.RexProMessage;
+import com.tinkerpop.rexster.protocol.message.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.message.SessionResponseMessage;
 
 import java.util.Iterator;
 import java.util.List;

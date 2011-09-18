@@ -85,7 +85,7 @@ public class RexProMessageFilter extends BaseFilter {
 
         List<RexProMessage> remainingMessages = null;
         if (messages.size() > 1) {
-             remainingMessages = messages.subList(1, messages.size());
+            remainingMessages = messages.subList(1, messages.size());
         }
 
         final int size = RexProMessage.HEADER_SIZE + message.getBodyLength();

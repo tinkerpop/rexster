@@ -1,10 +1,8 @@
 package com.tinkerpop.rexster.config;
 
-import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;

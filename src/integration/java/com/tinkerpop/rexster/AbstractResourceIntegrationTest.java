@@ -3,7 +3,6 @@ package com.tinkerpop.rexster;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.test.framework.JerseyTest;
-import org.apache.commons.collections.map.MultiValueMap;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -17,7 +16,7 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
 
     protected static String BASE_URI = "http://localhost:9998";
 
-    public AbstractResourceIntegrationTest()throws Exception {
+    public AbstractResourceIntegrationTest() throws Exception {
         super("com.tinkerpop.rexster");
 
         XMLConfiguration properties = new XMLConfiguration();
@@ -122,7 +121,7 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
     protected ClientResponse doGraphPostOfJson(GraphTestHolder testGraph, String path, String query, JSONObject jsonToPost) {
         String uri = makeGraphUriString(testGraph, path);
 
-        return doPostOfJson(uri, query,jsonToPost);
+        return doPostOfJson(uri, query, jsonToPost);
     }
 
     protected ClientResponse doGraphPutOfJson(GraphTestHolder testGraph, String path, String query, JSONObject jsonToPut) {

@@ -190,7 +190,7 @@ public class ExtensionResponse {
         return ok(new JSONObject(result));
     }
 
-    public static ExtensionResponse availableOptions(String ... methods) {
+    public static ExtensionResponse availableOptions(String... methods) {
         return new ExtensionResponse(Response.noContent()
                 .header("Access-Control-Allow-Methods", StringUtils.join(methods, ",")).build());
     }

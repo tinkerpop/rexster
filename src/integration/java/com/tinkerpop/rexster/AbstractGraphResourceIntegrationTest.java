@@ -84,7 +84,7 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
         jsonEdge.put(Tokens._OUT_V, graphHolder.getVertexIdSet().get(jsonEdge.optString(Tokens._OUT_V)));
 
         request.setEntity(jsonEdge);
-        List<Object> headerValue = new ArrayList<Object>(){{
+        List<Object> headerValue = new ArrayList<Object>() {{
             add(MediaType.APPLICATION_JSON);
         }};
         request.getHeaders().put("Content-Type", headerValue);

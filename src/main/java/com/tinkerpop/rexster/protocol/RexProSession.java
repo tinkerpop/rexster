@@ -2,15 +2,11 @@ package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.protocol.message.RexProMessage;
-import com.tinkerpop.rexster.protocol.message.ScriptRequestMessage;
 
 import javax.script.Bindings;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import java.io.IOException;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Server-side rexster session.

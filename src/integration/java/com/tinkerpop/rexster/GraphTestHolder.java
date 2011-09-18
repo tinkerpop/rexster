@@ -5,7 +5,7 @@ import java.util.Map;
 
 /**
  * Holds references and settings needed for a graph to be tested.
- *
+ * <p/>
  * This holder is created as a result of the configurations in the rexster-integration-test.xml file which
  * is used as configuration for the integration tests.  The type of graph will play a role in the tests
  * that will execute.

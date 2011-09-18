@@ -355,7 +355,7 @@ public abstract class BaseResource {
                 HttpMethod.PUT.toString());
     }
 
-    protected Response buildOptionsResponse(String ... methods) {
+    protected Response buildOptionsResponse(String... methods) {
         return Response.noContent()
                 .header("Access-Control-Allow-Methods", StringUtils.join(methods, ","))
                 .header("Access-Control-Allow-Headers", "*")

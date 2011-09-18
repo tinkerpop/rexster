@@ -2,7 +2,6 @@ package com.tinkerpop.rexster;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import com.sun.jersey.core.util.StringIgnoreCaseKeyComparator;
 import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -11,7 +10,6 @@ import org.junit.Test;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;

@@ -47,7 +47,7 @@ public class Neo4jGraphConfiguration implements GraphConfiguration {
 
                 // replace the ".." put in play by apache commons configuration.  that's expected behavior
                 // due to parsing key names to xml.
-                neo4jProperties.put(key.replace("..",  "."), neo4jSpecificConfiguration.getString(key));
+                neo4jProperties.put(key.replace("..", "."), neo4jSpecificConfiguration.getString(key));
             }
 
             if (highAvailabilityMode) {
