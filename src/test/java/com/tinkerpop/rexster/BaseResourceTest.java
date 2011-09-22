@@ -80,36 +80,6 @@ public class BaseResourceTest {
         Assert.assertEquals("peter", tt.getRequestObjectFlat().optString("c.c"));
     }
 
-    @Test
-    public void getReturnKeysNoKeys() throws Exception {
-        BaseResource tt = new MockResource();
-        JSONTokener tokener = new JSONTokener("{\"rexster\": { \"someproperty\": [ \"key\" ]}}");
-        JSONObject jsonObject = new JSONObject(tokener);
-        tt.setRequestObject(jsonObject);
-        Assert.assertNull(tt.getReturnKeys());
-    }
-
-    @Test
-    public void getReturnKeysValid() throws Exception {
-        BaseResource tt = new MockResource();
-        JSONTokener tokener = new JSONTokener("{\"rexster\": { \"" + Tokens.RETURN_KEYS + "\": [ \"key1\" ]}}");
-        JSONObject jsonObject = new JSONObject(tokener);
-        tt.setRequestObject(jsonObject);
-        Assert.assertNotNull(tt.getReturnKeys());
-        Assert.assertEquals(1, tt.getReturnKeys().size());
-        Assert.assertEquals("key1", tt.getReturnKeys().get(0));
-
-        tt = new MockResource();
-        tokener = new JSONTokener("{\"rexster\": { \"" + Tokens.RETURN_KEYS + "\": [ \"key1\", \"key2\", \"key3\" ]}}");
-        jsonObject = new JSONObject(tokener);
-        tt.setRequestObject(jsonObject);
-        Assert.assertNotNull(tt.getReturnKeys());
-        Assert.assertEquals(3, tt.getReturnKeys().size());
-        Assert.assertEquals("key1", tt.getReturnKeys().get(0));
-        Assert.assertEquals("key2", tt.getReturnKeys().get(1));
-        Assert.assertEquals("key3", tt.getReturnKeys().get(2));
-    }
-
     protected class MockResource extends BaseResource {
         public MockResource() {
             super(new MockRexsterApplicationProvider());

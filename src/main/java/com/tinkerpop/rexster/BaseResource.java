@@ -232,10 +232,6 @@ public abstract class BaseResource {
         }
     }
 
-    public JSONObject getRexsterRequest() {
-        return this.getRequestObject().optJSONObject(Tokens.REXSTER);
-    }
-
     protected JSONObject getNonRexsterRequest() throws JSONException {
         JSONObject object = new JSONObject();
         Iterator keys = this.getRequestObject().keys();
@@ -259,22 +255,6 @@ public abstract class BaseResource {
         }
         return keys;
 
-    }
-
-    public Long getStartOffset() {
-        return RequestObjectHelper.getStartOffset(this.getRequestObject());
-    }
-
-    public Long getEndOffset() {
-        return RequestObjectHelper.getEndOffset(this.getRequestObject());
-    }
-
-    protected boolean hasShowTypes() {
-        return RequestObjectHelper.getShowTypes(this.getRequestObject());
-    }
-
-    protected List<String> getReturnKeys() {
-        return RequestObjectHelper.getReturnKeys(this.getRequestObject());
     }
 
     /*

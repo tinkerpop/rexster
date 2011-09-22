@@ -67,8 +67,11 @@ public class VertexResource extends AbstractSubResource {
     public Response getVertices(@PathParam("graphname") String graphName) {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 
-        Long start = this.getStartOffset();
-        Long end = this.getEndOffset();
+        JSONObject theRequestObject = this.getRequestObject();
+        Long start = RequestObjectHelper.getStartOffset(theRequestObject);
+        Long end = RequestObjectHelper.getEndOffset(theRequestObject);
+        boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
+        List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
         try {
             long counter = 0l;
@@ -77,7 +80,7 @@ public class VertexResource extends AbstractSubResource {
             for (Vertex vertex : rag.getGraph().getVertices()) {
                 if (counter >= start && counter < end) {
                     wasInSection = true;
-                    vertexArray.put(JSONWriter.createJSONElement(vertex, this.getReturnKeys(), this.hasShowTypes()));
+                    vertexArray.put(JSONWriter.createJSONElement(vertex, returnKeys, showTypes));
                 } else if (wasInSection) {
                     break;
                 }
@@ -120,7 +123,12 @@ public class VertexResource extends AbstractSubResource {
         Vertex vertex = this.getRexsterApplicationGraph(graphName).getGraph().getVertex(id);
         if (null != vertex) {
             try {
-                this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(vertex, this.getReturnKeys(), this.hasShowTypes()));
+
+                JSONObject theRequestObject = this.getRequestObject();
+                List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+                boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
+
+                this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(vertex, returnKeys, showTypes));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
                 JSONArray extensionsList = getExtensionHypermedia(graphName, ExtensionPoint.VERTEX);
@@ -387,8 +395,11 @@ public class VertexResource extends AbstractSubResource {
         Vertex vertex = this.getRexsterApplicationGraph(graphName).getGraph().getVertex(vertexId);
 
         try {
-            Long start = this.getStartOffset();
-            Long end = this.getEndOffset();
+            JSONObject theRequestObject = this.getRequestObject();
+            Long start = RequestObjectHelper.getStartOffset(theRequestObject);
+            Long end = RequestObjectHelper.getEndOffset(theRequestObject);
+            boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
+            List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
             Object temp = this.getRequestObject().opt(Tokens._LABEL);
             String labelSet = null;
@@ -415,7 +426,7 @@ public class VertexResource extends AbstractSubResource {
 
                     for (Edge edge : itty) {
                         if (counter >= start && counter < end) {
-                            edgeArray.put(JSONWriter.createJSONElement(edge, this.getReturnKeys(), this.hasShowTypes()));
+                            edgeArray.put(JSONWriter.createJSONElement(edge, returnKeys, showTypes));
                         }
                         counter++;
                     }
@@ -431,7 +442,7 @@ public class VertexResource extends AbstractSubResource {
 
                     for (Edge edge : itty) {
                         if (counter >= start && counter < end) {
-                            edgeArray.put(JSONWriter.createJSONElement(edge, this.getReturnKeys(), this.hasShowTypes()));
+                            edgeArray.put(JSONWriter.createJSONElement(edge, returnKeys, showTypes));
                         }
                         counter++;
                     }
@@ -447,7 +458,7 @@ public class VertexResource extends AbstractSubResource {
 
                     for (Edge edge : itty) {
                         if (counter >= start && counter < end) {
-                            edgeArray.put(JSONWriter.createJSONElement(edge.getInVertex(), this.getReturnKeys(), this.hasShowTypes()));
+                            edgeArray.put(JSONWriter.createJSONElement(edge.getInVertex(), returnKeys, showTypes));
                         }
                         counter++;
                     }
@@ -463,7 +474,7 @@ public class VertexResource extends AbstractSubResource {
 
                     for (Edge edge : itty) {
                         if (counter >= start && counter < end) {
-                            edgeArray.put(JSONWriter.createJSONElement(edge.getOutVertex(), this.getReturnKeys(), this.hasShowTypes()));
+                            edgeArray.put(JSONWriter.createJSONElement(edge.getOutVertex(), returnKeys, showTypes));
                         }
                         counter++;
                     }
@@ -598,7 +609,9 @@ public class VertexResource extends AbstractSubResource {
                 }
             }
 
-            Iterator keys = this.getRequestObject().keys();
+            JSONObject theRequestObject = this.getRequestObject();
+
+            Iterator keys = theRequestObject.keys();
             while (keys.hasNext()) {
                 String key = keys.next().toString();
                 if (!key.startsWith(Tokens.UNDERSCORE)) {
@@ -608,7 +621,9 @@ public class VertexResource extends AbstractSubResource {
 
             rag.tryStopTransactionSuccess();
 
-            this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(vertex, this.getReturnKeys(), this.hasShowTypes()));
+            boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
+            List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+            this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(vertex, returnKeys, showTypes));
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
             rag.tryStopTransactionFailure();
@@ -692,7 +707,8 @@ public class VertexResource extends AbstractSubResource {
                 vertex.removeProperty(propertyKey);
             }
 
-            Iterator keys = this.getRequestObject().keys();
+            JSONObject theRequestObject = this.getRequestObject();
+            Iterator keys = theRequestObject.keys();
             while (keys.hasNext()) {
                 String key = keys.next().toString();
                 if (!key.startsWith(Tokens.UNDERSCORE)) {
@@ -702,7 +718,9 @@ public class VertexResource extends AbstractSubResource {
 
             rag.tryStopTransactionSuccess();
 
-            this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(vertex, this.getReturnKeys(), this.hasShowTypes()));
+            boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
+            List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+            this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(vertex, returnKeys, showTypes));
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
             rag.tryStopTransactionFailure();

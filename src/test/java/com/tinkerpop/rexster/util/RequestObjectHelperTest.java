@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.util;
 
+import com.tinkerpop.rexster.BaseResource;
 import com.tinkerpop.rexster.Tokens;
 import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONObject;
@@ -60,6 +61,12 @@ public class RequestObjectHelperTest {
 
         Assert.assertEquals("k1", keys.get(0));
         Assert.assertEquals("k2", keys.get(1));
+    }
+
+    @Test
+    public void getReturnKeysNoKeys() throws Exception {
+        JSONObject json = buildJSONObjectFromString("{\"rexster\": { \"someproperty\": [ \"key\" ]}}");
+        Assert.assertNull(RequestObjectHelper.getReturnKeys(json));
     }
 
     @Test

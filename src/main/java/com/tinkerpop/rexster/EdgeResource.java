@@ -68,8 +68,12 @@ public class EdgeResource extends AbstractSubResource {
 
         RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 
-        Long start = this.getStartOffset();
-        Long end = this.getEndOffset();
+        JSONObject theRequestObject = this.getRequestObject();
+        Long start = RequestObjectHelper.getStartOffset(theRequestObject);
+        Long end = RequestObjectHelper.getEndOffset(theRequestObject);
+        boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
+        List<String> returnKeys = RequestObjectHelper.getReturnKeys(this.getRequestObject());
+
         boolean wasInSection = false;
         long counter = 0l;
         try {
@@ -77,7 +81,7 @@ public class EdgeResource extends AbstractSubResource {
             for (Edge edge : rag.getGraph().getEdges()) {
                 if (counter >= start && counter < end) {
                     wasInSection = true;
-                    edgeArray.put(JSONWriter.createJSONElement(edge, this.getReturnKeys(), this.hasShowTypes()));
+                    edgeArray.put(JSONWriter.createJSONElement(edge, returnKeys, showTypes));
                 } else if (wasInSection) {
                     break;
                 }
@@ -117,7 +121,11 @@ public class EdgeResource extends AbstractSubResource {
 
         if (null != edge) {
             try {
-                this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(edge, this.getReturnKeys(), this.hasShowTypes()));
+                JSONObject theRequestObject = this.getRequestObject();
+                boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
+                List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+
+                this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(edge, returnKeys, showTypes));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
                 JSONArray extensionsList = getExtensionHypermedia(graphName, ExtensionPoint.EDGE);
@@ -499,7 +507,11 @@ public class EdgeResource extends AbstractSubResource {
                             edge.setProperty(key, this.getTypedPropertyValue(this.getRequestObject().getString(key)));
                         }
                     }
-                    this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(edge, this.getReturnKeys(), this.hasShowTypes()));
+
+                    JSONObject theRequestObject = this.getRequestObject();
+                    boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
+                    List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+                    this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(edge, returnKeys, showTypes));
                 } else {
                     // edge could not be found.  likely an error condition on the request
                     JSONObject error = generateErrorObjectJsonFail(new Exception("Edge cannot be found or created.  Please check the format of the request."));
@@ -591,14 +603,19 @@ public class EdgeResource extends AbstractSubResource {
                 edge.removeProperty(propertyKey);
             }
 
-            Iterator keys = this.getRequestObject().keys();
+            JSONObject theRequestObject = this.getRequestObject();
+            List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+            boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
+
+            Iterator keys = theRequestObject.keys();
             while (keys.hasNext()) {
                 String key = keys.next().toString();
                 if (!key.startsWith(Tokens.UNDERSCORE)) {
-                    edge.setProperty(key, this.getTypedPropertyValue(this.getRequestObject().getString(key)));
+                    edge.setProperty(key, this.getTypedPropertyValue(theRequestObject.getString(key)));
                 }
             }
-            this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(edge, this.getReturnKeys(), this.hasShowTypes()));
+
+            this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(edge, returnKeys, showTypes));
 
             rag.tryStopTransactionSuccess();
 

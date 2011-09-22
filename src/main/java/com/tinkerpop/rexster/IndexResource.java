@@ -8,6 +8,7 @@ import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.json.JSONWriter;
 import com.tinkerpop.rexster.extension.HttpMethod;
+import com.tinkerpop.rexster.util.RequestObjectHelper;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -29,6 +30,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -74,8 +76,8 @@ public class IndexResource extends AbstractSubResource {
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 
-        Long start = this.getStartOffset();
-        Long end = this.getEndOffset();
+        Long start = RequestObjectHelper.getStartOffset(this.getRequestObject());
+        Long end = RequestObjectHelper.getEndOffset(this.getRequestObject());
 
         long counter = 0l;
 
@@ -125,27 +127,32 @@ public class IndexResource extends AbstractSubResource {
         String key = null;
         Object value = null;
 
-        Object temp = this.getRequestObject().opt(Tokens.KEY);
+        JSONObject theRequestObject = this.getRequestObject();
+
+        Object temp = theRequestObject.opt(Tokens.KEY);
         if (null != temp)
             key = temp.toString();
 
-        temp = this.getRequestObject().opt(Tokens.VALUE);
+        temp = theRequestObject.opt(Tokens.VALUE);
         if (null != temp)
             value = getTypedPropertyValue(temp.toString());
 
 
-        Long start = this.getStartOffset();
-        Long end = this.getEndOffset();
+        Long start = RequestObjectHelper.getStartOffset(theRequestObject);
+        Long end = RequestObjectHelper.getEndOffset(theRequestObject);
+        List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+        boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
 
         long counter = 0l;
 
 
         if (null != index && key != null && value != null) {
             try {
+
                 JSONArray elementArray = new JSONArray();
                 for (Element element : (Iterable<Element>) index.get(key, value)) {
                     if (counter >= start && counter < end) {
-                        elementArray.put(JSONWriter.createJSONElement(element, this.getReturnKeys(), this.hasShowTypes()));
+                        elementArray.put(JSONWriter.createJSONElement(element, returnKeys, showTypes));
                     }
                     counter++;
                 }
