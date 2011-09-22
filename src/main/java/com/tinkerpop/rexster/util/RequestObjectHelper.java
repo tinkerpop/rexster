@@ -6,6 +6,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -137,6 +138,29 @@ public class RequestObjectHelper {
             return Long.MAX_VALUE;
         else
             return offset;
+    }
+
+    /**
+     * Given a request object, determine if it has graph element properties.
+     *
+     * Graph element properties are those that do not have an underscore.
+     * @param requestObject the request object.
+     * @return true if the element has properties and false otherwise.
+     */
+    public static boolean hasElementProperties(JSONObject requestObject) {
+
+        if (requestObject == null) {
+            return false;
+        }
+
+        Iterator keys = requestObject.keys();
+        while (keys.hasNext()) {
+            String key = keys.next().toString();
+            if (!key.startsWith(Tokens.UNDERSCORE)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static Long getOffset(JSONObject requestObject, String offsetToken) {

@@ -145,4 +145,21 @@ public class RequestObjectHelperTest {
         requestObject = buildJSONObjectFromString("{\"rexster\": { \"offset\": { \"start\":-10, \"end\":10001 }}}");
         Assert.assertEquals(10001l, (long) RequestObjectHelper.getEndOffset(requestObject));
     }
+
+    @Test
+    public void hasElementPropertiesTrue() {
+        JSONObject requestObject = buildJSONObjectFromString("{\"_id\": 1, \"name\":\"wally\" }");
+        Assert.assertTrue(RequestObjectHelper.hasElementProperties(requestObject));
+    }
+
+    @Test
+    public void hasElementPropertiesFalse() {
+        JSONObject requestObject = buildJSONObjectFromString("{\"_id\": 1 }");
+        Assert.assertFalse(RequestObjectHelper.hasElementProperties(requestObject));
+    }
+
+    @Test
+    public void hasElementPropertiesNullRequestFalse() {
+        Assert.assertFalse(RequestObjectHelper.hasElementProperties(null));
+    }
 }

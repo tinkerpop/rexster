@@ -10,6 +10,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterExtension;
+import com.tinkerpop.rexster.util.RequestObjectHelper;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -589,7 +590,9 @@ public class VertexResource extends AbstractSubResource {
             if (null == vertex) {
                 vertex = graph.addVertex(id);
             } else {
-                if (!this.hasElementProperties(this.getRequestObject())) {
+                if (!RequestObjectHelper.hasElementProperties(this.getRequestObject())) {
+                    // if the edge exists there better be some properties to assign
+                    // this really isn't a BAD_REQUEST, but CONFLICT isn't much better...bah
                     JSONObject error = generateErrorObjectJsonFail(new Exception("Vertex with id " + id + " already exists"));
                     throw new WebApplicationException(Response.status(Status.CONFLICT).entity(error).build());
                 }
