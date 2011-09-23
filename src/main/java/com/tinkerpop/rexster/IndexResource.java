@@ -8,6 +8,7 @@ import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.json.JSONWriter;
 import com.tinkerpop.rexster.extension.HttpMethod;
+import com.tinkerpop.rexster.util.ElementHelper;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -135,7 +136,7 @@ public class IndexResource extends AbstractSubResource {
 
         temp = theRequestObject.opt(Tokens.VALUE);
         if (null != temp)
-            value = getTypedPropertyValue(temp.toString());
+            value = ElementHelper.getTypedPropertyValue(temp.toString());
 
 
         Long start = RequestObjectHelper.getStartOffset(theRequestObject);
@@ -264,7 +265,7 @@ public class IndexResource extends AbstractSubResource {
 
         temp = this.getRequestObject().opt(Tokens.VALUE);
         if (temp != null) {
-            value = getTypedPropertyValue(temp.toString());
+            value = ElementHelper.getTypedPropertyValue(temp.toString());
         }
 
         if (index != null && key != null && value != null) {
@@ -322,7 +323,7 @@ public class IndexResource extends AbstractSubResource {
             key = temp.toString();
         temp = this.getRequestObject().opt(Tokens.VALUE);
         if (null != temp)
-            value = getTypedPropertyValue(temp.toString());
+            value = ElementHelper.getTypedPropertyValue(temp.toString());
         temp = this.getRequestObject().opt(Tokens.ID);
         if (null != temp)
             id = temp.toString();
@@ -434,7 +435,7 @@ public class IndexResource extends AbstractSubResource {
             key = temp.toString();
         temp = this.getRequestObject().opt(Tokens.VALUE);
         if (null != temp)
-            value = getTypedPropertyValue(temp.toString());
+            value = ElementHelper.getTypedPropertyValue(temp.toString());
         temp = this.getRequestObject().opt(Tokens.ID);
         if (null != temp)
             id = temp.toString();

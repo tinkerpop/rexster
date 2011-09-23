@@ -10,6 +10,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterExtension;
+import com.tinkerpop.rexster.util.ElementHelper;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -504,7 +505,7 @@ public class EdgeResource extends AbstractSubResource {
                     while (keys.hasNext()) {
                         String key = keys.next().toString();
                         if (!key.startsWith(Tokens.UNDERSCORE)) {
-                            edge.setProperty(key, this.getTypedPropertyValue(this.getRequestObject().getString(key)));
+                            edge.setProperty(key, ElementHelper.getTypedPropertyValue(this.getRequestObject().getString(key)));
                         }
                     }
 
@@ -611,7 +612,7 @@ public class EdgeResource extends AbstractSubResource {
             while (keys.hasNext()) {
                 String key = keys.next().toString();
                 if (!key.startsWith(Tokens.UNDERSCORE)) {
-                    edge.setProperty(key, this.getTypedPropertyValue(theRequestObject.getString(key)));
+                    edge.setProperty(key, ElementHelper.getTypedPropertyValue(theRequestObject.getString(key)));
                 }
             }
 
