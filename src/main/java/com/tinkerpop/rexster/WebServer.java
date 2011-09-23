@@ -412,7 +412,7 @@ public class WebServer {
         RexsterCommandLine line = getCliInput(cleanArguments(args));
 
         if (line.getCommand().hasOption("start")) {
-            if (line.getCommand().hasOption("debug")) {
+            if (line.getCommandParameters().hasOption("debug")) {
                 // turn on all logging for jersey
                 for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
                     java.util.logging.Logger.getLogger(l).setLevel(Level.ALL);
