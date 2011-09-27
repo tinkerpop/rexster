@@ -2,9 +2,9 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.gremlin.pipes.filter.LabelFilterPipe;
 import com.tinkerpop.pipes.Pipe;
 import com.tinkerpop.pipes.filter.FilterPipe;
-import com.tinkerpop.pipes.filter.LabelFilterPipe;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
