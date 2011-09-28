@@ -80,18 +80,6 @@
             <version>1.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-ha</artifactId>
-            <version>1.5.M01</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-management</artifactId>
-            <version>1.5.M01</version>
-            <scope>provided</scope>
-        </dependency>
         <!-- SERVER + REST SUPPORT -->
         <dependency>
             <groupId>com.sun.jersey</groupId>

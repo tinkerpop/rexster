@@ -2,12 +2,11 @@ package com.tinkerpop.rexster.config;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jHaGraph;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.HighlyAvailableGraphDatabase;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -63,8 +62,7 @@ public class Neo4jGraphConfiguration implements GraphConfiguration {
                     throw new GraphConfigurationException("Check graph configuration. Neo4j HA requires [ha.zoo_keeper_servers] <properties> of the configuration");
                 }
 
-                GraphDatabaseService graphDatabaseService = new HighlyAvailableGraphDatabase(graphFile, neo4jProperties);
-                return new Neo4jGraph(graphDatabaseService);
+                return new Neo4jHaGraph(graphFile, neo4jProperties);
 
             } else {
                 return new Neo4jGraph(graphFile, neo4jProperties);
