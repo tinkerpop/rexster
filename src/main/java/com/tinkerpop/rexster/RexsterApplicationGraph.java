@@ -4,25 +4,40 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.rexster.extension.ExtensionAllowed;
 import com.tinkerpop.rexster.extension.ExtensionConfiguration;
+import com.tinkerpop.rexster.extension.ExtensionDefinition;
+import com.tinkerpop.rexster.extension.ExtensionDescriptor;
+import com.tinkerpop.rexster.extension.ExtensionNaming;
+import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
+import com.tinkerpop.rexster.extension.RexsterExtension;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
 
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 /**
- * Holds a graph, its assigned traversals and packages.
+ * Holds a graph and its assigned extensions.
  */
 public class RexsterApplicationGraph {
 
-    private static final Logger logger = Logger.getLogger(RexsterApplication.class);
+    private static final Logger logger = Logger.getLogger(RexsterApplicationGraph.class);
 
     private Graph graph;
     private String graphName;
     private Set<ExtensionAllowed> extensionAllowables;
     private Set<ExtensionConfiguration> extensionConfigurations;
+
+    private static final Map<ExtensionPoint, JSONArray> hypermediaCache = new HashMap<ExtensionPoint, JSONArray>();
 
     public RexsterApplicationGraph(String graphName, Graph graph) {
         this.graphName = graphName;
@@ -157,5 +172,93 @@ public class RexsterApplicationGraph {
 
     public Set<ExtensionAllowed> getExtensionAllowables() {
         return this.extensionAllowables;
+    }
+
+    protected JSONArray getExtensionHypermedia(ExtensionPoint extensionPoint) {
+
+        JSONArray hypermediaLinks = new JSONArray();
+        if (hypermediaCache.containsKey(extensionPoint)) {
+            hypermediaLinks = hypermediaCache.get(extensionPoint);
+        } else {
+            ServiceLoader<? extends RexsterExtension> extensions = ServiceLoader.load(RexsterExtension.class);
+            for (RexsterExtension extension : extensions) {
+
+                Class clazz = extension.getClass();
+                ExtensionNaming extensionNaming = (ExtensionNaming) clazz.getAnnotation(ExtensionNaming.class);
+
+                // initialize the defaults
+                String currentExtensionNamespace = "g";
+                String currentExtensionName = clazz.getName();
+
+                if (extensionNaming != null) {
+
+                    // naming annotation is present to try to override the defaults
+                    // if the values are valid.
+                    if (extensionNaming.name() != null && !extensionNaming.name().isEmpty()) {
+                        currentExtensionName = extensionNaming.name();
+                    }
+
+                    // naming annotation is defaulted to "g" anyway but checking anyway to make sure
+                    // no one tries to pull any funny business.
+                    if (extensionNaming.namespace() != null && !extensionNaming.namespace().isEmpty()) {
+                        currentExtensionNamespace = extensionNaming.namespace();
+                    }
+                }
+
+                // test the configuration to see if the extension should even be available
+                ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(
+                        currentExtensionNamespace, currentExtensionName);
+
+                if (this.isExtensionAllowed(extensionSegmentSet)) {
+                    ExtensionConfiguration extensionConfig = this.findExtensionConfiguration(
+                            currentExtensionNamespace, currentExtensionName);
+                    RexsterExtension rexsterExtension = null;
+                    try {
+                        rexsterExtension = (RexsterExtension) clazz.newInstance();
+                    } catch (Exception ex) {
+                        logger.warn("Failed extension configuration check for " + currentExtensionNamespace + ":"
+                                + currentExtensionName + "on graph " + graphName);
+                    }
+
+                    if (rexsterExtension != null) {
+                        if (rexsterExtension.isConfigurationValid(extensionConfig)) {
+                            Method[] methods = clazz.getMethods();
+                            for (Method method : methods) {
+                                ExtensionDescriptor descriptor = method.getAnnotation(ExtensionDescriptor.class);
+                                ExtensionDefinition definition = method.getAnnotation(ExtensionDefinition.class);
+
+                                if (definition != null && definition.extensionPoint() == extensionPoint) {
+                                    String href = currentExtensionNamespace + "/" + currentExtensionName;
+                                    if (!definition.path().isEmpty()) {
+                                        href = href + "/" + definition.path();
+                                    }
+
+                                    HashMap hypermediaLink = new HashMap();
+                                    hypermediaLink.put("href", href);
+                                    hypermediaLink.put("method", definition.method().name());
+
+                                    // descriptor is not a required annotation for extensions.
+                                    if (descriptor != null) {
+                                        hypermediaLink.put("title", descriptor.description());
+                                    }
+
+                                    hypermediaLinks.put(new JSONObject(hypermediaLink));
+                                }
+                            }
+                        } else {
+                            logger.warn("An extension [" + currentExtensionNamespace + ":" + currentExtensionName + "] does not have a valid configuration.  Check rexster.xml and ensure that the configuration section matches what the extension expects.");
+                        }
+                    }
+                }
+            }
+
+            if (hypermediaLinks.length() == 0) {
+                hypermediaCache.put(extensionPoint, null);
+            } else {
+                hypermediaCache.put(extensionPoint, hypermediaLinks);
+            }
+        }
+
+        return hypermediaLinks;
     }
 }

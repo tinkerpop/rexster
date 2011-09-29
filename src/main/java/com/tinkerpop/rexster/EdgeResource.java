@@ -129,7 +129,8 @@ public class EdgeResource extends AbstractSubResource {
                 this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(edge, returnKeys, showTypes));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
-                JSONArray extensionsList = getExtensionHypermedia(graphName, ExtensionPoint.EDGE);
+                RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE);
                 if (extensionsList != null) {
                     this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                 }

@@ -121,7 +121,8 @@ public class VertexResource extends AbstractSubResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSingleVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
-        Vertex vertex = this.getRexsterApplicationGraph(graphName).getGraph().getVertex(id);
+        RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        Vertex vertex = rag.getGraph().getVertex(id);
         if (null != vertex) {
             try {
 
@@ -132,7 +133,7 @@ public class VertexResource extends AbstractSubResource {
                 this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(vertex, returnKeys, showTypes));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
-                JSONArray extensionsList = getExtensionHypermedia(graphName, ExtensionPoint.VERTEX);
+                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX);
                 if (extensionsList != null) {
                     this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                 }

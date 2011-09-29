@@ -82,7 +82,8 @@ public class GraphResource extends AbstractSubResource {
             this.resultObject.put(Tokens.UP_TIME, this.getTimeAlive());
             this.resultObject.put("version", RexsterApplication.getVersion());
 
-            JSONArray extensionsList = getExtensionHypermedia(graphName, ExtensionPoint.GRAPH);
+            RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+            JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.GRAPH);
             if (extensionsList != null) {
                 this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
             }
