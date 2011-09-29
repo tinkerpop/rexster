@@ -32,16 +32,7 @@ public class HeaderResponseFilter implements ContainerResponseFilter {
             acceptCharsetHeaderValue = WebServer.getCharacterEncoding();
         }
 
-        List<CharsetHolder> charsetRanks = CharsetHolder.getAcceptableCharsets(acceptCharsetHeaderValue);
-
-        CharsetHolder firstSupportedCharset = null;
-        for (CharsetHolder charsetRank : charsetRanks) {
-            if (charsetRank.isSupported()) {
-                firstSupportedCharset = charsetRank;
-                break;
-            }
-        }
-
+        CharsetHolder firstSupportedCharset = CharsetHolder.getFirstSupportedCharset(acceptCharsetHeaderValue);
         if (firstSupportedCharset != null) {
 
             MediaType contentTypeSpecifiedByService = response.getMediaType();

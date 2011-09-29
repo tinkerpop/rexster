@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -17,6 +18,19 @@ public class CharsetHolder implements Comparable<CharsetHolder> {
     private String charset;
     private float quality = 0.0f;
     private int order;
+
+    private static final int CACHE_MAX_SIZE = 1000;
+
+    private static final Map<String, CharsetHolder> charsetCache = Collections.synchronizedMap(
+            new LinkedHashMap(CACHE_MAX_SIZE) {
+
+                private static final long serialVersionUID = 2546245625L;
+
+                @Override
+                protected boolean removeEldestEntry(Map.Entry eldest) {
+                    return size() > CACHE_MAX_SIZE;
+                }
+            });
 
     public CharsetHolder(String charset, float quality, int order) {
 
@@ -50,6 +64,35 @@ public class CharsetHolder implements Comparable<CharsetHolder> {
         }
 
         return isSupportedCharset;
+    }
+
+    /**
+     * Accepts a standard value from the Accept-Charset field and gets the first matching charset supported
+     * by the server.
+     *
+     * Example: iso-8859-5, unicode-1-1;q=0.8
+     *
+     * @return the first matching charset that is supported by the server or null if one cannot be found.
+     */
+    public static CharsetHolder getFirstSupportedCharset(String acceptCharsetHeaderValue) {
+        CharsetHolder firstSupportedCharset = null;
+
+        if (charsetCache.containsKey(acceptCharsetHeaderValue)) {
+            firstSupportedCharset = charsetCache.get(acceptCharsetHeaderValue);
+        } else {
+            List<CharsetHolder> charsetRanks = getAcceptableCharsets(acceptCharsetHeaderValue);
+
+            for (CharsetHolder charsetRank : charsetRanks) {
+                if (charsetRank.isSupported()) {
+                    firstSupportedCharset = charsetRank;
+                    break;
+                }
+            }
+
+            charsetCache.put(acceptCharsetHeaderValue, firstSupportedCharset);
+        }
+
+        return firstSupportedCharset;
     }
 
     public static List<CharsetHolder> getAcceptableCharsets(String acceptCharsetHeaderValue) {
