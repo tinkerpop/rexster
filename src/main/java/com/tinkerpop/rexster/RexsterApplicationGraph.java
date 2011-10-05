@@ -37,6 +37,8 @@ public class RexsterApplicationGraph {
     private Set<ExtensionAllowed> extensionAllowables;
     private Set<ExtensionConfiguration> extensionConfigurations;
 
+    private static final ServiceLoader<? extends RexsterExtension> extensions = ServiceLoader.load(RexsterExtension.class);
+
     private static final Map<ExtensionPoint, JSONArray> hypermediaCache = new HashMap<ExtensionPoint, JSONArray>();
 
     public RexsterApplicationGraph(String graphName, Graph graph) {
@@ -145,7 +147,16 @@ public class RexsterApplicationGraph {
                     logger.warn("Graph [" + graphName + "] - Extension [" + namespace + ":" + name + "] does not have a valid configuration.  Please check rexster.xml");
                 }
             }
+
+            // cache the extension hypermedia once configurations are loaded and cached.
+            this.initializeExtensionHypermediaCache();
         }
+    }
+
+    private void initializeExtensionHypermediaCache(){
+        this.getExtensionHypermedia(ExtensionPoint.GRAPH);
+        this.getExtensionHypermedia(ExtensionPoint.VERTEX);
+        this.getExtensionHypermedia(ExtensionPoint.EDGE);
     }
 
     /**
@@ -180,7 +191,7 @@ public class RexsterApplicationGraph {
         if (hypermediaCache.containsKey(extensionPoint)) {
             hypermediaLinks = hypermediaCache.get(extensionPoint);
         } else {
-            ServiceLoader<? extends RexsterExtension> extensions = ServiceLoader.load(RexsterExtension.class);
+
             for (RexsterExtension extension : extensions) {
 
                 Class clazz = extension.getClass();

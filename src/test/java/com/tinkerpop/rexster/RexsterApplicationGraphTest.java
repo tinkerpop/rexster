@@ -138,6 +138,11 @@ public class RexsterApplicationGraphTest {
         list.add(xmlConfig);
 
         RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", null);
+
+        List allowables = new ArrayList();
+        allowables.add("tp:*");
+        rag.loadAllowableExtensions(list);
+
         rag.loadExtensionsConfigurations(list);
 
         ExtensionConfiguration extConfig = rag.findExtensionConfiguration("tp", "extensionname");
