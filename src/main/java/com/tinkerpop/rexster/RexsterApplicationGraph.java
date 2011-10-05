@@ -39,7 +39,7 @@ public class RexsterApplicationGraph {
 
     private static final ServiceLoader<? extends RexsterExtension> extensions = ServiceLoader.load(RexsterExtension.class);
 
-    private static final Map<ExtensionPoint, JSONArray> hypermediaCache = new HashMap<ExtensionPoint, JSONArray>();
+    private final Map<ExtensionPoint, JSONArray> hypermediaCache = new HashMap<ExtensionPoint, JSONArray>();
 
     public RexsterApplicationGraph(String graphName, Graph graph) {
         this.graphName = graphName;
