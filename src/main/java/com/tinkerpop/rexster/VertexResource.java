@@ -600,10 +600,12 @@ public class VertexResource extends AbstractSubResource {
             rag.tryStartTransaction();
             Vertex vertex = graph.getVertex(id);
 
+            final JSONObject theRequestObject = this.getRequestObject();
+
             if (null == vertex) {
                 vertex = graph.addVertex(id);
             } else {
-                if (!RequestObjectHelper.hasElementProperties(this.getRequestObject())) {
+                if (!RequestObjectHelper.hasElementProperties(theRequestObject)) {
                     // if the edge exists there better be some properties to assign
                     // this really isn't a BAD_REQUEST, but CONFLICT isn't much better...bah
                     JSONObject error = generateErrorObjectJsonFail(new Exception("Vertex with id " + id + " already exists"));
@@ -611,13 +613,11 @@ public class VertexResource extends AbstractSubResource {
                 }
             }
 
-            JSONObject theRequestObject = this.getRequestObject();
-
             Iterator keys = theRequestObject.keys();
             while (keys.hasNext()) {
                 String key = keys.next().toString();
                 if (!key.startsWith(Tokens.UNDERSCORE)) {
-                    vertex.setProperty(key, ElementHelper.getTypedPropertyValue(this.getRequestObject().getString(key)));
+                    vertex.setProperty(key, ElementHelper.getTypedPropertyValue(theRequestObject.getString(key)));
                 }
             }
 
