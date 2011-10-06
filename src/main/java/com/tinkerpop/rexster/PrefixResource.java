@@ -154,7 +154,7 @@ public class PrefixResource extends AbstractSubResource {
         try {
             final SailGraph graph = ((SailGraph) rag.getGraph());
 
-            JSONObject reqObject = this.getRequestObject();
+            final JSONObject reqObject = this.getRequestObject();
 
             if (!reqObject.has("prefix") || !reqObject.has("namespace")) {
                 JSONObject error = generateErrorObject("Parameters 'prefix' and 'namespace' required");

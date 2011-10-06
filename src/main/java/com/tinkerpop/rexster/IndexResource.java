@@ -67,6 +67,8 @@ public class IndexResource extends AbstractSubResource {
     public Response getAllIndices(@PathParam("graphname") String graphName) {
         RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 
+        final JSONObject theRequestObject = this.getRequestObject();
+
         IndexableGraph idxGraph = null;
         if (rag.getGraph() instanceof IndexableGraph) {
             idxGraph = (IndexableGraph) rag.getGraph();
@@ -77,8 +79,8 @@ public class IndexResource extends AbstractSubResource {
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 
-        Long start = RequestObjectHelper.getStartOffset(this.getRequestObject());
-        Long end = RequestObjectHelper.getEndOffset(this.getRequestObject());
+        Long start = RequestObjectHelper.getStartOffset(theRequestObject);
+        Long end = RequestObjectHelper.getEndOffset(theRequestObject);
 
         long counter = 0l;
 
@@ -258,12 +260,14 @@ public class IndexResource extends AbstractSubResource {
         String key = null;
         Object value = null;
 
-        Object temp = this.getRequestObject().opt(Tokens.KEY);
+        final JSONObject theRequestObject = this.getRequestObject();
+
+        Object temp = theRequestObject.opt(Tokens.KEY);
         if (temp != null) {
             key = temp.toString();
         }
 
-        temp = this.getRequestObject().opt(Tokens.VALUE);
+        temp = theRequestObject.opt(Tokens.VALUE);
         if (temp != null) {
             value = ElementHelper.getTypedPropertyValue(temp.toString());
         }
@@ -318,16 +322,18 @@ public class IndexResource extends AbstractSubResource {
         String id = null;
         String clazz = null;
 
-        Object temp = this.getRequestObject().opt(Tokens.KEY);
+        final JSONObject theRequestObject = this.getRequestObject();
+
+        Object temp = theRequestObject.opt(Tokens.KEY);
         if (null != temp)
             key = temp.toString();
-        temp = this.getRequestObject().opt(Tokens.VALUE);
+        temp = theRequestObject.opt(Tokens.VALUE);
         if (null != temp)
             value = ElementHelper.getTypedPropertyValue(temp.toString());
-        temp = this.getRequestObject().opt(Tokens.ID);
+        temp = theRequestObject.opt(Tokens.ID);
         if (null != temp)
             id = temp.toString();
-        temp = this.getRequestObject().opt(Tokens.CLASS);
+        temp = theRequestObject.opt(Tokens.CLASS);
         if (null != temp)
             clazz = temp.toString();
 
@@ -430,22 +436,24 @@ public class IndexResource extends AbstractSubResource {
         String type = null;
         Set<String> keys = null;
 
-        Object temp = this.getRequestObject().opt(Tokens.KEY);
+        final JSONObject theRequestObject = this.getRequestObject();
+
+        Object temp = theRequestObject.opt(Tokens.KEY);
         if (null != temp)
             key = temp.toString();
-        temp = this.getRequestObject().opt(Tokens.VALUE);
+        temp = theRequestObject.opt(Tokens.VALUE);
         if (null != temp)
             value = ElementHelper.getTypedPropertyValue(temp.toString());
-        temp = this.getRequestObject().opt(Tokens.ID);
+        temp = theRequestObject.opt(Tokens.ID);
         if (null != temp)
             id = temp.toString();
-        temp = this.getRequestObject().opt(Tokens.CLASS);
+        temp = theRequestObject.opt(Tokens.CLASS);
         if (null != temp)
             clazz = temp.toString();
-        temp = this.getRequestObject().opt(Tokens.TYPE);
+        temp = theRequestObject.opt(Tokens.TYPE);
         if (null != temp)
             type = temp.toString();
-        temp = this.getRequestObject().opt(Tokens.KEYS);
+        temp = theRequestObject.opt(Tokens.KEYS);
         if (null != temp) {
             try {
                 JSONArray ks;
