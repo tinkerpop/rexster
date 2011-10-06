@@ -40,6 +40,7 @@ public class RexsterApplicationGraph {
     private static final ServiceLoader<? extends RexsterExtension> extensions = ServiceLoader.load(RexsterExtension.class);
 
     private final Map<ExtensionPoint, JSONArray> hypermediaCache = new HashMap<ExtensionPoint, JSONArray>();
+    private final Map<ExtensionSegmentSet, Boolean> extensionAllowedCache = new HashMap<ExtensionSegmentSet, Boolean>();
 
     public RexsterApplicationGraph(String graphName, Graph graph) {
         this.graphName = graphName;
@@ -106,13 +107,19 @@ public class RexsterApplicationGraph {
      */
     public boolean isExtensionAllowed(ExtensionSegmentSet extensionSegmentSet) {
         boolean allowed = false;
-        for (ExtensionAllowed extensionAllowed : this.extensionAllowables) {
-            if (extensionAllowed.isExtensionAllowed(extensionSegmentSet)) {
-                allowed = true;
-                break;
-            }
-        }
 
+        if (!extensionAllowedCache.containsKey(extensionSegmentSet)) {
+            for (ExtensionAllowed extensionAllowed : this.extensionAllowables) {
+                if (extensionAllowed.isExtensionAllowed(extensionSegmentSet)) {
+                    allowed = true;
+                    break;
+                }
+            }
+
+            this.extensionAllowedCache.put(extensionSegmentSet, allowed);
+        } else {
+            allowed = this.extensionAllowedCache.get(extensionSegmentSet);
+        }
         return allowed;
     }
 
