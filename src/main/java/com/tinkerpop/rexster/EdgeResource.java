@@ -462,16 +462,19 @@ public class EdgeResource extends AbstractSubResource {
 
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         final Graph graph = rag.getGraph();
+
+        final JSONObject theRequestObject = this.getRequestObject();
+
         String inV = null;
-        Object temp = this.getRequestObject().opt(Tokens._IN_V);
+        Object temp = theRequestObject.opt(Tokens._IN_V);
         if (null != temp)
             inV = temp.toString();
         String outV = null;
-        temp = this.getRequestObject().opt(Tokens._OUT_V);
+        temp = theRequestObject.opt(Tokens._OUT_V);
         if (null != temp)
             outV = temp.toString();
         String label = null;
-        temp = this.getRequestObject().opt(Tokens._LABEL);
+        temp = theRequestObject.opt(Tokens._LABEL);
         if (null != temp)
             label = temp.toString();
 
@@ -492,7 +495,7 @@ public class EdgeResource extends AbstractSubResource {
                 }
 
             } else if (edge != null) {
-                if (!RequestObjectHelper.hasElementProperties(this.getRequestObject())) {
+                if (!RequestObjectHelper.hasElementProperties(theRequestObject)) {
                     // if the edge exists there better be some properties to assign
                     // this really isn't a BAD_REQUEST, but CONFLICT isn't much better...bah
                     JSONObject error = generateErrorObjectJsonFail(new Exception("Edge with id " + id + " already exists"));
@@ -502,15 +505,14 @@ public class EdgeResource extends AbstractSubResource {
 
             try {
                 if (edge != null) {
-                    Iterator keys = this.getRequestObject().keys();
+                    Iterator keys = theRequestObject.keys();
                     while (keys.hasNext()) {
                         String key = keys.next().toString();
                         if (!key.startsWith(Tokens.UNDERSCORE)) {
-                            edge.setProperty(key, ElementHelper.getTypedPropertyValue(this.getRequestObject().getString(key)));
+                            edge.setProperty(key, ElementHelper.getTypedPropertyValue(theRequestObject.getString(key)));
                         }
                     }
 
-                    JSONObject theRequestObject = this.getRequestObject();
                     boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
                     List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
                     this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(edge, returnKeys, showTypes));

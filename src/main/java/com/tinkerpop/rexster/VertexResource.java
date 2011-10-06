@@ -714,7 +714,7 @@ public class VertexResource extends AbstractSubResource {
             while (keys.hasNext()) {
                 String key = keys.next().toString();
                 if (!key.startsWith(Tokens.UNDERSCORE)) {
-                    vertex.setProperty(key, ElementHelper.getTypedPropertyValue(this.getRequestObject().getString(key)));
+                    vertex.setProperty(key, ElementHelper.getTypedPropertyValue(theRequestObject.getString(key)));
                 }
             }
 
