@@ -3,7 +3,7 @@ package com.tinkerpop.rexster.extension;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
+import com.tinkerpop.gremlin.groovy.jsr223.GremlinScriptEngine;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.gremlin.converter.JSONResultConverter;

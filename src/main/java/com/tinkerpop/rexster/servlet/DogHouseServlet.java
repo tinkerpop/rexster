@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.servlet;
 
 import com.sun.jersey.core.util.ReaderWriter;
-import com.tinkerpop.gremlin.GremlinTokens;
+import com.tinkerpop.gremlin.groovy.GremlinTokens;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

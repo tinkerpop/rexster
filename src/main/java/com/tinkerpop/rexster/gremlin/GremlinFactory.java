@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.gremlin;
 
-import com.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
+import com.tinkerpop.gremlin.groovy.jsr223.GremlinScriptEngine;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
