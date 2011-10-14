@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.servlet;
 
 import com.sun.jersey.core.util.ReaderWriter;
-import com.tinkerpop.gremlin.groovy.GremlinTokens;
+import com.tinkerpop.gremlin.Tokens;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -41,7 +41,7 @@ public class DogHouseServlet extends HttpServlet {
 
         // kind of opens a bad door here.  will probably rethink this a bit.  
         String content = ReaderWriter.readFromAsString(new InputStreamReader(resource.openStream()));
-        content = content.replace("{{inject}}", "<script type=\"text/javascript\">var GREMLIN_VERSION = \"" + GremlinTokens.VERSION + "\";var BASE_URI = \"" + baseRexsterApiUri + "\"</script>");
+        content = content.replace("{{inject}}", "<script type=\"text/javascript\">var GREMLIN_VERSION = \"" + Tokens.VERSION + "\";var BASE_URI = \"" + baseRexsterApiUri + "\"</script>");
         response.getWriter().write(content);
     }
 }
