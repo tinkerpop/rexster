@@ -10,6 +10,20 @@ All releases can be accessed through the TinkerPop Maven2 repository identified 
 
 ==<hr/>==
 
+h3. Version 0.7 (Brian -- NOT OFFICIALLY RELEASED YET)
+
+```xml
+ <dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>rexster</artifactId>
+  <version>0.7-SNAPSHOT</version>
+</dependency>
+```
+
+* Improved performance for most types of requests.
+
+==<hr/>==
+
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dalmatian.png!
 
 h3. Version 0.6 (Dalmatian -- September 18, 2011)
