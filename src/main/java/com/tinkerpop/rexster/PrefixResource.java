@@ -49,7 +49,7 @@ public class PrefixResource extends AbstractSubResource {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response getPrefixes(@PathParam("graphname") String graphName) {
 
         try {
@@ -86,7 +86,7 @@ public class PrefixResource extends AbstractSubResource {
 
     @GET
     @Path("/{prefix}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response getSinglePrefix(@PathParam("graphname") String graphName, @PathParam("prefix") String prefix) {
 
         try {
@@ -109,7 +109,7 @@ public class PrefixResource extends AbstractSubResource {
 
     @DELETE
     @Path("/{prefix}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response deleteSinglePrefix(@PathParam("graphname") String graphName, @PathParam("prefix") String prefix) {
 
         try {
@@ -131,7 +131,7 @@ public class PrefixResource extends AbstractSubResource {
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes(MediaType.APPLICATION_JSON)
     public Response postSinglePrefix(@PathParam("graphname") String graphName, JSONObject json) {
         this.setRequestObject(json);
@@ -139,7 +139,7 @@ public class PrefixResource extends AbstractSubResource {
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response postSinglePrefix(@PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
         this.buildRequestObject(formParams);
@@ -147,7 +147,7 @@ public class PrefixResource extends AbstractSubResource {
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response postSinglePrefix(@PathParam("graphname") String graphName) {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 

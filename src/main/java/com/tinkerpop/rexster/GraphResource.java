@@ -59,7 +59,7 @@ public class GraphResource extends AbstractSubResource {
      * graph.toString();
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response getGraph(@PathParam("graphname") String graphName) {
         Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
 
@@ -327,7 +327,7 @@ public class GraphResource extends AbstractSubResource {
      * @return Query time
      */
     @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response deleteGraph(@PathParam("graphname") String graphName) {
         Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
 

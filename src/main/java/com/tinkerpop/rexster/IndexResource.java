@@ -63,7 +63,7 @@ public class IndexResource extends AbstractSubResource {
      * get.getIndices();
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response getAllIndices(@PathParam("graphname") String graphName) {
         RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 
@@ -123,8 +123,19 @@ public class IndexResource extends AbstractSubResource {
      */
     @GET
     @Path("/{indexName}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
     public Response getElementsFromIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
+        return this.getElementsFromIndex(graphName, indexName, false);
+    }
+
+    @GET
+    @Path("/{indexName}")
+    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    public Response getElementsFromIndexRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
+        return this.getElementsFromIndex(graphName, indexName, true);
+    }
+
+    private Response getElementsFromIndex(String graphName, String indexName, boolean showTypes) {
         final Index index = this.getIndexFromGraph(graphName, indexName);
 
         String key = null;
@@ -144,7 +155,6 @@ public class IndexResource extends AbstractSubResource {
         Long start = RequestObjectHelper.getStartOffset(theRequestObject);
         Long end = RequestObjectHelper.getEndOffset(theRequestObject);
         List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-        boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
 
         long counter = 0l;
 
@@ -202,7 +212,7 @@ public class IndexResource extends AbstractSubResource {
      */
     @GET
     @Path("/{indexName}/keys")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response getAutomaticIndexKeys(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
         Index index = this.getIndexFromGraph(graphName, indexName);
 
@@ -253,7 +263,7 @@ public class IndexResource extends AbstractSubResource {
      */
     @GET
     @Path("/{indexName}/count")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response getIndexCount(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
         Index index = this.getIndexFromGraph(graphName, indexName);
 
@@ -312,7 +322,7 @@ public class IndexResource extends AbstractSubResource {
      */
     @DELETE
     @Path("/{indexName}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response deleteIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
         final Index index = this.getIndexFromGraph(graphName, indexName);
         final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
@@ -383,7 +393,7 @@ public class IndexResource extends AbstractSubResource {
      */
     @POST
     @Path("/{indexName}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response putElementInIndexOrCreateIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, MultivaluedMap<String, String> formParams) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
@@ -404,7 +414,7 @@ public class IndexResource extends AbstractSubResource {
      */
     @POST
     @Path("/{indexName}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes(MediaType.APPLICATION_JSON)
     public Response putElementInIndexOrCreateIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
@@ -424,7 +434,7 @@ public class IndexResource extends AbstractSubResource {
      */
     @POST
     @Path("/{indexName}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response putElementInIndexOrCreateIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
         final Index index = this.getIndexFromGraph(graphName, indexName);
         final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();

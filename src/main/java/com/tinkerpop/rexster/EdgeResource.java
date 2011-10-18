@@ -64,15 +64,24 @@ public class EdgeResource extends AbstractSubResource {
      * graph.getEdges();
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
     public Response getAllEdges(@PathParam("graphname") String graphName) {
+        return this.getAllEdges(graphName, false);
+    }
+
+    @GET
+    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    public Response getAllEdgesRexsterTypedJson(@PathParam("graphname") String graphName) {
+        return this.getAllEdges(graphName, true);
+    }
+
+    private Response getAllEdges(String graphName, boolean showTypes) {
 
         RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 
         JSONObject theRequestObject = this.getRequestObject();
         Long start = RequestObjectHelper.getStartOffset(theRequestObject);
         Long end = RequestObjectHelper.getEndOffset(theRequestObject);
-        boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
         List<String> returnKeys = RequestObjectHelper.getReturnKeys(this.getRequestObject());
 
         boolean wasInSection = false;
@@ -116,23 +125,42 @@ public class EdgeResource extends AbstractSubResource {
      */
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON})
     public Response getSingleEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        return getSingleEdge(graphName, id, false, false);
+    }
+
+    @GET
+    @Path("/{id}")
+    @Produces({RexsterMediaType.APPLICATION_REXSTER_JSON})
+    public Response getSingleEdgeRexsterJson(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        return getSingleEdge(graphName, id, false, true);
+    }
+
+    @GET
+    @Path("/{id}")
+    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    public Response getSingleEdgeRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        return getSingleEdge(graphName, id, true, true);
+    }
+
+    private Response getSingleEdge(String graphName, String id, boolean showTypes, boolean showHypermedia) {
         final Edge edge = this.getRexsterApplicationGraph(graphName).getGraph().getEdge(id);
 
         if (null != edge) {
             try {
                 JSONObject theRequestObject = this.getRequestObject();
-                boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
                 List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
                 this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(edge, returnKeys, showTypes));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
-                RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
-                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE);
-                if (extensionsList != null) {
-                    this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
+                if (showHypermedia) {
+                    RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+                    JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE);
+                    if (extensionsList != null) {
+                        this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
+                    }
                 }
             } catch (JSONException ex) {
                 logger.error(ex);
@@ -380,14 +408,25 @@ public class EdgeResource extends AbstractSubResource {
      * graph.addEdge(null);
      */
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response postNullEdge(@PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
         this.buildRequestObject(formParams);
-        return this.postEdge(graphName, null);
+        return this.postEdge(graphName, null, false);
+    }
+
+    @POST
+    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response postNullEdgeRexsterTypedJson(@PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(formParams);
+        return this.postEdge(graphName, null, true);
     }
 
     /**
@@ -395,14 +434,25 @@ public class EdgeResource extends AbstractSubResource {
      * graph.addEdge(null);
      */
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
     @Consumes(MediaType.APPLICATION_JSON)
     public Response postNullEdge(@PathParam("graphname") String graphName, JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
         this.setRequestObject(json);
-        return this.postEdge(graphName, null);
+        return this.postEdge(graphName, null, false);
+    }
+
+    @POST
+    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response postNullEdgeRexsterTypedJson(@PathParam("graphname") String graphName, JSONObject json) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.setRequestObject(json);
+        return this.postEdge(graphName, null, true);
     }
 
     /**
@@ -411,9 +461,15 @@ public class EdgeResource extends AbstractSubResource {
      * e.setProperty(key,value);
      */
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
     public Response postNullEdge(@PathParam("graphname") String graphName) {
-        return this.postEdge(graphName, null);
+        return this.postEdge(graphName, null, false);
+    }
+
+    @POST
+    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    public Response postNullEdgeRexsterTypedJson(@PathParam("graphname") String graphName) {
+        return this.postEdge(graphName, null, true);
     }
 
     /**
@@ -423,14 +479,26 @@ public class EdgeResource extends AbstractSubResource {
      */
     @POST
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response postEdge(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
         this.buildRequestObject(formParams);
-        return this.postEdge(graphName, id);
+        return this.postEdge(graphName, id, false);
+    }
+
+    @POST
+    @Path("/{id}")
+    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response postEdgeRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(formParams);
+        return this.postEdge(graphName, id, true);
     }
 
     /**
@@ -440,14 +508,26 @@ public class EdgeResource extends AbstractSubResource {
      */
     @POST
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
     @Consumes(MediaType.APPLICATION_JSON)
     public Response postEdge(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
         this.setRequestObject(json);
-        return this.postEdge(graphName, id);
+        return this.postEdge(graphName, id, false);
+    }
+
+    @POST
+    @Path("/{id}")
+    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response postEdgeRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.setRequestObject(json);
+        return this.postEdge(graphName, id, true);
     }
 
     /**
@@ -457,8 +537,19 @@ public class EdgeResource extends AbstractSubResource {
      */
     @POST
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
     public Response postEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        return postEdge(graphName, id, false);
+    }
+
+    @POST
+    @Path("/{id}")
+    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    public Response postEdgeRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        return postEdge(graphName, id, true);
+    }
+
+    private Response postEdge(@PathParam("graphname") String graphName, @PathParam("id") String id, boolean showTypes) {
 
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         final Graph graph = rag.getGraph();
@@ -480,7 +571,8 @@ public class EdgeResource extends AbstractSubResource {
 
         rag.tryStartTransaction();
         try {
-            Edge edge = graph.getEdge(id);
+            // blueprints throws IllegalArgumentException if the id is null
+            Edge edge = id == null ? null : graph.getEdge(id);
             if (null == edge && null != outV && null != inV && null != label) {
                 // there is no edge but the in/out vertex params and label are present so
                 // validate that the vertexes are present before creating the edge
@@ -513,7 +605,6 @@ public class EdgeResource extends AbstractSubResource {
                         }
                     }
 
-                    boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
                     List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
                     this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(edge, returnKeys, showTypes));
                 } else {
@@ -552,14 +643,26 @@ public class EdgeResource extends AbstractSubResource {
      */
     @PUT
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response putEdge(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
         this.buildRequestObject(formParams);
-        return this.putEdge(graphName, id);
+        return this.putEdge(graphName, id, false);
+    }
+
+    @PUT
+    @Path("/{id}")
+    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response putEdgeRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(formParams);
+        return this.putEdge(graphName, id, true);
     }
 
     /**
@@ -569,14 +672,26 @@ public class EdgeResource extends AbstractSubResource {
      */
     @PUT
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
     @Consumes(MediaType.APPLICATION_JSON)
     public Response putEdge(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
         this.setRequestObject(json);
-        return this.putEdge(graphName, id);
+        return this.putEdge(graphName, id, false);
+    }
+
+    @PUT
+    @Path("/{id}")
+    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response putEdgeRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.setRequestObject(json);
+        return this.putEdge(graphName, id, true);
     }
 
     /**
@@ -586,8 +701,19 @@ public class EdgeResource extends AbstractSubResource {
      */
     @PUT
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
     public Response putEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        return this.putEdge(graphName, id, false);
+    }
+
+    @PUT
+    @Path("/{id}")
+    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    public Response putEdgeRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+        return this.putEdge(graphName, id, true);
+    }
+
+    private Response putEdge(String graphName, String id, boolean showTypes) {
 
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         final Graph graph = rag.getGraph();
@@ -609,7 +735,6 @@ public class EdgeResource extends AbstractSubResource {
 
             JSONObject theRequestObject = this.getRequestObject();
             List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-            boolean showTypes = RequestObjectHelper.getShowTypes(theRequestObject);
 
             Iterator keys = theRequestObject.keys();
             while (keys.hasNext()) {
@@ -651,7 +776,7 @@ public class EdgeResource extends AbstractSubResource {
      */
     @DELETE
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response deleteEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
