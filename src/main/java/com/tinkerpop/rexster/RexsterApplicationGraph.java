@@ -2,6 +2,8 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.impls.event.EventGraph;
+import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
 import com.tinkerpop.rexster.extension.ExtensionAllowed;
 import com.tinkerpop.rexster.extension.ExtensionConfiguration;
 import com.tinkerpop.rexster.extension.ExtensionDefinition;
@@ -53,6 +55,21 @@ public class RexsterApplicationGraph {
 
     public Graph getGraph() {
         return graph;
+    }
+
+    public Graph getUnwrappedGraph() {
+        return unwrapGraph(this.graph);
+    }
+
+    public static Graph unwrapGraph(Graph g) {
+        Graph unwrapped = g;
+        if (g instanceof ReadOnlyGraph) {
+            unwrapped = unwrapGraph(((ReadOnlyGraph) g).getRawGraph());
+        } else if (g instanceof EventGraph) {
+            unwrapped = unwrapGraph(((EventGraph) g).getRawGraph());
+        }
+
+        return unwrapped;
     }
 
     public TransactionalGraph tryGetTransactionalGraph() {

@@ -1,5 +1,8 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.impls.event.EventGraph;
+import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.rexster.extension.ExtensionConfiguration;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
@@ -156,5 +159,37 @@ public class RexsterApplicationGraphTest {
         Assert.assertNotNull(map);
         Assert.assertTrue(map.containsKey("test"));
         Assert.assertEquals("1", map.get("test"));
+    }
+
+    @Test
+    public void unwrapGraphNoWrapping() {
+        Graph g = TinkerGraphFactory.createTinkerGraph();
+        Graph unwrapped = RexsterApplicationGraph.unwrapGraph(g);
+        Assert.assertEquals(g, unwrapped);
+    }
+
+    @Test
+    public void unwrapGraphReadonlyWrapping() {
+        Graph tg = TinkerGraphFactory.createTinkerGraph();
+        Graph g = new ReadOnlyGraph(tg);
+        Graph unwrapped = RexsterApplicationGraph.unwrapGraph(g);
+        Assert.assertEquals(tg, unwrapped);
+    }
+
+    @Test
+    public void unwrapGraphEventWrapping() {
+        Graph tg = TinkerGraphFactory.createTinkerGraph();
+        Graph g = new EventGraph(tg);
+        Graph unwrapped = RexsterApplicationGraph.unwrapGraph(g);
+        Assert.assertEquals(tg, unwrapped);
+    }
+
+    @Test
+    public void unwrapGraphReadonlyEventWrapping() {
+        Graph tg = TinkerGraphFactory.createTinkerGraph();
+        Graph eg = new EventGraph(tg);
+        Graph g = new ReadOnlyGraph(eg);
+        Graph unwrapped = RexsterApplicationGraph.unwrapGraph(g);
+        Assert.assertEquals(tg, unwrapped);
     }
 }

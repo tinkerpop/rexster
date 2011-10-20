@@ -54,7 +54,7 @@ public class PrefixResource extends AbstractSubResource {
 
         try {
             final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
-            final SailGraph graph = ((SailGraph) rag.getGraph());
+            final SailGraph graph = ((SailGraph) rag.getUnwrappedGraph());
             final JSONArray results = new JSONArray();
             for (final Map.Entry<String, String> entry : graph.getNamespaces().entrySet()) {
                 JSONObject result = new JSONObject();
@@ -91,7 +91,7 @@ public class PrefixResource extends AbstractSubResource {
 
         try {
             final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
-            final SailGraph graph = ((SailGraph) rag.getGraph());
+            final SailGraph graph = ((SailGraph) rag.getUnwrappedGraph());
             this.resultObject.put(Tokens.RESULTS, graph.getNamespaces().get(prefix));
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
@@ -114,7 +114,7 @@ public class PrefixResource extends AbstractSubResource {
 
         try {
             final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
-            final SailGraph graph = ((SailGraph) rag.getGraph());
+            final SailGraph graph = ((SailGraph) rag.getUnwrappedGraph());
             graph.removeNamespace(prefix);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
@@ -152,7 +152,7 @@ public class PrefixResource extends AbstractSubResource {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 
         try {
-            final SailGraph graph = ((SailGraph) rag.getGraph());
+            final SailGraph graph = ((SailGraph) rag.getUnwrappedGraph());
 
             final JSONObject reqObject = this.getRequestObject();
 
