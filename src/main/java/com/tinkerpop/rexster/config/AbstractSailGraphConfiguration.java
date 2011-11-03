@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
 import com.tinkerpop.blueprints.pgm.impls.sail.impls.MemoryStoreSailGraph;
 import com.tinkerpop.blueprints.pgm.impls.sail.impls.NativeStoreSailGraph;
+import com.tinkerpop.blueprints.pgm.impls.sail.impls.SparqlRepositorySailGraph;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -15,11 +16,13 @@ public abstract class AbstractSailGraphConfiguration implements GraphConfigurati
 
     public static final String SAIL_TYPE_MEMORY = "memory";
     public static final String SAIL_TYPE_NATIVE = "native";
+    public static final String SAIL_TYPE_SPARQL = "sparql";
 
     protected String sailType;
 
     public Graph configureGraphInstance(Configuration properties) throws GraphConfigurationException {
         String graphFile = properties.getString(Tokens.REXSTER_GRAPH_FILE, null);
+        String graphUrl = properties.getString(Tokens.REXSTER_GRAPH_URL, null);
 
         // get the <properties> section of the xml configuration
         HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) properties;
@@ -34,6 +37,11 @@ public abstract class AbstractSailGraphConfiguration implements GraphConfigurati
         // graph-file and data-directory must be present for native and neo4j
         if (sailType.equals(SAIL_TYPE_NATIVE) && (graphFile == null || graphFile.trim().length() == 0)) {
             throw new GraphConfigurationException("Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_FILE);
+        }
+
+        // graph-url must be present for SPARQL-based sail
+        if (sailType.equals(SAIL_TYPE_SPARQL) && (graphUrl == null || graphUrl.trim().length() == 0)) {
+            throw new GraphConfigurationException("Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_URL);
         }
 
         try {
@@ -59,6 +67,8 @@ public abstract class AbstractSailGraphConfiguration implements GraphConfigurati
                 } else {
                     graph = new NativeStoreSailGraph(graphFile);
                 }
+            } else if (this.sailType.equals(SAIL_TYPE_SPARQL)) {
+                graph = new SparqlRepositorySailGraph(graphUrl);
             }
 
             return graph;
