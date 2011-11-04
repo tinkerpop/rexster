@@ -109,6 +109,8 @@ public class GraphConfigurationContainer {
             graphConfigurationType = MemoryStoreSailGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("nativestoresailgraph")) {
             graphConfigurationType = NativeStoreSailGraphConfiguration.class.getName();
+        } else if (graphConfigurationType.equals("sparqlrepositorysailgraph")) {
+            graphConfigurationType = SparqlRepositorySailGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("dexgraph")) {
             graphConfigurationType = DexGraphConfiguration.class.getName();
         }
