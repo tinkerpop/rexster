@@ -21,7 +21,7 @@ public abstract class AbstractSailGraphConfiguration implements GraphConfigurati
     protected String sailType;
 
     public Graph configureGraphInstance(Configuration properties) throws GraphConfigurationException {
-        String graphFile = properties.getString(Tokens.REXSTER_GRAPH_FILE, null);
+        String graphFile = properties.getString(Tokens.REXSTER_GRAPH_LOCATION, null);
         String graphUrl = properties.getString(Tokens.REXSTER_GRAPH_URL, null);
 
         // get the <properties> section of the xml configuration
@@ -36,7 +36,7 @@ public abstract class AbstractSailGraphConfiguration implements GraphConfigurati
 
         // graph-file and data-directory must be present for native and neo4j
         if (sailType.equals(SAIL_TYPE_NATIVE) && (graphFile == null || graphFile.trim().length() == 0)) {
-            throw new GraphConfigurationException("Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_FILE);
+            throw new GraphConfigurationException("Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_LOCATION);
         }
 
         // graph-url must be present for SPARQL-based sail

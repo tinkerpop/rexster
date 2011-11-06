@@ -17,7 +17,7 @@
         <graph>
             <graph-name>tinkergraph</graph-name>
             <graph-type>tinkergraph</graph-type>
-            <graph-file>data/graph-example-1</graph-file>
+            <graph-location>data/graph-example-1</graph-location>
             <extensions>
                 <allows>
                     <allow>tp:gremlin</allow>
@@ -28,7 +28,7 @@
             <graph-name>tinkergraph-readonly</graph-name>
             <graph-read-only>true</graph-read-only>
             <graph-type>tinkergraph</graph-type>
-            <graph-file>data/graph-example-1</graph-file>
+            <graph-location>data/graph-example-1</graph-location>
             <extensions>
                 <allows>
                     <allow>tp:gremlin</allow>
@@ -38,7 +38,7 @@
         <graph>
             <graph-name>gratefulgraph</graph-name>
             <graph-type>com.tinkerpop.rexster.config.TinkerGraphGraphConfiguration</graph-type>
-            <graph-file>data/graph-example-2</graph-file>
+            <graph-location>data/graph-example-2</graph-location>
             <extensions>
                 <allows>
                     <allow>tp:gremlin</allow>
@@ -54,13 +54,13 @@
             <graph-enabled>false</graph-enabled>
             <graph-name>sailgraph</graph-name>
             <graph-type>nativestoresailgraph</graph-type>
-            <graph-file>data/sailgraph</graph-file>
+            <graph-location>data/sailgraph</graph-location>
         </graph>
         <graph>
             <graph-enabled>false</graph-enabled>
             <graph-name>orientdbsample</graph-name>
             <graph-type>orientgraph</graph-type>
-            <graph-file>local:C:/data/graph/graph</graph-file>
+            <graph-location>local:C:/data/graph/graph</graph-location>
             <properties>
                 <username>admin</username>
                 <password>admin</password>
@@ -70,7 +70,7 @@
             <graph-enabled>false</graph-enabled>
             <graph-name>neo4jsample</graph-name>
             <graph-type>neo4jgraph</graph-type>
-            <graph-file>/tmp/rexster-graph</graph-file>
+            <graph-location>/tmp/rexster-graph</graph-location>
             <properties>
                 <!-- Memory mapped I/O settings -->
                 <!-- For high traversal speed it is important to have the nodestore.db and relationshipstore.db files. -->
@@ -124,14 +124,14 @@
             <graph-enabled>false</graph-enabled>
             <graph-name>dexsample</graph-name>
             <graph-type>dexgraph</graph-type>
-            <graph-file>/tmp/graph.dex</graph-file>
+            <graph-location>/tmp/graph.dex</graph-location>
         </graph>
         <graph>
             <graph-enabled>false</graph-enabled>
             <graph-name>remotetinkergraph</graph-name>
             <graph-type>rexstergraph</graph-type>
             <graph-buffer-size>100</graph-buffer-size>
-            <graph-file>http://remoteserver:8182/tinkergraph</graph-file>
+            <graph-location>http://remoteserver:8182/tinkergraph</graph-location>
         </graph>
     </graphs>
 </rexster>

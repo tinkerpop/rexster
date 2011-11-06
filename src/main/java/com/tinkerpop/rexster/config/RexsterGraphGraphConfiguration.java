@@ -15,7 +15,7 @@ public class RexsterGraphGraphConfiguration implements GraphConfiguration {
         int bufferSize;
 
         try {
-            rexsterGraphUriToConnectTo = properties.getString(Tokens.REXSTER_GRAPH_FILE, null);
+            rexsterGraphUriToConnectTo = properties.getString(Tokens.REXSTER_GRAPH_LOCATION, null);
             bufferSize = properties.getInt(Tokens.REXSTER_GRAPH_BUFFER_SIZE, DEFAULT_BUFFER_SIZE);
         } catch (Exception ex) {
             throw new GraphConfigurationException(ex);

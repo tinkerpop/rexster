@@ -9,7 +9,7 @@ public class DexGraphConfiguration implements GraphConfiguration {
 
     public Graph configureGraphInstance(Configuration properties) throws GraphConfigurationException {
 
-        String graphFile = properties.getString(Tokens.REXSTER_GRAPH_FILE, null);
+        String graphFile = properties.getString(Tokens.REXSTER_GRAPH_LOCATION, null);
 
         try {
             return new DexGraph(graphFile);

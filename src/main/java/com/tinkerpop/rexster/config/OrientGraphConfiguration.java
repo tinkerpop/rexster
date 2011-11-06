@@ -11,10 +11,10 @@ public class OrientGraphConfiguration implements GraphConfiguration {
 
     public Graph configureGraphInstance(Configuration properties) throws GraphConfigurationException {
 
-        String graphFile = properties.getString(Tokens.REXSTER_GRAPH_FILE);
+        String graphFile = properties.getString(Tokens.REXSTER_GRAPH_LOCATION);
 
         if (graphFile == null || graphFile.length() == 0) {
-            throw new GraphConfigurationException("Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_FILE);
+            throw new GraphConfigurationException("Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_LOCATION);
         }
 
         // get the <properties> section of the xml configuration

@@ -20,14 +20,14 @@ public class OrientGraphConfigurationTest {
     @Test(expected = GraphConfigurationException.class)
     public void configureGraphInstanceNoOrientConfig() throws GraphConfigurationException {
         Configuration graphConfig = new HierarchicalConfiguration();
-        graphConfig.addProperty(Tokens.REXSTER_GRAPH_FILE, "some-file");
+        graphConfig.addProperty(Tokens.REXSTER_GRAPH_LOCATION, "some-file");
         configuration.configureGraphInstance(graphConfig);
     }
 
     @Test(expected = GraphConfigurationException.class)
     public void configureGraphInstanceConfigValidButNoGraphFound() throws GraphConfigurationException {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
-        graphConfig.addProperty(Tokens.REXSTER_GRAPH_FILE, "some-file");
+        graphConfig.addProperty(Tokens.REXSTER_GRAPH_LOCATION, "some-file");
 
         ArrayList<HierarchicalConfiguration.Node> listOfNodes = new ArrayList<HierarchicalConfiguration.Node>();
         listOfNodes.add(new HierarchicalConfiguration.Node("username", "me"));

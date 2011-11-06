@@ -146,7 +146,7 @@ public class GraphConfigurationContainerTest {
 
     private HierarchicalConfiguration constructBadHierarchicalConfiguration() {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
-        graphConfig.addProperty(Tokens.REXSTER_GRAPH_FILE, "bad");
+        graphConfig.addProperty(Tokens.REXSTER_GRAPH_LOCATION, "bad");
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_NAME, "junk");
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_TYPE, "com.tinkerpop.rexster.config.MockBadGraphConfiguration");
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_READ_ONLY, false);
@@ -164,7 +164,7 @@ public class GraphConfigurationContainerTest {
 
     private HierarchicalConfiguration constructHierarchicalConfiguration(String graphName, String fileName, String graphType, boolean readOnly) {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
-        graphConfig.addProperty(Tokens.REXSTER_GRAPH_FILE, fileName);
+        graphConfig.addProperty(Tokens.REXSTER_GRAPH_LOCATION, fileName);
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_NAME, graphName);
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_TYPE, graphType);
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_READ_ONLY, readOnly);

@@ -23,7 +23,7 @@ public class AbstractSailGraphConfigurationTest {
     @Test(expected = GraphConfigurationException.class)
     public void configureGraphInstanceNativeSailTypeEmptyGraphFile() throws GraphConfigurationException {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
-        graphConfig.setProperty(Tokens.REXSTER_GRAPH_FILE, "");
+        graphConfig.setProperty(Tokens.REXSTER_GRAPH_LOCATION, "");
 
         this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_NATIVE);
 
@@ -33,7 +33,7 @@ public class AbstractSailGraphConfigurationTest {
     @Test
     public void configureGraphInstanceMemorySailTypeEmptyGraphFile() throws GraphConfigurationException {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
-        graphConfig.setProperty(Tokens.REXSTER_GRAPH_FILE, "");
+        graphConfig.setProperty(Tokens.REXSTER_GRAPH_LOCATION, "");
 
         this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_MEMORY);
 

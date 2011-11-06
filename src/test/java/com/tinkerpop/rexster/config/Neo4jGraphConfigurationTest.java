@@ -22,14 +22,14 @@ public class Neo4jGraphConfigurationTest {
     @Test(expected = GraphConfigurationException.class)
     public void configureGraphInstanceNoNeo4jConfig() throws GraphConfigurationException {
         Configuration graphConfig = new HierarchicalConfiguration();
-        graphConfig.addProperty(Tokens.REXSTER_GRAPH_FILE, this.neo4jFile);
+        graphConfig.addProperty(Tokens.REXSTER_GRAPH_LOCATION, this.neo4jFile);
         configuration.configureGraphInstance(graphConfig);
     }
 
     @Test(expected = GraphConfigurationException.class)
     public void configureGraphInstanceHaOnNoProperties() throws GraphConfigurationException {
         Configuration graphConfig = new HierarchicalConfiguration();
-        graphConfig.addProperty(Tokens.REXSTER_GRAPH_FILE, this.neo4jFile);
+        graphConfig.addProperty(Tokens.REXSTER_GRAPH_LOCATION, this.neo4jFile);
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_HA, "true");
         configuration.configureGraphInstance(graphConfig);
     }
@@ -37,7 +37,7 @@ public class Neo4jGraphConfigurationTest {
     @Test(expected = GraphConfigurationException.class)
     public void configureGraphInstanceHaOnNoMachineId() throws GraphConfigurationException {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
-        graphConfig.addProperty(Tokens.REXSTER_GRAPH_FILE, this.neo4jFile);
+        graphConfig.addProperty(Tokens.REXSTER_GRAPH_LOCATION, this.neo4jFile);
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_HA, "true");
 
         ArrayList<HierarchicalConfiguration.Node> listOfNodes = new ArrayList<HierarchicalConfiguration.Node>();
@@ -50,7 +50,7 @@ public class Neo4jGraphConfigurationTest {
     @Test(expected = GraphConfigurationException.class)
     public void configureGraphInstanceHaOnNoServer() throws GraphConfigurationException {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
-        graphConfig.addProperty(Tokens.REXSTER_GRAPH_FILE, this.neo4jFile);
+        graphConfig.addProperty(Tokens.REXSTER_GRAPH_LOCATION, this.neo4jFile);
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_HA, "true");
 
         ArrayList<HierarchicalConfiguration.Node> listOfNodes = new ArrayList<HierarchicalConfiguration.Node>();
@@ -63,7 +63,7 @@ public class Neo4jGraphConfigurationTest {
     @Test(expected = GraphConfigurationException.class)
     public void configureGraphInstanceHaOnNoZkServers() throws GraphConfigurationException {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
-        graphConfig.addProperty(Tokens.REXSTER_GRAPH_FILE, this.neo4jFile);
+        graphConfig.addProperty(Tokens.REXSTER_GRAPH_LOCATION, this.neo4jFile);
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_HA, "true");
 
         ArrayList<HierarchicalConfiguration.Node> listOfNodes = new ArrayList<HierarchicalConfiguration.Node>();
