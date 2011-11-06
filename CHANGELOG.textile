@@ -23,6 +23,7 @@ h3. Version 0.7 (Brian -- NOT OFFICIALLY RELEASED YET)
 * Improved performance for most types of requests.
 * Added two custom Rexster mime types: @application/vnd.rexster+json@ and @application/vnd.rexster.typed+json@.
 * Fixed problem with the Prefix resource where SailGraph in read-only mode generated 500 (Internal Server Error) responses.
+* Added SPARQL Repository configuration.
 
 ==<hr/>==
 

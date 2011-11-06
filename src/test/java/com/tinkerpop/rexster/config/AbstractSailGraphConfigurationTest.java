@@ -30,6 +30,25 @@ public class AbstractSailGraphConfigurationTest {
         this.configuration.configureGraphInstance(graphConfig);
     }
 
+    @Test(expected = GraphConfigurationException.class)
+    public void configureGraphInstanceSparqlRepoSailTypeNoGraphFile() throws GraphConfigurationException {
+        HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
+
+        this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_SPARQL);
+
+        this.configuration.configureGraphInstance(graphConfig);
+    }
+
+    @Test(expected = GraphConfigurationException.class)
+    public void configureGraphInstanceSparqlRepoSailTypeEmptyGraphFile() throws GraphConfigurationException {
+        HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
+        graphConfig.setProperty(Tokens.REXSTER_GRAPH_LOCATION, "");
+
+        this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_SPARQL);
+
+        this.configuration.configureGraphInstance(graphConfig);
+    }
+
     @Test
     public void configureGraphInstanceMemorySailTypeEmptyGraphFile() throws GraphConfigurationException {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
