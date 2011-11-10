@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.json.JSONWriter;
@@ -37,9 +38,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceConfigurationError;
+import java.util.Set;
 
 @Path("/graphs/{graphname}/vertices")
 public class VertexResource extends AbstractSubResource {
@@ -788,7 +791,7 @@ public class VertexResource extends AbstractSubResource {
 
         try {
             rag.tryStartTransaction();
-            Vertex vertex = graph.getVertex(id);
+            final Vertex vertex = graph.getVertex(id);
 
             if (null == vertex) {
                 String msg = "Vertex with [" + id + "] cannot be found.";
@@ -799,9 +802,7 @@ public class VertexResource extends AbstractSubResource {
             }
 
             // remove all properties as this is a replace operation
-            for (String propertyKey : vertex.getPropertyKeys()) {
-                vertex.removeProperty(propertyKey);
-            }
+            com.tinkerpop.blueprints.pgm.util.ElementHelper.removeProperties(new ArrayList<Element>() {{ add(vertex); }});
 
             JSONObject theRequestObject = this.getRequestObject();
             Iterator keys = theRequestObject.keys();
