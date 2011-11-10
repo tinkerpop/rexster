@@ -6,9 +6,12 @@ import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONTokener;
 import org.junit.Test;
 
 import javax.ws.rs.core.MultivaluedMap;
+import java.lang.Object;
+import java.lang.String;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -190,14 +193,18 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
             assertPostedEdge(vertexIdIn, vertexIdOut, response);
 
             // post as JSON
-            // String complexKeyValueJson = "{\"propertya\":123,\"propertyb\":321.5,\"propertyc\":[\"x\",\"y\",\"z\"],\"propertyd\":{\"x\":\"xyz\"}}";
+            String complexKeyValueJson = "{\"propertya\":123,\"propertyb\":321.5,\"propertyc\":[\"x\",\"y\",\"z\"],\"propertyd\":{\"x\":\"xyz\"}}";
+            JSONTokener tokener = new JSONTokener(complexKeyValueJson);
+            JSONObject complexJsonObject = new JSONObject(tokener);
+
             Map<String, Object> jsonEdgeData = new HashMap<String, Object>();
             jsonEdgeData.put(Tokens._OUT_V, vertexIdOut);
             jsonEdgeData.put(Tokens._IN_V, vertexIdIn);
             jsonEdgeData.put(Tokens._LABEL, "jsonPost");
-            jsonEdgeData.put("complex", complexValue);
+            jsonEdgeData.put("complex", complexJsonObject);
 
             JSONObject jsonEdgeToPost = new JSONObject(jsonEdgeData);
+
             response = this.doGraphPostOfJson(testGraph, "edges", jsonEdgeToPost);
             assertPostedEdge(vertexIdIn, vertexIdOut, response);
 
@@ -224,7 +231,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     }
 
     @Test
-    public void putEdgeStatusOk() {
+    public void putEdgeStatusOk() throws JSONException{
         for (GraphTestHolder testGraph : this.testGraphs) {
             Iterator<String> itty = testGraph.getEdgeIdSet().keySet().iterator();
             String firstEdgeId = itty.next();
@@ -238,9 +245,11 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
             assertPuttedEdge(firstEdgeId, response);
 
             // put as JSON
-            // String complexKeyValueJson = "{\"propertya\":123,\"propertyb\":321.5,\"propertyc\":[\"x\",\"y\",\"z\"],\"propertyd\":{\"x\":\"xyz\"}}";
+            String complexKeyValueJson = "{\"propertya\":123,\"propertyb\":321.5,\"propertyc\":[\"x\",\"y\",\"z\"],\"propertyd\":{\"x\":\"xyz\"}}";
+            JSONTokener tokener = new JSONTokener(complexKeyValueJson);
+            JSONObject complexJsonObject = new JSONObject(tokener);
             Map<String, Object> jsonEdgeData = new HashMap<String, Object>();
-            jsonEdgeData.put("complex", complexValue);
+            jsonEdgeData.put("complex", complexJsonObject);
 
             JSONObject jsonEdgeToPost = new JSONObject(jsonEdgeData);
             response = this.doGraphPutOfJson(testGraph, "edges/" + secondEdgeId, jsonEdgeToPost);

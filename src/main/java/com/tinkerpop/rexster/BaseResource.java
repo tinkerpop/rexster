@@ -13,10 +13,12 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Variant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,6 +29,11 @@ import java.util.Set;
 public abstract class BaseResource {
 
     private static Logger logger = Logger.getLogger(BaseResource.class);
+
+    protected final List<Variant> producesVariantList = Variant.VariantListBuilder.newInstance().mediaTypes(
+                MediaType.APPLICATION_JSON_TYPE,
+                RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE,
+                RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE).add().build();
 
     protected final StatisticsHelper sh = new StatisticsHelper();
 

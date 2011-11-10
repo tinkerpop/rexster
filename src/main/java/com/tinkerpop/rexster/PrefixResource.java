@@ -132,7 +132,7 @@ public class PrefixResource extends AbstractSubResource {
 
     @POST
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response postSinglePrefix(@PathParam("graphname") String graphName, JSONObject json) {
         this.setRequestObject(json);
         return this.postSinglePrefix(graphName);

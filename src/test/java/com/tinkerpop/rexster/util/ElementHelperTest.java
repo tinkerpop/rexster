@@ -1,18 +1,14 @@
 package com.tinkerpop.rexster.util;
 
 import junit.framework.Assert;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.junit.Test;
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by IntelliJ IDEA.
- * User: smallette
- * Date: 9/22/11
- * Time: 8:10 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ElementHelperTest {
     
     @Test
@@ -48,8 +44,6 @@ public class ElementHelperTest {
 
         typedPropertyValue = ElementHelper.getTypedPropertyValue("(dfd,123)");
         Assert.assertNotNull(typedPropertyValue);
-        // TODO (string, marko) should be a datatype of string (causes problems for this model though)
-        // Assert.assertEquals("(dfd,123)", typedPropertyValue);
     }
 
     @Test
@@ -274,5 +268,99 @@ public class ElementHelperTest {
         Map innerMap2 = (Map) list.get(6);
         Assert.assertTrue(innerMap2.containsKey("x"));
         Assert.assertEquals(123, innerMap2.get("x"));
+    }
+
+    @Test
+    public void getTypedPropertyValueRawInteger() {
+        int expected = 100;
+        Object typedPropertyValue = ElementHelper.getTypedPropertyValue(expected);
+        Assert.assertEquals(expected, typedPropertyValue);
+
+        typedPropertyValue = ElementHelper.getTypedPropertyValue(expected, false);
+        Assert.assertEquals(expected, typedPropertyValue);
+    }
+
+    @Test
+    public void getTypedPropertyValueRawLong() {
+        long expected = 100l;
+        Object typedPropertyValue = ElementHelper.getTypedPropertyValue(expected);
+        Assert.assertEquals(expected, typedPropertyValue);
+
+        typedPropertyValue = ElementHelper.getTypedPropertyValue(expected, false);
+        Assert.assertEquals(expected, typedPropertyValue);
+    }
+
+    @Test
+    public void getTypedPropertyValueRawDouble() {
+        double expected = 100.1;
+        Object typedPropertyValue = ElementHelper.getTypedPropertyValue(expected);
+        Assert.assertEquals(expected, typedPropertyValue);
+
+        typedPropertyValue = ElementHelper.getTypedPropertyValue(expected, false);
+        Assert.assertEquals(expected, typedPropertyValue);
+    }
+
+    @Test
+    public void getTypedPropertyValueRawFloat() {
+        float expected = 100f;
+        Object typedPropertyValue = ElementHelper.getTypedPropertyValue(expected);
+        Assert.assertEquals(expected, typedPropertyValue);
+
+        typedPropertyValue = ElementHelper.getTypedPropertyValue(expected, false);
+        Assert.assertEquals(expected, typedPropertyValue);
+    }
+
+    @Test
+    public void getTypedPropertyValueRawString() {
+        // this is likely tested elsewhere, but wanted to do it in the same format as the
+        // other "Raw" tests
+        String expected = "(i,1000)";
+        Object typedPropertyValue = ElementHelper.getTypedPropertyValue(expected);
+        Assert.assertEquals(1000, typedPropertyValue);
+
+        typedPropertyValue = ElementHelper.getTypedPropertyValue(expected, false);
+        Assert.assertEquals(expected, typedPropertyValue);
+    }
+
+    @Test
+    public void getTypedPropertValueRawJSONObject() {
+        JSONObject json = new JSONObject();
+
+        try {
+            json.put("a", "testa");
+            json.put("b", 1000);
+            json.put("c", 1000d);
+            json.put("d", 1000l);
+            json.put("e", true);
+
+            JSONObject inner = new JSONObject();
+            inner.put("a", "inner");
+
+            json.put("f", inner);
+
+            JSONArray innerArray = new JSONArray();
+            innerArray.put("innera");
+
+            json.put("g", innerArray);
+        } catch (JSONException jse) {
+
+        }
+
+        Object typedPropertyValue = ElementHelper.getTypedPropertyValue(json);
+
+        Assert.assertTrue(typedPropertyValue instanceof Map);
+        Map map = (Map) typedPropertyValue;
+
+        Assert.assertEquals("testa", map.get("a"));
+        Assert.assertEquals(1000, map.get("b"));
+        Assert.assertEquals(1000d, map.get("c"));
+        Assert.assertEquals(1000l, map.get("d"));
+        Assert.assertEquals(true, map.get("e"));
+
+        Map innerMap = (Map) map.get("f");
+        Assert.assertEquals("inner", innerMap.get("a"));
+
+        List list = (List) map.get("g");
+        Assert.assertEquals("innera", list.get(0));
     }
 }

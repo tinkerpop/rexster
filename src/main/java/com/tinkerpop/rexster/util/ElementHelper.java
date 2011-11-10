@@ -1,13 +1,21 @@
 package com.tinkerpop.rexster.util;
 
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class ElementHelper {
+    public static Object getTypedPropertyValue(Object propertyValue) {
+        return getTypedPropertyValue(propertyValue, true);
+    }
+
     /**
      * Takes a property value string from the URI and attempts to parse it
-     * to its defined data type.
+     * to its defined data type.  Also accepts a JSONObject or JSONArray.
      * <p/>
      * The format of the property value must be enclosed with parens with
      * two values within it separated by a comma.  The first value is the data
@@ -36,46 +44,72 @@ public class ElementHelper {
      *
      * @param propertyValue The value from a key-value pair.  At a top level, this will
      *                      come from the URI as a one of the query parameters.
+     * @param parseTypes Set to true to check strings for data type formatting.
      * @return The property value coerced to the appropriate Java data type.
      */
-    public static Object getTypedPropertyValue(String propertyValue) {
+    public static Object getTypedPropertyValue(Object propertyValue, boolean parseTypes) {
         Object typedPropertyValue = propertyValue;
         if (typedPropertyValue == null) {
             typedPropertyValue = "";
         }
 
         // determine if the property is typed, otherwise assume it is a string
-        if (propertyValue != null && propertyValue.startsWith("(") && propertyValue.endsWith(")")) {
-            String dataType = getDataTypeSegment(propertyValue);
-            String theValue = getValueSegment(propertyValue);
+        if (propertyValue != null) {
+            if (propertyValue instanceof String) {
+                String stringPropertyValue = propertyValue.toString();
+                if (parseTypes && stringPropertyValue.startsWith("(") && stringPropertyValue.endsWith(")")) {
+                    String dataType = getDataTypeSegment(stringPropertyValue);
+                    String theValue = getValueSegment(stringPropertyValue);
 
-            if (dataType.equals("string")) {
-                typedPropertyValue = theValue;
-            } else if (dataType.equals("integer")) {
-                typedPropertyValue = tryParseInteger(theValue);
-            } else if (dataType.equals("long")) {
-                typedPropertyValue = tryParseLong(theValue);
-            } else if (dataType.equals("double")) {
-                typedPropertyValue = tryParseDouble(theValue);
-            } else if (dataType.equals("float")) {
-                typedPropertyValue = tryParseFloat(theValue);
-            } else if (dataType.equals("list")) {
-                ArrayList<String> items = tryParseList(theValue);
-                ArrayList typedItems = new ArrayList();
-                for (String item : items) {
-                    typedItems.add(getTypedPropertyValue(item));
+                    if (dataType.equals("string")) {
+                        typedPropertyValue = theValue;
+                    } else if (dataType.equals("integer")) {
+                        typedPropertyValue = tryParseInteger(theValue);
+                    } else if (dataType.equals("long")) {
+                        typedPropertyValue = tryParseLong(theValue);
+                    } else if (dataType.equals("double")) {
+                        typedPropertyValue = tryParseDouble(theValue);
+                    } else if (dataType.equals("float")) {
+                        typedPropertyValue = tryParseFloat(theValue);
+                    } else if (dataType.equals("list")) {
+                        ArrayList<String> items = tryParseList(theValue);
+                        ArrayList typedItems = new ArrayList();
+                        for (String item : items) {
+                            typedItems.add(getTypedPropertyValue(item));
+                        }
+
+                        typedPropertyValue = typedItems;
+                    } else if (dataType.equals("map")) {
+                        HashMap<String, String> stringProperties = tryParseMap(theValue);
+                        HashMap<String, Object> properties = new HashMap<String, Object>();
+
+                        for (Map.Entry<String, String> entry : stringProperties.entrySet()) {
+                            properties.put(entry.getKey(), getTypedPropertyValue(entry.getValue()));
+                        }
+
+                        typedPropertyValue = properties;
+                    }
                 }
-
-                typedPropertyValue = typedItems;
-            } else if (dataType.equals("map")) {
-                HashMap<String, String> stringProperties = tryParseMap(theValue);
+            } else if (propertyValue instanceof JSONObject) {
+                JSONObject innerJson = (JSONObject) propertyValue;
                 HashMap<String, Object> properties = new HashMap<String, Object>();
 
-                for (Map.Entry<String, String> entry : stringProperties.entrySet()) {
-                    properties.put(entry.getKey(), getTypedPropertyValue(entry.getValue()));
+                Iterator itty = innerJson.keys();
+                while (itty.hasNext()) {
+                    String key = (String) itty.next();
+                    properties.put(key, getTypedPropertyValue(innerJson.opt(key)));
                 }
 
                 typedPropertyValue = properties;
+            } else if (propertyValue instanceof JSONArray) {
+                JSONArray innerJson = (JSONArray) propertyValue;
+                ArrayList typedItems = new ArrayList();
+
+                for (int ix = 0; ix < innerJson.length(); ix++) {
+                    typedItems.add(getTypedPropertyValue(innerJson.opt(ix)));
+                }
+
+                typedPropertyValue = typedItems;
             }
         }
 

@@ -415,7 +415,7 @@ public class IndexResource extends AbstractSubResource {
     @POST
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response putElementInIndexOrCreateIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will

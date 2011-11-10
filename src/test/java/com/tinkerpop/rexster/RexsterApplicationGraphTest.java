@@ -144,7 +144,7 @@ public class RexsterApplicationGraphTest {
 
         List allowables = new ArrayList();
         allowables.add("tp:*");
-        rag.loadAllowableExtensions(list);
+        rag.loadAllowableExtensions(allowables);
 
         rag.loadExtensionsConfigurations(list);
 

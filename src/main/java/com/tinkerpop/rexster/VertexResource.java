@@ -29,11 +29,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Variant;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceConfigurationError;
@@ -547,30 +550,40 @@ public class VertexResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
     }
 
-    /**
-     * POST http://host/graph/vertices
-     * graph.addVertex(null);
-     */
     @POST
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response postNullVertex(@PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
+    public Response postNullVertexRexsterConsumesUrlEncoded(@Context Request request, @PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
         this.buildRequestObject(formParams);
-        return this.postVertex(graphName, null, false);
+        Variant v = request.selectVariant(producesVariantList);
+        return this.postVertex(graphName, null, true, v);
     }
 
     @POST
-    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response postNullVertexRexsterTypedJson(@PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    public Response postNullVertexRexsterConsumesJson(@Context Request request, @PathParam("graphname") String graphName, JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
-        this.buildRequestObject(formParams);
-        return this.postVertex(graphName, null, true);
+        this.setRequestObject(json);
+        Variant v = request.selectVariant(producesVariantList);
+        return this.postVertex(graphName, null, false, v);
+    }
+
+    @POST
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Consumes({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    public Response postNullVertexRexsterConsumesTypedJson(@Context Request request, @PathParam("graphname") String graphName, JSONObject json) {
+        // initializes the request object with the data POSTed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.setRequestObject(json);
+        Variant v = request.selectVariant(producesVariantList);
+        return this.postVertex(graphName, null, true, v);
     }
 
     /**
@@ -578,41 +591,10 @@ public class VertexResource extends AbstractSubResource {
      * graph.addVertex(null);
      */
     @POST
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response postNullVertex(@PathParam("graphname") String graphName, JSONObject json) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.setRequestObject(json);
-        return this.postVertex(graphName, null, false);
-    }
-
-    @POST
-    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response postNullVertexRexsterTypedJson(@PathParam("graphname") String graphName, JSONObject json) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.setRequestObject(json);
-        return this.postVertex(graphName, null, true);
-    }
-
-    /**
-     * POST http://host/graph/vertices
-     * graph.addVertex(null);
-     */
-    @POST
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
-    public Response postNullVertex(@PathParam("graphname") String graphName) {
-        return this.postVertex(graphName, null, false);
-    }
-
-    @POST
-    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response postNullVertexRexsterTypedJson(@PathParam("graphname") String graphName) {
-        return this.postVertex(graphName, null, true);
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    public Response postNullVertexOnUri(@Context Request request, @PathParam("graphname") String graphName) {
+        Variant v = request.selectVariant(producesVariantList);
+        return this.postVertex(graphName, null, true, v);
     }
 
     /**
@@ -622,26 +604,15 @@ public class VertexResource extends AbstractSubResource {
      */
     @POST
     @Path("/{id}")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response postVertex(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
+    public Response postVertexConsumesUrlEncoded(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
         this.buildRequestObject(formParams);
-        return this.postVertex(graphName, id, false);
-    }
-
-    @POST
-    @Path("/{id}")
-    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response postVertexRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        return this.postVertex(graphName, id, true);
+        Variant v = request.selectVariant(producesVariantList);
+        return this.postVertex(graphName, id, true, v);
     }
 
     /**
@@ -651,26 +622,28 @@ public class VertexResource extends AbstractSubResource {
      */
     @POST
     @Path("/{id}")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response postVertex(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    public Response postVertexConsumesJson(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
         this.setRequestObject(json);
-        return this.postVertex(graphName, id, false);
+        Variant v = request.selectVariant(producesVariantList);
+        return this.postVertex(graphName, id, false, v);
     }
 
     @POST
     @Path("/{id}")
-    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response postVertexRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Consumes({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    public Response postVertexRexsterConsumesTypedJson(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
         this.setRequestObject(json);
-        return this.postVertex(graphName, id, true);
+        Variant v = request.selectVariant(producesVariantList);
+        return this.postVertex(graphName, id, true, v);
     }
 
     /**
@@ -680,21 +653,21 @@ public class VertexResource extends AbstractSubResource {
      */
     @POST
     @Path("/{id}")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
-    public Response postVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
-        return postVertex(graphName, id, false);
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    public Response postVertexOnUri(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id) {
+        Variant v = request.selectVariant(producesVariantList);
+        return postVertex(graphName, id, true, v);
     }
 
-    @POST
-    @Path("/{id}")
-    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response postVertexRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String id) {
-        return postVertex(graphName, id, true);
-    }
-
-    private Response postVertex(String graphName, String id, boolean showTypes) {
+    private Response postVertex(final String graphName, final String id, final boolean parseTypes, final Variant variant) {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         final Graph graph = rag.getGraph();
+
+        final MediaType produces = variant.getMediaType();
+
+        final boolean showTypes = produces.equals(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE);
+        final boolean showHypermedia = produces.equals(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE)
+                || produces.equals(RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE);
 
         try {
             rag.tryStartTransaction();
@@ -719,7 +692,7 @@ public class VertexResource extends AbstractSubResource {
             while (keys.hasNext()) {
                 String key = keys.next().toString();
                 if (!key.startsWith(Tokens.UNDERSCORE)) {
-                    vertex.setProperty(key, ElementHelper.getTypedPropertyValue(theRequestObject.getString(key)));
+                    vertex.setProperty(key, ElementHelper.getTypedPropertyValue(theRequestObject.get(key), parseTypes));
                 }
             }
 
@@ -727,6 +700,14 @@ public class VertexResource extends AbstractSubResource {
 
             List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
             this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(vertex, returnKeys, showTypes));
+
+            if (showHypermedia) {
+                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX);
+                if (extensionsList != null) {
+                    this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
+                }
+            }
+
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
             rag.tryStopTransactionFailure();
@@ -754,26 +735,15 @@ public class VertexResource extends AbstractSubResource {
      */
     @PUT
     @Path("/{id}")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response putVertex(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
+    public Response putVertexConsumesUrlEncoded(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
         // initializes the request object with the data PUTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
         this.buildRequestObject(formParams);
-        return this.putVertex(graphName, id, false);
-    }
-
-    @PUT
-    @Path("/{id}")
-    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response putVertexRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data PUTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        return this.putVertex(graphName, id, true);
+        Variant v = request.selectVariant(producesVariantList);
+        return this.putVertex(graphName, id, v);
     }
 
     /**
@@ -783,26 +753,15 @@ public class VertexResource extends AbstractSubResource {
      */
     @PUT
     @Path("/{id}")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response putVertex(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response putVertexConsumesJson(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         // initializes the request object with the data PUTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
         this.setRequestObject(json);
-        return this.putVertex(graphName, id, false);
-    }
-
-    @PUT
-    @Path("/{id}")
-    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response putVertexRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
-        // initializes the request object with the data PUTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.setRequestObject(json);
-        return this.putVertex(graphName, id, true);
+        Variant v = request.selectVariant(producesVariantList);
+        return this.putVertex(graphName, id, v);
     }
 
     /**
@@ -812,21 +771,20 @@ public class VertexResource extends AbstractSubResource {
      */
     @PUT
     @Path("/{id}")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
-    public Response putVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
-        return putVertex(graphName, id, false);
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    public Response putVertexConsumesUri(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id) {
+        Variant v = request.selectVariant(producesVariantList);
+        return putVertex(graphName, id, v);
     }
 
-    @PUT
-    @Path("/{id}")
-    @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response putVertexRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String id) {
-        return putVertex(graphName, id, true);
-    }
-
-    private Response putVertex(String graphName, String id, boolean showTypes) {
+    private Response putVertex(final String graphName, final String id, final Variant variant) {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         final Graph graph = rag.getGraph();
+
+        final MediaType produces = variant.getMediaType();
+        final boolean showTypes = produces.equals(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE);
+        final boolean showHypermedia = produces.equals(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE)
+                || produces.equals(RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE);
 
         try {
             rag.tryStartTransaction();
@@ -858,6 +816,14 @@ public class VertexResource extends AbstractSubResource {
 
             List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
             this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(vertex, returnKeys, showTypes));
+
+            if (showHypermedia) {
+                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX);
+                if (extensionsList != null) {
+                    this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
+                }
+            }
+
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
             rag.tryStopTransactionFailure();
