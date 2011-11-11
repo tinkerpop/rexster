@@ -1,0 +1,188 @@
+<project name="Rexster" basedir="." default="release">
+
+    <property name="release.dir" value="release"/>
+
+    <property name="release.src.dir" value="${release.dir}/src"/>
+    <property name="release.wiki.dir" value="${release.dir}/wiki"/>
+
+    <property name="git-repo.src" value="git@github.com:spmallette/rexster.git"/>
+    <property name="git-repo.wiki" value="git@github.com:tinkerpop/rexster.wiki.git"/>
+    
+    <property name="git.install" value="/usr/bin"/>
+
+    <macrodef name="git">
+		<attribute name="command" />
+		<attribute name="options" default="" />
+		<attribute name="dir" default="" />
+		<attribute name="failerror" default="false" />
+		<element name="args" optional="true" />
+		<sequential>
+			<echo message="git dir @{dir}" />
+			<echo message="git @{command}" />
+			<exec executable="git" dir="@{dir}" failonerror="@{failerror}">
+				<arg line="@{command} @{options}" />
+				<args />
+			</exec>
+		</sequential>
+	</macrodef>
+
+    <macrodef name="git-clone">
+        <attribute name="repository"/>
+        <attribute name="dest"/>
+        <attribute name="dir"/>
+        <attribute name="options" default=""/>
+        <attribute name="failerror" default="false"/>
+        <sequential>
+            <git command="clone" dir="@{dir}" options="@{options}" failerror="@{failerror}">
+                <args>
+                    <arg value="@{repository}"/>
+                    <arg value="@{dest}"/>
+                </args>
+            </git>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="git-add">
+		<attribute name="file" />
+		<attribute name="dir" />
+		<attribute name="options" default="" />
+		<attribute name="failerror" default="false" />
+		<sequential>
+			<git command="add" dir="@{dir}" options="@{options}" failerror="@{failerror}" >
+				<args>
+					<arg value="@{file}" />
+				</args>
+			</git>
+		</sequential>
+	</macrodef>
+
+    <macrodef name="git-commit-with-message">
+		<attribute name="message" />
+		<attribute name="dir" />
+		<attribute name="options" default="" />
+		<attribute name="failerror" default="false" />
+		<sequential>
+			<git command="commit" dir="@{dir}" options="@{options}" failerror="@{failerror}" >
+				<args>
+					<arg value="-m @{message}" />
+				</args>
+			</git>
+		</sequential>
+	</macrodef>
+
+    <macrodef name="git-push">
+		<attribute name="remote" default="origin"/>
+		<attribute name="dir" />
+		<attribute name="options" default="" />
+		<attribute name="localRef" />
+		<attribute name="remoteRef" />
+		<attribute name="failerror" default="false" />
+		<sequential>
+			<git command="push" dir="@{dir}" options="@{options}" failerror="@{failerror}" >
+				<args>
+					<arg value="@{remote}" />
+					<arg value="@{localRef}:@{remoteRef}" />
+				</args>
+			</git>
+		</sequential>
+	</macrodef>
+
+    <macrodef name="git-tag">
+		<attribute name="tagName" />
+		<attribute name="dir" />
+		<attribute name="options" default="" />
+		<attribute name="failerror" default="false" />
+		<sequential>
+			<git command="tag" dir="@{dir}" options="@{options}" failerror="@{failerror}" >
+				<args>
+					<arg value="@{tagName}" />
+				</args>
+			</git>
+		</sequential>
+	</macrodef>
+
+    <macrodef name="maven">
+		<attribute name="command" />
+		<attribute name="options" default="" />
+		<attribute name="dir" default="" />
+		<attribute name="failerror" default="false" />
+		<element name="args" optional="true" />
+		<sequential>
+			<echo message="git dir @{dir}" />
+			<echo message="git @{command}" />
+			<exec executable="mvn" dir="@{dir}" failonerror="@{failerror}">
+				<arg line="@{command} @{options}" />
+				<args />
+			</exec>
+		</sequential>
+	</macrodef>
+
+    <target name="clean" description="clean release folders">
+        <delete dir="${release.dir}"/>
+    </target>
+
+    <target name="git-clone" description="get a fresh clone of Rexster from git" depends="clean">
+        <mkdir dir="${release.src.dir}"/>
+        <mkdir dir="${release.wiki.dir}"/>
+        <echo>Cloning ${ant.project.name} source.</echo>
+        <git-clone repository="${git-repo.src}" dest="${release.src.dir}" dir="." failerror="true"/>
+        <echo>Cloning ${ant.project.name} wiki.</echo>
+        <git-clone repository="${git-repo.wiki}" dest="${release.wiki.dir}" dir="." failerror="true"/>
+    </target>
+
+    <target name="wiki-work" description="manipulate the wiki, copy to project docs, and push to github">
+        <echo>Processing wiki</echo>
+        <copy file="${release.src.dir}/CHANGELOG.textile" overwrite="true" tofile="${release.wiki.dir}/Release-Notes.textile"
+                  description="copy the latest changelog to the release notes in the wiki"/>
+
+        <delete includeemptydirs="true">
+            <fileset dir="${release.src.dir}/doc/wiki" includes="*.*"/>
+        </delete>
+
+        <copy todir="${release.src.dir}/doc/wiki">
+            <fileset dir="${release.wiki.dir}" includes="*.*"/>
+        </copy>
+
+        <!-- uncomment after testing done
+        <git-add dir="${release.wiki.dir}" file="." options="-A" failerror="false"/>
+        <git-commit-with-message dir="${release.wiki.dir}" failerror="true" message="${ant.project.name} ${release.version} ${release.subname} release commit"/>
+        -->
+    </target>
+
+    <target name="build-deploy" description="build the project, push changes/tags to GitHub, and deploy" >
+        <echo>Building and deploying ${ant.project.name}</echo>
+        <maven command="clean install" dir="${release.src.dir}" failerror="true"/>
+
+        <echo>Pushing to GitHub</echo>
+        <git-add dir="${release.src.dir}" file="." options="-A" failerror="false"/>
+        <git-commit-with-message dir="${release.src.dir}" failerror="true" message="${ant.project.name} ${release.version} ${release.subname} release commit"/>
+        <git-push dir="${release.src.dir}" failerror="true" remote="origin" localRef="master" remoteRef="master" />
+
+        <git-tag dir="${release.src.dir}" failerror="true" tagName="${release.version}" options="-a -m '${ant.project.name} ${release.version} ${release.subname} release'"/>
+        <git-push dir="${release.src.dir}" failerror="true" remote="origin" localRef="master" remoteRef="master" options="--tags"/>
+
+        <maven command="clean install deploy" dir="${release.src.dir}" failerror="true"/>
+    </target>
+
+    <target name="release" description="release ${ant.project.name} in all its glory">
+        <fail unless="release.version">The release.version property must be set with -Drelease.version=&lt;version&gt; to specify the the version of this release.
+        </fail>
+        <fail unless="release.subname">The release.subname property must be set with -Drelease.subname=&lt;subname&gt; to specify the the subname of this release.
+        </fail>
+        <echo>Start releasing Rexster ${release.version}.</echo>
+
+        <input message="Are you sure it's time to release ${ant.project.name} ${release.version} ${release.subname}?" validargs="y,n" addproperty="release.confirmation"/>
+
+        <condition property="release.deny">
+            <equals arg1="n" arg2="${release.confirmation}"/>
+        </condition>
+
+        <fail if="release.deny">Release of ${ant.project.name} aborted.</fail>
+
+        <antcall target="git-clone"></antcall>
+        <antcall target="wiki-work"></antcall>
+        <antcall target="build-deploy"></antcall>
+        <echo>Finished releasing ${ant.project.name} ${release.version} ${release.subname}.</echo>
+    </target>
+
+</project>

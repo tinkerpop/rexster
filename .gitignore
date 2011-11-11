@@ -1,4 +1,5 @@
 *.log
+/release
 /target
 /bin
 # eclipse project files and local rexster.xml
