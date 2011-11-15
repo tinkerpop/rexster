@@ -233,48 +233,7 @@ Rexster.modules.graph = function(api) {
 	                	api.historyPush(uri);
 						
 						that.panelGraphElementViewSelected(api, split[5], split[6]);
-						
-						/* bah...visualization is not working nicely
-						var split = $(this).attr("href").split("/");
-						alert(split[2]);
-						
-						var colors = pv.Colors.category20();
-						var vis = new pv.Panel()
-							.canvas("dialogGraphView")
-						    .width(760)
-						    .height(530)
-						    .fillStyle("white")
-						    .event("mousedown", pv.Behavior.pan())
-						    .event("mousewheel", pv.Behavior.zoom(1/8));
-						
-						var graph;
-						// this sux right now
-						api.getVertexCenteredGraph("gratefulgraph", split[2], 2, function(g) {
-								graph = g;
-							}, 
-							function() {
-								alert("junk");
-							});
-						 
-						var force = vis.add(pv.Layout.Arc)
-						    .nodes(graph.vertices)
-						    .links(graph.edges);
-						 
-						force.link.add(pv.Line);
-						
-						force.node.add(pv.Dot)
-						    .size(function(d) { return (d.linkDegree + 4) * Math.pow(this.scale, -1.5) })
-						    .fillStyle(function(d) { return d.fix ? "brown" : colors(d.group) })
-						    .strokeStyle(function() { return this.fillStyle().darker() })
-						    .lineWidth(1)
-						    .title(function(d) { return d.nodeName })
-						    .event("mousedown", pv.Behavior.drag())
-						    .event("drag", force);
-						    
-						$("#dialogGraphView").dialog({height:600, width:800});
-						 
-						vis.render();
-					    */
+
 					});
 
 					if (results[ix]._type == "edge") {
