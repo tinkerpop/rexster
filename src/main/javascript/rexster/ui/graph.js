@@ -73,6 +73,16 @@ Rexster.modules.graph = function(api) {
 			api.getGraph(currentGraphName, function(graphResult) {
 				$("#panelGraphTitle").text(currentGraphName);
 				$("#panelGraphDetail").text(graphResult.graph);
+
+                $("#panelGraphExtensions").empty();
+
+				if (graphResult.extensions == undefined || graphResult.extensions.length == 0) {
+                    $("#panelGraphExtensions").append("<li>No extensions configured for this graph.</li>")
+				} else {
+				    Rexster("template", function(innerApi) {
+                        innerApi.applyListExtensionList(graphResult.extensions, "#panelGraphExtensions")
+                    });
+				}
 			},
 			function(err){
 				api.showMessageError("Could not get the graph profile from Rexster.");

@@ -10,6 +10,7 @@ Rexster.modules.template = function(api) {
 	templater.templateNameListVertices = "listVertices";
 	templater.templateNameListVertexViewInEdgeList = "listVertexViewInEdgeList";
 	templater.templateNameListVertexViewOutEdgeList = "listVertexViewOutEdgeList";
+	templater.templateNameListExtensionList = "listExtensionList";
 	
 	templater.init = function() {
 		// expects {id, menuName, [checked], [disabled]}
@@ -31,6 +32,10 @@ Rexster.modules.template = function(api) {
 		// expects {_label, _outV, _inV, _id, currentGraphName}
 		var templateListVertexViewOutEdgeList = '<li><a href="/doghouse/main/graph/${currentGraphName}/vertices/${_outV}">${_outV}</a> - <a href="/doghouse/main/graph/${currentGraphName}/edges/${_id}">${_label}</a> - ${_inV}</li>';
 		$.template(templater.templateNameListVertexViewOutEdgeList, templateListVertexViewOutEdgeList);
+
+        // expects {href, title}
+		var templateListExtensionList = '<li><a href="${href}">${title}</a></li>';
+		$.template(templater.templateNameListExtensionList, templateListExtensionList);
 	}
 	
 	/**
@@ -90,5 +95,10 @@ Rexster.modules.template = function(api) {
 	
 	api.applyListVertexViewInEdgeListTempate = function(data, selector) {
 		templater.applyTemplate(templater.templateNameListVertexViewInEdgeList, data, selector);
+	}
+
+	api.applyListExtensionList = function(data, selector) {
+	    templater.applyTemplate(templater.templateNameListExtensionList,
+	                            data.filter(function(extension){ return extension.method === "GET" }), selector);
 	}
 };
