@@ -26,6 +26,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -41,6 +42,8 @@ public class VertexResourceTest {
 
     protected Mockery mockery = new JUnit4Mockery();
     protected final String baseUri = "http://localhost/mock";
+
+    protected final URI requestUriPath = URI.create("http://localhost/graphs/mock/vertices");
 
     @Before
     public void init() {
@@ -348,6 +351,8 @@ public class VertexResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -384,6 +389,8 @@ public class VertexResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -420,6 +427,8 @@ public class VertexResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -459,6 +468,8 @@ public class VertexResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -494,6 +505,8 @@ public class VertexResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -531,6 +544,8 @@ public class VertexResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -568,6 +583,8 @@ public class VertexResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -608,6 +625,8 @@ public class VertexResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -643,6 +662,8 @@ public class VertexResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -680,6 +701,8 @@ public class VertexResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -717,6 +740,8 @@ public class VertexResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -757,6 +782,8 @@ public class VertexResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -791,6 +818,8 @@ public class VertexResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -823,6 +852,8 @@ public class VertexResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -868,6 +899,8 @@ public class VertexResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -893,6 +926,8 @@ public class VertexResourceTest {
             allowing(graph).removeVertex(v);
             allowing(rap).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -924,6 +959,8 @@ public class VertexResourceTest {
             will(returnValue(null));
             allowing(rap).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -951,6 +988,8 @@ public class VertexResourceTest {
             will(returnValue(v));
             allowing(rap).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -1152,6 +1191,8 @@ public class VertexResourceTest {
             will(returnValue(vertex));
             allowing(rap).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
@@ -1178,6 +1219,8 @@ public class VertexResourceTest {
             will(returnValue(generateMockedVertices(numberOfVertices)));
             allowing(rap).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         VertexResource resource = new VertexResource(uri, httpServletRequest, rap);

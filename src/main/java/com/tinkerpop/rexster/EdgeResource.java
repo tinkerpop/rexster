@@ -163,7 +163,7 @@ public class EdgeResource extends AbstractSubResource {
 
                 if (showHypermedia) {
                     RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
-                    JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE);
+                    JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE, this.getUriPath());
                     if (extensionsList != null) {
                         this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                     }
@@ -606,7 +606,7 @@ public class EdgeResource extends AbstractSubResource {
                 rag.tryStopTransactionSuccess();
 
                 if (showHypermedia) {
-                    JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE);
+                    JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE, this.getUriPath());
                     if (extensionsList != null) {
                         this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                     }
@@ -737,7 +737,7 @@ public class EdgeResource extends AbstractSubResource {
             rag.tryStopTransactionSuccess();
 
             if (showHypermedia) {
-                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE);
+                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE, this.getUriPath());
                 if (extensionsList != null) {
                     this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                 }

@@ -376,8 +376,8 @@ Rexster.modules.graph = function(api) {
 			
 			containerPanelElementViewer.find(".ui-widget-header").text(elementHeaderTitle);
 
+			// display the extensions available on the element that are "GET" based
 			var showElementExtensions = function(element) {
-			    // display the extensions available on the element that are "GET" based
                 $("#panelElementExtensions").empty()
                 if (element.extensions == undefined || element.extensions.length == 0) {
                     $("#panelElementExtensions").append("<li>No extensions.</li>")

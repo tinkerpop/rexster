@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 public class GraphResourceTest {
     protected Mockery mockery = new JUnit4Mockery();
     protected final String baseUri = "http://localhost/mock";
+    protected final URI requestUriPath = URI.create("http://localhost/graphs/mock");
 
     @Before
     public void init() {
@@ -64,6 +66,8 @@ public class GraphResourceTest {
             allowing(rap).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).clear();
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         GraphResource resource = new GraphResource(uri, httpServletRequest, rap);
@@ -99,6 +103,8 @@ public class GraphResourceTest {
             will(returnValue(rag));
             allowing(rap).getStartTime();
             will(returnValue(System.currentTimeMillis() - 10000));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         GraphResource resource = new GraphResource(uri, httpServletRequest, rap);

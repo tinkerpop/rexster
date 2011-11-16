@@ -34,7 +34,7 @@ Rexster.modules.template = function(api) {
 		$.template(templater.templateNameListVertexViewOutEdgeList, templateListVertexViewOutEdgeList);
 
         // expects {href, title}
-		var templateListExtensionList = '<li><a href="${href}">${title}</a></li>';
+		var templateListExtensionList = '<li><a href="${href}" {{if description}}title="${description}"{{/if}}>${title}</a></li>';
 		$.template(templater.templateNameListExtensionList, templateListExtensionList);
 	}
 	

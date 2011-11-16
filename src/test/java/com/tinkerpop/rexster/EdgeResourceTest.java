@@ -26,11 +26,11 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Tests edge resource.  Should not need to test any specific returns values as they are
@@ -41,6 +41,8 @@ public class EdgeResourceTest {
 
     protected Mockery mockery = new JUnit4Mockery();
     protected final String baseUri = "http://localhost/mock";
+
+    protected final URI requestUriPath = URI.create("http://localhost/graphs/mock/edges");
 
     @Before
     public void init() {
@@ -164,6 +166,8 @@ public class EdgeResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -196,6 +200,8 @@ public class EdgeResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -237,6 +243,8 @@ public class EdgeResourceTest {
             will(returnValue(v2));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -277,6 +285,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -324,6 +334,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -367,6 +379,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -410,6 +424,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -453,6 +469,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -501,6 +519,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -545,6 +565,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -589,6 +611,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -633,6 +657,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -681,6 +707,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -725,6 +753,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -769,6 +799,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -811,6 +843,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -850,6 +884,8 @@ public class EdgeResourceTest {
             will(returnValue(v2));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -901,6 +937,8 @@ public class EdgeResourceTest {
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -949,6 +987,8 @@ public class EdgeResourceTest {
             allowing(rap).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).removeEdge(returnEdge);
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -981,6 +1021,8 @@ public class EdgeResourceTest {
             will(returnValue(returnEdge));
             allowing(rap).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -1076,6 +1118,8 @@ public class EdgeResourceTest {
             will(returnValue(edge));
             allowing(rap).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -1102,6 +1146,8 @@ public class EdgeResourceTest {
             will(returnValue(inVertex));
             allowing(graph).getVertex(with(equal(requestedOutId)));
             will(returnValue(outVertex));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -1129,6 +1175,8 @@ public class EdgeResourceTest {
             will(returnValue(edge));
             allowing(rap).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
@@ -1155,6 +1203,8 @@ public class EdgeResourceTest {
             will(returnValue(generateMockedEdges(numberOfEdges)));
             allowing(rap).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
         }});
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);

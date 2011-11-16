@@ -94,7 +94,7 @@ public class GraphResource extends AbstractSubResource {
 
             if (showHypermedia) {
                 RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
-                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.GRAPH);
+                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.GRAPH, this.getUriPath());
                 if (extensionsList != null) {
                     this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                 }

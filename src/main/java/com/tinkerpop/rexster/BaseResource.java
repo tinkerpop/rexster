@@ -109,6 +109,19 @@ public abstract class BaseResource {
         return this.rexsterApplicationProvider;
     }
 
+    protected String getUriPath() {
+        String baseUri = "";
+        if (this.uriInfo != null){
+            baseUri = this.uriInfo.getAbsolutePath().toString();
+
+            if (!baseUri.endsWith("/")) {
+                baseUri = baseUri + "/";
+            }
+        }
+
+        return baseUri;
+    }
+
     /**
      * Sets the request object.
      * <p/>

@@ -165,7 +165,7 @@ public class VertexResource extends AbstractSubResource {
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
                 if (showHypermedia) {
-                    JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX);
+                    JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX, this.getUriPath());
                     if (extensionsList != null) {
                         this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                     }
@@ -705,7 +705,7 @@ public class VertexResource extends AbstractSubResource {
             this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(vertex, returnKeys, showTypes));
 
             if (showHypermedia) {
-                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX);
+                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX, this.getUriPath());
                 if (extensionsList != null) {
                     this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                 }
@@ -832,7 +832,7 @@ public class VertexResource extends AbstractSubResource {
             this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(vertex, returnKeys, showTypes));
 
             if (showHypermedia) {
-                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX);
+                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX, this.getUriPath());
                 if (extensionsList != null) {
                     this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                 }

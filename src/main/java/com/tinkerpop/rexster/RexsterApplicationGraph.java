@@ -18,6 +18,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,7 +42,7 @@ public class RexsterApplicationGraph {
 
     private static final ServiceLoader<? extends RexsterExtension> extensions = ServiceLoader.load(RexsterExtension.class);
 
-    private final Map<ExtensionPoint, JSONArray> hypermediaCache = new HashMap<ExtensionPoint, JSONArray>();
+    private final Map<ExtensionPoint, List<HashMap<String, String>>> hypermediaCache = new HashMap<ExtensionPoint, List<HashMap<String, String>>>();
     private final Map<ExtensionSegmentSet, Boolean> extensionAllowedCache = new HashMap<ExtensionSegmentSet, Boolean>();
 
     public RexsterApplicationGraph(String graphName, Graph graph) {
@@ -178,9 +179,9 @@ public class RexsterApplicationGraph {
     }
 
     private void initializeExtensionHypermediaCache(){
-        this.getExtensionHypermedia(ExtensionPoint.GRAPH);
-        this.getExtensionHypermedia(ExtensionPoint.VERTEX);
-        this.getExtensionHypermedia(ExtensionPoint.EDGE);
+        this.getExtensionHypermedia(ExtensionPoint.GRAPH, "");
+        this.getExtensionHypermedia(ExtensionPoint.VERTEX, "");
+        this.getExtensionHypermedia(ExtensionPoint.EDGE, "");
     }
 
     /**
@@ -209,9 +210,9 @@ public class RexsterApplicationGraph {
         return this.extensionAllowables;
     }
 
-    protected JSONArray getExtensionHypermedia(ExtensionPoint extensionPoint) {
+    protected JSONArray getExtensionHypermedia(ExtensionPoint extensionPoint, String baseUri) {
 
-        JSONArray hypermediaLinks = new JSONArray();
+        List<HashMap<String, String>> hypermediaLinks = new ArrayList<HashMap<String, String>>();
         if (hypermediaCache.containsKey(extensionPoint)) {
             hypermediaLinks = hypermediaCache.get(extensionPoint);
         } else {
@@ -268,16 +269,17 @@ public class RexsterApplicationGraph {
                                         href = href + "/" + definition.path();
                                     }
 
-                                    HashMap hypermediaLink = new HashMap();
+                                    HashMap<String, String> hypermediaLink = new HashMap<String, String>();
                                     hypermediaLink.put("href", href);
                                     hypermediaLink.put("method", definition.method().name());
+                                    hypermediaLink.put("title", currentExtensionName);
 
                                     // descriptor is not a required annotation for extensions.
                                     if (descriptor != null) {
-                                        hypermediaLink.put("title", descriptor.description());
+                                        hypermediaLink.put("description", descriptor.description());
                                     }
 
-                                    hypermediaLinks.put(new JSONObject(hypermediaLink));
+                                    hypermediaLinks.add(hypermediaLink);
                                 }
                             }
                         } else {
@@ -287,13 +289,31 @@ public class RexsterApplicationGraph {
                 }
             }
 
-            if (hypermediaLinks.length() == 0) {
+            if (hypermediaLinks.size() == 0) {
                 hypermediaCache.put(extensionPoint, null);
             } else {
                 hypermediaCache.put(extensionPoint, hypermediaLinks);
             }
         }
 
-        return hypermediaLinks;
+        JSONArray composedLinks = null;
+
+        if (hypermediaLinks != null) {
+            composedLinks = new JSONArray();
+            for (Map<String, String> hypermediaLink : hypermediaLinks) {
+                HashMap link = new HashMap();
+                for (Map.Entry<String, String> linkEntry : hypermediaLink.entrySet()) {
+                    if (linkEntry.getKey().equals("href")) {
+                        link.put(linkEntry.getKey(), baseUri + linkEntry.getValue());
+                    } else {
+                        link.put(linkEntry.getKey(), linkEntry.getValue());
+                    }
+                }
+
+                composedLinks.put(new JSONObject(link));
+            }
+        }
+
+        return composedLinks;
     }
 }
