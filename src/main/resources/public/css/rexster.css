@@ -66,6 +66,15 @@ html {
 	list-style-type: none;
 	list-style-image: none;
 }
+.extension-list {
+	list-style-type: none;
+	list-style-image: none;
+	font-size: smaller;
+}
+.extension-list li {
+	list-style-type: none;
+	list-style-image: none;
+}
 .intense {
 	background-color: #d9d9d9;
 	color:black;

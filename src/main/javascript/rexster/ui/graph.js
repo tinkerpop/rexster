@@ -74,8 +74,8 @@ Rexster.modules.graph = function(api) {
 				$("#panelGraphTitle").text(currentGraphName);
 				$("#panelGraphDetail").text(graphResult.graph);
 
-                $("#panelGraphExtensions").empty();
-
+                // display the extensions available on the graph that are "GET" based
+                $("#panelGraphExtensions").empty()
 				if (graphResult.extensions == undefined || graphResult.extensions.length == 0) {
                     $("#panelGraphExtensions").append("<li>No extensions configured for this graph.</li>")
 				} else {
@@ -374,7 +374,19 @@ Rexster.modules.graph = function(api) {
 			
 			elementHeaderTitle = elementHeaderTitle + " [" + objectId + "]";
 			
-			containerPanelElementViewer.find(".ui-widget-header").text(elementHeaderTitle); 
+			containerPanelElementViewer.find(".ui-widget-header").text(elementHeaderTitle);
+
+			var showElementExtensions = function(element) {
+			    // display the extensions available on the element that are "GET" based
+                $("#panelElementExtensions").empty()
+                if (element.extensions == undefined || element.extensions.length == 0) {
+                    $("#panelElementExtensions").append("<li>No extensions.</li>")
+                } else {
+                    Rexster("template", function(innerApi) {
+                        innerApi.applyListExtensionList(element.extensions, "#panelElementExtensions")
+                    });
+                }
+			}
 			
 			if (featureToBrowse === "vertices") {
 				$("#panelElementViewerLeft h3").text("In");
@@ -395,6 +407,8 @@ Rexster.modules.graph = function(api) {
                             "content" :"json-widget-content-vertex"
 						}
 				    });
+
+				    showElementExtensions(result);
 				}, 
 				function(err) {
 				},
@@ -457,7 +471,9 @@ Rexster.modules.graph = function(api) {
 						"jsonName": metaDataLabel,
 						"jsonData": element,
 						"outerPadding":"0px"});
-					
+
+				    showElementExtensions(result);
+
 					$("#panelElementViewerRight .intense .value").text("");
 					$("#panelElementViewerRight .intense .label").text("");
 

@@ -54,13 +54,23 @@ public class GraphResource extends AbstractSubResource {
                 HttpMethod.DELETE.toString());
     }
 
+    @GET
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getGraphProducesJson(@PathParam("graphname") String graphName) {
+        return getGraph(graphName, false);
+    }
+
     /**
      * GET http://host/graph
      * graph.toString();
      */
     @GET
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response getGraph(@PathParam("graphname") String graphName) {
+    @Produces({RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    public Response getGraphProducesRexsterJson(@PathParam("graphname") String graphName) {
+        return getGraph(graphName, true);
+    }
+
+    private Response getGraph(String graphName, boolean showHypermedia) {
         Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
 
         try {
@@ -82,12 +92,13 @@ public class GraphResource extends AbstractSubResource {
             this.resultObject.put(Tokens.UP_TIME, this.getTimeAlive());
             this.resultObject.put("version", RexsterApplication.getVersion());
 
-            RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
-            JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.GRAPH);
-            if (extensionsList != null) {
-                this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
+            if (showHypermedia) {
+                RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.GRAPH);
+                if (extensionsList != null) {
+                    this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
+                }
             }
-
         } catch (JSONException ex) {
             logger.error(ex);
             JSONObject error = generateErrorObjectJsonFail(ex);
