@@ -80,7 +80,17 @@ Rexster.modules.graph = function(api) {
                     $("#panelGraphExtensions").append("<li>No extensions configured for this graph.</li>")
 				} else {
 				    Rexster("template", function(innerApi) {
-                        innerApi.applyListExtensionList(graphResult.extensions, "#panelGraphExtensions")
+                        innerApi.applyListExtensionList(graphResult.extensions, "#panelGraphExtensions");
+
+                        $("#panelGraphExtensions > li > a").button({ icons: {primary:"ui-icon-circle-arrow-e"}});
+                        $("#panelGraphExtensions > li > a").unbind("click");
+                        $("#panelGraphExtensions > li > a").click(function(e) {
+                            e.preventDefault();
+
+                            $("#dialogForm :input[name=extensionUri']").val(this.href);
+                            $("#dialogForm").dialog("open");
+                            $("#dialogForm").dialog("option", "title", this.innerText);
+                        });
                     });
 				}
 			},
@@ -755,6 +765,22 @@ Rexster.modules.graph = function(api) {
 					}
 					
 				})
+
+				$("#dialogForm").dialog({
+                    autoOpen: false,
+                    height: 500,
+                    width: 600,
+                    modal: true,
+                    buttons: {
+                        "Execute": function() {
+                            var extensionToCall = extensionUri.val();
+
+                        },
+                        Cancel: function() {
+                            $(this).dialog("close");
+                        }
+                    }
+                });
 			}, 
 			function(err) {
 				api.showMessageError("Could not get the list of graphs from Rexster.");

@@ -9,7 +9,7 @@
     <!-- DON'T FORGET TO UPDATE Tokens.VERSION AT RELEASE -->
     <packaging>jar</packaging>
     <url>http://rexster.tinkerpop.com</url>
-    <name>Rexster: A RESTful Graph Shell</name>
+    <name>Rexster: A Graph Server</name>
     <description>
         Rexster is a multi-faceted graph server that exposes any Blueprints graph (e.g. TinkerGraph, Neo4j, OrientDB,
         DEX, and Sail RDF Stores) through several mechanisms with a general focus on REST.
