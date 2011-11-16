@@ -5,18 +5,23 @@ import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.event.EventGraph;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
 import com.tinkerpop.rexster.extension.ExtensionAllowed;
+import com.tinkerpop.rexster.extension.ExtensionApi;
+import com.tinkerpop.rexster.extension.ExtensionApiBehavior;
 import com.tinkerpop.rexster.extension.ExtensionConfiguration;
 import com.tinkerpop.rexster.extension.ExtensionDefinition;
 import com.tinkerpop.rexster.extension.ExtensionDescriptor;
 import com.tinkerpop.rexster.extension.ExtensionNaming;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
+import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
 import com.tinkerpop.rexster.extension.RexsterExtension;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
+import scala.util.parsing.json.JSON;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +47,7 @@ public class RexsterApplicationGraph {
 
     private static final ServiceLoader<? extends RexsterExtension> extensions = ServiceLoader.load(RexsterExtension.class);
 
-    private final Map<ExtensionPoint, List<HashMap<String, String>>> hypermediaCache = new HashMap<ExtensionPoint, List<HashMap<String, String>>>();
+    private final Map<ExtensionPoint, List<HashMap<String, Object>>> hypermediaCache = new HashMap<ExtensionPoint, List<HashMap<String, Object>>>();
     private final Map<ExtensionSegmentSet, Boolean> extensionAllowedCache = new HashMap<ExtensionSegmentSet, Boolean>();
 
     public RexsterApplicationGraph(String graphName, Graph graph) {
@@ -212,7 +217,7 @@ public class RexsterApplicationGraph {
 
     protected JSONArray getExtensionHypermedia(ExtensionPoint extensionPoint, String baseUri) {
 
-        List<HashMap<String, String>> hypermediaLinks = new ArrayList<HashMap<String, String>>();
+        List<HashMap<String, Object>> hypermediaLinks = new ArrayList<HashMap<String, Object>>();
         if (hypermediaCache.containsKey(extensionPoint)) {
             hypermediaLinks = hypermediaCache.get(extensionPoint);
         } else {
@@ -269,9 +274,9 @@ public class RexsterApplicationGraph {
                                         href = href + "/" + definition.path();
                                     }
 
-                                    HashMap<String, String> hypermediaLink = new HashMap<String, String>();
+                                    final HashMap<String, Object> hypermediaLink = new HashMap<String, Object>();
                                     hypermediaLink.put("href", href);
-                                    hypermediaLink.put("method", definition.method().name());
+                                    hypermediaLink.put("op", definition.method().name());
                                     hypermediaLink.put("title", currentExtensionName);
 
                                     // descriptor is not a required annotation for extensions.
@@ -280,6 +285,37 @@ public class RexsterApplicationGraph {
                                     }
 
                                     hypermediaLinks.add(hypermediaLink);
+
+                                    final JSONArray queryStringParameters = new JSONArray();
+                                    if (descriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
+                                        || descriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_DESCRIPTOR_ONLY) {
+                                        for (final ExtensionApi extensionApi : descriptor.api()) {
+                                            queryStringParameters.put(new HashMap<String, String>(){{
+                                                        put("name", extensionApi.parameterName());
+                                                        put("description", extensionApi.description());
+                                            }});
+                                        }
+                                    }
+
+                                    if (descriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
+                                        || descriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_PARAMETER_ONLY) {
+                                        final Annotation[][] parametersAnnotationSets = method.getParameterAnnotations();
+                                        for (Annotation[] parameterAnnotationSet : parametersAnnotationSets) {
+                                            for (Annotation annotation : parameterAnnotationSet){
+                                                if (annotation instanceof ExtensionRequestParameter) {
+                                                    final ExtensionRequestParameter extensionRequestParameter = (ExtensionRequestParameter) annotation;
+                                                    queryStringParameters.put(new HashMap<String, String>(){{
+                                                        put("name", extensionRequestParameter.name());
+                                                        put("description", extensionRequestParameter.description());
+                                                    }});
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (queryStringParameters.length() > 0) {
+                                        hypermediaLink.put("parameters", queryStringParameters);
+                                    }
                                 }
                             }
                         } else {
@@ -300,9 +336,9 @@ public class RexsterApplicationGraph {
 
         if (hypermediaLinks != null) {
             composedLinks = new JSONArray();
-            for (Map<String, String> hypermediaLink : hypermediaLinks) {
+            for (Map<String, Object> hypermediaLink : hypermediaLinks) {
                 HashMap link = new HashMap();
-                for (Map.Entry<String, String> linkEntry : hypermediaLink.entrySet()) {
+                for (Map.Entry<String, Object> linkEntry : hypermediaLink.entrySet()) {
                     if (linkEntry.getKey().equals("href")) {
                         link.put(linkEntry.getKey(), baseUri + linkEntry.getValue());
                     } else {

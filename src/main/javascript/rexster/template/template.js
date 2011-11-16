@@ -99,6 +99,6 @@ Rexster.modules.template = function(api) {
 
 	api.applyListExtensionList = function(data, selector) {
 	    templater.applyTemplate(templater.templateNameListExtensionList,
-	                            data.filter(function(extension){ return extension.method === "GET" }), selector);
+	                            data.filter(function(extension){ return extension.op === "GET" }), selector);
 	}
 };

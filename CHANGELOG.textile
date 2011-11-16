@@ -28,6 +28,12 @@ h3. Version 0.7 (Brian -- NOT OFFICIALLY RELEASED YET)
 * Fixed problem with the Prefix resource where SailGraph in read-only mode generated 500 (Internal Server Error) responses.
 * Added SPARQL Repository configuration.
 * Fixed error that appeared on multiple successive calls to PUT on the Vertex and Edge Resources.
+* The @extension@ key in JSON responses now includes more information:
+** The full URI to the extension resource (not just the relative URL).
+** Parameters for the query string.
+** The name of the extension (not just the description).
+* Dog House has Rexster Extension support
+** List all configured extensions for graphs, vertices and edges.
 
 ==<hr/>==
 
