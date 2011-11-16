@@ -87,9 +87,25 @@ Rexster.modules.graph = function(api) {
                         $("#panelGraphExtensions > li > a").click(function(e) {
                             e.preventDefault();
 
-                            $("#dialogForm :input[name=extensionUri']").val(this.href);
+                            var selectedExtension = this.textContent;
+
+                            $("#dialogForm > form > fieldset > input:gt(1)").remove();
+                            $("#dialogForm > form > fieldset > label:gt(1)").remove();
+
+                            // find the parameters for the current extension selected that are gets.
+                            var parametersForThisExtension = graphResult.extensions.filter(function(extension){
+                                return extension.title == selectedExtension && extension.op === "GET";
+                            })[0].parameters;
+
+                            // create the parameter entry form.
+                            if (parametersForThisExtension && parametersForThisExtension.length > 0) {
+                                innerApi.applyListExtensionParameterEntries(parametersForThisExtension, "#dialogForm > form > fieldset");
+                            }
+
+                            $("#dialogForm :input[name='extensionUri']").val(this.href);
                             $("#dialogForm").dialog("open");
-                            $("#dialogForm").dialog("option", "title", this.innerText);
+                            $("#dialogForm").dialog("option", "title", this.textContent);
+
                         });
                     });
 				}

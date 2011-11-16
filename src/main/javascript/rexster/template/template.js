@@ -11,6 +11,7 @@ Rexster.modules.template = function(api) {
 	templater.templateNameListVertexViewInEdgeList = "listVertexViewInEdgeList";
 	templater.templateNameListVertexViewOutEdgeList = "listVertexViewOutEdgeList";
 	templater.templateNameListExtensionList = "listExtensionList";
+	templater.templateNameListExtensionParameterEntries = "listExtensionParameterEntries";
 	
 	templater.init = function() {
 		// expects {id, menuName, [checked], [disabled]}
@@ -36,6 +37,11 @@ Rexster.modules.template = function(api) {
         // expects {href, title}
 		var templateListExtensionList = '<li><a href="${href}" {{if description}}title="${description}"{{/if}}>${title}</a></li>';
 		$.template(templater.templateNameListExtensionList, templateListExtensionList);
+
+        // expects {name, description}
+		var templateListExtensionParameterEntries = '<label for="${name}">${name}</label><input type="text" name="${name}" class="text ui-widget-content ui-corner-all" title="${description}" />';
+		$.template(templater.templateNameListExtensionParameterEntries, templateListExtensionParameterEntries);
+
 	}
 	
 	/**
@@ -101,4 +107,9 @@ Rexster.modules.template = function(api) {
 	    templater.applyTemplate(templater.templateNameListExtensionList,
 	                            data.filter(function(extension){ return extension.op === "GET" }), selector);
 	}
+
+	api.applyListExtensionParameterEntries = function(data, selector) {
+	    templater.applyTemplate(templater.templateNameListExtensionParameterEntries, data, selector);
+	}
+
 };
