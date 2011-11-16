@@ -27,9 +27,9 @@ public class GraphResourceTest {
     }
 
     @Test
-    public void getGraphValid() {
+    public void getGraphProducesJsonValid() {
         GraphResource resource = this.constructMockGetGraphScenario(new HashMap<String, String>());
-        Response response = resource.getGraph("graph");
+        Response response = resource.getGraphProducesJson("graph");
 
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());

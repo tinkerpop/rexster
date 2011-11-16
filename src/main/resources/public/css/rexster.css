@@ -70,6 +70,7 @@ html {
 	list-style-type: none;
 	list-style-image: none;
 	font-size: smaller;
+	margin-left:0em;
 }
 .extension-list li {
 	list-style-type: none;
