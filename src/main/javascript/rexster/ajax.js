@@ -2,7 +2,8 @@
  * Provides methods to access REST services within Rexster.
  */
 Rexster.modules.ajax = function(api) {
-	
+
+	var rexsterMimeType = "application/vnd.rexster-v1+json";
 	var baseUri = "";
 	
 	Rexster("server", function(api) {
@@ -20,7 +21,7 @@ Rexster.modules.ajax = function(api) {
 		$.ajax({
 			  url: baseUri,
 			  accepts:{
-			    json: "application/vnd.rexster+json"
+			    json: rexsterMimeType
 			  },
 			  type: "GET",
 			  dataType:"json",
@@ -40,7 +41,7 @@ Rexster.modules.ajax = function(api) {
 		$.ajax({
 			  url: baseUri + graphName,
 			  accepts:{
-			    json: "application/vnd.rexster+json"
+			    json: rexsterMimeType
 			  },
 			  type: "GET",
 			  dataType:"json",
@@ -62,7 +63,7 @@ Rexster.modules.ajax = function(api) {
 		$.ajax({
 			  url: baseUri + graphName + "/vertices?rexster.offset.start=" + start + "&rexster.offset.end=" + end,
 			  accepts:{
-			    json: "application/vnd.rexster+json"
+			    json: rexsterMimeType
 			  },
 			  type: "GET",
 			  dataType:"json",
@@ -85,7 +86,7 @@ Rexster.modules.ajax = function(api) {
 		$.ajax({
 			  url: baseUri + graphName + "/edges?rexster.offset.start=" + start + "&rexster.offset.end=" + end,
 			  accepts:{
-			    json: "application/vnd.rexster+json"
+			    json: rexsterMimeType
 			  },
 			  type: "GET",
 			  dataType:"json",
@@ -99,7 +100,7 @@ Rexster.modules.ajax = function(api) {
 		$.ajax({
 			  url: baseUri + graphName + "/vertices/" + vertex + "/bothE",
 			  accepts:{
-			    json: "application/vnd.rexster+json"
+			    json: rexsterMimeType
 			  },
 			  type: "GET",
 			  dataType:"json",
@@ -113,7 +114,7 @@ Rexster.modules.ajax = function(api) {
 		$.ajax({
 			  url: baseUri + graphName + "/vertices/" + vertex + "/inE",
 			  accepts:{
-			    json: "application/vnd.rexster+json"
+			    json: rexsterMimeType
 			  },
 			  type: "GET",
 			  dataType:"json",
@@ -127,7 +128,7 @@ Rexster.modules.ajax = function(api) {
 		$.ajax({
 			  url: baseUri + graphName + "/vertices/" + vertex + "/outE",
 			  accepts:{
-			    json: "application/vnd.rexster+json"
+			    json: rexsterMimeType
 			  },
 			  type: "GET",
 			  dataType:"json",
@@ -141,7 +142,7 @@ Rexster.modules.ajax = function(api) {
 		$.ajax({
 			  url: baseUri + graphName + "/vertices/" + vertex,
 			  accepts:{
-			    json: "application/vnd.rexster+json"
+			    json: rexsterMimeType
 			  },
 			  type: "GET",
 			  dataType:"json",
@@ -155,7 +156,7 @@ Rexster.modules.ajax = function(api) {
 		$.ajax({
 			  url: baseUri + graphName + "/edges/" + edge,
 			  accepts:{
-			    json: "application/vnd.rexster+json"
+			    json: rexsterMimeType
 			  },
 			  type: "GET",
 			  dataType:"json",
