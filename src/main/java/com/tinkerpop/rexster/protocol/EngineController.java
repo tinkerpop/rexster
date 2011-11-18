@@ -18,7 +18,7 @@ public class EngineController {
      * Add all flavors of gremlin to this list.
      */
     private final List<String> gremlinEngineNames = new ArrayList<String>(){{
-       add("gremlin");
+       add("gremlin-groovy");
     }};
 
     private static EngineController engineController;
