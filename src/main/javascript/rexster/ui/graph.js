@@ -74,76 +74,7 @@ Rexster.modules.graph = function(api) {
 				$("#panelGraphTitle").text(currentGraphName);
 				$("#panelGraphDetail").text(graphResult.graph);
 
-                // display the extensions available on the graph that are "GET" based
-                $("#panelGraphExtensions").accordion("destroy");
-                $("#panelGraphExtensions").empty()
-				if (graphResult.extensions == undefined || graphResult.extensions.length == 0) {
-                    $("#panelGraphExtensions").append("<li>No extensions configured for this graph.</li>")
-				} else {
-				    Rexster("template", function(innerApi) {
-                        innerApi.applyListExtensionList(graphResult.extensions, "#panelGraphExtensions");
-                        $("#panelGraphExtensions").accordion({
-                            autoHeight: false,
-                            collapsible: true,
-                            navigation: true,
-                            active: false
-                        });
-
-                        $("#panelGraphExtensions > div > a").button({ icons: {primary:"ui-icon-circle-arrow-e"}});
-                        $("#panelGraphExtensions > div > a").unbind("click");
-                        $("#panelGraphExtensions > div > a").click(function(e) {
-                            e.preventDefault();
-
-                            $("#dialogForm").dialog("open");
-                            $("#dialogForm").dialog("option", "title", this.title);
-
-                            var firstParameter = true;
-                            var extensionUriWithParameters = "";
-                            $(this).parent().find("form > fieldset > :input").each(function(index, textbox) {
-                                if (index === 0) {
-                                    extensionUriWithParameters = $(textbox).val();
-                                } else {
-                                    if ($(textbox).val() != "") {
-                                        if (firstParameter) {
-                                            extensionUriWithParameters = extensionUriWithParameters + "?" + $(textbox).attr("name") + "=" + $(textbox).val();
-                                            firstParameter = false;
-                                        } else {
-                                            extensionUriWithParameters = extensionUriWithParameters + "&" + $(textbox).attr("name") + "=" + $(textbox).val();
-                                        }
-                                    }
-                                }
-                            });
-
-                            $.ajax({
-                                url: extensionUriWithParameters,
-                                accepts:{
-                                  json: "application/json"
-                                },
-                                type: "GET",
-                                dataType:"json",
-                                success: function(result) {
-                                    $("#dialogForm > div").jsonviewer({
-                                        "jsonName": "Rexster Extension Results",
-                                        "jsonData": result,
-                                        "outerPadding":"0px",
-                                        "highlight":false
-                                    });
-                                },
-                                error: function(e) {
-                                    $("#dialogForm > div").empty();
-                                    $("#dialogForm > div").jsonviewer({
-                                        "jsonName": "Rexster Extension Results [ERROR]",
-                                        "jsonData": result,
-                                        "outerPadding":"0px",
-                                        "highlight":false
-                                    })
-                                }
-                            });
-                        });
-
-
-                    });
-				}
+                showElementExtensions(graphResult);
 			},
 			function(err){
 				api.showMessageError("Could not get the graph profile from Rexster.");
@@ -407,6 +338,82 @@ Rexster.modules.graph = function(api) {
 				});
 			}
 		}
+
+		// display the extensions available on the element that are "GET" based
+		var showElementExtensions = function(resultWithExtensions) {
+            $("#panelGraphExtensions").accordion("destroy");
+            $("#panelGraphExtensions").empty()
+            $("#panelExtensionsContainer").show();
+            if (resultWithExtensions.extensions == undefined || resultWithExtensions.extensions.length == 0) {
+                $("#panelGraphExtensions").append("<li>No extensions configured.</li>")
+            } else {
+                Rexster("template", function(innerApi) {
+                    innerApi.applyListExtensionList(resultWithExtensions.extensions, "#panelGraphExtensions");
+                    $("#panelGraphExtensions").accordion({
+                        autoHeight: false,
+                        collapsible: true,
+                        navigation: true,
+                        active: false
+                    });
+
+                    $("#panelGraphExtensions > div > a").button({ icons: {primary:"ui-icon-circle-arrow-e"}});
+                    $("#panelGraphExtensions > div > a").unbind("click");
+                    $("#panelGraphExtensions > div > a").click(function(e) {
+                        e.preventDefault();
+
+                        // clear the space where the JSON Viewer puts results
+                        $("#dialogForm > div").empty();
+                        $("#dialogForm").dialog("open");
+                        $("#dialogForm").dialog("option", "title", this.title);
+
+                        var firstParameter = true;
+                        var extensionUriWithParameters = "";
+                        $(this).parent().find("form > fieldset > :input").each(function(index, textbox) {
+                            if (index === 0) {
+                                extensionUriWithParameters = $(textbox).val();
+                            } else {
+                                if ($(textbox).val() != "") {
+                                    if (firstParameter) {
+                                        extensionUriWithParameters = extensionUriWithParameters + "?" + $(textbox).attr("name") + "=" + $(textbox).val();
+                                        firstParameter = false;
+                                    } else {
+                                        extensionUriWithParameters = extensionUriWithParameters + "&" + $(textbox).attr("name") + "=" + $(textbox).val();
+                                    }
+                                }
+                            }
+                        });
+
+                        $.ajax({
+                            url: extensionUriWithParameters,
+                            accepts:{
+                              json: "application/json"
+                            },
+                            type: "GET",
+                            dataType:"json",
+                            success: function(result) {
+                                $("#dialogForm > div").jsonviewer({
+                                    "jsonName": "Rexster Extension Results",
+                                    "jsonData": result,
+                                    "outerPadding":"0px",
+                                    "highlight":false
+                                });
+                            },
+                            error: function(e) {
+                                $("#dialogForm > div").empty();
+                                $("#dialogForm > div").jsonviewer({
+                                    "jsonName": "Rexster Extension Results [ERROR]",
+                                    "jsonData": JSON.parse(e.response()),
+                                    "outerPadding":"0px",
+                                    "highlight":false
+                                })
+                            }
+                        });
+                    });
+
+
+                });
+            }
+        }
 		
 		this.panelGraphElementViewSelected = function(api, featureToBrowse, objectId, onComplete) {
 			var that = this,
@@ -437,18 +444,6 @@ Rexster.modules.graph = function(api) {
 			
 			containerPanelElementViewer.find(".ui-widget-header").text(elementHeaderTitle);
 
-			// display the extensions available on the element that are "GET" based
-			var showElementExtensions = function(element) {
-                $("#panelElementExtensions").empty()
-                if (element.extensions == undefined || element.extensions.length == 0) {
-                    $("#panelElementExtensions").append("<li>No extensions.</li>")
-                } else {
-                    Rexster("template", function(innerApi) {
-                        innerApi.applyListExtensionList(element.extensions, "#panelElementExtensions")
-                    });
-                }
-			}
-			
 			if (featureToBrowse === "vertices") {
 				$("#panelElementViewerLeft h3").text("In");
 				$("#panelElementViewerRight h3").text("Out");
@@ -469,7 +464,7 @@ Rexster.modules.graph = function(api) {
 						}
 				    });
 
-				    //showElementExtensions(result);
+				    showElementExtensions(result);
 				}, 
 				function(err) {
 				},
@@ -533,7 +528,7 @@ Rexster.modules.graph = function(api) {
 						"jsonData": element,
 						"outerPadding":"0px"});
 
-				    //showElementExtensions(result);
+				    showElementExtensions(result);
 
 					$("#panelElementViewerRight .intense .value").text("");
 					$("#panelElementViewerRight .intense .label").text("");
@@ -688,13 +683,15 @@ Rexster.modules.graph = function(api) {
 			if (end != undefined) {
 				endPoint = end;
 			}
-			
+
+			$("#panelExtensionsContainer").hide();
+
 			currentFeatureBrowsed = featureToBrowse;
 
 			containerPanelElementViewer.hide();
 			containerPanelBrowser.show();
 			
-			containerPanelBrowser.find(".pager").show();;
+			containerPanelBrowser.find(".pager").show();
 			
 			this.panelGraphNavigationPaged(api, startPoint, endPoint, function() {
 				// it is expected that the onComplete will call Elastic.refresh() 

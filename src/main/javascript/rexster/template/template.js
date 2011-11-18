@@ -11,7 +11,6 @@ Rexster.modules.template = function(api) {
 	templater.templateNameListVertexViewInEdgeList = "listVertexViewInEdgeList";
 	templater.templateNameListVertexViewOutEdgeList = "listVertexViewOutEdgeList";
 	templater.templateNameListExtensionList = "listExtensionList";
-	templater.templateNameListExtensionParameterEntries = "listExtensionParameterEntries";
 	
 	templater.init = function() {
 		// expects {id, menuName, [checked], [disabled]}
@@ -37,10 +36,6 @@ Rexster.modules.template = function(api) {
         // expects {href, title, parameters[]}
 		var templateListExtensionList = '<h3><a href="#" {{if description}}title="${description}"{{/if}}>${title}</a></h3><div><form><fieldset><label for="extensionUri">Extension URI</label><input type="text" name="extensionUri" class="text ui-widget-content ui-corner-all" value="${href}" />{{each parameters}}<label for="${name}">${name}</label><input type="text" name="${name}" class="text ui-widget-content ui-corner-all" title="${description}" />{{/each}}</fieldset></form><a href="#" title="${title}">Execute</a></div>';
 		$.template(templater.templateNameListExtensionList, templateListExtensionList);
-
-        // expects {name, description}
-		var templateListExtensionParameterEntries = '<label for="${name}">${name}</label><input type="text" name="${name}" class="text ui-widget-content ui-corner-all" title="${description}" />';
-		$.template(templater.templateNameListExtensionParameterEntries, templateListExtensionParameterEntries);
 
 	}
 	
@@ -106,10 +101,6 @@ Rexster.modules.template = function(api) {
 	api.applyListExtensionList = function(data, selector) {
 	    templater.applyTemplate(templater.templateNameListExtensionList,
 	                            data.filter(function(extension){ return extension.op === "GET" }), selector);
-	}
-
-	api.applyListExtensionParameterEntries = function(data, selector) {
-	    templater.applyTemplate(templater.templateNameListExtensionParameterEntries, data, selector);
 	}
 
 };
