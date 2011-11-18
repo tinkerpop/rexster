@@ -18,7 +18,8 @@
                 'highlight':'json-widget-highlight',
                 'header':'json-widget-header',
                 'content' :'json-widget-content'
-            }
+            },
+            'highlight' : true
         };
         
         if (settings) $.extend(config, settings);
@@ -42,9 +43,11 @@
 	        $(container).addClass('json-widget').css({'padding': config['outerPadding'], 'padding-left': config['ident'] });
 	        
 	        // highlight on hover
-	        $(container).hover(function(event) {
-	        	$(container).children().toggleClass(config.overrideCss.highlight);
-	        });
+	        if (config.highlight === true) {
+                $(container).hover(function(event) {
+                    $(container).children().toggleClass(config.overrideCss.highlight);
+                });
+            }
 	        
 	        if (v.type() == "object" || v.type() == "array") {
 	        	var header = $('<div/>');

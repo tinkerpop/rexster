@@ -75,38 +75,73 @@ Rexster.modules.graph = function(api) {
 				$("#panelGraphDetail").text(graphResult.graph);
 
                 // display the extensions available on the graph that are "GET" based
+                $("#panelGraphExtensions").accordion("destroy");
                 $("#panelGraphExtensions").empty()
 				if (graphResult.extensions == undefined || graphResult.extensions.length == 0) {
                     $("#panelGraphExtensions").append("<li>No extensions configured for this graph.</li>")
 				} else {
 				    Rexster("template", function(innerApi) {
                         innerApi.applyListExtensionList(graphResult.extensions, "#panelGraphExtensions");
+                        $("#panelGraphExtensions").accordion({
+                            autoHeight: false,
+                            collapsible: true,
+                            navigation: true,
+                            active: false
+                        });
 
-                        $("#panelGraphExtensions > li > a").button({ icons: {primary:"ui-icon-circle-arrow-e"}});
-                        $("#panelGraphExtensions > li > a").unbind("click");
-                        $("#panelGraphExtensions > li > a").click(function(e) {
+                        $("#panelGraphExtensions > div > a").button({ icons: {primary:"ui-icon-circle-arrow-e"}});
+                        $("#panelGraphExtensions > div > a").unbind("click");
+                        $("#panelGraphExtensions > div > a").click(function(e) {
                             e.preventDefault();
 
-                            var selectedExtension = this.textContent;
-
-                            $("#dialogForm > form > fieldset > input:gt(1)").remove();
-                            $("#dialogForm > form > fieldset > label:gt(1)").remove();
-
-                            // find the parameters for the current extension selected that are gets.
-                            var parametersForThisExtension = graphResult.extensions.filter(function(extension){
-                                return extension.title == selectedExtension && extension.op === "GET";
-                            })[0].parameters;
-
-                            // create the parameter entry form.
-                            if (parametersForThisExtension && parametersForThisExtension.length > 0) {
-                                innerApi.applyListExtensionParameterEntries(parametersForThisExtension, "#dialogForm > form > fieldset");
-                            }
-
-                            $("#dialogForm :input[name='extensionUri']").val(this.href);
                             $("#dialogForm").dialog("open");
-                            $("#dialogForm").dialog("option", "title", this.textContent);
+                            $("#dialogForm").dialog("option", "title", this.title);
 
+                            var firstParameter = true;
+                            var extensionUriWithParameters = "";
+                            $(this).parent().find("form > fieldset > :input").each(function(index, textbox) {
+                                if (index === 0) {
+                                    extensionUriWithParameters = $(textbox).val();
+                                } else {
+                                    if ($(textbox).val() != "") {
+                                        if (firstParameter) {
+                                            extensionUriWithParameters = extensionUriWithParameters + "?" + $(textbox).attr("name") + "=" + $(textbox).val();
+                                            firstParameter = false;
+                                        } else {
+                                            extensionUriWithParameters = extensionUriWithParameters + "&" + $(textbox).attr("name") + "=" + $(textbox).val();
+                                        }
+                                    }
+                                }
+                            });
+
+                            $.ajax({
+                                url: extensionUriWithParameters,
+                                accepts:{
+                                  json: "application/json"
+                                },
+                                type: "GET",
+                                dataType:"json",
+                                success: function(result) {
+                                    $("#dialogForm > div").jsonviewer({
+                                        "jsonName": "Rexster Extension Results",
+                                        "jsonData": result,
+                                        "outerPadding":"0px",
+                                        "highlight":false
+                                    });
+                                },
+                                error: function(e) {
+                                    $("#dialogForm > div").empty();
+                                    $("#dialogForm > div").jsonviewer({
+                                        "jsonName": "Rexster Extension Results [ERROR]",
+                                        "jsonData": result,
+                                        "outerPadding":"0px",
+                                        "highlight":false
+                                    })
+                                }
+                            });
                         });
+
+
                     });
 				}
 			},
@@ -434,7 +469,7 @@ Rexster.modules.graph = function(api) {
 						}
 				    });
 
-				    showElementExtensions(result);
+				    //showElementExtensions(result);
 				}, 
 				function(err) {
 				},
@@ -498,7 +533,7 @@ Rexster.modules.graph = function(api) {
 						"jsonData": element,
 						"outerPadding":"0px"});
 
-				    showElementExtensions(result);
+				    //showElementExtensions(result);
 
 					$("#panelElementViewerRight .intense .value").text("");
 					$("#panelElementViewerRight .intense .label").text("");
@@ -784,14 +819,10 @@ Rexster.modules.graph = function(api) {
 
 				$("#dialogForm").dialog({
                     autoOpen: false,
-                    height: 500,
-                    width: 600,
+                    height: 550,
+                    width: 700,
                     modal: true,
                     buttons: {
-                        "Execute": function() {
-                            var extensionToCall = extensionUri.val();
-
-                        },
                         Cancel: function() {
                             $(this).dialog("close");
                         }

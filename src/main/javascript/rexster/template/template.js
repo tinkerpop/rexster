@@ -34,8 +34,8 @@ Rexster.modules.template = function(api) {
 		var templateListVertexViewOutEdgeList = '<li><a href="/doghouse/main/graph/${currentGraphName}/vertices/${_outV}">${_outV}</a> - <a href="/doghouse/main/graph/${currentGraphName}/edges/${_id}">${_label}</a> - ${_inV}</li>';
 		$.template(templater.templateNameListVertexViewOutEdgeList, templateListVertexViewOutEdgeList);
 
-        // expects {href, title}
-		var templateListExtensionList = '<li><a href="${href}" {{if description}}title="${description}"{{/if}}>${title}</a></li>';
+        // expects {href, title, parameters[]}
+		var templateListExtensionList = '<h3><a href="#" {{if description}}title="${description}"{{/if}}>${title}</a></h3><div><form><fieldset><label for="extensionUri">Extension URI</label><input type="text" name="extensionUri" class="text ui-widget-content ui-corner-all" value="${href}" />{{each parameters}}<label for="${name}">${name}</label><input type="text" name="${name}" class="text ui-widget-content ui-corner-all" title="${description}" />{{/each}}</fieldset></form><a href="#" title="${title}">Execute</a></div>';
 		$.template(templater.templateNameListExtensionList, templateListExtensionList);
 
         // expects {name, description}
