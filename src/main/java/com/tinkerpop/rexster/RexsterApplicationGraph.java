@@ -277,7 +277,16 @@ public class RexsterApplicationGraph {
                                     final HashMap<String, Object> hypermediaLink = new HashMap<String, Object>();
                                     hypermediaLink.put("href", href);
                                     hypermediaLink.put("op", definition.method().name());
-                                    hypermediaLink.put("title", currentExtensionName);
+                                    hypermediaLink.put("namespace", currentExtensionNamespace);
+                                    hypermediaLink.put("name", currentExtensionName);
+
+                                    String path = definition.path();
+                                    if (path != null && !path.isEmpty()){
+                                        hypermediaLink.put("path", path);
+                                        hypermediaLink.put("title", currentExtensionNamespace + ":" + currentExtensionName + "-" + path);
+                                    } else {
+                                        hypermediaLink.put("title", currentExtensionNamespace + ":" + currentExtensionName);
+                                    }
 
                                     // descriptor is not a required annotation for extensions.
                                     if (descriptor != null) {
@@ -291,8 +300,8 @@ public class RexsterApplicationGraph {
                                         || descriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_DESCRIPTOR_ONLY) {
                                         for (final ExtensionApi extensionApi : descriptor.api()) {
                                             queryStringParameters.put(new HashMap<String, String>(){{
-                                                        put("name", extensionApi.parameterName());
-                                                        put("description", extensionApi.description());
+                                                put("name", extensionApi.parameterName());
+                                                put("description", extensionApi.description());
                                             }});
                                         }
                                     }
