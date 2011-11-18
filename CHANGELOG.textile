@@ -34,6 +34,7 @@ h3. Version 0.7 (Brian -- NOT OFFICIALLY RELEASED YET)
 ** The name of the extension (not just the description).
 * Dog House has Rexster Extension support
 ** List all configured extensions for graphs, vertices and edges.
+** Launch extensions that can be accessed with a GET and that return JSON.
 
 ==<hr/>==
 
