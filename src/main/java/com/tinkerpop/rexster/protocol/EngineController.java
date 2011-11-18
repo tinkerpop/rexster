@@ -14,13 +14,24 @@ public class EngineController {
     private final ScriptEngineManager manager = new ScriptEngineManager();
     private final List<EngineHolder> engines = new ArrayList<EngineHolder>();
 
+    /**
+     * Add all flavors of gremlin to this list.
+     */
+    private final List<String> gremlinEngineNames = new ArrayList<String>(){{
+       add("gremlin");
+    }};
+
     private static EngineController engineController;
 
     private EngineController() {
         // for ruby
         System.setProperty("org.jruby.embed.localvariable.behavior", "persistent");
         for (ScriptEngineFactory factory : this.manager.getEngineFactories()) {
-            this.engines.add(new EngineHolder(factory));
+
+            // only add engine factories for those languages that are gremlin based.
+            if (gremlinEngineNames.contains(factory.getLanguageName())) {
+                this.engines.add(new EngineHolder(factory));
+            }
         }
     }
 
