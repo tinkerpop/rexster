@@ -3,7 +3,7 @@ package com.tinkerpop.rexster.extension;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.gremlin.groovy.jsr223.GremlinScriptEngine;
+import com.tinkerpop.gremlin.groovy.jsr223.GremlinGroovyScriptEngine;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.gremlin.converter.JSONResultConverter;
@@ -22,7 +22,7 @@ import java.util.List;
 public class GremlinExtension extends AbstractRexsterExtension {
     protected static Logger logger = Logger.getLogger(GremlinExtension.class);
 
-    private final static ScriptEngine engine = new GremlinScriptEngine();
+    private final static ScriptEngine engine = new GremlinGroovyScriptEngine();
     private static final String GRAPH_VARIABLE = "g";
     private static final String VERTEX_VARIABLE = "v";
     private static final String EDGE_VARIABLE = "e";

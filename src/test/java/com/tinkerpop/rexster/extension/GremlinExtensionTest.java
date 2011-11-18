@@ -39,7 +39,7 @@ public class GremlinExtensionTest {
             httpServletRequest, null, null, extensionMethodNoApi);
 
     /**
-     * Choosing not to mock Graph instance for these tests as GremlinScriptEngine is
+     * Choosing not to mock Graph instance for these tests as GremlinGroovyScriptEngine is
      * embedded into the GremlinExtension.
      */
     @BeforeClass

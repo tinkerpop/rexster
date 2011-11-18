@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.gremlin;
 
-import com.tinkerpop.gremlin.groovy.jsr223.GremlinScriptEngine;
+import com.tinkerpop.gremlin.groovy.jsr223.GremlinGroovyScriptEngine;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
@@ -24,7 +24,7 @@ public class GremlinFactory {
 
     public static ScriptEngine createGremlinScriptEngine(Map<String, Object> context) {
         try {
-            ScriptEngine engine = new GremlinScriptEngine();
+            ScriptEngine engine = new GremlinGroovyScriptEngine();
 
             Bindings bindings = new SimpleBindings();
             bindings.putAll(context);
