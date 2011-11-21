@@ -7,8 +7,6 @@
 
     <property name="git-repo.src" value="git@github.com:spmallette/rexster.git"/>
     <property name="git-repo.wiki" value="git@github.com:tinkerpop/rexster.wiki.git"/>
-    
-    <property name="git.install" value="/usr/bin"/>
 
     <macrodef name="git">
 		<attribute name="command" />
@@ -121,7 +119,7 @@
         <delete dir="${release.dir}"/>
     </target>
 
-    <target name="git-clone" description="get a fresh clone of Rexster from git" depends="clean">
+    <target name="git-clone" description="get a fresh clone of ${ant.project.name} from git" depends="clean">
         <mkdir dir="${release.src.dir}"/>
         <mkdir dir="${release.wiki.dir}"/>
         <echo>Cloning ${ant.project.name} source.</echo>
@@ -169,7 +167,7 @@
         </fail>
         <fail unless="release.subname">The release.subname property must be set with -Drelease.subname=&lt;subname&gt; to specify the the subname of this release.
         </fail>
-        <echo>Start releasing Rexster ${release.version}.</echo>
+        <echo>Start releasing ${ant.project.name} ${release.version}.</echo>
 
         <input message="Are you sure it's time to release ${ant.project.name} ${release.version} ${release.subname}?" validargs="y,n" addproperty="release.confirmation"/>
 
