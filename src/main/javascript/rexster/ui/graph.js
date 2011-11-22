@@ -362,9 +362,10 @@ Rexster.modules.graph = function(api) {
                         e.preventDefault();
 
                         // clear the space where the JSON Viewer puts results
-                        $("#dialogForm > div").empty();
+                        $("#dialogForm > #dialogFormJsonViewer").empty();
                         $("#dialogForm").dialog("open");
                         $("#dialogForm").dialog("option", "title", this.title);
+                        $("#dialogForm > #dialogFormLoading").show();
 
                         var firstParameter = true;
                         var extensionUriWithParameters = "";
@@ -391,7 +392,7 @@ Rexster.modules.graph = function(api) {
                             type: "GET",
                             dataType:"json",
                             success: function(result) {
-                                $("#dialogForm > div").jsonviewer({
+                                $("#dialogForm > #dialogFormJsonViewer").jsonviewer({
                                     "jsonName": "Rexster Extension Results",
                                     "jsonData": result,
                                     "outerPadding":"0px",
@@ -399,13 +400,16 @@ Rexster.modules.graph = function(api) {
                                 });
                             },
                             error: function(e) {
-                                $("#dialogForm > div").empty();
-                                $("#dialogForm > div").jsonviewer({
+                                $("#dialogForm > #dialogFormJsonViewer").empty();
+                                $("#dialogForm > #dialogFormJsonViewer").jsonviewer({
                                     "jsonName": "Rexster Extension Results [ERROR]",
                                     "jsonData": JSON.parse(e.response()),
                                     "outerPadding":"0px",
                                     "highlight":false
                                 })
+                            },
+                            complete: function() {
+                                $("#dialogForm > #dialogFormLoading").hide();
                             }
                         });
                     });
@@ -820,7 +824,7 @@ Rexster.modules.graph = function(api) {
                     width: 700,
                     modal: true,
                     buttons: {
-                        Cancel: function() {
+                        "Close": function() {
                             $(this).dialog("close");
                         }
                     }
