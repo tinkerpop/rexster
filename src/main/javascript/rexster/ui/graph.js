@@ -396,7 +396,8 @@ Rexster.modules.graph = function(api) {
                                     "jsonName": "Rexster Extension Results",
                                     "jsonData": result,
                                     "outerPadding":"0px",
-                                    "highlight":false
+                                    "highlight":false,
+                                    "showId":true
                                 });
                             },
                             error: function(e) {

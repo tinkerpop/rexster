@@ -14,6 +14,7 @@
             'innerPadding': '2px',
             'outerPadding': '4px',
             'debug' : false,
+            'showId' : false,
             'overrideCss' : {
                 'highlight':'json-widget-highlight',
                 'header':'json-widget-header',
@@ -34,7 +35,7 @@
 
     function format_value(element, name, data, config, showToolbar) {
         //debug('name=' + name + "; data=" + data);
-    	var isMetaData = name === "_type" || name === "_id" || name === "_outV" || name === "_inV" || name === "_label"; 
+    	var isMetaData = name === "_type" || (name === "_id" && !config['showId']) || name === "_outV" || name === "_inV" || name === "_label";
     	if (!isMetaData) {
 	        var v = new TypeHandler(data);
 	        var typePrefix = v.type().charAt(0);
