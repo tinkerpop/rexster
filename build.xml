@@ -1,3 +1,22 @@
+<!--
+Prerequisites:
++ Wiki and Release Notes must be in a release state.  For example, change the main wiki page to have the <dependency>
+  point to the latest version. Change the main Wiki page to have the JavaDoc pointer point to where the latest version
+  JavaDoc will be (for library projects only). Make sure the changelog.textile has the release date of the current
+  version.  Delete old docs/wiki directory.
++ Bump the pom.xml of the project (requires the bumping of all depended on TinkerPop projects too) - for Gremlin
+  and Rexster the Tokens.java public static String VERSION needs to be bumped.
++ A smart check is to run mvn clean install just prior to executing this script to be sure that build errors don't
+  block the release.
++ Commit/push the above changes
+
+Execute with:
+ant release -Drelease.version={version-number} -Drelease.subname={release-name}
+
+Post run:
++ For Gremlin and Rexster (apps as opposed to libraries), upload the project-x.y.zip to the downloads section
+  of the project.
+-->
 <project name="Rexster" basedir="." default="release">
 
     <property name="release.dir" value="release"/>
@@ -130,6 +149,8 @@
 
     <target name="wiki-work" description="manipulate the wiki, copy to project docs, and push to github">
         <echo>Processing wiki</echo>
+        <mkdir dir="${release.src.dir}/doc/wiki"/>
+
         <copy file="${release.src.dir}/CHANGELOG.textile" overwrite="true" tofile="${release.wiki.dir}/Release-Notes.textile"
                   description="copy the latest changelog to the release notes in the wiki"/>
 
