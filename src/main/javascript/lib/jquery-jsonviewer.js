@@ -20,13 +20,14 @@
                 'header':'json-widget-header',
                 'content' :'json-widget-content'
             },
-            'highlight' : true
+            'highlight' : true,
+            'showToolbar' : true
         };
         
         if (settings) $.extend(config, settings);
         
         this.each(function(key, element) {
-            format_value(element, config['jsonName'], config['jsonData'], config, true);
+            format_value(element, config['jsonName'], config['jsonData'], config, config['showToolbar']);
         });
         
         return this;
@@ -55,7 +56,7 @@
 		        $(header).appendTo(container);
 		        $(header).addClass(config.overrideCss.header + ' ui-corner-top')
 		            .css({ 'cursor': 'hand', //'float': 'left',
-		                'text-align': 'left', 'white-space': 'nowrap'
+		                'text-align': 'left'
 		            });
 		        $(header).text('' + (config['typePrefix'] ? "(" + typePrefix + ")" : "") + name);
 	        	

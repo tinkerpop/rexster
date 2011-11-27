@@ -98,7 +98,7 @@ Rexster.modules.ajax = function(api) {
 	
 	api.getVertexEdges = function(graphName, vertex, onSuccess, onFail, asynchronous) {
 		$.ajax({
-			  url: baseUri + graphName + "/vertices/" + vertex + "/bothE",
+			  url: baseUri + graphName + "/vertices/" + encodeURIComponent(vertex) + "/bothE",
 			  accepts:{
 			    json: rexsterMimeType
 			  },
@@ -112,7 +112,7 @@ Rexster.modules.ajax = function(api) {
 	
 	api.getVertexInEdges = function(graphName, vertex, onSuccess, onFail, asynchronous) {
 		$.ajax({
-			  url: baseUri + graphName + "/vertices/" + vertex + "/inE",
+			  url: baseUri + graphName + "/vertices/" + encodeURIComponent(vertex) + "/inE",
 			  accepts:{
 			    json: rexsterMimeType
 			  },
@@ -126,7 +126,7 @@ Rexster.modules.ajax = function(api) {
 	
 	api.getVertexOutEdges = function(graphName, vertex, onSuccess, onFail, asynchronous) {
 		$.ajax({
-			  url: baseUri + graphName + "/vertices/" + vertex + "/outE",
+			  url: baseUri + graphName + "/vertices/" + encodeURIComponent(vertex) + "/outE",
 			  accepts:{
 			    json: rexsterMimeType
 			  },
@@ -140,7 +140,7 @@ Rexster.modules.ajax = function(api) {
 	
 	api.getVertexElement = function(graphName, vertex, onSuccess, onFail, asynchronous) {
 		$.ajax({
-			  url: baseUri + graphName + "/vertices/" + vertex,
+			  url: baseUri + graphName + "/vertices/" + encodeURIComponent(vertex),
 			  accepts:{
 			    json: rexsterMimeType
 			  },
@@ -154,7 +154,7 @@ Rexster.modules.ajax = function(api) {
 	
 	api.getEdgeElement = function(graphName, edge, onSuccess, onFail, asynchronous) {
 		$.ajax({
-			  url: baseUri + graphName + "/edges/" + edge,
+			  url: baseUri + graphName + "/edges/" + encodeURIComponent(edge),
 			  accepts:{
 			    json: rexsterMimeType
 			  },

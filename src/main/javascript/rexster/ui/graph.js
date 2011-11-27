@@ -19,7 +19,8 @@ Rexster.modules.graph = function(api) {
 			 currentFeatureBrowsed = "",
 			 currentPageStart = 0,
 			 currentTotal = 0,
-			 pageSize = 10;
+			 pageSize = 10,
+			 isSail = false;
 		
 		if (!(this instanceof GraphPanelMediator)) {
 			return new GraphPanelMediator();
@@ -56,8 +57,9 @@ Rexster.modules.graph = function(api) {
             // look to hide the browser vertices button because sail graphs have infinite vertices.
             containerPanelGraphMenu.find("a[_type='vertices']").show();
 			api.getGraph(currentGraphName, function(result){
-			    if (result.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.MemoryStoreSailGraph"
-			        || result.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.NativeStoreSailGraph") {
+			    isSail = result.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.MemoryStoreSailGraph"
+			        || result.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.NativeStoreSailGraph";
+			    if (isSail) {
                     containerPanelGraphMenu.find("a[_type='vertices']").hide();
 			    }
 			});
@@ -234,7 +236,7 @@ Rexster.modules.graph = function(api) {
 						var split = uri.split("/");
 	                	api.historyPush(uri);
 						
-						that.panelGraphElementViewSelected(api, split[5], split[6]);
+						that.panelGraphElementViewSelected(api, split[5], split.slice(6).join("/"));
 
 					});
 
@@ -243,13 +245,15 @@ Rexster.modules.graph = function(api) {
                             "jsonName": "#" + (pageStart + ix + 1) + " | " + metaDataLabel,
                             "jsonData": results[ix],
                             "outerPadding":"0px",
-                            "toolbar": toolbar});
+                            "toolbar": toolbar,
+                            "showToolbar" : !isSail});
                     } else {
 						containerPanelBrowserMain.children().last().jsonviewer({
                             "jsonName": "#" + (pageStart + ix + 1) + " | " + metaDataLabel,
                             "jsonData": results[ix],
                             "outerPadding":"0px",
                             "toolbar": toolbar,
+                            "showToolbar" : !isSail,
                             "overrideCss" : {
                                 "highlight":"json-widget-highlight-vertex",
                                 "header":"json-widget-header-vertex",
@@ -516,7 +520,7 @@ Rexster.modules.graph = function(api) {
                 	api.historyPush(uri);
                 	
                 	// don't want the refresh to be called so pass an empty function
-					that.panelGraphElementViewSelected(api, split[5], split[6]);
+					that.panelGraphElementViewSelected(api, split[5], split.slice(6).join("/"));
 				});
 			} else {
 
@@ -582,7 +586,7 @@ Rexster.modules.graph = function(api) {
 							var split = uri.split("/");
 		                	api.historyPush(uri);
 							
-						    that.panelGraphElementViewSelected(api, split[5], split[6]);
+						    that.panelGraphElementViewSelected(api, split[5], split.slice(6).join("/"));
 						});
 						
 						$("#panelElementViewerRight > ul").jsonviewer({ 
@@ -590,6 +594,7 @@ Rexster.modules.graph = function(api) {
 							"jsonData": element,
 							"outerPadding":"0px",
 							"toolbar":toolbar,
+                            "showToolbar" : !isSail,
                             "overrideCss" : {
                                 "highlight":"json-widget-highlight-vertex",
                                 "header":"json-widget-header-vertex",
@@ -637,7 +642,7 @@ Rexster.modules.graph = function(api) {
 							var split = uri.split("/");
 		                	api.historyPush(uri);
 								
-							that.panelGraphElementViewSelected(api, split[5], split[6]);
+							that.panelGraphElementViewSelected(api, split[5], split.slice(6).join("/"));
 						});
 						
 						$("#panelElementViewerLeft > ul").jsonviewer({ 
@@ -645,6 +650,7 @@ Rexster.modules.graph = function(api) {
 							"jsonData": element,
 							"outerPadding":"0px",
 							"toolbar":toolbar,
+                            "showToolbar" : !isSail,
                             "overrideCss" : {
                                 "highlight":"json-widget-highlight-vertex",
                                 "header":"json-widget-header-vertex",
