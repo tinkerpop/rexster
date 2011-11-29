@@ -389,7 +389,7 @@ public class RexsterConsole {
 
         String host = "localhost";
         int port = 8184;
-        String language = "gremlin";
+        String language = "gremlin-groovy";
         int timeout = RexPro.DEFAULT_TIMEOUT_SECONDS;
 
         if (line.hasOption("rexsterhost")) {
