@@ -389,6 +389,16 @@ Rexster.modules.graph = function(api) {
                             }
                         });
 
+                        $("#dialogFormUriText").val(extensionUriWithParameters);
+                        $("#dialogFormUriText").select();
+
+                        $("#dialogFormUriText").unbind("click")
+                        $("#dialogFormUriText").click(function(evt)
+                        {
+                            evt.preventDefault();
+                            $(this).select();
+                        });
+
                         $.ajax({
                             url: extensionUriWithParameters,
                             accepts:{
