@@ -8,7 +8,6 @@ Rexster is a multi-faceted graph server that exposes any "Blueprints":http://blu
   ** "OrientDB":http://www.orientechnologies.com/ graph database
   ** "DEX":http://www.sparsity-technologies.com/dex graph database
   ** "Sesame 2.0":http://www.openrdf.org compliant RDF stores
-  **** "MemoryStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e705, "NativeStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e746, "LinkedDataSail":http://code.google.com/p/ripple/wiki/LinkedDataSail
 
 Rexster provides a browser-based user interface known as "The Dog House":https://github.com/tinkerpop/rexster/wiki/The-Dog-House. This interface allows for viewing vertices, edges, and their related properties. It also includes a console for executing "Gremlin":http://gremlin.tinkerpop.com scripts.
 
