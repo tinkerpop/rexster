@@ -58,7 +58,8 @@ Rexster.modules.graph = function(api) {
             containerPanelGraphMenu.find("a[_type='vertices']").show();
 			api.getGraph(currentGraphName, function(result){
 			    isSail = result.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.MemoryStoreSailGraph"
-			        || result.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.NativeStoreSailGraph";
+			        || result.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.NativeStoreSailGraph"
+			        || result.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.SparqlRepositorySailGraph";
 			    if (isSail) {
                     containerPanelGraphMenu.find("a[_type='vertices']").hide();
 			    }
