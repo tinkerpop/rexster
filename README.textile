@@ -2,12 +2,11 @@
 
 Rexster is a multi-faceted graph server that exposes any "Blueprints":http://blueprints.tinkerpop.com graph through several mechanisms with a general focus on REST. Extensions support standard traversal goals such as search, score, rank, and, in concert, recommendation. Rexster makes extensive use of "Blueprints":http://blueprints.tinkerpop.com, "Pipes":http://pipes.tinkerpop.com, and "Gremlin":http://gremlin.tinkerpop.com. In this way its possible to run Rexster over various graph systems including:
 
-  * Implementations:
-  ** "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory graph
-  ** "Neo4j":http://neo4j.org/ graph database
-  ** "OrientDB":http://www.orientechnologies.com/ graph database
-  ** "DEX":http://www.sparsity-technologies.com/dex graph database
-  ** "Sesame 2.0":http://www.openrdf.org compliant RDF stores
+ * "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory graph
+ * "Neo4j":http://neo4j.org/ graph database
+ * "OrientDB":http://www.orientechnologies.com/ graph database
+ * "DEX":http://www.sparsity-technologies.com/dex graph database
+ * "Sesame 2.0":http://www.openrdf.org compliant RDF stores
 
 Rexster provides a browser-based user interface known as "The Dog House":https://github.com/tinkerpop/rexster/wiki/The-Dog-House. This interface allows for viewing vertices, edges, and their related properties. It also includes a console for executing "Gremlin":http://gremlin.tinkerpop.com scripts.
 
