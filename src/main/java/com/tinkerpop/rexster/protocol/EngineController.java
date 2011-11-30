@@ -15,7 +15,12 @@ public class EngineController {
     private final List<EngineHolder> engines = new ArrayList<EngineHolder>();
 
     /**
-     * Add all flavors of gremlin to this list.
+     * All gremlin engines are prefixed with this value.
+     */
+    private static final String ENGINE_NAME_PREFIX = "gremlin-";
+
+    /**
+     * Add all flavors of gremlin to this list. This should be the true name of the language.
      */
     private final List<String> gremlinEngineNames = new ArrayList<String>(){{
        add("gremlin-groovy");
@@ -46,7 +51,8 @@ public class EngineController {
     public Iterator getAvailableEngineLanguages() {
         List<String> languages = new ArrayList<String>();
         for (EngineHolder engine : this.engines) {
-            languages.add(engine.getLanguageName());
+            String fullLanguageName = engine.getLanguageName();
+            languages.add(fullLanguageName.substring(fullLanguageName.indexOf(ENGINE_NAME_PREFIX) + ENGINE_NAME_PREFIX.length()));
         }
 
         return languages.iterator();
@@ -54,7 +60,7 @@ public class EngineController {
 
     public EngineHolder getEngineByLanguageName(String languageName) throws ScriptException {
         for (EngineHolder engine : this.engines) {
-            if (engine.getLanguageName().equals(languageName))
+            if (engine.getLanguageName().equals(ENGINE_NAME_PREFIX + languageName))
                 return engine;
         }
 
