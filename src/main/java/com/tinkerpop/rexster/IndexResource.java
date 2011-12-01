@@ -6,7 +6,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.util.json.JSONWriter;
+import com.tinkerpop.blueprints.pgm.util.json.GraphSONFactory;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.util.ElementHelper;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
@@ -165,7 +165,7 @@ public class IndexResource extends AbstractSubResource {
                 JSONArray elementArray = new JSONArray();
                 for (Element element : (Iterable<Element>) index.get(key, value)) {
                     if (counter >= start && counter < end) {
-                        elementArray.put(JSONWriter.createJSONElement(element, returnKeys, showTypes));
+                        elementArray.put(GraphSONFactory.createJSONElement(element, returnKeys, showTypes));
                     }
                     counter++;
                 }

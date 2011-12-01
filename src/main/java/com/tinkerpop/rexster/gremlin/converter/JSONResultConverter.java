@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.gremlin.converter;
 
 import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.util.json.JSONWriter;
+import com.tinkerpop.blueprints.pgm.util.json.GraphSONFactory;
 import com.tinkerpop.pipes.util.Table;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -98,9 +98,9 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
         }
         if (object instanceof Element) {
             if (returnKeys == null) {
-                return JSONWriter.createJSONElement((Element) object, null, showTypes);
+                return GraphSONFactory.createJSONElement((Element) object, null, showTypes);
             } else {
-                return JSONWriter.createJSONElement((Element) object, returnKeys, showTypes);
+                return GraphSONFactory.createJSONElement((Element) object, returnKeys, showTypes);
             }
         } else if (object instanceof Map) {
             JSONObject jsonObject = new JSONObject();

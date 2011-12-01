@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.util.json.JSONWriter;
+import com.tinkerpop.blueprints.pgm.util.json.GraphSONFactory;
 import com.tinkerpop.rexster.extension.ExtensionMethod;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceConfigurationError;
-import java.util.Set;
 
 @Path("/graphs/{graphname}/vertices")
 public class VertexResource extends AbstractSubResource {
@@ -96,7 +95,7 @@ public class VertexResource extends AbstractSubResource {
             for (Vertex vertex : rag.getGraph().getVertices()) {
                 if (counter >= start && counter < end) {
                     wasInSection = true;
-                    vertexArray.put(JSONWriter.createJSONElement(vertex, returnKeys, showTypes));
+                    vertexArray.put(GraphSONFactory.createJSONElement(vertex, returnKeys, showTypes));
                 } else if (wasInSection) {
                     break;
                 }
@@ -161,7 +160,7 @@ public class VertexResource extends AbstractSubResource {
                 JSONObject theRequestObject = this.getRequestObject();
                 List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
-                this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(vertex, returnKeys, showTypes));
+                this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(vertex, returnKeys, showTypes));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
                 if (showHypermedia) {
@@ -471,7 +470,7 @@ public class VertexResource extends AbstractSubResource {
 
                     for (Edge edge : itty) {
                         if (counter >= start && counter < end) {
-                            edgeArray.put(JSONWriter.createJSONElement(edge, returnKeys, showTypes));
+                            edgeArray.put(GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
                         }
                         counter++;
                     }
@@ -487,7 +486,7 @@ public class VertexResource extends AbstractSubResource {
 
                     for (Edge edge : itty) {
                         if (counter >= start && counter < end) {
-                            edgeArray.put(JSONWriter.createJSONElement(edge, returnKeys, showTypes));
+                            edgeArray.put(GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
                         }
                         counter++;
                     }
@@ -503,7 +502,7 @@ public class VertexResource extends AbstractSubResource {
 
                     for (Edge edge : itty) {
                         if (counter >= start && counter < end) {
-                            edgeArray.put(JSONWriter.createJSONElement(edge.getInVertex(), returnKeys, showTypes));
+                            edgeArray.put(GraphSONFactory.createJSONElement(edge.getInVertex(), returnKeys, showTypes));
                         }
                         counter++;
                     }
@@ -519,7 +518,7 @@ public class VertexResource extends AbstractSubResource {
 
                     for (Edge edge : itty) {
                         if (counter >= start && counter < end) {
-                            edgeArray.put(JSONWriter.createJSONElement(edge.getOutVertex(), returnKeys, showTypes));
+                            edgeArray.put(GraphSONFactory.createJSONElement(edge.getOutVertex(), returnKeys, showTypes));
                         }
                         counter++;
                     }
@@ -702,7 +701,7 @@ public class VertexResource extends AbstractSubResource {
             rag.tryStopTransactionSuccess();
 
             List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-            this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(vertex, returnKeys, showTypes));
+            this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(vertex, returnKeys, showTypes));
 
             if (showHypermedia) {
                 JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX, this.getUriPath());
@@ -829,7 +828,7 @@ public class VertexResource extends AbstractSubResource {
             rag.tryStopTransactionSuccess();
 
             List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-            this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(vertex, returnKeys, showTypes));
+            this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(vertex, returnKeys, showTypes));
 
             if (showHypermedia) {
                 JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX, this.getUriPath());

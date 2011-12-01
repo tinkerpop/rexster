@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.util.json.JSONWriter;
+import com.tinkerpop.blueprints.pgm.util.json.GraphSONFactory;
 import com.tinkerpop.rexster.extension.ExtensionMethod;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceConfigurationError;
-import java.util.Set;
 
 @Path("/graphs/{graphname}/edges")
 public class EdgeResource extends AbstractSubResource {
@@ -97,7 +96,7 @@ public class EdgeResource extends AbstractSubResource {
             for (Edge edge : rag.getGraph().getEdges()) {
                 if (counter >= start && counter < end) {
                     wasInSection = true;
-                    edgeArray.put(JSONWriter.createJSONElement(edge, returnKeys, showTypes));
+                    edgeArray.put(GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
                 } else if (wasInSection) {
                     break;
                 }
@@ -158,7 +157,7 @@ public class EdgeResource extends AbstractSubResource {
                 JSONObject theRequestObject = this.getRequestObject();
                 List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
-                this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(edge, returnKeys, showTypes));
+                this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
                 if (showHypermedia) {
@@ -596,7 +595,7 @@ public class EdgeResource extends AbstractSubResource {
                     }
 
                     List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-                    this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(edge, returnKeys, showTypes));
+                    this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
                 } else {
                     // edge could not be found.  likely an error condition on the request
                     JSONObject error = generateErrorObjectJsonFail(new Exception("Edge cannot be found or created.  Please check the format of the request."));
@@ -732,7 +731,7 @@ public class EdgeResource extends AbstractSubResource {
                 }
             }
 
-            this.resultObject.put(Tokens.RESULTS, JSONWriter.createJSONElement(edge, returnKeys, showTypes));
+            this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
 
             rag.tryStopTransactionSuccess();
 
