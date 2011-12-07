@@ -1,4 +1,4 @@
-All releases can be accessed through the TinkerPop Maven2 repository identified below.
+All releases can be accessed through the "TinkerPop":http://tinkerpop.com Maven2 repository identified below.
 
 ```xml
 <repository>
@@ -39,6 +39,7 @@ h3. Version 0.7 (Brian -- December 7, 2011)
 ** Launch extensions that can be accessed with a GET and that return JSON.
 * Dog House is kinder to SailGraph implementations (generally cosmetic changes).
 * Rexster Console only hosts Gremlin-flavored script engine implementations.  Currently, that means that @gremlin-groovy@ is the only exposed language.
+
 
 ==<hr/>==
 

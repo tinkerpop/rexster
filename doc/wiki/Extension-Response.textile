@@ -1,0 +1,50 @@
+All methods to be exposed as extensions must return an @ExtensionResponse@.  The @ExtensionResponse@ is a wrapper for a "Jersey":http://jersey.java.net/ @Response@.  It has a number of static helper methods to simplify its construction and is largely designed to help with the construction of JSON-based responses.
+
+h1. ok
+
+The @ok@ method of the @ExtensionResponse@ will build a response with a 200 status code.  The following is a simple example from the "Sample Kibbles":https://github.com/tinkerpop/rexster-kibbles/tree/master/sample-kibbles project:
+
+```java
+Map<String, String> map = new HashMap<String, String>();
+map.put("ping", reply);
+return ExtensionResponse.ok(map);
+```
+
+The @ok@ method takes a @Map@ as a parameter and converts it to a @JSONObject@ which will be returned as the entity within a Jersey @Response@ object.  It is also possible to build the @JSONObject@ manually and pass that to the @ok@ method as shown here:
+
+h1. error
+
+The @error@ method of the @ExtensionResponse@ will build a response with an error status code.  There are a number of overloads for this method that offer numerous way to construct the object with different return values and error codes.
+
+For example, the following code snippet tries to validate a parameter, called @reply@, from the URI query string:
+
+```java
+if (reply == null || reply.isEmpty()) {
+    ExtensionMethod extMethod = context.getExtensionMethod();
+    return ExtensionResponse.error(
+        "the reply parameter cannot be empty",
+        null,
+        Response.Status.BAD_REQUEST.getStatusCode(),
+        null,
+        generateErrorJson(extMethod.getExtensionApiAsJson()));
+}
+```
+
+h1. noContent
+
+The @noContent@ method of the @ExtensionResponse@ will construct a response with a 204 status code.
+
+h1. availableOptions
+
+the @availableOptions@ method of the @ExtensionResponse@ will construct a response with a 204 status code and include in the header the list of HTTP method supplied.  These methods are added to the @Access-Control-Allow-Methods@ header.  This helper method is useful in implementing the OPTIONS HTTP method within an extension.
+
+h1. Build Your Own With Jersey
+
+Should the basic helper methods of @ExtensionResponse@ not provide enough flexibility, it is possible to construct the Jersey @Response@ manually and pass that directly to the @ExtensionResponse@.  A good reason to construct a Jersey @Response@ object directly, would be if there was a situation where the extension looked to return an entity other than JSON.  
+
+The following code snippet from the @ProducesXmlExtension@ Sample Kibbles shows how this might be done:
+
+```java
+String xml = "<vertex><id>" + vertex.getId().toString() + "</id></vertex>";
+return new ExtensionResponse(Response.ok(xml).build());
+```

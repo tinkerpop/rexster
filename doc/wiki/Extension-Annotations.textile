@@ -1,0 +1,13 @@
+[[http://www.wpclipart.com/animals/dogs/cartoon_dogs/cartoon_dogs_6/cartoon_dog_T.png|width=100px]]
+
+Extensions are identified by implementing the @RexsterExtension@ interface and are defined and exposed through Rexster by way of the @Annotations@ assigned to the extension class and its methods.  
+
+|_. annotation |_. arguments |_. applies to |_. description |
+| @@ExtensionNaming@ | @namespace@, @name@ | class | defines the namespace and identifying extension name |
+| @@ExtensionDescriptor@ | @description@, @api@, @apiBehavior@ | method | meta-data exposed through REST |
+| @@ExtensionApi@ | @parameterName@, @description@ | @ExtensionDescriptor.api@ | defines the parameters of the extension |
+| @@ExtensionDefinition@ | @extensionPoint@, @path@, @tryIncludeRexsterAttributes@, @produces@ | method | defines how the extension is exposed in the REST API |
+| @@RexsterContext@ | | parameter | Rexster will try to inject variables from its context into method parameters |
+| @@ExtensionRequestParameter@ | @name@, @description@ | parameter | Rexster will try to inject the value of the @name@ from the request parameters |
+
+
