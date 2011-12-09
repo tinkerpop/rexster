@@ -322,11 +322,4 @@
             </properties>
         </profile>
     </profiles>
-    <distributionManagement>
-        <repository>
-            <id>tinkerpop-repository</id>
-            <name>TinkerPop Maven2 Repository</name>
-            <url>ftp://ftp.tinkerpop.com:21/public/maven2/</url>
-        </repository>
-    </distributionManagement>
 </project>
