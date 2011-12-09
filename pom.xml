@@ -32,6 +32,12 @@
         </developer>
     </developers>
     <inceptionYear>2009</inceptionYear>
+    <licenses>
+        <license>
+            <name>BSD 3-Clause</name>
+            <url>http://www.opensource.org/licenses/BSD-3-Clause</url>
+        </license>
+    </licenses>
     <scm>
         <connection>scm:git:git@github.com:tinkerpop/rexster.git</connection>
         <developerConnection>scm:git:git@github.com:tinkerpop/rexster.git</developerConnection>
