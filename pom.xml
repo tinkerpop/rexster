@@ -3,6 +3,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
     <groupId>com.tinkerpop</groupId>
     <artifactId>rexster</artifactId>
     <version>0.8-SNAPSHOT</version>
@@ -27,6 +32,17 @@
         </developer>
     </developers>
     <inceptionYear>2009</inceptionYear>
+    <licenses>
+        <license>
+            <name>BSD 3-Clause</name>
+            <url>http://www.opensource.org/licenses/BSD-3-Clause</url>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:git@github.com:tinkerpop/rexster.git</connection>
+        <developerConnection>scm:git:git@github.com:tinkerpop/rexster.git</developerConnection>
+        <url>git@github.com:tinkerpop/rexster.git</url>
+    </scm>
     <dependencies>
         <!-- PROPERTY GRAPH MODEL SUPPORT -->
         <dependency>
@@ -312,11 +328,4 @@
             </properties>
         </profile>
     </profiles>
-    <distributionManagement>
-        <repository>
-            <id>tinkerpop-repository</id>
-            <name>TinkerPop Maven2 Repository</name>
-            <url>ftp://ftp.tinkerpop.com:21/public/maven2/</url>
-        </repository>
-    </distributionManagement>
 </project>
