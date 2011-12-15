@@ -10,6 +10,18 @@ All releases can be accessed through the TinkerPop Maven2 repository identified 
 
 ==<hr/>==
 
+h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
+
+```xml
+ <dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>rexster</artifactId>
+  <version>0.8-SNAPSHOT</version>
+</dependency>
+```
+
+==<hr/>==
+
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-brian.png!
 
 h3. Version 0.7 (Brian -- December 7, 2011)
