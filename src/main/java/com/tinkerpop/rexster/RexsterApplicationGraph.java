@@ -296,8 +296,8 @@ public class RexsterApplicationGraph {
                                     hypermediaLinks.add(hypermediaLink);
 
                                     final JSONArray queryStringParameters = new JSONArray();
-                                    if (descriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
-                                        || descriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_DESCRIPTOR_ONLY) {
+                                    if (descriptor != null && (descriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
+                                        || descriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_DESCRIPTOR_ONLY)) {
                                         for (final ExtensionApi extensionApi : descriptor.api()) {
                                             queryStringParameters.put(new HashMap<String, String>(){{
                                                 put("name", extensionApi.parameterName());
@@ -306,8 +306,8 @@ public class RexsterApplicationGraph {
                                         }
                                     }
 
-                                    if (descriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
-                                        || descriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_PARAMETER_ONLY) {
+                                    if (descriptor != null && (descriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
+                                        || descriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_PARAMETER_ONLY)) {
                                         final Annotation[][] parametersAnnotationSets = method.getParameterAnnotations();
                                         for (Annotation[] parameterAnnotationSet : parametersAnnotationSets) {
                                             for (Annotation annotation : parameterAnnotationSet){
