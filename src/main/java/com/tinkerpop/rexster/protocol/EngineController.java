@@ -58,6 +58,18 @@ public class EngineController {
         return languages.iterator();
     }
 
+    public boolean isEngineAvailable(String languageName) {
+        boolean available = false;
+        try {
+            getEngineByLanguageName(languageName);
+            available = true;
+        } catch (ScriptException se) {
+            available = false;
+        }
+
+        return available;
+    }
+
     public EngineHolder getEngineByLanguageName(String languageName) throws ScriptException {
         for (EngineHolder engine : this.engines) {
             if (engine.getLanguageName().equals(ENGINE_NAME_PREFIX + languageName))

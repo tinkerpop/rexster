@@ -22,6 +22,8 @@ h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
 
 * Added @PUT@ to the Indices resource to place elements in an index.  This changes split this functionality away from @POST@.  @POST@ is now only for creating new indices.
 * @DELETE@ of index elements now accepts parameters to be sent as an entity on the request.
+* Fix PermGen issues with Gremlin processing.  This is bit of a stop gap fix in that it simply resets the engine after so many script executions.
+* The Gremlin Extension now includes a @language@ parameter so that one can specify the flavor of Gremlin that is being used.
 
 ==<hr/>==
 

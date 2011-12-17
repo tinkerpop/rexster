@@ -9,7 +9,11 @@ public class EngineHolder {
     private final String languageVersion;
     private final String engineName;
     private final String engineVersion;
-    private final ScriptEngine engine;
+    private final ScriptEngineFactory factory;
+    public static final int ENGINE_RESET_THRESHOLD = 1000;
+
+    private ScriptEngine engine;
+    private int numberOfScriptsEvaluated = 0;
 
     public EngineHolder(final ScriptEngineFactory factory) {
         this.languageName = factory.getLanguageName();
@@ -17,6 +21,7 @@ public class EngineHolder {
         this.engineName = factory.getEngineName();
         this.engineVersion = factory.getEngineVersion();
         this.engine = factory.getScriptEngine();
+        this.factory = factory;
     }
 
     public String getEngineName() {
@@ -32,6 +37,12 @@ public class EngineHolder {
     }
 
     public ScriptEngine getEngine() {
+        if (numberOfScriptsEvaluated > ENGINE_RESET_THRESHOLD) {
+            this.engine = this.factory.getScriptEngine();
+        } else {
+            numberOfScriptsEvaluated++;
+        }
+
         return this.engine;
     }
 

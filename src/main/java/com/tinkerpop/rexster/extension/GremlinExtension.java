@@ -7,6 +7,8 @@ import com.tinkerpop.gremlin.groovy.jsr223.GremlinGroovyScriptEngine;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.gremlin.converter.JSONResultConverter;
+import com.tinkerpop.rexster.protocol.EngineController;
+import com.tinkerpop.rexster.protocol.EngineHolder;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -22,23 +24,26 @@ import java.util.List;
 public class GremlinExtension extends AbstractRexsterExtension {
     protected static Logger logger = Logger.getLogger(GremlinExtension.class);
 
-    private final static ScriptEngine engine = new GremlinGroovyScriptEngine();
+    private static final EngineController enginerController = EngineController.getInstance();
     private static final String GRAPH_VARIABLE = "g";
     private static final String VERTEX_VARIABLE = "v";
     private static final String EDGE_VARIABLE = "e";
     private static final String WILDCARD = "*";
     private static final String SCRIPT = "script";
+    private static final String LANGUAGE = "language";
 
     private static final String API_SHOW_TYPES = "displays the properties of the elements with their native data type (default is false)";
     private static final String API_SCRIPT = "the Gremlin script to be evaluated";
     private static final String API_RETURN_KEYS = "an array of element property keys to return (default is to return all element properties)";
     private static final String API_START_OFFSET = "start index for a paged set of data to be returned";
     private static final String API_END_OFFSET = "end index for a paged set of data to be returned";
+    private static final String API_LANGUAGE = "the gremlin language flavor to use (default to groovy)";
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE, method = HttpMethod.GET)
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for an edge.",
             api = {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
+                    @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -54,6 +59,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for an edge.",
             api = {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
+                    @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -69,6 +75,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a vertex.",
             api = {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
+                    @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -84,6 +91,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a vertex.",
             api = {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
+                    @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -99,6 +107,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a graph.",
             api = {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
+                    @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -113,6 +122,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for a graph.",
             api = {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
+                    @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -133,21 +143,41 @@ public class GremlinExtension extends AbstractRexsterExtension {
         boolean showTypes = RequestObjectHelper.getShowTypes(requestObject);
         long offsetStart = RequestObjectHelper.getStartOffset(requestObject);
         long offsetEnd = RequestObjectHelper.getEndOffset(requestObject);
+        String language = null;
+        if (requestObject != null) {
+            language = requestObject.optString(LANGUAGE);
+        }
 
         Bindings bindings = new SimpleBindings();
         bindings.put(GRAPH_VARIABLE, graph);
-        bindings.put(VERTEX_VARIABLE, vertex);
-        bindings.put(EDGE_VARIABLE, edge);
+
+        if (vertex != null) {
+            bindings.put(VERTEX_VARIABLE, vertex);
+        }
+
+        if (edge != null) {
+            bindings.put(EDGE_VARIABLE, edge);
+        }
 
         // read the return keys from the request object
         List<String> returnKeys = RequestObjectHelper.getReturnKeys(requestObject, WILDCARD);
 
         ExtensionMethod extensionMethod = rexsterResourceContext.getExtensionMethod();
 
-        try {
-            if (script != null && !script.isEmpty()) {
+        String requestedLanguage = "groovy";
+        if (language != null && !language.equals("")) {
+            requestedLanguage = language;
+        }
 
-                Object result = engine.eval(script, bindings);
+        try {
+            if (!enginerController.isEngineAvailable(requestedLanguage)) {
+                 return ExtensionResponse.error("language requested is not available on the server",
+                         generateErrorJson(extensionMethod.getExtensionApiAsJson()));
+            }
+
+            if (script != null && !script.isEmpty()) {
+                EngineHolder engineHolder = enginerController.getEngineByLanguageName(requestedLanguage);
+                Object result = engineHolder.getEngine().eval(script, bindings);
                 JSONArray results = new JSONResultConverter(showTypes, offsetStart, offsetEnd, returnKeys).convert(result);
 
                 HashMap<String, Object> resultMap = new HashMap<String, Object>();
