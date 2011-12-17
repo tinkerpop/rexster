@@ -314,11 +314,36 @@ public class IndexResource extends AbstractSubResource {
         return Response.ok(this.resultObject).build();
     }
 
+    @DELETE
+    @Path("/{indexName}")
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response deleteIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, MultivaluedMap<String, String> formParams) {
+        // initializes the request object with the data DELETEed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.buildRequestObject(formParams);
+        return this.deleteIndex(graphName, indexName);
+
+    }
+
+    @DELETE
+    @Path("/{indexName}")
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    public Response deleteIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, JSONObject json) {
+        // initializes the request object with the data DELETEed to the resource.  URI parameters
+        // will then be ignored when the getRequestObject is called as the request object will
+        // have already been established.
+        this.setRequestObject(json);
+        return this.deleteIndex(graphName, indexName);
+    }
+
     /**
      * DELETE http://host/graph/indices/indexName
      * graph.dropIndex(indexName);
      * <p/>
-     * DELETE http://host/graph/indices/indexName?key=key1&value=value1&class=vertex&id=id1
+     * DELETE http://host/graph/indices/indexName?key=key1&value=value1&id=id1
      * Index index = graph.getIndex(indexName,...)
      * index.remove(key, value, graph.getVertex(id1));
      */
@@ -326,13 +351,9 @@ public class IndexResource extends AbstractSubResource {
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response deleteIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
-        final Index index = this.getIndexFromGraph(graphName, indexName);
-        final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
-
         String key = null;
         Object value = null;
         String id = null;
-        String clazz = null;
 
         final JSONObject theRequestObject = this.getRequestObject();
 
@@ -345,21 +366,28 @@ public class IndexResource extends AbstractSubResource {
         temp = theRequestObject.opt(Tokens.ID);
         if (null != temp)
             id = temp.toString();
-        temp = theRequestObject.opt(Tokens.CLASS);
-        if (null != temp)
-            clazz = temp.toString();
 
-        if (key == null && value == null && id == null && clazz == null) {
+        final Index index = this.getIndexFromGraph(graphName, indexName);
+        final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
+
+        if (null == index) {
+            String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
+            logger.info(msg);
+
+            JSONObject error = generateErrorObject(msg);
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
+        }
+
+        if (key == null && value == null && id == null) {
             graph.dropIndex(indexName);
-        } else if (null != index & key != null && value != null && clazz != null && id != null) {
+        } else if (null != index & key != null && value != null && id != null) {
             try {
-                if (clazz.equals(Tokens.VERTEX))
+                if (index.getIndexClass().equals(Vertex.class))
                     index.remove(key, value, graph.getVertex(id));
                 else
                     index.remove(key, value, graph.getEdge(id));
 
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-
 
             } catch (JSONException ex) {
                 logger.error(ex);
@@ -367,12 +395,6 @@ public class IndexResource extends AbstractSubResource {
                 JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
-        } else if (null == index) {
-            String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
-            logger.info(msg);
-
-            JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
         } else {
             String msg = "A key, value, id, and type (vertex/edge) must be provided to lookup elements in an index";
             logger.info(msg);

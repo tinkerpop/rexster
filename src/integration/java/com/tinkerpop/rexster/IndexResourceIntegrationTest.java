@@ -90,4 +90,49 @@ public class IndexResourceIntegrationTest extends AbstractGraphResourceIntegrati
 
         }
     }
+
+    @Test
+    public void deleteElementInIndexThenIndexItself() {
+        for (GraphTestHolder testGraph : this.testGraphs) {
+            doGraphPost(testGraph, "indices/newindex", "class=vertex&type=manual&keys=name");
+
+            String mappedId = testGraph.getVertexIdSet().get("1");
+
+            ClientResponse indexPutResponse = doGraphPut(testGraph, "indices/newindex", "key=name&value=marko&id=" + mappedId);
+
+            ClientResponse indexGetResponse = doGraphGet(testGraph, "indices/newindex", "key=name&value=marko");
+            Assert.assertNotNull(indexGetResponse);
+            Assert.assertEquals(ClientResponse.Status.OK, indexGetResponse.getClientResponseStatus());
+
+            JSONObject result = indexGetResponse.getEntity(JSONObject.class);
+            Assert.assertNotNull(result);
+
+            JSONArray results = result.optJSONArray("results");
+            Assert.assertNotNull(results);
+            Assert.assertEquals(1, results.length());
+
+            JSONObject marko = results.optJSONObject(0);
+            Assert.assertEquals(mappedId, marko.optString("_id"));
+            Assert.assertEquals("marko", marko.optString("name"));
+
+            doGraphDelete(testGraph, "indices/newindex", "key=name&value=marko&id=" + mappedId);
+
+            indexGetResponse = doGraphGet(testGraph, "indices/newindex", "key=name&value=marko");
+            Assert.assertNotNull(indexGetResponse);
+            Assert.assertEquals(ClientResponse.Status.OK, indexGetResponse.getClientResponseStatus());
+
+            result = indexGetResponse.getEntity(JSONObject.class);
+            Assert.assertNotNull(result);
+
+            results = result.optJSONArray("results");
+            Assert.assertNotNull(results);
+            Assert.assertEquals(0, results.length());
+
+            doGraphDelete(testGraph, "indices/newindex");
+            ClientResponse indexDeleteResponse = doGraphDelete(testGraph, "indices/newindex");
+
+            Assert.assertNotNull(indexDeleteResponse);
+            Assert.assertEquals(ClientResponse.Status.NOT_FOUND, indexDeleteResponse.getClientResponseStatus());
+        }
+    }
 }

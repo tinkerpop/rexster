@@ -21,6 +21,7 @@ h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
 ```
 
 * Added @PUT@ to the Indices resource to place elements in an index.  This changes split this functionality away from @POST@.  @POST@ is now only for creating new indices.
+* @DELETE@ of index elements now accepts parameters to be sent as an entity on the request.
 
 ==<hr/>==
 
