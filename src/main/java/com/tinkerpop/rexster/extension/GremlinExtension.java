@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.extension;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.util.json.GraphSONFactory;
 import com.tinkerpop.gremlin.groovy.jsr223.GremlinGroovyScriptEngine;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
@@ -18,6 +19,7 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.SimpleBindings;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 @ExtensionNaming(namespace = "tp", name = "gremlin")
@@ -138,17 +140,18 @@ public class GremlinExtension extends AbstractRexsterExtension {
                                                       String script) {
         ExtensionResponse extensionResponse;
 
-        JSONObject requestObject = rexsterResourceContext.getRequestObject();
+        final JSONObject requestObject = rexsterResourceContext.getRequestObject();
 
-        boolean showTypes = RequestObjectHelper.getShowTypes(requestObject);
-        long offsetStart = RequestObjectHelper.getStartOffset(requestObject);
-        long offsetEnd = RequestObjectHelper.getEndOffset(requestObject);
-        String language = null;
-        if (requestObject != null) {
-            language = requestObject.optString(LANGUAGE);
-        }
+        final boolean showTypes = RequestObjectHelper.getShowTypes(requestObject);
+        final long offsetStart = RequestObjectHelper.getStartOffset(requestObject);
+        final long offsetEnd = RequestObjectHelper.getEndOffset(requestObject);
 
-        Bindings bindings = new SimpleBindings();
+        // read the return keys from the request object
+        final List<String> returnKeys = RequestObjectHelper.getReturnKeys(requestObject, WILDCARD);
+
+        final String languageToExecuteWith = getLanguageToExecuteWith(requestObject);
+
+        final Bindings bindings = new SimpleBindings();
         bindings.put(GRAPH_VARIABLE, graph);
 
         if (vertex != null) {
@@ -159,29 +162,32 @@ public class GremlinExtension extends AbstractRexsterExtension {
             bindings.put(EDGE_VARIABLE, edge);
         }
 
-        // read the return keys from the request object
-        List<String> returnKeys = RequestObjectHelper.getReturnKeys(requestObject, WILDCARD);
+        // add all keys not defined by this request as bindings to the script engine
+        placeParametersOnBinding(requestObject, bindings);
 
-        ExtensionMethod extensionMethod = rexsterResourceContext.getExtensionMethod();
-
-        String requestedLanguage = "groovy";
-        if (language != null && !language.equals("")) {
-            requestedLanguage = language;
-        }
+        final ExtensionMethod extensionMethod = rexsterResourceContext.getExtensionMethod();
 
         try {
-            if (!enginerController.isEngineAvailable(requestedLanguage)) {
+            if (!enginerController.isEngineAvailable(languageToExecuteWith)) {
                  return ExtensionResponse.error("language requested is not available on the server",
                          generateErrorJson(extensionMethod.getExtensionApiAsJson()));
             }
 
             if (script != null && !script.isEmpty()) {
-                EngineHolder engineHolder = enginerController.getEngineByLanguageName(requestedLanguage);
+                final EngineHolder engineHolder = enginerController.getEngineByLanguageName(languageToExecuteWith);
                 Object result = engineHolder.getEngine().eval(script, bindings);
                 JSONArray results = new JSONResultConverter(showTypes, offsetStart, offsetEnd, returnKeys).convert(result);
 
                 HashMap<String, Object> resultMap = new HashMap<String, Object>();
                 resultMap.put(Tokens.SUCCESS, true);
+
+                /*
+                JSONObject jsonBindings = getBindingsAsJson(bindings);
+                if (jsonBindings != null) {
+                    resultMap.put("bindings", jsonBindings);
+                }
+                */
+
                 resultMap.put(Tokens.RESULTS, results);
 
                 JSONObject resultObject = new JSONObject(resultMap);
@@ -199,5 +205,45 @@ public class GremlinExtension extends AbstractRexsterExtension {
         }
 
         return extensionResponse;
+    }
+
+    private static JSONObject getBindingsAsJson(final Bindings bindings) throws Exception{
+        final HashMap<String, Object> bindingJsonValues = new HashMap<String, Object>();
+
+        for (String key : bindings.keySet()) {
+            if (!key.equals(Tokens.REXSTER) && !key.equals(LANGUAGE) && !key.equals(SCRIPT)
+                    && !key.equals(GRAPH_VARIABLE) && !key.equals(EDGE_VARIABLE) && !key.equals(VERTEX_VARIABLE)) {
+                bindingJsonValues.put(key, bindings.get(key));
+            }
+        }
+
+        JSONObject bindingJson = null;
+        if (!bindingJsonValues.isEmpty()) {
+            bindingJson = new JSONObject(bindingJsonValues);
+        }
+
+        return bindingJson;
+    }
+
+    private static void placeParametersOnBinding(final JSONObject requestObject, final Bindings bindings) {
+        if (requestObject != null) {
+            final Iterator keyIterator = requestObject.keys();
+            while (keyIterator.hasNext()) {
+                final String key = (String) keyIterator.next();
+                if (!key.equals(Tokens.REXSTER) && !key.equals(LANGUAGE) && !key.equals(SCRIPT)) {
+                    bindings.put(key, requestObject.opt(key));
+                }
+            }
+        }
+    }
+
+    private static String getLanguageToExecuteWith(JSONObject requestObject) {
+        final String language = requestObject != null ? requestObject.optString(LANGUAGE) : null;
+        String requestedLanguage = "groovy";
+        if (language != null && !language.equals("")) {
+            requestedLanguage = language;
+        }
+
+        return requestedLanguage;
     }
 }
