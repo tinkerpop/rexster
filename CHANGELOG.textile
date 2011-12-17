@@ -20,6 +20,8 @@ h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Added @PUT@ to the Indices resource to place elements in an index.  This changes split this functionality away from @POST@.  @POST@ is now only for creating new indices.
+
 ==<hr/>==
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-brian.png!

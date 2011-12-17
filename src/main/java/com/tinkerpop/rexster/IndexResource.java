@@ -438,9 +438,6 @@ public class IndexResource extends AbstractSubResource {
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response postIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
-        final Index index = this.getIndexFromGraph(graphName, indexName);
-        final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
-
         String clazz = null;
         String type = null;
         Set<String> keys = null;
@@ -476,14 +473,17 @@ public class IndexResource extends AbstractSubResource {
             keys = null;
         }
 
-        if (null != index && null != type && null != clazz) {
+        final Index index = this.getIndexFromGraph(graphName, indexName);
+        final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
+
+        if (null != index) {
             String msg = "Index [" + indexName + "] on graph [" + graphName + "] already exists";
             logger.info(msg);
 
             JSONObject error = generateErrorObject(msg);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
-        } else if (null == index) {
-
+        } else {
+            // create an index
             if (null != type && null != clazz) {
                 Index.Type t;
                 Class c;
@@ -529,18 +529,12 @@ public class IndexResource extends AbstractSubResource {
 
 
             } else {
-                String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
+                String msg = "Type (vertex/edge) and class (automatic/manual) must be provided to create a new index";
                 logger.info(msg);
 
                 JSONObject error = generateErrorObject(msg);
-                throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
             }
-        } else {
-            String msg = "A key, value, id, and type (vertex/edge) must be provided to add elements to an index";
-            logger.info(msg);
-
-            JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
         }
 
         return Response.ok(this.resultObject).build();
