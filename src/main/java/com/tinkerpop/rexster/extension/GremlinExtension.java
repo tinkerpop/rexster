@@ -10,6 +10,7 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.gremlin.converter.JSONResultConverter;
 import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.EngineHolder;
+import com.tinkerpop.rexster.util.ElementHelper;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -163,7 +164,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
         }
 
         // add all keys not defined by this request as bindings to the script engine
-        placeParametersOnBinding(requestObject, bindings);
+        placeParametersOnBinding(requestObject, bindings, showTypes);
 
         final ExtensionMethod extensionMethod = rexsterResourceContext.getExtensionMethod();
 
@@ -180,14 +181,6 @@ public class GremlinExtension extends AbstractRexsterExtension {
 
                 HashMap<String, Object> resultMap = new HashMap<String, Object>();
                 resultMap.put(Tokens.SUCCESS, true);
-
-                /*
-                JSONObject jsonBindings = getBindingsAsJson(bindings);
-                if (jsonBindings != null) {
-                    resultMap.put("bindings", jsonBindings);
-                }
-                */
-
                 resultMap.put(Tokens.RESULTS, results);
 
                 JSONObject resultObject = new JSONObject(resultMap);
@@ -207,6 +200,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
         return extensionResponse;
     }
 
+    /*
     private static JSONObject getBindingsAsJson(final Bindings bindings) throws Exception{
         final HashMap<String, Object> bindingJsonValues = new HashMap<String, Object>();
 
@@ -224,14 +218,15 @@ public class GremlinExtension extends AbstractRexsterExtension {
 
         return bindingJson;
     }
+    */
 
-    private static void placeParametersOnBinding(final JSONObject requestObject, final Bindings bindings) {
+    private static void placeParametersOnBinding(final JSONObject requestObject, final Bindings bindings, final boolean parseTypes) {
         if (requestObject != null) {
             final Iterator keyIterator = requestObject.keys();
             while (keyIterator.hasNext()) {
                 final String key = (String) keyIterator.next();
                 if (!key.equals(Tokens.REXSTER) && !key.equals(LANGUAGE) && !key.equals(SCRIPT)) {
-                    bindings.put(key, requestObject.opt(key));
+                    bindings.put(key, ElementHelper.getTypedPropertyValue(requestObject.opt(key), parseTypes));
                 }
             }
         }

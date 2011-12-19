@@ -3,10 +3,12 @@ package com.tinkerpop.rexster.extension;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
+import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONTokener;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
@@ -44,39 +46,7 @@ public class GremlinExtensionTest {
      */
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        graph = new TinkerGraph();
-        Vertex marko = graph.addVertex("1");
-        marko.setProperty("name", "marko");
-        marko.setProperty("age", 29);
-
-        Vertex vadas = graph.addVertex("2");
-        vadas.setProperty("name", "vadas");
-        vadas.setProperty("age", 27);
-
-        Vertex lop = graph.addVertex("3");
-        lop.setProperty("name", "lop");
-        lop.setProperty("lang", "java");
-
-        Vertex josh = graph.addVertex("4");
-        josh.setProperty("name", "josh");
-        josh.setProperty("age", 32);
-
-        Vertex ripple = graph.addVertex("5");
-        ripple.setProperty("name", "ripple");
-        ripple.setProperty("lang", "java");
-
-        Vertex peter = graph.addVertex("6");
-        peter.setProperty("name", "peter");
-        peter.setProperty("age", 35);
-
-        graph.addEdge("7", marko, vadas, "knows").setProperty("weight", 0.5f);
-        graph.addEdge("8", marko, josh, "knows").setProperty("weight", 1.0f);
-        graph.addEdge("9", marko, lop, "created").setProperty("weight", 0.4f);
-
-        graph.addEdge("10", josh, ripple, "created").setProperty("weight", 1.0f);
-        graph.addEdge("11", josh, lop, "created").setProperty("weight", 0.4f);
-
-        graph.addEdge("12", peter, lop, "created").setProperty("weight", 0.2f);
+        graph = TinkerGraphFactory.createTinkerGraph();
     }
 
     @Before
@@ -117,6 +87,31 @@ public class GremlinExtensionTest {
         Assert.assertNotNull(firstResult);
         Assert.assertTrue(firstResult.has("name"));
         Assert.assertEquals("marko", firstResult.optString("name"));
+    }
+
+    @Test
+    public void evaluateGetOnGraphWithBindings() throws Exception{
+        String json = "{\"x\":1, \"y\":2, \"z\":\"test\", \"list\":[3,2,1,0], \"map\":{\"mapx\":[300,200,100]}}";
+        RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(null, uriInfo,
+            httpServletRequest, new JSONObject(new JSONTokener(json)), null, extensionMethodNoApi);
+
+        ExtensionResponse extensionResponse = this.gremlinExtension.evaluateGetOnGraph(
+                rexsterResourceContext, graph, "[x+y, z, list.size, map.mapx.size]");
+        JSONObject jsonResponse = assertResponseAndGetEntity(extensionResponse,
+                Response.Status.OK.getStatusCode());
+
+        Assert.assertNotNull(jsonResponse);
+        Assert.assertTrue(jsonResponse.has("results"));
+
+        JSONArray jsonResults = jsonResponse.optJSONArray("results");
+        Assert.assertNotNull(jsonResults);
+        Assert.assertEquals(4, jsonResults.length());
+
+        Assert.assertEquals(3, jsonResults.optInt(0));
+        Assert.assertEquals("test", jsonResults.optString(1));
+        Assert.assertEquals(4, jsonResults.optInt(2));
+        Assert.assertEquals(3, jsonResults.optInt(3));
+
     }
 
     @Test
