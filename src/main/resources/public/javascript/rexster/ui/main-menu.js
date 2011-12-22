@@ -4,7 +4,8 @@ define(
         "rexster/template/template",
         "rexster/ui/graph",
         "rexster/ui/terminal",
-        "jquery-ui"
+        "jquery-ui",
+        "elastic"
     ],
     function (history, template, graph, terminal) {
         var currentPanel = null;

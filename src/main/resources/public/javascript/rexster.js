@@ -3,7 +3,9 @@ require(
         "domReady",
         "rexster/history",
         "rexster/template/template",
-        "rexster/ui/main-menu"
+        "rexster/ui/main-menu",
+        "order!has",
+        "order!has-detect-features"
     ],
     function (domReady, history, template, mainMenu) {
         domReady(function () {

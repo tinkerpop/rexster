@@ -1,5 +1,6 @@
 define(
     [
+        "elastic"
     ],
     function () {
         var infoContainer = new Info();
