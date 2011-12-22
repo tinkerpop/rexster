@@ -11,7 +11,8 @@ require.config({
         "jquery-history" :"lib/jquery-history",
         "jquery-url" : "lib/jquery-url",
         "jquery-jsonviewer" : "lib/jquery-jsonviewer",
-        "underscore" : "lib/underscore"
+        "underscore" : "lib/underscore",
+        "jit":"lib/jit-yc"
     },
     locale: "en-us"
 });
