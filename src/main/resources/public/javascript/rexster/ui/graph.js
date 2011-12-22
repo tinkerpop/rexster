@@ -60,14 +60,6 @@ define(
 
                 // look to hide the browser vertices button because sail graphs have infinite vertices.
                 containerPanelGraphMenu.find("a[_type='vertices']").show();
-                ajax.getGraph(currentGraphName, function(result){
-                    isSail = result.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.MemoryStoreSailGraph"
-                        || result.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.NativeStoreSailGraph"
-                        || result.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.SparqlRepositorySailGraph";
-                    if (isSail) {
-                        containerPanelGraphMenu.find("a[_type='vertices']").hide();
-                    }
-                });
 
                 containerMenuGraph.find(".graph-item").removeClass("ui-state-active");
                 containerMenuGraph.find("#graphItemgraph" + currentGraphName).addClass("ui-state-active");
@@ -78,6 +70,13 @@ define(
 
                 // load the graph profile
                 ajax.getGraph(currentGraphName, function(graphResult) {
+                    isSail = graphResult.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.MemoryStoreSailGraph"
+                        || graphResult.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.NativeStoreSailGraph"
+                        || graphResult.type === "com.tinkerpop.blueprints.pgm.impls.sail.impls.SparqlRepositorySailGraph";
+                    if (isSail) {
+                        containerPanelGraphMenu.find("a[_type='vertices']").hide();
+                    }
+
                     $("#panelGraphTitle").text(currentGraphName);
                     $("#panelGraphDetail").text(graphResult.graph);
 

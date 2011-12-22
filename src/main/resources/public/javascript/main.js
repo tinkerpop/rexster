@@ -10,7 +10,8 @@ require.config({
         "jquery-tmpl" : "lib/jquery-jtmpl-beta1",
         "jquery-history" :"lib/jquery-history",
         "jquery-url" : "lib/jquery-url",
-        "jquery-jsonviewer" : "lib/jquery-jsonviewer"
+        "jquery-jsonviewer" : "lib/jquery-jsonviewer",
+        "underscore" : "lib/underscore"
     },
     locale: "en-us"
 });
