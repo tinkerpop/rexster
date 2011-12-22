@@ -263,45 +263,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>net.alchim31.maven</groupId>
-                <artifactId>yuicompressor-maven-plugin</artifactId>
-                <version>1.1</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>compress</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <sourceDirectory>src/main/javascript</sourceDirectory>
-                    <outputDirectory>${project.build.directory}/javascript</outputDirectory>
-                    <aggregations>
-                        <aggregation>
-                            <insertNewLine>true</insertNewLine>
-
-                            <inputDir>${project.build.directory}/javascript</inputDir>
-                            <output>${project.build.directory}/generated-sources/web/rexster-lib.js</output>
-
-                            <includes>
-                                <include>lib/jquery-1.4.4-min.js</include>
-                                <include>lib/jquery-ui-1.8.7.custom-min.js</include>
-                                <include>lib/json2-min.js</include>
-                                <include>lib/has-min.js</include>
-                                <include>lib/has-detect-features-min.js</include>
-                                <include>lib/jquery-jtmpl-beta1-min.js</include>
-                                <include>lib/elastic-2.0.3-min.js</include>
-                                <include>lib/jquery-history-min.js</include>
-                                <include>lib/jquery-url-min.js</include>
-                                <include>lib/jquery-jsonviewer-min.js</include>
-                                <include>lib/protovis-r3.2-min.js</include>
-                            </includes>
-                        </aggregation>
-                    </aggregations>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>2.5</version>
                 <dependencies>

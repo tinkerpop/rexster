@@ -25,6 +25,7 @@ h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
 * Fix PermGen issues with Gremlin processing.  This is bit of a stop gap fix in that it simply resets the engine after so many script executions.
 * The Gremlin Extension now includes a @language@ parameter so that one can specify the flavor of Gremlin that is being used.
 * Gremlin Extension takes a @params@ extension and applies the keys and values within it to the bindings of the Gremlin script engine.
+* Dog House uses require.js for module loading.
 
 ==<hr/>==
 

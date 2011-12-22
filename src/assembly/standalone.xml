@@ -32,18 +32,8 @@
                 <include>favicon.ico</include>
                 <include>img/**</include>
                 <include>css/**</include>
+                <include>javascript/**</include>
             </includes>
-        </fileSet>
-        <fileSet>
-            <directory>target/generated-sources/web</directory>
-            <outputDirectory>/bin/public/javascript</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>src/main/javascript</directory>
-            <outputDirectory>/bin/public/javascript</outputDirectory>
-            <excludes>
-                <exclude>lib/**</exclude>
-            </excludes>
         </fileSet>
         <fileSet>
             <directory>data</directory>

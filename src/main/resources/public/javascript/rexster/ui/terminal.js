@@ -17,7 +17,7 @@
  */
 
 // Readline class to handle line input.
-var ReadLine = function(options, api) {
+var ReadLine = function(options, history) {
   this.options      = options || {};
   this.htmlForInput = this.options.htmlForInput;
   this.inputHandler = function(h, v, scope) { 
@@ -32,7 +32,7 @@ var ReadLine = function(options, api) {
     if(/visualize/.test(v)) {
       var vertex = ".";
       var parts = v.split(' ');
-      var state = api.getApplicationState();
+      var state = history.getApplicationState();
       
       if(parts.length == 2) {
         vertex = parts[1];
@@ -68,7 +68,7 @@ var ReadLine = function(options, api) {
       req = v;
     }
 
-    var state = api.getApplicationState();
+    var state = history.getApplicationState();
     $.ajax({
             data: { code : req, "g" : state.graph },
             type: "POST",
@@ -217,70 +217,77 @@ var EnterKeyCode      = 13;
 var UpArrowKeyCode    = 38;
 var DownArrowKeyCode  = 40;
 
+define(
+    [
+        "rexster/history",
+        "rexster/ajax",
+        "rexster/template/template",
+        "rexster/history"
+    ],
+    function (history, ajax, template, history) {
+        // public methods
+        return {
+            initTerminal : function(onInitComplete){
+                $("#panelGremlinMenuGraph").empty();
+                $("#terminal .line").remove();
 
-Rexster.modules.terminal = function(api) {
-	api.initTerminal = function(onInitComplete){
-		$("#panelGremlinMenuGraph").empty();
-		$("#terminal .line").remove();
-		
-		$("#gremlinVersion").text("Gremlin " + GREMLIN_VERSION);
-		
-		Rexster("ajax", "template", "info", "history", function(api) {
-			api.getGraphs(function(result){
-				
-				var ix = 0,
-					max = 0,
-				    graphs = [],
-				    state = api.getApplicationState();
-				
-				// construct a list of graphs that can be pushed into the graph menu
-				max = result.graphs.length;
-				for (ix = 0; ix < max; ix += 1) {
-					graphs.push({ "menuName": result.graphs[ix], "panel" : "gremlin" });
-				}
+                $("#gremlinVersion").text("Gremlin " + GREMLIN_VERSION);
 
-				api.applyMenuGraphTemplate(graphs, $("#panelGremlinMenuGraph"));
-				
-				$("#panelGremlinMenuGraph").find("div").unbind("hover");
-				$("#panelGremlinMenuGraph").find("div").hover(function() {
-					$(this).toggleClass("ui-state-hover");
-				});
-				
-				$("#panelGremlinMenuGraph").find("div").unbind("click");
-				$("#panelGremlinMenuGraph").find("div").click(function(evt) {
-					evt.preventDefault();
-					
-					$("#panelGremlinMenuGraph").find(".graph-item").removeClass("ui-state-active");
-	    			$(this).addClass("ui-state-active");
-					
-					var selectedLink = $(this).find("a"); 
-	                var uri = selectedLink.attr('href');
-	                api.historyPush(uri);
-	                
-				});
-				
-				// check the state, if it is at least two items deep then the state 
-				// of the graph is also selected and an attempt to make the graph active
-				// should be made.
-				if (state.hasOwnProperty("graph")) {
-					$("#panelGremlinMenuGraph").find(".graph-item").removeClass("ui-state-active");
-					$("#panelGremlinMenuGraph").find("#graphItemgremlin" + state.graph).addClass("ui-state-active");
-					
-					if (onInitComplete != undefined) {
-						onInitComplete();
-					}
-				}
-				
-				// if the state does not specify a graph then select the first one. 
-				if (!state.hasOwnProperty("graph")) {
-					$("#panelGremlinMenuGraph").find("#graphItemgremlin" + graphs[0].menuName).click();
-					if (onInitComplete != undefined) {
-						onInitComplete();
-					}
-				}	
-				
-				var terminal = new ReadLine({htmlForInput: DefaultInputHtml}, api);
-			});
-		});
-	}
-};
+                ajax.getGraphs(function(result){
+
+                    var ix = 0,
+                        max = 0,
+                        graphs = [],
+                        state = history.getApplicationState();
+
+                    // construct a list of graphs that can be pushed into the graph menu
+                    max = result.graphs.length;
+                    for (ix = 0; ix < max; ix += 1) {
+                        graphs.push({ "menuName": result.graphs[ix], "panel" : "gremlin" });
+                    }
+
+                    template.applyMenuGraphTemplate(graphs, $("#panelGremlinMenuGraph"));
+
+                    $("#panelGremlinMenuGraph").find("div").unbind("hover");
+                    $("#panelGremlinMenuGraph").find("div").hover(function() {
+                        $(this).toggleClass("ui-state-hover");
+                    });
+
+                    $("#panelGremlinMenuGraph").find("div").unbind("click");
+                    $("#panelGremlinMenuGraph").find("div").click(function(evt) {
+                        evt.preventDefault();
+
+                        $("#panelGremlinMenuGraph").find(".graph-item").removeClass("ui-state-active");
+                        $(this).addClass("ui-state-active");
+
+                        var selectedLink = $(this).find("a");
+                        var uri = selectedLink.attr('href');
+                        history.historyPush(uri);
+
+                    });
+
+                    // check the state, if it is at least two items deep then the state
+                    // of the graph is also selected and an attempt to make the graph active
+                    // should be made.
+                    if (state.hasOwnProperty("graph")) {
+                        $("#panelGremlinMenuGraph").find(".graph-item").removeClass("ui-state-active");
+                        $("#panelGremlinMenuGraph").find("#graphItemgremlin" + state.graph).addClass("ui-state-active");
+
+                        if (onInitComplete != undefined) {
+                            onInitComplete();
+                        }
+                    }
+
+                    // if the state does not specify a graph then select the first one.
+                    if (!state.hasOwnProperty("graph")) {
+                        $("#panelGremlinMenuGraph").find("#graphItemgremlin" + graphs[0].menuName).click();
+                        if (onInitComplete != undefined) {
+                            onInitComplete();
+                        }
+                    }
+
+                    var terminal = new ReadLine({htmlForInput: DefaultInputHtml}, history);
+                });
+            }
+        };
+    });
