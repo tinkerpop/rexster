@@ -24,7 +24,7 @@ h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
 * @DELETE@ of index elements now accepts parameters to be sent as an entity on the request.
 * Fix PermGen issues with Gremlin processing.  This is bit of a stop gap fix in that it simply resets the engine after so many script executions.
 * The Gremlin Extension now includes a @language@ parameter so that one can specify the flavor of Gremlin that is being used.
-* Gremlin Extension converts all parameters passed to it that are not part of what is expected by the extension itself to bindings to the Gremlin script engine.
+* Gremlin Extension takes a @params@ extension and applies the keys and values within it to the bindings of the Gremlin script engine.
 
 ==<hr/>==
 

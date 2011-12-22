@@ -34,6 +34,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
     private static final String WILDCARD = "*";
     private static final String SCRIPT = "script";
     private static final String LANGUAGE = "language";
+    private static final String PARAMS = "params";
 
     private static final String API_SHOW_TYPES = "displays the properties of the elements with their native data type (default is false)";
     private static final String API_SCRIPT = "the Gremlin script to be evaluated";
@@ -41,12 +42,14 @@ public class GremlinExtension extends AbstractRexsterExtension {
     private static final String API_START_OFFSET = "start index for a paged set of data to be returned";
     private static final String API_END_OFFSET = "end index for a paged set of data to be returned";
     private static final String API_LANGUAGE = "the gremlin language flavor to use (default to groovy)";
+    private static final String API_PARAMS = "a map of parameters to bind to the script engine";
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE, method = HttpMethod.GET)
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for an edge.",
             api = {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
                     @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
+                    @ExtensionApi(parameterName = PARAMS, description = API_PARAMS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -63,6 +66,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
             api = {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
                     @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
+                    @ExtensionApi(parameterName = PARAMS, description = API_PARAMS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -79,6 +83,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
             api = {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
                     @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
+                    @ExtensionApi(parameterName = PARAMS, description = API_PARAMS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -95,6 +100,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
             api = {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
                     @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
+                    @ExtensionApi(parameterName = PARAMS, description = API_PARAMS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -111,6 +117,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
             api = {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
                     @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
+                    @ExtensionApi(parameterName = PARAMS, description = API_PARAMS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -126,6 +133,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
             api = {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
                     @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
+                    @ExtensionApi(parameterName = PARAMS, description = API_PARAMS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -222,11 +230,12 @@ public class GremlinExtension extends AbstractRexsterExtension {
 
     private static void placeParametersOnBinding(final JSONObject requestObject, final Bindings bindings, final boolean parseTypes) {
         if (requestObject != null) {
-            final Iterator keyIterator = requestObject.keys();
-            while (keyIterator.hasNext()) {
-                final String key = (String) keyIterator.next();
-                if (!key.equals(Tokens.REXSTER) && !key.equals(LANGUAGE) && !key.equals(SCRIPT)) {
-                    bindings.put(key, ElementHelper.getTypedPropertyValue(requestObject.opt(key), parseTypes));
+            JSONObject paramMap = requestObject.optJSONObject(PARAMS);
+            if (paramMap != null) {
+                final Iterator keyIterator = paramMap.keys();
+                while (keyIterator.hasNext()) {
+                    final String key = (String) keyIterator.next();
+                    bindings.put(key, ElementHelper.getTypedPropertyValue(paramMap.opt(key), parseTypes));
                 }
             }
         }

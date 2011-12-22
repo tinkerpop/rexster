@@ -91,7 +91,7 @@ public class GremlinExtensionTest {
 
     @Test
     public void evaluateGetOnGraphWithBindings() throws Exception{
-        String json = "{\"x\":1, \"y\":2, \"z\":\"test\", \"list\":[3,2,1,0], \"map\":{\"mapx\":[300,200,100]}}";
+        String json = "{\"params\":{\"x\":1, \"y\":2, \"z\":\"test\", \"list\":[3,2,1,0], \"map\":{\"mapx\":[300,200,100]}}}";
         RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(null, uriInfo,
             httpServletRequest, new JSONObject(new JSONTokener(json)), null, extensionMethodNoApi);
 
