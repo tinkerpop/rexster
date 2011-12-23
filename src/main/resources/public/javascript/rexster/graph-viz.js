@@ -108,6 +108,20 @@ define(
                     style.fontSize = "0.8em";
                     style.color = "#ccc";
 
+                    if (node._depth <= 1) {
+                        style.fontSize = "0.7em";
+                        style.color = "#ccc";
+
+                    } else if(node._depth == 2){
+                        style.fontSize = "0.6em";
+                        style.color = "#494949";
+
+                    } else {
+                        style.fontSize = "0.5em";
+                        style.color = "#494949";
+
+                    }
+
                     if (typeof graphLabeler != "undefined") {
                         graphLabeler.setLabel(style, node);
                     }
