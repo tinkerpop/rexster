@@ -1,6 +1,6 @@
 define(
     [
-        "jquery-tmpl"
+        "dust"
     ],
     function () {
         var templater = {};
@@ -14,40 +14,35 @@ define(
 
         templater.init = function() {
             // expects {id, menuName, [checked], [disabled]}
-            var templateMainMenuMarkup = '<input type="radio" id="radioMenu${id}" value="${id}" name="radioMenu" {{if checked}}checked="checked"{{/if}} {{if disabled}}disabled="disabled"{{/if}}/><label for="radioMenu${id}">${menuName}</label>';
-            $.template(templater.templateNameMainMenuItem, templateMainMenuMarkup);
+            var templateMainMenuMarkup = '{#menuItems}<input type="radio" id="radioMenu{id}" value="{id}" name="radioMenu" {?checked}checked="checked"{/checked} {?disabled}disabled="disabled"{/disabled}/><label for="radioMenu{id}">{menuName}</label>{/menuItems}';
+            var dustMainMenuItemCompiled = dust.compile(templateMainMenuMarkup, templater.templateNameMainMenuItem);
+            dust.loadSource(dustMainMenuItemCompiled);
 
             // expects {menuName, panel}
-            var templateMenuGraph = '<div id="graphItem${panel}${menuName}" class="graph-item ui-state-default ui-corner-all" style="cursor:pointer;padding:2px;margin:1px"><a href="/doghouse/main/${panel}/${menuName}">${menuName}</a></div>';
-            $.template(templater.templateNameMenuGraph, templateMenuGraph);
+            var templateMenuGraph = '{#menuItems}<div id="graphItem{panel}{menuName}" class="graph-item ui-state-default ui-corner-all" style="cursor:pointer;padding:2px;margin:1px"><a href="/doghouse/main/${panel}/{menuName}">{menuName}</a></div>{/menuItems}';
+            var dustMenuGraphCompiled = dust.compile(templateMenuGraph, templater.templateNameMenuGraph);
+            dust.loadSource(dustMenuGraphCompiled);
 
             // expects {_id}
-            var templateListVertices = '<li class="column"><a href="http://www.google.com">${_id}</a></li>';
-            $.template(templater.templateNameListVertices, templateListVertices);
+            var templateListVertices = '{#vertices}<li class="column"><a href="http://www.google.com">{_id}</a></li>{/vertices}';
+            var dustListVerticesCompiled = dust.compile(templateListVertices, templater.templateNameListVertices);
+            dust.loadSource(dustListVerticesCompiled);
 
             // expects {_label, _inV, _outV, _id, currentGraphName}
-            var templateListVertexViewInEdgeList = '<li>${_outV} - <a href="/doghouse/main/graph/${currentGraphName}/edges/${_id}">${_label}</a> - <a href="/doghouse/main/graph/${currentGraphName}/vertices/${_inV}">${_inV}</a></li>';
-            $.template(templater.templateNameListVertexViewInEdgeList, templateListVertexViewInEdgeList);
+            var templateListVertexViewInEdgeList = '{#edges}<li>{_outV} - <a href="/doghouse/main/graph/{currentGraphName}/edges/{_id}">{_label}</a> - <a href="/doghouse/main/graph/{currentGraphName}/vertices/{_inV}">{_inV}</a></li>{/edges}';
+            var dustListVertexViewInEdgeListCompiled = dust.compile(templateListVertexViewInEdgeList, templater.templateNameListVertexViewInEdgeList);
+            dust.loadSource(dustListVertexViewInEdgeListCompiled);
 
             // expects {_label, _outV, _inV, _id, currentGraphName}
-            var templateListVertexViewOutEdgeList = '<li><a href="/doghouse/main/graph/${currentGraphName}/vertices/${_outV}">${_outV}</a> - <a href="/doghouse/main/graph/${currentGraphName}/edges/${_id}">${_label}</a> - ${_inV}</li>';
-            $.template(templater.templateNameListVertexViewOutEdgeList, templateListVertexViewOutEdgeList);
+            var templateListVertexViewOutEdgeList = '{#edges}<li><a href="/doghouse/main/graph/{currentGraphName}/vertices/{_outV}">{_outV}</a> - <a href="/doghouse/main/graph/{currentGraphName}/edges/{_id}">{_label}</a> - {_inV}</li>{/edges}';
+            var dustListVertexViewOutEdgeListCompiled = dust.compile(templateListVertexViewOutEdgeList, templater.templateNameListVertexViewOutEdgeList);
+            dust.loadSource(dustListVertexViewOutEdgeListCompiled);
 
             // expects {href, title, parameters[]}
-            var templateListExtensionList = '<h3><a href="#" {{if description}}title="${description}"{{/if}}>${title}</a></h3><div><form><fieldset><label for="extensionUri">Extension URI</label><input type="text" name="extensionUri" class="text ui-widget-content ui-corner-all" value="${href}" />{{each parameters}}<label for="${name}">${name}</label><input type="text" name="${name}" class="text ui-widget-content ui-corner-all" title="${description}" />{{/each}}</fieldset></form><a href="#" title="${title}">Execute</a></div>';
-            $.template(templater.templateNameListExtensionList, templateListExtensionList);
+            var templateListExtensionList = '{#extensions}<h3><a href="#" {?description}title="{description}"{/description}>{title}</a></h3><div><form><fieldset><label for="extensionUri">Extension URI</label><input type="text" name="extensionUri" class="text ui-widget-content ui-corner-all" value="{href}" />{#parameters}<label for="{name}">{name}</label><input type="text" name="{name}" class="text ui-widget-content ui-corner-all" title="{description}" />{/parameters}</fieldset></form><a href="#" title="{title}">Execute</a></div>{/extensions}';
+            var dustListExtensionListCompiled = dust.compile(templateListExtensionList, templater.templateNameListExtensionList);
+            dust.loadSource(dustListExtensionListCompiled);
 
-        }
-
-        /**
-         * Applies data to a template and appends it to a specific.
-         *
-         * @param templateName 	{String} The name of the template to render.
-         * @param data 			{Array} The data to render into the template which is a set of objects.
-         * @param target 		{String} A jQuery selector or element  to append the template to.
-         */
-        templater.applyTemplate = function(templateName, data, target) {
-            $.tmpl(templateName, data).appendTo(target);
         }
 
         // public methods
@@ -60,9 +55,13 @@ define(
              */
             applyListVerticesTemplate : function(data, selector) {
                 if (data.length > 0) {
-                    templater.applyTemplate(templater.templateNameListVertices, data, selector);
+                    dust.render(templater.templateNameListVertices, {vertices :data}, function(err, out) {
+                        $(out).appendTo(selector);
+                    });
                 } else {
-                    templater.applyTemplate(templater.templateNameListVertices, [{ "_id":"No vertices in this graph"}], selector);
+                    dust.render(templater.templateNameListVertices, {vertices :[{ "_id":"No vertices in this graph"}]}, function(err, out) {
+                        $(out).appendTo(selector);
+                    });
                 }
             },
 
@@ -74,7 +73,9 @@ define(
              */
             applyMenuGraphTemplate : function(data, selector) {
                 if (data.length > 0) {
-                    templater.applyTemplate(templater.templateNameMenuGraph, data, selector);
+                    dust.render(templater.templateNameMenuGraph, {menuItems :data}, function(err, out) {
+                        $(out).appendTo(selector);
+                    });
                 } else {
                     // TODO: need something here if nothing is configured ???
                 }
@@ -87,20 +88,27 @@ define(
              * @param selector	{String} A jQuery selector or element to append the template to.
              */
             applyMainMenuTemplate : function(data, selector) {
-                templater.applyTemplate(templater.templateNameMainMenuItem, data, selector);
+                dust.render(templater.templateNameMainMenuItem, {menuItems :data}, function(err, out) {
+                    $(out).appendTo(selector);
+                });
             },
 
             applyListVertexViewOutEdgeListTempate : function(data, selector) {
-                templater.applyTemplate(templater.templateNameListVertexViewOutEdgeList, data, selector);
+                dust.render(templater.templateNameListVertexViewOutEdgeList, {edges :data}, function(err, out) {
+                    $(out).appendTo(selector);
+                });
             },
 
             applyListVertexViewInEdgeListTempate : function(data, selector) {
-                templater.applyTemplate(templater.templateNameListVertexViewInEdgeList, data, selector);
+                dust.render(templater.templateNameListVertexViewInEdgeList, {edges :data}, function(err, out) {
+                    $(out).appendTo(selector);
+                });
             },
 
             applyListExtensionList : function(data, selector) {
-                templater.applyTemplate(templater.templateNameListExtensionList,
-                                        data.filter(function(extension){ return extension.op === "GET" }), selector);
+                dust.render(templater.templateNameListExtensionList, {extensions :data.filter(function(extension){ return extension.op === "GET" })}, function(err, out) {
+                    $(out).appendTo(selector);
+                });
             },
 
             initTemplates : templater.init
