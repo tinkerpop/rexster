@@ -24,7 +24,7 @@ define(
                 // concentric circles.
                 background: {
                     CanvasStyles: {
-                        strokeStyle: "#555"
+                        strokeStyle: "#4f3900"
                     }
                 },
 
@@ -39,12 +39,12 @@ define(
                 // Set Node and Edge styles.
                 Node: {
                     overridable: true,
-                    color: "#ddeeff"
+                    color: "#c79801"
                 },
 
                 Edge: {
                     overridable: true,
-                    color: "#c17878",
+                    color: "#ffd800",
                     lineWidth: 1.5
                 },
 
