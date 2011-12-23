@@ -120,14 +120,14 @@ html {
   display: inline;
   padding: 2px;
   background: black;
-  color: #45FF17;
+  color: #c79801;
   font-size: small;
   font-family: Monaco, Lucinda Console, Courier, Courier New, monospace;
 }
 
 #terminal p, #terminal pre {
   margin: 2px;
-  color: #45FF17;
+  color: #c79801;
   font-size: small;
   font-family: Monaco, Lucinda Console, Courier, Courier New, monospace;
 }
@@ -137,7 +137,7 @@ html {
 }
 
 #terminal span.prompt {
-  color: #45FF17;
+  color: #c79801;
   font-size: small;
   margin-left: 2px;
 }
