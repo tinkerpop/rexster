@@ -75,28 +75,6 @@ define(
                             }
                         }
                     },
-                    onMouseEnter: function (node, eventInfo, e) {
-                        if (typeof node != "boolean") {
-                            rgraph.canvas.getElement().style.cursor = "pointer";
-
-                            if (node.nodeFrom) {
-                                if (typeof handlers.onShowEdgeTip != "undefined") {
-                                    //toolTip.show(handlers.onShowEdgeTip(node.nodeFrom, node.nodeTo));
-                                }
-                            }
-                            else {
-                                if (typeof handlers.onShowNodeTip != "undefined") {
-                                    //toolTip.show(handlers.onShowNodeTip(node));
-                                }
-                            }
-                        }
-                    },
-                    onMouseLeave: function (node, eventInfo, e) {
-                        if (typeof node != "boolean") {
-                            rgraph.canvas.getElement().style.cursor = "";
-                            //toolTip.hide();
-                        }
-                    },
                     onMouseWheel: function (delta, e) {
                         zoomLevel += delta;
                     }

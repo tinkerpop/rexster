@@ -77,7 +77,7 @@ define(
 
                     $("#dialogGraphViz" ).dialog({
                         height: 625,
-                        width: 625,
+                        width: 800,
                         modal: true,
                         close: function(event, ui) {
                             if (typeof viz != "undefined") {
@@ -109,7 +109,7 @@ define(
 
 
                         var handlers = {
-                            onNodeRightClick : function onNodeRightClick(node) {
+                            onNodeRightClick : function(node) {
                                 ajax.getVertexBoth(graphName, node.data._id, function (results) {
                                         var jitDataToSum = _(results.results).map(function(n) {
                                             return {
@@ -135,6 +135,45 @@ define(
                                     function (jqXHR, textStatus, errorThrown) {
                                     }
                                 );
+                            },
+                            onNodeClick : function(node) {
+                                $("#dialogGraphVizRight").empty();
+
+                                var metaDataLabel = "Type:[" + node.data._type + "] ID:[" + node.data._id + "]";
+
+                                $("#dialogGraphVizRight").jsonviewer({
+                                    "jsonName": metaDataLabel,
+                                    "jsonData": node.data,
+                                    "outerPadding":"0px",
+                                    "showToolbar" : false,
+                                    "overrideCss" : {
+                                        "highlight":"json-widget-highlight-vertex",
+                                        "header":"json-widget-header-vertex",
+                                        "content" :"json-widget-content-vertex"
+                                    }
+                                });
+                            },
+                            onEdgeClick : function(nodeFrom, nodeTo){
+                                $("#dialogGraphVizRight").empty();
+
+                                ajax.getVertexEdges(graphName, nodeFrom.id, function(result){
+                                    _(_(result.results).filter(function(e){ return e._inV == nodeTo.id || e._outV == nodeTo.id; })).each(function(e){
+                                        $("#dialogGraphVizRight").append("<div/>");
+
+                                        var metaDataLabel = "Type:[" + e._type + "] ID:[" + e._id + "]"  + " In:[" + e._inV + "] Out:[" + e._outV + "] Label:[" + e._label + "]";
+                                        $("#dialogGraphVizRight").children().last().jsonviewer({
+                                            "jsonName": metaDataLabel,
+                                            "jsonData": e,
+                                            "outerPadding":"0px",
+                                            "showToolbar" : false,
+                                            "overrideCss" : {
+                                                "highlight":"json-widget-highlight-vertex",
+                                                "header":"json-widget-header-vertex",
+                                                "content" :"json-widget-content-vertex"
+                                            }
+                                        });
+                                    });
+                                })
                             }
                         };
 
