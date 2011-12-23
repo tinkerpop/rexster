@@ -82,6 +82,7 @@ define(
                         close: function(event, ui) {
                             if (typeof viz != "undefined") {
                                 viz.reset();
+                                $("#dialogGraphVizRight").empty();
                             }
                         }
                     });
