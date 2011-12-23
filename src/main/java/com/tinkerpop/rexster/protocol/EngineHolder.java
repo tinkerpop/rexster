@@ -37,8 +37,10 @@ public class EngineHolder {
     }
 
     public ScriptEngine getEngine() {
-        if (numberOfScriptsEvaluated > ENGINE_RESET_THRESHOLD) {
+        if (numberOfScriptsEvaluated >= ENGINE_RESET_THRESHOLD) {
+            // IMPORTANT: assumes that the factory implementation is not pooling engine instances
             this.engine = this.factory.getScriptEngine();
+            numberOfScriptsEvaluated = 1;
         } else {
             numberOfScriptsEvaluated++;
         }

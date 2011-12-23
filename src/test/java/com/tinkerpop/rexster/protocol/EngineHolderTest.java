@@ -10,11 +10,22 @@ public class EngineHolderTest {
     public void getEngineReset() throws Exception {
         EngineController controller = EngineController.getInstance();
         EngineHolder holder = controller.getEngineByLanguageName("groovy");
+
+        // counter at 0
         ScriptEngine engine = holder.getEngine();
-        for (int ix = 0; ix < EngineHolder.ENGINE_RESET_THRESHOLD; ix++) {
-            Assert.assertSame(engine, holder.getEngine());
+
+        // counter at 1
+        for (int iy = 0; iy < 10; iy++) {
+            for (int ix = 1; ix < EngineHolder.ENGINE_RESET_THRESHOLD; ix++) {
+                ScriptEngine sameEngine = holder.getEngine();
+                Assert.assertSame(engine, sameEngine);
+            }
+
+            ScriptEngine differentEngine = holder.getEngine();
+            Assert.assertNotSame(engine, differentEngine);
+
+            engine = differentEngine;
         }
 
-        Assert.assertNotSame(engine, holder.getEngine());
     }
 }
