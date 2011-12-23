@@ -11,6 +11,32 @@ define(
         var element;
         var graphName;
 
+        function addButton(tooltipText, icon, onClick) {
+            var toolbarButtonGraph = toolbar.append("<li/>").children().last();
+
+            toolbarButtonGraph.addClass("fixed column ui-state-default ui-corner-all pager-button")
+                .css({"width": "30px"});
+            toolbarButtonGraph.attr("title", tooltipText);
+
+            toolbarButtonGraph.hover(function(){
+                $(this).addClass("ui-state-hover");
+                $(this).removeClass("ui-state-default");
+            },
+            function(){
+                $(this).addClass("ui-state-default");
+                $(this).removeClass("ui-state-hover");
+            });
+
+            var featureBrowsed = element._type == "vertex" ? "vertices" : "edges";
+
+            var toolbarButtonGraphLink = toolbarButtonGraph.append("<a/>").children().first();
+            toolbarButtonGraphLink.attr("href", "/doghouse/main/graph/" + graphName + "/" + featureBrowsed + "/" + element._id);
+            toolbarButtonGraphLink.addClass(icon);
+            $(toolbarButtonGraphLink).click(onClick);
+
+            return toolbarButtonGraph;
+        }
+
         var Constr = function (currentGraphName, ele, med) {
             toolbar = $("<ul/>");
             // extra css here overrides some elastic css settings
@@ -29,27 +55,7 @@ define(
                 return toolbar;
             },
             addNavigateButton : function(){
-                var toolbarButtonGraph = toolbar.append("<li/>").children().last();
-
-                toolbarButtonGraph.addClass("fixed column ui-state-default ui-corner-all pager-button")
-                    .css({"width": "30px"});
-                toolbarButtonGraph.attr("title", "View Element");
-
-                toolbarButtonGraph.hover(function(){
-                    $(this).addClass("ui-state-hover");
-                    $(this).removeClass("ui-state-default");
-                },
-                function(){
-                    $(this).addClass("ui-state-default");
-                    $(this).removeClass("ui-state-hover");
-                });
-
-                var featureBrowsed = element._type == "vertex" ? "vertices" : "edges";
-
-                var toolbarButtonGraphLink = toolbarButtonGraph.append("<a/>").children().first();
-                toolbarButtonGraphLink.attr("href", "/doghouse/main/graph/" + graphName + "/" + featureBrowsed + "/" + element._id);
-                toolbarButtonGraphLink.addClass("ui-icon ui-icon-arrow-4-diag");
-                $(toolbarButtonGraphLink).click(function(event) {
+                addButton("View Element", "ui-icon ui-icon-arrow-4-diag", function(event) {
                     event.preventDefault();
                     var uri = $(this).attr('href');
                     var split = uri.split("/");
@@ -62,23 +68,7 @@ define(
                 return this;
             },
             addVisualizationButton : function(){
-                var toolbarButtonVisualizeVertex = $(toolbar.append("<li/>").children().last());
-                toolbarButtonVisualizeVertex.addClass("fixed column ui-state-default ui-corner-all pager-button")
-                    .css({"width": "30px"});
-                toolbarButtonVisualizeVertex.attr("title", "Visualize");
-                toolbarButtonVisualizeVertex.hover(function(){
-                    $(this).addClass("ui-state-hover");
-                    $(this).removeClass("ui-state-default");
-                },
-                function(){
-                    $(this).addClass("ui-state-default");
-                    $(this).removeClass("ui-state-hover");
-                });
-
-                var toolbarButtonVisualizeVertexLink = toolbarButtonVisualizeVertex.append("<a/>").children().first();
-                toolbarButtonVisualizeVertexLink.attr("href", "/doghouse/main/graph/" + graphName + "/vertices/" + element._id);
-                toolbarButtonVisualizeVertexLink.addClass("ui-icon ui-icon-zoomin");
-                $(toolbarButtonVisualizeVertexLink).click(function(event) {
+                addButton("Visualize", "ui-icon ui-icon-zoomin", function(event) {
                     event.preventDefault();
                     var uri = $(this).attr('href');
                     var split = uri.split("/");
