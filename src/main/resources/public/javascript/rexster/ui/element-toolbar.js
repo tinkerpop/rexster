@@ -82,7 +82,13 @@ define(
                         close: function(event, ui) {
                             if (typeof viz != "undefined") {
                                 viz.reset();
-                                $("#dialogGraphVizRight").empty();
+                            }
+
+                            $("#dialogGraphVizRight").empty();
+                        },
+                        buttons: {
+                            Close: function() {
+                                $(this).dialog("close");
                             }
                         }
                     });
