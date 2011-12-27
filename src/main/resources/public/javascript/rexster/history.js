@@ -45,12 +45,25 @@ define(
                     state.browse = {
                         element : encodedState.segment(4),
                         start : 0,
-                        end : 10
+                        end : 10,
+                        index : {
+                            name : null,
+                            key : null,
+                            value : null
+                        }
                     };
 
                     if (encodedState.param("rexster.offset.start") != null && encodedState.param("rexster.offset.end")) {
                         state.browse.start = encodedState.param("rexster.offset.start");
                         state.browse.end = encodedState.param("rexster.offset.end");
+                    }
+
+                    if (encodedState.param("rexster.index.name") != null
+                        && encodedState.param("rexster.index.key") != null
+                        && encodedState.param("rexster.index.value") != null) {
+                        state.browse.index.name = encodedState.param("rexster.index.name");
+                        state.browse.index.key = encodedState.param("rexster.index.key");
+                        state.browse.index.value = encodedState.param("rexster.index.value");
                     }
                 }
 

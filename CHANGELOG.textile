@@ -27,6 +27,7 @@ h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
 * Gremlin Extension takes a @params@ extension and applies the keys and values within it to the bindings of the Gremlin script engine.
 * Dog House uses require.js for module loading.
 * Simple graph visualization through "JIT":http://thejit.org.
+* Dog House provides a filter option when browsing vertices and edges.  Filters are backed by indices such that the user can select an index then specify a key/value to filter the paged results by.
 
 ==<hr/>==
 

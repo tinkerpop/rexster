@@ -19,7 +19,7 @@ define(
             dust.loadSource(dustMainMenuItemCompiled);
 
             // expects {menuName, panel}
-            var templateMenuGraph = '{#menuItems}<div id="graphItem{panel}{menuName}" class="graph-item ui-state-default ui-corner-all" style="cursor:pointer;padding:2px;margin:1px"><a href="/doghouse/main/${panel}/{menuName}">{menuName}</a></div>{/menuItems}';
+            var templateMenuGraph = '{#menuItems}<div id="graphItem{panel}{menuName}" class="graph-item ui-state-default ui-corner-all" style="cursor:pointer;padding:2px;margin:1px"><a href="/doghouse/main/{panel}/{menuName}">{menuName}</a></div>{/menuItems}';
             var dustMenuGraphCompiled = dust.compile(templateMenuGraph, templater.templateNameMenuGraph);
             dust.loadSource(dustMenuGraphCompiled);
 

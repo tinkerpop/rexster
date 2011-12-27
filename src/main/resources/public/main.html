@@ -95,6 +95,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div id="panelExtensionsContainer" style="width:100%">
                             <div class="ui-widget-header ui-corner-top">Extensions</div>
                             <div class="ui-widget-content ui-corner-bottom">
@@ -143,7 +144,7 @@
                         <div class="ui-widget-header ui-corner-top">Browser</div>
                         <div class="ui-widget-content ui-corner-bottom">
                             <div class="pager container make-space" style="font-size:small">
-                                <ul class="unit on-5 columns horizontal-center" style="width:380px">
+                                <ul class="unit on-6 columns horizontal-center" style="width:410px">
                                     <li class="fixed column ui-state-default ui-corner-all pager-button"
                                         style="width:30px" title="First"><a class="ui-icon ui-icon-seek-first"></a></li>
                                     <li class="fixed column ui-state-default ui-corner-all pager-button"
@@ -152,12 +153,16 @@
                                     <li class="fixed column pager-label" style="width:250px;text-align:center"></li>
                                     <li class="fixed column ui-state-default ui-corner-all pager-button"
                                         style="width:30px" title="Next"><a class="ui-icon ui-icon-seek-next"></a></li>
+                                    <li class="fixed column ui-state-default ui-corner-all pager-button"
+                                        style="width:30px" title="Filter"><a class="ui-icon ui-icon-search"></a></li>
+                                    <li class="fixed column ui-state-default ui-corner-all pager-button"
+                                        style="width:30px" title="Remove Filter" style="display:none;"><a class="ui-icon ui-icon-cancel"></a></li>
                                 </ul>
                             </div>
                             <div id="panelBrowserMain">
                             </div>
                             <div class="pager container make-space" style="font-size:small">
-                                <ul class="unit on-5 columns horizontal-center" style="width:380px">
+                                <ul class="unit on-6 columns horizontal-center" style="width:410px">
                                     <li class="fixed column ui-state-default ui-corner-all pager-button"
                                         style="width:30px" title="First"><a class="ui-icon ui-icon-seek-first"></a></li>
                                     <li class="fixed column ui-state-default ui-corner-all pager-button"
@@ -166,6 +171,10 @@
                                     <li class="fixed column pager-label" style="width:250px;text-align:center"></li>
                                     <li class="fixed column ui-state-default ui-corner-all pager-button"
                                         style="width:30px" title="Next"><a class="ui-icon ui-icon-seek-next"></a></li>
+                                    <li class="fixed column ui-state-default ui-corner-all pager-button"
+                                        style="width:30px" title="Filter"><a class="ui-icon ui-icon-search"></a></li>
+                                    <li class="fixed column ui-state-default ui-corner-all pager-button"
+                                        style="width:30px" title="Remove Filter" style="display:none;"><a class="ui-icon ui-icon-cancel" ></a></li>
                                 </ul>
                             </div>
                         </div>
@@ -180,7 +189,7 @@
     	<span style="float:right">Rexster: The Dog House</span>
     </div>
 
-    <div id="dialogForm" title="Rexster Extension">
+    <div id="dialogForm" title="Rexster Extension" style="display:none">
         <div id="dialogFormUri" style="margin-left:10px">
             <form>
                 <fieldset>
@@ -213,6 +222,19 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div id="dialogIndices" title="Indices" style="display:none">
+        <form>
+            <fieldset>
+                <label for="dialogFormIndexSelect" >Index</label>
+                <select id="dialogFormIndexSelect" name="dialogFormIndexSelect" class="text ui-widget-content ui-corner-all" style="width:100%"></select>
+                <label for="dialogFormIndexKeyText" >Key</label>
+                <input type="text" id="dialogFormIndexKeyText" name="dialogFormIndexKeyText" class="text ui-widget-content ui-corner-all" style="width:100%"/>
+                <label for="dialogFormIndexValueText" >Value</label>
+                <input type="text" id="dialogFormIndexValueText" name="dialogFormIndexValueText" class="text ui-widget-content ui-corner-all" style="width:100%"/>
+            </fieldset>
+        </form>
     </div>
 </div>
 </body>

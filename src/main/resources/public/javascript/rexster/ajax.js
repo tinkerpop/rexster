@@ -180,6 +180,34 @@ define(
                       async:asynchronous,
                       error: onFail
                     });
+            },
+
+            getIndices : function(graphName, onSuccess, onFail, asynchronous) {
+                $.ajax({
+                      url: baseUri + graphName + "/indices",
+                      accepts:{
+                        json: rexsterMimeType
+                      },
+                      type: "GET",
+                      dataType:"json",
+                      success: onSuccess,
+                      async:asynchronous,
+                      error: onFail
+                    });
+            },
+
+            getByIndex : function(graphName, start, end, indexName, indexKey, indexValue, onSuccess, onFail){
+                $.ajax({
+                      url: baseUri + graphName + "/indices/" + encodeURIComponent(indexName) + "?rexster.offset.start=" + start + "&rexster.offset.end=" + end + "&key=" + encodeURIComponent(indexKey) + "&value=" + encodeURIComponent(indexValue),
+                      accepts:{
+                        json: rexsterMimeType
+                      },
+                      type: "GET",
+                      dataType:"json",
+                      success: onSuccess,
+                      async:false,
+                      error: onFail
+                    });
             }
         };
     });

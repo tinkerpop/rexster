@@ -8,7 +8,7 @@ define(
         "underscore",
         "jquery-jsonviewer"
     ],
-    function (history, template, info, elementToolbar, ajax, graphViz, _) {
+    function (history, template, info, elementToolbar, ajax, _) {
 
         var mediator = new GraphPanelMediator("#panelGraphMenuGraph", "#panelElementViewer", "#panelGraphMenu", "#panelBrowser", "#panelBrowserMain"),
 	    currentGraph;
@@ -26,6 +26,7 @@ define(
                  currentFeatureBrowsed = "",
                  currentPageStart = 0,
                  currentTotal = 0,
+                 currentIndex,
                  pageSize = 10,
                  isSail = false;
 
@@ -47,6 +48,10 @@ define(
 
             this.getContainerPanelBrowser = function() {
                 return containerPanelBrowser;
+            }
+
+            this.setCurrentIndex = function(index) {
+                currentIndex = index;
             }
 
             /**
@@ -104,6 +109,15 @@ define(
                     this.panelGraphElementViewSelected(state.browse.element, state.objectId, onComplete);
                 } else {
                     // restore state to a page on the browser
+                    if (state.browse.index != undefined && state.browse.index.name != undefined) {
+                        var idx = {
+                            name: state.browse.index.name,
+                            key: state.browse.index.key,
+                            value: state.browse.index.value
+                        };
+                        mediator.setCurrentIndex(idx);
+                    }
+
                     this.panelGraphNavigationSelected(state.browse.element, state.browse.start, state.browse.end, onComplete);
                 }
             }
@@ -255,9 +269,23 @@ define(
                 nextRange = that.calculateNextPageRange();
                 previousRange = that.calculatePreviousPageRange();
 
-                containerPanelBrowser.find(".ui-icon-seek-first").attr("href", "/doghouse/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=0&rexster.offset.end=" + pageSize);
-                containerPanelBrowser.find(".ui-icon-seek-prev").attr("href", "/doghouse/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=" + previousRange.start + "&rexster.offset.end=" + previousRange.end);
-                containerPanelBrowser.find(".ui-icon-seek-next").attr("href", "/doghouse/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=" + nextRange.start + "&rexster.offset.end=" + nextRange.end);
+                if (currentIndex == undefined) {
+                    containerPanelBrowser.find(".ui-icon-cancel").parent().hide();
+
+                    containerPanelBrowser.find(".ui-icon-seek-first").attr("href", "/doghouse/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=0&rexster.offset.end=" + pageSize);
+                    containerPanelBrowser.find(".ui-icon-seek-prev").attr("href", "/doghouse/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=" + previousRange.start + "&rexster.offset.end=" + previousRange.end);
+                    containerPanelBrowser.find(".ui-icon-seek-next").attr("href", "/doghouse/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=" + nextRange.start + "&rexster.offset.end=" + nextRange.end);
+
+                } else {
+                    containerPanelBrowser.find(".ui-icon-cancel").parent().show();
+                    containerPanelBrowser.find(".ui-icon-cancel").attr("title", "Remove filter: [" + currentIndex.key + "=" + currentIndex.value + "]");
+
+                    containerPanelBrowser.find(".ui-icon-seek-first").attr("href", "/doghouse/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=0&rexster.offset.end=" + pageSize + "&rexster.index.name=" + currentIndex.name + "&rexster.index.key=" + currentIndex.key + "&rexster.index.value=" + currentIndex.value);
+                    containerPanelBrowser.find(".ui-icon-seek-prev").attr("href", "/doghouse/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=" + previousRange.start + "&rexster.offset.end=" + previousRange.end + "&rexster.index.name=" + currentIndex.name + "&rexster.index.key=" + currentIndex.key + "&rexster.index.value=" + currentIndex.value);
+                    containerPanelBrowser.find(".ui-icon-seek-next").attr("href", "/doghouse/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=" + nextRange.start + "&rexster.offset.end=" + nextRange.end + "&rexster.index.name=" + currentIndex.name + "&rexster.index.key=" + currentIndex.key + "&rexster.index.value=" + currentIndex.value);
+                }
+
+                containerPanelBrowser.find(".ui-icon-cancel").attr("href", "/doghouse/main/graph/" + currentGraphName + "/" + currentFeatureBrowsed + "?rexster.offset.start=0&rexster.offset.end=" + pageSize);
 
                 if (onPageChangeComplete != undefined) {
                     onPageChangeComplete();
@@ -294,20 +322,39 @@ define(
 
                 containerPanelBrowserMain.empty();
 
-                if (currentFeatureBrowsed === "vertices") {
-                    ajax.getVertices(currentGraphName, pageStart, pageEnd, function(data) {
-                        that.renderPagedResults(data.results, data.totalSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
-                    },
-                    function(err) {
-                        info.showMessageError("Could not get the vertices of graphs from Rexster.");
-                    });
-                } else if (currentFeatureBrowsed === "edges") {
-                    ajax.getEdges(currentGraphName, pageStart, pageEnd, function(data) {
-                        that.renderPagedResults(data.results, data.totalSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
-                    },
-                    function(err) {
-                        info.showMessageError("Could not get the edges of graphs from Rexster.");
-                    });
+                if (currentIndex == undefined) {
+                    if (currentFeatureBrowsed === "vertices") {
+                        ajax.getVertices(currentGraphName, pageStart, pageEnd, function(data) {
+                            that.renderPagedResults(data.results, data.totalSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
+                        },
+                        function(err) {
+                            info.showMessageError("Could not get the vertices of graphs from Rexster.");
+                        });
+                    } else if (currentFeatureBrowsed === "edges") {
+                        ajax.getEdges(currentGraphName, pageStart, pageEnd, function(data) {
+                            that.renderPagedResults(data.results, data.totalSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
+                        },
+                        function(err) {
+                            info.showMessageError("Could not get the edges of graphs from Rexster.");
+                        });
+                    }
+                } else {
+                    // get from indices...there's a filter on
+                    if (currentFeatureBrowsed === "vertices") {
+                        ajax.getByIndex(currentGraphName, pageStart, pageEnd, currentIndex.name, currentIndex.key, currentIndex.value, function(data) {
+                            that.renderPagedResults(data.results, data.totalSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
+                        },
+                        function(err) {
+                            info.showMessageError("Could not get the vertices of graphs from Rexster.");
+                        });
+                    } else if (currentFeatureBrowsed === "edges") {
+                        ajax.getByIndex(currentGraphName, pageStart, pageEnd, currentIndex.name, currentIndex.key, currentIndex.value, function(data) {
+                            that.renderPagedResults(data.results, data.totalSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
+                        },
+                        function(err) {
+                            info.showMessageError("Could not get the edges of graphs from Rexster.");
+                        });
+                    }
                 }
             }
 
@@ -665,8 +712,14 @@ define(
                     mediator.getContainerPanelGraphMenu().find("a").unbind("click");
                     mediator.getContainerPanelGraphMenu().find("a").click(function(evt) {
                         evt.preventDefault();
-                        var uri = $(this).attr('href');
+                        var uri = $(this).attr("href");
                         history.historyPush(uri);
+
+                        // reset the filter
+                        mediator.setCurrentIndex();
+                        $("#dialogFormIndexKeyText").val("");
+                        $("#dialogFormIndexValueText").val("");
+
                         mediator.panelGraphNavigationSelected($(this).attr("_type"));
                     });
 
@@ -726,15 +779,48 @@ define(
                         if ($(this).children().first().hasClass("ui-icon-seek-first")) {
                             // go to first batch of records on the list
                             mediator.panelGraphNavigationPagedFirst();
-                        } else if ($(this).children().first().hasClass("ui-icon-seek-end")) {
-                            // go to the last batch of records on the list
-                            mediator.panelGraphNavigationPagedLast();
+                        } else if ($(this).children().first().hasClass("ui-icon-search")) {
+                            // add indices based on the type being browsed.
+                            $("#dialogIndices select").empty();
+                            ajax.getIndices(history.getApplicationState().graph, function(result){
+                                _(_(result.results).filter(function(nextIndex) {
+                                    return nextIndex.class == (history.getApplicationState().browse.element == "vertices" ? "vertex" : "edge");
+                                })).each(function(nextIndex) {
+                                    $("#dialogIndices select")
+                                     .append($("<option></option>")
+                                     .attr("value", nextIndex.name)
+                                     .text(nextIndex.name));
+                                })}, null, false);
+
+                                // restore state to a page on the browser
+                                if (history.getApplicationState().browse.index != undefined && history.getApplicationState().browse.index.name != undefined) {
+                                    var idx = {
+                                        name: history.getApplicationState().browse.index.name,
+                                        key: history.getApplicationState().browse.index.key,
+                                        value: history.getApplicationState().browse.index.value
+                                    };
+                                    mediator.setCurrentIndex(idx);
+
+                                    $("#dialogFormIndexSelect").val(idx.name)
+                                    $("#dialogFormIndexKeyText").val(idx.key);
+                                    $("#dialogFormIndexValueText").val(idx.value);
+
+                                }
+
+                            $("#dialogIndices").dialog("open");
                         } else if ($(this).children().first().hasClass("ui-icon-seek-prev")) {
                             // go to the previous batch of records on the list
                             mediator.panelGraphNavigationPagedPrevious();
                         } else if ($(this).children().first().hasClass("ui-icon-seek-next")) {
                             // go to the next batch of records on the list
                             mediator.panelGraphNavigationPagedNext();
+                        } else if ($(this).children().first().hasClass("ui-icon-cancel")) {
+                            mediator.setCurrentIndex();
+
+                            $("#dialogFormIndexKeyText").val("");
+                            $("#dialogFormIndexValueText").val("");
+
+                            mediator.panelGraphNavigationPagedFirst();
                         }
 
                     })
@@ -746,6 +832,31 @@ define(
                         modal: true,
                         buttons: {
                             "Close": function() {
+                                $(this).dialog("close");
+                            }
+                        }
+                    });
+
+                    $("#dialogIndices").dialog({
+                        autoOpen: false,
+                        height: 550,
+                        width: 700,
+                        modal: true,
+                        buttons: {
+                            "Filter" : function() {
+                                var idx = {
+                                    name:$("#dialogFormIndexSelect").val(),
+                                    key:$("#dialogFormIndexKeyText").val(),
+                                    value:$("#dialogFormIndexValueText").val()
+                                };
+                                mediator.setCurrentIndex(idx);
+
+                                var idxUri = "/doghouse/main/graph/" + history.getApplicationState().graph + "/" + history.getApplicationState().browse.element + "?rexster.offset.start=0&rexster.offset.end=10&rexster.index.name=" + idx.name + "&rexster.index.key=" + idx.key + "&rexster.index.value=" + idx.value;
+                                history.historyPush(idxUri);
+                                mediator.panelGraphNavigationPagedFirst();
+                                $(this).dialog("close");
+                            },
+                            "Cancel": function() {
                                 $(this).dialog("close");
                             }
                         }
