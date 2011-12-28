@@ -1,12 +1,14 @@
 package com.tinkerpop.rexster.protocol;
 
 import junit.framework.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.script.ScriptEngine;
 
 public class EngineHolderTest {
     @Test
+    @Ignore
     public void getEngineReset() throws Exception {
         EngineController controller = EngineController.getInstance();
         EngineHolder holder = controller.getEngineByLanguageName("groovy");
