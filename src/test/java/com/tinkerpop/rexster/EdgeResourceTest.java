@@ -134,7 +134,6 @@ public class EdgeResourceTest {
 
         JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
 
         Assert.assertTrue(json.has(Tokens.RESULTS));
         Assert.assertFalse(json.isNull(Tokens.RESULTS));
@@ -898,7 +897,6 @@ public class EdgeResourceTest {
 
         JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
         Assert.assertTrue(json.has(Tokens.RESULTS));
 
         Assert.assertEquals("edge-property-value", returnEdge.getProperty("some-property"));
@@ -951,7 +949,6 @@ public class EdgeResourceTest {
 
         JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
         Assert.assertTrue(json.has(Tokens.RESULTS));
 
         Assert.assertEquals("NEW", returnEdge.getProperty("newProperty"));
@@ -1039,7 +1036,6 @@ public class EdgeResourceTest {
 
         JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
 
         Assert.assertTrue(json.has(Tokens.RESULTS));
         Assert.assertFalse(json.isNull(Tokens.RESULTS));
@@ -1220,7 +1216,6 @@ public class EdgeResourceTest {
         JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.TOTAL_SIZE));
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
 
         Assert.assertTrue(json.has(Tokens.RESULTS));
         Assert.assertFalse(json.isNull(Tokens.RESULTS));

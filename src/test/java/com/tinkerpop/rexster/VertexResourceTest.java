@@ -131,7 +131,6 @@ public class VertexResourceTest {
 
         JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
 
         Assert.assertTrue(json.has(Tokens.RESULTS));
         Assert.assertFalse(json.isNull(Tokens.RESULTS));
@@ -866,7 +865,6 @@ public class VertexResourceTest {
 
         JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
 
         Assert.assertTrue(json.has(Tokens.RESULTS));
         Assert.assertFalse(json.isNull(Tokens.RESULTS));
@@ -940,7 +938,6 @@ public class VertexResourceTest {
 
         JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
     }
 
     @Test(expected = WebApplicationException.class)
@@ -1002,7 +999,6 @@ public class VertexResourceTest {
 
         JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
 
         Set<String> keys = v.getPropertyKeys();
         Assert.assertEquals(0, keys.size());
@@ -1050,7 +1046,6 @@ public class VertexResourceTest {
 
         JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
 
         Assert.assertTrue(json.has(Tokens.RESULTS));
         Assert.assertFalse(json.isNull(Tokens.RESULTS));
@@ -1083,7 +1078,6 @@ public class VertexResourceTest {
 
         JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
 
         Assert.assertTrue(json.has(Tokens.TOTAL_SIZE));
         Assert.assertEquals(expectedTotalSize, json.optInt(Tokens.TOTAL_SIZE));
@@ -1162,7 +1156,6 @@ public class VertexResourceTest {
         Assert.assertTrue(json.has(Tokens.TOTAL_SIZE));
         //TODO Assert.assertEquals(numberOfVerticesTotal, json.optInt(Tokens.TOTAL_SIZE));
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
 
         Assert.assertTrue(json.has(Tokens.RESULTS));
         Assert.assertFalse(json.isNull(Tokens.RESULTS));

@@ -141,7 +141,6 @@ public class IndexResourceTest {
         Assert.assertTrue(json.has(Tokens.TOTAL_SIZE));
         Assert.assertEquals(100, json.optInt(Tokens.TOTAL_SIZE));
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
     }
 
     private IndexResource constructMockGetAllIndicesScenario(int numberOfIndicesToGenerate, final HashMap<String, String> parameters) {
@@ -180,7 +179,6 @@ public class IndexResourceTest {
         Assert.assertTrue(json.has(Tokens.TOTAL_SIZE));
         Assert.assertEquals(numberOfIndicesTotal, json.optInt(Tokens.TOTAL_SIZE));
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
 
         Assert.assertTrue(json.has(Tokens.RESULTS));
         Assert.assertFalse(json.isNull(Tokens.RESULTS));

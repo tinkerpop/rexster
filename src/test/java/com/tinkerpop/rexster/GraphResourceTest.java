@@ -42,7 +42,6 @@ public class GraphResourceTest {
         Assert.assertTrue(json.has("name"));
         Assert.assertEquals("graph", json.optString("name"));
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
         Assert.assertTrue(json.has(Tokens.UP_TIME));
         Assert.assertTrue(json.has(Tokens.READ_ONLY));
         Assert.assertTrue(json.has("version"));
@@ -80,7 +79,6 @@ public class GraphResourceTest {
 
         JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
     }
 
     private GraphResource constructMockGetGraphScenario(final HashMap<String, String> parameters) {

@@ -55,7 +55,6 @@ public class RexsterResourceTest {
 
         JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
         Assert.assertTrue(json.has("name"));
         Assert.assertTrue(json.has("graphs"));
         Assert.assertTrue(json.has(Tokens.UP_TIME));
@@ -92,7 +91,6 @@ public class RexsterResourceTest {
 
         JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.optDouble(Tokens.QUERY_TIME) > 0);
         Assert.assertTrue(json.has("name"));
         Assert.assertTrue(json.has("graphs"));
         Assert.assertTrue(json.has(Tokens.UP_TIME));
