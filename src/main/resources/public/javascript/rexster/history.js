@@ -34,7 +34,7 @@ define(
                     state = {};
 
                 if (!has("native-history-state")) {
-                    encodedState = jQuery.url.setUrl(Rexster.currentState);
+                    encodedState = jQuery.url.setUrl(currentState);
                 }
 
                 if (encodedState.segment() >= 6) {
