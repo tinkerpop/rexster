@@ -189,17 +189,6 @@ public class VertexResource extends AbstractSubResource {
 
     @HEAD
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response headVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        return this.executeVertexExtension(graphName, id, HttpMethod.HEAD);
-    }
-
-    @HEAD
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response headVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -210,17 +199,6 @@ public class VertexResource extends AbstractSubResource {
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     public Response headVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.HEAD);
-    }
-
-    @PUT
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response putVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        return this.executeVertexExtension(graphName, id, HttpMethod.PUT);
     }
 
     @PUT
@@ -239,17 +217,6 @@ public class VertexResource extends AbstractSubResource {
 
     @OPTIONS
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response optionsVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        return this.executeVertexExtension(graphName, id, HttpMethod.OPTIONS);
-    }
-
-    @OPTIONS
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response optionsVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -264,17 +231,6 @@ public class VertexResource extends AbstractSubResource {
 
     @DELETE
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response deleteVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        return this.executeVertexExtension(graphName, id, HttpMethod.DELETE);
-    }
-
-    @DELETE
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -285,17 +241,6 @@ public class VertexResource extends AbstractSubResource {
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
     public Response deleteVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.DELETE);
-    }
-
-    @POST
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response postVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        return this.executeVertexExtension(graphName, id, HttpMethod.POST);
     }
 
     @POST
@@ -554,18 +499,6 @@ public class VertexResource extends AbstractSubResource {
 
     @POST
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response postNullVertexRexsterConsumesUrlEncoded(@Context Request request, @PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        Variant v = request.selectVariant(producesVariantList);
-        return this.postVertex(graphName, null, true, v);
-    }
-
-    @POST
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
     public Response postNullVertexRexsterConsumesJson(@Context Request request, @PathParam("graphname") String graphName, JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
@@ -597,24 +530,6 @@ public class VertexResource extends AbstractSubResource {
     public Response postNullVertexOnUri(@Context Request request, @PathParam("graphname") String graphName) {
         Variant v = request.selectVariant(producesVariantList);
         return this.postVertex(graphName, null, true, v);
-    }
-
-    /**
-     * POST http://host/graph/vertices/id
-     * Vertex v = graph.addVertex(id);
-     * v.setProperty(key,value);
-     */
-    @POST
-    @Path("/{id}")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response postVertexConsumesUrlEncoded(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        Variant v = request.selectVariant(producesVariantList);
-        return this.postVertex(graphName, id, true, v);
     }
 
     /**
@@ -728,24 +643,6 @@ public class VertexResource extends AbstractSubResource {
         }
 
         return Response.ok(this.resultObject).build();
-    }
-
-    /**
-     * PUT http://host/graph/vertices/id
-     * Vertex v = graph.addVertex(id);
-     * v.setProperty(key,value);
-     */
-    @PUT
-    @Path("/{id}")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response putVertexConsumesUrlEncoded(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data PUTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        Variant v = request.selectVariant(producesVariantList);
-        return this.putVertex(graphName, id, true, v);
     }
 
     /**

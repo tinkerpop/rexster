@@ -147,8 +147,7 @@ public abstract class BaseResource {
      * Gets the request object.
      * <p/>
      * If it does not exist then an attempt is made to parse the parameter list on
-     * the URI into a JSON object.  It is then stored until the next request so
-     * that parse of the URI does not have to happen more than once.
+     * the URI into a JSON object.
      *
      * @return The request object.
      */
@@ -159,6 +158,7 @@ public abstract class BaseResource {
                 this.requestObjectFlat = new JSONObject();
 
                 if (this.httpServletRequest != null) {
+                    // unclear if this block of code is still necessary ???
                     Map<String, String[]> queryParameters = this.httpServletRequest.getParameterMap();
                     this.buildRequestObject(queryParameters);
                 }
@@ -226,30 +226,6 @@ public abstract class BaseResource {
         }
 
         this.requestObjectFlat = new JSONObject(flatMap);
-    }
-
-    protected void buildRequestObject(final MultivaluedMap<String, String> formParams) {
-        HashMap map = new HashMap();
-
-        for (String key : formParams.keySet()) {
-            List list = formParams.get(key);
-            if (list != null && list.size() >= 1) {
-                // rexster ignores all other values in the list and just takes the first
-                map.put(key, formParams.getFirst(key));
-            } else {
-                map.put(key, "");
-            }
-        }
-
-        try {
-            // need to reset the request object b/c it maybe have been initialized by query parameters
-            // or some other method.
-            this.requestObject = new JSONObject();
-            this.requestObjectFlat = new JSONObject();
-            this.buildRequestObject(map);
-        } catch (JSONException jsonException) {
-            this.setRequestObject(null);
-        }
     }
 
     protected JSONObject getNonRexsterRequest() throws JSONException {

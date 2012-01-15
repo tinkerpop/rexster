@@ -207,16 +207,6 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
 
             response = this.doGraphPostOfJson(testGraph, "edges", jsonEdgeToPost);
             assertPostedEdge(vertexIdIn, vertexIdOut, response);
-
-            // post as FORM
-            MultivaluedMap<String, String> mapToPost = new MultivaluedMapImpl();
-            mapToPost.putSingle(Tokens._OUT_V, vertexIdOut);
-            mapToPost.putSingle(Tokens._IN_V, vertexIdIn);
-            mapToPost.putSingle(Tokens._LABEL, "formPost");
-            mapToPost.putSingle("complex", complexValue);
-
-            response = this.doGraphPostOfForm(testGraph, "edges", mapToPost);
-            assertPostedEdge(vertexIdIn, vertexIdOut, response);
         }
     }
 
@@ -254,13 +244,6 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
             JSONObject jsonEdgeToPost = new JSONObject(jsonEdgeData);
             response = this.doGraphPutOfJson(testGraph, "edges/" + secondEdgeId, jsonEdgeToPost);
             assertPuttedEdge(secondEdgeId, response);
-
-            // put as FORM
-            MultivaluedMap<String, String> mapToPost = new MultivaluedMapImpl();
-            mapToPost.putSingle("complex", complexValue);
-
-            response = this.doGraphPutOfForm(testGraph, "edges/" + thirdEdgeId, mapToPost);
-            assertPuttedEdge(thirdEdgeId, response);
         }
     }
 

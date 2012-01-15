@@ -185,17 +185,6 @@ public class EdgeResource extends AbstractSubResource {
 
     @HEAD
     @Path("/{id}/{extension: .+}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response headVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        return this.executeEdgeExtension(graphName, id, HttpMethod.HEAD);
-    }
-
-    @HEAD
-    @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response headEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -206,17 +195,6 @@ public class EdgeResource extends AbstractSubResource {
     @Path("/{id}/{extension: .+}")
     public Response headEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeEdgeExtension(graphName, id, HttpMethod.HEAD);
-    }
-
-    @PUT
-    @Path("/{id}/{extension: .+}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response putVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        return this.executeEdgeExtension(graphName, id, HttpMethod.PUT);
     }
 
     @PUT
@@ -235,17 +213,6 @@ public class EdgeResource extends AbstractSubResource {
 
     @OPTIONS
     @Path("/{id}/{extension: .+}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response optionsVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        return this.executeEdgeExtension(graphName, id, HttpMethod.OPTIONS);
-    }
-
-    @OPTIONS
-    @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response optionsEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -260,17 +227,6 @@ public class EdgeResource extends AbstractSubResource {
 
     @DELETE
     @Path("/{id}/{extension: .+}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response deleteVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        return this.executeEdgeExtension(graphName, id, HttpMethod.DELETE);
-    }
-
-    @DELETE
-    @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -281,17 +237,6 @@ public class EdgeResource extends AbstractSubResource {
     @Path("/{id}/{extension: .+}")
     public Response deleteEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeEdgeExtension(graphName, id, HttpMethod.DELETE);
-    }
-
-    @POST
-    @Path("/{id}/{extension: .+}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response postVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        return this.executeEdgeExtension(graphName, id, HttpMethod.POST);
     }
 
     @POST
@@ -414,22 +359,6 @@ public class EdgeResource extends AbstractSubResource {
      */
     @POST
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response postNullEdgeConsumesUrlEncoded(@Context Request request, @PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        Variant v = request.selectVariant(producesVariantList);
-        return this.postEdge(graphName, null, true, v);
-    }
-
-    /**
-     * POST http://host/graph/edges
-     * graph.addEdge(null);
-     */
-    @POST
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
     public Response postNullEdgeConsumesJson(@Context Request request, @PathParam("graphname") String graphName, JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
@@ -466,24 +395,6 @@ public class EdgeResource extends AbstractSubResource {
     public Response postNullEdgeConsumesUri(@Context Request request, @PathParam("graphname") String graphName) {
         Variant v = request.selectVariant(producesVariantList);
         return this.postEdge(graphName, null, true, v);
-    }
-
-    /**
-     * POST http://host/graph/edge/id
-     * Edge e = graph.addEdge(id,graph.getVertex(id1),graph.getVertex(id2),label);
-     * e.setProperty(key,value);
-     */
-    @POST
-    @Path("/{id}")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response postEdgeConsumesUrlEncoded(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        Variant v = request.selectVariant(producesVariantList);
-        return this.postEdge(graphName, id, true, v);
     }
 
     /**
@@ -630,24 +541,6 @@ public class EdgeResource extends AbstractSubResource {
         }
 
         return Response.ok(this.resultObject).build();
-    }
-
-    /**
-     * PUT http://host/graph/edge/id
-     * Edge e = graph.addEdge(id,graph.getVertex(id1),graph.getVertex(id2),label);
-     * e.setProperty(key,value);
-     */
-    @PUT
-    @Path("/{id}")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response putEdgeConsumesUrlEncoded(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        Variant v = request.selectVariant(producesVariantList);
-        return this.putEdge(graphName, id, true, v);
     }
 
     /**

@@ -140,14 +140,6 @@ public class PrefixResource extends AbstractSubResource {
 
     @POST
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response postSinglePrefix(@PathParam("graphname") String graphName, MultivaluedMap<String, String> formParams) {
-        this.buildRequestObject(formParams);
-        return this.postSinglePrefix(graphName);
-    }
-
-    @POST
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response postSinglePrefix(@PathParam("graphname") String graphName) {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 
