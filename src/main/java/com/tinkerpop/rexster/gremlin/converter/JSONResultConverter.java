@@ -106,7 +106,9 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
             JSONObject jsonObject = new JSONObject();
             Map map = (Map) object;
             for (Object key : map.keySet()) {
-                jsonObject.put(key.toString(), this.prepareOutput(map.get(key)));
+                // force an error here by passing in a null key to the JSONObject.  That way a good error message
+                // gets back to the user.
+                jsonObject.put(key == null ? null : key.toString(), this.prepareOutput(map.get(key)));
             }
 
             return jsonObject;
