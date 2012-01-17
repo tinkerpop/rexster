@@ -120,7 +120,7 @@ public class RexsterScriptEngine extends AbstractScriptEngine {
             if (buffer.length() > 0) {
                 if (this.isSessionChanged) {
                     // session was changed by "put"
-                    this.session = new RemoteRexsterSession(this.host, this.port);
+                    this.session = new RemoteRexsterSession(this.host, this.port, "", "");
                     this.isSessionChanged = false;
                 }
 

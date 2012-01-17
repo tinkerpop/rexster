@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster;
+package com.tinkerpop.rexster.filter;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.log4j.Logger;

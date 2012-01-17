@@ -43,15 +43,15 @@ public class SessionRequestMessage extends RexProMessage {
         }
     }
 
-    public SessionRequestMessage(byte flag, byte channel) {
-        this(flag, channel, DEFAULT_CHUNK_SIZE);
+    public SessionRequestMessage(byte flag, byte channel, String username, String password) {
+        this(flag, channel, DEFAULT_CHUNK_SIZE, username, password);
     }
 
-    public SessionRequestMessage(byte flag, byte channel, int chunkSize) {
+    public SessionRequestMessage(byte flag, byte channel, int chunkSize, String username, String password) {
         super(RexProMessage.CURRENT_VERSION, MessageType.SESSION_REQUEST, flag,
                 BitWorks.convertUUIDToByteArray(EMPTY_SESSION),
                 BitWorks.convertUUIDToByteArray(UUID.randomUUID()),
-                buildBody(channel, chunkSize));
+                buildBody(channel, chunkSize, username, password));
 
         if (this.getFlag() == FLAG_KILL_SESSION) {
             throw new IllegalArgumentException("This type of message must be constructed without a body.");
@@ -73,6 +73,28 @@ public class SessionRequestMessage extends RexProMessage {
 
     }
 
+    public String[] getUsernamePassword() {
+        final String[] usernamePassword = new String [] { "", "" };
+
+        if (this.body.length > 0) {
+            ByteBuffer buffer = ByteBuffer.wrap(this.body);
+            buffer.position(5);
+            int usernameLength = buffer.getInt();
+
+            byte[] usernameBytes = new byte[usernameLength];
+            buffer.get(usernameBytes);
+            usernamePassword[0] = new String(usernameBytes);
+
+            int passwordLength = buffer.getInt();
+
+            byte[] passwordBytes = new byte[passwordLength];
+            buffer.get(passwordBytes);
+            usernamePassword[1] = new String(passwordBytes);
+        }
+
+        return usernamePassword;
+    }
+
     public int getChunkSize() {
         int chunkSize = DEFAULT_CHUNK_SIZE;
         if (this.body.length > 1) {
@@ -88,11 +110,15 @@ public class SessionRequestMessage extends RexProMessage {
         return channel == CHANNEL_NONE || channel == CHANNEL_CONSOLE;
     }
 
-    private static byte[] buildBody(byte channel, int chunkSize) {
-        ByteBuffer bb = ByteBuffer.allocate(5);
+    private static byte[] buildBody(byte channel, int chunkSize, String username, String password) {
+        ByteBuffer bb = ByteBuffer.allocate(13 + username.length() + password.length());
 
         bb.put(channel);
         bb.putInt(chunkSize);
+        bb.putInt(username.length());
+        bb.put(username.getBytes());
+        bb.putInt(password.length());
+        bb.put(password.getBytes());
 
         return bb.array();
     }

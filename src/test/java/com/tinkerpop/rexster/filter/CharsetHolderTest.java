@@ -1,5 +1,6 @@
-package com.tinkerpop.rexster;
+package com.tinkerpop.rexster.filter;
 
+import com.tinkerpop.rexster.filter.CharsetHolder;
 import org.junit.Assert;
 import org.junit.Test;
 

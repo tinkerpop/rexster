@@ -9,6 +9,11 @@
     <base-uri>http://localhost</base-uri>
     <web-root>public</web-root>
     <character-set>UTF-8</character-set>
+    <security>
+        <authentication>
+            <type>none</type>
+        </authentication>
+    </security>
     <graphs>
         <graph>
             <graph-name>emptygraph</graph-name>
