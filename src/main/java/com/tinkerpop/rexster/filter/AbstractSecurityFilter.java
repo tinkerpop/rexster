@@ -36,6 +36,10 @@ import javax.ws.rs.core.UriInfo;
 
 /**
  * Provides authentication for Rexster for all services: RexPro, REST, and Dog House.
+ *
+ * This is a bit of sketchy implementation of two semi-related bits of Grizzly/Jersey.  Trying to unify the
+ * implementation of security within the system for RexPro/REST/Dog House.  Could be a better way to do this,
+ * but it's not clear just yet.
  */
 public abstract class AbstractSecurityFilter extends BaseFilter implements ContainerRequestFilter {
 
