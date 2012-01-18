@@ -198,7 +198,9 @@ public class WebServer {
 
         HierarchicalConfiguration securityConfiguration = properties.configurationAt("security.authentication");
         String securityFilterType = securityConfiguration.getString("type");
-        if (!securityFilterType.equals("none")) {
+        if (securityFilterType.equals("none")) {
+            logger.info("Rexster configured with no security.");
+        } else {
             final AbstractSecurityFilter filter;
             if (securityFilterType.equals("default")) {
                 filter = new DefaultSecurityFilter();
@@ -209,6 +211,8 @@ public class WebServer {
             }
 
             filter.configure(properties);
+
+            logger.info("Rexster configured with [" + filter.getName() + "].");
         }
 
         filterChainBuilder.add(new SessionFilter(rexsterApplication));

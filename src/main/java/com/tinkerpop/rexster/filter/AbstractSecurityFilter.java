@@ -75,6 +75,11 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
     public abstract void configure(XMLConfiguration configuration);
 
     /**
+     * The name of the security filter.
+     */
+    public abstract String getName();
+
+    /**
      * RexPro authentication
      */
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {

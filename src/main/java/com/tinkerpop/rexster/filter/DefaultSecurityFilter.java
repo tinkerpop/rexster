@@ -61,4 +61,8 @@ public class DefaultSecurityFilter extends AbstractSecurityFilter {
             }
         }
     }
+
+    public String getName() {
+        return "DefaultSecurity";
+    }
 }
