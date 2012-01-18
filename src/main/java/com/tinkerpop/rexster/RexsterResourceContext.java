@@ -4,6 +4,7 @@ import com.tinkerpop.rexster.extension.ExtensionMethod;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -17,15 +18,22 @@ public class RexsterResourceContext {
     private JSONObject requestObject;
     private JSONObject requestObjectFlat;
     private ExtensionMethod extensionMethod;
+    private SecurityContext securityContext;
 
     public RexsterResourceContext(RexsterApplicationGraph rag, UriInfo uriInfo, HttpServletRequest request,
-                                  JSONObject requestObject, JSONObject requestObjectFlat, ExtensionMethod extensionMethod) {
+                                  JSONObject requestObject, JSONObject requestObjectFlat, ExtensionMethod extensionMethod,
+                                  SecurityContext securityContext) {
         this.rag = rag;
         this.uriInfo = uriInfo;
         this.request = request;
         this.requestObject = requestObject;
         this.extensionMethod = extensionMethod;
         this.requestObjectFlat = requestObjectFlat;
+        this.securityContext = securityContext;
+    }
+
+    public SecurityContext getSecurityContext() {
+        return this.securityContext;
     }
 
     public JSONObject getRequestObject() {

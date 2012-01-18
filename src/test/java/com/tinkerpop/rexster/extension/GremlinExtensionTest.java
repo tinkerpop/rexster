@@ -38,7 +38,7 @@ public class GremlinExtensionTest {
     private ExtensionMethod extensionMethodNoApi = new ExtensionMethod(null, null, null, null);
 
     private RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(null, uriInfo,
-            httpServletRequest, null, null, extensionMethodNoApi);
+            httpServletRequest, null, null, extensionMethodNoApi, null);
 
     /**
      * Choosing not to mock Graph instance for these tests as GremlinGroovyScriptEngine is
@@ -93,7 +93,7 @@ public class GremlinExtensionTest {
     public void evaluateGetOnGraphWithBindings() throws Exception{
         String json = "{\"params\":{\"x\":1, \"y\":2, \"z\":\"test\", \"list\":[3,2,1,0], \"map\":{\"mapx\":[300,200,100]}}}";
         RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(null, uriInfo,
-            httpServletRequest, new JSONObject(new JSONTokener(json)), null, extensionMethodNoApi);
+            httpServletRequest, new JSONObject(new JSONTokener(json)), null, extensionMethodNoApi, null);
 
         ExtensionResponse extensionResponse = this.gremlinExtension.evaluateGetOnGraph(
                 rexsterResourceContext, graph, "[x+y, z, list.size, map.mapx.size]");

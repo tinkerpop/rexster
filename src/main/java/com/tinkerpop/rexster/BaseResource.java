@@ -17,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 import java.util.ArrayList;
@@ -59,6 +60,9 @@ public abstract class BaseResource {
 
     @Context
     protected ServletContext servletContext;
+
+    @Context
+    protected SecurityContext securityContext;
 
     public BaseResource(RexsterApplicationProvider rexsterApplicationProvider) {
 
