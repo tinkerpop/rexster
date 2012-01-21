@@ -13,9 +13,14 @@ public class ElementHelperTest {
     
     @Test
     public void getTypedPropertyValueNullPropertyValue() {
-        Object emptyString = ElementHelper.getTypedPropertyValue(null);
-        Assert.assertNotNull(emptyString);
-        Assert.assertEquals("", emptyString);
+        Object nullValue = ElementHelper.getTypedPropertyValue(null);
+        Assert.assertNull(nullValue);
+    }
+
+    @Test
+    public void getTypedPropertyValueJSONObjectNullPropertyValue() {
+        Object nullValue = ElementHelper.getTypedPropertyValue(JSONObject.NULL);
+        Assert.assertNull(nullValue);
     }
 
     @Test
