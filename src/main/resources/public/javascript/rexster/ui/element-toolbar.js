@@ -124,7 +124,7 @@ define(
                                                 name : "" + n._id,
                                                 data : n,
                                                 adjacencies: [
-                                                    node.data._id
+                                                    "" + node.data._id
                                                 ]
                                             };
                                         });
@@ -137,7 +137,7 @@ define(
                                             }]).union(jitDataToSum);
 
                                         viz.sum(jitDataToSum);
-                                        viz.centerOnComplete(node.data._id);
+                                        viz.centerOnComplete("" + node.data._id);
                                     },
                                     function (jqXHR, textStatus, errorThrown) {
                                     }
