@@ -18,31 +18,35 @@ public class RemoteRexsterSession {
     private int rexProPort = 8184;
     private int timeout;
     private String rexProHost = "localhost";
+    private String username = "";
+    private String password = "";
 
     private UUID sessionKey = RexProMessage.EMPTY_SESSION;
 
     private List<String> availableLanguages;
 
-    public RemoteRexsterSession(String rexProHost, int rexProPort) {
-        this(rexProHost, rexProPort, RexPro.DEFAULT_TIMEOUT_SECONDS);
+    public RemoteRexsterSession(String rexProHost, int rexProPort, String username, String password) {
+        this(rexProHost, rexProPort, RexPro.DEFAULT_TIMEOUT_SECONDS, username, password);
     }
 
-    public RemoteRexsterSession(String rexProHost, int rexProPort, int timeout) {
+    public RemoteRexsterSession(String rexProHost, int rexProPort, int timeout, String username, String password) {
         this.rexProHost = rexProHost;
         this.rexProPort = rexProPort;
         this.timeout = timeout;
+        this.username = username;
+        this.password = password;
     }
 
     public void open() {
         if (sessionKey == RexProMessage.EMPTY_SESSION) {
-            RexProMessage sessionRequestMessageToSend = new SessionRequestMessage(SessionRequestMessage.FLAG_NEW_SESSION, SessionRequestMessage.CHANNEL_CONSOLE);
+            RexProMessage sessionRequestMessageToSend = new SessionRequestMessage(
+                    SessionRequestMessage.FLAG_NEW_SESSION, SessionRequestMessage.CHANNEL_CONSOLE,
+                    this.username, this.password);
             final RexProMessage rcvMessage = sendRequest(sessionRequestMessageToSend, 3);
 
-            if (rcvMessage != null) {
+            if (rcvMessage != null && rcvMessage.getType() == MessageType.SESSION_RESPONSE) {
                 final SessionResponseMessage sessionResponseMessage = new SessionResponseMessage(rcvMessage);
-
                 this.availableLanguages = sessionResponseMessage.getLanguages();
-
                 this.sessionKey = rcvMessage.getSessionAsUUID();
             }
         }

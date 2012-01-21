@@ -82,18 +82,6 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
         return doGraphDeleteOfJson(testGraph, path, null, jsontoDelete);
     }
 
-    protected ClientResponse doGraphPostOfForm(GraphTestHolder testGraph, String path, MultivaluedMap<String, String> mapToPost) {
-        return doGraphPostOfForm(testGraph, path, null, mapToPost);
-    }
-
-    protected ClientResponse doGraphPutOfForm(GraphTestHolder testGraph, String path, MultivaluedMap<String, String> mapToPut) {
-        return doGraphPutOfForm(testGraph, path, null, mapToPut);
-    }
-
-    protected ClientResponse doGraphDeleteOfForm(GraphTestHolder testGraph, String path, MultivaluedMap<String, String> mapToDelete) {
-        return doGraphDeleteOfForm(testGraph, path, null, mapToDelete);
-    }
-
     protected ClientResponse doGraphGet(GraphTestHolder testGraph, String path, String query) {
         String uri = makeGraphUriString(testGraph, path);
 
@@ -134,24 +122,6 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
         String uri = makeGraphUriString(testGraph, path);
 
         return doDeleteOfJson(uri, query, jsonToDelete);
-    }
-
-    protected ClientResponse doGraphPostOfForm(GraphTestHolder testGraph, String path, String query, MultivaluedMap<String, String> mapToPost) {
-        String uri = makeGraphUriString(testGraph, path);
-
-        return doPostOfForm(uri, query, mapToPost);
-    }
-
-    protected ClientResponse doGraphPutOfForm(GraphTestHolder testGraph, String path, String query, MultivaluedMap<String, String> mapToPut) {
-        String uri = makeGraphUriString(testGraph, path);
-
-        return doPutOfForm(uri, query, mapToPut);
-    }
-
-    protected ClientResponse doGraphDeleteOfForm(GraphTestHolder testGraph, String path, String query, MultivaluedMap<String, String> mapToDelete) {
-        String uri = makeGraphUriString(testGraph, path);
-
-        return doDeleteOfForm(uri, query, mapToDelete);
     }
 
     protected ClientResponse doGet(String path, String query) {
@@ -205,33 +175,6 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
 
         ClientRequest graphRequest = ClientRequest.create().type(MediaType.APPLICATION_JSON_TYPE).build(createUri("/" + uri), "DELETE");
         graphRequest.setEntity(jsonToDelete);
-
-        return this.client().handle(graphRequest);
-    }
-
-    protected ClientResponse doPostOfForm(String path, String query, MultivaluedMap<String, String> mapToPost) {
-        String uri = makeUriString(path, query);
-
-        ClientRequest graphRequest = ClientRequest.create().type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).build(createUri("/" + uri), "POST");
-        graphRequest.setEntity(mapToPost);
-
-        return this.client().handle(graphRequest);
-    }
-
-    protected ClientResponse doPutOfForm(String path, String query, MultivaluedMap<String, String> mapToPost) {
-        String uri = makeUriString(path, query);
-
-        ClientRequest graphRequest = ClientRequest.create().type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).build(createUri("/" + uri), "PUT");
-        graphRequest.setEntity(mapToPost);
-
-        return this.client().handle(graphRequest);
-    }
-
-    protected ClientResponse doDeleteOfForm(String path, String query, MultivaluedMap<String, String> mapToDelete) {
-        String uri = makeUriString(path, query);
-
-        ClientRequest graphRequest = ClientRequest.create().type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).build(createUri("/" + uri), "DELETE");
-        graphRequest.setEntity(mapToDelete);
 
         return this.client().handle(graphRequest);
     }

@@ -50,7 +50,7 @@ public class ElementHelper {
     public static Object getTypedPropertyValue(Object propertyValue, boolean parseTypes) {
         Object typedPropertyValue = propertyValue;
         if (typedPropertyValue == null) {
-            typedPropertyValue = "";
+            typedPropertyValue = null;
         }
 
         // determine if the property is typed, otherwise assume it is a string
@@ -90,6 +90,8 @@ public class ElementHelper {
                         typedPropertyValue = properties;
                     }
                 }
+            } else if (propertyValue == JSONObject.NULL) {
+                typedPropertyValue = null;
             } else if (propertyValue instanceof JSONObject) {
                 JSONObject innerJson = (JSONObject) propertyValue;
                 HashMap<String, Object> properties = new HashMap<String, Object>();

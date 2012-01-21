@@ -1,8 +1,10 @@
-package com.tinkerpop.rexster;
+package com.tinkerpop.rexster.filter;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
+import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.WebServer;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -10,15 +12,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  * Adds headers to the response.
  */
 public class HeaderResponseFilter implements ContainerResponseFilter {
-
-    private static Logger logger = Logger.getLogger(HeaderResponseFilter.class);
 
     public static final String HEADER_ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
     public static final String CONTENT_TYPE = "Content-Type";

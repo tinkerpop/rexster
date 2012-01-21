@@ -1,6 +1,10 @@
 package com.tinkerpop.rexster;
 
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.tinkerpop.rexster.filter.DefaultSecurityFilter;
+import com.tinkerpop.rexster.filter.HeaderResponseFilter;
+import com.tinkerpop.rexster.filter.AbstractSecurityFilter;
 import com.tinkerpop.rexster.protocol.RexProSessionMonitor;
 import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
 import com.tinkerpop.rexster.protocol.filter.ScriptFilter;
@@ -16,10 +20,12 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -54,7 +60,7 @@ public class WebServer {
 
     private static final String DEFAULT_WEB_ROOT_PATH = "public";
     private static final String DEFAULT_BASE_URI = "http://localhost";
-    protected static Logger logger = Logger.getLogger(WebServer.class);
+    private static Logger logger = Logger.getLogger(WebServer.class);
 
     static {
         PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
@@ -117,7 +123,7 @@ public class WebServer {
         characterEncoding = properties.getString("character-set", "ISO-8859-1");
 
         this.startRexsterServer(properties, baseUri, rexsterServerPort, webRootPath);
-        this.startRexProServer(rexproServerPort, rexsterApplication);
+        this.startRexProServer(properties, rexproServerPort, rexsterApplication);
 
     }
 
@@ -128,8 +134,18 @@ public class WebServer {
 
         ServletHandler jerseyHandler = new ServletHandler();
         jerseyHandler.addInitParameter("com.sun.jersey.config.property.packages", "com.tinkerpop.rexster");
-        jerseyHandler.addInitParameter("com.sun.jersey.spi.container.ContainerResponseFilters", "com.tinkerpop.rexster.HeaderResponseFilter");
+        jerseyHandler.addInitParameter(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, HeaderResponseFilter.class.getName());
         jerseyHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
+
+        HierarchicalConfiguration securityConfiguration = properties.configurationAt("security.authentication");
+        String securityFilterType = securityConfiguration.getString("type");
+        if (!securityFilterType.equals("none")) {
+            if (securityFilterType.equals("default")) {
+                jerseyHandler.addInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, DefaultSecurityFilter.class.getName());
+            } else {
+                jerseyHandler.addInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, securityFilterType);
+            }
+        }
 
         jerseyHandler.setContextPath("/");
         jerseyHandler.setServletInstance(new ServletContainer());
@@ -174,10 +190,31 @@ public class WebServer {
         logger.info("Rexster Server running on: [" + baseUri + ":" + rexsterServerPort + "]");
     }
 
-    private void startRexProServer(final Integer rexproServerPort, final RexsterApplication rexsterApplication) throws Exception {
+    private void startRexProServer(final XMLConfiguration properties, final Integer rexproServerPort,
+                                   final RexsterApplication rexsterApplication) throws Exception {
         FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
         filterChainBuilder.add(new TransportFilter());
         filterChainBuilder.add(new RexProMessageFilter());
+
+        HierarchicalConfiguration securityConfiguration = properties.configurationAt("security.authentication");
+        String securityFilterType = securityConfiguration.getString("type");
+        if (securityFilterType.equals("none")) {
+            logger.info("Rexster configured with no security.");
+        } else {
+            final AbstractSecurityFilter filter;
+            if (securityFilterType.equals("default")) {
+                filter = new DefaultSecurityFilter();
+                filterChainBuilder.add(filter);
+            } else {
+                filter = (AbstractSecurityFilter) Class.forName(securityFilterType).newInstance();
+                filterChainBuilder.add(filter);
+            }
+
+            filter.configure(properties);
+
+            logger.info("Rexster configured with [" + filter.getName() + "].");
+        }
+
         filterChainBuilder.add(new SessionFilter(rexsterApplication));
         filterChainBuilder.add(new ScriptFilter());
         filterChainBuilder.add(new EchoFilter());

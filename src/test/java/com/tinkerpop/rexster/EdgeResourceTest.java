@@ -295,55 +295,6 @@ public class EdgeResourceTest {
     }
 
     @Test
-    public void postNullEdgeConsumesUrlEncodedAcceptJsonValid() {
-        final HashMap<String, Object> parameters = generateEdgeParametersToPost(true);
-
-        final MultivaluedMap<String, String> formParams = new MultivaluedMapImpl();
-        for (String key : parameters.keySet()) {
-            formParams.add(key, parameters.get(key).toString());
-        }
-
-        final Vertex v1 = new MockVertex("1");
-        final Vertex v2 = new MockVertex("2");
-
-        final Edge returnEdge = new MockEdge("1", "label-1", new Hashtable<String, Object>(), v1, v2);
-
-        final Graph graph = this.mockery.mock(Graph.class);
-        final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
-
-        final UriInfo uri = this.mockery.mock(UriInfo.class);
-        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
-
-        final Request jsr311Request = this.mockery.mock(Request.class);
-        final Variant variantJson = new Variant(MediaType.APPLICATION_JSON_TYPE, null, null);
-
-        this.mockery.checking(new Expectations() {{
-            allowing(httpServletRequest).getParameterMap();
-            will(returnValue(parameters));
-            allowing(graph).getEdge(with(any(Object.class)));
-            will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
-            will(returnValue(rag));
-            allowing(graph).getVertex(with(equal("1")));
-            will(returnValue(v1));
-            allowing(graph).getVertex(with(equal("2")));
-            will(returnValue(v2));
-            allowing(graph).addEdge(null, v2, v1, "edge-label");
-            will(returnValue(returnEdge));
-            allowing(jsr311Request).selectVariant(with(any(List.class)));
-            will(returnValue(variantJson));
-            allowing(uri).getAbsolutePath();
-            will(returnValue(requestUriPath));
-        }});
-
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
-        Response response = resource.postNullEdgeConsumesUrlEncoded(jsr311Request, "graph", formParams);
-
-        assertPostEdgeProducesJson(response, false, false);
-    }
-
-    @Test
     public void postNullEdgeConsumesJsonAcceptJsonValid() {
         final HashMap<String, Object> parameters = generateEdgeParametersToPost(false);
         final JSONObject jsonToPost = new JSONObject(parameters);
@@ -474,56 +425,6 @@ public class EdgeResourceTest {
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
         Response response = resource.postNullEdgeConsumesUri(jsr311Request, "graph");
-
-        assertPostEdgeProducesJson(response, true, false);
-    }
-
-    @Test
-    public void postNullEdgeConsumesUrlEncodedAcceptRexsterJsonValid() {
-        final HashMap<String, Object> parameters = generateEdgeParametersToPost(true);
-
-        final MultivaluedMap<String, String> formParams = new MultivaluedMapImpl();
-        for (String key : parameters.keySet()) {
-            formParams.add(key, parameters.get(key).toString());
-        }
-
-        final Vertex v1 = new MockVertex("1");
-        final Vertex v2 = new MockVertex("2");
-
-        final Edge returnEdge = new MockEdge("1", "label-1", new Hashtable<String, Object>(), v1, v2);
-
-        final Graph graph = this.mockery.mock(Graph.class);
-        final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        initializeExtensionConfigurations(rag);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
-
-        final UriInfo uri = this.mockery.mock(UriInfo.class);
-        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
-
-        final Request jsr311Request = this.mockery.mock(Request.class);
-        final Variant variantJson = new Variant(RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE, null, null);
-
-        this.mockery.checking(new Expectations() {{
-            allowing(httpServletRequest).getParameterMap();
-            will(returnValue(parameters));
-            allowing(graph).getEdge(with(any(Object.class)));
-            will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
-            will(returnValue(rag));
-            allowing(graph).getVertex(with(equal("1")));
-            will(returnValue(v1));
-            allowing(graph).getVertex(with(equal("2")));
-            will(returnValue(v2));
-            allowing(graph).addEdge(null, v2, v1, "edge-label");
-            will(returnValue(returnEdge));
-            allowing(jsr311Request).selectVariant(with(any(List.class)));
-            will(returnValue(variantJson));
-            allowing(uri).getAbsolutePath();
-            will(returnValue(requestUriPath));
-        }});
-
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
-        Response response = resource.postNullEdgeConsumesUrlEncoded(jsr311Request, "graph", formParams);
 
         assertPostEdgeProducesJson(response, true, false);
     }
@@ -662,56 +563,6 @@ public class EdgeResourceTest {
 
         EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
         Response response = resource.postNullEdgeConsumesUri(jsr311Request, "graph");
-
-        assertPostEdgeProducesJson(response, true, true);
-    }
-
-    @Test
-    public void postNullEdgeConsumesUrlEncodedAcceptRexsterTypedJsonValid() {
-        final HashMap<String, Object> parameters = generateEdgeParametersToPost(true);
-
-        final MultivaluedMap<String, String> formParams = new MultivaluedMapImpl();
-        for (String key : parameters.keySet()) {
-            formParams.add(key, parameters.get(key).toString());
-        }
-
-        final Vertex v1 = new MockVertex("1");
-        final Vertex v2 = new MockVertex("2");
-
-        final Edge returnEdge = new MockEdge("1", "label-1", new Hashtable<String, Object>(), v1, v2);
-
-        final Graph graph = this.mockery.mock(Graph.class);
-        final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        initializeExtensionConfigurations(rag);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
-
-        final UriInfo uri = this.mockery.mock(UriInfo.class);
-        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
-
-        final Request jsr311Request = this.mockery.mock(Request.class);
-        final Variant variantJson = new Variant(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE, null, null);
-
-        this.mockery.checking(new Expectations() {{
-            allowing(httpServletRequest).getParameterMap();
-            will(returnValue(parameters));
-            allowing(graph).getEdge(with(any(Object.class)));
-            will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
-            will(returnValue(rag));
-            allowing(graph).getVertex(with(equal("1")));
-            will(returnValue(v1));
-            allowing(graph).getVertex(with(equal("2")));
-            will(returnValue(v2));
-            allowing(graph).addEdge(null, v2, v1, "edge-label");
-            will(returnValue(returnEdge));
-            allowing(jsr311Request).selectVariant(with(any(List.class)));
-            will(returnValue(variantJson));
-            allowing(uri).getAbsolutePath();
-            will(returnValue(requestUriPath));
-        }});
-
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
-        Response response = resource.postNullEdgeConsumesUrlEncoded(jsr311Request, "graph", formParams);
 
         assertPostEdgeProducesJson(response, true, true);
     }

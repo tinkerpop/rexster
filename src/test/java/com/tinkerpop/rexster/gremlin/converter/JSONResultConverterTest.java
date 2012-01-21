@@ -23,6 +23,13 @@ public class JSONResultConverterTest {
     }
 
     @Test
+    public void convertJSONObjectNullResultReturnsNull() throws Exception {
+        JSONArray results = this.converterNotPaged.convert(JSONObject.NULL);
+        Assert.assertNotNull(results);
+        Assert.assertEquals(1, results.length());
+    }
+
+    @Test
     public void convertTableNotPaged() throws Exception {
         Table table = new Table("col1", "col2");
         table.addRow("x1", "x2");

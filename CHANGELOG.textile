@@ -28,6 +28,9 @@ h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
 * Dog House uses require.js for module loading.
 * Simple graph visualization through "JIT":http://thejit.org.
 * Dog House provides a filter option when browsing vertices and edges.  Filters are backed by indices such that the user can select an index then specify a key/value to filter the paged results by.
+* Dropped support for support for @application/x-www-form-urlencoded@.
+* Basic authentication configurable through @rexster.xml@ and extensible via extensions to @AbstractSecurityFilter@.
+* Corrected issues with null values being passed to Gremlin Extension as bindings.
 
 ==<hr/>==
 

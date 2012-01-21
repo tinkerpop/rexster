@@ -33,6 +33,8 @@ public class RexsterConsole {
     private RemoteRexsterSession session = null;
     private String host;
     private String language;
+    private String username = "";
+    private String password = "";
     private int port;
     private int timeout;
     private List<String> currentBindings = new ArrayList<String>();
@@ -41,7 +43,7 @@ public class RexsterConsole {
 
     private static final String REXSTER_HISTORY = ".rexster_history";
 
-    public RexsterConsole(String host, int port, String language, int timeout) throws Exception {
+    public RexsterConsole(String host, int port, String language, int timeout, String username, String password) throws Exception {
 
         this.output.println("        (l_(l");
         this.output.println("(_______( 0 0");
@@ -53,9 +55,11 @@ public class RexsterConsole {
         this.port = port;
         this.language = language;
         this.timeout = timeout;
+        this.username = username;
+        this.password = password;
 
         this.output.println("opening session [" + this.host + ":" + this.port + "]");
-        this.session = new RemoteRexsterSession(this.host, this.port, this.timeout);
+        this.session = new RemoteRexsterSession(this.host, this.port, this.timeout, this.username, this.password);
         this.session.open();
 
         if (this.session.isOpen()) {
@@ -68,13 +72,15 @@ public class RexsterConsole {
 
     }
 
-    public RexsterConsole(String host, int port, String language, int timeout, String script) throws Exception {
+    public RexsterConsole(String host, int port, String language, int timeout, String script, String username, String password) throws Exception {
         this.host = host;
         this.port = port;
         this.language = language;
         this.timeout = timeout;
+        this.username = username;
+        this.password = password;
 
-        this.session = new RemoteRexsterSession(this.host, this.port, this.timeout);
+        this.session = new RemoteRexsterSession(this.host, this.port, this.timeout, this.username, this.password);
         this.session.open();
 
         if (!this.session.isOpen()) {
@@ -140,7 +146,7 @@ public class RexsterConsole {
                     if (this.session != null) {
                         this.session.reset();
                     } else {
-                        this.session = new RemoteRexsterSession(this.host, this.port, this.timeout);
+                        this.session = new RemoteRexsterSession(this.host, this.port, this.timeout, this.username, this.password);
                     }
                     this.output.println("--> done");
                 } else if (line.startsWith(Tokens.REXSTER_CONSOLE_EXECUTE)) {
@@ -352,6 +358,18 @@ public class RexsterConsole {
                 .withLongOpt("execute")
                 .create("e");
 
+        Option username = OptionBuilder.withArgName("username")
+                .hasArg()
+                .withDescription("username for authentication (if needed)")
+                .withLongOpt("user")
+                .create("u");
+
+        Option password = OptionBuilder.withArgName("password")
+                .hasArg()
+                .withDescription("password for authentication (if needed)")
+                .withLongOpt("pass")
+                .create("p");
+
         Options options = new Options();
         options.addOption(help);
         options.addOption(hostName);
@@ -359,6 +377,8 @@ public class RexsterConsole {
         options.addOption(language);
         options.addOption(timeout);
         options.addOption(scriptFile);
+        options.addOption(username);
+        options.addOption(password);
 
         return options;
     }
@@ -366,7 +386,7 @@ public class RexsterConsole {
     private static CommandLine getCliInput(final String[] args) throws Exception {
         Options options = getCliOptions();
         CommandLineParser parser = new GnuParser();
-        CommandLine line = null;
+        CommandLine line;
 
         try {
             line = parser.parse(options, args);
@@ -391,6 +411,8 @@ public class RexsterConsole {
         int port = 8184;
         String language = "groovy";
         int timeout = RexPro.DEFAULT_TIMEOUT_SECONDS;
+        String username = "";
+        String password = "";
 
         if (line.hasOption("rexsterhost")) {
             host = line.getOptionValue("rexsterhost");
@@ -418,18 +440,26 @@ public class RexsterConsole {
             }
         }
 
+        if (line.hasOption("user")) {
+            username = line.getOptionValue("user");
+        }
+
+        if (line.hasOption("pass")) {
+            password = line.getOptionValue("pass");
+        }
+
         String fileToExecute = null;
         if (line.hasOption("execute")) {
             fileToExecute = line.getOptionValue("execute");
 
             try {
-                new RexsterConsole(host, port, language, timeout, readFile(fileToExecute));
+                new RexsterConsole(host, port, language, timeout, readFile(fileToExecute), username, password);
             } catch (IOException ioe) {
                 System.out.println("could not read the file specified");
             }
 
         } else {
-            new RexsterConsole(host, port, language, timeout);
+            new RexsterConsole(host, port, language, timeout, username, password);
         }
     }
 }

@@ -25,6 +25,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -246,7 +247,8 @@ public abstract class AbstractSubResource extends BaseResource {
                 this.httpServletRequest,
                 this.getRequestObject(),
                 this.getRequestObjectFlat(),
-                methodToCall);
+                methodToCall,
+                this.securityContext);
 
         Annotation[][] parametersAnnotations = method.getParameterAnnotations();
         ArrayList methodToCallParams = new ArrayList();
@@ -266,6 +268,8 @@ public abstract class AbstractSubResource extends BaseResource {
                         methodToCallParams.add(this.uriInfo);
                     } else if (parameterTypes[ix].equals(HttpServletRequest.class)) {
                         methodToCallParams.add(this.httpServletRequest);
+                    } else if (parameterTypes[ix].equals(SecurityContext.class)) {
+                        methodToCallParams.add(this.securityContext);
                     } else if (parameterTypes[ix].equals(RexsterResourceContext.class)) {
                         methodToCallParams.add(rexsterResourceContext);
                     } else if (parameterTypes[ix].equals(Edge.class)) {

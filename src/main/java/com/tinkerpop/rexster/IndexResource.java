@@ -317,19 +317,6 @@ public class IndexResource extends AbstractSubResource {
     @DELETE
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response deleteIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data DELETEed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        return this.deleteIndex(graphName, indexName);
-
-    }
-
-    @DELETE
-    @Path("/{indexName}")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response deleteIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, JSONObject json) {
         // initializes the request object with the data DELETEed to the resource.  URI parameters
@@ -404,27 +391,6 @@ public class IndexResource extends AbstractSubResource {
         }
 
         return Response.ok(this.resultObject).build();
-
-    }
-
-    /**
-     * POST http://host/graph/indices/indexName?key=key1&value=value1&class=vertex&id=id1
-     * Index index = graph.getIndex(indexName,...);
-     * index.put(key,value,graph.getVertex(id1));
-     * <p/>
-     * POST http://host/graph/indices/indexName?class=vertex&type=automatic&keys=[name,age]
-     * graph.createIndex(indexName,Vertex.class,AUTOMATIC, {name, age})
-     */
-    @POST
-    @Path("/{indexName}")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response postIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        return this.postIndex(graphName, indexName);
 
     }
 
@@ -560,22 +526,6 @@ public class IndexResource extends AbstractSubResource {
         }
 
         return Response.ok(this.resultObject).build();
-    }
-
-    /**
-     * PUT http://host/graph/indices/indexName?key=key1&value=value1&class=vertex&id=id1
-     */
-    @PUT
-    @Path("/{indexName}")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response putElementInIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, MultivaluedMap<String, String> formParams) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.buildRequestObject(formParams);
-        return this.putElementInIndex(graphName, indexName);
-
     }
 
     /**
