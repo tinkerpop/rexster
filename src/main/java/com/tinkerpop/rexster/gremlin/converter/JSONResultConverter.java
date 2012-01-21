@@ -116,6 +116,8 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
             return this.convert(object);
         } else if (object instanceof Number || object instanceof Boolean) {
             return object;
+        } else if (object == JSONObject.NULL) {
+            return JSONObject.NULL;
         } else {
             return object.toString();
         }
