@@ -67,6 +67,10 @@ public class GraphConfigurationContainer {
                         } catch (GraphConfigurationException gce) {
                             logger.warn("Could not load graph " + graphName + ". Please check the XML configuration.");
 
+                            if (gce.getCause() != null) {
+                                logger.warn(gce.getCause().getMessage());
+                            }
+
                             failedConfigurations.add(graphConfig);
                         } catch (Exception e) {
                             logger.warn("Could not load graph " + graphName + ".", e);

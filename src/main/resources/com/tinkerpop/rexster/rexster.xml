@@ -18,11 +18,13 @@
         <graph>
             <graph-name>emptygraph</graph-name>
             <graph-type>tinkergraph</graph-type>
+            <graph-mock-tx>true</graph-mock-tx>
         </graph>
         <graph>
             <graph-name>tinkergraph</graph-name>
             <graph-type>tinkergraph</graph-type>
             <graph-location>data/graph-example-1</graph-location>
+            <graph-mock-tx>true</graph-mock-tx>
             <extensions>
                 <allows>
                     <allow>tp:gremlin</allow>
