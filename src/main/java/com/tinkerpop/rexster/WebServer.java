@@ -116,13 +116,14 @@ public class WebServer {
 
     private void start(final XMLConfiguration properties) throws Exception {
         RexsterApplication rexsterApplication = WebServerRexsterApplicationProvider.start(properties);
-        Integer rexsterServerPort = properties.getInteger("rexster-server-port", new Integer(8182));
-        Integer rexproServerPort = properties.getInteger("rexpro-server-port", new Integer(8184));
-        String webRootPath = properties.getString("web-root", DEFAULT_WEB_ROOT_PATH);
-        String baseUri = properties.getString("base-uri", DEFAULT_BASE_URI);
+        final Integer rexsterServerPort = properties.getInteger("rexster-server-port", new Integer(8182));
+        final String rexsterServerHost = properties.getString("rexster-server-host", "0.0.0.0");
+        final Integer rexproServerPort = properties.getInteger("rexpro-server-port", new Integer(8184));
+        final String webRootPath = properties.getString("web-root", DEFAULT_WEB_ROOT_PATH);
+        final String baseUri = properties.getString("base-uri", DEFAULT_BASE_URI);
         characterEncoding = properties.getString("character-set", "ISO-8859-1");
 
-        this.startRexsterServer(properties, baseUri, rexsterServerPort, webRootPath);
+        this.startRexsterServer(properties, baseUri, rexsterServerPort, rexsterServerHost, webRootPath);
         this.startRexProServer(properties, rexproServerPort, rexsterApplication);
 
     }
@@ -130,6 +131,7 @@ public class WebServer {
     private void startRexsterServer(final XMLConfiguration properties,
                                     final String baseUri,
                                     final Integer rexsterServerPort,
+                                    final String rexsterServerHost,
                                     final String webRootPath) throws Exception {
 
         ServletHandler jerseyHandler = new ServletHandler();
@@ -182,7 +184,7 @@ public class WebServer {
         config.addHttpHandler(visualizationHandler, "/doghouse/visualize");
         config.addHttpHandler(evaluatorHandler, "/doghouse/exec");
 
-        final NetworkListener listener = new NetworkListener("grizzly", "0.0.0.0", rexsterServerPort);
+        final NetworkListener listener = new NetworkListener("grizzly", rexsterServerHost, rexsterServerPort);
         this.rexsterServer.addListener(listener);
 
         this.rexsterServer.start();
