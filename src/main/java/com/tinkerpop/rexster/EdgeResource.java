@@ -316,6 +316,12 @@ public class EdgeResource extends AbstractSubResource {
                 throw wae;
             } catch (Exception ex) {
                 logger.error("Dynamic invocation of the [" + extensionSegmentSet + "] extension failed.", ex);
+
+                if (ex.getCause() != null) {
+                    Throwable cause = ex.getCause();
+                    logger.error("It would be smart to trap this this exception within the extension and supply a good response to the user:" + cause.getMessage(), cause);
+                }
+
                 JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
