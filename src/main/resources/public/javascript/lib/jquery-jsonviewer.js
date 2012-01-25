@@ -36,7 +36,11 @@
 
     function format_value(element, name, data, config, showToolbar) {
         //debug('name=' + name + "; data=" + data);
-    	var isMetaData = name === "_type" || (name === "_id" && !config['showId']) || name === "_outV" || name === "_inV" || name === "_label";
+
+        // we don't want to render metadata in the json viewer.  these are standard rexster properties that
+        // would muddy up the view.  one exception is $alpha which seems to be a jit related bit of meta data
+        // that gets injected at render time of the visualization.
+    	var isMetaData = name === "_type" || (name === "_id" && !config['showId']) || name === "_outV" || name === "_inV" || name === "_label" || name === "$alpha";
     	if (!isMetaData) {
 	        var v = new TypeHandler(data);
 	        var typePrefix = v.type().charAt(0);
