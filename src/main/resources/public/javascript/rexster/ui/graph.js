@@ -432,7 +432,7 @@ define(
                                 $("#dialogForm > #dialogFormJsonViewer").empty();
                                 $("#dialogForm > #dialogFormJsonViewer").jsonviewer({
                                     "jsonName": "Rexster Extension Results [ERROR]",
-                                    "jsonData": JSON.parse(e.response()),
+                                    "jsonData": JSON.parse(e.responseText),
                                     "outerPadding":"0px",
                                     "highlight":false
                                 })
