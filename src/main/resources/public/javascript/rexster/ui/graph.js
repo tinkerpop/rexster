@@ -402,7 +402,7 @@ define(
                             }
                         });
 
-                        $("#dialogFormUriText").val(extensionUriWithParameters);
+                        $("#dialogFormUriText").val(encodeURI(extensionUriWithParameters));
                         $("#dialogFormUriText").select();
 
                         $("#dialogFormUriText").unbind("click")
