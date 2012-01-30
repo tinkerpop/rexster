@@ -30,7 +30,11 @@ h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
 * Dog House provides a filter option when browsing vertices and edges.  Filters are backed by indices such that the user can select an index then specify a key/value to filter the paged results by.
 * Dropped support for support for @application/x-www-form-urlencoded@.
 * Basic authentication configurable through @rexster.xml@ and extensible via extensions to @AbstractSecurityFilter@.
-* Corrected issues with null values being passed to Gremlin Extension as bindings.
+* Better handling of null values being passed to Gremlin Extension as bindings.
+* Allow configuration of the Rexster server host in @rexster.xml@.
+* Launching an extension from Dog House that fails now properly removes the "Loading" spinner and displays the error.
+* Encode the URI for extensions launched in Dog House so that they are properly encoded for cut and paste use.
+* Added a mock @TransactionalGraph@ implementation so that a @TinkerGraph@ can be tested in a transactional mode (configured through @rexster.xml@).
 
 ==<hr/>==
 
@@ -63,7 +67,6 @@ h3. Version 0.7 (Brian -- December 7, 2011)
 ** Launch extensions that can be accessed with a GET and that return JSON.
 * Dog House is kinder to SailGraph implementations (generally cosmetic changes).
 * Rexster Console only hosts Gremlin-flavored script engine implementations.  Currently, that means that @gremlin-groovy@ is the only exposed language.
-* Allow configuration of the Rexster server host in @rexster.xml@.
 
 ==<hr/>==
 
