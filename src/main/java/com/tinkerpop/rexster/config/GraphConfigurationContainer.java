@@ -2,8 +2,8 @@ package com.tinkerpop.rexster.config;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
-import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyIndexableGraph;
+import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.ReadOnlyGraph;
+import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.ReadOnlyIndexableGraph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.configuration.HierarchicalConfiguration;

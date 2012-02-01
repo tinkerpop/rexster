@@ -2,8 +2,8 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.impls.event.EventGraph;
-import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyGraph;
+import com.tinkerpop.blueprints.pgm.util.wrappers.event.EventGraph;
+import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.ReadOnlyGraph;
 import com.tinkerpop.rexster.extension.ExtensionAllowed;
 import com.tinkerpop.rexster.extension.ExtensionApi;
 import com.tinkerpop.rexster.extension.ExtensionApiBehavior;
@@ -19,15 +19,12 @@ import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import scala.util.parsing.json.JSON;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
