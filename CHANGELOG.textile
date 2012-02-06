@@ -35,6 +35,7 @@ h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
 * Launching an extension from Dog House that fails now properly removes the "Loading" spinner and displays the error.
 * Encode the URI for extensions launched in Dog House so that they are properly encoded for cut and paste use.
 * Added a mock @TransactionalGraph@ implementation so that a @TinkerGraph@ can be tested in a transactional mode (configured through @rexster.xml@).
+* Results from the Gremlin Extension that are @Iterator@ implementations are now paging properly.
 
 ==<hr/>==
 

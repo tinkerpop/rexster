@@ -75,8 +75,9 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
 
             long counter = 0;
             while (itty.hasNext()) {
+                Object current = itty.next();
                 if (counter >= this.offsetStart && counter < this.offsetEnd) {
-                    results.put(prepareOutput(itty.next()));
+                    results.put(prepareOutput(current));
                 }
 
                 if (counter >= this.offsetEnd) {
