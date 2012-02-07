@@ -35,6 +35,8 @@ public class GremlinExtension extends AbstractRexsterExtension {
     public static final String EXTENSION_NAMESPACE = "tp";
     public static final String EXTENSION_NAME = "gremlin";
     
+    private static final Map<String, String> cachedScripts = new HashMap<String, String>();
+    
     private static final EngineController enginerController = EngineController.getInstance();
     private static final String GRAPH_VARIABLE = "g";
     private static final String VERTEX_VARIABLE = "v";
@@ -306,6 +308,8 @@ public class GremlinExtension extends AbstractRexsterExtension {
             return null;    
         }
         
+        boolean scriptsAreCached = areScriptsCached(configuration);
+        
         String scriptLocation = (String) configuration.get("scripts");
         
         final JSONArray jsonArray = requestObject != null ? requestObject.optJSONArray(LOAD) : null;
@@ -314,7 +318,17 @@ public class GremlinExtension extends AbstractRexsterExtension {
         if (jsonArray != null) {
             List<String> scriptList = new ArrayList<String>();
             for (int ix = 0; ix < jsonArray.length(); ix++) {
-                scriptList.add(readFile(scriptLocation + File.separator + jsonArray.optString(ix) + ".gremlin"));
+                final String locationAndScriptFile = scriptLocation + File.separator + jsonArray.optString(ix) + ".gremlin";
+
+                String script = cachedScripts.get(locationAndScriptFile);
+                if (script == null) {
+                    script = readFile(locationAndScriptFile);
+                    
+                    if (scriptsAreCached) {
+                        cachedScripts.put(locationAndScriptFile, script);
+                    }
+                }
+                scriptList.add(script);
             }
             
             scripts = scriptList.iterator();
@@ -339,5 +353,15 @@ public class GremlinExtension extends AbstractRexsterExtension {
         }
         
         return allowClientScript;
+    }
+    
+    private static boolean areScriptsCached(Map configuration) {
+        boolean cacheScripts = true;
+        if (configuration != null && configuration.containsKey("cache-scripts")) {
+            String configValue = (String) configuration.get("cache-scripts");
+            cacheScripts = configValue.toLowerCase().equals("true") ? true : false;
+        }
+
+        return cacheScripts;
     }
 }
