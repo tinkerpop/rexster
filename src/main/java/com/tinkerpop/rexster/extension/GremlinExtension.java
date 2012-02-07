@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.extension;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.gremlin.converter.JSONResultConverter;
@@ -10,20 +11,30 @@ import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.EngineHolder;
 import com.tinkerpop.rexster.util.ElementHelper;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.script.Bindings;
 import javax.script.SimpleBindings;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-@ExtensionNaming(namespace = "tp", name = "gremlin")
+@ExtensionNaming(namespace = GremlinExtension.EXTENSION_NAMESPACE, name = GremlinExtension.EXTENSION_NAME)
 public class GremlinExtension extends AbstractRexsterExtension {
     protected static Logger logger = Logger.getLogger(GremlinExtension.class);
 
+    public static final String EXTENSION_NAMESPACE = "tp";
+    public static final String EXTENSION_NAME = "gremlin";
+    
     private static final EngineController enginerController = EngineController.getInstance();
     private static final String GRAPH_VARIABLE = "g";
     private static final String VERTEX_VARIABLE = "v";
@@ -32,6 +43,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
     private static final String SCRIPT = "script";
     private static final String LANGUAGE = "language";
     private static final String PARAMS = "params";
+    private static final String LOAD = "load";
 
     private static final String API_SHOW_TYPES = "displays the properties of the elements with their native data type (default is false)";
     private static final String API_SCRIPT = "the Gremlin script to be evaluated";
@@ -40,6 +52,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
     private static final String API_END_OFFSET = "end index for a paged set of data to be returned";
     private static final String API_LANGUAGE = "the gremlin language flavor to use (default to groovy)";
     private static final String API_PARAMS = "a map of parameters to bind to the script engine";
+    private static final String API_LOAD = "a list of 'stored procedures' to execute prior to the 'script' (if 'script' is not specified then the last script in this argument will return the values";
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE, method = HttpMethod.GET)
     @ExtensionDescriptor(description = "evaluate an ad-hoc Gremlin script for an edge.",
@@ -47,6 +60,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
                     @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
                     @ExtensionApi(parameterName = PARAMS, description = API_PARAMS),
+                    @ExtensionApi(parameterName = LOAD, description = API_LOAD),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -64,6 +78,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
                     @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
                     @ExtensionApi(parameterName = PARAMS, description = API_PARAMS),
+                    @ExtensionApi(parameterName = LOAD, description = API_LOAD),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -81,6 +96,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
                     @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
                     @ExtensionApi(parameterName = PARAMS, description = API_PARAMS),
+                    @ExtensionApi(parameterName = LOAD, description = API_LOAD),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -98,6 +114,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
                     @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
                     @ExtensionApi(parameterName = PARAMS, description = API_PARAMS),
+                    @ExtensionApi(parameterName = LOAD, description = API_LOAD),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -115,6 +132,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
                     @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
                     @ExtensionApi(parameterName = PARAMS, description = API_PARAMS),
+                    @ExtensionApi(parameterName = LOAD, description = API_LOAD),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -131,6 +149,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
                     @ExtensionApi(parameterName = LANGUAGE, description = API_LANGUAGE),
                     @ExtensionApi(parameterName = PARAMS, description = API_PARAMS),
+                    @ExtensionApi(parameterName = LOAD, description = API_LOAD),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_START, description = API_START_OFFSET),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.OFFSET_END, description = API_END_OFFSET)
@@ -170,8 +189,28 @@ public class GremlinExtension extends AbstractRexsterExtension {
 
         // add all keys not defined by this request as bindings to the script engine
         placeParametersOnBinding(requestObject, bindings, showTypes);
+        
+        // get the list of "stored procedures" to run
+        RexsterApplicationGraph rag = rexsterResourceContext.getRexsterApplicationGraph();
 
         final ExtensionMethod extensionMethod = rexsterResourceContext.getExtensionMethod();
+        
+        Iterator<String> scriptsToRun = null;
+        try {
+            ExtensionConfiguration extensionConfiguration = rag != null ? rag.findExtensionConfiguration(EXTENSION_NAMESPACE, EXTENSION_NAME) : null;
+            if (extensionConfiguration != null) {
+                scriptsToRun = getScriptsToRun(requestObject, extensionConfiguration.tryGetMapFromConfiguration());
+            }
+        } catch (IOException ioe) {
+            return ExtensionResponse.error(ioe,
+                    generateErrorJson(extensionMethod.getExtensionApiAsJson()));
+        }
+
+        if ((script == null || script.isEmpty()) && scriptsToRun == null) {
+            return ExtensionResponse.error(
+                    "no scripts provided",
+                    generateErrorJson(extensionMethod.getExtensionApiAsJson()));
+        }
 
         try {
             if (!enginerController.isEngineAvailable(languageToExecuteWith)) {
@@ -179,23 +218,28 @@ public class GremlinExtension extends AbstractRexsterExtension {
                          generateErrorJson(extensionMethod.getExtensionApiAsJson()));
             }
 
-            if (script != null && !script.isEmpty()) {
-                final EngineHolder engineHolder = enginerController.getEngineByLanguageName(languageToExecuteWith);
-                Object result = engineHolder.getEngine().eval(script, bindings);
-                JSONArray results = new JSONResultConverter(showTypes, offsetStart, offsetEnd, returnKeys).convert(result);
+            final EngineHolder engineHolder = enginerController.getEngineByLanguageName(languageToExecuteWith);
 
-                HashMap<String, Object> resultMap = new HashMap<String, Object>();
-                resultMap.put(Tokens.SUCCESS, true);
-                resultMap.put(Tokens.RESULTS, results);
-
-                JSONObject resultObject = new JSONObject(resultMap);
-                extensionResponse = ExtensionResponse.ok(resultObject);
-
-            } else {
-                extensionResponse = ExtensionResponse.error(
-                        "no script provided",
-                        generateErrorJson(extensionMethod.getExtensionApiAsJson()));
+            // result is either the ad-hoc script on the query string or the last "stored procedure"
+            Object result = null;
+            if (scriptsToRun != null) {
+                while (scriptsToRun.hasNext()) {
+                    result = engineHolder.getEngine().eval(scriptsToRun.next(), bindings);
+                }
             }
+
+            if (script != null && !script.isEmpty()) {
+                result = engineHolder.getEngine().eval(script, bindings);
+            }
+
+            JSONArray results = new JSONResultConverter(showTypes, offsetStart, offsetEnd, returnKeys).convert(result);
+
+            HashMap<String, Object> resultMap = new HashMap<String, Object>();
+            resultMap.put(Tokens.SUCCESS, true);
+            resultMap.put(Tokens.RESULTS, results);
+
+            JSONObject resultObject = new JSONObject(resultMap);
+            extensionResponse = ExtensionResponse.ok(resultObject);
 
         } catch (Exception e) {
             extensionResponse = ExtensionResponse.error(e,
@@ -246,5 +290,42 @@ public class GremlinExtension extends AbstractRexsterExtension {
         }
 
         return requestedLanguage;
+    }
+
+    private static Iterator<String> getScriptsToRun(JSONObject requestObject, Map configuration) throws IOException {
+        
+        if (configuration == null) {
+            logger.warn("No scripts are configured for the Gremlin Extension so 'load' query string parameter will be ignored");
+            return null;
+        }
+        
+        if (!configuration.containsKey("scripts")) {
+            logger.warn("The configuration suppled for the Gremlin Extension does not contain a 'scripts' key so 'load' query string parameter will be ignored");
+            return null;    
+        }
+        
+        String scriptLocation = (String) configuration.get("scripts");
+        
+        final JSONArray jsonArray = requestObject != null ? requestObject.optJSONArray(LOAD) : null;
+        
+        Iterator<String> scripts = null;
+        if (jsonArray != null) {
+            List<String> scriptList = new ArrayList<String>();
+            for (int ix = 0; ix < jsonArray.length(); ix++) {
+                scriptList.add(readFile(scriptLocation + File.separator + jsonArray.optString(ix) + ".gremlin"));
+            }
+            
+            scripts = scriptList.iterator();
+        }
+
+        return scripts;
+    }
+
+    public static String readFile(String fileName) throws IOException {
+
+        StringWriter stringWriter = new StringWriter();
+        IOUtils.copy(new FileInputStream(new File(fileName)), stringWriter);
+
+        return stringWriter.toString();
     }
 }

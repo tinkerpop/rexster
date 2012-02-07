@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
+import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
 import org.codehaus.jettison.json.JSONArray;
@@ -66,7 +67,7 @@ public class GremlinExtensionTest {
 
         Assert.assertNotNull(jsonResponse);
         Assert.assertTrue(jsonResponse.has(Tokens.MESSAGE));
-        Assert.assertEquals("no script provided", jsonResponse.optString(Tokens.MESSAGE));
+        Assert.assertEquals("no scripts provided", jsonResponse.optString(Tokens.MESSAGE));
     }
 
     @Test
