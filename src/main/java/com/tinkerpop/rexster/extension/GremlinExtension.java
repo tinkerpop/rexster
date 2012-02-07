@@ -194,12 +194,14 @@ public class GremlinExtension extends AbstractRexsterExtension {
         RexsterApplicationGraph rag = rexsterResourceContext.getRexsterApplicationGraph();
 
         final ExtensionMethod extensionMethod = rexsterResourceContext.getExtensionMethod();
+        Map configurationMap = null;
         
         Iterator<String> scriptsToRun = null;
         try {
             ExtensionConfiguration extensionConfiguration = rag != null ? rag.findExtensionConfiguration(EXTENSION_NAMESPACE, EXTENSION_NAME) : null;
             if (extensionConfiguration != null) {
-                scriptsToRun = getScriptsToRun(requestObject, extensionConfiguration.tryGetMapFromConfiguration());
+                configurationMap = extensionConfiguration.tryGetMapFromConfiguration();
+                scriptsToRun = getScriptsToRun(requestObject, configurationMap);
             }
         } catch (IOException ioe) {
             return ExtensionResponse.error(ioe,
@@ -228,7 +230,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
                 }
             }
 
-            if (script != null && !script.isEmpty()) {
+            if (isClientScriptAllowed(configurationMap) && script != null && !script.isEmpty()) {
                 result = engineHolder.getEngine().eval(script, bindings);
             }
 
@@ -321,11 +323,21 @@ public class GremlinExtension extends AbstractRexsterExtension {
         return scripts;
     }
 
-    public static String readFile(String fileName) throws IOException {
+    private static String readFile(String fileName) throws IOException {
 
         StringWriter stringWriter = new StringWriter();
         IOUtils.copy(new FileInputStream(new File(fileName)), stringWriter);
 
         return stringWriter.toString();
+    }
+    
+    private static boolean isClientScriptAllowed(Map configuration) {
+        boolean allowClientScript = true;
+        if (configuration != null && configuration.containsKey("allow-client-script")) {
+            String configValue = (String) configuration.get("allow-client-script");
+            allowClientScript = configValue.toLowerCase().equals("true") ? true : false;
+        }
+        
+        return allowClientScript;
     }
 }

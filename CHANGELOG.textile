@@ -37,6 +37,7 @@ h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
 * Added a mock @TransactionalGraph@ implementation so that a @TinkerGraph@ can be tested in a transactional mode (configured through @rexster.xml@).
 * Results from the Gremlin Extension that are @Iterator@ implementations are now paging properly.
 * Added the @load@ parameter to the Gremlin Extension so that it is possible to execute server-side stored Gremlin scripts.
+* Gremlin Extension can be configured so that it does not execute scripts sent on the @script@ parameter leaving it to only process server-side scripts with the @load@ parameter.
 
 ==<hr/>==
 
