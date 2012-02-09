@@ -2,7 +2,8 @@ package com.tinkerpop.rexster.gremlin.converter;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.util.io.graphson.GraphSONFactory;
-import com.tinkerpop.pipes.util.Table;
+import com.tinkerpop.pipes.util.structures.Row;
+import com.tinkerpop.pipes.util.structures.Table;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -35,13 +36,13 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
 
         } else if (result instanceof Table) {
             Table table = (Table) result;
-            Iterator<Table.Row> rows = table.iterator();
+            Iterator<Row> rows = table.iterator();
 
             List<String> columnNames = table.getColumnNames();
             long counter = 0;
 
             while (rows.hasNext()) {
-                Table.Row row = rows.next();
+                Row row = rows.next();
                 if (counter >= this.offsetStart && counter < this.offsetEnd) {
                     Map<String, Object> map = new HashMap<String, Object>();
                     for (String columnName : columnNames) {
