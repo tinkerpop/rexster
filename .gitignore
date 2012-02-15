@@ -1,7 +1,8 @@
 *.log
 /data
-/release
-/target
+/rexster-server/release
+/rexster-server/target
+/rexster-kibbles/*/target
 /bin
 # eclipse project files and local rexster.xml
 *.classpath
