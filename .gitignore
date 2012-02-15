@@ -1,4 +1,5 @@
 *.log
+/data
 /release
 /target
 /bin

@@ -1,0 +1,22 @@
+!https://github.com/tinkerpop/rexster-kibbles/raw/master/sample-kibbles/doc/images/rexster-sample-logo.png!
+
+
+h1. Sample Kibbles
+
+The Sample Kibbles project provides a series of well documented Rexster Extensions to help developers get started in their efforts to extend Rexster.
+
+The following examples are included:
+
+|_. extension |_. description |_. uri |
+| @MapConfigurationExtension@ | Demonstrates how graph specific configuration in rexster.xml can be exposed to the extension. | @http://base/graphs/graph/tp-sample/map-config@ |
+| @ParametersExtension@ | Demonstrates echoing of different kinds of request parameters. | @http://base/graphs/graph/tp-sample/parameters@ |
+| @PingExtension@ | Performs a simple echo of the value of a URI query string parameter. | @http://base/graphs/graph/tp-sample/ping@ |
+| @PingAddOnExtension@ | Performs a simple echo of the value of a URI query string parameter demonstrating that Extensions can be spread across multiple classes within a namespace and extension name. | @http://basegraphs//graph/tp-sample/ping/pong@ |
+| @ProducesXmlExtension@ | Demonstrates how to return types other than @application/json@. | @http://base/graphs/graph/vertices/1/tp-sample/produces-xml@
+@http://base/graphs/graph/edges/1/tp-sample/produces-xml@ |
+| @SecureExtension@ | Demonstrates how to get a @Principal@ object from the @SecurityContext@. | @http://base/graphs/graph/vertices/1/tp-sample/secure@ |
+| @SimplePathExtension@  | Demonstrates how a pathed extension works where multiple extension methods are exposed from the same extension point. | @http://basegraphs//graph/tp-sample/simple-path/some-work@
+@http://base/graphs/graph/tp-sample/simple-path/other-work@ |
+| @SimpleRootExtension@  | Demonstrates how a root extension works. | @http://base/graphs/graph/tp-sample/simple-root@
+@http://base/graphs/graph/tp-sample/vertices/1/simple-root@
+@http://base/graphs/graph/tp-sample/edges/1/simple-root@ |

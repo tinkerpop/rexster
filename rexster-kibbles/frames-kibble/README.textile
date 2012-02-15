@@ -1,0 +1,48 @@
+!https://github.com/tinkerpop/rexster-kibbles/raw/master/frames-kibble/doc/images/rexster-frames-logo.png!
+
+"Frames":http://frames.tinkerpop.com exposes any Blueprints graph as a collection of interrelated domain objects. The Frames Extension for Rexster exposes a _framed_ graph element through the REST API. 
+
+h2. REST API
+
+h3. GET Operations
+
+|_. returns |_. uri |_. description |
+| @@Property@ "getters" of _frame_ | @http://base/graphs/graph/vertices/1/tp/frames/{frame}@ | maps vertex 1 to the specified _frame_ |
+| @@Property@ "getters" of _frame_ | @http://base/graphs/graph/edges/1/tp/frames/{frame}@ | maps edge 1 to the specified _frame_ with standard directionality |
+| @@Property@ "getters" of _frame_ | @http://base/graphs/graph/edges/1/tp/frames/{frame}?direction=inverse@ | maps edge 1 to the specified _frame_ with inverse directionality |
+
+h2. Configuration
+
+The Frames Extension requires configuration within @rexster.xml@.  The configuration tells the extension how to map the request URI to a _framed_ element.
+
+bc. <graph>
+  <graph-name>tinkergraph</graph-name>
+  <graph-type>tinkergraph</graph-type>
+  <graph-file>data/graph-example-1.xml</graph-file>
+  <extensions>
+    <allows>
+      <allow>tp:frames</allow>
+    </allows>
+    <extension>
+      <namespace>tp</namespace>
+      <name>frames</name>
+      <configuration>
+        <person>com.tinkerpop.frames.domain.classes.Person</person>
+        <project>com.tinkerpop.frames.domain.classes.Project</project>
+      </configuration>
+    </extension>
+  </extensions>
+</graph>
+
+The @configuration@ element defines a series of key/value pairs, where each keyed element (@person@ and @project@ in this example), represents a path on the request URI and the keyed elements value represents the _framed_ graph element. Therefore, given the above configuration this URI:
+
+@http://localhost:8182/graphs/tinkergraph/vertices/1/tp/frames/person@
+
+would find the vertex with an identifier of "1", wrap the returned vertex in a @Person@ frame, and utilize the @@Property@ "Frames annotations":https://github.com/tinkerpop/frames/wiki/Annotations to "get" a Person object as JSON.  The JSON would look like this:
+
+bc. {
+  "name":"marko",
+  "age":29,
+  "version":"0.3-SNAPSHOT",
+  "queryTime":24.40612
+}

@@ -1,0 +1,36 @@
+!https://github.com/tinkerpop/rexster-kibbles/raw/master/sparql-kibble/doc/images/rexster-sparql-logo.png!
+
+The "SPARQL":http://www.w3.org/TR/rdf-sparql-query/ Kibble provides a means to execute SPARQL queries against "Sail graph":https://github.com/tinkerpop/blueprints/wiki/Sail-Implementation implementations.
+
+h2. REST API
+
+h3. GET Operations
+
+|_. returns |_. uri |_. description |
+| map of vertices | @http://base/graphs/graph/tp/sparql?query=some-sparql@ | executes a SPARQL query (denoted by some-sparql) |
+
+It is important to remember that the SPARQL query for the @query@ parameter must be URL encoded.  For example this SPARQL query:
+
+bc. SELECT ?x ?y WHERE { ?x <http://tinkerpop.com#knows> ?y }
+
+needs to be encoded to:
+
+bc. http://localhost:8182/graphs/sailgraph/tp/sparql?query=SELECT%20%3Fx%20%3Fy%20WHERE%20{%20%3Fx%20%3Chttp%3A%2F%2Ftinkerpop.com%23knows%3E%20%3Fy%20}
+
+It is also possible to POST JSON or form data to this URI.  For example:
+
+bc. curl -v -X POST -H "Content-Type:application/json" -d '{"query":"SELECT ?x ?y WHERE { ?x <http://tinkerpop.com#knows> ?y }"}' http://localhost:8182/graphs/sailgraph/tp/sparql
+
+will return:
+
+bc. {
+  "results":[
+    {"y":{"_id":"http:\/\/tinkerpop.com#2","_type":"vertex","kind":"uri"},
+     "x":{"_id":"http:\/\/tinkerpop.com#1","_type":"vertex","kind":"uri"}},
+    {"y":{"_id":"http:\/\/tinkerpop.com#4","_type":"vertex","kind":"uri"},
+     "x":{"_id":"http:\/\/tinkerpop.com#1","_type":"vertex","kind":"uri"}}
+    ],
+  "success":true,
+  "version":"0.4-SNAPSHOT",
+  "queryTime":90.959991
+}

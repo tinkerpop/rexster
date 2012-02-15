@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -8,13 +8,13 @@
         <artifactId>oss-parent</artifactId>
         <version>7</version>
     </parent>
-    <groupId>com.tinkerpop</groupId>
+    <groupId>com.tinkerpop.rexster</groupId>
     <artifactId>rexster</artifactId>
     <version>0.8-SNAPSHOT</version>
     <!-- DON'T FORGET TO UPDATE Tokens.VERSION AT RELEASE -->
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <url>http://rexster.tinkerpop.com</url>
-    <name>Rexster: A Graph Server</name>
+    <name>Rexster</name>
     <description>
         Rexster is a multi-faceted graph server that exposes any Blueprints graph (e.g. TinkerGraph, Neo4j, OrientDB,
         DEX, and Sail RDF Stores) through several mechanisms with a general focus on REST.
@@ -43,225 +43,20 @@
         <developerConnection>scm:git:git@github.com:tinkerpop/rexster.git</developerConnection>
         <url>git@github.com:tinkerpop/rexster.git</url>
     </scm>
-    <dependencies>
-        <!-- PROPERTY GRAPH MODEL SUPPORT -->
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-core</artifactId>
-            <version>1.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.gremlin</groupId>
-            <artifactId>gremlin-java</artifactId>
-            <version>1.5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.gremlin</groupId>
-            <artifactId>gremlin-groovy</artifactId>
-            <version>1.5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-sail-graph</artifactId>
-            <version>1.2-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-graph-jung</artifactId>
-            <version>1.2-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-dex-graph</artifactId>
-            <version>1.2-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-neo4j-graph</artifactId>
-            <version>1.2-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-orient-graph</artifactId>
-            <version>1.2-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-rexster-graph</artifactId>
-            <version>1.2-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- SERVER + REST SUPPORT -->
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>1.11</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>1.11</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-grizzly2</artifactId>
-            <version>1.11</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-json</artifactId>
-            <version>1.11</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-servlet</artifactId>
-            <version>1.11</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
-            <artifactId>grizzly-http-servlet</artifactId>
-            <version>2.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
-            <artifactId>grizzly-framework</artifactId>
-            <version>2.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
-        </dependency>
-        <!-- LOGGING -->
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
-        </dependency>
-        <!-- COMMONS -->
-        <dependency>
-            <groupId>commons-configuration</groupId>
-            <artifactId>commons-configuration</artifactId>
-            <version>1.6</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-        <!-- OTHER -->
-        <dependency>
-            <groupId>jline</groupId>
-            <artifactId>jline</artifactId>
-            <version>0.9.94</version>
-        </dependency>
-        <!-- TESTING -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.5</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jmock</groupId>
-            <artifactId>jmock-junit4</artifactId>
-            <version>2.5.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.jersey-test-framework</groupId>
-            <artifactId>jersey-test-framework-grizzly2</artifactId>
-            <version>1.11</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <repositories>
-        <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Repository for Maven</name>
-            <url>http://download.java.net/maven/2/</url>
-        </repository>
-        <repository>
-            <id>maven-repository.dev.java.net</id>
-            <name>Java.net Maven 1 Repository (legacy)</name>
-            <url>http://download.java.net/maven/1</url>
-        </repository>
-        <repository>
-            <id>glassfish-maven2-repository.dev.java.net</id>
-            <name>Java.net Maven 2 Repository for GlassFish</name>
-            <url>http://download.java.net/maven/glassfish/</url>
-            <layout>default</layout>
-        </repository>
-    </repositories>
+
+    <modules>
+        <module>rexster-server</module>
+        <module>rexster-kibbles</module>
+    </modules>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <srcdir>src/test/java</srcdir>
     </properties>
+
     <build>
         <directory>${basedir}/target</directory>
-        <finalName>${project.artifactId}-${project.version}</finalName>
-        <testSourceDirectory>${srcdir}</testSourceDirectory>
-        <resources>
-            <resource>
-                <directory>${basedir}/src/main/resources
-                </directory>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>${basedir}/src/test/resources
-                </directory>
-            </testResource>
-            <testResource>
-                <directory>${basedir}/src/integration/resources
-                </directory>
-            </testResource>
-        </testResources>
         <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2-beta-4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attached</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/assembly/standalone.xml</descriptor>
-                        <descriptor>src/assembly/distribution.xml</descriptor>
-                    </descriptors>
-                    <finalName>${project.artifactId}-${project.version}</finalName>
-                    <outputDirectory>target</outputDirectory>
-                    <workDirectory>target/assembly/work</workDirectory>
-                    <tarLongFileMode>warn</tarLongFileMode>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.tinkerpop.rexster.WebServer</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>2.5</version>
@@ -288,17 +83,17 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <!-- This profile can be activated in order to run integration tests, e.g. `mvn clean test -Pintegration-test` -->
-        <profile>
-            <id>integration-test</id>
-            <activation>
-                <!-- keep this setting false for commit purposes -->
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <srcdir>src/integration/java</srcdir>
-            </properties>
-        </profile>
-    </profiles>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.8</version>
+                <configuration>
+                    <aggregate>true</aggregate>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>

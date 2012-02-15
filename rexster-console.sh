@@ -1,3 +1,3 @@
 #!/bin/bash
 
-target/rexster-*-standalone/bin/rexster-console.sh $@
+rexster-server/target/rexster-server-*-standalone/bin/rexster-console.sh $@

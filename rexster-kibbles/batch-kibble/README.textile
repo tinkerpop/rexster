@@ -1,0 +1,92 @@
+!https://github.com/tinkerpop/rexster-kibbles/raw/master/batch-kibble/doc/images/rexster-batch-logo.png!
+
+The Batch Kibble makes it possible to execute multiple operations over REST.  More specifically, it is possible to do the following:
+
+* Retrieve a group of vertices or edges by identifier in a single call.
+* Execute a series of create, update, and delete operations within a single request transaction.
+
+h2. REST API
+
+h3. GET Operations
+
+|_. returns |_. uri |_. description |
+| vertices | @http://base/graphs/graph/tp/batch/vertices?idList=[1,2,3]@ | retrieve vertices with _id 1, 2 and 3 |
+| edges | @http://base/graphs/graph/tp/batch/edges?idList=[5,6,7]@ | retrieve edges with _id 5, 6, and 7 |
+
+Please note that if elements identified in the @idList@ cannot be found the extension will simply ignore the identifier for purpose of sending the return results.  In other words, if a request is made for vertices with three identifiers but Rexster can only locate one of the three then only one vertex will be returned in the results array.
+
+h3. POST Operations
+
+|_. returns |_. uri |_. description |
+| confirmation | @http://base/graphs/graph/tp/batch/tx@ | execute JSON transaction list |
+
+The transaction POST operation consumes JSON, where a single key @tx@ contains an array of graph actions to perform within a single transaction.  Each element of the array should include a @_action@ key which must contain one of the three following values:
+
+* create
+* update
+* delete
+
+In all cases, a @_type@ key containing @vertex@ or @edge@ must accompany each element of the transaction.
+
+h4. Create
+
+The @create@ action creates a vertex or an edge.  If the @_id@ key is specified and the graph element already exists the transaction will fail.  Edges must specify the @_outV@ and @_inV@ keys and the values of those keys must point to existing vertices in the graph or the transaction will fail.
+
+h4. Update
+
+The @update@ action will update properties of a vertex of an edge.  The @_id@ property must refer to an existing graph element.  If it does not, the transaction will not fail, but obviously no update will occur.
+
+h4. Delete
+
+The @delete@ action will either delete properties of a vertex of an edge or delete the graph element entirely.  The @_id@ property must refer to an existing graph element.  If it does not, the transaction will not fail, but obviously no delete will occur.  The @_keys@ key specifies an array of property names that should be removed from the graph element.  In the event that the @_key@ key is not present or if the array value is empty, the extension will delete the graph element.
+
+h4. JSON Transaction Example
+
+```javascript
+{
+    "tx": [
+        {
+            "_action": "create",
+            "_type": "vertex",
+            "_id": 100,
+            "k1": "v1"
+        },
+        {
+            "_action": "create",
+            "_type": "vertex",
+            "_id": 101,
+            "k1": "v2"
+        },
+        {
+            "_action": "create",
+            "_type": "edge",
+            "_id": 1000,
+            "_label": "buddy",
+            "_outV": 100,
+            "_inV": 101,
+            "k2": "v3"
+        },
+        {
+            "_action": "update",
+            "_type": "vertex",
+            "_id": 1,
+            "name": "okram",
+            "k1": "v4"
+        },
+        {
+            "_action": "delete",
+            "_type": "vertex",
+            "_id": 4,
+            "_keys": [
+                "age",
+                "name"
+            ]
+        },
+        {
+            "_action": "delete",
+            "_type": "vertex",
+            "_id": 3
+        }
+    ]
+}
+```

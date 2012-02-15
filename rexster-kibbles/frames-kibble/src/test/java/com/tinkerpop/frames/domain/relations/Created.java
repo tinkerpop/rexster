@@ -1,0 +1,24 @@
+package com.tinkerpop.frames.domain.relations;
+
+import com.tinkerpop.frames.Domain;
+import com.tinkerpop.frames.Property;
+import com.tinkerpop.frames.Range;
+import com.tinkerpop.frames.domain.classes.Person;
+import com.tinkerpop.frames.domain.classes.Project;
+
+/**
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
+ */
+public interface Created {
+    @Domain
+    public Project getDomain();
+
+    @Range
+    public Person getRange();
+
+    @Property("weight")
+    public Float getWeight();
+
+    @Property("weight")
+    public void setWeight(float weight);
+}

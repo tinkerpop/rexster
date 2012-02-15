@@ -1,0 +1,8 @@
+com.tinkerpop.rexster.kibbles.sample.MapConfigurationExtension
+com.tinkerpop.rexster.kibbles.sample.ParametersExtension
+com.tinkerpop.rexster.kibbles.sample.PingExtension
+com.tinkerpop.rexster.kibbles.sample.PingAddOnExtension
+com.tinkerpop.rexster.kibbles.sample.ProducesXmlExtension
+com.tinkerpop.rexster.kibbles.sample.SecureExtension
+com.tinkerpop.rexster.kibbles.sample.SimplePathExtension
+com.tinkerpop.rexster.kibbles.sample.SimpleRootExtension

@@ -1,0 +1,102 @@
+All releases can be accessed through the TinkerPop Maven2 repository identified below.
+
+```xml
+<repository>
+  <id>tinkerpop-repository</id>
+  <name>TinkerPop Maven2 Repository</name>
+  <url>http://tinkerpop.com/maven2</url>
+</repository>
+```
+
+==<hr/>==
+
+h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>batch-kibble</artifactId>
+  <version>0.8-SNAPSHOT</version>
+</dependency>
+<dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>frames-kibble</artifactId>
+  <version>0.8-SNAPSHOT</version>
+</dependency>
+<dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>sample-kibbles</artifactId>
+  <version>0.8-SNAPSHOT</version>
+</dependency>
+<dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>sparql-kibble</artifactId>
+  <version>0.8-SNAPSHOT</version>
+</dependency>
+```
+
+* Secure Sample Kibble shows how to get a @Principal@ from the @SecurityContext@.
+
+==<hr/>==
+
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-brian.png!
+
+h3. Version 0.7 (Brian -- December 7, 2011)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>batch-kibble</artifactId>
+  <version>0.7</version>
+</dependency>
+<dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>frames-kibble</artifactId>
+  <version>0.7</version>
+</dependency>
+<dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>sample-kibbles</artifactId>
+  <version>0.7</version>
+</dependency>
+<dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>sparql-kibble</artifactId>
+  <version>0.7</version>
+</dependency>
+```
+
+* New Parameters Sample Kibble shows how to deal with injecting different data types into the request.
+* Upgrade all Kibbles to use GraphSON.
+
+==<hr/>==
+
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dalmatian.png!
+
+h3. Version 0.6 (Dalmatian -- September 18, 2011)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>batch-kibble</artifactId>
+  <version>0.6</version>
+</dependency>
+<dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>frames-kibble</artifactId>
+  <version>0.6</version>
+</dependency>
+<dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>sample-kibbles</artifactId>
+  <version>0.6</version>
+</dependency>
+<dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>sparql-kibble</artifactId>
+  <version>0.6</version>
+</dependency>
+```
+
+* New Batch Kibble makes it possible to execute commands in a batch/transactional fashion.
+* Bring all Kibbles up to the latest version of REST API changes for the current version of Rexster.
