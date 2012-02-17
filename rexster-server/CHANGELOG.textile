@@ -1,12 +1,5 @@
-All releases can be accessed through the TinkerPop Maven2 repository identified below.
-
-```xml
-<repository>
-  <id>tinkerpop-repository</id>
-  <name>TinkerPop Maven2 Repository</name>
-  <url>http://tinkerpop.com/maven2</url>
-</repository>
-```
+Rexster: A Graph Server
+"http://rexster.tinkerpop.com":http://rexster.tinkerpop.com
 
 ==<hr/>==
 

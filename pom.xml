@@ -11,7 +11,7 @@
     <groupId>com.tinkerpop.rexster</groupId>
     <artifactId>rexster</artifactId>
     <version>0.8-SNAPSHOT</version>
-    <!-- DON'T FORGET TO UPDATE Tokens.VERSION AT RELEASE -->
+    <!-- DON'T FORGET TO UPDATE rexster-server Tokens.VERSION AT RELEASE -->
     <packaging>pom</packaging>
     <url>http://rexster.tinkerpop.com</url>
     <name>Rexster</name>
@@ -58,15 +58,17 @@
         <directory>${basedir}/target</directory>
         <plugins>
             <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.5</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.wagon</groupId>
-                        <artifactId>wagon-ftp</artifactId>
-                        <version>1.0-alpha-6</version>
-                    </dependency>
-                </dependencies>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.2</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
