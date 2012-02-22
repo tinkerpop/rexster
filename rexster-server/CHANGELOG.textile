@@ -3,7 +3,9 @@ Rexster: A Graph Server
 
 ==<hr/>==
 
-h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-santas-little-helper.png!
+
+h3. Version 0.8 (Santa's Little Helper -- NOT OFFICIALLY RELEASED YET)
 
 ```xml
  <dependency>
