@@ -6,6 +6,7 @@ Rexster is a multi-faceted graph server that exposes any "Blueprints":http://blu
  * "Neo4j":http://neo4j.org/ graph database
  * "OrientDB":http://www.orientechnologies.com/ graph database
  * "DEX":http://www.sparsity-technologies.com/dex graph database
+ * "InfiniteGraph":http://www.infinitegraph.com/ graph database
  * "Sesame 2.0":http://www.openrdf.org compliant RDF stores
 
 Rexster provides a browser-based user interface known as "The Dog House":https://github.com/tinkerpop/rexster/wiki/The-Dog-House. This interface allows for viewing vertices, edges, and their related properties. It also includes a console for executing "Gremlin":http://gremlin.tinkerpop.com scripts. Rexster also includes "Rexster Console":https://github.com/tinkerpop/rexster/wiki/Rexster-Console which allows remote evaluation of scripts within the Rexster Server context.
