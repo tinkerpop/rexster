@@ -1,4 +1,4 @@
-!https://github.com/tinkerpop/rexster-kibbles/raw/master/batch-kibble/doc/images/rexster-batch-logo.png!
+!https://github.com/tinkerpop/rexster/raw/master/rexster-kibbles/batch-kibble/doc/images/rexster-batch-logo.png!
 
 The Batch Kibble makes it possible to execute multiple operations over REST.  More specifically, it is possible to do the following:
 
