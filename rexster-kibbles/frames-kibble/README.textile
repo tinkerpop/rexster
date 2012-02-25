@@ -1,4 +1,4 @@
-!https://github.com/tinkerpop/rexster-kibbles/raw/master/frames-kibble/doc/images/rexster-frames-logo.png!
+!https://github.com/tinkerpop/rexster/raw/master/rexster-kibbles/frames-kibble/doc/images/rexster-frames-logo.png!
 
 "Frames":http://frames.tinkerpop.com exposes any Blueprints graph as a collection of interrelated domain objects. The Frames Extension for Rexster exposes a _framed_ graph element through the REST API. 
 
