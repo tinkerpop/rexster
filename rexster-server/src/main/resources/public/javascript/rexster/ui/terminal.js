@@ -124,9 +124,11 @@ ReadLine.prototype = {
           break;
         case UpArrowKeyCode: 
           ctx.getCommand('previous');
+          ev.preventDefault();
           break;
         case DownArrowKeyCode: 
           ctx.getCommand('next');
+          ev.preventDefault();
           break;
       }
     });
@@ -145,8 +147,9 @@ ReadLine.prototype = {
     }
     this.adjustHistoryPointer(direction);
     this.activeLine[0].value = this.history[this.historyPtr];
-    $(this.activeLine[0]).focus();
-    //this.activeLine[0].value = this.activeLine[0].value;
+
+    var lenOfCommand = this.activeLine[0].value.length;
+    $(this.activeLine[0]).selectRange(lenOfCommand, lenOfCommand);
   },
 
   // Moves the history pointer to the 'next' or 'previous' position. 
@@ -201,6 +204,21 @@ ReadLine.prototype = {
 $htmlFormat = function(obj) {
   return tojson(obj, ' ', ' ', true);
 }
+
+$.fn.selectRange = function(start, end) {
+    return this.each(function() {
+        if(this.setSelectionRange) {
+            this.focus();
+            this.setSelectionRange(start, end);
+        } else if(this.createTextRange) {
+            var range = this.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', end);
+            range.moveStart('character', start);
+            range.select();
+        }
+    });
+};
 
 var DefaultInputHtml = function(stack) {
     var linePrompt = "";
