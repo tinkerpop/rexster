@@ -1,4 +1,4 @@
-!https://github.com/tinkerpop/rexster-kibbles/raw/master/sample-kibbles/doc/images/rexster-sample-logo.png!
+!https://github.com/tinkerpop/rexster/raw/master/rexster-kibbles/sample-kibbles/doc/images/rexster-sample-logo.png!
 
 
 h1. Sample Kibbles
