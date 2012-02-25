@@ -1,4 +1,4 @@
-!https://github.com/tinkerpop/rexster-kibbles/raw/master/sparql-kibble/doc/images/rexster-sparql-logo.png!
+!https://github.com/tinkerpop/rexster/raw/master/rexster-kibbles/sparql-kibble/doc/images/rexster-sparql-logo.png!
 
 The "SPARQL":http://www.w3.org/TR/rdf-sparql-query/ Kibble provides a means to execute SPARQL queries against "Sail graph":https://github.com/tinkerpop/blueprints/wiki/Sail-Implementation implementations.
 
