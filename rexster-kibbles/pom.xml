@@ -14,7 +14,7 @@
     <version>0.8-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>http://rexster.tinkerpop.com</url>
-    <name>Rexster Kibbles: A collection of general-purposes Rexster Extensions</name>
+    <name>Rexster Kibbles: General-Purpose Rexster Extensions</name>
     <description>Rexster Kibbles is a collection of general-purpose extensions for the Rexster graph server.
     </description>
     <inceptionYear>2011</inceptionYear>
