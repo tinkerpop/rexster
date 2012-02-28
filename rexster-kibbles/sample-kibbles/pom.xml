@@ -4,11 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.tinkerpop.rexster-kibbles</groupId>
+        <groupId>com.tinkerpop.rexster</groupId>
         <artifactId>rexster-kibbles</artifactId>
         <version>0.8</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <groupId>com.tinkerpop.rexster.rexster-kibbles</groupId>
     <artifactId>sample-kibbles</artifactId>
     <version>${rexster-kibbles.version}</version>
     <packaging>jar</packaging>

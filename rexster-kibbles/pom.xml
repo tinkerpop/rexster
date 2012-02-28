@@ -9,7 +9,6 @@
         <version>0.8</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <groupId>com.tinkerpop.rexster</groupId>
     <artifactId>rexster-kibbles</artifactId>
     <version>0.8</version>
     <packaging>pom</packaging>
