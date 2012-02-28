@@ -1,8 +1,3 @@
-Rexster: A Graph Server
-"http://rexster.tinkerpop.com":http://rexster.tinkerpop.com
-
-==<hr/>==
-
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-santas-little-helper.png!
 
 h3. Version 0.8 (Santa's Little Helper -- February 28, 2012)
@@ -64,29 +59,9 @@ h3. Version 0.8 (Santa's Little Helper -- February 28, 2012)
 h3. Version 0.7 (Brian -- December 7, 2011)
 
 ```xml
-<dependency>
+ <dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>rexster</artifactId>
-  <version>0.7</version>
-</dependency>
-<dependency>
-  <groupId>com.tinkerpop</groupId>
-  <artifactId>batch-kibble</artifactId>
-  <version>0.7</version>
-</dependency>
-<dependency>
-  <groupId>com.tinkerpop</groupId>
-  <artifactId>frames-kibble</artifactId>
-  <version>0.7</version>
-</dependency>
-<dependency>
-  <groupId>com.tinkerpop</groupId>
-  <artifactId>sample-kibbles</artifactId>
-  <version>0.7</version>
-</dependency>
-<dependency>
-  <groupId>com.tinkerpop</groupId>
-  <artifactId>sparql-kibble</artifactId>
   <version>0.7</version>
 </dependency>
 ```
@@ -108,9 +83,7 @@ h3. Version 0.7 (Brian -- December 7, 2011)
 ** Launch extensions that can be accessed with a GET and that return JSON.
 * Dog House is kinder to SailGraph implementations (generally cosmetic changes).
 * Rexster Console only hosts Gremlin-flavored script engine implementations.  Currently, that means that @gremlin-groovy@ is the only exposed language.
-* Upgrade all Kibbles to use GraphSON.
-* Sample Kibble
-** New Parameters Sample Kibble shows how to deal with injecting different data types into the request.
+
 
 ==<hr/>==
 
@@ -119,29 +92,9 @@ h3. Version 0.7 (Brian -- December 7, 2011)
 h3. Version 0.6 (Dalmatian -- September 18, 2011)
 
 ```xml
-<dependency>
+ <dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>rexster</artifactId>
-  <version>0.6</version>
-</dependency>
-<dependency>
-  <groupId>com.tinkerpop</groupId>
-  <artifactId>batch-kibble</artifactId>
-  <version>0.6</version>
-</dependency>
-<dependency>
-  <groupId>com.tinkerpop</groupId>
-  <artifactId>frames-kibble</artifactId>
-  <version>0.6</version>
-</dependency>
-<dependency>
-  <groupId>com.tinkerpop</groupId>
-  <artifactId>sample-kibbles</artifactId>
-  <version>0.6</version>
-</dependency>
-<dependency>
-  <groupId>com.tinkerpop</groupId>
-  <artifactId>sparql-kibble</artifactId>
   <version>0.6</version>
 </dependency>
 ```
@@ -158,8 +111,6 @@ h3. Version 0.6 (Dalmatian -- September 18, 2011)
 ** The REST URI scheme has changed slightly to include a @graphs@ segment, as in: @http://localhost:8182/graphs/tinkergraph@
 * RexPro sessions that remain idle for a configurable amount of time are destroyed.
 * Support OPTIONS HTTP method for all REST resources so that HTTP Access Control works properly when used (eg. jquery).
-* New Batch Kibble makes it possible to execute commands in a batch/transactional fashion.
-* Bring all Kibbles up to the latest version of REST API changes for the current version of Rexster.
 
 ==<hr/>==
 

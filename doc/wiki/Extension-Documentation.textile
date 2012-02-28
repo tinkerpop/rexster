@@ -1,0 +1,156 @@
+[[http://www.wpclipart.com/animals/dogs/cartoon_dogs/cartoon_dogs_6/cartoon_dog_T.png|width=100px]]
+
+Rexster helps provide API documentation to users of the extension in two ways.  First, Rexster will show what extensions are properly configured and available from a particular URI as well as how to access them.  Second, Rexster can display API documentation for a specific service as part of error message generation.
+
+h1. Hypermedia
+
+When accessing a URI [[extension point|Extension Points]], the list of properly configured extensions will be displayed.  Accessing this URI with the built-in [[Gremlin Extension]] configured (remember to set the @Accept@ header with the @application/vnd.rexster-v1+json@ [[Rexster Mime Type|Rexster Mime Types]]):
+
+```text
+http://localhost:8182/graphs/tinkergraph/
+```
+
+will yield:
+
+```javascript
+{
+    "version": "*.*",
+    "name": "tinkergraph",
+    "graph": "tinkergraph[vertices:6 edges:6 directory:data/graph-example-1]",
+    "readOnly": false,
+    "type": "com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph",
+    "queryTime": 0.32901,
+    "upTime": "0[d]:00[h]:07[m]:30[s]",
+    "extensions": [
+        {
+            "title": "tp:gremlin",
+            "op": "GET",
+            "description": "evaluate an ad-hoc Gremlin script for a graph.",
+            "name": "gremlin",
+            "parameters": [
+                {
+                    "description": "displays the properties of the elements with their native data type (default is false)",
+                    "name": "rexster.showTypes"
+                },
+                {
+                    "description": "an array of element property keys to return (default is to return all element properties)",
+                    "name": "rexster.returnKeys"
+                },
+                {
+                    "description": "start index for a paged set of data to be returned",
+                    "name": "rexster.offset.start"
+                },
+                {
+                    "description": "end index for a paged set of data to be returned",
+                    "name": "rexster.offset.end"
+                },
+                {
+                    "description": "the Gremlin script to be evaluated",
+                    "name": "script"
+                }
+            ],
+            "href": "http://localhost:8182/graphs/tinkergraph/tp/gremlin",
+            "namespace": "tp"
+        },
+        {
+            "title": "tp:gremlin",
+            "op": "POST",
+            "description": "evaluate an ad-hoc Gremlin script for a graph.",
+            "name": "gremlin",
+            "parameters": [
+                {
+                    "description": "displays the properties of the elements with their native data type (default is false)",
+                    "name": "rexster.showTypes"
+                },
+                {
+                    "description": "an array of element property keys to return (default is to return all element properties)",
+                    "name": "rexster.returnKeys"
+                },
+                {
+                    "description": "start index for a paged set of data to be returned",
+                    "name": "rexster.offset.start"
+                },
+                {
+                    "description": "end index for a paged set of data to be returned",
+                    "name": "rexster.offset.end"
+                },
+                {
+                    "description": "the Gremlin script to be evaluated",
+                    "name": "script"
+                }
+            ],
+            "href": "http://localhost:8182/graphs/tinkergraph/tp/gremlin",
+            "namespace": "tp"
+        }
+    ]
+}
+```
+
+In the event that the extension is not properly configured in some way, it will not appear in this list.
+
+h1. API Documentation
+
+When a failure occurs, it is nice to show to the user what the expectations are for the extension and its basic API.  Rexster helps with this in a few ways: parameter descriptions, explicit description and a combination of the two.  
+
+h2. Parameter Description
+
+A @description@ parameter can be supplied to the @ExtensionRequestParameter@.  Consider this code snippet from the @PingExtension@ in the "Sample Kibbles":https://github.com/tinkerpop/rexster-kibbles/tree/master/sample-kibbles project:
+
+```java
+public ExtensionResponse evaluatePing(@RexsterContext RexsterResourceContext context,
+                                      @RexsterContext Graph graph,
+                                      @ExtensionRequestParameter(name="reply", description="a value to reply with") String reply) 
+```
+
+When accessing the following URI (forgetting to include the @reply@ URI query string parameter):
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp-sample/ping
+```
+
+Rexster will provide the following response:
+
+```javascript
+{
+  "message":"the reply parameter cannot be empty",
+  "api":{
+    "description":"a simple ping extension.",
+    "parameters":[{"reply":"a value to reply with"}]
+  },
+  "success":false}
+```
+
+Note that the @reply@ parameter is injected into the @api.parameters@ along with the value from the @description@ parameter.  It is possible to get the @api@ JSON fragment from the @ExtensionMethod@ using the @getExtensionApiAsJson@ method. 
+
+h2. Explicit Description
+
+If for some reason the extension is not using @@ExtensionRequestParameter@ annotations (perhaps the extension simply extracts the extension parameters from one of the context objects directly), the extension can provide its documentation directly through the @@ExtensionDescriptor@ annotation.  Simply supply an array of @@ExtensionApi@ annotations to the @api@ parameter of the @@ExtensionDescriptor@.
+
+Given the following sample:
+
+```java
+@ExtensionDescriptor(description = "some extension i wrote for gremlin",
+                     api = {
+                         @ExtensionApi(parameterName = "script", description = "the Gremlin script to be evaluated"),
+                         @ExtensionApi(parameterName = "xyz", description = "a fake parameter")
+                     })
+```
+
+the returned JSON with @api@ attribute would look like:
+
+```javascript
+{
+  "message":null,
+  "api":{
+    "description":"some extension i wrote for gremlin",
+    "parameters":[
+      {"script":"the Gremlin script to be evaluated"}, 
+      {"xyz":"a fake parameter"}
+    ]
+  },
+  "success":false}
+```
+
+h2. Combined
+
+It is possible to use both the parameter-based description as well as the explicit description together.  By default, Rexster will try to use explicit description first and the override existing keys with values from the parameter description first.  That behavior can be controlled by setting the @apiBehavior@ property on the @@ExtensionDescriptor@ annotation.

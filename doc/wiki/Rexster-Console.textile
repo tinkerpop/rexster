@@ -1,0 +1,130 @@
+Rexster Console is a "REPL":http://en.wikipedia.org/wiki/Read-eval-print_loop similar to the REPL available from "Gremlin":https://github.com/tinkerpop/gremlin/wiki/Using-gremlin-from-the-command-line.  It differs in several ways:
+
+* Script evaluation within Rexster Console occurs remotely on a Rexster server. 
+* Rexster Console communicates with any "Gremlin-flavored":https://github.com/tinkerpop/gremlin/wiki/JVM-Language-Implementations "JSR223":http://jcp.org/en/jsr/detail?id=223 compliant ScriptEngine hosted within the Rexster server.  (At this time, Rexster only hosts "Gremlin Groovy":https://github.com/tinkerpop/gremlin/wiki/Using-Gremlin-through-Groovy) The variable pool is shared across each engine. In this way, its possible to make use of each language’s unique expressive qualities when manipulating variables.
+* Rexster Console provides access to configured graphs within Rexster server through the @rexster@ variable that is injected into the variable pool on the server.
+
+h1. Getting Started
+
+To start the console, first ensure that the Rexster server is running, then start the console from the command line (this assumes that Rexster is not [[configured|Rexster Security]] with authentication turned on):
+
+```text
+rexster-console.sh
+```
+
+```text
+        (l_(l
+(_______( 0 0
+(        (-Y-) <woof>
+l l-----l l
+l l,,   l l,,
+opening session with Rexster [localhost:8185]--> ready
+?h for help
+
+rexster[groovy]> 
+```
+
+Note the language name in square brackets.  This represents the script engine language that the line will be evaluated with on the server.  It's easy to see what languages are available on the server:
+
+```text
+rexster[groovy]> ?l
+-= Available Languages =-
+?groovy
+```
+
+It is important to note that Rexster abbreviates the script engine language names.  For example, @groovy@ is really @gremlin-groovy@.  As Rexster only deals with gremlin-flavored script engines and all script engines to be developed in the future will be prefixed with @gremlin-@, Rexster simply ignores that prefix to make things more succinct.
+
+To change languages simply type one of those languages (case sensitive) into the command-line *(The following examples are for demonstration purposes only as Gremlin Scala does not yet have a script engine implementation)*:
+
+```text
+rexster[groovy]> ?scala
+rexster[scala]> 
+```
+
+Variables are shared across script engines within a Rexster Console session.  
+
+```text
+rexster[groovy]> x = 1 + 1
+==>2
+rexster[groovy]> ?scala
+rexster[scala]> x = x + 1
+==>3
+rexster[scala]> y = x + 1 
+==>4
+rexster[scala]> ?groovy
+rexster[groovy]> x + y
+==>7.0
+```
+
+Getting access to graphs configured within Rexster is allowed through the @rexster@ variable which is a context object on the server.
+
+```text
+rexster[groovy]> g = rexster.getGraph("tinkergraph")
+==>tinkergraph[vertices:6 edges:6]
+rexster[groovy]> g.v(1).name
+==>marko
+```
+
+h1. Command Line
+
+The Rexster Console accepts several parameters for its initialization.
+  
+|_. parameter |_. description |
+| -l | The default language to use at startup of the console.  Defaulted to @groovy@. |
+| -rh | The host name or IP address of the Rexster server. Defaulted to @localhost@. |
+| -rp | The port of the Rexster server that is serving RexPro. Defaulted to @8185@ |
+| -t | The number of seconds the console will wait for a response from the server. Defaulted to 100. |
+| -e | A script file to execute remotely. |
+| -u | Username (only required if default authentication is turned on) |
+| -p | Password (only required if default authentication is turned on) |
+| -h | Displays the help message. |
+
+Common usage:
+
+```text
+rexster-console.sh -rh localhost -rp 8185
+```
+
+To remotely execute a script in a file via the console:
+
+```text
+rexster-console.sh -rh localhost -rp 8185 -e my-script.grm
+```
+
+It is important to keep in mind that Gremlin is the default language for the console, therefore if the script is a non-Gremlin script, ensure that the @-l@ parameter is passed with the language specified.  It is also worth mentioning that Rexster Console commands cannot be executed from a script.  In other words, it will not allow any of the @?@ prefixed features specific to Rexster Console to be executed.  For example, a script can not change scripting languages within the script itself.
+
+Port 8185 is the default RexPro port as defined in @rexster.xml@.  Please see the [[Rexster Configuration]] section for more information on this setting.
+
+h1. Console Commands
+
+From within the console, there are a number of actions that can be executed from the command line.  Each command is prefixed with a question mark:
+
+|_. returns |_. description |
+| ?{language-name} | Change the language of the script engine.  The language parameter is case sensitive and must be an available script engine on the server. |
+| ?b | Show the variable pool. |
+| ?l | List the languages installed on Rexster. |
+| ?r | Refresh the Rexster Console session.  The variable pool will be destroyed. |
+| ?e {file-name} | Execute a script file on the server. |
+| ?q | Close the session and exit the command line. |
+| ?h | Display help. |
+
+When using the @?e@ option, it is important to recognize that the REPL commands do not apply.  For example, the script file cannot contain a @?r@ to refresh the session.
+
+h1. Rexster Context
+
+When establishing a session with Rexster, the @rexster@ context variable is injected into the variable pool that is shared with all the script engines.  The @rexster@ variable provides access to server-side resources such as the graphs configured within Rexster.  The following operations are available from the @rexster@ within script evaluations:
+
+|_. function |_. description |
+| getGraph(graphName) | Gets a configured graph instance within Rexster. The @graphName@ specified is a String value that is case sensitive and matches the name of a configured graph. |
+| getGraphNames() | Gets the list of configured graph instance names on the server. |
+| getVersion() | Gets the version of Rexster on the server. |
+
+```text
+rexster[groovy]> graphNames = rexster.graphNames.toArray()
+==>tinkergraph
+==>gratefulgraph
+==>tinkergraph-readonly
+==>emptygraph
+rexster[groovy]> g = rexster.getGraph(graphNames[0])
+==>tinkergraph[vertices:6 edges:6]
+```

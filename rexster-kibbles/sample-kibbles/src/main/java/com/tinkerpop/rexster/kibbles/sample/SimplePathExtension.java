@@ -58,7 +58,7 @@ public class SimplePathExtension extends AbstractSampleExtension {
      * <p/>
      * Outputted JSON (if the object is a graph) will look like this:
      * <p/>
-     * {"output":"tinkergraph[vertices:6 edges:6]","version":"0.3-SNAPSHOT","queryTime":38.02189}
+     * {"output":"tinkergraph[vertices:6 edges:6]","version":"0.3","queryTime":38.02189}
      * <p/>
      * Note the "version" and "queryTime" properties within the JSON.  Rexster will attempt to automatically
      * add these items when it understands the output to be JSON.  It is possible to override this default

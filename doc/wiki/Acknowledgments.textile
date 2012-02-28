@@ -1,0 +1,11 @@
+<img width="100" src="https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-character-2.png"/>
+
+This section provides a list of the people that have contributed in some way to the creation of Rexster.
+
+# "Stephen Mallete":http://stephen.genoprime.com -- designed, developed, tested, and documented Rexster.
+# "Marko A. Rodriguez":http://markorodriguez.com -- designed, developed, tested, and documented Rexster. 
+# "Peter Neubauer":http://www.linkedin.com/in/neubauer -- aided in the evangelizing and conceptualizing of Rexster.
+# "Pierre De Wilde":http://www.linkedin.com/in/pierredewilde -- designs and tests new features.
+# "Ketrina Yim":http://www.ketrinayim.com/ -- designed the Rexster logo.
+
+Please review Rexster's "pom.xml":http://github.com/tinkerpop/rexster/blob/master/pom.xml. Rexster would not be possible without the work done by others to create these useful packages.

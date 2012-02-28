@@ -1,0 +1,83 @@
+[[http://www.wpclipart.com/animals/dogs/cartoon_dogs/cartoon_dogs_6/cartoon_dog_T.png|width=100px]]
+
+Extension naming plays an important role in how the extension is exposed within Rexster.  Extension names are defined through the @ExtensionNaming@ annotation which applies to a class.  The annotation takes two parameters: the @namespace@ and @name@.  Consider the following example:
+
+```java
+@ExtensionNaming(name = "myextension", namespace = "ns")
+```
+
+The @namespace@ specifies the "package" within which the extension will serve and really behaves as a means for organizing common extensions.  If the @namespace@ is not specified, it will be defaulted to the "global" namespace which is specified as "g".  Therefore, the following annotations are equivalent:
+
+```java
+@ExtensionNaming(name = "myextension", namespace = "g")
+@ExtensionNaming(name = "myextension")
+```
+
+The @name@ parameter refers to the name of the extension itself.  The @name@ should be unique within the @namespace@.  Rexster will not complain of naming collisions, so therefore it is important to examine both the approach to naming as well as the configuration within Rexster of individual extensions per graph.
+
+The values supplied to the @@ExtensionName@ annotation directly define the the extension URI given a particular [[extension point | Extension Points]].  Therefore, assuming a particular graph configured an extension with the following @@ExtensionNaming@ annotation:
+
+```java
+@ExtensionNaming(name = "myextension", namespace = "ns")
+```
+
+The above annotation would expose that extension on the following base URIs depending upon the extension point:
+
+```text
+# graph extension point
+http://{base}/{graph}/ns/myextension
+
+# vertex extension point
+http://{base}/{graph}/vertices/{id}/ns/myextension
+
+# edge extension point
+http://{base}/{graph}/edges/{id}/ns/myextension
+```
+
+It is possible to apply the same @@ExtensionNaming@ annotation to multiple classes.  If this approach is taken, it is only necessary to take care in defining the extension methods to avoid naming collisions which will not be resolved in a predictable manner.  For example, the code snippets below are adapted from the Ping Extension in the "Sample Kibbles":https://github.com/tinkerpop/rexster-kibbles/tree/master/sample-kibbles project:
+
+```java
+@ExtensionNaming(namespace = "tp", name = "ping")
+public class PingExtension extends AbstractRexsterExtension {
+
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
+    @ExtensionDescriptor(description = "a simple ping extension.")
+    public ExtensionResponse evaluatePing(@RexsterContext RexsterResourceContext context,
+                                          @RexsterContext Graph graph,
+                                          @ExtensionRequestParameter(name = "reply", description = "a value to reply with") String reply) {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("ping", reply);
+        return ExtensionResponse.ok(map);
+    }
+}
+
+@ExtensionNaming(namespace = "tp", name = "ping")
+public class PingAddOnExtension extends AbstractRexsterExtension {
+
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "pong")
+    @ExtensionDescriptor(description = "a simple ping extension.")
+    public ExtensionResponse evaluatePing(@RexsterContext RexsterResourceContext context,
+                                          @RexsterContext Graph graph,
+                                          @ExtensionRequestParameter(name = "reply", description = "a value to reply with") String reply) {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("ping-add-on", reply);
+        return ExtensionResponse.ok(map);
+    }
+}
+```
+
+Note that both classes have the same @@ExtensionNaming@ annotation, where the namespace is @tp@ and the name is @ping@.  The first class, @PingExtension@, will respond to requests at:
+
+```text
+http://localhost:8182/graph/tp/ping
+```
+
+and the second will respond to requests at:
+
+```text
+http://localhost:8182/graph/tp/ping/pong
+```
+
+It is also important to remember that both classes must be listed in the @com.tinkerpop.rexster.extension.RexsterExtension@ file in @META-INF/services@.  Read more about [[Deploying an Extension]] in regards to this issue.
+
+Please refer to the [[Rexster Configuration]] section for explanation as to how extensions can be configured to work with graphs given the @name@ and @namespace@ parameters on the @@ExtensionNaming@ annotation.

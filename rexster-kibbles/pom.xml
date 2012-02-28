@@ -6,12 +6,12 @@
     <parent>
         <groupId>com.tinkerpop.rexster</groupId>
         <artifactId>rexster</artifactId>
-        <version>0.8-SNAPSHOT</version>
+        <version>0.8</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>com.tinkerpop.rexster-kibbles</groupId>
     <artifactId>rexster-kibbles</artifactId>
-    <version>0.8-SNAPSHOT</version>
+    <version>0.8</version>
     <packaging>pom</packaging>
     <url>http://rexster.tinkerpop.com</url>
     <name>Rexster Kibbles: General-Purpose Rexster Extensions</name>
@@ -48,10 +48,10 @@
         <module>batch-kibble</module>
     </modules>
     <properties>
-        <rexster-kibbles.version>0.8-SNAPSHOT</rexster-kibbles.version>
-        <rexster.version>0.8-SNAPSHOT</rexster.version>
-        <blueprints.version>1.2-SNAPSHOT</blueprints.version>
-        <frames.version>0.7-SNAPSHOT</frames.version>
+        <rexster-kibbles.version>0.8</rexster-kibbles.version>
+        <rexster.version>0.8</rexster.version>
+        <blueprints.version>1.2</blueprints.version>
+        <frames.version>0.7</frames.version>
         <junit.version>4.5</junit.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

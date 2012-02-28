@@ -31,6 +31,6 @@ bc. {
      "x":{"_id":"http:\/\/tinkerpop.com#1","_type":"vertex","kind":"uri"}}
     ],
   "success":true,
-  "version":"0.4-SNAPSHOT",
+  "version":"0.4",
   "queryTime":90.959991
 }

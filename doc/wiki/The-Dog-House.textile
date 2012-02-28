@@ -1,0 +1,101 @@
+Rexster's Dog House is a browser-based interface to Rexster and currently provides the following functions:
+
+* Vertex and Edge Browser - View vertices and edges for a selected graph.
+* Filter graph elements by index.
+* Basic graph visualization with "JavaScript InfoVis Toolkit":http://thejit.org.
+* Launch [[Extensions]].
+* Gremlin Console - Simulates a Gremlin console session against a selected graph.
+
+h1. Getting Started
+
+Start the Rexster Web Server as described on the [[Getting Started]] page, using:
+
+```text
+rexster-start.sh
+```
+
+[[Configuration|Rexster Configuration]] related to the Dog House are found in the @rexster.xml@ file.  Given the default configuration, The Dog House can be accessed at:
+
+```text
+http://localhost:8182/doghouse
+```
+
+It is important to remember that if you intend to host The Dog House somewhere besides @http://localhost@, you must change the @<base-uri>@ element in @rexster.xml@.  Therefore, if you intend to host at @http://my.favoritegraph.com:8182/doghouse@ then be sure to change @rexster.xml@ as follows:
+
+```xml
+<rexster>
+  <rexster-server-port>8182</rexster-server-port>
+  <base-uri>http://my.favoritegraph.com</base-uri>
+  <web-root>public</web-root>
+  <character-set>UTF-8</character-set>
+  ...
+</rexster>
+```
+
+h1. Vertex and Edge Browser
+
+The Vertex and Edge Browser lists the graphs that are configured within Rexster.  Rexster will only shows those graphs which are marked as enabled within the configuration.  Selecting a graph yields the opportunity to browse vertices or edges.  A pager at the top and bottom of the browse panel listing vertices or edges allows one to cycle through the listing and the multi-cornered arrow button within each drills through to a detailed view of that element.  From there it is possible to see other graph elements associated with the one selected.
+
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dog-house-browse.png!
+
+Note the small magnifying glass button to the right of the move next button on the pager.  The button will display a filtering dialog box which allows you to select the index to search by and the key/value for the filter.
+
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dog-house-index.png!
+
+When you click the Filter button the vertex/edge browser will page through the results returned by the index.  To cancel the filtering, simply click the Remove button, which will appear to the right of the Filter button after a filter is created.
+
+The value field of the filtering dialog box allows [[Rexster typing|Property Data Types]], so if your index is an integer value, you can enter @(i,10)@ to get your results.
+
+h1. Graph Visualization
+
+You can visualize parts of a graph from a starting vertex.  Click the Visualize button attached to each vertex to display a the vertex and its connected vertices.
+
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dog-house-viz.png!
+
+You can expand the visualization by right-clicking any vertex in the graph to include the connections of that vertex.  Left-clicking a vertex or edge will display the properties of that graph element in the right-hand panel.  Standard pan operations are supported by dragging and zooming is controlled with the mouse wheel.
+
+h1. Extensions Launcher
+
+[[Rexster Extensions|Extensions]] can be triggered from within Dog House.  Extensions configured in Rexster are available from within the "Browse" panel as shown in the screenshot below:
+
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dog-house-extension-list.png!
+
+As the screenshot above shows, there are three configured extensions: 
+
+* @tp:gremlin@ - the built-in [[Gremlin Extension]].
+* @tp:batch-vertices@ - the "Batch Kibble":https://github.com/tinkerpop/rexster-kibbles/tree/master/batch-kibble for vertices.
+* @tp:batch-edges@ - the "Batch Kibble":https://github.com/tinkerpop/rexster-kibbles/tree/master/batch-kibble for edges.
+
+It is important to note that the extensions listed are sensitive to what is currently being browsed in Dog House.  In other words, if a graph in selected then extensions configured to the graph [[extension point|Extension Points]] are shown and if viewing a vertex or edge within a graph then extensions configured to the vertex or edge extension points are shown.  Extensions shown in Dog House are further limited to @GET@ operations that return JSON.  For example, if an extension only executes via @POST@ it will not be displayed.
+
+Selecting an extension will expand the accordion and display the URI to the extension and the expected parameters as extracted from the [[extension API|Extension Documentation]].  Tooltips on the textboxes for parameters show descriptions from the API.
+
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dog-house-extension-expanded.png!
+
+The following screenshot displays the results of the executed extension:
+
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dog-house-extension-launched.png!
+
+h1. Gremlin Console
+
+The Gremlin Console looks to simulate a Gremlin session within the browser.  First, ensure that the appropriate graph is selected so that Gremlin scripts are evaluated against the right graph.  Like the Vertex and Edge Browser, the graph listing only includes graphs that are marked as enabled within the configuration.  Once the correct graph is selected, simply use the console as one would use Gremlin in a terminal session.
+
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-dog-house-gremlin.png!
+
+It is important to note that the Gremlin Console in The Dog House will only accept single line statements.  For example:
+
+```text
+gremlin> for(int i=0; i<10; i++) { 
+gremlin>   println i; 
+gremlin> }
+```
+
+would need to be written as:
+
+```text
+gremlin> for(int i=0; i<10; i++) { println i; }
+```
+
+h1. Limitations
+
+The Dog House works best with "Google Chrome":http://www.google.com/chrome/ 8 or better, but has been shown to work well with "Firefox":http://www.mozilla.com/ 3.6.13+/4.

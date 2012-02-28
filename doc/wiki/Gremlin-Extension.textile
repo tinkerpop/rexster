@@ -1,0 +1,359 @@
+!https://github.com/tinkerpop/gremlin/raw/master/doc/images/gremlin-logo.png!
+
+"Gremlin":http://gremlin.tinkerpop.com is a graph-based traversal language developed for "property graphs":http://wiki.github.com/tinkerpop/gremlin/defining-a-property-graph. In combination with Rexster, Gremlin allows users to execute ad-hoc computations on the graph backend. 
+
+Gremlin is exposed through Rexster as an [[Extension|Extensions]] and scripts may be executed via the REST API or through the Gremlin Console in [[The Dog House]].  
+
+h1. Gremlin Use-Cases
+
+Through Gremlin, its possible, amongst other things, to perform the following tasks:
+
+* Add/delete vertices and edges from the graph.
+* Manipulate the graph indices.
+* Search for elements of a graph.
+* Load graph data from a file or URL.
+* Make use of "JUNG":http://jung.sourceforge.net/ algorithms.
+* Make use of "SPARQL":http://www.w3.org/TR/rdf-sparql-query/ queries over OpenRDF-based graphs.
+* and much, much more.
+
+In general, using the @GremlinExtension@ provided with Rexster, various graph management tasks can be accomplished.
+
+h1. Executing Scripts
+
+The Gremlin Extension is exposed on the following @ExtensionPoint@ options: graphs, vertices and edges which means it is available on the following URIs:
+
+```text
+http://localhost:8182/graphs/{graph}/tp/gremlin
+http://localhost:8182/graphs/{graph}/vertices/{id}/tp/gremlin
+http://localhost:8182/graphs/{graph}/edges/{id}/tp/gremlin
+```
+
+The difference among these URIs is the context within which the Gremlin session is initialized with graph variables.  When simply accessing Gremlin from the graph @ExtensionPoint@, the Gremlin session is given access to the requested graph.  When accessed from the vertex or edge @ExtensionPoint@, the requested vertex or edge is pushed into the session with the graph.
+
+Therefore, given the following URI:
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=g.v(1)
+```
+
+Rexster will take the requested @tinkergraph@ and pass it to the Gremlin script engine in the context of the variable @g@.  Similarly, the vertex and edge resource will pass a @v@ and @e@ variable, respectively, to the script engine for the requested vertex or edge.
+
+For a vertex,
+
+```text
+http://localhost:8182/graphs/tinkergraph/vertices/1/tp/gremlin?script=v.out()
+```
+
+Rexster will respond with:
+
+```javascript
+{
+  "results":[
+    {"_id":"2","_type":"vertex","name":"vadas","age":27},
+    {"_id":"3","_type":"vertex","name":"lop","lang":"java"},
+    {"_id":"4","_type":"vertex","name":"josh","age":32}
+  ],
+  "success":true,
+  "version":"*.*",
+  "queryTime":5.963338
+}
+```
+
+For an edge,
+
+```text
+http://localhost:8182/graphs/tinkergraph/edges/11/tp/gremlin?script=e.inV
+```
+
+Rexster will respond with:
+
+```javascript
+{
+  "results":[
+    {"_id":"3","_type":"vertex","name":"lop","lang":"java"}
+  ],
+  "success":true,
+  "version":"*.*",
+  "queryTime":5.963338
+}
+```
+
+By default, Rexster uses the @groovy@ flavor of Gremlin for processing scripts.  It is possible to specify other flavors of Gremlin with the @language@ parameter (*Note:* No other Gremlin flavors are exposed at this time.  This feature is for future compatibility).  
+
+h1. Configuration
+
+The Gremlin Extension does not require any specific configuration beyond including it in the @<allows>@ section of the @<extensions>@ element of @rexster.xml@.  The Gremlin Extension is in the TinkerPop namespace called @tp@ and its name is @gremlin@.  Therefore, the configuration would look something like this:
+
+```xml
+<graph>
+  <graph-name>tinkergraph</graph-name>
+  <graph-type>tinkergraph</graph-type>
+  <graph-file>data/graph-example-1.xml</graph-file>
+  <extensions>
+    <allows>
+      <allow>tp:gremlin</allow>
+    </allows>
+    <extension>
+      <namespace>tp</namespace>
+      <name>gremlin</name>
+      <configuration>
+        <scripts>script-directory</scripts>
+        <allow-client-script>true</allow-client-script>
+        <cache-scripts>true</cache-scripts>
+      </configuration>
+    </extension>
+  </extensions>
+</graph>
+```
+
+The @<configuration>@ element is an optional element which contains several settings.  The first is the @<scripts>@ element, which represents a directory that Rexster can access for Gremlin script files.  The script files must be suffixed with a @.gremlin@ extension for Rexster to find them.  You can read more about how to utilize these script files below.
+
+The second setting is the @<allow-client=script>@ option controls whether or not scripts passed to the @script@ parameter are executed or not.  This value is @true@ by default when the configuration is not present.  
+
+The third setting is the @cache-scripts>@ element.  When set to @true@ (the default if the configuration setting is not present), the Gremlin Extension will read the script file once the first time it is referenced and keep it in memory for future calls.  If the value is @false@, the Gremlin Extension will read the script each time a call is made where the script is referenced.  Scripts are cached globally across graph configuration.  In other words, if two graphs both reference the same script directory as the location for Gremlin scripts, the script will only be cached once.  
+
+h1. Example Gremlin Script in URI	 	
+	 	
+Here is a simple ad-hoc query as an example of how Gremlin can be a useful Rexster service. Get the the vertex with @name@ "marko".	 	
+	 	
+```text	 	
+http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=g.idx(%22vertices%22)[[name:%22marko%22]]	 	
+```
+	 	
+```javascript
+{
+  "results":[
+    {"_id":"1","_type":"vertex","name":"marko","age":29}
+  ],
+  "success":true,
+  "version":"*.*",
+  "queryTime":16.409712
+}	
+```
+
+h1. Gremlin Extension API
+
+To see the full API of the @GremlinExtension@ service, simply call the service without any query parameters.
+
+```text
+http://localhost:8182/graphs/gratefulgraph/tp/gremlin
+```
+
+The returned JSON is provided below.
+
+```javascript
+{
+  "message": "no scripts provided",
+  "api": {
+    "description": "evaluate an ad-hoc Gremlin script for a graph.",
+    "parameters": {
+      "rexster.returnKeys": "an array of element property keys to return (default is to return all element properties)",
+      "rexster.showTypes": "displays the properties of the elements with their native data type (default is false)",
+      "load": "a list of 'stored procedures' to execute prior to the 'script' (if 'script' is not specified then the last script in this argument will return the values",
+      "rexster.offset.end": "end index for a paged set of data to be returned",
+      "rexster.offset.start": "start index for a paged set of data to be returned",
+      "params": "a map of parameters to bind to the script engine",
+      "language": "the gremlin language flavor to use (default to groovy)",
+      "script": "the Gremlin script to be evaluated"
+    }
+  },
+  "success": false
+}
+```
+
+h2. Paging - Offset Parameter
+
+The @rexster.offset.start@ and @rexster.offset.end@ parameters allow gremlin results to paged.  The two parameters represent the respective indexes that tell the Gremlin Extension what records to return.  Without paging, the following URI will return all results.
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=g.v(1).outE
+```
+
+```javascript
+{
+  "results":[
+    {"_id":"7","_type":"edge","_label":"knows","_inV":"2","_outV":"1","weight":0.5},
+    {"_id":"9","_type":"edge","_label":"created","_inV":"3","_outV":"1","weight":0.4},
+    {"_id":"8","_type":"edge","_label":"knows","_inV":"4","_outV":"1","weight":1}
+  ],
+  "success":true,
+  "version":"*.*",
+  "queryTime":6.423103
+}
+```
+
+Specifying the @rexster.offset.start@ alone will return all values starting from the value of that index to the end of the result set.
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=g.v(1).outE&rexster.offset.start=1
+```
+
+```javascript
+{
+  "results":[
+    {"_id":"9","_type":"edge","_label":"created","_inV":"3","_outV":"1","weight":0.4},
+    {"_id":"8","_type":"edge","_label":"knows","_inV":"4","_outV":"1","weight":1}
+  ],
+  "success":true,
+  "version":"*.*",
+  "queryTime":6.423103
+}
+```
+
+Specifying the @rexster.offset.end@ alone will return all values starting from the beginning of the list to the value of the end offset.
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=g.v(1).outE&rexster.offset.end=1
+```
+
+```javascript
+{
+  "results":[
+    {"_id":"7","_type":"edge","_label":"knows","_inV":"2","_outV":"1","weight":0.5}
+  ],
+  "success":true,
+  "version":"*.*",
+  "queryTime":6.423103
+}
+```
+
+Specifying both the @rexster.offset.start@ and @rexster.offset.end@ will return just those results that exist between those two indexes.
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=g.v(1).outE&rexster.offset.end=2&rexster.offset.start=1
+```
+
+```javascript
+{
+  "results":[
+    {"_id":"9","_type":"edge","_label":"created","_inV":"3","_outV":"1","weight":0.4}
+  ],
+  "success":true,
+  "version":"*.*",
+  "queryTime":6.423103
+}
+```
+
+h2. Return Keys Parameter
+
+The @rexster.returnKeys@ parameter allows one to specify how to construct a JSON object representation of a returned @Element@ (i.e. @Vertex@ or @Edge@). All elements are returned as JSON objects with the properties identified by the @rexster.returnKeys@ array being what is included in the JSON representation. The wildcard @*@ denotes to return all properties of the element.
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=g.idx(%22vertices%22)[[name:%22marko%22]]&rexster.returnKeys=[age]
+```
+
+```javascript
+{
+  "results":[
+    {"_id":"1","_type":"vertex","age":29}
+  ],
+  "success":true,
+  "version":"*.*",
+  "queryTime":7.547388
+}
+```
+
+h2. Script Engine Bindings
+
+Parameters can be passed to the Gremlin Extension through the @params@ argument.  These key/values pairs become bindings to the script engine that can then be used in the script itself.  
+
+```text
+curl -v -X POST -d '{"params":{"list":[1,2,3],"text":"test"},"script":"[list[0]+list[1]+list[2], text]"}' -H "Content-Type:application/json" http://localhost:8182/graphs/tinkergraph/tp/gremlin
+```
+
+```JavaScript
+{
+    "results": [
+        6,
+        "test"
+    ],
+    "success": true,
+    "version": "*.*",
+    "queryTime": 3547.145821
+}
+```
+
+To use the [[Rexster type system|Property Data Types]] for parameters to be placed in the bindings be sure to set @rexster.showTypes@ to @true@ as it will control that data type parsing operation.
+
+h2. Load Parameter
+
+It is possible to execute "stored procedures" by utilizing the @load@ parameter.  The load parameter accepts an array of Gremlin script file names that must exist in the configured @scripts@ directory of @rexster.xml@ (as part of the Gremlin configuration described above).  Those script files are executed in order prior to the execution of the Gremlin script passed on the @script@ argument.  In the event that no @script@ parameter is supplied the return value of the Gremlin Extension ends up being the output of the final script passed to @load@ parameter.
+
+The benefit of storing these scripts on the server is that globally reusable functions and algorithms can be centralized and protected on the server.  In doing this, it makes it possible to keep heavy logic on the server (which may amount to many lines of Gremlin) and simply reference those functions from the @script@ argument.  
+
+For example, add two server-side script files to the directory configured in @rexster.xml@:
+
+* vertices.gremlin
+* filter-age.gremlin
+
+The @vertices.gremlin@ script simply contains a script that puts the list of vertices into a variable, called @vx@, in the script engine context:
+
+```groovy
+vx = g.V;
+```
+
+The @filter-age.gremlin@ script contains a generic function that filters a list of vertices.
+
+```groovy
+def filterOver30(vertices) {
+  return vertices.filter{it.age > 30}
+} 
+```
+
+You can then make use of these functions with the following REST API call:
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=filterOver30(vx)&load=[vertices,filter-age]
+```
+
+The URI references both scripts as an array in the @load@ parameter (note that the files are referenced by name without the @.gremlin@ extension).  The @script@ argument calls the @filterOver30@ function and passes in the list of vertices established by the @vertices.gremlin@ script.  This call returns the following:
+
+```javascript
+{
+  "results": [
+    {
+      "name": "peter",
+      "age": 35,
+      "_id": "6",
+      "_type": "vertex"
+    },
+    {
+      "name": "josh",
+      "age": 32,
+      "_id": "4",
+      "_type": "vertex"
+    }
+  ],
+  "success": true,
+  "version": "0.8",
+  "queryTime": 12.299851
+}
+```
+
+h1. Using Multi-Line Scripts 
+
+For multi-line constructs, its possible to use tools like "cURL":http://en.wikipedia.org/wiki/CURL to post JSON to the traversal service instead of relying on the conversion of the URI query parameters to be mapped to JSON (see [[Mapping a URI to JSON]]). However, you can also use newline characters in your URI.
+
+h1. Troubleshooting
+
+It's important to ensure that the Gremlin Extension returns data that can be converted to valid JSON. A common case where this does not happen is when a Gremlin script returns a null value as a map key (null values as map values are OK). JSON does not support a null value in the key and therefore the Gremlin Extension will return a "Null key" error.
+
+The following is an example script that presents such a situation:
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=m=[:];g.V.age.groupCount(m).iterate();m;
+```
+
+Since @age@ is not an available property of all vertices (@V@), the script will produce a map that has a @null@ key.
+
+One way to work around this would be to filter out nulls as in:
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=m=[:];g.V.age.filter{it!=null}.groupCount(m).iterate();m;
+```
+
+Another way to work around this would be to convert null key into a string "null" key as in:
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=m=[:];g.V.age.groupCount(m).iterate();m['null']=m[null];m.remove(null);m;
+```

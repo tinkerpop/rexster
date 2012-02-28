@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.tinkerpop.rexster-kibbles</groupId>
         <artifactId>rexster-kibbles</artifactId>
-        <version>0.8-SNAPSHOT</version>
+        <version>0.8</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>sparql-kibble</artifactId>
@@ -38,8 +38,8 @@
             <version>${blueprints.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tinkerpop</groupId>
-            <artifactId>rexster</artifactId>
+            <groupId>com.tinkerpop.rexster</groupId>
+            <artifactId>rexster-server</artifactId>
             <version>${rexster.version}</version>
         </dependency>
         <!-- CONFIGURATION -->
