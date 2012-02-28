@@ -44,7 +44,7 @@ public class ElementHelper {
      *
      * @param propertyValue The value from a key-value pair.  At a top level, this will
      *                      come from the URI as a one of the query parameters.
-     * @param parseTypes Set to true to check strings for data type formatting.
+     * @param parseTypes    Set to true to check strings for data type formatting.
      * @return The property value coerced to the appropriate Java data type.
      */
     public static Object getTypedPropertyValue(Object propertyValue, boolean parseTypes) {

@@ -3,14 +3,14 @@ package com.tinkerpop.rexster.util;
 import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
-import org.junit.Test;
 import org.codehaus.jettison.json.JSONObject;
+import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
 
 public class ElementHelperTest {
-    
+
     @Test
     public void getTypedPropertyValueNullPropertyValue() {
         Object nullValue = ElementHelper.getTypedPropertyValue(null);

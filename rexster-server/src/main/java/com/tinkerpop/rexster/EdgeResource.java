@@ -616,7 +616,9 @@ public class EdgeResource extends AbstractSubResource {
             }
 
             // remove all properties as this is a replace operation
-            com.tinkerpop.blueprints.pgm.util.ElementHelper.removeProperties(new ArrayList<Element>() {{ add(edge); }});
+            com.tinkerpop.blueprints.pgm.util.ElementHelper.removeProperties(new ArrayList<Element>() {{
+                add(edge);
+            }});
 
             JSONObject theRequestObject = this.getRequestObject();
             List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);

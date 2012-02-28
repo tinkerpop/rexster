@@ -3,10 +3,10 @@ package com.tinkerpop.rexster;
 import com.sun.jersey.api.client.ClientResponse;
 import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONArray;
-import org.junit.Test;
 import org.codehaus.jettison.json.JSONObject;
+import org.junit.Test;
 
-public class IndexResourceIntegrationTest extends AbstractGraphResourceIntegrationTest  {
+public class IndexResourceIntegrationTest extends AbstractGraphResourceIntegrationTest {
     public IndexResourceIntegrationTest() throws Exception {
         super();
     }

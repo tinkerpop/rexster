@@ -5,7 +5,6 @@ import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.WebServer;
-import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.core.MediaType;

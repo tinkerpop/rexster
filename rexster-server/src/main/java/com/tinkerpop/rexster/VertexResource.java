@@ -716,7 +716,9 @@ public class VertexResource extends AbstractSubResource {
             }
 
             // remove all properties as this is a replace operation
-            com.tinkerpop.blueprints.pgm.util.ElementHelper.removeProperties(new ArrayList<Element>() {{ add(vertex); }});
+            com.tinkerpop.blueprints.pgm.util.ElementHelper.removeProperties(new ArrayList<Element>() {{
+                add(vertex);
+            }});
 
             JSONObject theRequestObject = this.getRequestObject();
             Iterator keys = theRequestObject.keys();

@@ -3,29 +3,28 @@ package com.tinkerpop.rexster.filter;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 
-import java.io.FileReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Provides authentication for Rexster for all services: RexPro, REST, and Dog House.
- *
+ * <p/>
  * Utilizes a simple list of usernames and passwords in rexster.xml.  Example:
- *
- *  <security>
- *      <authentication>
- *         <type>default</type>
- *         <configuration>
- *             <users>
- *                 <user>
- *                      <username>rexster</username>
- *                      <password>rexster</password>
- *                  </user>
- *              </users>
- *          </configuration>
- *      </authentication>
- *  </security>
+ * <p/>
+ * <security>
+ * <authentication>
+ * <type>default</type>
+ * <configuration>
+ * <users>
+ * <user>
+ * <username>rexster</username>
+ * <password>rexster</password>
+ * </user>
+ * </users>
+ * </configuration>
+ * </authentication>
+ * </security>
  */
 public class DefaultSecurityFilter extends AbstractSecurityFilter {
 

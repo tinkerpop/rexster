@@ -30,8 +30,8 @@ public class ParametersExtension extends AbstractSampleExtension {
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "string")
     @ExtensionDescriptor(description = "pass a string parameter to be used in the response.")
     public ExtensionResponse evaluateSomeString(@RexsterContext RexsterResourceContext context,
-                                                 @RexsterContext Graph graph,
-                                                 @ExtensionRequestParameter(name = "some-string", description = "a string to reply with") String reply) {
+                                                @RexsterContext Graph graph,
+                                                @ExtensionRequestParameter(name = "some-string", description = "a string to reply with") String reply) {
         if (reply == null || reply.isEmpty()) {
             ExtensionMethod extMethod = context.getExtensionMethod();
             return ExtensionResponse.error(
@@ -72,7 +72,7 @@ public class ParametersExtension extends AbstractSampleExtension {
 
     /**
      * Lists are parsed to JSONArray from the URI when passed as
-     *
+     * <p/>
      * http://localhost/graphs/tinkergraph/tp-sample/parameters/list?some-list=[1,2,3]
      */
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "list")
@@ -97,9 +97,9 @@ public class ParametersExtension extends AbstractSampleExtension {
 
     /**
      * To pass a string value that contains square brackets set parseToJson = false
-     *
+     * <p/>
      * http://localhost/graphs/tinkergraph/tp-sample/parameters/list-raw?some-list=[1,2,3]
-     *
+     * <p/>
      * In this case, the data type is not a JSONArray but a String.  The process of mapping a URI to JSON
      * is not performed.
      */
@@ -125,19 +125,19 @@ public class ParametersExtension extends AbstractSampleExtension {
 
     /**
      * Accessing:
-     *
+     * <p/>
      * http://localhost:8182/graphs/tinkergraph/tp-sample/parameters/object?a=1&b.a=marko&b.b=true&b.c.a=peter&c=[marko,povel]
-     *
+     * <p/>
      * would yield three parameters that could be injected to this method: an integer for "a",
      * a JSONObject for "b" and a JSONArray for "c".
      */
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "object")
     @ExtensionDescriptor(description = "pass an object parameter to be used in the response.")
     public ExtensionResponse evaluateSomeObject(@RexsterContext RexsterResourceContext context,
-                                              @RexsterContext Graph graph,
-                                              @ExtensionRequestParameter(name = "a", description = "a list to reply with") Integer reply,
-                                              @ExtensionRequestParameter(name = "b", description = "a list to reply with") JSONObject replyObject,
-                                              @ExtensionRequestParameter(name = "c", description = "a list to reply with") JSONArray replyList) {
+                                                @RexsterContext Graph graph,
+                                                @ExtensionRequestParameter(name = "a", description = "a list to reply with") Integer reply,
+                                                @ExtensionRequestParameter(name = "b", description = "a list to reply with") JSONObject replyObject,
+                                                @ExtensionRequestParameter(name = "c", description = "a list to reply with") JSONArray replyList) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("a", reply);
         map.put("b", replyObject);

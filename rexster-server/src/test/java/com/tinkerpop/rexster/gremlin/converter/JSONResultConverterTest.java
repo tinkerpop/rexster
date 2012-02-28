@@ -181,7 +181,7 @@ public class JSONResultConverterTest {
 
         Assert.assertNotNull(converted);
         Assert.assertEquals(2, converted.length());
-        
+
         Assert.assertEquals("y", converted.getString(0));
         Assert.assertEquals("z", converted.getString(1));
     }

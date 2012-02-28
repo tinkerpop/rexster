@@ -22,8 +22,8 @@ public class EngineController {
     /**
      * Add all flavors of gremlin to this list. This should be the true name of the language.
      */
-    private final List<String> gremlinEngineNames = new ArrayList<String>(){{
-       add("gremlin-groovy");
+    private final List<String> gremlinEngineNames = new ArrayList<String>() {{
+        add("gremlin-groovy");
     }};
 
     private static EngineController engineController;

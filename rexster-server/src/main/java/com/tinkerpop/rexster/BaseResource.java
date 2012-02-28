@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.extension.HttpMethod;
-import com.tinkerpop.rexster.util.RequestObjectHelper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -14,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
@@ -32,9 +30,9 @@ public abstract class BaseResource {
     private static Logger logger = Logger.getLogger(BaseResource.class);
 
     protected final List<Variant> producesVariantList = Variant.VariantListBuilder.newInstance().mediaTypes(
-                MediaType.APPLICATION_JSON_TYPE,
-                RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE,
-                RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE).add().build();
+            MediaType.APPLICATION_JSON_TYPE,
+            RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE,
+            RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE).add().build();
 
     protected final StatisticsHelper sh = new StatisticsHelper();
 
@@ -115,7 +113,7 @@ public abstract class BaseResource {
 
     protected String getUriPath() {
         String baseUri = "";
-        if (this.uriInfo != null){
+        if (this.uriInfo != null) {
             baseUri = this.uriInfo.getAbsolutePath().toString();
 
             if (!baseUri.endsWith("/")) {

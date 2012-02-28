@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster;
 
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -9,9 +8,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
 import org.junit.Test;
 
-import javax.ws.rs.core.MultivaluedMap;
-import java.lang.Object;
-import java.lang.String;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -221,7 +217,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     }
 
     @Test
-    public void putEdgeStatusOk() throws JSONException{
+    public void putEdgeStatusOk() throws JSONException {
         for (GraphTestHolder testGraph : this.testGraphs) {
             Iterator<String> itty = testGraph.getEdgeIdSet().keySet().iterator();
             String firstEdgeId = itty.next();

@@ -34,9 +34,9 @@ public class GremlinExtension extends AbstractRexsterExtension {
 
     public static final String EXTENSION_NAMESPACE = "tp";
     public static final String EXTENSION_NAME = "gremlin";
-    
+
     private static final Map<String, String> cachedScripts = new HashMap<String, String>();
-    
+
     private static final EngineController enginerController = EngineController.getInstance();
     private static final String GRAPH_VARIABLE = "g";
     private static final String VERTEX_VARIABLE = "v";
@@ -191,13 +191,13 @@ public class GremlinExtension extends AbstractRexsterExtension {
 
         // add all keys not defined by this request as bindings to the script engine
         placeParametersOnBinding(requestObject, bindings, showTypes);
-        
+
         // get the list of "stored procedures" to run
         RexsterApplicationGraph rag = rexsterResourceContext.getRexsterApplicationGraph();
 
         final ExtensionMethod extensionMethod = rexsterResourceContext.getExtensionMethod();
         Map configurationMap = null;
-        
+
         Iterator<String> scriptsToRun = null;
         try {
             ExtensionConfiguration extensionConfiguration = rag != null ? rag.findExtensionConfiguration(EXTENSION_NAMESPACE, EXTENSION_NAME) : null;
@@ -218,8 +218,8 @@ public class GremlinExtension extends AbstractRexsterExtension {
 
         try {
             if (!enginerController.isEngineAvailable(languageToExecuteWith)) {
-                 return ExtensionResponse.error("language requested is not available on the server",
-                         generateErrorJson(extensionMethod.getExtensionApiAsJson()));
+                return ExtensionResponse.error("language requested is not available on the server",
+                        generateErrorJson(extensionMethod.getExtensionApiAsJson()));
             }
 
             final EngineHolder engineHolder = enginerController.getEngineByLanguageName(languageToExecuteWith);
@@ -297,23 +297,23 @@ public class GremlinExtension extends AbstractRexsterExtension {
     }
 
     private static Iterator<String> getScriptsToRun(JSONObject requestObject, Map configuration) throws IOException {
-        
+
         if (configuration == null) {
             logger.warn("No scripts are configured for the Gremlin Extension so 'load' query string parameter will be ignored");
             return null;
         }
-        
+
         if (!configuration.containsKey("scripts")) {
             logger.warn("The configuration suppled for the Gremlin Extension does not contain a 'scripts' key so 'load' query string parameter will be ignored");
-            return null;    
+            return null;
         }
-        
+
         boolean scriptsAreCached = areScriptsCached(configuration);
-        
+
         String scriptLocation = (String) configuration.get("scripts");
-        
+
         final JSONArray jsonArray = requestObject != null ? requestObject.optJSONArray(LOAD) : null;
-        
+
         Iterator<String> scripts = null;
         if (jsonArray != null) {
             List<String> scriptList = new ArrayList<String>();
@@ -323,14 +323,14 @@ public class GremlinExtension extends AbstractRexsterExtension {
                 String script = cachedScripts.get(locationAndScriptFile);
                 if (script == null) {
                     script = readFile(locationAndScriptFile);
-                    
+
                     if (scriptsAreCached) {
                         cachedScripts.put(locationAndScriptFile, script);
                     }
                 }
                 scriptList.add(script);
             }
-            
+
             scripts = scriptList.iterator();
         }
 
@@ -344,17 +344,17 @@ public class GremlinExtension extends AbstractRexsterExtension {
 
         return stringWriter.toString();
     }
-    
+
     private static boolean isClientScriptAllowed(Map configuration) {
         boolean allowClientScript = true;
         if (configuration != null && configuration.containsKey("allow-client-script")) {
             String configValue = (String) configuration.get("allow-client-script");
             allowClientScript = configValue.toLowerCase().equals("true") ? true : false;
         }
-        
+
         return allowClientScript;
     }
-    
+
     private static boolean areScriptsCached(Map configuration) {
         boolean cacheScripts = true;
         if (configuration != null && configuration.containsKey("cache-scripts")) {

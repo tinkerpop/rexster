@@ -142,8 +142,9 @@ public class RequestObjectHelper {
 
     /**
      * Given a request object, determine if it has graph element properties.
-     *
+     * <p/>
      * Graph element properties are those that do not have an underscore.
+     *
      * @param requestObject the request object.
      * @return true if the element has properties and false otherwise.
      */

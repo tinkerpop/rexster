@@ -1,11 +1,11 @@
 package com.tinkerpop.rexster.util;
 
-import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 
 /**
  * Mocked transactional graph for testing purposes.
- *
+ * <p/>
  * This class doesn't really do anything Transactional.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)

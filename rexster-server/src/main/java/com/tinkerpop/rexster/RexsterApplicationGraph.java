@@ -180,7 +180,7 @@ public class RexsterApplicationGraph {
         }
     }
 
-    private void initializeExtensionHypermediaCache(){
+    private void initializeExtensionHypermediaCache() {
         this.getExtensionHypermedia(ExtensionPoint.GRAPH, "");
         this.getExtensionHypermedia(ExtensionPoint.VERTEX, "");
         this.getExtensionHypermedia(ExtensionPoint.EDGE, "");
@@ -278,7 +278,7 @@ public class RexsterApplicationGraph {
                                     hypermediaLink.put("name", currentExtensionName);
 
                                     String path = definition.path();
-                                    if (path != null && !path.isEmpty()){
+                                    if (path != null && !path.isEmpty()) {
                                         hypermediaLink.put("path", path);
                                         hypermediaLink.put("title", currentExtensionNamespace + ":" + currentExtensionName + "-" + path);
                                     } else {
@@ -294,9 +294,9 @@ public class RexsterApplicationGraph {
 
                                     final JSONArray queryStringParameters = new JSONArray();
                                     if (descriptor != null && (descriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
-                                        || descriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_DESCRIPTOR_ONLY)) {
+                                            || descriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_DESCRIPTOR_ONLY)) {
                                         for (final ExtensionApi extensionApi : descriptor.api()) {
-                                            queryStringParameters.put(new HashMap<String, String>(){{
+                                            queryStringParameters.put(new HashMap<String, String>() {{
                                                 put("name", extensionApi.parameterName());
                                                 put("description", extensionApi.description());
                                             }});
@@ -304,13 +304,13 @@ public class RexsterApplicationGraph {
                                     }
 
                                     if (descriptor != null && (descriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
-                                        || descriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_PARAMETER_ONLY)) {
+                                            || descriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_PARAMETER_ONLY)) {
                                         final Annotation[][] parametersAnnotationSets = method.getParameterAnnotations();
                                         for (Annotation[] parameterAnnotationSet : parametersAnnotationSets) {
-                                            for (Annotation annotation : parameterAnnotationSet){
+                                            for (Annotation annotation : parameterAnnotationSet) {
                                                 if (annotation instanceof ExtensionRequestParameter) {
                                                     final ExtensionRequestParameter extensionRequestParameter = (ExtensionRequestParameter) annotation;
-                                                    queryStringParameters.put(new HashMap<String, String>(){{
+                                                    queryStringParameters.put(new HashMap<String, String>() {{
                                                         put("name", extensionRequestParameter.name());
                                                         put("description", extensionRequestParameter.description());
                                                     }});

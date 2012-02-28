@@ -1,19 +1,12 @@
 package com.tinkerpop.rexster.kibbles.sample;
 
-import com.tinkerpop.rexster.RexsterResourceContext;
-import com.tinkerpop.rexster.extension.ExtensionApi;
-import com.tinkerpop.rexster.extension.ExtensionApiBehavior;
-import com.tinkerpop.rexster.extension.ExtensionDescriptor;
-import com.tinkerpop.rexster.extension.ExtensionMethod;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
-import groovy.json.JsonOutput;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
 import javax.ws.rs.core.Response;
-import java.lang.annotation.Annotation;
 
 public class ParametersExtensionTest {
     private ParametersExtension parametersExtension = new ParametersExtension();
@@ -72,7 +65,7 @@ public class ParametersExtensionTest {
 
     @Test
     public void evaluateSomeListValid() {
-        JSONArray replyToSend = new JSONArray()  {{
+        JSONArray replyToSend = new JSONArray() {{
             put(1);
             put(2);
             put(3);

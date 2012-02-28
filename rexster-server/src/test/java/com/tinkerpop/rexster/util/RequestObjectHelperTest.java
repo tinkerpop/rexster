@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.util;
 
-import com.tinkerpop.rexster.BaseResource;
 import com.tinkerpop.rexster.Tokens;
 import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONObject;

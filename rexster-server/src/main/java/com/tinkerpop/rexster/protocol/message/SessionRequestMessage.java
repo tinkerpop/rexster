@@ -74,7 +74,7 @@ public class SessionRequestMessage extends RexProMessage {
     }
 
     public String[] getUsernamePassword() {
-        final String[] usernamePassword = new String [] { "", "" };
+        final String[] usernamePassword = new String[]{"", ""};
 
         if (this.body.length > 0) {
             ByteBuffer buffer = ByteBuffer.wrap(this.body);

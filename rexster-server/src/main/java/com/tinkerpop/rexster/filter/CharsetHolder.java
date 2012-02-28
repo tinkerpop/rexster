@@ -69,7 +69,7 @@ public class CharsetHolder implements Comparable<CharsetHolder> {
     /**
      * Accepts a standard value from the Accept-Charset field and gets the first matching charset supported
      * by the server.
-     *
+     * <p/>
      * Example: iso-8859-5, unicode-1-1;q=0.8
      *
      * @return the first matching charset that is supported by the server or null if one cannot be found.

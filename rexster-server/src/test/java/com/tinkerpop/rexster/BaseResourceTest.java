@@ -2,7 +2,6 @@ package com.tinkerpop.rexster;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONTokener;
 import org.junit.Assert;
 import org.junit.Test;
 

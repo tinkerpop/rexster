@@ -1,10 +1,7 @@
 package com.tinkerpop.rexster.extension;
 
 import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
-import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
 import org.codehaus.jettison.json.JSONArray;
@@ -91,10 +88,10 @@ public class GremlinExtensionTest {
     }
 
     @Test
-    public void evaluateGetOnGraphWithBindings() throws Exception{
+    public void evaluateGetOnGraphWithBindings() throws Exception {
         String json = "{\"params\":{\"x\":1, \"y\":2, \"z\":\"test\", \"list\":[3,2,1,0], \"map\":{\"mapx\":[300,200,100]}}}";
         RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(null, uriInfo,
-            httpServletRequest, new JSONObject(new JSONTokener(json)), null, extensionMethodNoApi, null);
+                httpServletRequest, new JSONObject(new JSONTokener(json)), null, extensionMethodNoApi, null);
 
         ExtensionResponse extensionResponse = this.gremlinExtension.evaluateGetOnGraph(
                 rexsterResourceContext, graph, "[x+y, z, list.size, map.mapx.size]");

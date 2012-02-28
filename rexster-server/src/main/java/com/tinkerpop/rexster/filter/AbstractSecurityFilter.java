@@ -12,7 +12,6 @@ import com.tinkerpop.rexster.protocol.message.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.message.MessageType;
 import com.tinkerpop.rexster.protocol.message.RexProMessage;
 import com.tinkerpop.rexster.protocol.message.SessionRequestMessage;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
@@ -20,12 +19,6 @@ import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.security.Principal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
@@ -33,10 +26,15 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
+import java.io.FileReader;
+import java.io.IOException;
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Provides authentication for Rexster for all services: RexPro, REST, and Dog House.
- *
+ * <p/>
  * This is a bit of sketchy implementation of two semi-related bits of Grizzly/Jersey.  Trying to unify the
  * implementation of security within the system for RexPro/REST/Dog House.  Could be a better way to do this,
  * but it's not clear just yet.
@@ -72,7 +70,7 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
 
     /**
      * Configure the filter.
-     *
+     * <p/>
      * This method will be called multiple times so look to cache the configuration once after the
      * first call.
      */
@@ -186,9 +184,9 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
         }};
 
         return Response.status(Response.Status.UNAUTHORIZED)
-                                       .header("WWW-Authenticate", "Basic realm=\"rexster\"")
-                                       .type("application/json")
-                                       .entity(new JSONObject(errorEntity)).build();
+                .header("WWW-Authenticate", "Basic realm=\"rexster\"")
+                .type("application/json")
+                .entity(new JSONObject(errorEntity)).build();
     }
 
     public class Authorizer implements SecurityContext {
