@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.tinkerpop.rexster</groupId>
     <artifactId>rexster</artifactId>
-    <version>0.8</version>
+    <version>0.9-SNAPSHOT</version>
     <!-- DON'T FORGET TO UPDATE rexster-server Tokens.VERSION AT RELEASE -->
     <packaging>pom</packaging>
     <url>http://rexster.tinkerpop.com</url>
@@ -51,6 +51,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <blueprints.version>1.3-SNAPSHOT</blueprints.version>
+        <gremlin.version>1.6-SNAPSHOT</gremlin.version>
+        <pipes.version>1.1-SNAPSHOT</pipes.version>
+        <frames.version>0.8-SNAPSHOT</frames.version>
+        <rexster.version>0.9-SNAPSHOT</rexster.version>
+        <junit.version>4.5</junit.version>
         <srcdir>src/test/java</srcdir>
     </properties>
 

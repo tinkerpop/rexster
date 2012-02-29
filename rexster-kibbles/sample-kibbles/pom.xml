@@ -6,12 +6,12 @@
     <parent>
         <groupId>com.tinkerpop.rexster</groupId>
         <artifactId>rexster-kibbles</artifactId>
-        <version>0.8</version>
+        <version>0.9-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>com.tinkerpop.rexster.rexster-kibbles</groupId>
     <artifactId>sample-kibbles</artifactId>
-    <version>${rexster-kibbles.version}</version>
+    <version>0.9-SNAPSHOT</version>
     <packaging>jar</packaging>
     <url>http://rexster-kibbles.tinkerpop.com</url>
     <name>Rexster Kibbles: Sample</name>
@@ -60,7 +60,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.5</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

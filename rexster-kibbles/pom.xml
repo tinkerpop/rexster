@@ -6,11 +6,11 @@
     <parent>
         <groupId>com.tinkerpop.rexster</groupId>
         <artifactId>rexster</artifactId>
-        <version>0.8</version>
+        <version>0.9-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>rexster-kibbles</artifactId>
-    <version>0.8</version>
+    <version>0.9-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>http://rexster.tinkerpop.com</url>
     <name>Rexster Kibbles: General-Purpose Rexster Extensions</name>
@@ -46,14 +46,6 @@
         <module>sparql-kibble</module>
         <module>batch-kibble</module>
     </modules>
-    <properties>
-        <rexster-kibbles.version>0.8</rexster-kibbles.version>
-        <rexster.version>0.8</rexster.version>
-        <blueprints.version>1.2</blueprints.version>
-        <frames.version>0.7</frames.version>
-        <junit.version>4.5</junit.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
     <build>
         <directory>${basedir}/target</directory>
     </build>
