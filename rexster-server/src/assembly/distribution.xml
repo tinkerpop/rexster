@@ -6,6 +6,7 @@
         <fileSet>
             <includes>
                 <include>pom.xml</include>
+                <include>rexster.xml</include>
             </includes>
         </fileSet>
         <fileSet>
