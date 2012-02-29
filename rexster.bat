@@ -11,5 +11,3 @@ if exist "%%a\bin\rexster.bat" set TARGET=%%a
 
 cd %TARGET%\bin\
 call rexster.bat %*
-
-cd ..\..\..\..
