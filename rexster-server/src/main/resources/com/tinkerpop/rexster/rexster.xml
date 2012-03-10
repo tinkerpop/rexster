@@ -13,6 +13,14 @@
     <security>
         <authentication>
             <type>none</type>
+            <configuration>
+                <users>
+                    <user>
+                        <username>rexster</username>
+                        <password>rexster</password>
+                    </user>
+                </users>
+            </configuration>
         </authentication>
     </security>
     <graphs>
@@ -20,6 +28,11 @@
             <graph-name>emptygraph</graph-name>
             <graph-type>tinkergraph</graph-type>
             <graph-mock-tx>true</graph-mock-tx>
+            <extensions>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
+            </extensions>
         </graph>
         <graph>
             <graph-name>tinkergraph</graph-name>
@@ -73,6 +86,11 @@
                 <username>admin</username>
                 <password>admin</password>
             </properties>
+            <extensions>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
+            </extensions>
         </graph>
         <graph>
             <graph-enabled>false</graph-enabled>
@@ -127,12 +145,22 @@
                      not in use the relationship cache will not be increased above this value  -->
                 <max_relationship_cache_size>3500</max_relationship_cache_size>
             </properties>
+            <extensions>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
+            </extensions>
         </graph>
         <graph>
             <graph-enabled>false</graph-enabled>
             <graph-name>dexsample</graph-name>
             <graph-type>dexgraph</graph-type>
             <graph-location>/tmp/graph.dex</graph-location>
+            <extensions>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
+            </extensions>
         </graph>
         <graph>
             <graph-enabled>false</graph-enabled>
@@ -140,6 +168,11 @@
             <graph-type>rexstergraph</graph-type>
             <graph-buffer-size>100</graph-buffer-size>
             <graph-location>http://remoteserver:8182/tinkergraph</graph-location>
+            <extensions>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
+            </extensions>
         </graph>
     </graphs>
 </rexster>
