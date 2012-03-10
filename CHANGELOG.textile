@@ -13,6 +13,8 @@ h3. Version 0.9 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* REST API for POSTing new indices supports @params@ argument which constructs a parameter map which will configure the newly created index.
+
 ==<hr/>==
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-santas-little-helper.png!

@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.util.io.graphson.GraphSONFactory;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.util.ElementHelper;
@@ -29,8 +30,10 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -428,17 +431,18 @@ public class IndexResource extends AbstractSubResource {
         String clazz = null;
         String type = null;
         Set<String> keys = null;
+        Parameter<Object, Object>[] indexParameters = null;
 
         final JSONObject theRequestObject = this.getRequestObject();
 
         Object temp = theRequestObject.opt(Tokens.CLASS);
-        if (null != temp)
+        if (temp != null)
             clazz = temp.toString();
         temp = theRequestObject.opt(Tokens.TYPE);
-        if (null != temp)
+        if (temp != null)
             type = temp.toString();
         temp = theRequestObject.opt(Tokens.KEYS);
-        if (null != temp) {
+        if (temp != null) {
             try {
                 JSONArray ks;
                 if (temp instanceof String) {
@@ -456,8 +460,21 @@ public class IndexResource extends AbstractSubResource {
                 JSONObject error = generateErrorObject("Automatic index keys must be in an array: " + temp);
                 throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
             }
-        } else {
-            keys = null;
+        }
+
+        temp = theRequestObject.opt("params");
+        if (temp != null){
+            JSONObject idxParamsJson = (JSONObject) temp;
+            ArrayList<Parameter<Object, Object>> idxParamsList = new ArrayList<Parameter<Object, Object>>();
+
+            Iterator idxParamKeys = idxParamsJson.keys();
+            while(idxParamKeys.hasNext()) {
+                String nextIdxParamKey = (String) idxParamKeys.next();
+                idxParamsList.add(new Parameter<Object, Object>(nextIdxParamKey, idxParamsJson.optString(nextIdxParamKey)));
+            }
+
+            indexParameters = new Parameter[idxParamsList.size()];
+            idxParamsList.toArray(indexParameters);
         }
 
         final Index index = this.getIndexFromGraph(graphName, indexName);
@@ -492,13 +509,12 @@ public class IndexResource extends AbstractSubResource {
                     throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
                 }
 
-                // why do we need this local "i" variable?
-                Index i;
+                Index newIndex;
                 try {
                     if (t == Index.Type.MANUAL)
-                        i = graph.createManualIndex(indexName, c);
+                        newIndex = graph.createManualIndex(indexName, c, indexParameters);
                     else
-                        i = graph.createAutomaticIndex(indexName, c, keys);
+                        newIndex = graph.createAutomaticIndex(indexName, c, keys, indexParameters);
                 } catch (Exception e) {
                     logger.info(e.getMessage());
                     JSONObject error = generateErrorObject(e.getMessage());
@@ -506,7 +522,7 @@ public class IndexResource extends AbstractSubResource {
                 }
                 try {
                     this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-                    this.resultObject.put(Tokens.RESULTS, createJSONObject(i));
+                    this.resultObject.put(Tokens.RESULTS, createJSONObject(newIndex));
                 } catch (JSONException ex) {
                     logger.error(ex);
 
