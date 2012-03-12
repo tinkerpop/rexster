@@ -48,7 +48,8 @@ public abstract class BaseResource {
 
     protected JSONObject resultObject = new JSONObject();
 
-    private RexsterApplicationProvider rexsterApplicationProvider;
+    @Context
+    private RexsterApplication rexsterApplication;
 
     @Context
     protected HttpServletRequest httpServletRequest;
@@ -62,12 +63,8 @@ public abstract class BaseResource {
     @Context
     protected SecurityContext securityContext;
 
-    public BaseResource(RexsterApplicationProvider rexsterApplicationProvider) {
-
-        // the general assumption is that the web server is the provider for RexsterApplication
-        // instances.  this really should only change in unit test scenarios.
-        this.rexsterApplicationProvider = rexsterApplicationProvider;
-
+    public BaseResource(RexsterApplication rexsterApplication) {
+        this.rexsterApplication = rexsterApplication;
         sh.stopWatch();
 
         try {
@@ -99,16 +96,8 @@ public abstract class BaseResource {
         return new JSONObject(m);
     }
 
-    protected RexsterApplicationProvider getRexsterApplicationProvider() {
-        if (this.rexsterApplicationProvider == null) {
-            try {
-                this.rexsterApplicationProvider = new WebServerRexsterApplicationProvider(this.servletContext);
-            } catch (Exception ex) {
-                logger.info("The Rexster Application Provider could not be configured", ex);
-            }
-        }
-
-        return this.rexsterApplicationProvider;
+    protected RexsterApplication getRexsterApplication() {
+        return this.rexsterApplication;
     }
 
     protected String getUriPath() {
@@ -287,7 +276,7 @@ public abstract class BaseResource {
     */
 
     protected String getTimeAlive() {
-        long timeMillis = System.currentTimeMillis() - this.rexsterApplicationProvider.getStartTime();
+        long timeMillis = System.currentTimeMillis() - this.rexsterApplication.getStartTime();
         long timeSeconds = timeMillis / 1000;
         long timeMinutes = timeSeconds / 60;
         long timeHours = timeMinutes / 60;

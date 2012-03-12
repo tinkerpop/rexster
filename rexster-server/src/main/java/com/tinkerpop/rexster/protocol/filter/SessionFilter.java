@@ -12,16 +12,14 @@ import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;
 
+import javax.ws.rs.core.Context;
 import java.io.IOException;
 import java.util.UUID;
 
 public class SessionFilter extends BaseFilter {
 
-    private final RexsterApplication rexsterApplication;
-
-    public SessionFilter(final RexsterApplication rexsterApplication) {
-        this.rexsterApplication = rexsterApplication;
-    }
+    @Context
+    private RexsterApplication rexsterApplication;
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
         final RexProMessage message = ctx.getMessage();

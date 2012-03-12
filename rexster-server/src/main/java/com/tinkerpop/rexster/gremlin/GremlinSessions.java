@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.gremlin;
 
-import com.tinkerpop.rexster.RexsterApplicationProvider;
+import com.tinkerpop.rexster.RexsterApplication;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -24,8 +24,8 @@ public class GremlinSessions {
      * Gets a GremlinSession for a given session identifier and graph name,
      * creating a GremlinSession if one does not exist.
      */
-    public static GremlinSession getSession(String sessionId, String graphName, RexsterApplicationProvider rap) {
-        ensureSessionExists(sessionId, graphName, rap);
+    public static GremlinSession getSession(String sessionId, String graphName, RexsterApplication ra) {
+        ensureSessionExists(sessionId, graphName, ra);
         return sessions.get(sessionId + graphName);
     }
 
@@ -72,10 +72,10 @@ public class GremlinSessions {
         return sessions.keySet();
     }
 
-    protected static void ensureSessionExists(String sessionId, String graphName, RexsterApplicationProvider rap) {
+    protected static void ensureSessionExists(String sessionId, String graphName, RexsterApplication ra) {
         String key = sessionId + graphName;
         if (!sessions.containsKey(key)) {
-            sessions.put(key, new GremlinSession(graphName, rap));
+            sessions.put(key, new GremlinSession(graphName, ra));
         }
     }
 

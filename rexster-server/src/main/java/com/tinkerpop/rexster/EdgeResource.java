@@ -51,8 +51,8 @@ public class EdgeResource extends AbstractSubResource {
         super(null);
     }
 
-    public EdgeResource(UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
-        super(rap);
+    public EdgeResource(UriInfo ui, HttpServletRequest req, RexsterApplication ra) {
+        super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;
     }

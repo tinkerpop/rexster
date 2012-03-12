@@ -41,8 +41,8 @@ public abstract class AbstractSubResource extends BaseResource {
 
     protected static final Map<ExtensionSegmentSet, List<RexsterExtension>> extensionCache = new HashMap<ExtensionSegmentSet, List<RexsterExtension>>();
 
-    protected AbstractSubResource(RexsterApplicationProvider rap) {
-        super(rap);
+    protected AbstractSubResource(RexsterApplication ra) {
+        super(ra);
 
         try {
 
@@ -58,7 +58,7 @@ public abstract class AbstractSubResource extends BaseResource {
     }
 
     public RexsterApplicationGraph getRexsterApplicationGraph(String graphName) {
-        RexsterApplicationGraph rag = this.getRexsterApplicationProvider().getApplicationGraph(graphName);
+        RexsterApplicationGraph rag = this.getRexsterApplication().getApplicationGraph(graphName);
         if (rag == null) {
 
             if (!graphName.equals("favicon.ico")) {

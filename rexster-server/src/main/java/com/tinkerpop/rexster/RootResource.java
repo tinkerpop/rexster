@@ -15,8 +15,8 @@ public class RootResource extends BaseResource {
         super(null);
     }
 
-    public RootResource(RexsterApplicationProvider rap) {
-        super(rap);
+    public RootResource(RexsterApplication ra) {
+        super(ra);
     }
 
     @OPTIONS

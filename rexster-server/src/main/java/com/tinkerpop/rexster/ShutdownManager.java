@@ -66,7 +66,7 @@ public class ShutdownManager {
         shutdownSocketThread.setDaemon(true);
         shutdownSocketThread.start();
 
-        //Add the listener to the shutdown list 
+        //Add the listener to the shutdown list
         this.internalShutdownListeners.add(shutdownSocketListener);
 
         //Register a shutdown handler

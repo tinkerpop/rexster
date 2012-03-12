@@ -41,8 +41,8 @@ public class GraphResource extends AbstractSubResource {
         super(null);
     }
 
-    public GraphResource(UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
-        super(rap);
+    public GraphResource(UriInfo ui, HttpServletRequest req, RexsterApplication ra) {
+        super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;
     }
