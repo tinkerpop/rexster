@@ -33,7 +33,7 @@ public class RootResource extends BaseResource {
         sb.append("<body>");
         sb.append("<div align=\"center\"><a href=\"http://tinkerpop.com\"><img src=\"/doghouse/img/tinkerpop-splash.png\"/></a></div>");
         sb.append("<div align=\"center\">");
-        sb.append("<h3 style=\"color:#B5B5B5\">Rexster - " + RexsterApplication.getVersion() + "</h3>");
+        sb.append("<h3 style=\"color:#B5B5B5\">Rexster - " + RexsterApplicationImpl.getVersion() + "</h3>");
         sb.append("<p><a style=\"color:#B5B5B5\" href=\"/doghouse\">The Dog House</a></p>");
         sb.append("<p><a style=\"color:#B5B5B5\" href=\"/graphs\">REST API<a></p>");
         sb.append("</div>");

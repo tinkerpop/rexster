@@ -43,7 +43,7 @@ public class ShutdownManager {
     private String host = "127.0.0.1";
 
     static {
-        PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
+        PropertyConfigurator.configure(RexsterApplicationImpl.class.getResource("log4j.properties"));
     }
 
     public ShutdownManager(String host, int port) {

@@ -19,7 +19,7 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
         super("com.tinkerpop.rexster");
 
         XMLConfiguration properties = new XMLConfiguration();
-        properties.load(RexsterApplication.class.getResourceAsStream("rexster-integration-test.xml"));
+        properties.load(RexsterApplicationImpl.class.getResourceAsStream("rexster-integration-test.xml"));
         WebServerRexsterApplicationProvider.start(properties);
     }
 

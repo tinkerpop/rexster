@@ -46,7 +46,7 @@ public abstract class AbstractSubResource extends BaseResource {
 
         try {
 
-            this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
+            this.resultObject.put(Tokens.VERSION, RexsterApplicationImpl.getVersion());
 
         } catch (JSONException ex) {
 
@@ -386,7 +386,7 @@ public abstract class AbstractSubResource extends BaseResource {
 
                 if (entity != null) {
                     try {
-                        entity.put(Tokens.VERSION, RexsterApplication.getVersion());
+                        entity.put(Tokens.VERSION, RexsterApplicationImpl.getVersion());
                         entity.put(Tokens.QUERY_TIME, this.sh.stopWatch());
                     } catch (JSONException jsonException) {
                         // nothing bad happening here

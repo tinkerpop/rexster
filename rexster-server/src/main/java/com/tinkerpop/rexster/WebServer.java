@@ -506,7 +506,7 @@ public class WebServer {
                 logger.error("Could not start Rexster Server.  A port that Rexster needs is in use.");
             }
         } else if (line.getCommand().hasOption("version")) {
-            System.out.println("Rexster version [" + RexsterApplication.getVersion() + "]");
+            System.out.println("Rexster version [" + RexsterApplicationImpl.getVersion() + "]");
         } else if (line.getCommand().hasOption("stop")) {
             if (line.hasCommandParameters() && line.getCommandParameters().hasOption("wait")) {
                 issueControlCommand(line, ShutdownManager.COMMAND_SHUTDOWN_WAIT);
