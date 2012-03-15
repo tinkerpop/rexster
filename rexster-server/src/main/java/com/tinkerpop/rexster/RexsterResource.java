@@ -28,8 +28,8 @@ public class RexsterResource extends BaseResource {
         super(null);
     }
 
-    public RexsterResource(RexsterApplicationProvider rap) {
-        super(rap);
+    public RexsterResource(RexsterApplication ra) {
+        super(ra);
     }
 
     @OPTIONS
@@ -41,7 +41,7 @@ public class RexsterResource extends BaseResource {
     public Response getRexsterRoot() {
         try {
 
-            Set<String> graphNames = this.getRexsterApplicationProvider().getGraphsNames();
+            Set<String> graphNames = this.getRexsterApplication().getGraphNames();
             JSONArray jsonArrayNames = new JSONArray(graphNames);
 
             this.resultObject.put("name", "Rexster: A Graph Server");

@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster.servlet;
 
-import com.tinkerpop.rexster.RexsterApplicationProvider;
-import com.tinkerpop.rexster.WebServerRexsterApplicationProvider;
+import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.gremlin.GremlinEvaluationJob;
 import com.tinkerpop.rexster.gremlin.GremlinSessions;
 import com.tinkerpop.rexster.gremlin.converter.ConsoleResultConverter;
@@ -28,6 +27,12 @@ public class EvaluatorServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final String newLineRegex = "(\r\n|\r|\n|\n\r)";
+
+    private final RexsterApplication rexsterApplication;
+
+    public EvaluatorServlet(RexsterApplication rexsterApplication) {
+        this.rexsterApplication = rexsterApplication;
+    }
 
     @SuppressWarnings("unchecked")
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -56,8 +61,8 @@ public class EvaluatorServlet extends HttpServlet {
         System.setOut(out);
 
         try {
-            RexsterApplicationProvider rap = new WebServerRexsterApplicationProvider(this.getServletContext());
-            GremlinEvaluationJob job = GremlinSessions.getSession(sessionId, graphName, rap).evaluate(code);
+            GremlinEvaluationJob job = GremlinSessions.getSession(sessionId, graphName,
+                    rexsterApplication).evaluate(code);
             List<String> lines = new ConsoleResultConverter(job.getOutputWriter()).convert(job.getResult());
             for (String line : lines) {
                 out.println("==>" + line);

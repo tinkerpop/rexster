@@ -328,7 +328,7 @@ public class VertexResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -344,7 +344,7 @@ public class VertexResourceTest {
             will(returnValue(null));
             allowing(graph).addVertex(with(any(Object.class)));
             will(returnValue(v));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -352,7 +352,7 @@ public class VertexResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         Response response = resource.postNullVertexOnUri(jsr311Request, "graph");
 
         assertPostVertexProducesJson(response, false, false);
@@ -366,7 +366,7 @@ public class VertexResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -382,7 +382,7 @@ public class VertexResourceTest {
             will(returnValue(null));
             allowing(graph).addVertex(with(any(Object.class)));
             will(returnValue(v));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -390,7 +390,7 @@ public class VertexResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         Response response = resource.postNullVertexRexsterConsumesJson(jsr311Request, "graph", jsonToPost);
 
         assertPostVertexProducesJson(response, false, false);
@@ -404,7 +404,7 @@ public class VertexResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -420,7 +420,7 @@ public class VertexResourceTest {
             will(returnValue(null));
             allowing(graph).addVertex(with(any(Object.class)));
             will(returnValue(v));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -428,7 +428,7 @@ public class VertexResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         Response response = resource.postNullVertexRexsterConsumesTypedJson(jsr311Request, "graph", jsonToPost);
 
         assertPostVertexProducesJson(response, false, false);
@@ -441,7 +441,7 @@ public class VertexResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -457,7 +457,7 @@ public class VertexResourceTest {
             will(returnValue(null));
             allowing(graph).addVertex(with(any(Object.class)));
             will(returnValue(v));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -465,7 +465,7 @@ public class VertexResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         Response response = resource.postNullVertexOnUri(jsr311Request, "graph");
 
         assertPostVertexProducesJson(response, true, false);
@@ -480,7 +480,7 @@ public class VertexResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -496,7 +496,7 @@ public class VertexResourceTest {
             will(returnValue(null));
             allowing(graph).addVertex(with(any(Object.class)));
             will(returnValue(v));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -504,7 +504,7 @@ public class VertexResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         Response response = resource.postNullVertexRexsterConsumesJson(jsr311Request, "graph", jsonToPost);
 
         assertPostVertexProducesJson(response, true, false);
@@ -519,7 +519,7 @@ public class VertexResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -535,7 +535,7 @@ public class VertexResourceTest {
             will(returnValue(null));
             allowing(graph).addVertex(with(any(Object.class)));
             will(returnValue(v));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -543,7 +543,7 @@ public class VertexResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         Response response = resource.postNullVertexRexsterConsumesTypedJson(jsr311Request, "graph", jsonToPost);
 
         assertPostVertexProducesJson(response, true, false);
@@ -556,7 +556,7 @@ public class VertexResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -572,7 +572,7 @@ public class VertexResourceTest {
             will(returnValue(null));
             allowing(graph).addVertex(with(any(Object.class)));
             will(returnValue(v));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -580,7 +580,7 @@ public class VertexResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         Response response = resource.postNullVertexOnUri(jsr311Request, "graph");
 
         assertPostVertexProducesJson(response, true, true);
@@ -595,7 +595,7 @@ public class VertexResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -611,7 +611,7 @@ public class VertexResourceTest {
             will(returnValue(null));
             allowing(graph).addVertex(with(any(Object.class)));
             will(returnValue(v));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -619,7 +619,7 @@ public class VertexResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         Response response = resource.postNullVertexRexsterConsumesJson(jsr311Request, "graph", jsonToPost);
 
         assertPostVertexProducesJson(response, true, true);
@@ -634,7 +634,7 @@ public class VertexResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -650,7 +650,7 @@ public class VertexResourceTest {
             will(returnValue(null));
             allowing(graph).addVertex(with(any(Object.class)));
             will(returnValue(v));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -658,7 +658,7 @@ public class VertexResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         Response response = resource.postNullVertexRexsterConsumesTypedJson(jsr311Request, "graph", jsonToPost);
 
         assertPostVertexProducesJson(response, true, true);
@@ -671,7 +671,7 @@ public class VertexResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -685,7 +685,7 @@ public class VertexResourceTest {
             will(returnValue(parameters));
             allowing(graph).getVertex(with(any(Object.class)));
             will(returnValue(v));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -693,7 +693,7 @@ public class VertexResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         resource.postVertexOnUri(jsr311Request, "graph", "1");
     }
 
@@ -704,7 +704,7 @@ public class VertexResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -719,7 +719,7 @@ public class VertexResourceTest {
             will(returnValue(parameters));
             allowing(graph).getVertex(with(any(Object.class)));
             will(returnValue(v));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -727,7 +727,7 @@ public class VertexResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         Response response = resource.putVertexConsumesUri(jsr311Request, "graph", "1");
 
         Assert.assertNotNull(response);
@@ -752,7 +752,7 @@ public class VertexResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -765,7 +765,7 @@ public class VertexResourceTest {
             will(returnValue(parameters));
             allowing(graph).getVertex(with(any(Object.class)));
             will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -773,7 +773,7 @@ public class VertexResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         resource.putVertexConsumesUri(jsr311Request, "graph", "1");
 
     }
@@ -782,7 +782,7 @@ public class VertexResourceTest {
     public void deleteVertexValid() {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -794,13 +794,13 @@ public class VertexResourceTest {
             allowing(graph).getVertex(with(any(Object.class)));
             will(returnValue(v));
             allowing(graph).removeVertex(v);
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(uri).getAbsolutePath();
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         Response response = resource.deleteVertex("graph", "1");
 
         Assert.assertNotNull(response);
@@ -816,7 +816,7 @@ public class VertexResourceTest {
     public void deleteVertexNoVertexFound() {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -826,13 +826,13 @@ public class VertexResourceTest {
             will(returnValue(new HashMap<String, String>()));
             allowing(graph).getVertex(with(any(Object.class)));
             will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(uri).getAbsolutePath();
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         resource.deleteVertex("graph", "1");
     }
 
@@ -843,7 +843,7 @@ public class VertexResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -855,13 +855,13 @@ public class VertexResourceTest {
             will(returnValue(parameters));
             allowing(graph).getVertex(with(any(Object.class)));
             will(returnValue(v));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(uri).getAbsolutePath();
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         Response response = resource.deleteVertex("graph", "1");
 
         Assert.assertNotNull(response);
@@ -1039,7 +1039,7 @@ public class VertexResourceTest {
     private VertexResource constructMockGetSingleVertexScenario(final Vertex vertex, final HashMap<String, String> parameters) {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         List<String> namespaces = new ArrayList<String>();
         namespaces.add("*:*");
@@ -1054,13 +1054,13 @@ public class VertexResourceTest {
             will(returnValue(parameters));
             allowing(graph).getVertex(with(any(Object.class)));
             will(returnValue(vertex));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(uri).getAbsolutePath();
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         return resource;
     }
 
@@ -1071,7 +1071,7 @@ public class VertexResourceTest {
     private VertexResource constructMockGetVerticesScenario(final int numberOfVertices, final HashMap<String, String> parameters) {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
@@ -1082,13 +1082,13 @@ public class VertexResourceTest {
             will(returnValue(parameters));
             allowing(graph).getVertices();
             will(returnValue(generateMockedVertices(numberOfVertices)));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(uri).getAbsolutePath();
             will(returnValue(requestUriPath));
         }});
 
-        VertexResource resource = new VertexResource(uri, httpServletRequest, rap);
+        VertexResource resource = new VertexResource(uri, httpServletRequest, ra);
         return resource;
     }
 

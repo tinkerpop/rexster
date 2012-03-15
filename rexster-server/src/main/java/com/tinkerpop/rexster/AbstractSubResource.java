@@ -41,12 +41,12 @@ public abstract class AbstractSubResource extends BaseResource {
 
     protected static final Map<ExtensionSegmentSet, List<RexsterExtension>> extensionCache = new HashMap<ExtensionSegmentSet, List<RexsterExtension>>();
 
-    protected AbstractSubResource(RexsterApplicationProvider rap) {
-        super(rap);
+    protected AbstractSubResource(RexsterApplication ra) {
+        super(ra);
 
         try {
 
-            this.resultObject.put(Tokens.VERSION, RexsterApplication.getVersion());
+            this.resultObject.put(Tokens.VERSION, RexsterApplicationImpl.getVersion());
 
         } catch (JSONException ex) {
 
@@ -58,7 +58,7 @@ public abstract class AbstractSubResource extends BaseResource {
     }
 
     public RexsterApplicationGraph getRexsterApplicationGraph(String graphName) {
-        RexsterApplicationGraph rag = this.getRexsterApplicationProvider().getApplicationGraph(graphName);
+        RexsterApplicationGraph rag = this.getRexsterApplication().getApplicationGraph(graphName);
         if (rag == null) {
 
             if (!graphName.equals("favicon.ico")) {
@@ -386,7 +386,7 @@ public abstract class AbstractSubResource extends BaseResource {
 
                 if (entity != null) {
                     try {
-                        entity.put(Tokens.VERSION, RexsterApplication.getVersion());
+                        entity.put(Tokens.VERSION, RexsterApplicationImpl.getVersion());
                         entity.put(Tokens.QUERY_TIME, this.sh.stopWatch());
                     } catch (JSONException jsonException) {
                         // nothing bad happening here

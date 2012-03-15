@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster.servlet;
 
-import com.tinkerpop.rexster.RexsterApplicationProvider;
-import com.tinkerpop.rexster.WebServerRexsterApplicationProvider;
+import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.gremlin.GremlinEvaluationJob;
 import com.tinkerpop.rexster.gremlin.GremlinSessions;
 import com.tinkerpop.rexster.gremlin.converter.ConsoleResultConverter;
@@ -24,8 +23,13 @@ import java.util.List;
  * Original author Pavel A. Yaskevich
  */
 public class VisualizationServlet extends HttpServlet {
-
     private static final long serialVersionUID = 1L;
+
+    private final RexsterApplication rexsterApplication;
+
+    public VisualizationServlet(RexsterApplication rexsterApplication) {
+        this.rexsterApplication = rexsterApplication;
+    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ServletContext sc = getServletContext();
@@ -38,10 +42,10 @@ public class VisualizationServlet extends HttpServlet {
         sc.log("[GET /visualize?v=" + request.getParameter("v") + "] 200 OK");
 
         try {
-            RexsterApplicationProvider rap = new WebServerRexsterApplicationProvider(this.getServletContext());
-
-            GremlinEvaluationJob job = GremlinSessions.getSession(sessionId, graphName, rap).evaluate(code);
-            List<String> result = new ConsoleResultConverter(job.getOutputWriter()).convert(job.getResult());
+            GremlinEvaluationJob job = GremlinSessions.getSession(sessionId, graphName,
+                    rexsterApplication).evaluate(code);
+            List<String> result = new ConsoleResultConverter(job.getOutputWriter()).convert(
+                    job.getResult());
             response.getWriter().println(((result.size() == 1) ? result.get(0) : result));
         } catch (Exception e) {
             response.getWriter().println(e.getMessage());

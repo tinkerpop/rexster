@@ -34,7 +34,7 @@ public class IndexResourceTest {
     public void getAllIndicesNonIndexableGraph() {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
@@ -43,11 +43,11 @@ public class IndexResourceTest {
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(new HashMap<String, String>()));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
         }});
 
-        IndexResource resource = new IndexResource(uri, httpServletRequest, rap);
+        IndexResource resource = new IndexResource(uri, httpServletRequest, ra);
         resource.getAllIndices("graph");
     }
 
@@ -146,7 +146,7 @@ public class IndexResourceTest {
     private IndexResource constructMockGetAllIndicesScenario(int numberOfIndicesToGenerate, final HashMap<String, String> parameters) {
         final IndexableGraph graph = this.mockery.mock(IndexableGraph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -159,13 +159,13 @@ public class IndexResourceTest {
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getIndices();
             will(returnValue(indices));
         }});
 
-        IndexResource resource = new IndexResource(uri, httpServletRequest, rap);
+        IndexResource resource = new IndexResource(uri, httpServletRequest, ra);
         return resource;
     }
 

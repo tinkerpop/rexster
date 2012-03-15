@@ -114,7 +114,7 @@ public class WebServer {
     }
 
     private void start(final XMLConfiguration properties) throws Exception {
-        RexsterApplication rexsterApplication = WebServerRexsterApplicationProvider.start(properties);
+        WebServerRexsterApplicationProvider.start(properties);
         final Integer rexsterServerPort = properties.getInteger("rexster-server-port", new Integer(8182));
         final String rexsterServerHost = properties.getString("rexster-server-host", "0.0.0.0");
         final Integer rexproServerPort = properties.getInteger("rexpro-server-port", new Integer(8184));
@@ -123,7 +123,7 @@ public class WebServer {
         characterEncoding = properties.getString("character-set", "ISO-8859-1");
 
         this.startRexsterServer(properties, baseUri, rexsterServerPort, rexsterServerHost, webRootPath);
-        this.startRexProServer(properties, rexproServerPort, rexsterApplication);
+        this.startRexProServer(properties, rexproServerPort);
 
     }
 
@@ -151,6 +151,9 @@ public class WebServer {
         jerseyHandler.setContextPath("/");
         jerseyHandler.setServletInstance(new ServletContainer());
 
+        WebServerRexsterApplicationProvider provider = new WebServerRexsterApplicationProvider();
+        RexsterApplication application = provider.getValue();
+
         // servlet that services all url from "main" by simply sending
         // main.html back to the calling client.  main.html handles its own
         // state given the uri
@@ -163,14 +166,14 @@ public class WebServer {
         visualizationHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
 
         visualizationHandler.setContextPath("/doghouse/visualize");
-        visualizationHandler.setServletInstance(new VisualizationServlet());
+        visualizationHandler.setServletInstance(new VisualizationServlet(application));
 
         // servlet for gremlin console
         ServletHandler evaluatorHandler = new ServletHandler();
         evaluatorHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
 
         evaluatorHandler.setContextPath("/doghouse/exec");
-        evaluatorHandler.setServletInstance(new EvaluatorServlet());
+        evaluatorHandler.setServletInstance(new EvaluatorServlet(application));
 
         String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
         dogHouseHandler.addInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri", baseUri + ":" + rexsterServerPort.toString());
@@ -191,8 +194,8 @@ public class WebServer {
         logger.info("Rexster Server running on: [" + baseUri + ":" + rexsterServerPort + "]");
     }
 
-    private void startRexProServer(final XMLConfiguration properties, final Integer rexproServerPort,
-                                   final RexsterApplication rexsterApplication) throws Exception {
+    private void startRexProServer(final XMLConfiguration properties,
+                                   final Integer rexproServerPort) throws Exception {
         FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
         filterChainBuilder.add(new TransportFilter());
         filterChainBuilder.add(new RexProMessageFilter());
@@ -216,7 +219,7 @@ public class WebServer {
             logger.info("Rexster configured with [" + filter.getName() + "].");
         }
 
-        filterChainBuilder.add(new SessionFilter(rexsterApplication));
+        filterChainBuilder.add(new SessionFilter());
         filterChainBuilder.add(new ScriptFilter());
         filterChainBuilder.add(new EchoFilter());
 
@@ -506,7 +509,7 @@ public class WebServer {
                 logger.error("Could not start Rexster Server.  A port that Rexster needs is in use.");
             }
         } else if (line.getCommand().hasOption("version")) {
-            System.out.println("Rexster version [" + RexsterApplication.getVersion() + "]");
+            System.out.println("Rexster version [" + RexsterApplicationImpl.getVersion() + "]");
         } else if (line.getCommand().hasOption("stop")) {
             if (line.hasCommandParameters() && line.getCommandParameters().hasOption("wait")) {
                 issueControlCommand(line, ShutdownManager.COMMAND_SHUTDOWN_WAIT);

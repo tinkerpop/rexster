@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.gremlin;
 
-import com.tinkerpop.rexster.RexsterApplicationProvider;
+import com.tinkerpop.rexster.RexsterApplication;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -53,11 +53,11 @@ public class GremlinSession implements Runnable {
 
     private String graphName;
 
-    private RexsterApplicationProvider rap;
+    private RexsterApplication ra;
 
-    public GremlinSession(String graphName, RexsterApplicationProvider rap) {
+    public GremlinSession(String graphName, RexsterApplication ra) {
         this.graphName = graphName;
-        this.rap = rap;
+        this.ra = ra;
         runner.start();
     }
 
@@ -68,7 +68,7 @@ public class GremlinSession implements Runnable {
             while (true) {
                 if (scriptEngine == null) {
                     Map<String, Object> context = new HashMap<String, Object>();
-                    context.put("g", this.rap.getApplicationGraph(this.graphName).getGraph());
+                    context.put("g", this.ra.getApplicationGraph(this.graphName).getGraph());
                     scriptEngine = com.tinkerpop.rexster.gremlin.GremlinFactory
                             .createGremlinScriptEngine(context);
                 }
