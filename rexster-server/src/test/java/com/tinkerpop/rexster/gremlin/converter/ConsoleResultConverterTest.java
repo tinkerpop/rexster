@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ConsoleResultConverterTest {
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     private Writer writer;
     private ConsoleResultConverter converter;
@@ -126,7 +127,7 @@ public class ConsoleResultConverterTest {
 
     @Test
     public void convertWriter() throws Exception {
-        this.writer.write("x\n");
+        this.writer.write("x" + LINE_SEPARATOR);
         this.writer.write("y");
 
         List<String> converted = this.converter.convert(null);
