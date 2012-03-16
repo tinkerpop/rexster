@@ -51,8 +51,8 @@ public class VertexResource extends AbstractSubResource {
         super(null);
     }
 
-    public VertexResource(UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
-        super(rap);
+    public VertexResource(UriInfo ui, HttpServletRequest req, RexsterApplication ra) {
+        super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;
     }

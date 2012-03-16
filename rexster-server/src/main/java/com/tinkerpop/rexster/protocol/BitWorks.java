@@ -39,7 +39,7 @@ public class BitWorks {
 
         for (String value : values) {
             stream.write(ByteBuffer.allocate(4).putInt(value.length()).array());
-            stream.write(value.getBytes(Charset.forName("UTF-8")));
+            stream.write(value.getBytes(Charset.defaultCharset()));
         }
 
         return stream.toByteArray();

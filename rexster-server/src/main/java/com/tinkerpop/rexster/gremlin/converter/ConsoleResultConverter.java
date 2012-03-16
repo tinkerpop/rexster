@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ConsoleResultConverter implements ResultConverter<List<String>> {
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     private final Writer outputWriter;
 
@@ -50,7 +51,7 @@ public class ConsoleResultConverter implements ResultConverter<List<String>> {
             List<String> outputLines = new ArrayList<String>();
 
             // Handle eval() result
-            String[] printLines = this.outputWriter.toString().split("\n");
+            String[] printLines = this.outputWriter.toString().split(LINE_SEPARATOR);
 
             if (printLines.length > 0 && printLines[0].length() > 0) {
                 for (String printLine : printLines) {

@@ -1,61 +1,72 @@
 package com.tinkerpop.rexster;
 
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
+import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.inject.InjectableProvider;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.log4j.Logger;
 
-import javax.servlet.ServletContext;
-import java.util.Set;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.ext.Provider;
+import java.lang.reflect.Type;
 
 /**
- * Providers the RexsterApplication through the instantiated WebServer and
- * its static methods.
+ * A Jersey InjectableProvider and Injectable that supplies Servlets which have a @Context
+ * annotated RexsterApplication field with a RexsterApplicationImpl.
+ *
+ * Users interested in embedding Rexster into their custom application should write a Provider
+ * class following this pattern that supplies their custom implementation of RexsterApplication.
+ *
+ * @author Jordan A. Lewis (http://jordanlewis.org)
  */
-public class WebServerRexsterApplicationProvider implements RexsterApplicationProvider {
-
-    protected static final Logger logger = Logger.getLogger(WebServerRexsterApplicationProvider.class);
+@Provider
+public class WebServerRexsterApplicationProvider
+    extends AbstractHttpContextInjectable<RexsterApplication>
+    implements InjectableProvider<Context, Type> {
 
     private static RexsterApplication rexster;
 
-    public WebServerRexsterApplicationProvider(ServletContext servletContext) throws Exception {
-        if (rexster == null) {
-            String configurationPath = servletContext.getInitParameter("com.tinkerpop.rexster.config");
+    private static XMLConfiguration configurationProperties;
 
-            if (configurationPath == null || configurationPath.trim().length() == 0) {
-                configurationPath = "rexster.xml";
-            }
-
-            XMLConfiguration properties = new XMLConfiguration();
-            properties.load(RexsterApplication.class.getResourceAsStream(configurationPath));
-            rexster = new RexsterApplication(properties);
-        }
-    }
-
-    public static RexsterApplication start(final XMLConfiguration properties) {
-        rexster = new RexsterApplication(properties);
-        return rexster;
+    public static void start(XMLConfiguration properties) {
+        configurationProperties = properties;
     }
 
     public static void stop() {
-        try {
-            rexster.stop();
-        } catch (Exception ex) {
-            logger.warn("Rexster graph may not have been shutdown properly", ex);
+        rexster.stop();
+    }
+
+    public WebServerRexsterApplicationProvider() {
+        if (rexster == null) {
+            if (configurationProperties == null) {
+                configurationProperties = new XMLConfiguration();
+            }
+            rexster = new RexsterApplicationImpl(configurationProperties);
         }
     }
 
-    public RexsterApplication getRexsterApplication() {
+    @Override
+    public RexsterApplication getValue(HttpContext c) {
         return rexster;
     }
 
-    public RexsterApplicationGraph getApplicationGraph(String graphName) {
-        return this.getRexsterApplication().getApplicationGraph(graphName);
+    @Override
+    public RexsterApplication getValue() {
+        return rexster;
     }
 
-    public Set<String> getGraphsNames() {
-        return this.getRexsterApplication().getGraphNames();
+    @Override
+    public ComponentScope getScope() {
+        return ComponentScope.Singleton;
     }
 
-    public long getStartTime() {
-        return this.getRexsterApplication().getStartTime();
+    @Override
+    public Injectable getInjectable(ComponentContext ic, Context context, Type type) {
+        if (type.equals(RexsterApplication.class)) {
+            return this;
+        }
+        return null;
     }
 }

@@ -24,7 +24,7 @@ public abstract class BaseTest {
     public BaseTest() {
         try {
             XMLConfiguration properties = new XMLConfiguration();
-            properties.load(RexsterApplication.class.getResourceAsStream("rexster.xml"));
+            properties.load(RexsterApplicationImpl.class.getResourceAsStream("rexster.xml"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -35,7 +35,7 @@ public abstract class BaseTest {
             public void run() {
                 try {
                     XMLConfiguration properties = new XMLConfiguration();
-                    properties.load(RexsterApplication.class.getResourceAsStream("rexster.xml"));
+                    properties.load(RexsterApplicationImpl.class.getResourceAsStream("rexster.xml"));
                     webServer = new WebServer(properties, false);
                 } catch (Exception e) {
                     e.printStackTrace();
