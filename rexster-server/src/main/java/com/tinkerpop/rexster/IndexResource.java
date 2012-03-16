@@ -431,7 +431,7 @@ public class IndexResource extends AbstractSubResource {
         String clazz = null;
         String type = null;
         Set<String> keys = null;
-        Parameter<Object, Object>[] indexParameters = null;
+        Parameter<Object, Object>[] indexParameters = new Parameter[0];
 
         final JSONObject theRequestObject = this.getRequestObject();
 
