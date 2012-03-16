@@ -27,7 +27,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -81,11 +80,11 @@ public class BaseResourceTest {
 
     protected class MockResource extends BaseResource {
         public MockResource() {
-            super(new MockRexsterApplicationProvider());
+            super(null);
         }
 
         public MockResource(Map map) {
-            super(new MockRexsterApplicationProvider());
+            super(null);
             this.httpServletRequest = new MockHttpServletRequest(map);
         }
 
@@ -418,31 +417,6 @@ public class BaseResourceTest {
         public boolean isUserInRole(String arg0) {
             // TODO Auto-generated method stub
             return false;
-        }
-
-    }
-
-    protected class MockRexsterApplicationProvider implements RexsterApplicationProvider {
-
-        private final long startTime = System.currentTimeMillis();
-
-        public RexsterApplication getRexsterApplication() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public RexsterApplicationGraph getApplicationGraph(String graphName) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public Set<String> getGraphsNames() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public long getStartTime() {
-            return this.startTime;
         }
 
     }

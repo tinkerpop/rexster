@@ -27,7 +27,7 @@ public class RexsterResourceTest {
 
     @Test
     public void evaluateMultipleGraphs() {
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
         final Set<String> graphNames = new HashSet<String>();
         graphNames.add("graph1");
@@ -39,13 +39,13 @@ public class RexsterResourceTest {
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(new HashMap<String, String>()));
-            allowing(rap).getGraphsNames();
+            allowing(ra).getGraphNames();
             will(returnValue(graphNames));
-            allowing(rap).getStartTime();
+            allowing(ra).getStartTime();
             will(returnValue(startTime));
         }});
 
-        RexsterResource resource = new RexsterResource(rap);
+        RexsterResource resource = new RexsterResource(ra);
         Response response = resource.getRexsterRoot();
 
         Assert.assertNotNull(response);
@@ -66,7 +66,7 @@ public class RexsterResourceTest {
 
     @Test
     public void evaluateNoGraphs() {
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
         final Set<String> graphNames = new HashSet<String>();
 
@@ -75,13 +75,13 @@ public class RexsterResourceTest {
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(new HashMap<String, String>()));
-            allowing(rap).getGraphsNames();
+            allowing(ra).getGraphNames();
             will(returnValue(graphNames));
-            allowing(rap).getStartTime();
+            allowing(ra).getStartTime();
             will(returnValue(startTime));
         }});
 
-        RexsterResource resource = new RexsterResource(rap);
+        RexsterResource resource = new RexsterResource(ra);
         Response response = resource.getRexsterRoot();
 
         Assert.assertNotNull(response);

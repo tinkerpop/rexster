@@ -146,7 +146,7 @@ public class EdgeResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -159,7 +159,7 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -167,7 +167,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
 
         resource.postNullEdgeConsumesUri(jsr311Request, "graph");
     }
@@ -178,7 +178,7 @@ public class EdgeResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -193,7 +193,7 @@ public class EdgeResourceTest {
             will(returnValue(null));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -201,7 +201,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         resource.postNullEdgeConsumesUri(jsr311Request, "graph");
     }
 
@@ -219,7 +219,7 @@ public class EdgeResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -232,7 +232,7 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(returnEdge));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
             will(returnValue(v1));
@@ -244,7 +244,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         resource.postEdgeConsumesUri(jsr311Request, "graph", "1");
     }
 
@@ -259,7 +259,7 @@ public class EdgeResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -272,7 +272,7 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
             will(returnValue(v1));
@@ -286,7 +286,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         Response response = resource.postNullEdgeConsumesUri(jsr311Request, "graph");
 
         assertPostEdgeProducesJson(response, false, false);
@@ -304,7 +304,7 @@ public class EdgeResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -317,7 +317,7 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
             will(returnValue(v1));
@@ -331,7 +331,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         Response response = resource.postNullEdgeConsumesJson(jsr311Request, "graph", jsonToPost);
 
         assertPostEdgeProducesJson(response, false, false);
@@ -349,7 +349,7 @@ public class EdgeResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -362,7 +362,7 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
             will(returnValue(v1));
@@ -376,7 +376,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         Response response = resource.postNullEdgeConsumesTypedJson(jsr311Request, "graph", jsonToPost);
 
         assertPostEdgeProducesJson(response, false, false);
@@ -394,7 +394,7 @@ public class EdgeResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -407,7 +407,7 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
             will(returnValue(v1));
@@ -421,7 +421,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         Response response = resource.postNullEdgeConsumesUri(jsr311Request, "graph");
 
         assertPostEdgeProducesJson(response, true, false);
@@ -440,7 +440,7 @@ public class EdgeResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -453,7 +453,7 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
             will(returnValue(v1));
@@ -467,7 +467,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         Response response = resource.postNullEdgeConsumesJson(jsr311Request, "graph", jsonToPost);
 
         assertPostEdgeProducesJson(response, true, false);
@@ -486,7 +486,7 @@ public class EdgeResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -499,7 +499,7 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
             will(returnValue(v1));
@@ -513,7 +513,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         Response response = resource.postNullEdgeConsumesTypedJson(jsr311Request, "graph", jsonToPost);
 
         assertPostEdgeProducesJson(response, true, false);
@@ -532,7 +532,7 @@ public class EdgeResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -545,7 +545,7 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
             will(returnValue(v1));
@@ -559,7 +559,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         Response response = resource.postNullEdgeConsumesUri(jsr311Request, "graph");
 
         assertPostEdgeProducesJson(response, true, true);
@@ -578,7 +578,7 @@ public class EdgeResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -591,7 +591,7 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
             will(returnValue(v1));
@@ -605,7 +605,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         Response response = resource.postNullEdgeConsumesJson(jsr311Request, "graph", jsonToPost);
 
         assertPostEdgeProducesJson(response, true, true);
@@ -624,7 +624,7 @@ public class EdgeResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -637,7 +637,7 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
             will(returnValue(v1));
@@ -651,7 +651,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         Response response = resource.postNullEdgeConsumesTypedJson(jsr311Request, "graph", jsonToPost);
 
         assertPostEdgeProducesJson(response, true, true);
@@ -668,7 +668,7 @@ public class EdgeResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -681,7 +681,7 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(null));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
             will(returnValue(v1));
@@ -695,7 +695,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         resource.postEdgeConsumesUri(jsr311Request, "graph", "1");
     }
 
@@ -711,7 +711,7 @@ public class EdgeResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -724,7 +724,7 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(returnEdge));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
             will(returnValue(v1));
@@ -736,7 +736,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         Response response = resource.postEdgeConsumesUri(jsr311Request, "graph", "1");
 
         Assert.assertNotNull(response);
@@ -767,7 +767,7 @@ public class EdgeResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -780,7 +780,7 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(returnEdge));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -788,7 +788,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         Response response = resource.putEdgeOnUri(jsr311Request, "graph", "1");
 
         Assert.assertNotNull(response);
@@ -820,7 +820,7 @@ public class EdgeResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -830,14 +830,14 @@ public class EdgeResourceTest {
             will(returnValue(new HashMap<String, String>()));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(returnEdge));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).removeEdge(returnEdge);
             allowing(uri).getAbsolutePath();
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         resource.deleteEdge("graph", "100");
     }
 
@@ -855,7 +855,7 @@ public class EdgeResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -865,13 +865,13 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(returnEdge));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(uri).getAbsolutePath();
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         resource.deleteEdge("graph", "100");
 
         Assert.assertNull(returnEdge.getProperty("to-delete"));
@@ -951,7 +951,7 @@ public class EdgeResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -961,13 +961,13 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(edge));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(uri).getAbsolutePath();
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         return resource;
     }
 
@@ -975,7 +975,7 @@ public class EdgeResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -985,7 +985,7 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(edge));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal(requestedInId)));
             will(returnValue(inVertex));
@@ -995,7 +995,7 @@ public class EdgeResourceTest {
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         return resource;
     }
 
@@ -1007,7 +1007,7 @@ public class EdgeResourceTest {
         namespaces.add("*:*");
         rag.loadAllowableExtensions(namespaces);
 
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
@@ -1018,13 +1018,13 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdge(with(any(Object.class)));
             will(returnValue(edge));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(uri).getAbsolutePath();
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         return resource;
     }
 
@@ -1035,7 +1035,7 @@ public class EdgeResourceTest {
     private EdgeResource constructMockGetAllEdgesScenario(final int numberOfEdges, final HashMap<String, String> parameters) {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
@@ -1046,13 +1046,13 @@ public class EdgeResourceTest {
             will(returnValue(parameters));
             allowing(graph).getEdges();
             will(returnValue(generateMockedEdges(numberOfEdges)));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(uri).getAbsolutePath();
             will(returnValue(requestUriPath));
         }});
 
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, rap);
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
         return resource;
     }
 

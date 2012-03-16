@@ -36,7 +36,7 @@ public class PrefixResourceTest {
         SailGraph sg = new MemoryStoreSailGraph();
         SailGraphFactory.createTinkerGraph(sg);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", sg);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -44,11 +44,11 @@ public class PrefixResourceTest {
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(new HashMap<String, String>()));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
         }});
 
-        PrefixResource resource = new PrefixResource(uri, httpServletRequest, rap);
+        PrefixResource resource = new PrefixResource(uri, httpServletRequest, ra);
         Response response = resource.getPrefixes("graph");
 
         Assert.assertNotNull(response);
@@ -71,7 +71,7 @@ public class PrefixResourceTest {
         SailGraph sg = new MemoryStoreSailGraph();
         SailGraphFactory.createTinkerGraph(sg);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", sg);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -79,11 +79,11 @@ public class PrefixResourceTest {
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(new HashMap<String, String>()));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
         }});
 
-        PrefixResource resource = new PrefixResource(uri, httpServletRequest, rap);
+        PrefixResource resource = new PrefixResource(uri, httpServletRequest, ra);
         Response response = resource.getSinglePrefix("graph", "tg");
 
         Assert.assertNotNull(response);
@@ -104,7 +104,7 @@ public class PrefixResourceTest {
         SailGraph sg = new MemoryStoreSailGraph();
         SailGraphFactory.createTinkerGraph(sg);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", sg);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -112,11 +112,11 @@ public class PrefixResourceTest {
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(new HashMap<String, String>()));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
         }});
 
-        PrefixResource resource = new PrefixResource(uri, httpServletRequest, rap);
+        PrefixResource resource = new PrefixResource(uri, httpServletRequest, ra);
         Response response = resource.deleteSinglePrefix("graph", "tg");
 
         Assert.assertNotNull(response);

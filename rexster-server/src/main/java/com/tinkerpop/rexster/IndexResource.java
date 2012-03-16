@@ -50,8 +50,8 @@ public class IndexResource extends AbstractSubResource {
         super(null);
     }
 
-    public IndexResource(UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
-        super(rap);
+    public IndexResource(UriInfo ui, HttpServletRequest req, RexsterApplication ra) {
+        super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;
     }

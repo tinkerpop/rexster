@@ -56,20 +56,20 @@ public class GraphResourceTest {
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
 
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(new HashMap<String, String>()));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).clear();
             allowing(uri).getAbsolutePath();
             will(returnValue(requestUriPath));
         }});
 
-        GraphResource resource = new GraphResource(uri, httpServletRequest, rap);
+        GraphResource resource = new GraphResource(uri, httpServletRequest, ra);
         Response response = resource.deleteGraph("graph");
 
         Assert.assertNotNull(response);
@@ -91,21 +91,21 @@ public class GraphResourceTest {
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
 
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
-            allowing(rap).getStartTime();
+            allowing(ra).getStartTime();
             will(returnValue(System.currentTimeMillis() - 10000));
             allowing(uri).getAbsolutePath();
             will(returnValue(requestUriPath));
         }});
 
-        GraphResource resource = new GraphResource(uri, httpServletRequest, rap);
+        GraphResource resource = new GraphResource(uri, httpServletRequest, ra);
         return resource;
     }
 }

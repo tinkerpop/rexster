@@ -41,8 +41,8 @@ public class GraphResource extends AbstractSubResource {
         super(null);
     }
 
-    public GraphResource(UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
-        super(rap);
+    public GraphResource(UriInfo ui, HttpServletRequest req, RexsterApplication ra) {
+        super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;
     }
@@ -89,7 +89,7 @@ public class GraphResource extends AbstractSubResource {
             this.resultObject.put("type", graphType);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             this.resultObject.put(Tokens.UP_TIME, this.getTimeAlive());
-            this.resultObject.put("version", RexsterApplication.getVersion());
+            this.resultObject.put("version", RexsterApplicationImpl.getVersion());
 
             if (showHypermedia) {
                 RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);

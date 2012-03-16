@@ -35,8 +35,8 @@ public class PrefixResource extends AbstractSubResource {
         super(null);
     }
 
-    public PrefixResource(UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
-        super(rap);
+    public PrefixResource(UriInfo ui, HttpServletRequest req, RexsterApplication ra) {
+        super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;
     }

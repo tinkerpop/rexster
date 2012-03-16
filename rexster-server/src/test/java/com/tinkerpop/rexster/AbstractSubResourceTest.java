@@ -40,16 +40,16 @@ public class AbstractSubResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplicationProvider rap = this.mockery.mock(RexsterApplicationProvider.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         this.mockery.checking(new Expectations() {{
             allowing(req).getParameterMap();
             will(returnValue(new HashMap<String, String>()));
-            allowing(rap).getApplicationGraph(with(any(String.class)));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
         }});
 
-        this.mockResource = new MockAbstractSubResource(uriInfo, req, rap);
+        this.mockResource = new MockAbstractSubResource(uriInfo, req, ra);
     }
 
     @Test
@@ -273,8 +273,8 @@ public class AbstractSubResourceTest {
 
     private class MockAbstractSubResource extends AbstractSubResource {
 
-        public MockAbstractSubResource(UriInfo ui, HttpServletRequest req, RexsterApplicationProvider rap) {
-            super(rap);
+        public MockAbstractSubResource(UriInfo ui, HttpServletRequest req, RexsterApplication ra) {
+            super(ra);
             this.httpServletRequest = req;
             this.uriInfo = ui;
 
