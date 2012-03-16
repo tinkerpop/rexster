@@ -219,7 +219,10 @@ public class WebServer {
             logger.info("Rexster configured with [" + filter.getName() + "].");
         }
 
-        filterChainBuilder.add(new SessionFilter());
+        WebServerRexsterApplicationProvider provider = new WebServerRexsterApplicationProvider();
+        RexsterApplication application = provider.getValue();
+
+        filterChainBuilder.add(new SessionFilter(application));
         filterChainBuilder.add(new ScriptFilter());
         filterChainBuilder.add(new EchoFilter());
 

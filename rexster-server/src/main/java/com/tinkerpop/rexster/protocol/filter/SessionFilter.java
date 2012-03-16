@@ -18,8 +18,11 @@ import java.util.UUID;
 
 public class SessionFilter extends BaseFilter {
 
-    @Context
     private RexsterApplication rexsterApplication;
+    
+    public SessionFilter(RexsterApplication rexsterApplication){
+        this.rexsterApplication = rexsterApplication;
+    }
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
         final RexProMessage message = ctx.getMessage();
