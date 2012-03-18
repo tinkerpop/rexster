@@ -644,10 +644,11 @@ public class IndexResource extends AbstractSubResource {
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 
-
-        for (final Index index : idxGraph.getIndices()) {
-            if (index.getIndexName().equals(name))
+        final Iterable<Index<? extends Element>> indices = idxGraph.getIndices();
+        for (final Index index : indices) {
+            if (index.getIndexName().equals(name)) {
                 return index;
+            }
         }
 
         return null;
