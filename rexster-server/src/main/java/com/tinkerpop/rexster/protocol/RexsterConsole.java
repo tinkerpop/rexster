@@ -282,9 +282,9 @@ public class RexsterConsole {
                 int lengthOfBindings = bb.getInt();
                 bb.position(lengthOfBindings + 4);
 
-                // this used to be a while loop on the hasRemaining, but i dropped it b/c we're currently
-                // sending back bytes as one batch so there's not really a need to loop it.
-                if (bb.hasRemaining()) {
+                // multiple objects (those from an iterator) are returned as multiple lines each with their
+                // own length counter.
+                while (bb.hasRemaining()) {
                     int segmentLength = bb.getInt();
                     byte[] resultObjectBytes = new byte[segmentLength];
                     bb.get(resultObjectBytes);
