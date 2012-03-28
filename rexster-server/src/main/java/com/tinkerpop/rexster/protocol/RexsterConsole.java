@@ -23,6 +23,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -289,7 +290,7 @@ public class RexsterConsole {
                     byte[] resultObjectBytes = new byte[segmentLength];
                     bb.get(resultObjectBytes);
 
-                    lines.add(new String(resultObjectBytes));
+                    lines.add(new String(resultObjectBytes, Charset.forName("UTF-8")));
                 }
 
             } catch (IllegalArgumentException iae) {

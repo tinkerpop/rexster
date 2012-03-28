@@ -38,8 +38,9 @@ public class BitWorks {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
         for (String value : values) {
-            stream.write(ByteBuffer.allocate(4).putInt(value.length()).array());
-            stream.write(value.getBytes(Charset.defaultCharset()));
+            byte[] valueAsBytes = value.getBytes(Charset.forName("UTF-8"));
+            stream.write(ByteBuffer.allocate(4).putInt(valueAsBytes.length).array());
+            stream.write(valueAsBytes);
         }
 
         return stream.toByteArray();
