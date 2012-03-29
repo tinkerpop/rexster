@@ -510,6 +510,8 @@ public class EdgeResource extends AbstractSubResource {
                         }
                     }
 
+                    rag.tryStopTransactionSuccess();
+
                     List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
                     this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
                 } else {
@@ -517,8 +519,6 @@ public class EdgeResource extends AbstractSubResource {
                     JSONObject error = generateErrorObjectJsonFail(new Exception("Edge cannot be found or created.  Please check the format of the request."));
                     throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
                 }
-
-                rag.tryStopTransactionSuccess();
 
                 if (showHypermedia) {
                     JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE, this.getUriPath());
@@ -631,9 +631,9 @@ public class EdgeResource extends AbstractSubResource {
                 }
             }
 
-            this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
-
             rag.tryStopTransactionSuccess();
+
+            this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
 
             if (showHypermedia) {
                 JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE, this.getUriPath());
