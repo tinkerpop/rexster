@@ -137,6 +137,11 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>3.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.msgpack</groupId>
+            <artifactId>msgpack</artifactId>
+            <version>0.6.5</version>
+        </dependency>
         <!-- LOGGING -->
         <dependency>
             <groupId>log4j</groupId>

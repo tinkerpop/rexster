@@ -1,11 +1,10 @@
 package com.tinkerpop.rexster.protocol;
 
-import com.tinkerpop.rexster.protocol.message.KillSessionRequestMessage;
-import com.tinkerpop.rexster.protocol.message.MessageType;
-import com.tinkerpop.rexster.protocol.message.RexProMessage;
-import com.tinkerpop.rexster.protocol.message.SessionRequestMessage;
-import com.tinkerpop.rexster.protocol.message.SessionResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -39,15 +38,24 @@ public class RemoteRexsterSession {
 
     public void open() {
         if (sessionKey == RexProMessage.EMPTY_SESSION) {
-            RexProMessage sessionRequestMessageToSend = new SessionRequestMessage(
-                    SessionRequestMessage.FLAG_NEW_SESSION, SessionRequestMessage.CHANNEL_CONSOLE,
-                    this.username, this.password);
+            SessionRequestMessage sessionRequestMessageToSend = new SessionRequestMessage();
+            sessionRequestMessageToSend.Username = this.username;
+            sessionRequestMessageToSend.Password = this.password;
+            sessionRequestMessageToSend.setSessionAsUUID(SessionRequestMessage.EMPTY_SESSION);
+            sessionRequestMessageToSend.Channel = SessionRequestMessage.CHANNEL_CONSOLE;
+            sessionRequestMessageToSend.Flag = SessionRequestMessage.FLAG_NEW_SESSION;
+            sessionRequestMessageToSend.setRequestAsUUID(UUID.randomUUID());
+            
             final RexProMessage rcvMessage = sendRequest(sessionRequestMessageToSend, 3);
 
-            if (rcvMessage != null && rcvMessage.getType() == MessageType.SESSION_RESPONSE) {
-                final SessionResponseMessage sessionResponseMessage = new SessionResponseMessage(rcvMessage);
-                this.availableLanguages = sessionResponseMessage.getLanguages();
-                this.sessionKey = rcvMessage.getSessionAsUUID();
+            if (rcvMessage != null && rcvMessage instanceof SessionResponseMessage) {
+                final SessionResponseMessage sessionResponseMessage = (SessionResponseMessage) rcvMessage;
+                this.availableLanguages = new ArrayList();
+                for (String lang : sessionResponseMessage.Languages) {
+                    this.availableLanguages.add(lang);
+                }
+                
+                this.sessionKey = rcvMessage.sessionAsUUID();
             }
         }
     }
@@ -127,15 +135,17 @@ public class RemoteRexsterSession {
 
         try {
             if (sessionKey != RexProMessage.EMPTY_SESSION) {
-                RexProMessage sessionKillMessageToSend = new KillSessionRequestMessage();
+                SessionRequestMessage sessionKillMessageToSend = new SessionRequestMessage();
+                sessionKillMessageToSend.Flag = SessionRequestMessage.FLAG_KILL_SESSION;
+                sessionKillMessageToSend.setRequestAsUUID(UUID.randomUUID());
 
                 // need to set the session here so that the server knows which one to delete.
-                sessionKillMessageToSend.setSession(BitWorks.convertUUIDToByteArray(this.sessionKey));
+                sessionKillMessageToSend.setSessionAsUUID(this.sessionKey);
                 final RexProMessage rcvMessage = sendRequest(sessionKillMessageToSend, 3);
 
                 // response message will have an EMPTY_SESSION
-                if (rcvMessage.getType() == MessageType.SESSION_RESPONSE) {
-                    this.sessionKey = rcvMessage.getSessionAsUUID();
+                if (rcvMessage instanceof SessionResponseMessage) {
+                    this.sessionKey = rcvMessage.sessionAsUUID();
                 } else {
                     // TODO: an error message
                 }

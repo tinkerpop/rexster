@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster.protocol.message;
+package com.tinkerpop.rexster.protocol.msg;
 
 public class MessageType {
     public static final byte ERROR = 0;

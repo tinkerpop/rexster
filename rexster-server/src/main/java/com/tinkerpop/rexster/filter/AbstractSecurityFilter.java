@@ -7,12 +7,11 @@ package com.tinkerpop.rexster.filter;
 import com.sun.jersey.core.util.Base64;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.RexsterApplicationImpl;
-import com.tinkerpop.rexster.protocol.message.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.message.MessageType;
-import com.tinkerpop.rexster.protocol.message.RexProMessage;
-import com.tinkerpop.rexster.protocol.message.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MessageType;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
@@ -88,18 +87,21 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
         final RexProMessage message = ctx.getMessage();
 
-        if (message.getType() == MessageType.SESSION_REQUEST && !message.hasSession()) {
-            SessionRequestMessage specificMessage = new SessionRequestMessage(message);
+        if (message instanceof SessionRequestMessage && !message.hasSession()) {
+            SessionRequestMessage specificMessage = (SessionRequestMessage) message;
 
-            if (specificMessage.getFlag() == SessionRequestMessage.FLAG_NEW_SESSION) {
-                final String[] usernamePassword = specificMessage.getUsernamePassword();
-                final String username = usernamePassword[0];
-                final String password = usernamePassword[1];
+            if (specificMessage.Flag == SessionRequestMessage.FLAG_NEW_SESSION) {
+                final String username = specificMessage.Username;
+                final String password = specificMessage.Password;
                 if (!authenticate(username, password)) {
                     // there is no session to this message...that's a problem
-                    ctx.write(new ErrorResponseMessage(RexProMessage.EMPTY_SESSION, message.getRequestAsUUID(),
-                            ErrorResponseMessage.FLAG_ERROR_AUTHENTICATION_FAILURE,
-                            "Invalid username or password."));
+                    ErrorResponseMessage errorMessage = new ErrorResponseMessage();
+                    errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
+                    errorMessage.Request = specificMessage.Request;
+                    errorMessage.ErrorMessage = "Invalid username or password.";
+                    errorMessage.Flag = ErrorResponseMessage.FLAG_ERROR_AUTHENTICATION_FAILURE;
+
+                    ctx.write(errorMessage);
 
                     return ctx.getStopAction();
                 }

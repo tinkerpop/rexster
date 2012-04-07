@@ -3,17 +3,17 @@ package com.tinkerpop.rexster.protocol.filter;
 import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.RexProSessions;
-import com.tinkerpop.rexster.protocol.message.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.message.MessageType;
-import com.tinkerpop.rexster.protocol.message.RexProMessage;
-import com.tinkerpop.rexster.protocol.message.SessionRequestMessage;
-import com.tinkerpop.rexster.protocol.message.SessionResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;
 
-import javax.ws.rs.core.Context;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.UUID;
 
 public class SessionFilter extends BaseFilter {
@@ -27,29 +27,50 @@ public class SessionFilter extends BaseFilter {
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
         final RexProMessage message = ctx.getMessage();
 
-        if (message.getType() == MessageType.SESSION_REQUEST) {
-            SessionRequestMessage specificMessage = new SessionRequestMessage(message);
+        if (message instanceof SessionRequestMessage) {
+            SessionRequestMessage specificMessage = (SessionRequestMessage) message;
 
-            if (specificMessage.getFlag() == SessionRequestMessage.FLAG_NEW_SESSION) {
+            if (specificMessage.Flag == SessionRequestMessage.FLAG_NEW_SESSION) {
                 UUID sessionKey = UUID.randomUUID();
 
                 // construct a session with the right channel
                 RexProSessions.ensureSessionExists(sessionKey.toString(), this.rexsterApplication,
-                        specificMessage.getChannel(), specificMessage.getChunkSize());
+                        specificMessage.Channel, SessionRequestMessage.DEFAULT_CHUNK_SIZE);
 
                 EngineController engineController = EngineController.getInstance();
+                ArrayList<String> langs = new ArrayList<String>();
+                Iterator<String> itty = engineController.getAvailableEngineLanguages();
+                while (itty.hasNext()) {
+                    langs.add(itty.next());
+                }
+                
+                SessionResponseMessage responseMessage = new SessionResponseMessage();
+                responseMessage.setSessionAsUUID(sessionKey);
+                responseMessage.Request = specificMessage.Request;
+                responseMessage.Flag = (byte) 0;
+                responseMessage.Languages = new String[langs.size()];
+                langs.toArray(responseMessage.Languages); 
+                
+                ctx.write(responseMessage);
 
-                ctx.write(new SessionResponseMessage(sessionKey, specificMessage.getRequestAsUUID(),
-                        engineController.getAvailableEngineLanguages()));
-
-            } else if (specificMessage.getFlag() == SessionRequestMessage.FLAG_KILL_SESSION) {
-                RexProSessions.destroySession(specificMessage.getSessionAsUUID().toString());
-                ctx.write(new SessionResponseMessage(RexProMessage.EMPTY_SESSION, specificMessage.getRequestAsUUID(), null));
+            } else if (specificMessage.Flag == SessionRequestMessage.FLAG_KILL_SESSION) {
+                RexProSessions.destroySession(specificMessage.sessionAsUUID().toString());
+                SessionResponseMessage responseMessage = new SessionResponseMessage();
+                responseMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
+                responseMessage.Request = specificMessage.Request;
+                responseMessage.Languages = new String[0];
+                responseMessage.Flag = (byte) 0;
+                
+                ctx.write(responseMessage);
             } else {
                 // there is no session to this message...that's a problem
-                ctx.write(new ErrorResponseMessage(RexProMessage.EMPTY_SESSION, message.getRequestAsUUID(),
-                        ErrorResponseMessage.FLAG_ERROR_MESSAGE_VALIDATION,
-                        "The message has an invalid flag."));
+                ErrorResponseMessage errorMessage = new ErrorResponseMessage();
+                errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
+                errorMessage.Request = specificMessage.Request;
+                errorMessage.ErrorMessage = "The message has an invalid flag.";
+                errorMessage.Flag = ErrorResponseMessage.FLAG_ERROR_MESSAGE_VALIDATION;
+
+                ctx.write(errorMessage);
             }
 
             // nothing left to do...session was created
@@ -58,18 +79,26 @@ public class SessionFilter extends BaseFilter {
 
         if (!message.hasSession()) {
             // there is no session to this message...that's a problem
-            ctx.write(new ErrorResponseMessage(RexProMessage.EMPTY_SESSION, message.getRequestAsUUID(),
-                    ErrorResponseMessage.FLAG_ERROR_MESSAGE_VALIDATION,
-                    "The message does not specify a session."));
+            ErrorResponseMessage errorMessage = new ErrorResponseMessage();
+            errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
+            errorMessage.Request = message.Request;
+            errorMessage.ErrorMessage = "The message does not specify a session.";
+            errorMessage.Flag = ErrorResponseMessage.FLAG_ERROR_MESSAGE_VALIDATION;
+
+            ctx.write(errorMessage);
 
             return ctx.getStopAction();
         }
 
-        if (!RexProSessions.hasSessionKey(message.getSessionAsUUID().toString())) {
+        if (!RexProSessions.hasSessionKey(message.sessionAsUUID().toString())) {
             // the message is assigned a session that does not exist on the server
-            ctx.write(new ErrorResponseMessage(RexProMessage.EMPTY_SESSION, message.getRequestAsUUID(),
-                    ErrorResponseMessage.FLAG_ERROR_INVALID_SESSION,
-                    "The session on the request does not exist or has otherwise expired."));
+            ErrorResponseMessage errorMessage = new ErrorResponseMessage();
+            errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
+            errorMessage.Request = message.Request;
+            errorMessage.ErrorMessage = "The session on the request does not exist or has otherwise expired.";
+            errorMessage.Flag = ErrorResponseMessage.FLAG_ERROR_INVALID_SESSION;
+
+            ctx.write(errorMessage);
 
             return ctx.getStopAction();
         }

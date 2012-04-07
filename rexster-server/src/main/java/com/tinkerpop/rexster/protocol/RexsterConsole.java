@@ -2,10 +2,10 @@ package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.pipes.util.iterators.SingleIterator;
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.protocol.message.ConsoleScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.message.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.message.RexProMessage;
-import com.tinkerpop.rexster.protocol.message.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import jline.ConsoleReader;
 import jline.History;
 import org.apache.commons.cli.CommandLine;
@@ -22,12 +22,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class RexsterConsole {
 
@@ -149,6 +148,11 @@ public class RexsterConsole {
                     } else {
                         this.session = new RemoteRexsterSession(this.host, this.port, this.timeout, this.username, this.password);
                     }
+                    
+                    // reset binding cache in the console...it will come back fresh from the server on the 
+                    // next script eval
+                    this.currentBindings.clear();
+
                     this.output.println("--> done");
                 } else if (line.startsWith(Tokens.REXSTER_CONSOLE_EXECUTE)) {
                     String fileToExecute = line.substring(Tokens.REXSTER_CONSOLE_EXECUTE.length()).trim();
@@ -265,37 +269,27 @@ public class RexsterConsole {
             session.open();
 
             // pass in some dummy rexster bindings...not really fully working quite right for scriptengine usage
-            final RexProMessage scriptMessage = new ScriptRequestMessage(
-                    session.getSessionKey(), scriptEngineName, new RexsterBindings(), script);
-
+            final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
+            scriptMessage.setSessionAsUUID(session.getSessionKey());
+            scriptMessage.Script = script;
+            scriptMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToByteArray(new RexsterBindings());
+            scriptMessage.LanguageName = scriptEngineName;
+            scriptMessage.Flag = (byte) 0;
+            scriptMessage.setRequestAsUUID(UUID.randomUUID());
+            
             final RexProMessage resultMessage = session.sendRequest(scriptMessage, 3, 500);
 
-            ArrayList<String> lines = new ArrayList<String>();
+            List<String> lines = new ArrayList<String>();
             List<String> bindings = new ArrayList<String>();
             try {
-                ConsoleScriptResponseMessage responseMessage = new ConsoleScriptResponseMessage(resultMessage);
+                ConsoleScriptResponseMessage responseMessage = (ConsoleScriptResponseMessage) resultMessage;
 
-                bindings = responseMessage.getBindings();
-
-                ByteBuffer bb = ByteBuffer.wrap(responseMessage.getBody());
-
-                // navigate to the start of the results...bindings are attached if there is no error present
-                int lengthOfBindings = bb.getInt();
-                bb.position(lengthOfBindings + 4);
-
-                // multiple objects (those from an iterator) are returned as multiple lines each with their
-                // own length counter.
-                while (bb.hasRemaining()) {
-                    int segmentLength = bb.getInt();
-                    byte[] resultObjectBytes = new byte[segmentLength];
-                    bb.get(resultObjectBytes);
-
-                    lines.add(new String(resultObjectBytes, Charset.forName("UTF-8")));
-                }
+                bindings = responseMessage.BindingsAsList();
+                lines = responseMessage.ConsoleLinesAsList();
 
             } catch (IllegalArgumentException iae) {
-                ErrorResponseMessage errorMessage = new ErrorResponseMessage(resultMessage);
-                lines.add(errorMessage.getErrorMessage());
+                ErrorResponseMessage errorMessage = (ErrorResponseMessage) resultMessage;
+                lines.add(errorMessage.ErrorMessage);
             }
 
             Object result = lines.iterator();

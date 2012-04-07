@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
-import com.tinkerpop.rexster.protocol.message.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.GrizzlyFuture;
 import org.glassfish.grizzly.filterchain.BaseFilter;
