@@ -6,6 +6,7 @@ import org.msgpack.annotation.Message;
 
 import javax.script.Bindings;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -30,49 +31,31 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
     public List<String> BindingsAsList() {
         List<String> bindings = new ArrayList<String>();
 
-        try {
-            ByteBuffer bb = ByteBuffer.wrap(this.Bindings);
+        ByteBuffer bb = ByteBuffer.wrap(this.Bindings);
 
-            while (bb.hasRemaining()) {
-                int segmentLength = bb.getInt();
-                byte[] segmentBytes = new byte[segmentLength];
-                bb.get(segmentBytes);
+        while (bb.hasRemaining()) {
+            int segmentLength = bb.getInt();
+            byte[] segmentBytes = new byte[segmentLength];
+            bb.get(segmentBytes);
 
-                bindings.add(new String(segmentBytes));
-            }
-
-        } catch (Exception e) {
-            // TODO: clean up
-            e.printStackTrace();
+            bindings.add(new String(segmentBytes));
         }
 
         return bindings;
     }
 
-    public static byte[] convertBindingsToByteArray(Bindings bindings) {
+    public static byte[] convertBindingsToByteArray(Bindings bindings) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        try {
-            for (String key : bindings.keySet()) {
-                baos.write(BitWorks.convertStringsToByteArray(key + "=" + bindings.get(key).toString()));
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        for (String key : bindings.keySet()) {
+            baos.write(BitWorks.convertStringsToByteArray(key + "=" + bindings.get(key).toString()));
         }
-
+ 
         return baos.toByteArray();
     }
 
-    public static List<String> convertResultToConsoleLines(Object result) {
+    public static List<String> convertResultToConsoleLines(Object result) throws Exception {
         ConsoleResultConverter converter = new ConsoleResultConverter(new StringWriter());
-        List<String> linesAsList = new ArrayList<String>();
-        try {
-            linesAsList = converter.convert(result);
-        } catch (Exception ex) {
-            // TODO: cleanup
-            ex.printStackTrace();
-        }
-        
-        return linesAsList;
+        return converter.convert(result);
     }
 }

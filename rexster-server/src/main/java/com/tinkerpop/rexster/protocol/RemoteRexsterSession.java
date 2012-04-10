@@ -110,8 +110,6 @@ public class RemoteRexsterSession {
                     logMessage = logMessage + " Trying again in " + waitMsBetweenTries + " (ms)";
                 }
 
-                //logger.warn(logMessage, ex);
-
                 rcvMessage = null;
 
                 // wait
@@ -146,8 +144,6 @@ public class RemoteRexsterSession {
                 // response message will have an EMPTY_SESSION
                 if (rcvMessage instanceof SessionResponseMessage) {
                     this.sessionKey = rcvMessage.sessionAsUUID();
-                } else {
-                    // TODO: an error message
                 }
             }
         } catch (Exception ex) {

@@ -89,10 +89,6 @@ public class GraphConfigurationContainerTest {
     public void getApplicationGraphsSupportedGraphs() {
         configList.add(constructDefaultTinkerGraphHierarchicalConfiguration("test-tinkergraph-shorthand"));
 
-        // TODO: how to properly test orient and neo4j without requiring instances of either
-        // configList.add(constructDefaultTinkerGraphHierarchicalConfiguration("test2"));
-        // configList.add(constructDefaultTinkerGraphHierarchicalConfiguration("test3"));
-
         try {
             GraphConfigurationContainer container = new GraphConfigurationContainer(configList);
             Assert.assertEquals(0, container.getFailedConfigurations().size());

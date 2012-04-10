@@ -180,7 +180,6 @@ public abstract class AbstractSubResource extends BaseResource {
 
             for (Method method : methods) {
                 // looks for the first method that matches.  methods that multi-match will be ignored right now
-                // todo: we probably need to add some kind of up-front validation of extensions.
                 ExtensionDefinition extensionDefinition = method.getAnnotation(ExtensionDefinition.class);
                 ExtensionDescriptor extensionDescriptor = method.getAnnotation(ExtensionDescriptor.class);
 

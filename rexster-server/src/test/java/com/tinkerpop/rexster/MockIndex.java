@@ -23,7 +23,6 @@ public class MockIndex implements Index {
     }
 
     public CloseableSequence get(String arg0, Object arg1) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -40,13 +39,9 @@ public class MockIndex implements Index {
     }
 
     public void put(String arg0, Object arg1, Element arg2) {
-        // TODO Auto-generated method stub
-
     }
 
     public void remove(String arg0, Object arg1, Element arg2) {
-        // TODO Auto-generated method stub
-
     }
 
 }

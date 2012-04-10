@@ -62,8 +62,12 @@ public class ScriptFilter extends BaseFilter {
                 ctx.write(errorMessage);
 
                 return ctx.getStopAction();
+            } catch (ClassNotFoundException cnfe) {
+                logger.error(cnfe);
             } catch (IOException ioe) {
                 logger.error(ioe);
+            } catch (Throwable t) {
+                logger.error(t);
             }
 
             return ctx.getStopAction();

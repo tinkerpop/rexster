@@ -302,7 +302,6 @@ public class RexsterConsole {
 
         } catch (Exception e) {
             System.out.println("The session with Rexster Server may have been lost.  Please try again or refresh your session with ?r");
-        } finally {
         }
 
         return returnValue;

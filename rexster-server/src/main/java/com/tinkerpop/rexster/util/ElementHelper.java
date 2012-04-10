@@ -243,7 +243,7 @@ public class ElementHelper {
         // assumes that the propertyValue has open and closed parens
         String dataType = "string";
 
-        // strip the initial parens and read up to the comman.
+        // strip the initial parens and read up to the command.
         // no need to check for string as that is the default
         int place = propertyValue.indexOf(',');
         String inner = propertyValue.substring(1, place).trim();
@@ -256,12 +256,10 @@ public class ElementHelper {
         } else if (inner.equals("f") || inner.equals("float")) {
             dataType = "float";
         } else if (inner.equals("list")) {
-            // TODO: need to ensure square brackets enclose the array
             dataType = "list";
         } else if (inner.equals("l") || inner.equals("long")) {
             dataType = "long";
         } else if (inner.equals("map")) {
-            // TODO: need to validate format...outer parens plus name value pairs
             dataType = "map";
         }
 
