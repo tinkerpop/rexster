@@ -19,6 +19,7 @@ public class RemoteRexsterSession {
     private String rexProHost = "localhost";
     private String username = "";
     private String password = "";
+    private byte channel;
 
     private UUID sessionKey = RexProMessage.EMPTY_SESSION;
 
@@ -29,11 +30,16 @@ public class RemoteRexsterSession {
     }
 
     public RemoteRexsterSession(String rexProHost, int rexProPort, int timeout, String username, String password) {
+        this(rexProHost, rexProPort, timeout, username, password, SessionRequestMessage.CHANNEL_CONSOLE);
+    }
+
+    public RemoteRexsterSession(String rexProHost, int rexProPort, int timeout, String username, String password, byte channel) {
         this.rexProHost = rexProHost;
         this.rexProPort = rexProPort;
         this.timeout = timeout;
         this.username = username;
         this.password = password;
+        this.channel = channel;
     }
 
     public void open() {
@@ -42,7 +48,7 @@ public class RemoteRexsterSession {
             sessionRequestMessageToSend.Username = this.username;
             sessionRequestMessageToSend.Password = this.password;
             sessionRequestMessageToSend.setSessionAsUUID(SessionRequestMessage.EMPTY_SESSION);
-            sessionRequestMessageToSend.Channel = SessionRequestMessage.CHANNEL_CONSOLE;
+            sessionRequestMessageToSend.Channel = channel;
             sessionRequestMessageToSend.Flag = SessionRequestMessage.FLAG_NEW_SESSION;
             sessionRequestMessageToSend.setRequestAsUUID(UUID.randomUUID());
             

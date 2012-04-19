@@ -9,6 +9,7 @@ public class SessionRequestMessage extends RexProMessage {
     public static final byte CHANNEL_NONE = 0;
 
     public static final byte CHANNEL_CONSOLE = 1;
+    public static final byte CHANNEL_MSGPACK = 2;
 
     /**
      * Starts a session.

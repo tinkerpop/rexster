@@ -4,6 +4,7 @@ import com.tinkerpop.rexster.protocol.RexProSession;
 import com.tinkerpop.rexster.protocol.RexProSessions;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
@@ -43,6 +44,14 @@ public class ScriptFilter extends BaseFilter {
                     consoleLines.toArray(consoleScriptResponseMessage.ConsoleLines);
                     
                     messageList.add(consoleScriptResponseMessage);
+                } else if (session.getChannel() == SessionRequestMessage.CHANNEL_MSGPACK) {
+                    MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
+                    msgPackScriptResponseMessage.Flag = MsgPackScriptResponseMessage.FLAG_COMPLETE_MESSAGE;
+                    msgPackScriptResponseMessage.Session = specificMessage.Session;
+                    msgPackScriptResponseMessage.Request = specificMessage.Request;
+                    msgPackScriptResponseMessage.Results = MsgPackScriptResponseMessage.convertResultToConsoleLines(result);
+                    
+                    messageList.add(msgPackScriptResponseMessage);
                 }
 
                 ctx.write(messageList);

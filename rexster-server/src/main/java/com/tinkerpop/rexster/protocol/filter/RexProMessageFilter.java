@@ -4,6 +4,7 @@ import com.tinkerpop.rexster.protocol.RexProSession;
 import com.tinkerpop.rexster.protocol.msg.MessageType;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
@@ -46,14 +47,16 @@ public class RexProMessageFilter extends BaseFilter {
             message = unpacker.read(ScriptRequestMessage.class);
         } else if (messageType == MessageType.SESSION_REQUEST) {
             message = unpacker.read(SessionRequestMessage.class);
-        } else if (messageType == MessageType.SCRIPT_RESPONSE) {
+        } else if (messageType == MessageType.CONSOLE_SCRIPT_RESPONSE) {
             message = unpacker.read(ConsoleScriptResponseMessage.class);
         } else if (messageType == MessageType.SESSION_RESPONSE) {
             message = unpacker.read(SessionResponseMessage.class);
         } else if (messageType == MessageType.ERROR) {
             message = unpacker.read(ErrorResponseMessage.class);
+        } else if (messageType == MessageType.MSGPACK_SCRIPT_RESPONSE) {
+            message = unpacker.read(MsgPackScriptResponseMessage.class);
         }
-
+           
         if (message == null) {
             logger.warn("Message did not match an expected type.");
 
@@ -97,13 +100,15 @@ public class RexProMessageFilter extends BaseFilter {
         if (message instanceof SessionResponseMessage) {
             packer.write(MessageType.SESSION_RESPONSE);
         } else if (message instanceof ConsoleScriptResponseMessage) {
-            packer.write(MessageType.SCRIPT_RESPONSE);
+            packer.write(MessageType.CONSOLE_SCRIPT_RESPONSE);
         } else if (message instanceof ErrorResponseMessage) {
             packer.write(MessageType.ERROR);
         } else if (message instanceof ScriptRequestMessage) {
             packer.write(MessageType.SCRIPT_REQUEST);
         } else if (message instanceof SessionRequestMessage) {
             packer.write(MessageType.SESSION_REQUEST);
+        } else if (message instanceof MsgPackScriptResponseMessage) {
+            packer.write(MessageType.MSGPACK_SCRIPT_RESPONSE);
         }
         
         packer.write(message);
