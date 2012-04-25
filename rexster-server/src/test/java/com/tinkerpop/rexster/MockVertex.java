@@ -51,6 +51,7 @@ public class MockVertex implements Vertex {
         this.properties.put(key, value);
     }
 
+    /*
     public Iterable<Edge> getOutEdges(String... labels) {
         if (labels.length == 0) {
             return this.outEdges;
@@ -66,6 +67,29 @@ public class MockVertex implements Vertex {
             return this.inEdges;
         } else {
             Pipe pipe = new LabelFilterPipe(labels[0], FilterPipe.Filter.EQUAL);
+            pipe.setStarts(this.inEdges);
+            return pipe;
+        }
+    }
+    */
+
+    @Override
+    public Iterable<Edge> getOutEdges(Object... filters) {
+        if (filters.length == 0) {
+            return this.outEdges;
+        } else {
+            Pipe pipe = new LabelFilterPipe(filters[0].toString(), FilterPipe.Filter.EQUAL);
+            pipe.setStarts(this.outEdges);
+            return pipe;
+        }
+    }
+
+    @Override
+    public Iterable<Edge> getInEdges(Object... filters) {
+        if (filters.length == 0) {
+            return this.inEdges;
+        } else {
+            Pipe pipe = new LabelFilterPipe(filters[0].toString(), FilterPipe.Filter.EQUAL);
             pipe.setStarts(this.inEdges);
             return pipe;
         }
