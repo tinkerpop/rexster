@@ -94,7 +94,7 @@ public class RexsterApplicationImpl implements RexsterApplication {
 
                 if (graph instanceof ReadOnlyGraph) {
                     // can't call shutdown on a readonly graph.
-                    shutdownGraph = ((ReadOnlyGraph) graph).getRawGraph();
+                    shutdownGraph = ((ReadOnlyGraph) graph).getBaseGraph();
                 }
 
                 shutdownGraph.shutdown();

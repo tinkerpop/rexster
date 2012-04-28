@@ -67,9 +67,9 @@ public class RexsterApplicationGraph {
     public static Graph unwrapGraph(Graph g) {
         Graph unwrapped = g;
         if (g instanceof ReadOnlyGraph) {
-            unwrapped = unwrapGraph(((ReadOnlyGraph) g).getRawGraph());
+            unwrapped = unwrapGraph(((ReadOnlyGraph) g).getBaseGraph());
         } else if (g instanceof EventGraph) {
-            unwrapped = unwrapGraph(((EventGraph) g).getRawGraph());
+            unwrapped = unwrapGraph(((EventGraph) g).getBaseGraph());
         }
 
         return unwrapped;

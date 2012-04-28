@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.WrappableGraph;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.ReadOnlyGraph;
 import com.tinkerpop.rexster.extension.ExtensionMethod;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
@@ -80,8 +80,8 @@ public class GraphResource extends AbstractSubResource {
 
             boolean isReadOnly = false;
             String graphType = graph.getClass().getName();
-            if (graph instanceof WrappableGraph) {
-                graphType = ((WrappableGraph) graph).getRawGraph().getClass().getName();
+            if (graph instanceof WrapperGraph) {
+                graphType = ((WrapperGraph) graph).getBaseGraph().getClass().getName();
                 
                 if (graph instanceof ReadOnlyGraph) {
                     isReadOnly = true;
