@@ -1,7 +1,9 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.BasicQuery;
 import com.tinkerpop.gremlin.pipes.filter.LabelFilterPipe;
 import com.tinkerpop.pipes.Pipe;
 import com.tinkerpop.pipes.filter.FilterPipe;
@@ -51,7 +53,6 @@ public class MockVertex implements Vertex {
         this.properties.put(key, value);
     }
 
-    /*
     public Iterable<Edge> getOutEdges(String... labels) {
         if (labels.length == 0) {
             return this.outEdges;
@@ -71,27 +72,8 @@ public class MockVertex implements Vertex {
             return pipe;
         }
     }
-    */
 
-    @Override
-    public Iterable<Edge> getOutEdges(Object... filters) {
-        if (filters.length == 0) {
-            return this.outEdges;
-        } else {
-            Pipe pipe = new LabelFilterPipe(filters[0].toString(), FilterPipe.Filter.EQUAL);
-            pipe.setStarts(this.outEdges);
-            return pipe;
-        }
-    }
-
-    @Override
-    public Iterable<Edge> getInEdges(Object... filters) {
-        if (filters.length == 0) {
-            return this.inEdges;
-        } else {
-            Pipe pipe = new LabelFilterPipe(filters[0].toString(), FilterPipe.Filter.EQUAL);
-            pipe.setStarts(this.inEdges);
-            return pipe;
-        }
+    public Query query() {
+        return new BasicQuery(this);
     }
 }
