@@ -9,11 +9,10 @@ import org.apache.commons.configuration.ConversionException;
 import org.apache.log4j.Logger;
 
 public class TinkerGraphGraphConfiguration implements GraphConfiguration {
-    private static final Logger logger = Logger.getLogger(GraphConfigurationContainer.class);
 
-    public Graph configureGraphInstance(Configuration properties) throws GraphConfigurationException {
+    public Graph configureGraphInstance(final Configuration properties) throws GraphConfigurationException {
 
-        String graphFile = properties.getString(Tokens.REXSTER_GRAPH_LOCATION, null);
+        final String graphFile = properties.getString(Tokens.REXSTER_GRAPH_LOCATION, null);
 
         // determines if a mock transactional graph should be used for testing purposes.
         boolean mockTx;

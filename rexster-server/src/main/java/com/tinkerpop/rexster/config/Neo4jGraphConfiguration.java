@@ -13,18 +13,18 @@ import java.util.Iterator;
 
 public class Neo4jGraphConfiguration implements GraphConfiguration {
 
-    public Graph configureGraphInstance(Configuration properties) throws GraphConfigurationException {
+    public Graph configureGraphInstance(final Configuration properties) throws GraphConfigurationException {
 
-        String graphFile = properties.getString(Tokens.REXSTER_GRAPH_LOCATION);
+        final String graphFile = properties.getString(Tokens.REXSTER_GRAPH_LOCATION);
 
         if (graphFile == null || graphFile.length() == 0) {
             throw new GraphConfigurationException("Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_LOCATION);
         }
 
-        boolean highAvailabilityMode = properties.getBoolean(Tokens.REXSTER_GRAPH_HA, false);
+        final boolean highAvailabilityMode = properties.getBoolean(Tokens.REXSTER_GRAPH_HA, false);
 
         // get the <properties> section of the xml configuration
-        HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) properties;
+        final HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) properties;
         SubnodeConfiguration neo4jSpecificConfiguration;
 
         try {
@@ -36,11 +36,11 @@ public class Neo4jGraphConfiguration implements GraphConfiguration {
         try {
 
             // properties to initialize the neo4j instance.
-            HashMap<String, String> neo4jProperties = new HashMap<String, String>();
+            final HashMap<String, String> neo4jProperties = new HashMap<String, String>();
 
             // read the properties from the xml file and convert them to properties
             // to be injected into neo4j.
-            Iterator<String> neo4jSpecificConfigurationKeys = neo4jSpecificConfiguration.getKeys();
+            final Iterator<String> neo4jSpecificConfigurationKeys = neo4jSpecificConfiguration.getKeys();
             while (neo4jSpecificConfigurationKeys.hasNext()) {
                 String key = neo4jSpecificConfigurationKeys.next();
 
@@ -68,7 +68,9 @@ public class Neo4jGraphConfiguration implements GraphConfiguration {
                 return new Neo4jGraph(graphFile, neo4jProperties);
             }
 
-        } catch (Exception ex) {
+        } catch (GraphConfigurationException gce) {
+            throw gce;
+        }catch (Exception ex) {
             throw new GraphConfigurationException(ex);
         }
     }

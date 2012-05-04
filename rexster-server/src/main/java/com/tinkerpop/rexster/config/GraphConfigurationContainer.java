@@ -64,6 +64,7 @@ public class GraphConfigurationContainer {
                             logger.info("Graph " + graphName + " - " + graph + " loaded");
                         } catch (GraphConfigurationException gce) {
                             logger.warn("Could not load graph " + graphName + ". Please check the XML configuration.");
+                            logger.warn(gce.getMessage());
 
                             if (gce.getCause() != null) {
                                 logger.warn(gce.getCause().getMessage());
@@ -134,6 +135,8 @@ public class GraphConfigurationContainer {
                 graph = readWriteGraph;
             }
 
+        } catch (NoClassDefFoundError err) {
+            throw new GraphConfigurationException("GraphConfiguration [" + graphConfigurationType + "] could not instantiate a class [" + err.getMessage() + "].  Ensure that it is in Rexste's path.");
         } catch (Exception ex) {
             throw new GraphConfigurationException("GraphConfiguration could not be found or otherwise instantiated:." + graphConfigurationType, ex);
         }

@@ -4,5 +4,5 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import org.apache.commons.configuration.Configuration;
 
 public interface GraphConfiguration {
-    Graph configureGraphInstance(Configuration properties) throws GraphConfigurationException;
+    Graph configureGraphInstance(final Configuration properties) throws GraphConfigurationException;
 }
