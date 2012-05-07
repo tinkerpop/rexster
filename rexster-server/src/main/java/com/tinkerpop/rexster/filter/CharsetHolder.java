@@ -13,11 +13,11 @@ import java.util.Map;
 import java.util.SortedMap;
 
 public class CharsetHolder implements Comparable<CharsetHolder> {
-    private static Logger logger = Logger.getLogger(CharsetHolder.class);
+    private static final Logger logger = Logger.getLogger(CharsetHolder.class);
 
-    private String charset;
-    private float quality = 0.0f;
-    private int order;
+    private final String charset;
+    private final float quality;
+    private final int order;
 
     private static final int CACHE_MAX_SIZE = 1000;
 
@@ -32,7 +32,7 @@ public class CharsetHolder implements Comparable<CharsetHolder> {
                 }
             });
 
-    public CharsetHolder(String charset, float quality, int order) {
+    public CharsetHolder(final String charset, final float quality, final int order) {
 
         if (charset == null) {
             throw new NullArgumentException("charset");
@@ -56,14 +56,12 @@ public class CharsetHolder implements Comparable<CharsetHolder> {
     }
 
     public boolean isSupported() {
-        boolean isSupportedCharset = true;
         try {
-            isSupportedCharset = Charset.isSupported(this.charset);
+            return Charset.isSupported(this.charset);
         } catch (IllegalCharsetNameException icne) {
-            isSupportedCharset = false;
+            logger.debug("Illegal charset requested.", icne);
+            return false;
         }
-
-        return isSupportedCharset;
     }
 
     /**
@@ -74,13 +72,13 @@ public class CharsetHolder implements Comparable<CharsetHolder> {
      *
      * @return the first matching charset that is supported by the server or null if one cannot be found.
      */
-    public static CharsetHolder getFirstSupportedCharset(String acceptCharsetHeaderValue) {
+    public static CharsetHolder getFirstSupportedCharset(final String acceptCharsetHeaderValue) {
         CharsetHolder firstSupportedCharset = null;
 
         if (charsetCache.containsKey(acceptCharsetHeaderValue)) {
             firstSupportedCharset = charsetCache.get(acceptCharsetHeaderValue);
         } else {
-            List<CharsetHolder> charsetRanks = getAcceptableCharsets(acceptCharsetHeaderValue);
+            final List<CharsetHolder> charsetRanks = getAcceptableCharsets(acceptCharsetHeaderValue);
 
             for (CharsetHolder charsetRank : charsetRanks) {
                 if (charsetRank.isSupported()) {
@@ -95,24 +93,23 @@ public class CharsetHolder implements Comparable<CharsetHolder> {
         return firstSupportedCharset;
     }
 
-    public static List<CharsetHolder> getAcceptableCharsets(String acceptCharsetHeaderValue) {
-        ArrayList<CharsetHolder> charsetHolders = new ArrayList<CharsetHolder>();
+    public static List<CharsetHolder> getAcceptableCharsets(final String acceptCharsetHeaderValue) {
+        final ArrayList<CharsetHolder> charsetHolders = new ArrayList<CharsetHolder>();
 
-        String[] charsetStrings = acceptCharsetHeaderValue.split(",");
+        final String[] charsetStrings = acceptCharsetHeaderValue.split(",");
         int order = 0;
 
         CharsetHolder asteriskCharset = null;
 
         for (String charsetString : charsetStrings) {
             try {
-                String charsetValue;
                 float qualityValue = 1f;
 
-                String[] charsetComponents = charsetString.split(";");
+                final String[] charsetComponents = charsetString.split(";");
 
-                charsetValue = charsetComponents[0];
+                final String charsetValue = charsetComponents[0];
                 if (charsetComponents.length == 2) {
-                    String[] qualityPair = charsetComponents[1].trim().split("=");
+                    final String[] qualityPair = charsetComponents[1].trim().split("=");
                     if (qualityPair.length == 2) {
                         qualityValue = Float.parseFloat(qualityPair[1].trim());
                     }
@@ -131,12 +128,12 @@ public class CharsetHolder implements Comparable<CharsetHolder> {
             order++;
         }
 
-        SortedMap<String, Charset> availableCharsets = Charset.availableCharsets();
+        final SortedMap<String, Charset> availableCharsets = Charset.availableCharsets();
         if (asteriskCharset == null) {
             for (Map.Entry<String, Charset> availableCharset : availableCharsets.entrySet()) {
 
                 CharsetHolder otherCharsetHolder = new CharsetHolder(availableCharset.getKey(), 0, Integer.MAX_VALUE);
-                ;
+                
                 if (availableCharset.getKey().equals("ISO-8859-1")) {
                     otherCharsetHolder = new CharsetHolder(availableCharset.getKey(), 1, Integer.MAX_VALUE);
                 }
@@ -147,7 +144,7 @@ public class CharsetHolder implements Comparable<CharsetHolder> {
             }
         } else {
             for (Map.Entry<String, Charset> availableCharset : availableCharsets.entrySet()) {
-                CharsetHolder otherCharsetHolder = new CharsetHolder(availableCharset.getKey(), asteriskCharset.getQuality(), 0);
+                final CharsetHolder otherCharsetHolder = new CharsetHolder(availableCharset.getKey(), asteriskCharset.getQuality(), 0);
 
                 if (!charsetHolders.contains(otherCharsetHolder)) {
                     charsetHolders.add(otherCharsetHolder);
@@ -160,7 +157,7 @@ public class CharsetHolder implements Comparable<CharsetHolder> {
         return charsetHolders;
     }
 
-    public int compareTo(CharsetHolder charsetHolder) {
+    public int compareTo(final CharsetHolder charsetHolder) {
         int compare = this.quality == charsetHolder.getQuality() ? 0 : (this.quality > charsetHolder.getQuality() ? -1 : 1);
         if (compare == 0) {
             compare = this.order == charsetHolder.getOrder() ? 0 : (this.order > charsetHolder.getOrder() ? 1 : -1);
@@ -174,7 +171,7 @@ public class CharsetHolder implements Comparable<CharsetHolder> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        CharsetHolder that = (CharsetHolder) o;
+        final CharsetHolder that = (CharsetHolder) o;
 
         if (!charset.equals(that.charset)) return false;
 
