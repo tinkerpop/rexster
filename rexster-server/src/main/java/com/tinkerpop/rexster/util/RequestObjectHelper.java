@@ -24,7 +24,7 @@ public class RequestObjectHelper {
      * @param requestObject the request object
      * @return the JSON
      */
-    public static JSONObject getRexsterRequest(JSONObject requestObject) {
+    public static JSONObject getRexsterRequest(final JSONObject requestObject) {
         return requestObject != null ? requestObject.optJSONObject(Tokens.REXSTER) : null;
     }
 
@@ -47,7 +47,7 @@ public class RequestObjectHelper {
      */
     public static List<String> getReturnKeys(final JSONObject requestObject, final String wildcard) {
 
-        JSONObject rexsterRequestObject = getRexsterRequest(requestObject);
+        final JSONObject rexsterRequestObject = getRexsterRequest(requestObject);
 
         if (rexsterRequestObject != null) {
             try {
@@ -99,7 +99,7 @@ public class RequestObjectHelper {
      * @return whether the user specified a show types (default is false)
      */
     public static boolean getShowTypes(final JSONObject requestObject) {
-        JSONObject rexsterRequestObject = getRexsterRequest(requestObject);
+        final JSONObject rexsterRequestObject = getRexsterRequest(requestObject);
 
         if (rexsterRequestObject != null) {
             try {
@@ -118,8 +118,8 @@ public class RequestObjectHelper {
      * @param requestObject the request object.
      * @return the start offset
      */
-    public static Long getStartOffset(JSONObject requestObject) {
-        Long offset = getOffset(requestObject, Tokens.START);
+    public static Long getStartOffset(final JSONObject requestObject) {
+        final Long offset = getOffset(requestObject, Tokens.START);
         if (null == offset)
             return 0l;
         else
@@ -132,8 +132,8 @@ public class RequestObjectHelper {
      * @param requestObject the request object.
      * @return the end offset
      */
-    public static Long getEndOffset(JSONObject requestObject) {
-        Long offset = getOffset(requestObject, Tokens.END);
+    public static Long getEndOffset(final JSONObject requestObject) {
+        final Long offset = getOffset(requestObject, Tokens.END);
         if (null == offset)
             return Long.MAX_VALUE;
         else
@@ -148,15 +148,15 @@ public class RequestObjectHelper {
      * @param requestObject the request object.
      * @return true if the element has properties and false otherwise.
      */
-    public static boolean hasElementProperties(JSONObject requestObject) {
+    public static boolean hasElementProperties(final JSONObject requestObject) {
 
         if (requestObject == null) {
             return false;
         }
 
-        Iterator keys = requestObject.keys();
+        final Iterator keys = requestObject.keys();
         while (keys.hasNext()) {
-            String key = keys.next().toString();
+            final String key = keys.next().toString();
             if (!key.startsWith(Tokens.UNDERSCORE)) {
                 return true;
             }
@@ -164,9 +164,9 @@ public class RequestObjectHelper {
         return false;
     }
 
-    private static Long getOffset(JSONObject requestObject, String offsetToken) {
+    private static Long getOffset(final JSONObject requestObject, final String offsetToken) {
 
-        JSONObject rexsterRequestObject = getRexsterRequest(requestObject);
+        final JSONObject rexsterRequestObject = getRexsterRequest(requestObject);
 
         if (rexsterRequestObject != null) {
 

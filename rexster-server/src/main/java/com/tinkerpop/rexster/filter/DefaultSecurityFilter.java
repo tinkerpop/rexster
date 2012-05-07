@@ -43,13 +43,13 @@ public class DefaultSecurityFilter extends AbstractSecurityFilter {
     /**
      * Reads the configuration from rexster.xml and converts it to a map of usernames and passwords.
      */
-    public void configure(XMLConfiguration configuration) {
+    public void configure(final XMLConfiguration configuration) {
         if (users == null) {
             users = new HashMap<String, String>();
 
             try {
-                HierarchicalConfiguration authenticationConfiguration = configuration.configurationAt("security.authentication.configuration.users");
-                List<HierarchicalConfiguration> userListFromConfiguration = authenticationConfiguration.configurationsAt("user");
+                final HierarchicalConfiguration authenticationConfiguration = configuration.configurationAt("security.authentication.configuration.users");
+                final List<HierarchicalConfiguration> userListFromConfiguration = authenticationConfiguration.configurationsAt("user");
 
                 for (HierarchicalConfiguration userFromConfiguration : userListFromConfiguration) {
                     users.put(userFromConfiguration.getString("username"), userFromConfiguration.getString("password"));

@@ -41,7 +41,7 @@ import java.util.Map;
  */
 public abstract class AbstractSecurityFilter extends BaseFilter implements ContainerRequestFilter {
 
-    private static Logger logger = Logger.getLogger(AbstractSecurityFilter.class);
+    private static final Logger logger = Logger.getLogger(AbstractSecurityFilter.class);
 
     @Context
     protected UriInfo uriInfo;
@@ -58,7 +58,7 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
     }
 
 
-    public AbstractSecurityFilter(XMLConfiguration configuration) {
+    public AbstractSecurityFilter(final XMLConfiguration configuration) {
         configure(configuration);
         isConfigured = true;
     }
@@ -74,7 +74,7 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
      * This method will be called multiple times so look to cache the configuration once after the
      * first call.
      */
-    public abstract void configure(XMLConfiguration configuration);
+    public abstract void configure(final XMLConfiguration configuration);
 
     /**
      * The name of the security filter.
@@ -88,14 +88,14 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
         final RexProMessage message = ctx.getMessage();
 
         if (message instanceof SessionRequestMessage && !message.hasSession()) {
-            SessionRequestMessage specificMessage = (SessionRequestMessage) message;
+            final SessionRequestMessage specificMessage = (SessionRequestMessage) message;
 
             if (specificMessage.Flag == SessionRequestMessage.FLAG_NEW_SESSION) {
                 final String username = specificMessage.Username;
                 final String password = specificMessage.Password;
                 if (!authenticate(username, password)) {
                     // there is no session to this message...that's a problem
-                    ErrorResponseMessage errorMessage = new ErrorResponseMessage();
+                    final ErrorResponseMessage errorMessage = new ErrorResponseMessage();
                     errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
                     errorMessage.Request = specificMessage.Request;
                     errorMessage.ErrorMessage = "Invalid username or password.";
@@ -114,8 +114,8 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
     /**
      * REST/Dog House based authentication.
      */
-    public ContainerRequest filter(ContainerRequest request) {
-        User user = authenticateServletRequest(request);
+    public ContainerRequest filter(final ContainerRequest request) {
+        final User user = authenticateServletRequest(request);
         request.setSecurityContext(new Authorizer(user));
         return request;
     }
@@ -144,7 +144,7 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
         this.initFromServletConfiguration();
 
         // get the authorization header value
-        String authentication = request.getHeaderValue(ContainerRequest.AUTHORIZATION);
+        final String authentication = request.getHeaderValue(ContainerRequest.AUTHORIZATION);
         if (authentication == null) {
             throw new WebApplicationException(generateErrorResponse("Authentication credentials are required."));
         }
@@ -154,10 +154,10 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
             throw new WebApplicationException(generateErrorResponse("Invalid authentication credentials."));
         }
 
-        authentication = authentication.substring("Basic ".length());
-        final String[] values = new String(Base64.base64Decode(authentication)).split(":");
+        final String authenticationBase64Segment = authentication.substring("Basic ".length());
+        final String[] values = new String(Base64.base64Decode(authenticationBase64Segment)).split(":");
         if (values.length < 2) {
-            logger.info("Authentication failed: invalid authentication string format [" + authentication + "]");
+            logger.info("Authentication failed: invalid authentication string format [" + authenticationBase64Segment + "]");
             throw new WebApplicationException(generateErrorResponse("Invalid authentication credentials."));
         }
 
@@ -173,7 +173,7 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
             user = new User(username, "user");
             logger.debug("Authentication succeeded for [" + username + "]");
         } else {
-            logger.info("Authentication failed: invalid username or password [" + authentication + "]");
+            logger.info("Authentication failed: invalid username or password [" + authenticationBase64Segment + "]");
             throw new WebApplicationException(generateErrorResponse("Invalid username or password."));
         }
 
@@ -194,8 +194,8 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
 
     public class Authorizer implements SecurityContext {
 
-        private User user;
-        private Principal principal;
+        private final User user;
+        private final Principal principal;
 
         public Authorizer(final User user) {
             this.user = user;
@@ -226,8 +226,8 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
 
     public class User {
 
-        public String username;
-        public String role;
+        public final String username;
+        public final String role;
 
         public User(String username, String role) {
             this.username = username;
