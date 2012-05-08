@@ -22,6 +22,7 @@ import org.msgpack.unpacker.Unpacker;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,13 +35,40 @@ public class RexProMessageFilter extends BaseFilter {
         // Get the source buffer from the context
         final Buffer sourceBuffer = ctx.getMessage();
         final int sourceBufferLength = sourceBuffer.remaining();
+
+        // If source buffer doesn't contain header
+        if (sourceBufferLength < 5) {
+            // stop the filterchain processing and store sourceBuffer to be
+            // used next time
+            return ctx.getStopAction(sourceBuffer);
+        }
+
+        byte[] grr = new byte[sourceBufferLength];
+        sourceBuffer.get(grr);
         sourceBuffer.rewind();
-        byte[] messageAsBytes = new byte[sourceBufferLength];
+
+        final byte messageType = grr[0];
+        final int bodyLength = ByteBuffer.wrap(grr).getInt(1);
+        final int completeMessageLength = 5 + bodyLength;
+
+        // If the source message doesn't contain entire body
+        if (grr.length < completeMessageLength) {
+            // stop the filterchain processing and store sourceBuffer to be
+            // used next time
+            return ctx.getStopAction(sourceBuffer);
+        }
+
+        // Check if the source buffer has more than 1 complete message
+        // If yes - split up the first message and the remainder
+        final Buffer remainder = sourceBufferLength > completeMessageLength ?
+                sourceBuffer.split(completeMessageLength) : null;
+
+        byte[] messageAsBytes = new byte[bodyLength];
+        sourceBuffer.position(5);
         sourceBuffer.get(messageAsBytes);
 
         ByteArrayInputStream in = new ByteArrayInputStream(messageAsBytes);
         Unpacker unpacker = msgpack.createUnpacker(in);
-        byte messageType = unpacker.readByte();
         
         RexProMessage message = null;
         if (messageType == MessageType.SCRIPT_REQUEST) {
@@ -73,7 +101,7 @@ public class RexProMessageFilter extends BaseFilter {
 
         sourceBuffer.tryDispose();
 
-        return ctx.getInvokeAction();
+        return ctx.getInvokeAction(remainder);
     }
 
     public NextAction handleWrite(final FilterChainContext ctx) throws IOException {
@@ -94,27 +122,31 @@ public class RexProMessageFilter extends BaseFilter {
             remainingMessages = messages.subList(1, messages.size());
         }
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Packer packer = msgpack.createPacker(out);
-        
-        if (message instanceof SessionResponseMessage) {
-            packer.write(MessageType.SESSION_RESPONSE);
-        } else if (message instanceof ConsoleScriptResponseMessage) {
-            packer.write(MessageType.CONSOLE_SCRIPT_RESPONSE);
-        } else if (message instanceof ErrorResponseMessage) {
-            packer.write(MessageType.ERROR);
-        } else if (message instanceof ScriptRequestMessage) {
-            packer.write(MessageType.SCRIPT_REQUEST);
-        } else if (message instanceof SessionRequestMessage) {
-            packer.write(MessageType.SESSION_REQUEST);
-        } else if (message instanceof MsgPackScriptResponseMessage) {
-            packer.write(MessageType.MSGPACK_SCRIPT_RESPONSE);
-        }
-        
+        ByteArrayOutputStream rexProMessageStream = new ByteArrayOutputStream();
+        Packer packer = msgpack.createPacker(rexProMessageStream);
         packer.write(message);
-        byte[] messageAsBytes = out.toByteArray();
-        out.close();
-        
+        byte[] rexProMessageAsBytes = rexProMessageStream.toByteArray();
+        rexProMessageStream.close();
+
+        ByteBuffer bb = ByteBuffer.allocate(5 + rexProMessageAsBytes.length);
+        if (message instanceof SessionResponseMessage) {
+            bb.put(MessageType.SESSION_RESPONSE);
+        } else if (message instanceof ConsoleScriptResponseMessage) {
+            bb.put(MessageType.CONSOLE_SCRIPT_RESPONSE);
+        } else if (message instanceof ErrorResponseMessage) {
+            bb.put(MessageType.ERROR);
+        } else if (message instanceof ScriptRequestMessage) {
+            bb.put(MessageType.SCRIPT_REQUEST);
+        } else if (message instanceof SessionRequestMessage) {
+            bb.put(MessageType.SESSION_REQUEST);
+        } else if (message instanceof MsgPackScriptResponseMessage) {
+            bb.put(MessageType.MSGPACK_SCRIPT_RESPONSE);
+        }
+
+        bb.putInt(rexProMessageAsBytes.length);
+        bb.put(rexProMessageAsBytes);
+
+        byte[] messageAsBytes = bb.array();
         final int size = messageAsBytes.length;
 
         // Retrieve the memory manager
