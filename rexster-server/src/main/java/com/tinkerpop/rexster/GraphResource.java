@@ -186,14 +186,14 @@ public class GraphResource extends AbstractSubResource {
         return this.executeGraphExtension(graphName, HttpMethod.GET);
     }
 
-    private Response executeGraphExtension(String graphName, HttpMethod httpMethodRequested) {
+    private Response executeGraphExtension(final String graphName, final HttpMethod httpMethodRequested) {
 
         ExtensionResponse extResponse;
         ExtensionMethod methodToCall;
-        ExtensionSegmentSet extensionSegmentSet = parseUriForExtensionSegment(graphName, ExtensionPoint.GRAPH);
+        final ExtensionSegmentSet extensionSegmentSet = parseUriForExtensionSegment(graphName, ExtensionPoint.GRAPH);
 
         // determine if the namespace and extension are enabled for this graph
-        RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 
         if (rag.isExtensionAllowed(extensionSegmentSet)) {
 
@@ -234,7 +234,7 @@ public class GraphResource extends AbstractSubResource {
                 }
 
                 // found the method...time to do work
-                returnValue = invokeExtension(graphName, methodToCall);
+                returnValue = invokeExtension(rag, methodToCall);
 
             } catch (WebApplicationException wae) {
                 // already logged this...just throw it  up.

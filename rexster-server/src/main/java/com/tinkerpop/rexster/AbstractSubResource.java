@@ -216,31 +216,30 @@ public abstract class AbstractSubResource extends BaseResource {
         return methodToCall;
     }
 
-    protected Object invokeExtension(String graphName, ExtensionMethod methodToCall)
+    protected Object invokeExtension(final RexsterApplicationGraph rexsterApplicationGraph, final ExtensionMethod methodToCall)
             throws IllegalAccessException, InvocationTargetException {
-        return this.invokeExtension(graphName, methodToCall, null, null);
+        return this.invokeExtension(rexsterApplicationGraph, methodToCall, null, null);
     }
 
-    protected Object invokeExtension(String graphName, ExtensionMethod methodToCall, Vertex vertexContext)
+    protected Object invokeExtension(final RexsterApplicationGraph rexsterApplicationGraph, final ExtensionMethod methodToCall, final Vertex vertexContext)
             throws IllegalAccessException, InvocationTargetException {
-        return this.invokeExtension(graphName, methodToCall, null, vertexContext);
+        return this.invokeExtension(rexsterApplicationGraph, methodToCall, null, vertexContext);
     }
 
-    protected Object invokeExtension(String graphName, ExtensionMethod methodToCall, Edge edgeContext)
+    protected Object invokeExtension(final RexsterApplicationGraph rexsterApplicationGraph, final ExtensionMethod methodToCall, final Edge edgeContext)
             throws IllegalAccessException, InvocationTargetException {
-        return this.invokeExtension(graphName, methodToCall, edgeContext, null);
+        return this.invokeExtension(rexsterApplicationGraph, methodToCall, edgeContext, null);
     }
 
-    protected Object invokeExtension(String graphName, ExtensionMethod methodToCall, Edge edgeContext, Vertex vertexContext)
+    protected Object invokeExtension(final RexsterApplicationGraph rexsterApplicationGraph, final ExtensionMethod methodToCall, final Edge edgeContext, final Vertex vertexContext)
             throws IllegalAccessException, InvocationTargetException {
-        RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
-        rag.trySetTransactionalModeAutomatic();
+        rexsterApplicationGraph.trySetTransactionalModeAutomatic();
 
-        RexsterExtension rexsterExtension = methodToCall.getRexsterExtension();
-        Method method = methodToCall.getMethod();
+        final RexsterExtension rexsterExtension = methodToCall.getRexsterExtension();
+        final Method method = methodToCall.getMethod();
 
-        RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(
-                this.getRexsterApplicationGraph(graphName),
+        final RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(
+                rexsterApplicationGraph,
                 this.uriInfo,
                 this.httpServletRequest,
                 this.getRequestObject(),
@@ -248,18 +247,18 @@ public abstract class AbstractSubResource extends BaseResource {
                 methodToCall,
                 this.securityContext);
 
-        Annotation[][] parametersAnnotations = method.getParameterAnnotations();
-        ArrayList methodToCallParams = new ArrayList();
+        final Annotation[][] parametersAnnotations = method.getParameterAnnotations();
+        final ArrayList methodToCallParams = new ArrayList();
         for (int ix = 0; ix < parametersAnnotations.length; ix++) {
-            Annotation[] annotation = parametersAnnotations[ix];
-            Class[] parameterTypes = method.getParameterTypes();
+            final Annotation[] annotation = parametersAnnotations[ix];
+            final Class[] parameterTypes = method.getParameterTypes();
 
             if (annotation != null) {
                 if (annotation[0] instanceof RexsterContext) {
                     if (parameterTypes[ix].equals(Graph.class)) {
-                        methodToCallParams.add(rag.getGraph());
+                        methodToCallParams.add(rexsterApplicationGraph.getGraph());
                     } else if (parameterTypes[ix].equals(RexsterApplicationGraph.class)) {
-                        methodToCallParams.add(rag);
+                        methodToCallParams.add(rexsterApplicationGraph);
                     } else if (parameterTypes[ix].equals(ExtensionMethod.class)) {
                         methodToCallParams.add(methodToCall);
                     } else if (parameterTypes[ix].equals(UriInfo.class)) {
@@ -279,7 +278,7 @@ public abstract class AbstractSubResource extends BaseResource {
                         methodToCallParams.add(null);
                     }
                 } else if (annotation[0] instanceof ExtensionRequestParameter) {
-                    ExtensionRequestParameter extensionRequestParameter = (ExtensionRequestParameter) annotation[0];
+                    final ExtensionRequestParameter extensionRequestParameter = (ExtensionRequestParameter) annotation[0];
                     if (parameterTypes[ix].equals(String.class)) {
                         if (extensionRequestParameter.parseToJson()) {
                             methodToCallParams.add(this.getRequestObject().optString(extensionRequestParameter.name()));
