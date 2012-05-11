@@ -283,35 +283,4 @@ public class GraphResource extends AbstractSubResource {
 
         return Response.fromResponse(extResponse.getJerseyResponse()).type(mediaType).build();
     }
-
-    /**
-     * DELETE http://host/graph
-     * graph.clear()
-     *
-     * @return Query time
-     */
-    @DELETE
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response deleteGraph(@PathParam("graphname") String graphName) {
-        Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
-
-        try {
-            graph.clear();
-        } catch (Exception ex) {
-            logger.error(ex);
-            JSONObject error = generateErrorObject(ex.getMessage());
-            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
-        }
-
-        try {
-            this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-        } catch (JSONException ex) {
-            logger.error(ex);
-            JSONObject error = generateErrorObjectJsonFail(ex);
-            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
-        }
-
-        return Response.ok(this.resultObject).build();
-
-    }
 }
