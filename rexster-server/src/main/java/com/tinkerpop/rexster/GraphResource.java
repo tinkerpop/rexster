@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.ReadOnlyGraph;
@@ -36,13 +37,13 @@ import java.util.ServiceConfigurationError;
 @Path("/graphs/{graphname}")
 public class GraphResource extends AbstractSubResource {
 
-    private static Logger logger = Logger.getLogger(GraphResource.class);
+    private static final Logger logger = Logger.getLogger(GraphResource.class);
 
     public GraphResource() {
         super(null);
     }
 
-    public GraphResource(UriInfo ui, HttpServletRequest req, RexsterApplication ra) {
+    public GraphResource(final UriInfo ui, final HttpServletRequest req, final RexsterApplication ra) {
         super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;
@@ -66,12 +67,13 @@ public class GraphResource extends AbstractSubResource {
      */
     @GET
     @Produces({RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response getGraphProducesRexsterJson(@PathParam("graphname") String graphName) {
+    public Response getGraphProducesRexsterJson(@PathParam("graphname") final String graphName) {
         return getGraph(graphName, true);
     }
 
-    private Response getGraph(String graphName, boolean showHypermedia) {
-        Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
+    private Response getGraph(final String graphName, final boolean showHypermedia) {
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final Graph graph = rag.getGraph();
 
         try {
 
@@ -87,23 +89,24 @@ public class GraphResource extends AbstractSubResource {
                     isReadOnly = true;
                 }
             }
-
+            
+            final Features features = graph.getFeatures();
+            this.resultObject.put(Tokens.FEATURES, new JSONObject(features.toMap()));
             this.resultObject.put(Tokens.READ_ONLY, isReadOnly);
-            this.resultObject.put("type", graphType);
+            this.resultObject.put(Tokens.TYPE, graphType);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             this.resultObject.put(Tokens.UP_TIME, this.getTimeAlive());
-            this.resultObject.put("version", RexsterApplicationImpl.getVersion());
+            this.resultObject.put(Tokens.VERSION, RexsterApplicationImpl.getVersion());
 
             if (showHypermedia) {
-                RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
-                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.GRAPH, this.getUriPath());
+                final JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.GRAPH, this.getUriPath());
                 if (extensionsList != null) {
                     this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                 }
             }
         } catch (JSONException ex) {
             logger.error(ex);
-            JSONObject error = generateErrorObjectJsonFail(ex);
+            final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 

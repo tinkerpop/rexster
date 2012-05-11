@@ -16,6 +16,7 @@ h3. Version 0.9 (NOT OFFICIALLY RELEASED YET)
 * REST API for POSTing new indices supports @params@ argument which constructs a parameter map which will configure the newly created index.
 * The DELETE operation for the Graph resource has been removed since Blueprints no longer supports Graph.clear().
 * The Index resource no longer has a @keys@ sub-resource nor the notion of "automatic" or "manual" indices due to changes in the Blueprints API.
+* Add metadata from graph @Features@ to the Graph resource.
 
 ==<hr/>==
 

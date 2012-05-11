@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import org.codehaus.jettison.json.JSONObject;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -44,8 +45,9 @@ public class GraphResourceTest {
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
         Assert.assertTrue(json.has(Tokens.UP_TIME));
         Assert.assertTrue(json.has(Tokens.READ_ONLY));
-        Assert.assertTrue(json.has("version"));
-        Assert.assertTrue(json.has("type"));
+        Assert.assertTrue(json.has(Tokens.VERSION));
+        Assert.assertTrue(json.has(Tokens.TYPE));
+        Assert.assertTrue(json.has(Tokens.FEATURES));
 
     }
 
@@ -71,6 +73,8 @@ public class GraphResourceTest {
             will(returnValue(System.currentTimeMillis() - 10000));
             allowing(uri).getAbsolutePath();
             will(returnValue(requestUriPath));
+            allowing(graph).getFeatures();
+            will(returnValue(new TinkerGraph().getFeatures()));
         }});
 
         GraphResource resource = new GraphResource(uri, httpServletRequest, ra);

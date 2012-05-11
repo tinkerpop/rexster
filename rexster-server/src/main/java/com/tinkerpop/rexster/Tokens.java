@@ -5,7 +5,7 @@ package com.tinkerpop.rexster;
  */
 public class Tokens {
 
-    public static final String REXSTER_VERSION = "0.8";
+    public static final String REXSTER_VERSION = "0.9-SNAPSHOT";
 
     public static final String _ID = "_id";
     public static final String ID = "id";
@@ -63,6 +63,7 @@ public class Tokens {
     public static final String MESSAGE = "message";
     public static final String QUERY_TIME = "queryTime";
     public static final String VERSION = "version";
+    public static final String FEATURES = "features";
     public static final String UNDERSCORE = "_";
     public static final String PERIOD_REGEX = "\\.";
     public static final String REXSTER = "rexster";
