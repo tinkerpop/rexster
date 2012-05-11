@@ -2,7 +2,6 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.Index.Type;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -153,7 +152,7 @@ public class IndexResourceTest {
         final ArrayList<Index> indices = new ArrayList<Index>();
 
         for (int ix = 0; ix < numberOfIndicesToGenerate; ix++) {
-            indices.add(new MockIndex("index-name-" + new Integer(ix).toString(), Type.MANUAL, String.class, 100l));
+            indices.add(new MockIndex("index-name-" + new Integer(ix).toString(), String.class, 100l));
         }
 
         this.mockery.checking(new Expectations() {{

@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
@@ -44,13 +44,13 @@ import java.util.Set;
 @Path("/graphs/{graphname}/indices")
 public class IndexResource extends AbstractSubResource {
 
-    private static Logger logger = Logger.getLogger(EdgeResource.class);
+    private static final Logger logger = Logger.getLogger(EdgeResource.class);
 
     public IndexResource() {
         super(null);
     }
 
-    public IndexResource(UriInfo ui, HttpServletRequest req, RexsterApplication ra) {
+    public IndexResource(final UriInfo ui, final HttpServletRequest req, final RexsterApplication ra) {
         super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;
@@ -67,28 +67,26 @@ public class IndexResource extends AbstractSubResource {
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response getAllIndices(@PathParam("graphname") String graphName) {
-        RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+    public Response getAllIndices(@PathParam("graphname") final String graphName) {
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final Graph graph = rag.getGraph();
 
         final JSONObject theRequestObject = this.getRequestObject();
 
-        IndexableGraph idxGraph = null;
-        if (rag.getGraph() instanceof IndexableGraph) {
-            idxGraph = (IndexableGraph) rag.getGraph();
-        }
+        final IndexableGraph idxGraph = graph instanceof IndexableGraph ? (IndexableGraph) graph : null;
 
         if (idxGraph == null) {
-            JSONObject error = this.generateErrorObject("The requested graph is not of type IndexableGraph.");
+            final JSONObject error = this.generateErrorObject("The requested graph is not of type " + IndexableGraph.class.getName() + ".");
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 
-        Long start = RequestObjectHelper.getStartOffset(theRequestObject);
-        Long end = RequestObjectHelper.getEndOffset(theRequestObject);
+        final Long start = RequestObjectHelper.getStartOffset(theRequestObject);
+        final Long end = RequestObjectHelper.getEndOffset(theRequestObject);
 
         long counter = 0l;
 
         try {
-            JSONArray indexArray = new JSONArray();
+            final JSONArray indexArray = new JSONArray();
             for (Index index : idxGraph.getIndices()) {
                 if (counter >= start && counter < end) {
                     indexArray.put(createJSONObject(index));
@@ -103,7 +101,7 @@ public class IndexResource extends AbstractSubResource {
         } catch (JSONException ex) {
             logger.error(ex);
 
-            JSONObject error = generateErrorObjectJsonFail(ex);
+            final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 
@@ -128,24 +126,24 @@ public class IndexResource extends AbstractSubResource {
     @GET
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
-    public Response getElementsFromIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
+    public Response getElementsFromIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
         return this.getElementsFromIndex(graphName, indexName, false);
     }
 
     @GET
     @Path("/{indexName}")
     @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response getElementsFromIndexRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
+    public Response getElementsFromIndexRexsterTypedJson(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
         return this.getElementsFromIndex(graphName, indexName, true);
     }
 
-    private Response getElementsFromIndex(String graphName, String indexName, boolean showTypes) {
+    private Response getElementsFromIndex(final String graphName, final String indexName, final boolean showTypes) {
         final Index index = this.getIndexFromGraph(graphName, indexName);
 
         String key = null;
         Object value = null;
 
-        JSONObject theRequestObject = this.getRequestObject();
+        final JSONObject theRequestObject = this.getRequestObject();
 
         Object temp = theRequestObject.opt(Tokens.KEY);
         if (null != temp)
@@ -155,18 +153,16 @@ public class IndexResource extends AbstractSubResource {
         if (null != temp)
             value = ElementHelper.getTypedPropertyValue(temp.toString());
 
-
-        Long start = RequestObjectHelper.getStartOffset(theRequestObject);
-        Long end = RequestObjectHelper.getEndOffset(theRequestObject);
-        List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+        final Long start = RequestObjectHelper.getStartOffset(theRequestObject);
+        final Long end = RequestObjectHelper.getEndOffset(theRequestObject);
+        final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
         long counter = 0l;
-
 
         if (null != index && key != null && value != null) {
             try {
 
-                JSONArray elementArray = new JSONArray();
+                final JSONArray elementArray = new JSONArray();
                 for (Element element : (Iterable<Element>) index.get(key, value)) {
                     if (counter >= start && counter < end) {
                         elementArray.put(GraphSONFactory.createJSONElement(element, returnKeys, showTypes));
@@ -178,79 +174,25 @@ public class IndexResource extends AbstractSubResource {
                 this.resultObject.put(Tokens.TOTAL_SIZE, counter);
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
-
             } catch (JSONException ex) {
                 logger.error(ex);
 
-                JSONObject error = generateErrorObjectJsonFail(ex);
+                final JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
         } else if (null == index) {
-            String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
+            final String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
             logger.info(msg);
 
-            JSONObject error = generateErrorObject(msg);
+            final JSONObject error = generateErrorObject(msg);
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
         } else {
             // return info about the index itself
-            HashMap map = new HashMap();
+            final HashMap map = new HashMap();
             map.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             map.put(Tokens.RESULTS, createJSONObject(index));
 
             this.resultObject = new JSONObject(map);
-        }
-
-        return Response.ok(this.resultObject).build();
-    }
-
-    @OPTIONS
-    @Path("/{indexName}/keys")
-    public Response optionsAutomaticIndexKeys() {
-        return buildOptionsResponse(HttpMethod.GET.toString());
-    }
-
-    /**
-     * GET http://host/graph/indices/indexName/keys
-     * AutomaticIndex index = (AutomaticIndex) graph.getIndex(indexName,...);
-     * index.getAutoIndexKeys();
-     */
-    @GET
-    @Path("/{indexName}/keys")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response getAutomaticIndexKeys(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
-        Index index = this.getIndexFromGraph(graphName, indexName);
-
-        if (null != index && index.getIndexType().equals(Index.Type.AUTOMATIC)) {
-            try {
-                JSONArray keyArray = new JSONArray();
-                if (null == ((AutomaticIndex) index).getAutoIndexKeys()) {
-                    keyArray.put((String) null);
-                } else {
-                    for (String key : ((Set<String>) ((AutomaticIndex) index).getAutoIndexKeys())) {
-                        keyArray.put(key);
-                    }
-                }
-
-                this.resultObject.put(Tokens.RESULTS, keyArray);
-                this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
-            } catch (JSONException ex) {
-                logger.error(ex);
-
-                JSONObject error = generateErrorObjectJsonFail(ex);
-                throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
-            }
-        } else if (null == index) {
-            String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
-            logger.info(msg);
-
-            JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
-        } else {
-            String msg = "Only automatic indices have user provided keys";
-            logger.info(msg);
-
-            JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
         }
 
         return Response.ok(this.resultObject).build();
@@ -268,8 +210,8 @@ public class IndexResource extends AbstractSubResource {
     @GET
     @Path("/{indexName}/count")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response getIndexCount(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
-        Index index = this.getIndexFromGraph(graphName, indexName);
+    public Response getIndexCount(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
+        final Index index = this.getIndexFromGraph(graphName, indexName);
 
         String key = null;
         Object value = null;
@@ -288,7 +230,7 @@ public class IndexResource extends AbstractSubResource {
 
         if (index != null && key != null && value != null) {
             try {
-                long count = index.count(key, value);
+                final long count = index.count(key, value);
 
                 this.resultObject.put(Tokens.TOTAL_SIZE, count);
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
@@ -296,20 +238,20 @@ public class IndexResource extends AbstractSubResource {
             } catch (JSONException ex) {
                 logger.error(ex);
 
-                JSONObject error = generateErrorObjectJsonFail(ex);
+                final JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
         } else if (null == index) {
-            String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
+            final String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
             logger.info(msg);
 
-            JSONObject error = generateErrorObject(msg);
+            final JSONObject error = generateErrorObject(msg);
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
         } else {
-            String msg = "A key and value must be provided to lookup elements in an index";
+            final String msg = "A key and value must be provided to lookup elements in an index";
             logger.info(msg);
 
-            JSONObject error = generateErrorObject(msg);
+            final JSONObject error = generateErrorObject(msg);
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
         }
 
@@ -320,7 +262,7 @@ public class IndexResource extends AbstractSubResource {
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response deleteIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, JSONObject json) {
+    public Response deleteIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName, final JSONObject json) {
         // initializes the request object with the data DELETEed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
@@ -339,7 +281,7 @@ public class IndexResource extends AbstractSubResource {
     @DELETE
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response deleteIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
+    public Response deleteIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
         String key = null;
         Object value = null;
         String id = null;
@@ -360,10 +302,10 @@ public class IndexResource extends AbstractSubResource {
         final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
 
         if (null == index) {
-            String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
+            final String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
             logger.info(msg);
 
-            JSONObject error = generateErrorObject(msg);
+            final JSONObject error = generateErrorObject(msg);
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(error).build());
         }
 
@@ -381,14 +323,14 @@ public class IndexResource extends AbstractSubResource {
             } catch (JSONException ex) {
                 logger.error(ex);
 
-                JSONObject error = generateErrorObjectJsonFail(ex);
+                final JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
         } else {
-            String msg = "A key, value, id, and type (vertex/edge) must be provided to lookup elements in an index";
+            final String msg = "A key, value, id, and type (vertex/edge) must be provided to lookup elements in an index";
             logger.info(msg);
 
-            JSONObject error = generateErrorObject(msg);
+            final JSONObject error = generateErrorObject(msg);
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
         }
 
@@ -408,7 +350,7 @@ public class IndexResource extends AbstractSubResource {
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response postIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, JSONObject json) {
+    public Response postIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName, final JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
@@ -427,7 +369,7 @@ public class IndexResource extends AbstractSubResource {
     @POST
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response postIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
+    public Response postIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
         String clazz = null;
         String type = null;
         Set<String> keys = null;
@@ -444,7 +386,7 @@ public class IndexResource extends AbstractSubResource {
         temp = theRequestObject.opt(Tokens.KEYS);
         if (temp != null) {
             try {
-                JSONArray ks;
+                final JSONArray ks;
                 if (temp instanceof String) {
                     ks = new JSONArray();
                     ks.put(temp);
@@ -457,19 +399,19 @@ public class IndexResource extends AbstractSubResource {
                     keys.add(ks.getString(i));
                 }
             } catch (Exception e) {
-                JSONObject error = generateErrorObject("Automatic index keys must be in an array: " + temp);
+                final JSONObject error = generateErrorObject("Automatic index keys must be in an array: " + temp);
                 throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
             }
         }
 
         temp = theRequestObject.opt("params");
         if (temp != null){
-            JSONObject idxParamsJson = (JSONObject) temp;
-            ArrayList<Parameter<Object, Object>> idxParamsList = new ArrayList<Parameter<Object, Object>>();
+            final JSONObject idxParamsJson = (JSONObject) temp;
+            final ArrayList<Parameter<Object, Object>> idxParamsList = new ArrayList<Parameter<Object, Object>>();
 
-            Iterator idxParamKeys = idxParamsJson.keys();
+            final Iterator idxParamKeys = idxParamsJson.keys();
             while(idxParamKeys.hasNext()) {
-                String nextIdxParamKey = (String) idxParamKeys.next();
+                final String nextIdxParamKey = (String) idxParamKeys.next();
                 idxParamsList.add(new Parameter<Object, Object>(nextIdxParamKey, idxParamsJson.optString(nextIdxParamKey)));
             }
 
@@ -481,43 +423,30 @@ public class IndexResource extends AbstractSubResource {
         final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
 
         if (null != index) {
-            String msg = "Index [" + indexName + "] on graph [" + graphName + "] already exists";
+            final String msg = "Index [" + indexName + "] on graph [" + graphName + "] already exists";
             logger.info(msg);
 
-            JSONObject error = generateErrorObject(msg);
+            final JSONObject error = generateErrorObject(msg);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } else {
             // create an index
             if (null != type && null != clazz) {
-                Index.Type t;
-                Class c;
-                if (type.equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
-                    t = Index.Type.AUTOMATIC;
-                else if (type.equals(Index.Type.MANUAL.toString().toLowerCase()))
-                    t = Index.Type.MANUAL;
-                else {
-                    JSONObject error = generateErrorObject("Index type must be either automatic or manual");
-                    throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
-                }
-
+                final Class c;
                 if (clazz.equals(Tokens.VERTEX))
                     c = Vertex.class;
                 else if (clazz.equals(Tokens.EDGE))
                     c = Edge.class;
                 else {
-                    JSONObject error = generateErrorObject("Index class must be either vertex or edge");
+                    final JSONObject error = generateErrorObject("Index class must be either vertex or edge");
                     throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
                 }
 
-                Index newIndex;
+                final Index newIndex;
                 try {
-                    if (t == Index.Type.MANUAL)
-                        newIndex = graph.createManualIndex(indexName, c, indexParameters);
-                    else
-                        newIndex = graph.createAutomaticIndex(indexName, c, keys, indexParameters);
+                    newIndex = graph.createIndex(indexName, c, indexParameters);
                 } catch (Exception e) {
                     logger.info(e.getMessage());
-                    JSONObject error = generateErrorObject(e.getMessage());
+                    final JSONObject error = generateErrorObject(e.getMessage());
                     throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
                 }
                 try {
@@ -526,16 +455,16 @@ public class IndexResource extends AbstractSubResource {
                 } catch (JSONException ex) {
                     logger.error(ex);
 
-                    JSONObject error = generateErrorObjectJsonFail(ex);
+                    final JSONObject error = generateErrorObjectJsonFail(ex);
                     throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
                 }
 
 
             } else {
-                String msg = "Type (vertex/edge) and class (automatic/manual) must be provided to create a new index";
+                final String msg = "Type (vertex/edge) and class (automatic/manual) must be provided to create a new index";
                 logger.info(msg);
 
-                JSONObject error = generateErrorObject(msg);
+                final JSONObject error = generateErrorObject(msg);
                 throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
             }
         }
@@ -550,7 +479,7 @@ public class IndexResource extends AbstractSubResource {
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response putElementInIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName, JSONObject json) {
+    public Response putElementInIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName, final JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
@@ -564,7 +493,7 @@ public class IndexResource extends AbstractSubResource {
     @PUT
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response putElementInIndex(@PathParam("graphname") String graphName, @PathParam("indexName") String indexName) {
+    public Response putElementInIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
         final Index index = this.getIndexFromGraph(graphName, indexName);
         final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
 
@@ -596,7 +525,7 @@ public class IndexResource extends AbstractSubResource {
                 else if (index.getIndexClass().equals(Edge.class))
                     index.put(key, value, graph.getEdge(id));
                 else {
-                    JSONObject error = generateErrorObject("Index class must be either vertex or edge");
+                    final JSONObject error = generateErrorObject("Index class must be either vertex or edge");
                     throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
                 }
 
@@ -605,22 +534,22 @@ public class IndexResource extends AbstractSubResource {
             } catch (JSONException ex) {
                 logger.error(ex);
 
-                JSONObject error = generateErrorObjectJsonFail(ex);
+                final JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
         } else {
-            String msg = "A key, value, and id must be provided to add elements to an index";
+            final String msg = "A key, value, and id must be provided to add elements to an index";
             logger.info(msg);
 
-            JSONObject error = generateErrorObject(msg);
+            final JSONObject error = generateErrorObject(msg);
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
         }
 
         return Response.ok(this.resultObject).build();
     }
 
-    private static JSONObject createJSONObject(Index index) {
-        Map<String, String> mapIndex = new HashMap<String, String>();
+    private static JSONObject createJSONObject(final Index index) {
+        final Map<String, String> mapIndex = new HashMap<String, String>();
         mapIndex.put("name", index.getIndexName());
         if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
             mapIndex.put("class", "vertex");
@@ -628,19 +557,16 @@ public class IndexResource extends AbstractSubResource {
             mapIndex.put("class", "edge");
         }
 
-        mapIndex.put("type", index.getIndexType().toString().toLowerCase());
         return new JSONObject(mapIndex);
     }
 
-    private Index getIndexFromGraph(String graphName, final String name) {
+    private Index getIndexFromGraph(final String graphName, final String name) {
 
-        IndexableGraph idxGraph = null;
-        if (this.getRexsterApplicationGraph(graphName).getGraph() instanceof IndexableGraph) {
-            idxGraph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
-        }
-
+        final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
+        final IndexableGraph idxGraph = graph instanceof IndexableGraph ? (IndexableGraph) graph : null;
+        
         if (idxGraph == null) {
-            JSONObject error = this.generateErrorObject("The requested graph is not of type IndexableGraph.");
+            final JSONObject error = this.generateErrorObject("The requested graph is not of type IndexableGraph.");
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 

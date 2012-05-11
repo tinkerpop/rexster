@@ -49,38 +49,6 @@ public class GraphResourceTest {
 
     }
 
-    @Test
-    public void deleteGraphValid() {
-        final Graph graph = this.mockery.mock(Graph.class);
-        final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-
-        final UriInfo uri = this.mockery.mock(UriInfo.class);
-
-        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
-        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
-
-        this.mockery.checking(new Expectations() {{
-            allowing(httpServletRequest).getParameterMap();
-            will(returnValue(new HashMap<String, String>()));
-            allowing(ra).getApplicationGraph(with(any(String.class)));
-            will(returnValue(rag));
-            allowing(graph).clear();
-            allowing(uri).getAbsolutePath();
-            will(returnValue(requestUriPath));
-        }});
-
-        GraphResource resource = new GraphResource(uri, httpServletRequest, ra);
-        Response response = resource.deleteGraph("graph");
-
-        Assert.assertNotNull(response);
-        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        Assert.assertNotNull(response.getEntity());
-        Assert.assertTrue(response.getEntity() instanceof JSONObject);
-
-        JSONObject json = (JSONObject) response.getEntity();
-        Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-    }
-
     private GraphResource constructMockGetGraphScenario(final HashMap<String, String> parameters) {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);

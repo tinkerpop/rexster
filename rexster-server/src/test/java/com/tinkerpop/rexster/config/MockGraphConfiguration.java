@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.config;
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import org.apache.commons.configuration.Configuration;
@@ -12,6 +13,11 @@ public class MockGraphConfiguration implements GraphConfiguration {
     }
 
     public class MockGraph implements Graph {
+
+        @Override
+        public Features getFeatures() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
 
         public Vertex addVertex(Object o) {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
@@ -26,6 +32,11 @@ public class MockGraphConfiguration implements GraphConfiguration {
         }
 
         public Iterable<Vertex> getVertices() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public Iterable<Vertex> getVertices(String key, Object value) {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
 
@@ -45,8 +56,9 @@ public class MockGraphConfiguration implements GraphConfiguration {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
 
-        public void clear() {
-            //To change body of implemented methods use File | Settings | File Templates.
+        @Override
+        public Iterable<Edge> getEdges(String key, Object value) {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
 
         public void shutdown() {

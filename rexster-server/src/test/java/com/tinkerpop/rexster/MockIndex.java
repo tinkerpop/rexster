@@ -1,19 +1,17 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.CloseableSequence;
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 
 public class MockIndex implements Index {
 
     private String indexName;
-    private Type indexType;
     private Class clazz;
     private long count;
 
-    public MockIndex(String indexName, Type type, Class clazz, long count) {
+    public MockIndex(String indexName, Class clazz, long count) {
         this.indexName = indexName;
-        this.indexType = type;
         this.clazz = clazz;
         this.count = count;
     }
@@ -22,7 +20,12 @@ public class MockIndex implements Index {
         return count;
     }
 
-    public CloseableSequence get(String arg0, Object arg1) {
+    public CloseableIterable get(String arg0, Object arg1) {
+        return null;
+    }
+
+    @Override
+    public CloseableIterable query(String key, Object query) {
         return null;
     }
 
@@ -32,10 +35,6 @@ public class MockIndex implements Index {
 
     public String getIndexName() {
         return this.indexName;
-    }
-
-    public Type getIndexType() {
-        return this.indexType;
     }
 
     public void put(String arg0, Object arg1, Element arg2) {
