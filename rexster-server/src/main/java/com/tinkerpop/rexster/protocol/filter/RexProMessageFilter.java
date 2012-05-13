@@ -1,9 +1,9 @@
 package com.tinkerpop.rexster.protocol.filter;
 
 import com.tinkerpop.rexster.protocol.RexProSession;
-import com.tinkerpop.rexster.protocol.msg.MessageType;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MessageType;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
@@ -40,7 +40,7 @@ public class RexProMessageFilter extends BaseFilter {
         ByteArrayInputStream in = new ByteArrayInputStream(messageAsBytes);
         Unpacker unpacker = msgpack.createUnpacker(in);
         byte messageType = unpacker.readByte();
-        
+
         RexProMessage message = null;
         if (messageType == MessageType.SCRIPT_REQUEST) {
             message = unpacker.read(ScriptRequestMessage.class);
@@ -62,7 +62,7 @@ public class RexProMessageFilter extends BaseFilter {
             errorMessage.Request = new byte[0];
             errorMessage.ErrorMessage = "Message did not match an expected type.";
             errorMessage.Flag = ErrorResponseMessage.FLAG_ERROR_MESSAGE_VALIDATION;
-            
+
             ctx.write(errorMessage);
         }
 
@@ -93,7 +93,7 @@ public class RexProMessageFilter extends BaseFilter {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Packer packer = msgpack.createPacker(out);
-        
+
         if (message instanceof SessionResponseMessage) {
             packer.write(MessageType.SESSION_RESPONSE);
         } else if (message instanceof ConsoleScriptResponseMessage) {
@@ -105,11 +105,11 @@ public class RexProMessageFilter extends BaseFilter {
         } else if (message instanceof SessionRequestMessage) {
             packer.write(MessageType.SESSION_REQUEST);
         }
-        
+
         packer.write(message);
         byte[] messageAsBytes = out.toByteArray();
         out.close();
-        
+
         final int size = messageAsBytes.length;
 
         // Retrieve the memory manager

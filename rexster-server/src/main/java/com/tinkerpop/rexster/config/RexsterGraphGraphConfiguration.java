@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.config;
 
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.impls.rexster.RexsterGraph;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.impls.rexster.RexsterGraph;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.configuration.Configuration;
 

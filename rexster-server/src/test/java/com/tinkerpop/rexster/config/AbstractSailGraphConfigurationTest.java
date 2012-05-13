@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.config;
 
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.impls.sail.impls.MemoryStoreSailGraph;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.impls.sail.impls.MemoryStoreSailGraph;
 import com.tinkerpop.rexster.Tokens;
 import junit.framework.Assert;
 import org.apache.commons.configuration.HierarchicalConfiguration;

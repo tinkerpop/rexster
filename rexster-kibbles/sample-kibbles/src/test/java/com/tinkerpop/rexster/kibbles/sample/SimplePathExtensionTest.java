@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.kibbles.sample;
 
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;

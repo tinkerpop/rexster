@@ -1,13 +1,13 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.Parameter;
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.util.io.graphson.GraphSONFactory;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Index;
+import com.tinkerpop.blueprints.IndexableGraph;
+import com.tinkerpop.blueprints.Parameter;
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONFactory;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.util.ElementHelper;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
@@ -405,12 +405,12 @@ public class IndexResource extends AbstractSubResource {
         }
 
         temp = theRequestObject.opt("params");
-        if (temp != null){
+        if (temp != null) {
             final JSONObject idxParamsJson = (JSONObject) temp;
             final ArrayList<Parameter<Object, Object>> idxParamsList = new ArrayList<Parameter<Object, Object>>();
 
             final Iterator idxParamKeys = idxParamsJson.keys();
-            while(idxParamKeys.hasNext()) {
+            while (idxParamKeys.hasNext()) {
                 final String nextIdxParamKey = (String) idxParamKeys.next();
                 idxParamsList.add(new Parameter<Object, Object>(nextIdxParamKey, idxParamsJson.optString(nextIdxParamKey)));
             }
@@ -564,7 +564,7 @@ public class IndexResource extends AbstractSubResource {
 
         final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
         final IndexableGraph idxGraph = graph instanceof IndexableGraph ? (IndexableGraph) graph : null;
-        
+
         if (idxGraph == null) {
             final JSONObject error = this.generateErrorObject("The requested graph is not of type IndexableGraph.");
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());

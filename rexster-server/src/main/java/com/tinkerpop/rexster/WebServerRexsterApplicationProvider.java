@@ -15,7 +15,7 @@ import java.lang.reflect.Type;
 /**
  * A Jersey InjectableProvider and Injectable that supplies Servlets which have a @Context
  * annotated RexsterApplication field with a RexsterApplicationImpl.
- *
+ * <p/>
  * Users interested in embedding Rexster into their custom application should write a Provider
  * class following this pattern that supplies their custom implementation of RexsterApplication.
  *
@@ -23,8 +23,8 @@ import java.lang.reflect.Type;
  */
 @Provider
 public class WebServerRexsterApplicationProvider
-    extends AbstractHttpContextInjectable<RexsterApplication>
-    implements InjectableProvider<Context, Type> {
+        extends AbstractHttpContextInjectable<RexsterApplication>
+        implements InjectableProvider<Context, Type> {
 
     private static RexsterApplication rexster;
 

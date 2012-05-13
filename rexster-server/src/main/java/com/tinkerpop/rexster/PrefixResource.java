@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
+import com.tinkerpop.blueprints.impls.sail.SailGraph;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;

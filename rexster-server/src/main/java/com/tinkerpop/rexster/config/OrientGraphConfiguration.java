@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster.config;
 
 import com.orientechnologies.orient.core.config.OGlobalConfiguration;
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;

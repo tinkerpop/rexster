@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.config;
 
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.ReadOnlyGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.ReadOnlyIndexableGraph;
+import com.tinkerpop.blueprints.util.wrappers.readonly.ReadOnlyGraph;
+import com.tinkerpop.blueprints.util.wrappers.readonly.ReadOnlyIndexableGraph;
 import com.tinkerpop.rexster.Tokens;
 import junit.framework.Assert;
 import org.apache.commons.configuration.HierarchicalConfiguration;

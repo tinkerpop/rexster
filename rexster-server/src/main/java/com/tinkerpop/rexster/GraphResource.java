@@ -1,9 +1,9 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.Features;
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.ReadOnlyGraph;
+import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
+import com.tinkerpop.blueprints.util.wrappers.readonly.ReadOnlyGraph;
 import com.tinkerpop.rexster.extension.ExtensionMethod;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
@@ -84,12 +84,12 @@ public class GraphResource extends AbstractSubResource {
             String graphType = graph.getClass().getName();
             if (graph instanceof WrapperGraph) {
                 graphType = ((WrapperGraph) graph).getBaseGraph().getClass().getName();
-                
+
                 if (graph instanceof ReadOnlyGraph) {
                     isReadOnly = true;
                 }
             }
-            
+
             final Features features = graph.getFeatures();
             this.resultObject.put(Tokens.FEATURES, new JSONObject(features.toMap()));
             this.resultObject.put(Tokens.READ_ONLY, isReadOnly);

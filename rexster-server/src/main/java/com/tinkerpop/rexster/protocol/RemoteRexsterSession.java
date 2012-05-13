@@ -45,7 +45,7 @@ public class RemoteRexsterSession {
             sessionRequestMessageToSend.Channel = SessionRequestMessage.CHANNEL_CONSOLE;
             sessionRequestMessageToSend.Flag = SessionRequestMessage.FLAG_NEW_SESSION;
             sessionRequestMessageToSend.setRequestAsUUID(UUID.randomUUID());
-            
+
             final RexProMessage rcvMessage = sendRequest(sessionRequestMessageToSend, 3);
 
             if (rcvMessage != null && rcvMessage instanceof SessionResponseMessage) {
@@ -54,7 +54,7 @@ public class RemoteRexsterSession {
                 for (String lang : sessionResponseMessage.Languages) {
                     this.availableLanguages.add(lang);
                 }
-                
+
                 this.sessionKey = rcvMessage.sessionAsUUID();
             }
         }

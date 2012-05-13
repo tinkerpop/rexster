@@ -41,7 +41,7 @@ public class ScriptFilter extends BaseFilter {
                     List<String> consoleLines = ConsoleScriptResponseMessage.convertResultToConsoleLines(result);
                     consoleScriptResponseMessage.ConsoleLines = new String[consoleLines.size()];
                     consoleLines.toArray(consoleScriptResponseMessage.ConsoleLines);
-                    
+
                     messageList.add(consoleScriptResponseMessage);
                 }
 

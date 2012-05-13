@@ -1,9 +1,9 @@
 package com.tinkerpop.rexster.kibbles.sparql;
 
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
-import com.tinkerpop.blueprints.pgm.impls.sail.SailGraphFactory;
-import com.tinkerpop.blueprints.pgm.impls.sail.impls.MemoryStoreSailGraph;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.impls.sail.SailGraph;
+import com.tinkerpop.blueprints.impls.sail.SailGraphFactory;
+import com.tinkerpop.blueprints.impls.sail.impls.MemoryStoreSailGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.extension.ExtensionResponse;

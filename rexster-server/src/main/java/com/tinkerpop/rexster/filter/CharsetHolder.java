@@ -133,7 +133,7 @@ public class CharsetHolder implements Comparable<CharsetHolder> {
             for (Map.Entry<String, Charset> availableCharset : availableCharsets.entrySet()) {
 
                 CharsetHolder otherCharsetHolder = new CharsetHolder(availableCharset.getKey(), 0, Integer.MAX_VALUE);
-                
+
                 if (availableCharset.getKey().equals("ISO-8859-1")) {
                     otherCharsetHolder = new CharsetHolder(availableCharset.getKey(), 1, Integer.MAX_VALUE);
                 }

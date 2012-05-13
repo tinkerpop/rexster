@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
-import com.tinkerpop.blueprints.pgm.impls.sail.SailGraphFactory;
-import com.tinkerpop.blueprints.pgm.impls.sail.impls.MemoryStoreSailGraph;
+import com.tinkerpop.blueprints.impls.sail.SailGraph;
+import com.tinkerpop.blueprints.impls.sail.SailGraphFactory;
+import com.tinkerpop.blueprints.impls.sail.impls.MemoryStoreSailGraph;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.jmock.Expectations;

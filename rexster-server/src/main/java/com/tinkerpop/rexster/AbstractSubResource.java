@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.rexster.extension.ExtensionDefinition;
 import com.tinkerpop.rexster.extension.ExtensionDescriptor;
 import com.tinkerpop.rexster.extension.ExtensionMethod;
@@ -231,8 +231,8 @@ public abstract class AbstractSubResource extends BaseResource {
         return this.invokeExtension(rexsterApplicationGraph, methodToCall, edgeContext, null);
     }
 
-    protected Object invokeExtension(final RexsterApplicationGraph rexsterApplicationGraph, 
-                                     final ExtensionMethod methodToCall, final Edge edgeContext, 
+    protected Object invokeExtension(final RexsterApplicationGraph rexsterApplicationGraph,
+                                     final ExtensionMethod methodToCall, final Edge edgeContext,
                                      final Vertex vertexContext)
             throws IllegalAccessException, InvocationTargetException {
         rexsterApplicationGraph.trySetTransactionalModeAutomatic();
@@ -376,8 +376,8 @@ public abstract class AbstractSubResource extends BaseResource {
         return method.invoke(rexsterExtension, methodToCallParams.toArray());
     }
 
-    protected ExtensionResponse tryAppendRexsterAttributesIfJson(final ExtensionResponse extResponse, 
-                                                                 final ExtensionMethod methodToCall, 
+    protected ExtensionResponse tryAppendRexsterAttributesIfJson(final ExtensionResponse extResponse,
+                                                                 final ExtensionMethod methodToCall,
                                                                  final String mediaType) {
         ExtensionResponse newExtensionResponse = extResponse;
         if (mediaType.equals(MediaType.APPLICATION_JSON)

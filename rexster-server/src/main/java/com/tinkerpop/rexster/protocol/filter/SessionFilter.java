@@ -19,8 +19,8 @@ import java.util.UUID;
 public class SessionFilter extends BaseFilter {
 
     private RexsterApplication rexsterApplication;
-    
-    public SessionFilter(RexsterApplication rexsterApplication){
+
+    public SessionFilter(RexsterApplication rexsterApplication) {
         this.rexsterApplication = rexsterApplication;
     }
 
@@ -43,14 +43,14 @@ public class SessionFilter extends BaseFilter {
                 while (itty.hasNext()) {
                     langs.add(itty.next());
                 }
-                
+
                 SessionResponseMessage responseMessage = new SessionResponseMessage();
                 responseMessage.setSessionAsUUID(sessionKey);
                 responseMessage.Request = specificMessage.Request;
                 responseMessage.Flag = (byte) 0;
                 responseMessage.Languages = new String[langs.size()];
-                langs.toArray(responseMessage.Languages); 
-                
+                langs.toArray(responseMessage.Languages);
+
                 ctx.write(responseMessage);
 
             } else if (specificMessage.Flag == SessionRequestMessage.FLAG_KILL_SESSION) {
@@ -60,7 +60,7 @@ public class SessionFilter extends BaseFilter {
                 responseMessage.Request = specificMessage.Request;
                 responseMessage.Languages = new String[0];
                 responseMessage.Flag = (byte) 0;
-                
+
                 ctx.write(responseMessage);
             } else {
                 // there is no session to this message...that's a problem

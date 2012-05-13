@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster.config;
 
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jHaGraph;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
+import com.tinkerpop.blueprints.impls.neo4j.Neo4jHaGraph;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -70,7 +70,7 @@ public class Neo4jGraphConfiguration implements GraphConfiguration {
 
         } catch (GraphConfigurationException gce) {
             throw gce;
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             throw new GraphConfigurationException(ex);
         }
     }

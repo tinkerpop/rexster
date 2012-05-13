@@ -1,9 +1,9 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.EventGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.ReadOnlyGraph;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
+import com.tinkerpop.blueprints.util.wrappers.readonly.ReadOnlyGraph;
 import com.tinkerpop.rexster.extension.ExtensionAllowed;
 import com.tinkerpop.rexster.extension.ExtensionApi;
 import com.tinkerpop.rexster.extension.ExtensionApiBehavior;
@@ -92,7 +92,7 @@ public class RexsterApplicationGraph {
     public void tryStartTransaction() {
         TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
-       //     transactionalGraph.setMaxBufferSize(0);
+            //     transactionalGraph.setMaxBufferSize(0);
             transactionalGraph.startTransaction();
         }
     }
@@ -101,7 +101,7 @@ public class RexsterApplicationGraph {
         TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
             transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-        //    transactionalGraph.setMaxBufferSize(1);
+            //    transactionalGraph.setMaxBufferSize(1);
         }
     }
 
@@ -109,14 +109,14 @@ public class RexsterApplicationGraph {
         TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
             transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
-       //     transactionalGraph.setMaxBufferSize(1);
+            //     transactionalGraph.setMaxBufferSize(1);
         }
     }
 
     public void trySetTransactionalModeAutomatic() {
         TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
-       //     transactionalGraph.setMaxBufferSize(1);
+            //     transactionalGraph.setMaxBufferSize(1);
         }
     }
 

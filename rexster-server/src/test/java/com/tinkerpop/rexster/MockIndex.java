@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.pgm.CloseableIterable;
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.CloseableIterable;
+import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Index;
 
 public class MockIndex implements Index {
 

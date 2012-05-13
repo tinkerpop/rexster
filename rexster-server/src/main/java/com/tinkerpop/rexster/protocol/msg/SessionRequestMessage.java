@@ -19,7 +19,7 @@ public class SessionRequestMessage extends RexProMessage {
      * Destroy a session.
      */
     public static final byte FLAG_KILL_SESSION = 1;
-    
+
     public byte Channel;
     public String Username;
     public String Password;

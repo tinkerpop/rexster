@@ -148,7 +148,7 @@ public class RexsterConsole {
                     } else {
                         this.session = new RemoteRexsterSession(this.host, this.port, this.timeout, this.username, this.password);
                     }
-                    
+
                     // reset binding cache in the console...it will come back fresh from the server on the 
                     // next script eval
                     this.currentBindings.clear();
@@ -276,7 +276,7 @@ public class RexsterConsole {
             scriptMessage.LanguageName = scriptEngineName;
             scriptMessage.Flag = (byte) 0;
             scriptMessage.setRequestAsUUID(UUID.randomUUID());
-            
+
             final RexProMessage resultMessage = session.sendRequest(scriptMessage, 3, 500);
 
             List<String> lines = new ArrayList<String>();

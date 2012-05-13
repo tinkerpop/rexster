@@ -50,7 +50,7 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
         for (String key : bindings.keySet()) {
             baos.write(BitWorks.convertStringsToByteArray(key + "=" + bindings.get(key).toString()));
         }
- 
+
         return baos.toByteArray();
     }
 

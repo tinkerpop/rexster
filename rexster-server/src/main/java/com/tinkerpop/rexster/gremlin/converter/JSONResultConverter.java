@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.gremlin.converter;
 
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.util.io.graphson.GraphSONFactory;
+import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONFactory;
 import com.tinkerpop.pipes.util.structures.Row;
 import com.tinkerpop.pipes.util.structures.Table;
 import org.codehaus.jettison.json.JSONArray;
