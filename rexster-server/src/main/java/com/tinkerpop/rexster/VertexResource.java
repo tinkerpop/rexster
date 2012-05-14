@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
@@ -413,9 +414,9 @@ public class VertexResource extends AbstractSubResource {
                 if (direction.equals(Tokens.OUT_E) || direction.equals(Tokens.BOTH_E)) {
                     Iterable<Edge> itty;
                     if (labels != null && labels.length > 0) {
-                        itty = vertex.getOutEdges(labels);
+                        itty = vertex.getEdges(Direction.OUT,  labels);
                     } else {
-                        itty = vertex.getOutEdges();
+                        itty = vertex.getEdges(Direction.OUT);
                     }
 
                     for (Edge edge : itty) {
@@ -429,9 +430,9 @@ public class VertexResource extends AbstractSubResource {
                 if (direction.equals(Tokens.IN_E) || direction.equals(Tokens.BOTH_E)) {
                     Iterable<Edge> itty;
                     if (labels != null && labels.length > 0) {
-                        itty = vertex.getInEdges(labels);
+                        itty = vertex.getEdges(Direction.IN, labels);
                     } else {
-                        itty = vertex.getInEdges();
+                        itty = vertex.getEdges(Direction.IN);
                     }
 
                     for (Edge edge : itty) {
@@ -445,9 +446,9 @@ public class VertexResource extends AbstractSubResource {
                 if (direction.equals(Tokens.OUT) || direction.equals(Tokens.BOTH)) {
                     Iterable<Edge> itty;
                     if (labels != null && labels.length > 0) {
-                        itty = vertex.getOutEdges(labels);
+                        itty = vertex.getEdges(Direction.OUT,  labels);
                     } else {
-                        itty = vertex.getOutEdges();
+                        itty = vertex.getEdges(Direction.OUT);
                     }
 
                     for (Edge edge : itty) {
@@ -461,9 +462,9 @@ public class VertexResource extends AbstractSubResource {
                 if (direction.equals(Tokens.IN) || direction.equals(Tokens.BOTH)) {
                     Iterable<Edge> itty;
                     if (labels != null && labels.length > 0) {
-                        itty = vertex.getInEdges(labels);
+                        itty = vertex.getEdges(Direction.IN, labels);
                     } else {
-                        itty = vertex.getInEdges();
+                        itty = vertex.getEdges(Direction.IN);
                     }
 
                     for (Edge edge : itty) {

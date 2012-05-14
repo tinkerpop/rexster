@@ -7,6 +7,10 @@ import com.tinkerpop.blueprints.util.DefaultQuery;
 import com.tinkerpop.gremlin.pipes.filter.LabelFilterPipe;
 import com.tinkerpop.pipes.Pipe;
 import com.tinkerpop.pipes.filter.FilterPipe;
+import com.tinkerpop.blueprints.util.VerticesFromEdgesIterable;
+import com.tinkerpop.blueprints.Direction;
+import com.tinkerpop.blueprints.util.MultiIterable;
+import java.util.Arrays;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -53,7 +57,7 @@ public class MockVertex implements Vertex {
         this.properties.put(key, value);
     }
 
-    public Iterable<Edge> getOutEdges(String... labels) {
+    private Iterable<Edge> getOutEdges(String... labels) {
         if (labels.length == 0) {
             return this.outEdges;
         } else {
@@ -63,7 +67,7 @@ public class MockVertex implements Vertex {
         }
     }
 
-    public Iterable<Edge> getInEdges(String... labels) {
+    private Iterable<Edge> getInEdges(String... labels) {
         if (labels.length == 0) {
             return this.inEdges;
         } else {
@@ -72,6 +76,21 @@ public class MockVertex implements Vertex {
             return pipe;
         }
     }
+
+    public Iterable<Edge> getEdges(final Direction direction, final String... labels) {
+        if (direction.equals(Direction.OUT)) {
+            return this.getOutEdges(labels);
+        } else if (direction.equals(Direction.IN))
+            return this.getInEdges(labels);
+        else {
+            return new MultiIterable<Edge>(Arrays.asList(this.getInEdges(labels), this.getOutEdges(labels)));
+        }
+    }
+
+    public Iterable<Vertex> getVertices(final Direction direction, final String... labels) {
+        return new VerticesFromEdgesIterable(this, direction, labels);
+    }
+
 
     public Query query() {
         return new DefaultQuery(this);
