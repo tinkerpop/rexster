@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
@@ -28,7 +29,7 @@ import java.util.HashMap;
 /**
  * @author Stephen Mallette
  */
-@Path("/graphs/{graphname}/keyIndices")
+@Path("/graphs/{graphname}/keyindices")
 public class KeyIndexResource extends AbstractSubResource {
     private static final Logger logger = Logger.getLogger(EdgeResource.class);
 
@@ -43,17 +44,13 @@ public class KeyIndexResource extends AbstractSubResource {
     }
 
     @OPTIONS
-    public Response optionsKeyIndex() {
+    public Response optionsKeyIndices() {
         return buildOptionsResponse(HttpMethod.GET.toString());
     }
 
-    /**
-     * GET http://host/graph/indices
-     * get.getIndices();
-     */
     @GET
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response getKeyIndex(@PathParam("graphname") final String graphName) {
+    public Response getKeyIndices(@PathParam("graphname") final String graphName) {
         final KeyIndexableGraph graph = this.getKeyIndexableGraph(graphName);
         
         try {
@@ -85,10 +82,51 @@ public class KeyIndexResource extends AbstractSubResource {
     }
 
     @OPTIONS
+    @Path("/{clazz}")
+    public Response optionsIndexKeys() {
+        return buildOptionsResponse(HttpMethod.GET.toString());
+    }
+
+    @GET
+    @Path("/{clazz}")
+    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    public Response getIndexKeys(@PathParam("graphname") final String graphName, @PathParam("clazz") final String clazz) {
+        final Class<? extends Element> keyClass;
+        if (clazz.equals(Tokens.VERTEX)) {
+            keyClass = Vertex.class;
+        } else if (clazz.equals(Tokens.EDGE)) {
+            keyClass = Edge.class;
+        } else {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
+        }
+        
+        final KeyIndexableGraph graph = this.getKeyIndexableGraph(graphName);
+
+        try {
+            final JSONArray keyArray = new JSONArray();
+            for (String key : graph.getIndexedKeys(keyClass)) {
+                keyArray.put(key);
+            }
+
+            this.resultObject.put(Tokens.RESULTS, keyArray);
+            this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
+
+        } catch (JSONException ex) {
+            logger.error(ex);
+
+            final JSONObject error = generateErrorObjectJsonFail(ex);
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        }
+
+        return Response.ok(this.resultObject).build();
+
+    }
+    
+    @OPTIONS
     @Path("/{clazz}/{keyName}")
-    public Response optionsElementsFromIndex() {
+    public Response optionsIndexKey() {
         return buildOptionsResponse(HttpMethod.DELETE.toString(),
-                                    HttpMethod.POST.toString());
+                HttpMethod.POST.toString());
     }
 
     @DELETE
