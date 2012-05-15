@@ -3,13 +3,15 @@ Rexster: A Graph Server
 
 ==<hr/>==
 
-h3. Version 0.9 (NOT OFFICIALLY RELEASED YET)
+h2. Rexster 0.y.z
+
+h3. Version 2.0.0 (NOT OFFICIALLY RELEASED YET)
 
 ```xml
 <dependency>
   <groupId>com.tinkerpop.rexster</groupId>
   <artifactId>rexster</artifactId>
-  <version>0.9-SNAPSHOT</version>
+  <version>2.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -18,7 +20,7 @@ h3. Version 0.9 (NOT OFFICIALLY RELEASED YET)
 * The Index resource no longer has a @keys@ sub-resource nor the notion of "automatic" or "manual" indices due to changes in the Blueprints API.
 * Add metadata from graph @Features@ to the Graph resource.
 
-==<hr/>==
+h2. Rexster 0.x
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-santas-little-helper.png!
 
