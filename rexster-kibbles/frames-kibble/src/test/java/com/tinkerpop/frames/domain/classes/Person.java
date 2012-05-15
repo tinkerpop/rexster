@@ -1,10 +1,10 @@
 package com.tinkerpop.frames.domain.classes;
 
-import com.tinkerpop.frames.Adjacent;
+import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Incident;
 import com.tinkerpop.frames.Property;
-import com.tinkerpop.frames.domain.relations.Created;
-import com.tinkerpop.frames.domain.relations.Knows;
+import com.tinkerpop.frames.domain.incidences.Created;
+import com.tinkerpop.frames.domain.incidences.Knows;
 
 import java.util.Collection;
 
@@ -25,28 +25,28 @@ public interface Person extends NamedObject {
     @Incident(label = "knows")
     public Collection<Knows> getKnows();
 
-    @Adjacent(label = "knows")
+    @Adjacency(label = "knows")
     public Collection<Person> getKnowsPeople();
 
     @Incident(label = "created")
     public Collection<Created> getCreated();
 
-    @Adjacent(label = "created")
+    @Adjacency(label = "created")
     public Collection<Project> getCreatedProjects();
 
-    @Adjacent(label = "knows")
+    @Adjacency(label = "knows")
     public void addKnowsPerson(final Person person);
 
     @Incident(label = "knows")
     public Knows addKnows(final Person person);
 
-    @Adjacent(label = "created")
+    @Adjacency(label = "created")
     public void addCreatedProject(final Project project);
 
     @Incident(label = "created")
     public Created addCreated(final Project project);
 
-    @Adjacent(label = "knows")
+    @Adjacency(label = "knows")
     public void removeKnowsPerson(final Person person);
 
     @Incident(label = "knows")

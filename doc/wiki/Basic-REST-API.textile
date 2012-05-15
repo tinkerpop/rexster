@@ -11,10 +11,10 @@ h1. GET Operations
 | graph        | @/graphs/<graph>@                                             | get the graph named <graph>                                                                                          |
 | vertices     | @/graphs/<graph>/vertices@                                    | get all vertices                                                                                                     |
 | vertex       | @/graphs/<graph>/vertices/<id>@                               | get vertex with id @<id>@                                                                                            |
-| vertices     | @/graphs/<graph>/vertices/<id>/out@                           | get the adjacent out vertices of vertex @<id>@                                                                       |
-| vertices     | @/graphs/<graph>/vertices/<id>/in@                            | get the adjacent in vertices of vertex @<id>@                                                                        |
-| vertices     | @/graphs/<graph>/vertices/<id>/both@                          | get the both adjacent in and out vertices of vertex @<id>@                                                           |
-| edges        | @/graphs/<graph>/vertices/<id>/<dir>?_label=written_by@       | get the adjacent vertices of @<id>@ with edge label equal to "written_by" (value may also be a comma separated list) |
+| vertices     | @/graphs/<graph>/vertices/<id>/out@                           | get the adjacency out vertices of vertex @<id>@                                                                       |
+| vertices     | @/graphs/<graph>/vertices/<id>/in@                            | get the adjacency in vertices of vertex @<id>@                                                                        |
+| vertices     | @/graphs/<graph>/vertices/<id>/both@                          | get the both adjacency in and out vertices of vertex @<id>@                                                           |
+| edges        | @/graphs/<graph>/vertices/<id>/<dir>?_label=written_by@       | get the adjacency vertices of @<id>@ with edge label equal to "written_by" (value may also be a comma separated list) |
 | edges        | @/graphs/<graph>/edges@                                       | get all edges                                                                                                        |
 | edge         | @/graphs/<graph>/edges/<id>@                                  | get edge with id @<id>@                                                                                              |
 | edges        | @/graphs/<graph>/vertices/<id>/outE@                          | get the out edges of vertex @<id>@                                                                                   |

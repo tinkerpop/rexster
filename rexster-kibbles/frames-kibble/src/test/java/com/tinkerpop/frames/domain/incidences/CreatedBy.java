@@ -1,4 +1,4 @@
-package com.tinkerpop.frames.domain.relations;
+package com.tinkerpop.frames.domain.incidences;
 
 import com.tinkerpop.frames.Domain;
 import com.tinkerpop.frames.Property;

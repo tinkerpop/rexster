@@ -101,7 +101,7 @@ h3. Version 0.6 (Dalmatian -- September 18, 2011)
 
 * Support for High Availability mode of Neo4j
 * The @rexster-stop.sh@ command is now consistent with the @rexster-stop.sh@ in terms of parameter naming and shorthand.
-* Retrieve adjacent vertices through REST API of the vertex resource.
+* Retrieve adjacency vertices through REST API of the vertex resource.
 * Filter by multiple edge labels in the REST API of the vertex resource.
 * PUT on vertex and edge resources in the REST API replaces all graph element properties with the specified set.
 * Combine rexster-start.sh and rexster-stop.sh into rexster.sh with new @-version@ and @-status@ commands.

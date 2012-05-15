@@ -50,9 +50,9 @@ public class FramesExtensionTest {
         sb.append("<configuration>");
         sb.append("<person>com.tinkerpop.frames.domain.classes.Person</person>");
         sb.append("<project>com.tinkerpop.frames.domain.classes.Project</project>");
-        sb.append("<created>com.tinkerpop.frames.domain.relations.Created</created>");
-        sb.append("<createdby>com.tinkerpop.frames.domain.relations.CreatedBy</createdby>");
-        sb.append("<knows>com.tinkerpop.frames.domain.relations.Knows</knows>");
+        sb.append("<created>com.tinkerpop.frames.domain.incidences.Created</created>");
+        sb.append("<createdby>com.tinkerpop.frames.domain.incidences.CreatedBy</createdby>");
+        sb.append("<knows>com.tinkerpop.frames.domain.incidences.Knows</knows>");
         sb.append("<notreal>com.tinkerpop.frames.domain.relations.ThisFrameIsNotReal</notreal>");
         sb.append("</configuration></extension>");
 
