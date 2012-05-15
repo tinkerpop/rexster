@@ -16,7 +16,7 @@ public class MockGraphConfiguration implements GraphConfiguration {
 
         @Override
         public Features getFeatures() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return new Features(); //To change body of implemented methods use File | Settings | File Templates.
         }
 
         public Vertex addVertex(Object o) {
