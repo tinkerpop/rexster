@@ -2,6 +2,8 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.Direction;
+import com.tinkerpop.blueprints.util.ExceptionFactory;
 
 import java.util.Hashtable;
 import java.util.Set;
@@ -48,18 +50,17 @@ public class MockEdge implements Edge {
     }
 
     @Override
-    public Vertex getInVertex() {
-        return this.inVertex;
-    }
-
-    @Override
     public String getLabel() {
         return this.label;
     }
 
-    @Override
-    public Vertex getOutVertex() {
-        return this.outVertex;
+    public Vertex getVertex(final Direction direction) throws IllegalArgumentException {
+        if (direction.equals(Direction.IN))
+            return this.inVertex;
+        else if (direction.equals(Direction.OUT))
+            return this.outVertex;
+        else
+            throw ExceptionFactory.bothIsNotSupported();
     }
 
 }

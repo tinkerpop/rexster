@@ -453,7 +453,7 @@ public class VertexResource extends AbstractSubResource {
 
                     for (Edge edge : itty) {
                         if (counter >= start && counter < end) {
-                            edgeArray.put(GraphSONFactory.createJSONElement(edge.getInVertex(), returnKeys, showTypes));
+                            edgeArray.put(GraphSONFactory.createJSONElement(edge.getVertex(Direction.IN), returnKeys, showTypes));
                         }
                         counter++;
                     }
@@ -469,7 +469,7 @@ public class VertexResource extends AbstractSubResource {
 
                     for (Edge edge : itty) {
                         if (counter >= start && counter < end) {
-                            edgeArray.put(GraphSONFactory.createJSONElement(edge.getOutVertex(), returnKeys, showTypes));
+                            edgeArray.put(GraphSONFactory.createJSONElement(edge.getVertex(Direction.OUT), returnKeys, showTypes));
                         }
                         counter++;
                     }

@@ -258,9 +258,9 @@ public abstract class BaseResource {
             else if (key.equals(Tokens._LABEL))
                 temp = ((Edge) element).getLabel();
             else if (key.equals(Tokens._IN_V))
-                temp = ((Edge) element).getInVertex().getId();
+                temp = ((Edge) element).getVertex(Direction.IN).getId();
             else if (key.equals(Tokens._OUT_V))
-                temp = ((Edge) element).getOutVertex().getId();
+                temp = ((Edge) element).getVertex(Direction.OUT).getId();
             else if (key.equals(Tokens._TYPE)) {
                 if (element instanceof Vertex)
                     temp = Tokens.VERTEX;
