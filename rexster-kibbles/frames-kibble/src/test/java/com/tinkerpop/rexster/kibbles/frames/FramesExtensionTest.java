@@ -191,7 +191,7 @@ public class FramesExtensionTest {
         // can do a slimmed down RexsterResourceContext
         this.ctx = new RexsterResourceContext(this.rag, uri, null, null, null, null, null);
 
-        ExtensionResponse extResp = this.framesExtension.doFramesWorkOnEdge(this.ctx, this.graph, this.graph.getEdge(11), "standard");
+        ExtensionResponse extResp = this.framesExtension.doFramesWorkOnEdge(this.ctx, this.graph, this.graph.getEdge(11), "in");
 
         Assert.assertNotNull(extResp);
         Assert.assertNotNull(extResp.getJerseyResponse());
@@ -213,7 +213,7 @@ public class FramesExtensionTest {
         // can do a slimmed down RexsterResourceContext
         this.ctx = new RexsterResourceContext(this.rag, uri, null, null, null, null, null);
 
-        ExtensionResponse extResp = this.framesExtension.doFramesWorkOnEdge(this.ctx, this.graph, this.graph.getEdge(11), "standard");
+        ExtensionResponse extResp = this.framesExtension.doFramesWorkOnEdge(this.ctx, this.graph, this.graph.getEdge(11), "in");
 
         Assert.assertNotNull(extResp);
         Assert.assertNotNull(extResp.getJerseyResponse());
@@ -234,7 +234,7 @@ public class FramesExtensionTest {
         // can do a slimmed down RexsterResourceContext
         this.ctx = new RexsterResourceContext(this.rag, uri, null, null, null, null, null);
 
-        ExtensionResponse extResp = this.framesExtension.doFramesWorkOnEdge(this.ctx, this.graph, this.graph.getEdge(11), "standard");
+        ExtensionResponse extResp = this.framesExtension.doFramesWorkOnEdge(this.ctx, this.graph, this.graph.getEdge(11), "in");
 
         Assert.assertNotNull(extResp);
         Assert.assertNotNull(extResp.getJerseyResponse());
@@ -255,7 +255,7 @@ public class FramesExtensionTest {
         // can do a slimmed down RexsterResourceContext
         this.ctx = new RexsterResourceContext(this.rag, uri, null, null, null, null, null);
 
-        ExtensionResponse extResp = this.framesExtension.doFramesWorkOnEdge(this.ctx, this.graph, this.graph.getEdge(11), "standard");
+        ExtensionResponse extResp = this.framesExtension.doFramesWorkOnEdge(this.ctx, this.graph, this.graph.getEdge(11), "in");
 
         Assert.assertNotNull(extResp);
         Assert.assertNotNull(extResp.getJerseyResponse());
