@@ -2,7 +2,9 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -55,6 +57,36 @@ public class EdgeResourceTest {
         Response response = resource.getAllEdges("graph");
         this.assertEdgesOkResponseJsonStructure(numberOfEdges, numberOfEdges, response);
     }
+
+    @Test
+    public void getEdgesKeyIndexed() {
+        KeyIndexableGraph graph = TinkerGraphFactory.createTinkerGraph();
+        graph.createKeyIndex("weight", Edge.class);
+
+        final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
+
+        final UriInfo uri = this.mockery.mock(UriInfo.class);
+
+        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+
+        final HashMap<String, String> parameters = new HashMap<String, String>();
+        parameters.put(Tokens.KEY, "weight");
+        parameters.put(Tokens.VALUE, "(f,0.4)");
+
+        this.mockery.checking(new Expectations() {{
+            allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(ra).getApplicationGraph(with(any(String.class)));
+            will(returnValue(rag));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
+        }});
+
+        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
+        assertEdgesOkResponseJsonStructure(2, 2, resource.getAllEdges("graph"));
+    }
+
 
     @Test
     public void getAllEdgesNoResults() {
