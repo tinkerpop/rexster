@@ -363,7 +363,6 @@ public class IndexResource extends AbstractSubResource {
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response postIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
         String clazz = null;
-        String type = null;
         Set<String> keys = null;
         Parameter<Object, Object>[] indexParameters = new Parameter[0];
 
@@ -372,9 +371,6 @@ public class IndexResource extends AbstractSubResource {
         Object temp = theRequestObject.opt(Tokens.CLASS);
         if (temp != null)
             clazz = temp.toString();
-        temp = theRequestObject.opt(Tokens.TYPE);
-        if (temp != null)
-            type = temp.toString();
         temp = theRequestObject.opt(Tokens.KEYS);
         if (temp != null) {
             try {
@@ -422,7 +418,7 @@ public class IndexResource extends AbstractSubResource {
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } else {
             // create an index
-            if (null != type && null != clazz) {
+            if (null != clazz) {
                 final Class c;
                 if (clazz.equals(Tokens.VERTEX))
                     c = Vertex.class;
@@ -453,7 +449,7 @@ public class IndexResource extends AbstractSubResource {
 
 
             } else {
-                final String msg = "Type (vertex/edge) must be provided to create a new index";
+                final String msg = "Class (vertex/edge) must be provided to create a new index";
                 logger.info(msg);
 
                 final JSONObject error = generateErrorObject(msg);
