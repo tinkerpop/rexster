@@ -358,14 +358,6 @@ public class IndexResource extends AbstractSubResource {
         return this.postIndex(graphName, indexName);
     }
 
-    /**
-     * POST http://host/graph/indices/indexName?key=key1&value=value1&class=vertex&id=id1
-     * Index index = graph.getIndex(indexName,...);
-     * index.put(key,value,graph.getVertex(id1));
-     * <p/>
-     * POST http://host/graph/indices/indexName?class=vertex&type=automatic&keys=[name,age]
-     * graph.createIndex(indexName,Vertex.class,AUTOMATIC, {name, age})
-     */
     @POST
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
@@ -399,7 +391,7 @@ public class IndexResource extends AbstractSubResource {
                     keys.add(ks.getString(i));
                 }
             } catch (Exception e) {
-                final JSONObject error = generateErrorObject("Automatic index keys must be in an array: " + temp);
+                final JSONObject error = generateErrorObject("Index keys must be in an array: " + temp);
                 throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
             }
         }
@@ -461,7 +453,7 @@ public class IndexResource extends AbstractSubResource {
 
 
             } else {
-                final String msg = "Type (vertex/edge) and class (automatic/manual) must be provided to create a new index";
+                final String msg = "Type (vertex/edge) must be provided to create a new index";
                 logger.info(msg);
 
                 final JSONObject error = generateErrorObject(msg);
