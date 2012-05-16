@@ -2,7 +2,7 @@ package com.tinkerpop.frames.domain.classes;
 
 
 import com.tinkerpop.frames.Adjacency;
-import com.tinkerpop.frames.Incident;
+import com.tinkerpop.frames.Incidence;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.domain.incidences.Created;
 import com.tinkerpop.frames.domain.incidences.Knows;
@@ -26,28 +26,28 @@ public interface Person extends NamedObject {
     @Adjacency(label = "knows")
     public Collection<Knows> getKnows();
 
-    @Incident(label = "knows")
+    @Incidence(label = "knows")
     public Collection<Person> getKnowsPeople();
 
     @Adjacency(label = "created")
     public Collection<Created> getCreated();
 
-    @Incident(label = "created")
+    @Incidence(label = "created")
     public Collection<Project> getCreatedProjects();
 
-    @Incident(label = "knows")
+    @Incidence(label = "knows")
     public void addKnowsPerson(final Person person);
 
     @Adjacency(label = "knows")
     public Knows addKnows(final Person person);
 
-    @Incident(label = "created")
+    @Incidence(label = "created")
     public void addCreatedProject(final Project project);
 
     @Adjacency(label = "created")
     public Created addCreated(final Project project);
 
-    @Incident(label = "knows")
+    @Incidence(label = "knows")
     public void removeKnowsPerson(final Person person);
 
     @Adjacency(label = "knows")
