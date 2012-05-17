@@ -14,30 +14,10 @@ public class IndexResourceIntegrationTest extends AbstractGraphResourceIntegrati
     @Test
     public void postIndexManualSucceed() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            ClientResponse indexResponse = doGraphPost(testGraph, "indices/newindex", "class=vertex&type=manual");
-
-            Assert.assertNotNull(indexResponse);
-            Assert.assertEquals(ClientResponse.Status.OK, indexResponse.getClientResponseStatus());
-        }
-    }
-
-    @Test
-    public void postIndexAutomaticSucceed() {
-        for (GraphTestHolder testGraph : this.testGraphs) {
-            ClientResponse indexResponse = doGraphPost(testGraph, "indices/newindex", "class=vertex&type=manual&keys=x");
-
-            Assert.assertNotNull(indexResponse);
-            Assert.assertEquals(ClientResponse.Status.OK, indexResponse.getClientResponseStatus());
-        }
-    }
-
-    @Test
-    public void postIndexBadRequestMissingType() {
-        for (GraphTestHolder testGraph : this.testGraphs) {
             ClientResponse indexResponse = doGraphPost(testGraph, "indices/newindex", "class=vertex");
 
             Assert.assertNotNull(indexResponse);
-            Assert.assertEquals(ClientResponse.Status.BAD_REQUEST, indexResponse.getClientResponseStatus());
+            Assert.assertEquals(ClientResponse.Status.OK, indexResponse.getClientResponseStatus());
         }
     }
 

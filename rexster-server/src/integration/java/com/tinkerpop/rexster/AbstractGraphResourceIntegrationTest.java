@@ -58,8 +58,33 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
     @After
     public void tearDown() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            ClientRequest graphRequest = ClientRequest.create().build(createUri("/" + testGraph.getGraphName()), "DELETE");
-            this.client().handle(graphRequest);
+            ClientResponse response = doGraphGet(testGraph, "vertices");
+            JSONObject verticesJson = response.getEntity(JSONObject.class);
+            JSONArray verticesToDelete = verticesJson.optJSONArray(Tokens.RESULTS);
+            for (int ix = 0; ix < verticesToDelete.length(); ix++) {
+                this.client().handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/vertices/" + verticesToDelete.optJSONObject(ix).optString(Tokens._ID)), "DELETE"));
+            }
+
+            response = doGraphGet(testGraph, "indices");
+            JSONObject indicesJson = response.getEntity(JSONObject.class);
+            JSONArray indicesToDelete = indicesJson.optJSONArray(Tokens.RESULTS);
+            for (int ix = 0; ix < indicesToDelete.length(); ix++) {
+                this.client().handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/indices/" + indicesToDelete.optJSONObject(ix).optString("name")), "DELETE"));
+            }
+
+            response = doGraphGet(testGraph, "keyindices/vertex");
+            JSONObject keyIndicesVertexJson = response.getEntity(JSONObject.class);
+            JSONArray keyIndicesVertexToDelete = keyIndicesVertexJson.optJSONArray(Tokens.RESULTS);
+            for (int ix = 0; ix < keyIndicesVertexToDelete.length(); ix++) {
+                this.client().handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/vertex/keyindices/" + keyIndicesVertexToDelete.optString(ix)), "DELETE"));
+            }
+
+            response = doGraphGet(testGraph, "keyindices/edge");
+            JSONObject keyIndicesEdgeJson = response.getEntity(JSONObject.class);
+            JSONArray keyIndicesEdgeToDelete = keyIndicesEdgeJson.optJSONArray(Tokens.RESULTS);
+            for (int ix = 0; ix < keyIndicesEdgeToDelete.length(); ix++) {
+                this.client().handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/edge/keyindices/" + keyIndicesEdgeToDelete.optString(ix)), "DELETE"));
+            }
         }
     }
 
