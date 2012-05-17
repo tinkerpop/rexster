@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.protocol.filter.ScriptFilter;
 import com.tinkerpop.rexster.protocol.filter.SessionFilter;
 import com.tinkerpop.rexster.servlet.DogHouseServlet;
 import com.tinkerpop.rexster.servlet.EvaluatorServlet;
+import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
 import com.tinkerpop.rexster.servlet.VisualizationServlet;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
@@ -181,7 +182,7 @@ public class WebServer {
         this.rexsterServer = new HttpServer();
         final ServerConfiguration config = this.rexsterServer.getServerConfiguration();
         config.addHttpHandler(jerseyHandler, "/");
-        config.addHttpHandler(new StaticHttpHandler(absoluteWebRootPath), "/doghouse");
+        config.addHttpHandler(new RexsterStaticHttpHandler(absoluteWebRootPath), "/doghouse");
         config.addHttpHandler(dogHouseHandler, "/doghouse/main/*");
         config.addHttpHandler(visualizationHandler, "/doghouse/visualize");
         config.addHttpHandler(evaluatorHandler, "/doghouse/exec");
