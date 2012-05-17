@@ -111,7 +111,6 @@ define(
                     // restore state to a page on the browser
                     if (state.browse.index != undefined && state.browse.index.name != undefined) {
                         var idx = {
-                            name: state.browse.index.name,
                             key: state.browse.index.key,
                             value: state.browse.index.value
                         };
@@ -324,14 +323,14 @@ define(
 
                 if (currentIndex == undefined) {
                     if (currentFeatureBrowsed === "vertices") {
-                        ajax.getVertices(currentGraphName, pageStart, pageEnd, function(data) {
+                        ajax.getVertices(currentGraphName, pageStart, pageEnd, null, null, function(data) {
                             that.renderPagedResults(data.results, data.totalSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
                         },
                         function(err) {
                             info.showMessageError("Could not get the vertices of graphs from Rexster.");
                         });
                     } else if (currentFeatureBrowsed === "edges") {
-                        ajax.getEdges(currentGraphName, pageStart, pageEnd, function(data) {
+                        ajax.getEdges(currentGraphName, pageStart, pageEnd, null, null, function(data) {
                             that.renderPagedResults(data.results, data.totalSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
                         },
                         function(err) {
@@ -341,14 +340,14 @@ define(
                 } else {
                     // get from indices...there's a filter on
                     if (currentFeatureBrowsed === "vertices") {
-                        ajax.getByIndex(currentGraphName, pageStart, pageEnd, currentIndex.name, currentIndex.key, currentIndex.value, function(data) {
+                        ajax.getVertices(currentGraphName, pageStart, pageEnd, currentIndex.key, currentIndex.value, function(data) {
                             that.renderPagedResults(data.results, data.totalSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
                         },
                         function(err) {
                             info.showMessageError("Could not get the vertices of graphs from Rexster.");
                         });
                     } else if (currentFeatureBrowsed === "edges") {
-                        ajax.getByIndex(currentGraphName, pageStart, pageEnd, currentIndex.name, currentIndex.key, currentIndex.value, function(data) {
+                        ajax.getEdges(currentGraphName, pageStart, pageEnd, currentIndex.key, currentIndex.value, function(data) {
                             that.renderPagedResults(data.results, data.totalSize, currentGraphName, pageStart, pageEnd, onPageChangeComplete);
                         },
                         function(err) {
@@ -717,7 +716,6 @@ define(
 
                         // reset the filter
                         mediator.setCurrentIndex();
-                        $("#dialogFormIndexKeyText").val("");
                         $("#dialogFormIndexValueText").val("");
 
                         mediator.panelGraphNavigationSelected($(this).attr("_type"));
@@ -782,30 +780,30 @@ define(
                         } else if ($(this).children().first().hasClass("ui-icon-search")) {
                             // add indices based on the type being browsed.
                             $("#dialogIndices select").empty();
-                            ajax.getIndices(history.getApplicationState().graph, function(result){
-                                _(_(result.results).filter(function(nextIndex) {
-                                    return nextIndex.class == (history.getApplicationState().browse.element == "vertices" ? "vertex" : "edge");
-                                })).each(function(nextIndex) {
+                            var keyType = history.getApplicationState().browse.element == "vertices" ? "vertex" : "edge";
+                            ajax.getKeyIndices(history.getApplicationState().graph, keyType, function(result){
+
+                                _(result.results).each(function(nextIndex) {
                                     $("#dialogIndices select")
                                      .append($("<option></option>")
-                                     .attr("value", nextIndex.name)
-                                     .text(nextIndex.name));
-                                })}, null, false);
+                                     .attr("value", nextIndex)
+                                     .text(nextIndex));
+                                });
 
-                                // restore state to a page on the browser
-                                if (history.getApplicationState().browse.index != undefined && history.getApplicationState().browse.index.name != undefined) {
-                                    var idx = {
-                                        name: history.getApplicationState().browse.index.name,
-                                        key: history.getApplicationState().browse.index.key,
-                                        value: history.getApplicationState().browse.index.value
-                                    };
-                                    mediator.setCurrentIndex(idx);
+                            }, false, null);
 
-                                    $("#dialogFormIndexSelect").val(idx.name)
-                                    $("#dialogFormIndexKeyText").val(idx.key);
-                                    $("#dialogFormIndexValueText").val(idx.value);
+                            // restore state to a page on the browser
+                            if (history.getApplicationState().browse.index != undefined && history.getApplicationState().browse.index.name != undefined) {
+                                var idx = {
+                                    key: history.getApplicationState().browse.index.key,
+                                    value: history.getApplicationState().browse.index.value
+                                };
+                                mediator.setCurrentIndex(idx);
 
-                                }
+                                $("#dialogFormIndexSelect").val(idx.key);
+                                $("#dialogFormIndexValueText").val(idx.value);
+
+                            }
 
                             $("#dialogIndices").dialog("open");
                         } else if ($(this).children().first().hasClass("ui-icon-seek-prev")) {
@@ -817,7 +815,6 @@ define(
                         } else if ($(this).children().first().hasClass("ui-icon-cancel")) {
                             mediator.setCurrentIndex();
 
-                            $("#dialogFormIndexKeyText").val("");
                             $("#dialogFormIndexValueText").val("");
 
                             mediator.panelGraphNavigationPagedFirst();
@@ -844,16 +841,22 @@ define(
                         modal: true,
                         buttons: {
                             "Filter" : function() {
+
                                 var idx = {
-                                    name:$("#dialogFormIndexSelect").val(),
-                                    key:$("#dialogFormIndexKeyText").val(),
+                                    key:$("#dialogFormIndexSelect").val(),
                                     value:$("#dialogFormIndexValueText").val()
                                 };
-                                mediator.setCurrentIndex(idx);
 
-                                var idxUri = "/doghouse/main/graph/" + history.getApplicationState().graph + "/" + history.getApplicationState().browse.element + "?rexster.offset.start=0&rexster.offset.end=10&rexster.index.name=" + idx.name + "&rexster.index.key=" + idx.key + "&rexster.index.value=" + idx.value;
-                                history.historyPush(idxUri);
-                                mediator.panelGraphNavigationPagedFirst();
+                                if (idx.key != null) {
+                                    mediator.setCurrentIndex(idx);
+
+                                    var idxUri = "/doghouse/main/graph/" + history.getApplicationState().graph + "/" + history.getApplicationState().browse.element + "?rexster.offset.start=0&rexster.offset.end=10&rexster.index.key=" + idx.key + "&rexster.index.value=" + idx.value;
+                                    history.historyPush(idxUri);
+                                    mediator.panelGraphNavigationPagedFirst();
+                                }else {
+                                    alert("This graph has no Key Indices (or one hasn't be selected) to search on.");
+                                }
+
                                 $(this).dialog("close");
                             },
                             "Cancel": function() {

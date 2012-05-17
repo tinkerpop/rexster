@@ -61,9 +61,14 @@ define(
              * @param onSuccess	{Function} The action that occurs on a successful REST call.
              * @param onFail 	{Function} The action that occurs on a failed REST call.
              */
-            getVertices : function(graphName, start, end, onSuccess, onFail){
+            getVertices : function(graphName, start, end, key, value, onSuccess, onFail){
+                var uri = baseUri + graphName + "/vertices?rexster.offset.start=" + start + "&rexster.offset.end=" + end;
+                if (key != null && value != null) {
+                    uri = uri + "&key=" + key + "&value=" + value;
+                }
+
                 $.ajax({
-                      url: baseUri + graphName + "/vertices?rexster.offset.start=" + start + "&rexster.offset.end=" + end,
+                      url: uri,
                       accepts:{
                         json: rexsterMimeType
                       },
@@ -84,9 +89,14 @@ define(
              * @param onSuccess	{Function} The action that occurs on a successful REST call.
              * @param onFail 	{Function} The action that occurs on a failed REST call.
              */
-            getEdges : function(graphName, start, end, onSuccess, onFail){
+            getEdges : function(graphName, start, end, key, value, onSuccess, onFail){
+                var uri = baseUri + graphName + "/edges?rexster.offset.start=" + start + "&rexster.offset.end=" + end;
+                if (key != null && value != null) {
+                    uri = uri + "&key=" + key + "&value=" + value;
+                }
+
                 $.ajax({
-                      url: baseUri + graphName + "/edges?rexster.offset.start=" + start + "&rexster.offset.end=" + end,
+                      url: uri,
                       accepts:{
                         json: rexsterMimeType
                       },
@@ -182,9 +192,9 @@ define(
                     });
             },
 
-            getIndices : function(graphName, onSuccess, onFail, asynchronous) {
+            getKeyIndices : function(graphName, keyType, onSuccess, onFail, asynchronous) {
                 $.ajax({
-                      url: baseUri + graphName + "/indices",
+                      url: baseUri + graphName + "/keyindices/" + keyType,
                       accepts:{
                         json: rexsterMimeType
                       },
@@ -192,20 +202,6 @@ define(
                       dataType:"json",
                       success: onSuccess,
                       async:asynchronous,
-                      error: onFail
-                    });
-            },
-
-            getByIndex : function(graphName, start, end, indexName, indexKey, indexValue, onSuccess, onFail){
-                $.ajax({
-                      url: baseUri + graphName + "/indices/" + encodeURIComponent(indexName) + "?rexster.offset.start=" + start + "&rexster.offset.end=" + end + "&key=" + encodeURIComponent(indexKey) + "&value=" + encodeURIComponent(indexValue),
-                      accepts:{
-                        json: rexsterMimeType
-                      },
-                      type: "GET",
-                      dataType:"json",
-                      success: onSuccess,
-                      async:false,
                       error: onFail
                     });
             }

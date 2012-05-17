@@ -47,7 +47,6 @@ define(
                         start : 0,
                         end : 10,
                         index : {
-                            name : null,
                             key : null,
                             value : null
                         }
