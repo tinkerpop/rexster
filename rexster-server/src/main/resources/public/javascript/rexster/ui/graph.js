@@ -109,7 +109,8 @@ define(
                     this.panelGraphElementViewSelected(state.browse.element, state.objectId, onComplete);
                 } else {
                     // restore state to a page on the browser
-                    if (state.browse.index != undefined && state.browse.index.name != undefined) {
+                    if (state.browse.index != undefined && state.browse.index.key != undefined
+                        && state.browse.index.key != null) {
                         var idx = {
                             key: state.browse.index.key,
                             value: state.browse.index.value

@@ -57,10 +57,8 @@ define(
                         state.browse.end = encodedState.param("rexster.offset.end");
                     }
 
-                    if (encodedState.param("rexster.index.name") != null
-                        && encodedState.param("rexster.index.key") != null
+                    if (encodedState.param("rexster.index.key") != null
                         && encodedState.param("rexster.index.value") != null) {
-                        state.browse.index.name = encodedState.param("rexster.index.name");
                         state.browse.index.key = encodedState.param("rexster.index.key");
                         state.browse.index.value = encodedState.param("rexster.index.value");
                     }
