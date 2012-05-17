@@ -23,7 +23,6 @@ public interface Project extends NamedObject {
     @Incidence(label = "created", direction = Direction.IN)
     public Collection<CreatedBy> getCreatedBy();
 
-
     @Adjacency(label = "created", direction = Direction.IN)
     public void removeCreatedByPerson(Person person);
 

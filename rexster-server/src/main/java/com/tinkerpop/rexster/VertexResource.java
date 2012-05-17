@@ -80,19 +80,35 @@ public class VertexResource extends AbstractSubResource {
         return getVertices(graphName, true);
     }
 
-    private Response getVertices(String graphName, boolean showTypes) {
+    private Response getVertices(final String graphName, final boolean showTypes) {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final Graph graph = rag.getGraph();
+        
+        final JSONObject theRequestObject = this.getRequestObject();
+        final Long start = RequestObjectHelper.getStartOffset(theRequestObject);
+        final Long end = RequestObjectHelper.getEndOffset(theRequestObject);
+        final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
-        JSONObject theRequestObject = this.getRequestObject();
-        Long start = RequestObjectHelper.getStartOffset(theRequestObject);
-        Long end = RequestObjectHelper.getEndOffset(theRequestObject);
-        List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+        String key = null;
+        Object value = null;
 
+        Object temp = theRequestObject.opt(Tokens.KEY);
+        if (null != temp)
+            key = temp.toString();
+
+        temp = theRequestObject.opt(Tokens.VALUE);
+        if (null != temp)
+            value = ElementHelper.getTypedPropertyValue(temp.toString());
+        
+        final boolean filtered = key != null && value != null;
+        
         try {
             long counter = 0l;
             final JSONArray vertexArray = new JSONArray();
             boolean wasInSection = false;
-            for (Vertex vertex : rag.getGraph().getVertices()) {
+            
+            final Iterable<Vertex> vertices = filtered ? graph.getVertices(key, value) : graph.getVertices();
+            for (Vertex vertex : vertices) {
                 if (counter >= start && counter < end) {
                     wasInSection = true;
                     vertexArray.put(GraphSONFactory.createJSONElement(vertex, returnKeys, showTypes));

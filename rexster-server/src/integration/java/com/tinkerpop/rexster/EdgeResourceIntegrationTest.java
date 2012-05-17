@@ -32,7 +32,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     @Test
     public void getEdgeFoundStatusOk() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            String id = testGraph.getEdgeIdSet().keySet().iterator().next();
+            String id = testGraph.getEdgeIdSet().values().iterator().next();
             ClientResponse graphResponse = doGraphGet(testGraph, "edges/" + id);
 
             Assert.assertNotNull(graphResponse);
@@ -156,7 +156,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     @Test
     public void postEdgeEdgeExistingWithNoEdgePropertiesStatusConflict() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            String id = testGraph.getEdgeIdSet().keySet().iterator().next();
+            String id = testGraph.getEdgeIdSet().values().iterator().next();
             ClientResponse response = this.doGraphPost(testGraph, "edges/" + id);
 
             Assert.assertNotNull(response);
@@ -167,7 +167,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     @Test
     public void postEdgeNewEdgeVerticesDoNotExistStatusConflict() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            String id = testGraph.getEdgeIdSet().keySet().iterator().next();
+            String id = testGraph.getEdgeIdSet().values().iterator().next();
             ClientResponse response = this.doGraphPost(testGraph, "edges/" + id, "_outV=102notreal&_inV=123notreal");
 
             Assert.assertNotNull(response);
@@ -178,7 +178,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     @Test
     public void postEdgeStatusOk() throws JSONException {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            Iterator<String> itty = testGraph.getVertexIdSet().keySet().iterator();
+            Iterator<String> itty = testGraph.getVertexIdSet().values().iterator();
             String vertexIdIn = itty.next();
             String vertexIdOut = itty.next();
 
@@ -219,7 +219,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     @Test
     public void putEdgeStatusOk() throws JSONException {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            Iterator<String> itty = testGraph.getEdgeIdSet().keySet().iterator();
+            Iterator<String> itty = testGraph.getEdgeIdSet().values().iterator();
             String firstEdgeId = itty.next();
             String secondEdgeId = itty.next();
             String thirdEdgeId = itty.next();
@@ -255,7 +255,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     @Test
     public void deleteEdgeStatusOk() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            Iterator<String> itty = testGraph.getEdgeIdSet().keySet().iterator();
+            Iterator<String> itty = testGraph.getEdgeIdSet().values().iterator();
             String edgeToDelete = itty.next();
 
             ClientResponse responseGetEdge = this.doGraphGet(testGraph, "edges/" + edgeToDelete);

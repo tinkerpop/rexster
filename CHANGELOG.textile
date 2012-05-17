@@ -19,6 +19,8 @@ h3. Version 2.0.0 (NOT OFFICIALLY RELEASED YET)
 * The DELETE operation for the Graph resource has been removed since Blueprints no longer supports Graph.clear().
 * The Index resource no longer has a @keys@ sub-resource nor the notion of "automatic" or "manual" indices due to changes in the Blueprints API.
 * Add metadata from graph @Features@ to the Graph resource.
+* @KeyIndexResource@ to access features of @KeyIndexableGraph@ instances.
+* @VertexResource@ and @EdgeResource@ support key index filtering.
 
 h2. Rexster 0.x
 

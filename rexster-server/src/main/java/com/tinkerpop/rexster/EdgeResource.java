@@ -79,20 +79,35 @@ public class EdgeResource extends AbstractSubResource {
         return this.getAllEdges(graphName, true);
     }
 
-    private Response getAllEdges(String graphName, boolean showTypes) {
+    private Response getAllEdges(final String graphName, final boolean showTypes) {
 
-        RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final Graph graph = rag.getGraph();
 
-        JSONObject theRequestObject = this.getRequestObject();
-        Long start = RequestObjectHelper.getStartOffset(theRequestObject);
-        Long end = RequestObjectHelper.getEndOffset(theRequestObject);
-        List<String> returnKeys = RequestObjectHelper.getReturnKeys(this.getRequestObject());
+        final JSONObject theRequestObject = this.getRequestObject();
+        final Long start = RequestObjectHelper.getStartOffset(theRequestObject);
+        final Long end = RequestObjectHelper.getEndOffset(theRequestObject);
+        final List<String> returnKeys = RequestObjectHelper.getReturnKeys(this.getRequestObject());
 
+        String key = null;
+        Object value = null;
+
+        Object temp = theRequestObject.opt(Tokens.KEY);
+        if (null != temp)
+            key = temp.toString();
+
+        temp = theRequestObject.opt(Tokens.VALUE);
+        if (null != temp)
+            value = ElementHelper.getTypedPropertyValue(temp.toString());
+
+        final boolean filtered = key != null && value != null;
+        
         boolean wasInSection = false;
         long counter = 0l;
         try {
-            JSONArray edgeArray = new JSONArray();
-            for (Edge edge : rag.getGraph().getEdges()) {
+            final JSONArray edgeArray = new JSONArray();
+            final Iterable<Edge> edges = filtered ? graph.getEdges(key, value) : graph.getEdges();
+            for (Edge edge : edges) {
                 if (counter >= start && counter < end) {
                     wasInSection = true;
                     edgeArray.put(GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
@@ -109,7 +124,7 @@ public class EdgeResource extends AbstractSubResource {
         } catch (JSONException ex) {
             logger.error(ex);
 
-            JSONObject error = generateErrorObjectJsonFail(ex);
+            final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 

@@ -26,7 +26,7 @@ public class VertexResourceIntegrationTest extends AbstractGraphResourceIntegrat
     @Test
     public void getVertexFoundStatusOk() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            String id = testGraph.getVertexIdSet().keySet().iterator().next();
+            String id = testGraph.getVertexIdSet().values().iterator().next();
             ClientResponse graphResponse = doGraphGet(testGraph, "vertices/" + id);
 
             Assert.assertNotNull(graphResponse);
