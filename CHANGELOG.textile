@@ -21,6 +21,7 @@ h3. Version 2.0.0 (NOT OFFICIALLY RELEASED YET)
 * Add metadata from graph @Features@ to the Graph resource.
 * @KeyIndexResource@ to access features of @KeyIndexableGraph@ instances.
 * @VertexResource@ and @EdgeResource@ support key index filtering.
+* Improved messaging to the server console regarding which @rexster.xml@ file is being loaded.
 
 h2. Rexster 0.x
 

@@ -363,7 +363,7 @@ public class WebServer {
         return options;
     }
 
-    private static RexsterCommandLine getCliInput(final String[] args) throws Exception {
+    private static RexsterCommandLine getCliInput(final String[] args) {
         Options options = getCliOptions();
         Options innerOptions = null;
         GnuParser parser = new GnuParser();
@@ -450,11 +450,11 @@ public class WebServer {
         return cleanedArgumentsAsArray;
     }
 
-    public static void main(final String[] args) throws Exception {
+    public static void main(final String[] args)  {
 
-        XMLConfiguration properties = new XMLConfiguration();
+        final XMLConfiguration properties = new XMLConfiguration();
 
-        RexsterCommandLine line = getCliInput(cleanArguments(args));
+        final RexsterCommandLine line = getCliInput(cleanArguments(args));
 
         if (line.getCommand().hasOption("start")) {
             if (line.hasCommandParameters() && line.getCommandParameters().hasOption("debug")) {
@@ -469,23 +469,32 @@ public class WebServer {
                 }
             }
 
-            String rexsterXmlFile = "rexster.xml";
-
-            if (line.hasCommandParameters() && line.getCommandParameters().hasOption("configuration")) {
-
-                rexsterXmlFile = line.getCommandParameters().getOptionValue("configuration");
-
-                try {
-                    properties.load(new FileReader(rexsterXmlFile));
-                } catch (IOException e) {
-                    throw new Exception("Could not locate " + rexsterXmlFile + " properties file.");
-                }
-            } else {
-                // no arguments to parse...check the default rexster.xml in the root of the working directory
-                try {
-                    properties.load(new FileReader(rexsterXmlFile));
-                } catch (IOException e) {
-                    properties.load(RexsterApplication.class.getResourceAsStream(rexsterXmlFile));
+            final boolean rexsterXmlConfiguredFromCommandLine = line.hasCommandParameters() && line.getCommandParameters().hasOption("configuration");
+            final String rexsterXmlFileLocation = rexsterXmlConfiguredFromCommandLine ? line.getCommandParameters().getOptionValue("configuration") : "rexster.xml";
+            final File rexsterXmlFile = new File(rexsterXmlFileLocation);
+            
+            try {
+                // load either the rexster.xml from the command line or the default rexster.xml in the root of the
+                // working directory
+                properties.load(new FileReader(rexsterXmlFileLocation));
+                logger.info("Using [" + rexsterXmlFile.getAbsolutePath() + "] as configuration source.");
+            } catch (Exception e) {
+                logger.warn("Could not load configuration from [" + rexsterXmlFile.getAbsolutePath() + "]");
+                
+                if (rexsterXmlConfiguredFromCommandLine) {
+                    // since an explicit value for rexster.xml was supplied and could not be found then 
+                    // we won't continue to load rexster.
+                    throw new RuntimeException("Could not load configuration from [" + rexsterXmlFile.getAbsolutePath() + "]");
+                } else {
+                    // since the default value for rexster.xml was supplied and could not be found, try to 
+                    // revert to the rexster.xml stored as a resource.  a good fall back for users just 
+                    // getting started with rexster.
+                    try {
+                        properties.load(RexsterApplication.class.getResourceAsStream(rexsterXmlFileLocation));
+                        logger.info("Using [" + rexsterXmlFileLocation + "] resource as configuration source.");
+                    } catch (Exception ex){
+                        logger.fatal("None of the default rexster.xml can be found or read.");
+                    }
                 }
             }
 
@@ -495,7 +504,7 @@ public class WebServer {
             // initialization preventing it from having to be explicitly defined
             // in rexster.xml itself.  there's probably an even better way to do
             // this *sigh*
-            properties.addProperty("self-xml", rexsterXmlFile);
+            properties.addProperty("self-xml", rexsterXmlFileLocation);
 
             // overrides rexster-server-port from command line
             if (line.hasCommandParameters() && line.getCommandParameters().hasOption("rexsterport")) {
@@ -510,7 +519,9 @@ public class WebServer {
             try {
                 new WebServer(properties, true);
             } catch (BindException be) {
-                logger.error("Could not start Rexster Server.  A port that Rexster needs is in use.");
+                logger.fatal("Could not start Rexster Server.  A port that Rexster needs is in use.");
+            } catch (Exception ex) {
+                logger.fatal("The Rexster Server could not be started", ex);
             }
         } else if (line.getCommand().hasOption("version")) {
             System.out.println("Rexster version [" + RexsterApplicationImpl.getVersion() + "]");
