@@ -176,33 +176,63 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     }
 
     @Test
-    public void postEdgeStatusOk() throws JSONException {
+    public void postEdgeSimpleStatusOk() throws JSONException {
         for (GraphTestHolder testGraph : this.testGraphs) {
             Iterator<String> itty = testGraph.getVertexIdSet().values().iterator();
             String vertexIdIn = itty.next();
             String vertexIdOut = itty.next();
 
             // post as URI
-            String complexValue = "(map,(propertya=(i,123),propertyb=(d,321.5),propertyc=(list,(x,y,z)),propertyd=(map,(x=xyz))))";
-            String complexKeyValueUri = "&complex=" + complexValue;
-            ClientResponse response = this.doGraphPost(testGraph, "edges", "_outV=" + vertexIdOut + "&_inV=" + vertexIdIn + "&_label=uriPost" + complexKeyValueUri);
-            assertPostedEdge(vertexIdIn, vertexIdOut, response);
+            String edgeProperty = "propertya=(i,123)&propertyb=(d,321.5)&propertyc=test";
+            ClientResponse response = this.doGraphPost(testGraph, "edges", "_outV=" + vertexIdOut + "&_inV=" + vertexIdIn + "&_label=uriPost&" + edgeProperty);
+            assertPostedEdge(vertexIdIn, vertexIdOut, response, true);
 
             // post as JSON
-            String complexKeyValueJson = "{\"propertya\":123,\"propertyb\":321.5,\"propertyc\":[\"x\",\"y\",\"z\"],\"propertyd\":{\"x\":\"xyz\"}}";
-            JSONTokener tokener = new JSONTokener(complexKeyValueJson);
-            JSONObject complexJsonObject = new JSONObject(tokener);
-
             Map<String, Object> jsonEdgeData = new HashMap<String, Object>();
             jsonEdgeData.put(Tokens._OUT_V, vertexIdOut);
             jsonEdgeData.put(Tokens._IN_V, vertexIdIn);
             jsonEdgeData.put(Tokens._LABEL, "jsonPost");
-            jsonEdgeData.put("complex", complexJsonObject);
+            jsonEdgeData.put("propertya", 123);
+            jsonEdgeData.put("propertyb", 321.5);
+            jsonEdgeData.put("propertyc", "test");
 
             JSONObject jsonEdgeToPost = new JSONObject(jsonEdgeData);
 
             response = this.doGraphPostOfJson(testGraph, "edges", jsonEdgeToPost);
-            assertPostedEdge(vertexIdIn, vertexIdOut, response);
+            assertPostedEdge(vertexIdIn, vertexIdOut, response, true);
+        }
+    }
+
+    @Test
+    public void postEdgeComplexStatusOk() throws JSONException {
+        for (GraphTestHolder testGraph : this.testGraphs) {
+            if (testGraph.getFeatures().supportsMapProperty){
+                Iterator<String> itty = testGraph.getVertexIdSet().values().iterator();
+                String vertexIdIn = itty.next();
+                String vertexIdOut = itty.next();
+    
+                // post as URI
+                String complexValue = "(map,(propertya=(i,123),propertyb=(d,321.5),propertyc=(list,(x,y,z)),propertyd=(map,(x=xyz))))";
+                String complexKeyValueUri = "&complex=" + complexValue;
+                ClientResponse response = this.doGraphPost(testGraph, "edges", "_outV=" + vertexIdOut + "&_inV=" + vertexIdIn + "&_label=uriPost" + complexKeyValueUri);
+                assertPostedEdge(vertexIdIn, vertexIdOut, response, false);
+    
+                // post as JSON
+                String complexKeyValueJson = "{\"propertya\":123,\"propertyb\":321.5,\"propertyc\":[\"x\",\"y\",\"z\"],\"propertyd\":{\"x\":\"xyz\"}}";
+                JSONTokener tokener = new JSONTokener(complexKeyValueJson);
+                JSONObject complexJsonObject = new JSONObject(tokener);
+    
+                Map<String, Object> jsonEdgeData = new HashMap<String, Object>();
+                jsonEdgeData.put(Tokens._OUT_V, vertexIdOut);
+                jsonEdgeData.put(Tokens._IN_V, vertexIdIn);
+                jsonEdgeData.put(Tokens._LABEL, "jsonPost");
+                jsonEdgeData.put("complex", complexJsonObject);
+    
+                JSONObject jsonEdgeToPost = new JSONObject(jsonEdgeData);
+    
+                response = this.doGraphPostOfJson(testGraph, "edges", jsonEdgeToPost);
+                assertPostedEdge(vertexIdIn, vertexIdOut, response, false);
+            }
         }
     }
 
@@ -217,29 +247,54 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     }
 
     @Test
-    public void putEdgeStatusOk() throws JSONException {
+    public void putEdgeSimpleStatusOk() throws JSONException {
         for (GraphTestHolder testGraph : this.testGraphs) {
             Iterator<String> itty = testGraph.getEdgeIdSet().values().iterator();
             String firstEdgeId = itty.next();
             String secondEdgeId = itty.next();
-            String thirdEdgeId = itty.next();
 
             // put as URI
-            String complexValue = "(map,(propertya=(i,123),propertyb=(d,321.5),propertyc=(list,(x,y,z)),propertyd=(map,(x=xyz))))";
-            String complexKeyValueUri = "complex=" + complexValue;
-            ClientResponse response = this.doGraphPut(testGraph, "edges/" + firstEdgeId, complexKeyValueUri);
-            assertPuttedEdge(firstEdgeId, response);
+            String edgeProperty = "propertya=(i,123)&propertyb=(d,321.5)&propertyc=test";
+            ClientResponse response = this.doGraphPut(testGraph, "edges/" + firstEdgeId, edgeProperty);
+            assertPuttedEdge(firstEdgeId, response, true);
 
             // put as JSON
-            String complexKeyValueJson = "{\"propertya\":123,\"propertyb\":321.5,\"propertyc\":[\"x\",\"y\",\"z\"],\"propertyd\":{\"x\":\"xyz\"}}";
-            JSONTokener tokener = new JSONTokener(complexKeyValueJson);
-            JSONObject complexJsonObject = new JSONObject(tokener);
             Map<String, Object> jsonEdgeData = new HashMap<String, Object>();
-            jsonEdgeData.put("complex", complexJsonObject);
+            jsonEdgeData.put("propertya", 123);
+            jsonEdgeData.put("propertyb", 321.5);
+            jsonEdgeData.put("propertyc", "test");
 
-            JSONObject jsonEdgeToPost = new JSONObject(jsonEdgeData);
-            response = this.doGraphPutOfJson(testGraph, "edges/" + secondEdgeId, jsonEdgeToPost);
-            assertPuttedEdge(secondEdgeId, response);
+            JSONObject jsonEdgeToPut = new JSONObject(jsonEdgeData);
+            response = this.doGraphPutOfJson(testGraph, "edges/" + secondEdgeId, jsonEdgeToPut);
+            assertPuttedEdge(secondEdgeId, response, true);
+        }
+    }
+
+    @Test
+    public void putEdgeComplexStatusOk() throws JSONException {
+        for (GraphTestHolder testGraph : this.testGraphs) {
+            if (testGraph.getFeatures().supportsMapProperty) {
+                Iterator<String> itty = testGraph.getEdgeIdSet().values().iterator();
+                String firstEdgeId = itty.next();
+                String secondEdgeId = itty.next();
+
+                // put as URI
+                String complexValue = "(map,(propertya=(i,123),propertyb=(d,321.5),propertyc=(list,(x,y,z)),propertyd=(map,(x=xyz))))";
+                String complexKeyValueUri = "complex=" + complexValue;
+                ClientResponse response = this.doGraphPut(testGraph, "edges/" + firstEdgeId, complexKeyValueUri);
+                assertPuttedEdge(firstEdgeId, response, false);
+
+                // put as JSON
+                String complexKeyValueJson = "{\"propertya\":123,\"propertyb\":321.5,\"propertyc\":[\"x\",\"y\",\"z\"],\"propertyd\":{\"x\":\"xyz\"}}";
+                JSONTokener tokener = new JSONTokener(complexKeyValueJson);
+                JSONObject complexJsonObject = new JSONObject(tokener);
+                Map<String, Object> jsonEdgeData = new HashMap<String, Object>();
+                jsonEdgeData.put("complex", complexJsonObject);
+
+                JSONObject jsonEdgeToPost = new JSONObject(jsonEdgeData);
+                response = this.doGraphPutOfJson(testGraph, "edges/" + secondEdgeId, jsonEdgeToPost);
+                assertPuttedEdge(secondEdgeId, response, false);
+            }
         }
     }
 
@@ -294,7 +349,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
         }
     }
 
-    private void assertPostedEdge(String vertexIdIn, String vertexIdOut, ClientResponse response) {
+    private void assertPostedEdge(String vertexIdIn, String vertexIdOut, ClientResponse response, boolean simpleProperties) {
         Assert.assertNotNull(response);
         Assert.assertEquals(ClientResponse.Status.OK, response.getClientResponseStatus());
 
@@ -302,17 +357,25 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
         Assert.assertEquals(vertexIdIn, createdEdgeJson.optString(Tokens._IN_V));
         Assert.assertEquals(vertexIdOut, createdEdgeJson.optString(Tokens._OUT_V));
 
-        assertPostedEdgeComplexProperties(createdEdgeJson);
+        if (simpleProperties) {
+            assertPostedEdgeSimpleProperties(createdEdgeJson);    
+        } else {
+            assertPostedEdgeComplexProperties(createdEdgeJson);
+        }
     }
 
-    private void assertPuttedEdge(String edgeId, ClientResponse response) {
+    private void assertPuttedEdge(String edgeId, ClientResponse response, boolean simpleProperties) {
         Assert.assertNotNull(response);
         Assert.assertEquals(ClientResponse.Status.OK, response.getClientResponseStatus());
 
         JSONObject createdEdgeJson = response.getEntity(JSONObject.class).optJSONObject(Tokens.RESULTS);
         Assert.assertEquals(edgeId, createdEdgeJson.optString(Tokens._ID));
 
-        assertPostedEdgeComplexProperties(createdEdgeJson);
+        if (simpleProperties) {
+            assertPostedEdgeSimpleProperties(createdEdgeJson);
+        } else {
+            assertPostedEdgeComplexProperties(createdEdgeJson);
+        }
 
         int countProperties = 0;
         Iterator<String> itty = createdEdgeJson.keys();
@@ -323,7 +386,11 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
             }
         }
 
-        Assert.assertEquals(1, countProperties);
+        if (simpleProperties) {
+            Assert.assertEquals(3, countProperties);
+        } else {
+            Assert.assertEquals(1, countProperties);
+        }
     }
 
     private void assertPostedEdgeComplexProperties(JSONObject createdEdgeJson) {
@@ -336,5 +403,11 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
 
         JSONObject mapInMapProperty = mapRootProperty.optJSONObject("propertyd");
         Assert.assertEquals("xyz", mapInMapProperty.optString("x"));
+    }
+    
+    private void assertPostedEdgeSimpleProperties(JSONObject createdEdgeJson) {
+        Assert.assertEquals(123, createdEdgeJson.optInt("propertya"));
+        Assert.assertEquals(321.5, createdEdgeJson.optDouble("propertyb"));
+        Assert.assertEquals("test", createdEdgeJson.optString("propertyc"));
     }
 }

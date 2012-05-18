@@ -1,5 +1,8 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.blueprints.Features;
+
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,17 +15,28 @@ import java.util.Map;
  */
 public class GraphTestHolder {
 
-    private String graphName;
+    private final String graphName;
 
-    private String graphType;
+    private final String graphType;
 
-    private Map<String, String> vertexIdSet = new HashMap<String, String>();
+    private final Map<String, String> vertexIdSet = new HashMap<String, String>();
 
-    private Map<String, String> edgeIdSet = new HashMap<String, String>();
+    private final Map<String, String> edgeIdSet = new HashMap<String, String>();
+    
+    private final Features features = new Features();
 
-    public GraphTestHolder(String graphName, String graphType) {
+    public GraphTestHolder(final String graphName, final String graphType, final Map<String, Boolean> graphFeatures) {
         this.graphName = graphName;
         this.graphType = graphType;
+
+        for(Map.Entry<String, Boolean> entry : graphFeatures.entrySet()) {
+            try {
+                Field field = Features.class.getField(entry.getKey());
+                field.set(features, entry.getValue().booleanValue());
+            } catch (Exception e) {
+                throw new RuntimeException("There is disparity between the features returned from Rexster and the Features class.");                
+            }
+        }
     }
 
     public String getGraphName() {
@@ -31,6 +45,10 @@ public class GraphTestHolder {
 
     public String getGraphType() {
         return graphType;
+    }
+    
+    public Features getFeatures() {
+        return features;
     }
 
     public Map<String, String> getVertexIdSet() {

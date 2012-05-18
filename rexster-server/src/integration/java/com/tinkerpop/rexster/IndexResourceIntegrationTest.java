@@ -22,16 +22,6 @@ public class IndexResourceIntegrationTest extends AbstractGraphResourceIntegrati
     }
 
     @Test
-    public void postIndexBadRequestMissingClass() {
-        for (GraphTestHolder testGraph : this.testGraphs) {
-            ClientResponse indexResponse = doGraphPost(testGraph, "indices/newindex", "type=manual");
-
-            Assert.assertNotNull(indexResponse);
-            Assert.assertEquals(ClientResponse.Status.BAD_REQUEST, indexResponse.getClientResponseStatus());
-        }
-    }
-
-    @Test
     public void putElementInIndexIndexNotFound() {
         for (GraphTestHolder testGraph : this.testGraphs) {
             ClientResponse indexResponse = doGraphPut(testGraph, "indices/newindex", "key=x&value=y");
@@ -44,7 +34,7 @@ public class IndexResourceIntegrationTest extends AbstractGraphResourceIntegrati
     @Test
     public void putElementInIndexValid() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            doGraphPost(testGraph, "indices/newindex", "class=vertex&type=manual&keys=name");
+            doGraphPost(testGraph, "indices/newindex", "class=vertex&keys=name");
 
             String mappedId = testGraph.getVertexIdSet().get("1");
 
@@ -74,7 +64,7 @@ public class IndexResourceIntegrationTest extends AbstractGraphResourceIntegrati
     @Test
     public void deleteElementInIndexThenIndexItself() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            doGraphPost(testGraph, "indices/newindex", "class=vertex&type=manual&keys=name");
+            doGraphPost(testGraph, "indices/newindex", "class=vertex&keys=name");
 
             String mappedId = testGraph.getVertexIdSet().get("1");
 
