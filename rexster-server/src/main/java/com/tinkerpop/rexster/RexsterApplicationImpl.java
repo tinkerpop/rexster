@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
 import com.tinkerpop.blueprints.util.wrappers.readonly.ReadOnlyGraph;
 import com.tinkerpop.rexster.config.GraphConfigurationContainer;
 import com.tinkerpop.rexster.config.GraphConfigurationException;
@@ -84,19 +85,13 @@ public class RexsterApplicationImpl implements RexsterApplication {
         // need to shutdown all the graphs that were started with the web server
         for (RexsterApplicationGraph rag : this.graphs.values()) {
 
-            Graph graph = rag.getGraph();
+            final Graph graph = rag.getGraph();
             logger.info("Shutting down " + rag.getGraphName() + " - " + graph);
 
             // graph may not have been initialized properly if an exception gets tossed in
             // on graph creation
             if (graph != null) {
-                Graph shutdownGraph = graph;
-
-                if (graph instanceof ReadOnlyGraph) {
-                    // can't call shutdown on a readonly graph.
-                    shutdownGraph = ((ReadOnlyGraph) graph).getBaseGraph();
-                }
-
+                final Graph shutdownGraph = rag.getUnwrappedGraph();
                 shutdownGraph.shutdown();
             }
         }

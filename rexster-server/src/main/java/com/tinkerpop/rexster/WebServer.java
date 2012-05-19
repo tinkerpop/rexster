@@ -67,7 +67,6 @@ public class WebServer {
     }
 
     protected HttpServer rexsterServer;
-    protected HttpServer doghouseServer;
     protected TCPNIOTransport rexproServer;
 
     public WebServer(final XMLConfiguration properties, boolean user) throws Exception {
@@ -79,7 +78,7 @@ public class WebServer {
             this.start(properties);
         }
 
-        // initialize teh session monitor for rexpro to clean up dead sessions.
+        // initialize the session monitor for rexpro to clean up dead sessions.
         Long rexProSessionMaxIdle = properties.getLong("rexpro-session-max-idle", new Long(1790000));
         Long rexProSessionCheckInterval = properties.getLong("rexpro-session-check-interval", new Long(3000000));
         new RexProSessionMonitor(rexProSessionMaxIdle, rexProSessionCheckInterval);
@@ -91,11 +90,8 @@ public class WebServer {
         //Register a shutdown hook
         shutdownManager.registerShutdownListener(new ShutdownManager.ShutdownListener() {
             public void shutdown() {
-                try {
-                    stop();
-                } catch (Exception ex) {
-
-                }
+                // shutdown grizzly/graphs
+                stop();
             }
         });
 
@@ -237,11 +233,24 @@ public class WebServer {
         logger.info("RexPro serving on port: [" + rexproServerPort + "]");
     }
 
-    protected void stop() throws Exception {
-        this.rexsterServer.stop();
-        this.doghouseServer.stop();
-        this.rexproServer.stop();
-        WebServerRexsterApplicationProvider.stop();
+    protected void stop() {
+        try {
+            this.rexsterServer.stop();
+        } catch (Exception ex) {
+            logger.debug("Error shutting down Rexster Server ignored.", ex);
+        }
+        
+        try {
+            this.rexproServer.stop();
+        } catch (Exception ex) {
+            logger.debug("Error shutting down RexPro Server ignored.", ex);
+        }
+        
+        try {
+            WebServerRexsterApplicationProvider.stop();
+        } catch (Exception ex) {
+            logger.warn("Error while shutting down graphs.  All graphs may not have been shutdown cleanly.");
+        }
     }
 
     @SuppressWarnings("static-access")
