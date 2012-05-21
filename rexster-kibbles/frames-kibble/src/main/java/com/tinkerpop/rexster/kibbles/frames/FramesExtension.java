@@ -5,7 +5,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.frames.FramesManager;
+import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
@@ -99,7 +99,7 @@ public class FramesExtension extends AbstractRexsterExtension {
         }
 
         ExtensionResponse extensionResponse;
-        FramesManager manager = new FramesManager(graph);
+        FramedGraph framedGraph = new FramedGraph(graph);
 
         ExtensionConfiguration extensionConfig = rexsterResourceContext.getRexsterApplicationGraph()
                 .findExtensionConfiguration(EXTENSION_NAMESPACE, EXTENSION_NAME);
@@ -130,9 +130,9 @@ public class FramesExtension extends AbstractRexsterExtension {
                 Object obj = null;
 
                 if (element instanceof Vertex) {
-                    obj = manager.frame((Vertex) element, clazz);
+                    obj = framedGraph.frame((Vertex) element, clazz);
                 } else if (element instanceof Edge) {
-                    obj = manager.frame((Edge) element, Direction.BOTH, clazz);
+                    obj = framedGraph.frame((Edge) element, Direction.BOTH, clazz);
                 }
 
                 Map map = new HashMap();
