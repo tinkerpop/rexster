@@ -12,12 +12,14 @@ import org.msgpack.type.NilValue;
 import org.msgpack.type.ValueFactory;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Converts a result from Gremlin to a byte array encoded by MsgPack.
+ */
 public class MsgPackResultConverter implements ResultConverter<byte[]> {
 
     public byte[] convert(final Object result) throws Exception {

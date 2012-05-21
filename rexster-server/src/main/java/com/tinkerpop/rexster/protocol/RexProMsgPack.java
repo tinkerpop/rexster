@@ -78,13 +78,14 @@ public class RexProMsgPack {
             Iterator<Value> itty = unpacker.iterator();
             unpacker.close();
             while (itty.hasNext()){
-                Map<String,Value> map = new Converter(msgpack.read(itty.next().asRawValue().getByteArray())).read(tMap(TString, TValue));
+                final Map<String,Value> map = new Converter(itty.next()).read(tMap(TString, TValue));
+                final String vId = map.get("id").asRawValue().getString();
 
                 MsgPackScriptResponseMessage vertexResultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
-                        createScriptRequestMessage(session, "g.v(" + map.get("id") + ")"), 100);
+                        createScriptRequestMessage(session, "g.v(" + vId + ")"), 100);
 
                 unpacker = msgpack.createUnpacker(new ByteArrayInputStream(vertexResultMessage.Results));
-                Value valueVertex = msgpack.read(unpacker.iterator().next().asRawValue().getByteArray());
+                Value valueVertex = unpacker.iterator().next();
                 unpacker.close();
 
                 System.out.println(new Converter(valueVertex).read(tMap(TString, TValue)));
@@ -98,13 +99,14 @@ public class RexProMsgPack {
             itty = unpacker.iterator();
             unpacker.close();
             while (itty.hasNext()){
-                Map<String,Value> map = new Converter(msgpack.read(itty.next().asRawValue().getByteArray())).read(tMap(TString, TValue));
+                final Map<String,Value> map = new Converter(itty.next()).read(tMap(TString, TValue));
+                final String eId = map.get("id").asRawValue().getString();
 
                 MsgPackScriptResponseMessage edgeResultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
-                        createScriptRequestMessage(session, "g.e(" + map.get("id") + ")"), 100);
+                        createScriptRequestMessage(session, "g.e(" + eId + ")"), 100);
 
                 unpacker = msgpack.createUnpacker(new ByteArrayInputStream(edgeResultMessage.Results));
-                Value valueEdge = msgpack.read(unpacker.iterator().next().asRawValue().getByteArray());
+                Value valueEdge = unpacker.iterator().next();
                 unpacker.close();
 
                 System.out.println(new Converter(valueEdge).read(tMap(TString, TValue)));
