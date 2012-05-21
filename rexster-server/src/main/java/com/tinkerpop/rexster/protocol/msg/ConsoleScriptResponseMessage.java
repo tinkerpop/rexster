@@ -45,10 +45,11 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
     }
 
     public static byte[] convertBindingsToByteArray(Bindings bindings) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         for (String key : bindings.keySet()) {
-            baos.write(BitWorks.convertStringsToByteArray(key + "=" + bindings.get(key).toString()));
+            final Object val = bindings.get(key);
+            baos.write(BitWorks.convertStringsToByteArray(key + "=" + (val == null ? "null" : val.toString())));
         }
 
         return baos.toByteArray();
