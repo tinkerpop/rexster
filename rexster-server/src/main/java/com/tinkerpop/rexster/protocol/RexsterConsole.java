@@ -282,11 +282,17 @@ public class RexsterConsole {
             List<String> lines = new ArrayList<String>();
             List<String> bindings = new ArrayList<String>();
             try {
-                ConsoleScriptResponseMessage responseMessage = (ConsoleScriptResponseMessage) resultMessage;
+                if (resultMessage instanceof ConsoleScriptResponseMessage) {
+                    final ConsoleScriptResponseMessage responseMessage = (ConsoleScriptResponseMessage) resultMessage;
 
-                bindings = responseMessage.BindingsAsList();
-                lines = responseMessage.ConsoleLinesAsList();
-
+                    bindings = responseMessage.BindingsAsList();
+                    lines = responseMessage.ConsoleLinesAsList();
+                } else if (resultMessage instanceof ErrorResponseMessage) {
+                    final ErrorResponseMessage errorMessage = (ErrorResponseMessage) resultMessage;
+                    lines = new ArrayList() {{
+                        add(errorMessage.ErrorMessage);
+                    }};
+                }
             } catch (IllegalArgumentException iae) {
                 ErrorResponseMessage errorMessage = (ErrorResponseMessage) resultMessage;
                 lines.add(errorMessage.ErrorMessage);

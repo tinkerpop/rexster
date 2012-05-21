@@ -70,8 +70,6 @@ public class WebServer {
     protected TCPNIOTransport rexproServer;
 
     public WebServer(final XMLConfiguration properties, boolean user) throws Exception {
-        logger.info(".:Welcome to Rexster:.");
-
         if (user) {
             this.startUser(properties);
         } else {
@@ -460,6 +458,8 @@ public class WebServer {
     }
 
     public static void main(final String[] args)  {
+
+        logger.info(".:Welcome to Rexster:.");
 
         final XMLConfiguration properties = new XMLConfiguration();
 
