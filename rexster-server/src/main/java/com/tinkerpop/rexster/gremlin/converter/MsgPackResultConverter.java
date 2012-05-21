@@ -21,46 +21,41 @@ import java.util.Map;
 public class MsgPackResultConverter implements ResultConverter<byte[]> {
 
     public byte[] convert(final Object result) throws Exception {
-        MessagePack msgpack = new MessagePack();
-        List<byte[]> results = new ArrayList<byte[]>();
+        final MessagePack msgpack = new MessagePack();
+
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final Packer packer = msgpack.createPacker(out);
+
         if (result == null) {
-            // for example a script like g.clear()
-            results = null;
-
+            packer.write(ValueFactory.createNilValue());
         } else if (result instanceof Table) {
-            Table table = (Table) result;
-            Iterator<Row> rows = table.iterator();
+            final Table table = (Table) result;
+            final Iterator<Row> rows = table.iterator();
 
-            List<String> columnNames = table.getColumnNames();
+            final List<String> columnNames = table.getColumnNames();
+
             while (rows.hasNext()) {
-                Row row = rows.next();
-                Map<String, Object> map = new HashMap<String, Object>();
+                final Row row = rows.next();
+                final Map<String, Object> map = new HashMap<String, Object>();
                 for (String columnName : columnNames) {
                     map.put(columnName, prepareOutput(row.getColumn(columnName)));
                 }
 
-                results.add(msgpack.write(map));
+                packer.write(map);
             }
         } else if (result instanceof Iterable) {
             for (Object o : (Iterable) result) {
-                results.add(msgpack.write(prepareOutput(o)));
+                packer.write(prepareOutput(o));
             }
         } else if (result instanceof Iterator) {
-            Iterator itty = (Iterator) result;
+            final Iterator itty = (Iterator) result;
 
             while (itty.hasNext()) {
                 Object current = itty.next();
-                results.add(msgpack.write(prepareOutput(current)));
+                packer.write(prepareOutput(current));
             }
         } else {
-            results.add(msgpack.write(prepareOutput(result)));
-        }
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Packer packer = msgpack.createPacker(out);
-
-        for (byte[] someResult : results) {
-            packer.write(someResult, 0, someResult.length);
+            packer.write(prepareOutput(result));
         }
 
         return out.toByteArray();
@@ -71,12 +66,12 @@ public class MsgPackResultConverter implements ResultConverter<byte[]> {
             return null;
         }
         if (object instanceof Element) {
-            Map<String,Object> elementMap = new HashMap<String, Object>();
-            Element element = (Element) object;
+            final Map<String,Object> elementMap = new HashMap<String, Object>();
+            final Element element = (Element) object;
             elementMap.put("id", element.getId());
             
             if (element instanceof Edge) {
-                Edge edge = (Edge) element;
+                final Edge edge = (Edge) element;
                 elementMap.put("type", Tokens.EDGE);
                 elementMap.put("in", edge.getVertex(Direction.IN).getId());
                 elementMap.put("out", edge.getVertex(Direction.OUT).getId());
@@ -85,10 +80,10 @@ public class MsgPackResultConverter implements ResultConverter<byte[]> {
                 elementMap.put("type", Tokens.VERTEX);
             }
 
-            Map<String, Object> elementProperties = new HashMap<String, Object>(); 
-            Iterator<String> itty = element.getPropertyKeys().iterator();
+            final Map<String, Object> elementProperties = new HashMap<String, Object>();
+            final Iterator<String> itty = element.getPropertyKeys().iterator();
             while (itty.hasNext()) {
-                String propertyKey = itty.next();
+                final String propertyKey = itty.next();
                 elementProperties.put(propertyKey, this.prepareOutput(element.getProperty(propertyKey)));
             }
 
@@ -96,8 +91,8 @@ public class MsgPackResultConverter implements ResultConverter<byte[]> {
                     
             return elementMap;
         } else if (object instanceof Map) {
-            Map<String, Object> msgPackMap = new HashMap<String, Object>();
-            Map map = (Map) object;
+            final Map<String, Object> msgPackMap = new HashMap<String, Object>();
+            final Map map = (Map) object;
             for (Object key : map.keySet()) {
                 // TODO: rethink this key conversion
                 msgPackMap.put(key == null ? null : key.toString(), this.prepareOutput(map.get(key)));

@@ -4,14 +4,19 @@ import com.tinkerpop.pipes.util.structures.Table;
 import org.junit.Assert;
 import org.junit.Test;
 import org.msgpack.MessagePack;
+import org.msgpack.template.Template;
+import org.msgpack.type.MapValue;
 import org.msgpack.type.Value;
 import org.msgpack.type.ValueFactory;
 import org.msgpack.unpacker.Converter;
+import org.msgpack.unpacker.Unpacker;
+import org.msgpack.unpacker.UnpackerIterator;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import static org.msgpack.template.Templates.tMap;
@@ -23,18 +28,19 @@ public class MsgPackResultConverterTest {
 
     private MsgPackResultConverter converter = new MsgPackResultConverter();
     private MessagePack msgpack = new MessagePack();
-    /*
+
     @Test
     public void convertNullResultReturnsNull() throws Exception {
         byte[] results = this.converter.convert(null);
-        Assert.assertNull(results);
+        Assert.assertNotNull(results);
+        Assert.assertTrue(msgpack.read(results).isNilValue());
     }
 
     @Test
     public void convertJSONObjectNullResultReturnsNull() throws Exception {
         byte[] results = this.converter.convert(ValueFactory.createNilValue());
         Assert.assertNotNull(results);
-        Assert.assertEquals(1, results.size());
+        Assert.assertTrue(msgpack.read(results).isNilValue());
     }
 
     @Test
@@ -43,31 +49,26 @@ public class MsgPackResultConverterTest {
         table.addRow("x1", "x2");
         table.addRow("y1", "y2");
 
-        List<byte[]> results = this.converter.convert(table);
+        byte[] results = this.converter.convert(table);
 
         Assert.assertNotNull(results);
-        Assert.assertEquals(2, results.size());
 
-        boolean rowMatchX = false;
-        boolean rowMatchY = false;
-        
-        for (int ix = 0; ix < results.size(); ix++) {
-            Map<String, String> row = msgpack.read(results.get(ix), tMap(TString, TString));
+        final InputStream inputStream = new ByteArrayInputStream(results);
+        final Unpacker unpacker = msgpack.createUnpacker(inputStream);
 
-            Assert.assertNotNull(row);
-            Assert.assertTrue(row.containsKey("col1"));
-            Assert.assertTrue(row.containsKey("col2"));
+        final Template<Map<String, String>> mapTmpl = tMap(TString, TString);
 
-            if (row.get("col1").equals("x1") && row.get("col2").equals("x2")) {
-                rowMatchX = true;
-            }
+        Map<String, String> mapX = unpacker.read(mapTmpl);
+        Assert.assertTrue(mapX.containsKey("col1"));
+        Assert.assertTrue(mapX.containsKey("col2"));
+        Assert.assertEquals("x1", mapX.get("col1"));
+        Assert.assertEquals("x2", mapX.get("col2"));
 
-            if (row.get("col1").equals("y1") && row.get("col2").equals("y2")) {
-                rowMatchY = true;
-            }
-        }
-
-        Assert.assertTrue(rowMatchX && rowMatchY);
+        Map<String, String> mapY = unpacker.read(mapTmpl);
+        Assert.assertTrue(mapY.containsKey("col1"));
+        Assert.assertTrue(mapY.containsKey("col2"));
+        Assert.assertEquals("y1", mapY.get("col1"));
+        Assert.assertEquals("y2", mapY.get("col2"));
     }
 
     @Test
@@ -78,13 +79,33 @@ public class MsgPackResultConverterTest {
         funList.add(new FunObject("y"));
         Iterable<FunObject> iterable = funList;
 
-        List<byte[]> converted = this.converter.convert(iterable);
+        byte[] converted = this.converter.convert(iterable);
 
         Assert.assertNotNull(converted);
-        Assert.assertEquals(2, converted.size());
 
-        Assert.assertEquals("x", msgpack.read(converted.get(0), TString));
-        Assert.assertEquals("y", msgpack.read(converted.get(1), TString));
+        final InputStream inputStream = new ByteArrayInputStream(converted);
+        final Unpacker unpacker = msgpack.createUnpacker(inputStream);
+        final UnpackerIterator unpackerItty = unpacker.iterator();
+
+        int counter = 0;
+        boolean matchX = false;
+        boolean matchY = false;
+
+        while (unpackerItty.hasNext()) {
+            final Value v = unpackerItty.next();
+            if (v.asRawValue().getString().equals("x")) {
+                matchX = true;
+            }
+
+            if (v.asRawValue().getString().equals("y")) {
+                matchY = true;
+            }
+
+            counter++;
+        }
+
+        Assert.assertEquals(2, counter);
+        Assert.assertTrue(matchX && matchY);
     }
 
     @Test
@@ -95,13 +116,31 @@ public class MsgPackResultConverterTest {
         funList.add(new FunObject("y"));
         Iterator<FunObject> iterable = funList.iterator();
 
-        List<byte[]> converted = this.converter.convert(iterable);
+        byte[] converted = this.converter.convert(iterable);
 
-        Assert.assertNotNull(converted);
-        Assert.assertEquals(2, converted.size());
+        final InputStream inputStream = new ByteArrayInputStream(converted);
+        final Unpacker unpacker = msgpack.createUnpacker(inputStream);
+        final UnpackerIterator unpackerItty = unpacker.iterator();
 
-        Assert.assertEquals("x", msgpack.read(converted.get(0), TString));
-        Assert.assertEquals("y", msgpack.read(converted.get(1), TString));
+        int counter = 0;
+        boolean matchX = false;
+        boolean matchY = false;
+
+        while (unpackerItty.hasNext()) {
+            final Value v = unpackerItty.next();
+            if (v.asRawValue().getString().equals("x")) {
+                matchX = true;
+            }
+
+            if (v.asRawValue().getString().equals("y")) {
+                matchY = true;
+            }
+
+            counter++;
+        }
+
+        Assert.assertEquals(2, counter);
+        Assert.assertTrue(matchX && matchY);
     }
 
     @Test
@@ -113,14 +152,36 @@ public class MsgPackResultConverterTest {
         funList.add(new FunObject("y"));
         Iterator<FunObject> iterable = funList.iterator();
 
-        List<byte[]> converted = this.converter.convert(iterable);
+        byte[] converted = this.converter.convert(iterable);
 
-        Assert.assertNotNull(converted);
-        Assert.assertEquals(3, converted.size());
+        final InputStream inputStream = new ByteArrayInputStream(converted);
+        final Unpacker unpacker = msgpack.createUnpacker(inputStream);
+        final UnpackerIterator unpackerItty = unpacker.iterator();
 
-        Assert.assertEquals("x", msgpack.read(converted.get(0), TString));
-        Assert.assertTrue(msgpack.read(converted.get(1)).isNilValue());
-        Assert.assertEquals("y", msgpack.read(converted.get(2), TString));
+        int counter = 0;
+        boolean matchX = false;
+        boolean matchY = false;
+        boolean matchNil = false;
+
+        while (unpackerItty.hasNext()) {
+            final Value v = unpackerItty.next();
+            if (v.isRawValue() && v.asRawValue().getString().equals("x")) {
+                matchX = true;
+            }
+
+            if (v.isRawValue() && v.asRawValue().getString().equals("y")) {
+                matchY = true;
+            }
+
+            if (v.isNilValue()) {
+                matchNil = true;
+            }
+
+            counter++;
+        }
+
+        Assert.assertEquals(3, counter);
+        Assert.assertTrue(matchX && matchY && matchNil);
 
     }
 
@@ -134,18 +195,23 @@ public class MsgPackResultConverterTest {
         map.put("y", "some");
         map.put("z", innerMap);
 
-        List<byte[]> converted = this.converter.convert(map);
+        byte[] converted = this.converter.convert(map);
 
         Assert.assertNotNull(converted);
-        Assert.assertEquals(1, converted.size());
 
-        byte[] msgPacked = converted.get(0);
-        Map<String, Value> mapValue = msgpack.read(msgPacked, tMap(TString, TValue));
+        final InputStream inputStream = new ByteArrayInputStream(converted);
+        final Unpacker unpacker = msgpack.createUnpacker(inputStream);
+        final Template<Map<String, Value>> mapTmpl = tMap(TString, TValue);
 
-        Assert.assertEquals("some", mapValue.get("y").asRawValue().getString());
-        Assert.assertEquals("x", mapValue.get("x").asRawValue().getString());
+        Map<String, Value> unpackedMap = unpacker.read(mapTmpl);
+        Assert.assertTrue(unpackedMap.containsKey("x"));
+        Assert.assertTrue(unpackedMap.containsKey("y"));
+        Assert.assertTrue(unpackedMap.containsKey("z"));
+        Assert.assertEquals("x", unpackedMap.get("x").asRawValue().getString());
+        Assert.assertEquals("some", unpackedMap.get("y").asRawValue().getString());
 
-        Map innerMapValue = new Converter(mapValue.get("z").asMapValue()).read(tMap(TString, TString));
+        MapValue mapValue = unpackedMap.get("z").asMapValue();
+        Map innerMapValue = new Converter(mapValue).read(tMap(TString, TString));
         Assert.assertNotNull(innerMapValue);
         Assert.assertEquals("b", innerMapValue.get("a"));
     }
@@ -161,5 +227,4 @@ public class MsgPackResultConverterTest {
             return this.val;
         }
     }
-    */
 }
