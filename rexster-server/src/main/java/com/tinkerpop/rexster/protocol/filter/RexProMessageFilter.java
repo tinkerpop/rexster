@@ -43,12 +43,6 @@ public class RexProMessageFilter extends BaseFilter {
             return ctx.getStopAction(sourceBuffer);
         }
 
-        /*
-        byte[] grr = new byte[sourceBufferLength];
-        sourceBuffer.get(grr);
-        sourceBuffer.rewind();
-        */
-
         final byte messageType = sourceBuffer.get(0);
         final int bodyLength = sourceBuffer.getInt(1);
         final int completeMessageLength = 5 + bodyLength;

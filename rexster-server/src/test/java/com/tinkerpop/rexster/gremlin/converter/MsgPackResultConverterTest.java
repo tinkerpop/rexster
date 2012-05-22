@@ -8,6 +8,7 @@ import org.msgpack.template.Template;
 import org.msgpack.type.MapValue;
 import org.msgpack.type.Value;
 import org.msgpack.type.ValueFactory;
+import org.msgpack.unpacker.BufferUnpacker;
 import org.msgpack.unpacker.Converter;
 import org.msgpack.unpacker.Unpacker;
 import org.msgpack.unpacker.UnpackerIterator;
@@ -53,8 +54,7 @@ public class MsgPackResultConverterTest {
 
         Assert.assertNotNull(results);
 
-        final InputStream inputStream = new ByteArrayInputStream(results);
-        final Unpacker unpacker = msgpack.createUnpacker(inputStream);
+        final BufferUnpacker unpacker = msgpack.createBufferUnpacker(results);
 
         final Template<Map<String, String>> mapTmpl = tMap(TString, TString);
 
@@ -83,8 +83,7 @@ public class MsgPackResultConverterTest {
 
         Assert.assertNotNull(converted);
 
-        final InputStream inputStream = new ByteArrayInputStream(converted);
-        final Unpacker unpacker = msgpack.createUnpacker(inputStream);
+        final BufferUnpacker unpacker = msgpack.createBufferUnpacker(converted);
         final UnpackerIterator unpackerItty = unpacker.iterator();
 
         int counter = 0;
@@ -118,8 +117,7 @@ public class MsgPackResultConverterTest {
 
         byte[] converted = this.converter.convert(iterable);
 
-        final InputStream inputStream = new ByteArrayInputStream(converted);
-        final Unpacker unpacker = msgpack.createUnpacker(inputStream);
+        final BufferUnpacker unpacker = msgpack.createBufferUnpacker(converted);
         final UnpackerIterator unpackerItty = unpacker.iterator();
 
         int counter = 0;
@@ -154,8 +152,7 @@ public class MsgPackResultConverterTest {
 
         byte[] converted = this.converter.convert(iterable);
 
-        final InputStream inputStream = new ByteArrayInputStream(converted);
-        final Unpacker unpacker = msgpack.createUnpacker(inputStream);
+        final BufferUnpacker unpacker = msgpack.createBufferUnpacker(converted);
         final UnpackerIterator unpackerItty = unpacker.iterator();
 
         int counter = 0;
@@ -199,8 +196,7 @@ public class MsgPackResultConverterTest {
 
         Assert.assertNotNull(converted);
 
-        final InputStream inputStream = new ByteArrayInputStream(converted);
-        final Unpacker unpacker = msgpack.createUnpacker(inputStream);
+        final BufferUnpacker unpacker = msgpack.createBufferUnpacker(converted);
         final Template<Map<String, Value>> mapTmpl = tMap(TString, TValue);
 
         Map<String, Value> unpackedMap = unpacker.read(mapTmpl);

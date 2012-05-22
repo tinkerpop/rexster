@@ -43,7 +43,36 @@ public class RexProMsgPack {
     }};
     
     public static void main(String[] args) {
-       
+        bigCalls();
+    }
+
+    private static void bigCalls() {
+        long start = System.currentTimeMillis();
+
+        RestHelper.Authentication = new RexsterAuthentication(null, null);
+        JSONObject restResult = RestHelper.get("http://localhost:8182/graphs/gratefulgraph/tp/gremlin?script=g.V");
+        restResult = RestHelper.get("http://localhost:8182/graphs/gratefulgraph/tp/gremlin?script=g.E");
+
+        long checkpoint = System.currentTimeMillis();
+
+        try {
+            RemoteRexsterSession session = new RemoteRexsterSession("localhost", 8184, 100, "", "", SessionRequestMessage.CHANNEL_MSGPACK);
+            session.open();
+
+            MsgPackScriptResponseMessage resultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
+                    createScriptRequestMessage(session, "g=rexster.getGraph('gratefulgraph');g.V;"), 100);
+            resultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
+                    createScriptRequestMessage(session, "g.E;"), 100);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+
+        System.out.println((checkpoint - start) + ":" + (System.currentTimeMillis() - checkpoint));
+    }
+
+    private static void lotsOfCalls(){
         long start = System.currentTimeMillis();
 
         RestHelper.Authentication = new RexsterAuthentication(null, null);
@@ -63,7 +92,7 @@ public class RexProMsgPack {
         }
 
         long checkpoint = System.currentTimeMillis();
-        
+
         try {
             RemoteRexsterSession session = new RemoteRexsterSession("localhost", 8184, 100, "", "", SessionRequestMessage.CHANNEL_MSGPACK);
             session.open();
@@ -74,7 +103,7 @@ public class RexProMsgPack {
             MessagePack msgpack = new MessagePack();
 
             Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(resultMessage.Results));
-            
+
             Iterator<Value> itty = unpacker.iterator();
             unpacker.close();
             while (itty.hasNext()){
@@ -111,7 +140,7 @@ public class RexProMsgPack {
 
                 System.out.println(new Converter(valueEdge).read(tMap(TString, TValue)));
             }
-            
+
             System.out.println((checkpoint - start) + ":" + (System.currentTimeMillis() - checkpoint));
         } catch (Exception ex) {
             ex.printStackTrace();

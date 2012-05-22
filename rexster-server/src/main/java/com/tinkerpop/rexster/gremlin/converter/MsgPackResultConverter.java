@@ -7,6 +7,7 @@ import com.tinkerpop.pipes.util.structures.Row;
 import com.tinkerpop.pipes.util.structures.Table;
 import com.tinkerpop.rexster.Tokens;
 import org.msgpack.MessagePack;
+import org.msgpack.packer.BufferPacker;
 import org.msgpack.packer.Packer;
 import org.msgpack.type.NilValue;
 import org.msgpack.type.ValueFactory;
@@ -16,99 +17,109 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Converts a result from Gremlin to a byte array encoded by MsgPack.
  */
 public class MsgPackResultConverter implements ResultConverter<byte[]> {
+    private final MessagePack msgpack = new MessagePack();
 
     public byte[] convert(final Object result) throws Exception {
-        final MessagePack msgpack = new MessagePack();
+        BufferPacker packer = msgpack.createBufferPacker(1024);
+        prepareOutput(result, packer);
+        return packer.toByteArray();
+    }
 
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        final Packer packer = msgpack.createPacker(out);
-
-        if (result == null) {
+    private void prepareOutput(Object object, Packer packer) throws Exception {
+        if (object == null) {
             packer.write(ValueFactory.createNilValue());
-        } else if (result instanceof Table) {
-            final Table table = (Table) result;
+        } else if (object instanceof String) {
+            packer.write((String) object);
+        } else if (object instanceof Number) {
+            packer.write(object);
+        } else if (object instanceof Boolean) {
+            packer.write((Boolean) object);
+        } else if (object instanceof Element) {
+            final Element element = (Element) object;
+            final Set<String> propertyKeys = element.getPropertyKeys();
+            final boolean isVertex = element instanceof Edge;
+            final int elementSize = isVertex ? 3 : 6;
+
+            packer.writeMapBegin(elementSize);
+            packer.write("id");
+            packer.write(element.getId());
+            
+            if (element instanceof Edge) {
+                final Edge edge = (Edge) element;
+                packer.write("type");
+                packer.write(Tokens.EDGE);
+                packer.write("in");
+                packer.write(edge.getVertex(Direction.IN).getId());
+                packer.write("out");
+                packer.write(edge.getVertex(Direction.OUT).getId());
+                packer.write("label");
+                packer.write(edge.getLabel());
+            } else {
+                packer.write("type");
+                packer.write(Tokens.VERTEX);
+            }
+
+            if (propertyKeys.size() > 0) {
+                packer.write("properties");
+                packer.writeMapBegin(propertyKeys.size());
+
+                final Iterator<String> itty = propertyKeys.iterator();
+                while (itty.hasNext()) {
+                    final String propertyKey = itty.next();
+                    packer.write(propertyKey);
+                    this.prepareOutput(element.getProperty(propertyKey), packer);
+                }
+
+                packer.writeMapEnd(false);
+            }
+
+            packer.writeMapEnd(false);
+        } else if (object instanceof Map) {
+            final Map map = (Map) object;
+
+            packer.writeMapBegin(map.size());
+            for (Object key : map.keySet()) {
+                // TODO: rethink this key conversion
+                packer.write(key == null ? null : key.toString());
+                this.prepareOutput(map.get(key), packer);
+            }
+        } else if (object instanceof Table) {
+            final Table table = (Table) object;
             final Iterator<Row> rows = table.iterator();
 
             final List<String> columnNames = table.getColumnNames();
 
             while (rows.hasNext()) {
                 final Row row = rows.next();
-                final Map<String, Object> map = new HashMap<String, Object>();
+
+                packer.writeMapBegin(table.size());
                 for (String columnName : columnNames) {
-                    map.put(columnName, prepareOutput(row.getColumn(columnName)));
+                    packer.write(columnName);
+                    prepareOutput(row.getColumn(columnName), packer);
                 }
 
-                packer.write(map);
+                packer.writeMapEnd(false);
             }
-        } else if (result instanceof Iterable) {
-            for (Object o : (Iterable) result) {
-                packer.write(prepareOutput(o));
+        } else if (object instanceof Iterable) {
+            for (Object o : (Iterable) object) {
+                prepareOutput(o, packer);
             }
-        } else if (result instanceof Iterator) {
-            final Iterator itty = (Iterator) result;
-
+        } else if (object instanceof Iterator) {
+            final Iterator itty = (Iterator) object;
             while (itty.hasNext()) {
                 Object current = itty.next();
-                packer.write(prepareOutput(current));
+                prepareOutput(current, packer);
             }
-        } else {
-            packer.write(prepareOutput(result));
-        }
-
-        return out.toByteArray();
-    }
-
-    private Object prepareOutput(Object object) throws Exception {
-        if (object == null) {
-            return null;
-        }
-        if (object instanceof Element) {
-            final Map<String,Object> elementMap = new HashMap<String, Object>();
-            final Element element = (Element) object;
-            elementMap.put("id", element.getId());
-            
-            if (element instanceof Edge) {
-                final Edge edge = (Edge) element;
-                elementMap.put("type", Tokens.EDGE);
-                elementMap.put("in", edge.getVertex(Direction.IN).getId());
-                elementMap.put("out", edge.getVertex(Direction.OUT).getId());
-                elementMap.put("label", edge.getLabel());
-            } else {
-                elementMap.put("type", Tokens.VERTEX);
-            }
-
-            final Map<String, Object> elementProperties = new HashMap<String, Object>();
-            final Iterator<String> itty = element.getPropertyKeys().iterator();
-            while (itty.hasNext()) {
-                final String propertyKey = itty.next();
-                elementProperties.put(propertyKey, this.prepareOutput(element.getProperty(propertyKey)));
-            }
-
-            elementMap.put("properties", elementProperties);
-                    
-            return elementMap;
-        } else if (object instanceof Map) {
-            final Map<String, Object> msgPackMap = new HashMap<String, Object>();
-            final Map map = (Map) object;
-            for (Object key : map.keySet()) {
-                // TODO: rethink this key conversion
-                msgPackMap.put(key == null ? null : key.toString(), this.prepareOutput(map.get(key)));
-            }
-
-            return msgPackMap;
-        } else if (object instanceof Table || object instanceof Iterable || object instanceof Iterator) {
-            return this.convert(object);
-        } else if (object instanceof Number || object instanceof Boolean) {
-            return object;
         } else if (object instanceof NilValue) {
-            return ValueFactory.createNilValue();
+            packer.write((NilValue) object);
         } else {
-            return object.toString();
+            packer.write(object.toString());
         }
     }
 }
