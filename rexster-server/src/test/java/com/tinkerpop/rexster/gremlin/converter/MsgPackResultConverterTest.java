@@ -1,5 +1,7 @@
 package com.tinkerpop.rexster.gremlin.converter;
 
+import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.pipes.util.structures.Table;
 import org.junit.Assert;
 import org.junit.Test;
@@ -69,6 +71,22 @@ public class MsgPackResultConverterTest {
         Assert.assertTrue(mapY.containsKey("col2"));
         Assert.assertEquals("y1", mapY.get("col1"));
         Assert.assertEquals("y2", mapY.get("col2"));
+    }
+
+    @Test
+    public void convertElements() throws Exception {
+        TinkerGraph g = TinkerGraphFactory.createTinkerGraph();
+        byte[] converted = this.converter.convert(g.getVertices());
+
+        final BufferUnpacker unpacker = msgpack.createBufferUnpacker(converted);
+        final UnpackerIterator unpackerItty = unpacker.iterator();
+        int counter = 0;
+        while (unpackerItty.hasNext()) {
+            unpackerItty.next();
+            counter++;
+        }
+
+        Assert.assertEquals(6, counter);
     }
 
     @Test

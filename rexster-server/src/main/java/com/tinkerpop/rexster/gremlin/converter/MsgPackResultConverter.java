@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.gremlin.converter;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.pipes.util.structures.Row;
 import com.tinkerpop.pipes.util.structures.Table;
 import com.tinkerpop.rexster.Tokens;
@@ -12,8 +13,6 @@ import org.msgpack.packer.Packer;
 import org.msgpack.type.NilValue;
 import org.msgpack.type.ValueFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -34,40 +33,37 @@ public class MsgPackResultConverter implements ResultConverter<byte[]> {
     private void prepareOutput(Object object, Packer packer) throws Exception {
         if (object == null) {
             packer.write(ValueFactory.createNilValue());
-        } else if (object instanceof String) {
-            packer.write((String) object);
-        } else if (object instanceof Number) {
+        } else if (object instanceof String || object instanceof Number || object instanceof Boolean) {
             packer.write(object);
-        } else if (object instanceof Boolean) {
-            packer.write((Boolean) object);
         } else if (object instanceof Element) {
             final Element element = (Element) object;
             final Set<String> propertyKeys = element.getPropertyKeys();
-            final boolean isVertex = element instanceof Edge;
-            final int elementSize = isVertex ? 3 : 6;
+            final int propertySize = propertyKeys.size();
+            final boolean isVertex = element instanceof Vertex;
+            final int elementSize = (isVertex ? 2 : 5) + ((propertySize > 0) ? 1 : 0);
 
             packer.writeMapBegin(elementSize);
-            packer.write("id");
+            packer.write(Tokens._ID);
             packer.write(element.getId());
             
-            if (element instanceof Edge) {
-                final Edge edge = (Edge) element;
-                packer.write("type");
-                packer.write(Tokens.EDGE);
-                packer.write("in");
-                packer.write(edge.getVertex(Direction.IN).getId());
-                packer.write("out");
-                packer.write(edge.getVertex(Direction.OUT).getId());
-                packer.write("label");
-                packer.write(edge.getLabel());
-            } else {
-                packer.write("type");
+            if (isVertex) {
+                packer.write(Tokens._TYPE);
                 packer.write(Tokens.VERTEX);
+            } else {
+                final Edge edge = (Edge) element;
+                packer.write(Tokens._TYPE);
+                packer.write(Tokens.EDGE);
+                packer.write(Tokens._IN_V);
+                packer.write(edge.getVertex(Direction.IN).getId());
+                packer.write(Tokens._OUT_V);
+                packer.write(edge.getVertex(Direction.OUT).getId());
+                packer.write(Tokens._LABEL);
+                packer.write(edge.getLabel());
             }
 
             if (propertyKeys.size() > 0) {
-                packer.write("properties");
-                packer.writeMapBegin(propertyKeys.size());
+                packer.write(Tokens._PROPERTIES);
+                packer.writeMapBegin(propertySize);
 
                 final Iterator<String> itty = propertyKeys.iterator();
                 while (itty.hasNext()) {
@@ -85,7 +81,6 @@ public class MsgPackResultConverter implements ResultConverter<byte[]> {
 
             packer.writeMapBegin(map.size());
             for (Object key : map.keySet()) {
-                // TODO: rethink this key conversion
                 packer.write(key == null ? null : key.toString());
                 this.prepareOutput(map.get(key), packer);
             }
@@ -113,8 +108,7 @@ public class MsgPackResultConverter implements ResultConverter<byte[]> {
         } else if (object instanceof Iterator) {
             final Iterator itty = (Iterator) object;
             while (itty.hasNext()) {
-                Object current = itty.next();
-                prepareOutput(current, packer);
+                prepareOutput(itty.next(), packer);
             }
         } else if (object instanceof NilValue) {
             packer.write((NilValue) object);

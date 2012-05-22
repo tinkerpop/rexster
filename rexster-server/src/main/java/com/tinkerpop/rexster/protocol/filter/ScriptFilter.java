@@ -49,7 +49,7 @@ public class ScriptFilter extends BaseFilter {
                     msgPackScriptResponseMessage.Flag = MsgPackScriptResponseMessage.FLAG_COMPLETE_MESSAGE;
                     msgPackScriptResponseMessage.Session = specificMessage.Session;
                     msgPackScriptResponseMessage.Request = specificMessage.Request;
-                    msgPackScriptResponseMessage.Results = MsgPackScriptResponseMessage.convertResultToConsoleLines(result);
+                    msgPackScriptResponseMessage.Results = MsgPackScriptResponseMessage.convertResultToBytes(result);
                     
                     messageList.add(msgPackScriptResponseMessage);
                 }

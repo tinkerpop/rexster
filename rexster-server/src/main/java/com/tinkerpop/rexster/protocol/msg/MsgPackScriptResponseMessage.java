@@ -10,7 +10,7 @@ public class MsgPackScriptResponseMessage extends RexProMessage {
     public byte[] Results;
     public byte[] Bindings;
 
-    public static byte[] convertResultToConsoleLines(Object result) throws Exception {
+    public static byte[] convertResultToBytes(Object result) throws Exception {
         return converter.convert(result);
     }
 }

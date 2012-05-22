@@ -2,6 +2,7 @@ package com.tinkerpop.rexster;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class Tokens {
 
@@ -13,6 +14,7 @@ public class Tokens {
     public static final String _LABEL = "_label";
     public static final String _OUT_V = "_outV";
     public static final String _IN_V = "_inV";
+    public static final String _PROPERTIES = "_properties";
     public static final String VERTEX = "vertex";
     public static final String EDGE = "edge";
     public static final String RESULTS = "results";
