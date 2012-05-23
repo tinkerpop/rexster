@@ -11,8 +11,10 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.msgpack.MessagePack;
 import org.msgpack.type.Value;
+import org.msgpack.unpacker.BufferUnpacker;
 import org.msgpack.unpacker.Converter;
 import org.msgpack.unpacker.Unpacker;
+import org.msgpack.unpacker.UnpackerIterator;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -43,73 +45,107 @@ public class RexProMsgPack {
     }};
     
     public static void main(String[] args) {
-       
-        long start = System.currentTimeMillis();
+        //bigCalls();
+        lotsOfCalls(false);
+    }
+
+    private static void bigCalls() {
+
+        RemoteRexsterSession session = new RemoteRexsterSession("localhost", 8184, 100, "", "",
+                SessionRequestMessage.CHANNEL_MSGPACK);
+        session.open();
 
         RestHelper.Authentication = new RexsterAuthentication(null, null);
 
+        long start = System.currentTimeMillis();
+
         JSONObject restResult = RestHelper.get("http://localhost:8182/graphs/gratefulgraph/tp/gremlin?script=g.V");
-        JSONArray restVertices = restResult.optJSONArray(Tokens.RESULTS);
-        for (int ix =0; ix < restVertices.length(); ix++)  {
-            JSONObject restVertex = RestHelper.get("http://localhost:8182/graphs/gratefulgraph/tp/gremlin?script=g.v(" + restVertices.optJSONObject(ix).optString(Tokens._ID) + ")");
-            System.out.println(restVertex);
+        restResult = RestHelper.get("http://localhost:8182/graphs/gratefulgraph/tp/gremlin?script=g.E");
+
+        long checkpoint = System.currentTimeMillis();
+
+        try {
+            MsgPackScriptResponseMessage resultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
+                    createScriptRequestMessage(session, "g=rexster.getGraph('gratefulgraph');g.V;"), 100);
+            resultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
+                    createScriptRequestMessage(session, "g.E;"), 100);
+            System.out.println((checkpoint - start) + ":" + (System.currentTimeMillis() - checkpoint));
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
-        restResult = RestHelper.get("http://localhost:8182/graphs/gratefulgraph/tp/gremlin?script=g.E");
-        JSONArray restEdges = restResult.optJSONArray(Tokens.RESULTS);
-        for (int ix =0; ix < restEdges.length(); ix++)  {
-            JSONObject restEdge = RestHelper.get("http://localhost:8182/graphs/gratefulgraph/tp/gremlin?script=g.e(" + restEdges.optJSONObject(ix).optString(Tokens._ID) + ")");
-            System.out.println(restEdge);
+
+    }
+
+    private static void lotsOfCalls(boolean doJson){
+
+        RemoteRexsterSession session = new RemoteRexsterSession("localhost", 8184, 100, "", "", SessionRequestMessage.CHANNEL_MSGPACK);
+        session.open();
+        RestHelper.Authentication = new RexsterAuthentication(null, null);
+
+        MessagePack msgpack = new MessagePack();
+
+        long start = System.currentTimeMillis();
+
+        if (doJson) {
+            JSONObject restResult = RestHelper.get("http://localhost:8182/graphs/gratefulgraph/tp/gremlin?script=g.V");
+            JSONArray restVertices = restResult.optJSONArray(Tokens.RESULTS);
+            for (int ix =0; ix < restVertices.length(); ix++)  {
+                JSONObject restVertex = RestHelper.get("http://localhost:8182/graphs/gratefulgraph/tp/gremlin?script=g.v(" + restVertices.optJSONObject(ix).optString(Tokens._ID) + ")");
+                System.out.println(restVertex);
+            }
+
+            restResult = RestHelper.get("http://localhost:8182/graphs/gratefulgraph/tp/gremlin?script=g.E");
+            JSONArray restEdges = restResult.optJSONArray(Tokens.RESULTS);
+            for (int ix =0; ix < restEdges.length(); ix++)  {
+                JSONObject restEdge = RestHelper.get("http://localhost:8182/graphs/gratefulgraph/tp/gremlin?script=g.e(" + restEdges.optJSONObject(ix).optString(Tokens._ID) + ")");
+                System.out.println(restEdge);
+            }
         }
 
         long checkpoint = System.currentTimeMillis();
-        
+
         try {
-            RemoteRexsterSession session = new RemoteRexsterSession("localhost", 8184, 100, "", "", SessionRequestMessage.CHANNEL_MSGPACK);
-            session.open();
 
             MsgPackScriptResponseMessage resultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
                     createScriptRequestMessage(session, "g=rexster.getGraph('gratefulgraph');g.V;"), 100);
 
-            MessagePack msgpack = new MessagePack();
+            BufferUnpacker unpacker = msgpack.createBufferUnpacker(resultMessage.Results);
+            unpacker.setArraySizeLimit(Integer.MAX_VALUE);
+            unpacker.setMapSizeLimit(Integer.MAX_VALUE);
+            unpacker.setRawSizeLimit(Integer.MAX_VALUE);
 
-            Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(resultMessage.Results));
-            
-            Iterator<Value> itty = unpacker.iterator();
-            unpacker.close();
+            UnpackerIterator itty = unpacker.iterator();
             while (itty.hasNext()){
-                Map<String,Value> map = new Converter(msgpack.read(itty.next().asRawValue().getByteArray())).read(tMap(TString, TValue));
+                final Map<String,Value> map = new Converter(msgpack, itty.next()).read(tMap(TString, TValue));
+                final String vId = map.get(Tokens._ID).asRawValue().getString();
 
                 MsgPackScriptResponseMessage vertexResultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
-                        createScriptRequestMessage(session, "g.v(" + map.get("id") + ")"), 100);
+                        createScriptRequestMessage(session, "g.v(" + vId + ")"), 100);
 
-                unpacker = msgpack.createUnpacker(new ByteArrayInputStream(vertexResultMessage.Results));
-                Value valueVertex = msgpack.read(unpacker.iterator().next().asRawValue().getByteArray());
-                unpacker.close();
+                unpacker = msgpack.createBufferUnpacker(vertexResultMessage.Results);
+                System.out.println(unpacker.read(tMap(TString, TValue)));
 
-                System.out.println(new Converter(valueVertex).read(tMap(TString, TValue)));
             }
 
             resultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
                     createScriptRequestMessage(session, "g.E;"), 100);
 
-            unpacker = msgpack.createUnpacker(new ByteArrayInputStream(resultMessage.Results));
+            unpacker = msgpack.createBufferUnpacker(resultMessage.Results);
 
             itty = unpacker.iterator();
-            unpacker.close();
             while (itty.hasNext()){
-                Map<String,Value> map = new Converter(msgpack.read(itty.next().asRawValue().getByteArray())).read(tMap(TString, TValue));
+                final Map<String,Value> map = new Converter(msgpack, itty.next()).read(tMap(TString, TValue));
+                final String eId = map.get(Tokens._ID).asRawValue().getString();
 
                 MsgPackScriptResponseMessage edgeResultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
-                        createScriptRequestMessage(session, "g.e(" + map.get("id") + ")"), 100);
+                        createScriptRequestMessage(session, "g.e(" + eId + ")"), 100);
 
-                unpacker = msgpack.createUnpacker(new ByteArrayInputStream(edgeResultMessage.Results));
-                Value valueEdge = msgpack.read(unpacker.iterator().next().asRawValue().getByteArray());
-                unpacker.close();
-
-                System.out.println(new Converter(valueEdge).read(tMap(TString, TValue)));
+                unpacker = msgpack.createBufferUnpacker(edgeResultMessage.Results);
+                System.out.println(unpacker.read(tMap(TString, TValue)));
             }
-            
+
             System.out.println((checkpoint - start) + ":" + (System.currentTimeMillis() - checkpoint));
         } catch (Exception ex) {
             ex.printStackTrace();
