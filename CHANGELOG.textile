@@ -1,27 +1,29 @@
 Rexster: A Graph Server
 "http://rexster.tinkerpop.com":http://rexster.tinkerpop.com
 
-==<hr/>==
-
 h2. Rexster 0.y.z
 
-h3. Version 2.0.0 (NOT OFFICIALLY RELEASED YET)
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-2.png!
+
+h3. Version 2.0.0 (May 23, 2012)
 
 ```xml
 <dependency>
   <groupId>com.tinkerpop.rexster</groupId>
   <artifactId>rexster</artifactId>
-  <version>2.0.0-SNAPSHOT</version>
+  <version>2.0.0</version>
 </dependency>
 ```
 
-* REST API for POSTing new indices supports @params@ argument which constructs a parameter map which will configure the newly created index.
-* The DELETE operation for the Graph resource has been removed since Blueprints no longer supports Graph.clear().
-* The Index resource no longer has a @keys@ sub-resource nor the notion of "automatic" or "manual" indices due to changes in the Blueprints API.
-* Add metadata from graph @Features@ to the Graph resource.
-* @KeyIndexResource@ to access features of @KeyIndexableGraph@ instances.
-* @VertexResource@ and @EdgeResource@ support key index filtering.
-* Improved messaging to the server console regarding which @rexster.xml@ file is being loaded.
+* REST API for POSTing new indices supports @params@ argument which constructs a parameter map which will configure the newly created index
+* The DELETE operation for the Graph resource has been removed since Blueprints no longer supports @Graph.clear()@
+* The Index resource no longer has a @keys@ sub-resource nor the notion of "automatic" or "manual" indices due to changes in the Blueprints API
+* Add metadata from graph @Features@ to the Graph resource
+* @KeyIndexResource@ to access features of @KeyIndexableGraph@ instances
+* @VertexResource@ and @EdgeResource@ support key index filtering
+* Improved messaging to the server console regarding which @rexster.xml@ file is being loaded
+
+==<hr/>==
 
 h2. Rexster 0.x
 
