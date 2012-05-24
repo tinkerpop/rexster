@@ -1,4 +1,5 @@
 *.log
+/target
 /data
 /rexster-server/release
 /rexster-server/target
