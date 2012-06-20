@@ -113,12 +113,13 @@ public class WebServer {
         final Integer rexsterServerPort = properties.getInteger("rexster-server-port", new Integer(8182));
         final String rexsterServerHost = properties.getString("rexster-server-host", "0.0.0.0");
         final Integer rexproServerPort = properties.getInteger("rexpro-server-port", new Integer(8184));
+        final String rexproServerHost = properties.getString("rexpro-server-host", "0.0.0.0");
         final String webRootPath = properties.getString("web-root", DEFAULT_WEB_ROOT_PATH);
         final String baseUri = properties.getString("base-uri", DEFAULT_BASE_URI);
         characterEncoding = properties.getString("character-set", "ISO-8859-1");
 
         this.startRexsterServer(properties, baseUri, rexsterServerPort, rexsterServerHost, webRootPath);
-        this.startRexProServer(properties, rexproServerPort);
+        this.startRexProServer(properties, rexproServerPort, rexproServerHost);
 
     }
 
@@ -190,7 +191,8 @@ public class WebServer {
     }
 
     private void startRexProServer(final XMLConfiguration properties,
-                                   final Integer rexproServerPort) throws Exception {
+                                   final Integer rexproServerPort,
+                                   final String rexproServerHost) throws Exception {
         FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
         filterChainBuilder.add(new TransportFilter());
         filterChainBuilder.add(new RexProMessageFilter());
@@ -224,7 +226,7 @@ public class WebServer {
         this.rexproServer = TCPNIOTransportBuilder.newInstance().build();
         this.rexproServer.setIOStrategy(WorkerThreadIOStrategy.getInstance());
         this.rexproServer.setProcessor(filterChainBuilder.build());
-        this.rexproServer.bind(rexproServerPort);
+        this.rexproServer.bind(rexproServerHost, rexproServerPort);
 
         this.rexproServer.start();
 
