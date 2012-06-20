@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import org.apache.log4j.Logger;
@@ -132,19 +133,6 @@ public class KeyIndexResource extends AbstractSubResource {
     @DELETE
     @Path("{clazz}/{keyName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response deleteIndexKey(@PathParam("graphname") final String graphName, @PathParam("clazz") final String clazz, 
-                                   @PathParam("keyName") final String keyName, final JSONObject json) {
-        // initializes the request object with the data DELETEed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.setRequestObject(json);
-        return this.deleteIndexKey(graphName, clazz, keyName);
-    }
-
-    @DELETE
-    @Path("{clazz}/{keyName}")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response deleteIndexKey(@PathParam("graphname") final String graphName, @PathParam("clazz") final String clazz, 
                                    @PathParam("keyName") final String keyName) {
         final Class keyClass;
@@ -164,9 +152,12 @@ public class KeyIndexResource extends AbstractSubResource {
         
         try {
             graph.dropKeyIndex(keyName, keyClass);
+            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);
+
+            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
 
             final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
@@ -174,19 +165,6 @@ public class KeyIndexResource extends AbstractSubResource {
 
         return Response.ok(this.resultObject).build();
 
-    }
-
-    @POST
-    @Path("/{clazz}/{keyName}")
-    @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response postIndexKey(@PathParam("graphname") final String graphName, @PathParam("clazz") final String clazz,
-                                 @PathParam("keyName") final String keyName, final JSONObject json) {
-        // initializes the request object with the data POSTed to the resource.  URI parameters
-        // will then be ignored when the getRequestObject is called as the request object will
-        // have already been established.
-        this.setRequestObject(json);
-        return this.postIndexKey(graphName, clazz, keyName);
     }
 
     @POST
@@ -212,9 +190,12 @@ public class KeyIndexResource extends AbstractSubResource {
 
         try {
             graph.createKeyIndex(keyName, keyClass);
+            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);
+
+            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
 
             final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());

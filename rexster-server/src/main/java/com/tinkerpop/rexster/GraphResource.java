@@ -114,7 +114,7 @@ public class GraphResource extends AbstractSubResource {
     }
 
     @HEAD
-    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response headGraphExtension(@PathParam("graphname") String graphName, JSONObject json) {
         this.setRequestObject(json);
@@ -122,13 +122,13 @@ public class GraphResource extends AbstractSubResource {
     }
 
     @HEAD
-    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     public Response headGraphExtension(@PathParam("graphname") String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.HEAD);
     }
 
     @PUT
-    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response putGraphExtension(@PathParam("graphname") String graphName, JSONObject json) {
         this.setRequestObject(json);
@@ -136,13 +136,13 @@ public class GraphResource extends AbstractSubResource {
     }
 
     @PUT
-    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     public Response putGraphExtension(@PathParam("graphname") String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.PUT);
     }
 
     @OPTIONS
-    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response optionsGraphExtension(@PathParam("graphname") String graphName, JSONObject json) {
         this.setRequestObject(json);
@@ -150,13 +150,13 @@ public class GraphResource extends AbstractSubResource {
     }
 
     @OPTIONS
-    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     public Response optionsGraphExtension(@PathParam("graphname") String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.OPTIONS);
     }
 
     @DELETE
-    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteGraphExtension(@PathParam("graphname") String graphName, JSONObject json) {
         this.setRequestObject(json);
@@ -164,13 +164,13 @@ public class GraphResource extends AbstractSubResource {
     }
 
     @DELETE
-    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     public Response deleteGraphExtension(@PathParam("graphname") String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.DELETE);
     }
 
     @POST
-    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response postGraphExtension(@PathParam("graphname") String graphName, JSONObject json) {
         this.setRequestObject(json);
@@ -178,13 +178,13 @@ public class GraphResource extends AbstractSubResource {
     }
 
     @POST
-    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     public Response postGraphExtension(@PathParam("graphname") String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.POST);
     }
 
     @GET
-    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!prefixes).+}")
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     public Response getGraphExtension(@PathParam("graphname") String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.GET);
     }
