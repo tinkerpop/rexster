@@ -152,12 +152,18 @@ public class KeyIndexResource extends AbstractSubResource {
         
         try {
             graph.dropKeyIndex(keyName, keyClass);
-            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+
+            if (graph instanceof TransactionalGraph) {
+                ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            }
+
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);
 
-            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            if (graph instanceof TransactionalGraph) {
+                ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            }
 
             final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
@@ -190,12 +196,17 @@ public class KeyIndexResource extends AbstractSubResource {
 
         try {
             graph.createKeyIndex(keyName, keyClass);
-            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+
+            if (graph instanceof TransactionalGraph) {
+                ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            }
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);
 
-            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            if (graph instanceof TransactionalGraph) {
+                ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            }
 
             final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
