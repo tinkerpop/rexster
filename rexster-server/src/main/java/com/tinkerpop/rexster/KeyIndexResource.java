@@ -148,22 +148,19 @@ public class KeyIndexResource extends AbstractSubResource {
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
         }
 
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         final KeyIndexableGraph graph = this.getKeyIndexableGraph(graphName);
         
         try {
             graph.dropKeyIndex(keyName, keyClass);
 
-            if (graph instanceof TransactionalGraph) {
-                ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-            }
+            rag.tryStopTransactionSuccess();
 
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);
 
-            if (graph instanceof TransactionalGraph) {
-                ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            }
+            rag.tryStopTransactionFailure();
 
             final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
@@ -192,21 +189,19 @@ public class KeyIndexResource extends AbstractSubResource {
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
         }
 
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         final KeyIndexableGraph graph = this.getKeyIndexableGraph(graphName);
 
         try {
             graph.createKeyIndex(keyName, keyClass);
 
-            if (graph instanceof TransactionalGraph) {
-                ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-            }
+            rag.tryStopTransactionSuccess();
+
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);
 
-            if (graph instanceof TransactionalGraph) {
-                ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            }
+            rag.tryStopTransactionFailure();
 
             final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
