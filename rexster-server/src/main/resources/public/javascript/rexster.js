@@ -13,7 +13,15 @@ require(
             // only make this feature available to browsers that support it
             if (has("native-history-state")) {
                 window.onpopstate = function(event) {
-                    restoreApplication();
+                    var popped = ('state' in window.history), initialURL = location.href
+                    $(window).bind('popstate', function(event) {
+                      // Ignore inital popstate that some browsers fire on page load
+                      var initialPop = !popped && location.href == initialURL
+                      popped = true
+                      if ( initialPop ) return
+
+                        restoreApplication();
+                    });
                 };
             }
 
@@ -32,15 +40,8 @@ require(
             if (!state.hasOwnProperty("menu")) {
                 // since there is no menu selected initialized the graph page first.
                 history.historyPush("/doghouse/main/graph");
-
-                if (!has("native-history-state")) {
-                    restoreApplication()
-                }
-
-            } else {
-                if (!has("native-history-state")) {
-                    restoreApplication()
-                }
             }
+
+            restoreApplication();
         });
     });
