@@ -609,7 +609,7 @@ public class VertexResource extends AbstractSubResource {
                 || produces.equals(RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE);
 
         try {
-            rag.tryStartTransaction();
+            //rag.tryStartTransaction();
 
             // blueprints throws IllegalArgumentException if the id is null
             Vertex vertex = id == null ? null : graph.getVertex(id);
@@ -721,7 +721,7 @@ public class VertexResource extends AbstractSubResource {
                 || produces.equals(RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE);
 
         try {
-            rag.tryStartTransaction();
+            //rag.tryStartTransaction();
             final Vertex vertex = graph.getVertex(id);
 
             if (null == vertex) {
@@ -794,7 +794,7 @@ public class VertexResource extends AbstractSubResource {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         final Graph graph = rag.getGraph();
 
-        rag.tryStartTransaction();
+        //rag.tryStartTransaction();
 
         try {
             final List<String> keys = this.getNonRexsterRequestKeys();

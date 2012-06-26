@@ -167,7 +167,7 @@ public class BatchExtension extends AbstractRexsterExtension {
         }
 
         try {
-            rag.tryStartTransaction();
+            //rag.tryStartTransaction();
 
             JSONArray txArray = transactionJson.optJSONArray("tx");
             String currentAction;

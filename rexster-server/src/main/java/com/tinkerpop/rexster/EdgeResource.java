@@ -489,7 +489,7 @@ public class EdgeResource extends AbstractSubResource {
         if (null != temp)
             label = temp.toString();
 
-        rag.tryStartTransaction();
+        //rag.tryStartTransaction();
         try {
             // blueprints throws IllegalArgumentException if the id is null
             Edge edge = id == null ? null : graph.getEdge(id);
@@ -620,7 +620,7 @@ public class EdgeResource extends AbstractSubResource {
         final boolean showHypermedia = produces.equals(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE)
                 || produces.equals(RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE);
 
-        rag.tryStartTransaction();
+        //rag.tryStartTransaction();
         try {
             final Edge edge = graph.getEdge(id);
             if (edge == null) {
@@ -692,7 +692,7 @@ public class EdgeResource extends AbstractSubResource {
         final Graph graph = rag.getGraph();
 
         try {
-            rag.tryStartTransaction();
+            //rag.tryStartTransaction();
             final List<String> keys = this.getNonRexsterRequestKeys();
             final Edge edge = graph.getEdge(id);
             if (null != edge) {

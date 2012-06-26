@@ -83,14 +83,6 @@ public class RexsterApplicationGraph {
         return transactionalGraph != null;
     }
 
-    public void tryStartTransaction() {
-        TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
-        if (transactionalGraph != null) {
-            //     transactionalGraph.setMaxBufferSize(0);
-            transactionalGraph.startTransaction();
-        }
-    }
-
     public void tryStopTransactionSuccess() {
         TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
