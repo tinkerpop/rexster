@@ -172,10 +172,10 @@ public abstract class BaseResource {
 
     private void buildRequestObject(final Map queryParameters) throws JSONException {
 
-        Map<String, Object> flatMap = new HashMap<String, Object>();
+        final Map<String, Object> flatMap = new HashMap<String, Object>();
 
         for (String key : (Set<String>) queryParameters.keySet()) {
-            String[] keys = key.split(Tokens.PERIOD_REGEX);
+            final String[] keys = key.split(Tokens.PERIOD_REGEX);
             JSONObject embeddedObject = this.requestObject;
             for (int i = 0; i < keys.length - 1; i++) {
                 JSONObject tempEmbeddedObject = (JSONObject) embeddedObject.opt(keys[i]);
@@ -187,7 +187,7 @@ public abstract class BaseResource {
             }
 
             String rawValue;
-            Object val = queryParameters.get(key);
+            final Object val = queryParameters.get(key);
             if (val instanceof String) {
                 rawValue = (String) val;
             } else {
@@ -217,6 +217,8 @@ public abstract class BaseResource {
         }
 
         this.requestObjectFlat = new JSONObject(flatMap);
+
+
     }
 
     protected JSONObject getNonRexsterRequest() throws JSONException {

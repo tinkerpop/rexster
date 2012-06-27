@@ -1,13 +1,23 @@
 package com.tinkerpop.rexster.util;
 
+import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.rexster.Tokens;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONTokener;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -164,6 +174,76 @@ public class RequestObjectHelper {
         return false;
     }
 
+    public static Set<QueryProperties> getQueryProperties(final JSONObject requestObject) {
+        final Set<QueryProperties> properties = new HashSet<QueryProperties>();
+        final JSONArray propertyArray = requestObject.optJSONArray(Tokens._PROPERTIES);
+        if (propertyArray != null) {
+            // read the contents of the property array which will be a string array value because
+            // of limitations in the URI to JSON process.  this is a bit of a hack to get
+            // the array out
+            final JSONArray jsonPropertyArray;
+
+            try {
+                final StringBuffer sb = new StringBuffer();
+                for (int ix = 0; ix < propertyArray.length(); ix++) {
+                    sb.append(propertyArray.optString(ix));
+
+                    if (ix < propertyArray.length() - 1) {
+                        sb.append(",");
+                    }
+                }
+
+                final String propertyArgument = sb.toString();
+                int startBracePlace = propertyArgument.indexOf('[');
+                int endBracePlace = propertyArgument.indexOf(']');
+                while (startBracePlace > -1 && endBracePlace > -1) {
+
+                    // extract the elements of the array within the braces
+                    final String triple = propertyArgument.substring(startBracePlace + 1, endBracePlace);
+                    final String [] separated = triple.split(",");
+                    final String [] tripleSplit = new String[3];
+                    tripleSplit[0] = separated[0].trim();
+                    tripleSplit[1] = separated[1].trim();
+
+                    String[] tripleValue =  Arrays.copyOfRange(separated, 2, separated.length);
+                    tripleSplit[2] = StringUtils.join(tripleValue, ',');
+
+                    final Query.Compare c;
+                    final String compareString = tripleSplit[1];
+                    if (compareString.equals("=")) {
+                        c = Query.Compare.EQUAL;
+                    } else if (compareString.equals("<>")) {
+                        c = Query.Compare.NOT_EQUAL;
+                    } else if (compareString.equals(">")) {
+                        c = Query.Compare.GREATER_THAN;
+                    } else if (compareString.equals(">=")) {
+                        c = Query.Compare.GREATER_THAN_EQUAL;
+                    } else if (compareString.equals("<")) {
+                        c = Query.Compare.LESS_THAN;
+                    } else if (compareString.equals("<=")) {
+                        c = Query.Compare.LESS_THAN_EQUAL;
+                    } else {
+                        throw new WebApplicationException(Response.Status.BAD_REQUEST);
+                    }
+
+                    properties.add(new QueryProperties(tripleSplit[0], c,
+                            (Comparable) ElementHelper.getTypedPropertyValue(tripleSplit[2], true)));
+
+                    startBracePlace = propertyArgument.indexOf('[', endBracePlace);
+                    endBracePlace = propertyArgument.indexOf(']', endBracePlace + 1);
+                }
+
+            } catch (WebApplicationException wae) {
+                throw wae;
+            } catch (Exception jse) {
+                // the properties were not in the correct format of [[x,=,y],[x,<>,z]]
+                throw new WebApplicationException(Response.Status.BAD_REQUEST);
+            }
+        }
+
+        return properties;
+    }
+
     private static Long getOffset(final JSONObject requestObject, final String offsetToken) {
 
         final JSONObject rexsterRequestObject = getRexsterRequest(requestObject);
@@ -186,5 +266,4 @@ public class RequestObjectHelper {
             return null;
         }
     }
-
 }

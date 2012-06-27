@@ -15,8 +15,15 @@ public class Tokens {
     public static final String _OUT_V = "_outV";
     public static final String _IN_V = "_inV";
     public static final String _PROPERTIES = "_properties";
+    public static final String _DIRECTION = "_direction";
+    public static final String _RETURN = "_return";
+    public static final String _LIMIT = "_limit";
     public static final String VERTEX = "vertex";
+    public static final String VERTICES = "vertices";
     public static final String EDGE = "edge";
+    public static final String EDGES = "edges";
+    public static final String VERTEX_IDS = "ids";
+    public static final String COUNT = "count";
     public static final String RESULTS = "results";
     public static final String EXTENSIONS = "extensions";
 
@@ -61,6 +68,7 @@ public class Tokens {
     public static final String OUT = "out";
     public static final String IN = "in";
     public static final String BOTH = "both";
+    public static final String QUERY = "query";
     public static final String TOTAL_SIZE = "totalSize";
     public static final String MESSAGE = "message";
     public static final String QUERY_TIME = "queryTime";

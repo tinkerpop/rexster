@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONFactory;
 import com.tinkerpop.rexster.extension.ExtensionMethod;
@@ -13,6 +14,7 @@ import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterExtension;
 import com.tinkerpop.rexster.util.ElementHelper;
+import com.tinkerpop.rexster.util.QueryProperties;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -42,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceConfigurationError;
+import java.util.Set;
 
 @Path("/graphs/{graphname}/vertices")
 public class VertexResource extends AbstractSubResource {
@@ -204,7 +207,7 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @HEAD
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response headVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -212,13 +215,13 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @HEAD
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     public Response headVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.HEAD);
     }
 
     @PUT
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response putVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -226,13 +229,13 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @PUT
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     public Response putVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.PUT);
     }
 
     @OPTIONS
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response optionsVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -240,13 +243,13 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @OPTIONS
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     public Response optionsVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.OPTIONS);
     }
 
     @DELETE
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -254,13 +257,13 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @DELETE
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     public Response deleteVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.DELETE);
     }
 
     @POST
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response postVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
@@ -268,13 +271,13 @@ public class VertexResource extends AbstractSubResource {
     }
 
     @POST
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     public Response postVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.POST);
     }
 
     @GET
-    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in).+}")
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     public Response getVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.GET);
     }
@@ -404,31 +407,99 @@ public class VertexResource extends AbstractSubResource {
     }
 
     private Response getVertexEdges(String graphName, String vertexId, String direction, boolean showTypes) {
-        Vertex vertex = this.getRexsterApplicationGraph(graphName).getGraph().getVertex(vertexId);
+        final Vertex vertex = this.getRexsterApplicationGraph(graphName).getGraph().getVertex(vertexId);
+        if (vertex == null) {
+            final String msg = "Vertex with [" + vertexId + "] cannot be found.";
+            logger.info(msg);
+
+            final JSONObject error = generateErrorObject(msg);
+            throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
+        }
 
         try {
-            JSONObject theRequestObject = this.getRequestObject();
-            Long start = RequestObjectHelper.getStartOffset(theRequestObject);
-            Long end = RequestObjectHelper.getEndOffset(theRequestObject);
-            List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+            final JSONObject theRequestObject = this.getRequestObject();
+            final Long start = RequestObjectHelper.getStartOffset(theRequestObject);
+            final Long end = RequestObjectHelper.getEndOffset(theRequestObject);
+            final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
-            Object temp = this.getRequestObject().opt(Tokens._LABEL);
-            String labelSet = null;
-            if (temp != null) {
-                labelSet = temp.toString();
-            }
-
+            final JSONArray labelSet = theRequestObject.optJSONArray(Tokens._LABEL);
             String[] labels = null;
             if (labelSet != null) {
-                labels = labelSet.split(",");
+                labels = new String[labelSet.length()];
+                for (int ix = 0; ix < labelSet.length(); ix++) {
+                    labels[ix] = labelSet.optString(ix);
+                }
             }
 
+            // if this is a query and the _return is "count" then we don't bother to send back the
+            // result array
+            boolean countOnly = false;
             long counter = 0l;
-            JSONArray edgeArray = new JSONArray();
+            final JSONArray elementArray = new JSONArray();
 
-            if (null != vertex) {
+            if (direction.equals(Tokens.QUERY)) {
+
+                final String returnString = theRequestObject.optString(Tokens._RETURN);
+
+                final String queryDirectionString = theRequestObject.has(Tokens._DIRECTION) ?
+                        theRequestObject.optString(Tokens._DIRECTION) : "";
+                final Direction queryDirection;
+                if (queryDirectionString.equals(Tokens.OUT)) {
+                    queryDirection = Direction.OUT;
+                } else if (queryDirectionString.equals(Tokens.IN)) {
+                    queryDirection = Direction.IN;
+                } else {
+                    queryDirection = Direction.BOTH;
+                }
+
+                Query query = vertex.query().direction(queryDirection);
+                if (labels != null) {
+                    query = query.labels(labels);
+                }
+
+                final Set<QueryProperties> queryProperties = RequestObjectHelper.getQueryProperties(theRequestObject);
+                if (queryProperties.size() > 0) {
+                    for (QueryProperties queryProperty : queryProperties) {
+                        query = query.has(queryProperty.getName(), queryProperty.getValue(), queryProperty.getCompare());
+                    }
+                }
+
+                final long limit = theRequestObject.has(Tokens._LIMIT) ? theRequestObject.getLong(Tokens._LIMIT) : Long.MIN_VALUE;
+                if (limit >= 0) {
+                    query = query.limit(limit);
+                }
+
+                if (returnString.equals(Tokens.VERTICES) || returnString.equals(Tokens.VERTEX_IDS)){
+                    final Iterable<Vertex> vertexQueryResults = query.vertices();
+                    for (Vertex v : vertexQueryResults) {
+                        if (counter >= start && counter < end) {
+                            if (returnString.equals(Tokens.VERTICES)) {
+                                elementArray.put(GraphSONFactory.createJSONElement(v, returnKeys, showTypes));
+                            } else {
+                                elementArray.put(v.getId());
+                            }
+                        }
+                        counter++;
+                    }
+                } else if (returnString.equals(Tokens.EDGES)) {
+                    final Iterable<Edge> edgeQueryResults = query.edges();
+                    for (Edge e : edgeQueryResults) {
+                        if (counter >= start && counter < end) {
+                            elementArray.put(GraphSONFactory.createJSONElement(e, returnKeys, showTypes));
+                        }
+                        counter++;
+                    }
+                } else if (returnString.equals(Tokens.COUNT)) {
+                    counter = query.count();
+                    countOnly = true;
+                } else {
+                    final JSONObject error = generateErrorObject(Tokens._RETURN + " query string argument was invalid.");
+                    throw new WebApplicationException(Response.status(Status.BAD_REQUEST).entity(error).build());
+                }
+            }
+            else {
                 if (direction.equals(Tokens.OUT_E) || direction.equals(Tokens.BOTH_E)) {
-                    Iterable<Edge> itty;
+                    final Iterable<Edge> itty;
                     if (labels != null && labels.length > 0) {
                         itty = vertex.getEdges(Direction.OUT,  labels);
                     } else {
@@ -437,14 +508,14 @@ public class VertexResource extends AbstractSubResource {
 
                     for (Edge edge : itty) {
                         if (counter >= start && counter < end) {
-                            edgeArray.put(GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
+                            elementArray.put(GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
                         }
                         counter++;
                     }
                 }
 
                 if (direction.equals(Tokens.IN_E) || direction.equals(Tokens.BOTH_E)) {
-                    Iterable<Edge> itty;
+                    final Iterable<Edge> itty;
                     if (labels != null && labels.length > 0) {
                         itty = vertex.getEdges(Direction.IN, labels);
                     } else {
@@ -453,14 +524,14 @@ public class VertexResource extends AbstractSubResource {
 
                     for (Edge edge : itty) {
                         if (counter >= start && counter < end) {
-                            edgeArray.put(GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
+                            elementArray.put(GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
                         }
                         counter++;
                     }
                 }
 
                 if (direction.equals(Tokens.OUT) || direction.equals(Tokens.BOTH)) {
-                    Iterable<Edge> itty;
+                    final Iterable<Edge> itty;
                     if (labels != null && labels.length > 0) {
                         itty = vertex.getEdges(Direction.OUT,  labels);
                     } else {
@@ -469,14 +540,14 @@ public class VertexResource extends AbstractSubResource {
 
                     for (Edge edge : itty) {
                         if (counter >= start && counter < end) {
-                            edgeArray.put(GraphSONFactory.createJSONElement(edge.getVertex(Direction.IN), returnKeys, showTypes));
+                            elementArray.put(GraphSONFactory.createJSONElement(edge.getVertex(Direction.IN), returnKeys, showTypes));
                         }
                         counter++;
                     }
                 }
 
                 if (direction.equals(Tokens.IN) || direction.equals(Tokens.BOTH)) {
-                    Iterable<Edge> itty;
+                    final Iterable<Edge> itty;
                     if (labels != null && labels.length > 0) {
                         itty = vertex.getEdges(Direction.IN, labels);
                     } else {
@@ -485,34 +556,31 @@ public class VertexResource extends AbstractSubResource {
 
                     for (Edge edge : itty) {
                         if (counter >= start && counter < end) {
-                            edgeArray.put(GraphSONFactory.createJSONElement(edge.getVertex(Direction.OUT), returnKeys, showTypes));
+                            elementArray.put(GraphSONFactory.createJSONElement(edge.getVertex(Direction.OUT), returnKeys, showTypes));
                         }
                         counter++;
                     }
                 }
-
-
-            } else {
-                String msg = "Vertex with [" + vertexId + "] cannot be found.";
-                logger.info(msg);
-
-                JSONObject error = generateErrorObject(msg);
-                throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
             }
 
-            this.resultObject.put(Tokens.RESULTS, edgeArray);
+            if (!countOnly) {
+                this.resultObject.put(Tokens.RESULTS, elementArray);
+            }
+
             this.resultObject.put(Tokens.TOTAL_SIZE, counter);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
         } catch (JSONException ex) {
             logger.error(ex);
 
-            JSONObject error = generateErrorObjectJsonFail(ex);
+            final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } catch (WebApplicationException wae) {
+            throw wae;
         } catch (RuntimeException re) {
             logger.error(re);
 
-            JSONObject error = generateErrorObject(re.getMessage(), re);
+            final JSONObject error = generateErrorObject(re.getMessage(), re);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 
