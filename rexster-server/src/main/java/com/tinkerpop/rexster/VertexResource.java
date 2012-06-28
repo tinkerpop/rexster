@@ -434,133 +434,105 @@ public class VertexResource extends AbstractSubResource {
             // if this is a query and the _return is "count" then we don't bother to send back the
             // result array
             boolean countOnly = false;
+
+            // what kind of data the calling client wants back (vertices, edges, count, vertex identifiers)
+            String returnString = null;
+
+            // the query direction (both, out, in)
+            Direction queryDirection = null;
+
+            // break out the segment into the return and the direction
+            if (direction.equals(Tokens.OUT_E)){
+                returnString = Tokens.EDGES;
+                queryDirection = Direction.OUT;
+            } else if (direction.equals(Tokens.IN_E)) {
+                returnString = Tokens.EDGES;
+                queryDirection = Direction.IN;
+            } else if (direction.equals(Tokens.BOTH_E)) {
+                returnString = Tokens.EDGES;
+                queryDirection = Direction.BOTH;
+            } else if (direction.equals(Tokens.OUT)) {
+                returnString = Tokens.VERTICES;
+                queryDirection = Direction.OUT;
+            } else if (direction.equals(Tokens.IN)) {
+                returnString = Tokens.VERTICES;
+                queryDirection = Direction.IN;
+            } else if (direction.equals(Tokens.BOTH)) {
+                returnString = Tokens.VERTICES;
+                queryDirection = Direction.BOTH;
+            } else if (direction.equals(Tokens.BOTH_COUNT)) {
+                returnString = Tokens.COUNT;
+                queryDirection = Direction.BOTH;
+                countOnly = true;
+            } else if (direction.equals(Tokens.IN_COUNT)) {
+                returnString = Tokens.COUNT;
+                queryDirection = Direction.IN;
+                countOnly = true;
+            } else if (direction.equals(Tokens.OUT_COUNT)) {
+                returnString = Tokens.COUNT;
+                queryDirection = Direction.OUT;
+                countOnly = true;
+            } else if (direction.equals(Tokens.BOTH_IDS)) {
+                returnString = Tokens.VERTEX_IDS;
+                queryDirection = Direction.BOTH;
+            } else if (direction.equals(Tokens.IN_IDS)) {
+                returnString = Tokens.VERTEX_IDS;
+                queryDirection = Direction.IN;
+            } else if (direction.equals(Tokens.OUT_IDS)) {
+                returnString = Tokens.VERTEX_IDS;
+                queryDirection = Direction.OUT;
+            }
+
+            // throw bad request if query direction is not established
+            if (queryDirection == null) {
+                throw new WebApplicationException(Status.BAD_REQUEST);
+            }
+
             long counter = 0l;
             final JSONArray elementArray = new JSONArray();
 
-            if (direction.equals(Tokens.QUERY)) {
+            Query query = vertex.query().direction(queryDirection);
+            if (labels != null) {
+                query = query.labels(labels);
+            }
 
-                final String returnString = theRequestObject.optString(Tokens._RETURN);
-
-                final String queryDirectionString = theRequestObject.has(Tokens._DIRECTION) ?
-                        theRequestObject.optString(Tokens._DIRECTION) : "";
-                final Direction queryDirection;
-                if (queryDirectionString.equals(Tokens.OUT)) {
-                    queryDirection = Direction.OUT;
-                } else if (queryDirectionString.equals(Tokens.IN)) {
-                    queryDirection = Direction.IN;
-                } else {
-                    queryDirection = Direction.BOTH;
-                }
-
-                Query query = vertex.query().direction(queryDirection);
-                if (labels != null) {
-                    query = query.labels(labels);
-                }
-
-                final Set<QueryProperties> queryProperties = RequestObjectHelper.getQueryProperties(theRequestObject);
-                if (queryProperties.size() > 0) {
-                    for (QueryProperties queryProperty : queryProperties) {
-                        query = query.has(queryProperty.getName(), queryProperty.getValue(), queryProperty.getCompare());
-                    }
-                }
-
-                final long limit = theRequestObject.has(Tokens._LIMIT) ? theRequestObject.getLong(Tokens._LIMIT) : Long.MIN_VALUE;
-                if (limit >= 0) {
-                    query = query.limit(limit);
-                }
-
-                if (returnString.equals(Tokens.VERTICES) || returnString.equals(Tokens.VERTEX_IDS)){
-                    final Iterable<Vertex> vertexQueryResults = query.vertices();
-                    for (Vertex v : vertexQueryResults) {
-                        if (counter >= start && counter < end) {
-                            if (returnString.equals(Tokens.VERTICES)) {
-                                elementArray.put(GraphSONFactory.createJSONElement(v, returnKeys, showTypes));
-                            } else {
-                                elementArray.put(v.getId());
-                            }
-                        }
-                        counter++;
-                    }
-                } else if (returnString.equals(Tokens.EDGES)) {
-                    final Iterable<Edge> edgeQueryResults = query.edges();
-                    for (Edge e : edgeQueryResults) {
-                        if (counter >= start && counter < end) {
-                            elementArray.put(GraphSONFactory.createJSONElement(e, returnKeys, showTypes));
-                        }
-                        counter++;
-                    }
-                } else if (returnString.equals(Tokens.COUNT)) {
-                    counter = query.count();
-                    countOnly = true;
-                } else {
-                    final JSONObject error = generateErrorObject(Tokens._RETURN + " query string argument was invalid.");
-                    throw new WebApplicationException(Response.status(Status.BAD_REQUEST).entity(error).build());
+            final Set<QueryProperties> queryProperties = RequestObjectHelper.getQueryProperties(theRequestObject);
+            if (queryProperties.size() > 0) {
+                for (QueryProperties queryProperty : queryProperties) {
+                    query = query.has(queryProperty.getName(), queryProperty.getValue(), queryProperty.getCompare());
                 }
             }
-            else {
-                if (direction.equals(Tokens.OUT_E) || direction.equals(Tokens.BOTH_E)) {
-                    final Iterable<Edge> itty;
-                    if (labels != null && labels.length > 0) {
-                        itty = vertex.getEdges(Direction.OUT,  labels);
-                    } else {
-                        itty = vertex.getEdges(Direction.OUT);
-                    }
 
-                    for (Edge edge : itty) {
-                        if (counter >= start && counter < end) {
-                            elementArray.put(GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
+            final long limit = theRequestObject.has(Tokens._LIMIT) ? theRequestObject.getLong(Tokens._LIMIT) : Long.MIN_VALUE;
+            if (limit >= 0) {
+                query = query.limit(limit);
+            }
+
+            if (returnString.equals(Tokens.VERTICES) || returnString.equals(Tokens.VERTEX_IDS)){
+                final Iterable<Vertex> vertexQueryResults = query.vertices();
+                for (Vertex v : vertexQueryResults) {
+                    if (counter >= start && counter < end) {
+                        if (returnString.equals(Tokens.VERTICES)) {
+                            elementArray.put(GraphSONFactory.createJSONElement(v, returnKeys, showTypes));
+                        } else {
+                            elementArray.put(v.getId());
                         }
-                        counter++;
                     }
+                    counter++;
                 }
-
-                if (direction.equals(Tokens.IN_E) || direction.equals(Tokens.BOTH_E)) {
-                    final Iterable<Edge> itty;
-                    if (labels != null && labels.length > 0) {
-                        itty = vertex.getEdges(Direction.IN, labels);
-                    } else {
-                        itty = vertex.getEdges(Direction.IN);
+            } else if (returnString.equals(Tokens.EDGES)) {
+                final Iterable<Edge> edgeQueryResults = query.edges();
+                for (Edge e : edgeQueryResults) {
+                    if (counter >= start && counter < end) {
+                        elementArray.put(GraphSONFactory.createJSONElement(e, returnKeys, showTypes));
                     }
-
-                    for (Edge edge : itty) {
-                        if (counter >= start && counter < end) {
-                            elementArray.put(GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
-                        }
-                        counter++;
-                    }
+                    counter++;
                 }
-
-                if (direction.equals(Tokens.OUT) || direction.equals(Tokens.BOTH)) {
-                    final Iterable<Edge> itty;
-                    if (labels != null && labels.length > 0) {
-                        itty = vertex.getEdges(Direction.OUT,  labels);
-                    } else {
-                        itty = vertex.getEdges(Direction.OUT);
-                    }
-
-                    for (Edge edge : itty) {
-                        if (counter >= start && counter < end) {
-                            elementArray.put(GraphSONFactory.createJSONElement(edge.getVertex(Direction.IN), returnKeys, showTypes));
-                        }
-                        counter++;
-                    }
-                }
-
-                if (direction.equals(Tokens.IN) || direction.equals(Tokens.BOTH)) {
-                    final Iterable<Edge> itty;
-                    if (labels != null && labels.length > 0) {
-                        itty = vertex.getEdges(Direction.IN, labels);
-                    } else {
-                        itty = vertex.getEdges(Direction.IN);
-                    }
-
-                    for (Edge edge : itty) {
-                        if (counter >= start && counter < end) {
-                            elementArray.put(GraphSONFactory.createJSONElement(edge.getVertex(Direction.OUT), returnKeys, showTypes));
-                        }
-                        counter++;
-                    }
-                }
+            } else if (returnString.equals(Tokens.COUNT)) {
+                counter = query.count();
+            } else {
+                final JSONObject error = generateErrorObject(Tokens._RETURN + " query string argument was invalid.");
+                throw new WebApplicationException(Response.status(Status.BAD_REQUEST).entity(error).build());
             }
 
             if (!countOnly) {

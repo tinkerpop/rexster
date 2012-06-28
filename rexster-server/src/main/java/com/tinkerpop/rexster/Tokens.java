@@ -68,6 +68,12 @@ public class Tokens {
     public static final String OUT = "out";
     public static final String IN = "in";
     public static final String BOTH = "both";
+    public static final String OUT_COUNT = "outCount";
+    public static final String IN_COUNT = "inCount";
+    public static final String BOTH_COUNT = "bothCount";
+    public static final String OUT_IDS = "outIds";
+    public static final String IN_IDS = "inIds";
+    public static final String BOTH_IDS = "bothIds";
     public static final String QUERY = "query";
     public static final String TOTAL_SIZE = "totalSize";
     public static final String MESSAGE = "message";

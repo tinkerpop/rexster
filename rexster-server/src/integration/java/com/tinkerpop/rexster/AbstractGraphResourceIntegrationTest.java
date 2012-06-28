@@ -13,7 +13,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 
-import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -101,8 +100,8 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
     }
 
     protected void postVertex(GraphTestHolder graphHolder, Vertex v) throws JSONException {
-        ClientRequest request = ClientRequest.create().type(MediaType.APPLICATION_JSON_TYPE).build(createUri("/" + graphHolder.getGraphName() + "/vertices"), "POST");
-        request.setEntity(GraphSONFactory.createJSONElement(v));
+        ClientRequest request = ClientRequest.create().type(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON).build(createUri("/" + graphHolder.getGraphName() + "/vertices"), "POST");
+        request.setEntity(typeTheElement(GraphSONFactory.createJSONElement(v)));
 
         ClientResponse response = this.client().handle(request);
 
@@ -116,13 +115,13 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
     protected void postEdge(GraphTestHolder graphHolder, Edge e) throws JSONException {
         ClientRequest request = ClientRequest.create().build(createUri("/" + graphHolder.getGraphName() + "/edges"), "POST");
 
-        JSONObject jsonEdge = GraphSONFactory.createJSONElement(e);
+        JSONObject jsonEdge = typeTheElement(GraphSONFactory.createJSONElement(e));
         jsonEdge.put(Tokens._IN_V, graphHolder.getVertexIdSet().get(jsonEdge.optString(Tokens._IN_V)));
         jsonEdge.put(Tokens._OUT_V, graphHolder.getVertexIdSet().get(jsonEdge.optString(Tokens._OUT_V)));
 
         request.setEntity(jsonEdge);
         List<Object> headerValue = new ArrayList<Object>() {{
-            add(MediaType.APPLICATION_JSON);
+            add(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON);
         }};
         request.getHeaders().put("Content-Type", headerValue);
 
@@ -134,4 +133,35 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
         graphHolder.getEdgeIdSet().put(e.getId().toString(), id);
 
     }
+
+    public static JSONObject typeTheElement(JSONObject json) {
+        // map is only one level deep for the test graph so this doesn't really need to be recursive
+        final Iterator it = json.keys();
+
+        try {
+            while (it.hasNext()) {
+                final String key = (String) it.next();
+                if (!key.startsWith("_")) {
+                    final Object value = json.opt(key);
+                    if (value instanceof String)
+                        json.put(key, "(s," + value.toString() + ")");
+                    else if (value instanceof Integer)
+                        json.put(key, "(i," + value + ")");
+                    else if (value instanceof Long)
+                        json.put(key, "(l," + value + ")");
+                    else if (value instanceof Float)
+                        json.put(key, "(f," + value + ")");
+                    else if (value instanceof Double)
+                        json.put(key, "(d," + value + ")");
+                    else
+                        json.put(key, value.toString());
+                }
+            }
+        } catch (JSONException jsone) {
+
+        }
+
+        return json;
+    }
+
 }
