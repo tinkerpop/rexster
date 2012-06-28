@@ -17,6 +17,7 @@ h3. Version 2.1.0 (NOT OFFICIALLY RELEASED YET)
 
 * Fixed issue with POST and DELETE of key indices via REST API.
 * Configuration element of @rexster.xml@ to bind the rexpro hostname.
+* Vertex query API.
 
 ==<hr/>==
 
