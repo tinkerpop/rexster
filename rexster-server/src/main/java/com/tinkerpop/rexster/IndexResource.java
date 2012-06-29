@@ -299,7 +299,8 @@ public class IndexResource extends AbstractSubResource {
             id = temp.toString();
 
         final Index index = this.getIndexFromGraph(graphName, indexName);
-        final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final IndexableGraph graph = (IndexableGraph) rag.getGraph();
 
         if (null == index) {
             final String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
@@ -310,7 +311,17 @@ public class IndexResource extends AbstractSubResource {
         }
 
         if (key == null && value == null && id == null) {
-            graph.dropIndex(indexName);
+            try {
+                graph.dropIndex(indexName);
+                rag.tryStopTransactionSuccess();
+            } catch (Exception ex) {
+                logger.error(ex);
+
+                rag.tryStopTransactionFailure();
+
+                final JSONObject error = generateErrorObjectJsonFail(ex);
+                throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            }
         } else if (null != index & key != null && value != null && id != null) {
             try {
                 if (index.getIndexClass().equals(Vertex.class))
@@ -318,10 +329,13 @@ public class IndexResource extends AbstractSubResource {
                 else
                     index.remove(key, value, graph.getEdge(id));
 
+                rag.tryStopTransactionSuccess();
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
             } catch (JSONException ex) {
                 logger.error(ex);
+
+                rag.tryStopTransactionFailure();
 
                 final JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
@@ -408,7 +422,8 @@ public class IndexResource extends AbstractSubResource {
         }
 
         final Index index = this.getIndexFromGraph(graphName, indexName);
-        final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final IndexableGraph graph = (IndexableGraph) rag.getGraph();
 
         if (null != index) {
             final String msg = "Index [" + indexName + "] on graph [" + graphName + "] already exists";
@@ -432,8 +447,12 @@ public class IndexResource extends AbstractSubResource {
                 final Index newIndex;
                 try {
                     newIndex = graph.createIndex(indexName, c, indexParameters);
+                    rag.tryStopTransactionSuccess();
                 } catch (Exception e) {
                     logger.info(e.getMessage());
+
+                    rag.tryStopTransactionFailure();
+
                     final JSONObject error = generateErrorObject(e.getMessage());
                     throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
                 }
@@ -483,7 +502,8 @@ public class IndexResource extends AbstractSubResource {
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response putElementInIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
         final Index index = this.getIndexFromGraph(graphName, indexName);
-        final IndexableGraph graph = (IndexableGraph) this.getRexsterApplicationGraph(graphName).getGraph();
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final IndexableGraph graph = (IndexableGraph) rag.getGraph();
 
         if (index == null) {
             JSONObject error = generateErrorObject("Index not found.");
@@ -508,11 +528,14 @@ public class IndexResource extends AbstractSubResource {
 
         if (key != null && value != null && id != null) {
             try {
-                if (index.getIndexClass().equals(Vertex.class))
+                if (index.getIndexClass().equals(Vertex.class)) {
                     index.put(key, value, graph.getVertex(id));
-                else if (index.getIndexClass().equals(Edge.class))
+                    rag.tryStopTransactionSuccess();
+                } else if (index.getIndexClass().equals(Edge.class)) {
                     index.put(key, value, graph.getEdge(id));
-                else {
+                    rag.tryStopTransactionSuccess();
+                } else {
+                    rag.tryStopTransactionFailure();
                     final JSONObject error = generateErrorObject("Index class must be either vertex or edge");
                     throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
                 }
