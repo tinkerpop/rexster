@@ -502,7 +502,7 @@ public class EdgeResource extends AbstractSubResource {
                     // in/out vertexes are found so edge can be created
                     edge = graph.addEdge(id, out, in, label);
                 } else {
-                    JSONObject error = generateErrorObjectJsonFail(new Exception("One or both of the vertices for the edge does not exist in the graph."));
+                    final JSONObject error = generateErrorObjectJsonFail(new Exception("One or both of the vertices for the edge does not exist in the graph."));
                     throw new WebApplicationException(Response.status(Status.CONFLICT).entity(error).build());
                 }
 
@@ -510,14 +510,14 @@ public class EdgeResource extends AbstractSubResource {
                 if (!RequestObjectHelper.hasElementProperties(theRequestObject)) {
                     // if the edge exists there better be some properties to assign
                     // this really isn't a BAD_REQUEST, but CONFLICT isn't much better...bah
-                    JSONObject error = generateErrorObjectJsonFail(new Exception("Edge with id " + id + " already exists"));
+                    final JSONObject error = generateErrorObjectJsonFail(new Exception("Edge with id " + id + " already exists"));
                     throw new WebApplicationException(Response.status(Status.CONFLICT).entity(error).build());
                 }
             }
 
             try {
                 if (edge != null) {
-                    Iterator keys = theRequestObject.keys();
+                    final Iterator keys = theRequestObject.keys();
                     while (keys.hasNext()) {
                         String key = keys.next().toString();
                         if (!key.startsWith(Tokens.UNDERSCORE)) {
@@ -527,16 +527,16 @@ public class EdgeResource extends AbstractSubResource {
 
                     rag.tryStopTransactionSuccess();
 
-                    List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+                    final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
                     this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
                 } else {
                     // edge could not be found.  likely an error condition on the request
-                    JSONObject error = generateErrorObjectJsonFail(new Exception("Edge cannot be found or created.  Please check the format of the request."));
+                    final JSONObject error = generateErrorObjectJsonFail(new Exception("Edge cannot be found or created.  Please check the format of the request."));
                     throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
                 }
 
                 if (showHypermedia) {
-                    JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE, this.getUriPath());
+                    final JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE, this.getUriPath());
                     if (extensionsList != null) {
                         this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                     }

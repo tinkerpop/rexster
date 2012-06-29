@@ -423,79 +423,20 @@ public class VertexResource extends AbstractSubResource {
             final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
             // accept either an array of labels or just one label
-            JSONArray labelSet = theRequestObject.optJSONArray(Tokens._LABEL);
-            if (labelSet == null) {
-                final String oneLabel = theRequestObject.optString(Tokens._LABEL);
-                if (oneLabel != null && !oneLabel.isEmpty()) {
-                    labelSet = new JSONArray();
-                    labelSet.put(oneLabel);
-                }
-            }
+            final String[] labels = getLabelsFromRequest(theRequestObject);
 
-            String[] labels = null;
-            if (labelSet != null) {
-                labels = new String[labelSet.length()];
-                for (int ix = 0; ix < labelSet.length(); ix++) {
-                    labels[ix] = labelSet.optString(ix);
-                }
-            }
+            // break out the segment into the return and the direction
+            final VertexQueryArguments queryArguments = new VertexQueryArguments(direction);
 
             // if this is a query and the _return is "count" then we don't bother to send back the
             // result array
-            boolean countOnly = false;
+            final boolean countOnly = queryArguments.isCountOnly();
 
             // what kind of data the calling client wants back (vertices, edges, count, vertex identifiers)
-            String returnString = null;
+            final ReturnType returnType = queryArguments.getReturnType();
 
             // the query direction (both, out, in)
-            Direction queryDirection = null;
-
-            // break out the segment into the return and the direction
-            if (direction.equals(Tokens.OUT_E)){
-                returnString = Tokens.EDGES;
-                queryDirection = Direction.OUT;
-            } else if (direction.equals(Tokens.IN_E)) {
-                returnString = Tokens.EDGES;
-                queryDirection = Direction.IN;
-            } else if (direction.equals(Tokens.BOTH_E)) {
-                returnString = Tokens.EDGES;
-                queryDirection = Direction.BOTH;
-            } else if (direction.equals(Tokens.OUT)) {
-                returnString = Tokens.VERTICES;
-                queryDirection = Direction.OUT;
-            } else if (direction.equals(Tokens.IN)) {
-                returnString = Tokens.VERTICES;
-                queryDirection = Direction.IN;
-            } else if (direction.equals(Tokens.BOTH)) {
-                returnString = Tokens.VERTICES;
-                queryDirection = Direction.BOTH;
-            } else if (direction.equals(Tokens.BOTH_COUNT)) {
-                returnString = Tokens.COUNT;
-                queryDirection = Direction.BOTH;
-                countOnly = true;
-            } else if (direction.equals(Tokens.IN_COUNT)) {
-                returnString = Tokens.COUNT;
-                queryDirection = Direction.IN;
-                countOnly = true;
-            } else if (direction.equals(Tokens.OUT_COUNT)) {
-                returnString = Tokens.COUNT;
-                queryDirection = Direction.OUT;
-                countOnly = true;
-            } else if (direction.equals(Tokens.BOTH_IDS)) {
-                returnString = Tokens.VERTEX_IDS;
-                queryDirection = Direction.BOTH;
-            } else if (direction.equals(Tokens.IN_IDS)) {
-                returnString = Tokens.VERTEX_IDS;
-                queryDirection = Direction.IN;
-            } else if (direction.equals(Tokens.OUT_IDS)) {
-                returnString = Tokens.VERTEX_IDS;
-                queryDirection = Direction.OUT;
-            }
-
-            // throw bad request if query direction is not established
-            if (queryDirection == null) {
-                throw new WebApplicationException(Status.BAD_REQUEST);
-            }
+            final Direction queryDirection = queryArguments.getQueryDirection();
 
             long counter = 0l;
             final JSONArray elementArray = new JSONArray();
@@ -517,11 +458,11 @@ public class VertexResource extends AbstractSubResource {
                 query = query.limit(limit);
             }
 
-            if (returnString.equals(Tokens.VERTICES) || returnString.equals(Tokens.VERTEX_IDS)){
+            if (returnType == ReturnType.VERTICES || returnType == ReturnType.VERTEX_IDS){
                 final Iterable<Vertex> vertexQueryResults = query.vertices();
                 for (Vertex v : vertexQueryResults) {
                     if (counter >= start && counter < end) {
-                        if (returnString.equals(Tokens.VERTICES)) {
+                        if (returnType.equals(ReturnType.VERTICES)) {
                             elementArray.put(GraphSONFactory.createJSONElement(v, returnKeys, showTypes));
                         } else {
                             elementArray.put(v.getId());
@@ -529,7 +470,7 @@ public class VertexResource extends AbstractSubResource {
                     }
                     counter++;
                 }
-            } else if (returnString.equals(Tokens.EDGES)) {
+            } else if (returnType == ReturnType.EDGES) {
                 final Iterable<Edge> edgeQueryResults = query.edges();
                 for (Edge e : edgeQueryResults) {
                     if (counter >= start && counter < end) {
@@ -537,10 +478,10 @@ public class VertexResource extends AbstractSubResource {
                     }
                     counter++;
                 }
-            } else if (returnString.equals(Tokens.COUNT)) {
+            } else if (returnType == ReturnType.COUNT) {
                 counter = query.count();
             } else {
-                final JSONObject error = generateErrorObject(Tokens._RETURN + " query string argument was invalid.");
+                final JSONObject error = generateErrorObject(direction + " direction segment was invalid.");
                 throw new WebApplicationException(Response.status(Status.BAD_REQUEST).entity(error).build());
             }
 
@@ -658,8 +599,6 @@ public class VertexResource extends AbstractSubResource {
                 || produces.equals(RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE);
 
         try {
-            //rag.tryStartTransaction();
-
             // blueprints throws IllegalArgumentException if the id is null
             Vertex vertex = id == null ? null : graph.getVertex(id);
 
@@ -887,6 +826,102 @@ public class VertexResource extends AbstractSubResource {
         }
 
         return Response.ok(this.resultObject).build();
+
+    }
+
+    private static String[] getLabelsFromRequest(JSONObject theRequestObject) {
+        JSONArray labelSet = theRequestObject.optJSONArray(Tokens._LABEL);
+        if (labelSet == null) {
+            final String oneLabel = theRequestObject.optString(Tokens._LABEL);
+            if (oneLabel != null && !oneLabel.isEmpty()) {
+                labelSet = new JSONArray();
+                labelSet.put(oneLabel);
+            }
+        }
+
+        String[] labels = null;
+        if (labelSet != null) {
+            labels = new String[labelSet.length()];
+            for (int ix = 0; ix < labelSet.length(); ix++) {
+                labels[ix] = labelSet.optString(ix);
+            }
+        }
+        return labels;
+    }
+
+    private enum ReturnType { VERTICES, EDGES, COUNT, VERTEX_IDS };
+    private final class VertexQueryArguments {
+
+        private final Direction queryDirection;
+        private final ReturnType returnType;
+        private final boolean countOnly;
+
+        public VertexQueryArguments(String directionSegment){
+            if (directionSegment.equals(Tokens.OUT_E)){
+                returnType = ReturnType.EDGES;
+                queryDirection = Direction.OUT;
+                countOnly = false;
+            } else if (directionSegment.equals(Tokens.IN_E)) {
+                returnType = ReturnType.EDGES;
+                queryDirection = Direction.IN;
+                countOnly = false;
+            } else if (directionSegment.equals(Tokens.BOTH_E)) {
+                returnType = ReturnType.EDGES;
+                queryDirection = Direction.BOTH;
+                countOnly = false;
+            } else if (directionSegment.equals(Tokens.OUT)) {
+                returnType = ReturnType.VERTICES;
+                queryDirection = Direction.OUT;
+                countOnly = false;
+            } else if (directionSegment.equals(Tokens.IN)) {
+                returnType = ReturnType.VERTICES;
+                queryDirection = Direction.IN;
+                countOnly = false;
+            } else if (directionSegment.equals(Tokens.BOTH)) {
+                returnType = ReturnType.VERTICES;
+                queryDirection = Direction.BOTH;
+                countOnly = false;
+            } else if (directionSegment.equals(Tokens.BOTH_COUNT)) {
+                returnType = ReturnType.COUNT;
+                queryDirection = Direction.BOTH;
+                countOnly = true;
+            } else if (directionSegment.equals(Tokens.IN_COUNT)) {
+                returnType = ReturnType.COUNT;
+                queryDirection = Direction.IN;
+                countOnly = true;
+            } else if (directionSegment.equals(Tokens.OUT_COUNT)) {
+                returnType = ReturnType.COUNT;
+                queryDirection = Direction.OUT;
+                countOnly = true;
+            } else if (directionSegment.equals(Tokens.BOTH_IDS)) {
+                returnType = ReturnType.VERTEX_IDS;
+                queryDirection = Direction.BOTH;
+                countOnly = false;
+            } else if (directionSegment.equals(Tokens.IN_IDS)) {
+                returnType = ReturnType.VERTEX_IDS;
+                queryDirection = Direction.IN;
+                countOnly = false;
+            } else if (directionSegment.equals(Tokens.OUT_IDS)) {
+                returnType = ReturnType.VERTEX_IDS;
+                queryDirection = Direction.OUT;
+                countOnly = false;
+            } else {
+                final JSONObject error = generateErrorObject(directionSegment + " segment was invalid.");
+                throw new WebApplicationException(Response.status(Status.BAD_REQUEST).entity(error).build());
+            }
+        }
+
+        public Direction getQueryDirection() {
+            return queryDirection;
+        }
+
+        public ReturnType getReturnType() {
+            return returnType;
+        }
+
+        public boolean isCountOnly() {
+            return countOnly;
+        }
 
     }
 }
