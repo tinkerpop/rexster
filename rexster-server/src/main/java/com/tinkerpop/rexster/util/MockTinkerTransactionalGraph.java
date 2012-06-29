@@ -20,10 +20,6 @@ public class MockTinkerTransactionalGraph extends TinkerGraph implements Transac
         super();
     }
 
-    public void startTransaction() throws IllegalStateException{
-
-    }
-
     public void stopTransaction(final Conclusion conclusion) {
 
     }
