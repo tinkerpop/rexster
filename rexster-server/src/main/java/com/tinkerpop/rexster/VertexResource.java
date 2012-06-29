@@ -422,7 +422,16 @@ public class VertexResource extends AbstractSubResource {
             final Long end = RequestObjectHelper.getEndOffset(theRequestObject);
             final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
-            final JSONArray labelSet = theRequestObject.optJSONArray(Tokens._LABEL);
+            // accept either an array of labels or just one label
+            JSONArray labelSet = theRequestObject.optJSONArray(Tokens._LABEL);
+            if (labelSet == null) {
+                final String oneLabel = theRequestObject.optString(Tokens._LABEL);
+                if (oneLabel != null && !oneLabel.isEmpty()) {
+                    labelSet = new JSONArray();
+                    labelSet.put(oneLabel);
+                }
+            }
+
             String[] labels = null;
             if (labelSet != null) {
                 labels = new String[labelSet.length()];
