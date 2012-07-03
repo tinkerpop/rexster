@@ -26,7 +26,7 @@
         <!-- PUBLIC -->
         <fileSet>
             <directory>target/classes/public</directory>
-            <outputDirectory>/bin/public</outputDirectory>
+            <outputDirectory>/public</outputDirectory>
             <includes>
                 <include>*.html</include>
                 <include>favicon.ico</include>
@@ -37,7 +37,7 @@
         </fileSet>
         <fileSet>
             <directory>data</directory>
-            <outputDirectory>/bin/data</outputDirectory>
+            <outputDirectory>/data</outputDirectory>
         </fileSet>
     </fileSets>
 
