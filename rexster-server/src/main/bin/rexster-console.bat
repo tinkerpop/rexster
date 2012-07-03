@@ -1,10 +1,7 @@
 :: Windows launcher script for Rexster Console
 @echo off
 
-cd ..\lib
-set LIBDIR=%CD%
-
-cd ..\..\..\
+set LIBDIR=lib
 
 set JAVA_OPTIONS=-Xms32m -Xmx512m
 
