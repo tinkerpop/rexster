@@ -25,14 +25,12 @@ public class ConsoleResultConverterTest {
     }
 
     @Test
-    public void convertNullResultReturnsEmptyList() throws Exception {
+    public void convertNullResultReturnsZeroSizeList() throws Exception {
 
         List<String> converted = this.converter.convert(null);
 
         Assert.assertNotNull(converted);
-        Assert.assertEquals(1, converted.size());
-
-        Assert.assertEquals("", converted.get(0));
+        Assert.assertEquals(0, converted.size());
     }
 
     @Test

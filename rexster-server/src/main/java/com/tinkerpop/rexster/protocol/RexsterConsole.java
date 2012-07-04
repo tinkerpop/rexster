@@ -206,10 +206,13 @@ public class RexsterConsole {
         }
 
         while (itty.hasNext()) {
-            if (showPrefix) {
-                this.output.println("==>" + itty.next());
-            } else {
-                this.output.println(itty.next());
+            final Object o = itty.next();
+            if (o != null) {
+                if (showPrefix) {
+                    this.output.println("==>" + o);
+                } else {
+                    this.output.println(o);
+                }
             }
         }
 

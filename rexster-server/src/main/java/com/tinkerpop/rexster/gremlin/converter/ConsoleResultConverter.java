@@ -59,16 +59,7 @@ public class ConsoleResultConverter implements ResultConverter<List<String>> {
                 }
             }
 
-            if (resultLines == null
-                    || resultLines.size() == 0
-                    || (resultLines.size() == 1 && (resultLines.get(0) == null || resultLines
-                    .get(0).toString().length() == 0))) {
-                // Result was empty, add empty text if there was also no IO
-                // output
-                if (outputLines.size() == 0) {
-                    outputLines.add("");
-                }
-            } else {
+            if (resultLines != null && resultLines.size() > 0) {
                 // Make sure all lines are strings
                 for (Object resultLine : resultLines) {
                     outputLines.add(resultLine != null ? resultLine.toString() : "null");
