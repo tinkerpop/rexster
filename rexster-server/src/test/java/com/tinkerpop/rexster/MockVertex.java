@@ -53,8 +53,9 @@ public class MockVertex implements Vertex {
         return this.properties.remove(key);
     }
 
-    public void setProperty(String key, Object value) {
+    public Vertex setProperty(String key, Object value) {
         this.properties.put(key, value);
+        return this;
     }
 
     private Iterable<Edge> getOutEdges(String... labels) {
