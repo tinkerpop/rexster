@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 
 import java.util.Hashtable;
@@ -45,9 +45,8 @@ public class MockEdge implements Edge {
     }
 
     @Override
-    public Edge setProperty(String key, Object value) {
+    public void setProperty(String key, Object value) {
         this.properties.put(key, value);
-        return this;
     }
 
     @Override

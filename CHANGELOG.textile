@@ -5,7 +5,7 @@ h2. Rexster 0.y.z
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-2.png!
 
-h3. Version 2.1.0 (NOT OFFICIALLY RELEASED YET) 
+h3. Version 2.1.0 (NOT OFFICIALLY RELEASED YET)
 
 ```xml
 <dependency>
