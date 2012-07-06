@@ -1,0 +1,5 @@
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-logo.png!
+
+Rexster Protocol contains the components for Rexster's binary protocol "RexPro".  Currently, it's primarily used by Rexster Console and isn't really ready for other binary protocol clients.
+
+The documentation for Rexster can be found at this "location":http://rexster.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.
