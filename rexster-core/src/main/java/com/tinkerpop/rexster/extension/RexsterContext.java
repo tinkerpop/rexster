@@ -10,6 +10,8 @@ import java.lang.annotation.Target;
  * plugging in values that match the expected types from the request.  This annotation can be
  * applied to these types:  edge/vertex/graph (dependent on the ExtensionPoint),
  * and RexsterResourceContext.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)

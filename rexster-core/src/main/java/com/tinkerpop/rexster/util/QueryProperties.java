@@ -3,6 +3,8 @@ package com.tinkerpop.rexster.util;
 import com.tinkerpop.blueprints.Query;
 
 /**
+ * Holder for query properties parsed by the RequestObjectHelper to be translated into a Vertex Query.
+ *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class QueryProperties {

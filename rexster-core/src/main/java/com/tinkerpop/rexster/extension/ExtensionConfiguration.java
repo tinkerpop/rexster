@@ -9,6 +9,8 @@ import java.util.Map;
 
 /**
  * Holds information that details the configuration of an extension.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class ExtensionConfiguration {
     private static final Logger logger = Logger.getLogger(ExtensionConfiguration.class);

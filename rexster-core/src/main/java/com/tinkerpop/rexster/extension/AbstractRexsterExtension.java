@@ -7,7 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Base class for extensions.
+ * Base class for extensions. Consider using this class a starting point for extension creation.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public abstract class AbstractRexsterExtension implements RexsterExtension {
 

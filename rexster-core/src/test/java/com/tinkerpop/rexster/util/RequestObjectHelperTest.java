@@ -38,7 +38,7 @@ public class RequestObjectHelperTest {
 
     @Test
     public void getReturnKeysWildcarded() {
-        JSONObject jsonWithWildcard = buildJSONObjectFromString("{\"rexster\": { \"returnKeys\": [\"" + RequestObjectHelper.DEFAULT_WILDCARD + "\"]}}");
+        JSONObject jsonWithWildcard = buildJSONObjectFromString("{\"rexster\": { \"returnKeys\": [\"" + Tokens.WILDCARD + "\"]}}");
         Assert.assertNull(RequestObjectHelper.getReturnKeys(jsonWithWildcard));
     }
 
@@ -50,7 +50,7 @@ public class RequestObjectHelperTest {
 
     @Test
     public void getReturnKeysNonArrayBased() {
-        JSONObject jsonWithNonArrayReturnKeyValue = buildJSONObjectFromString("{\"rexster\": { \"" + Tokens.RETURN_KEYS + "\": \"" + RequestObjectHelper.DEFAULT_WILDCARD + "\"}}");
+        JSONObject jsonWithNonArrayReturnKeyValue = buildJSONObjectFromString("{\"rexster\": { \"" + Tokens.RETURN_KEYS + "\": \"" + Tokens.WILDCARD + "\"}}");
         Assert.assertNull(RequestObjectHelper.getReturnKeys(jsonWithNonArrayReturnKeyValue));
     }
 

@@ -5,6 +5,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * The descriptor for the extension used for self-documentation and hypermedia.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface ExtensionDescriptor {

@@ -8,6 +8,8 @@ import java.lang.annotation.Target;
 /**
  * Provides for a namespace and extension name which is applied at a class level.  Extensions
  * are then exposed on specific graphs by their namespace and name via rexster.xml configuration.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

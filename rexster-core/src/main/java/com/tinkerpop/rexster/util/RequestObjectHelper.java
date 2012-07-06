@@ -17,11 +17,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Helper class for reading parameters from the JSON request object.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RequestObjectHelper {
-
-    public static final String DEFAULT_WILDCARD = "*";
 
     /**
      * Given a request object, return the fragment of JSON that deals with Rexster-reserved parameters.
@@ -42,7 +43,7 @@ public class RequestObjectHelper {
      * @return the return keys
      */
     public static List<String> getReturnKeys(final JSONObject requestObject) {
-        return getReturnKeys(requestObject, DEFAULT_WILDCARD);
+        return getReturnKeys(requestObject, Tokens.WILDCARD);
     }
 
     /**
@@ -171,6 +172,9 @@ public class RequestObjectHelper {
         return false;
     }
 
+    /**
+     * Gets a set of QueryProperties that can be translated into a Vertex Query.
+     */
     public static Set<QueryProperties> getQueryProperties(final JSONObject requestObject) {
         final Set<QueryProperties> properties = new HashSet<QueryProperties>();
         final JSONArray propertyArray = requestObject.optJSONArray(Tokens._PROPERTIES);

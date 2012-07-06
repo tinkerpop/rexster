@@ -7,6 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  * Tries to extract a value from the request to inject into the extension.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER})

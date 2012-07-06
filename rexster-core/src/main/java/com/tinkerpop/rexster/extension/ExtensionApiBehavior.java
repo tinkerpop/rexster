@@ -2,6 +2,8 @@ package com.tinkerpop.rexster.extension;
 
 /**
  * Defines how the extension API information should be generated.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public enum ExtensionApiBehavior {
     /**

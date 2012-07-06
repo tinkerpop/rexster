@@ -2,6 +2,8 @@ package com.tinkerpop.rexster.extension;
 
 /**
  * Holds namespaces that define which extensions are allowed for a specific graph.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class ExtensionAllowed {
     private final String namespace;

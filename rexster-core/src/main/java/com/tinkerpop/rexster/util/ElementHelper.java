@@ -8,7 +8,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * Converts a property value from the query string into a typed value using standard Rexster Data Typing.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public class ElementHelper {
+
+    /**
+     * Takes a property value string from the URI and attempts to parse it
+     * to its defined data type using Rexster Data Typing.
+     */
     public static Object getTypedPropertyValue(Object propertyValue) {
         return getTypedPropertyValue(propertyValue, true);
     }

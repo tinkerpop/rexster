@@ -9,6 +9,8 @@ import java.lang.annotation.Target;
  * Defines an extension method to rexster.  Extensions may be applied to one of three
  * extension points: graph, vertex and edge.  This basically means that extensions can
  * hang from any one of these resources in rexster.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
