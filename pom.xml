@@ -48,6 +48,8 @@
         <module>rexster-server</module>
         <module>rexster-kibbles</module>
         <module>rexster-core</module>
+        <module>rexster-console</module>
+        <module>rexster-protocol</module>
     </modules>
 
     <properties>

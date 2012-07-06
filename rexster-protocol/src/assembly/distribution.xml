@@ -18,7 +18,7 @@
         <fileSet>
             <directory>target</directory>
             <includes>
-                <include>rexster-core-*.jar</include>
+                <include>rexster-protocol-*.jar</include>
             </includes>
         </fileSet>
     </fileSets>

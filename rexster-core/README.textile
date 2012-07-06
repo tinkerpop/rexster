@@ -1,0 +1,8 @@
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-logo.png!
+
+Rexster Core provides the building blocks utilized in the extension of Rexster.  These components include classes for creating:
+
+* "Extensions":https://github.com/tinkerpop/rexster/wiki/Extensions
+* Graph Configurations
+
+The documentation for Rexster can be found at this "location":http://rexster.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.

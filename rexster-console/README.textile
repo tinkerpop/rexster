@@ -1,0 +1,5 @@
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-logo.png!
+
+Rexster Console is a remote REPL for "Rexster":http://rexster.tinkerpop.com.
+
+The documentation for Rexster Console can be found at this "location":https://github.com/tinkerpop/rexster/wiki/Rexster-Console. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.
