@@ -4,6 +4,7 @@
 /rexster-server/release
 /rexster-server/target
 /rexster-kibbles/*/target
+/rexster-core/target
 /bin
 # eclipse project files and local rexster.xml
 *.classpath

@@ -2,12 +2,10 @@ package com.tinkerpop.rexster.util;
 
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.rexster.Tokens;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONTokener;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -17,7 +15,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

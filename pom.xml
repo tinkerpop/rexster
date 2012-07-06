@@ -47,6 +47,7 @@
     <modules>
         <module>rexster-server</module>
         <module>rexster-kibbles</module>
+        <module>rexster-core</module>
     </modules>
 
     <properties>

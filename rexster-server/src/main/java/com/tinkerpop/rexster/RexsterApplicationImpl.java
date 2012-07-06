@@ -1,8 +1,6 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.util.wrappers.readonly.ReadOnlyGraph;
 import com.tinkerpop.rexster.config.GraphConfigurationContainer;
 import com.tinkerpop.rexster.config.GraphConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;

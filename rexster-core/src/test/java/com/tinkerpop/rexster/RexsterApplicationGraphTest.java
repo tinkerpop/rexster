@@ -81,11 +81,11 @@ public class RexsterApplicationGraphTest {
 
         this.mockery.checking(new Expectations() {{
             allowing(namespacePathSegment).getPath();
-            will(returnValue("ns"));
+            will(Expectations.returnValue("ns"));
             allowing(extensionPathSegment).getPath();
-            will(returnValue("ext"));
+            will(Expectations.returnValue("ext"));
             allowing(uri).getPathSegments();
-            will(returnValue(pathSegments));
+            will(Expectations.returnValue(pathSegments));
         }});
 
         Assert.assertTrue(rag.isExtensionAllowed(new ExtensionSegmentSet(uri, ExtensionPoint.GRAPH)));
@@ -114,11 +114,11 @@ public class RexsterApplicationGraphTest {
 
         this.mockery.checking(new Expectations() {{
             allowing(namespacePathSegment).getPath();
-            will(returnValue("ns"));
+            will(Expectations.returnValue("ns"));
             allowing(extensionPathSegment).getPath();
-            will(returnValue("ext"));
+            will(Expectations.returnValue("ext"));
             allowing(uri).getPathSegments();
-            will(returnValue(pathSegments));
+            will(Expectations.returnValue(pathSegments));
         }});
 
         Assert.assertFalse(rag.isExtensionAllowed(new ExtensionSegmentSet(uri, ExtensionPoint.GRAPH)));
