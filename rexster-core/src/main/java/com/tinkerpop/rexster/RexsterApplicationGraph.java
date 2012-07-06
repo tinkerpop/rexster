@@ -30,7 +30,10 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 /**
- * Holds a graph and its assigned extensions.
+ * Holds a graph and its assigned extensions. This wrapper is what is supplied to the RexsterResourceContext
+ * to be passed to extensions and other Rexster resources.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RexsterApplicationGraph {
 
@@ -51,22 +54,41 @@ public class RexsterApplicationGraph {
         this.graph = graph;
     }
 
+    /**
+     * Gets the name of the graph as supplied in rexster.xml as part of the configuration.
+     *
+     * @return the name of the graph
+     */
     public String getGraphName() {
         return graphName;
     }
 
+    /**
+     * Gets the graph instance itself.
+     *
+     * @return the graph instance.
+     */
     public Graph getGraph() {
         return graph;
     }
 
+    /**
+     * If this graph is an instance of WrapperGraph, this method recursively unwraps the graph to get its
+     * base implementation.
+     *
+     * For purposes of Rexster, graph wrapping occurs when the graph is marked as read-only in rexster.xml.
+     *
+     * @return the unwrapped graph.
+     */
     public Graph getUnwrappedGraph() {
         return unwrapGraph(this.graph);
     }
 
-    public static Graph unwrapGraph(final Graph g) {
-        return g instanceof WrapperGraph ? unwrapGraph(((WrapperGraph) g).getBaseGraph()) : g;
-    }
-
+    /**
+     * Helper method that will attempt to get a transactional graph instance if the graph can be cast to such.
+     *
+     * @return the transactional graph or null if it is not transactional
+     */
     public TransactionalGraph tryGetTransactionalGraph() {
         TransactionalGraph transactionalGraph = null;
         if (this.graph instanceof TransactionalGraph) {
@@ -76,38 +98,41 @@ public class RexsterApplicationGraph {
         return transactionalGraph;
     }
 
+    /**
+     * Determines if the graph is transactional or not.
+     *
+     * @return true if transactional and false otherwise.
+     */
     public boolean isTransactionalGraph() {
         final TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         return transactionalGraph != null;
     }
 
+    /**
+     * Stops a transaction with success if the graph is transactional.  If the graph is not transactional,
+     * the method does nothing.
+     */
     public void tryStopTransactionSuccess() {
         final TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
             transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-            //    transactionalGraph.setMaxBufferSize(1);
-        }
-    }
-
-    public void tryStopTransactionFailure() {
-        final TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
-        if (transactionalGraph != null) {
-            transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            //     transactionalGraph.setMaxBufferSize(1);
-        }
-    }
-
-    public void trySetTransactionalModeAutomatic() {
-        final TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
-        if (transactionalGraph != null) {
-            //     transactionalGraph.setMaxBufferSize(1);
         }
     }
 
     /**
-     * Determines if a particular extension is allowed given configured allowables from rexster.xml.
-     * <p/>
-     * Ensure that loadAllowableExtensions is called prior to this method.
+     * Stops a transaction with failure if the graph is transactional.  If the graph is not transactional,
+     * the method does nothing.
+     */
+    public void tryStopTransactionFailure() {
+        final TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
+        if (transactionalGraph != null) {
+            transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        }
+    }
+
+    /**
+     * Determines if a particular extension is allowed given configured allowables from rexster.xml. Ensure
+     * that loadAllowableExtensions is called prior to this method.
      */
     public boolean isExtensionAllowed(final ExtensionSegmentSet extensionSegmentSet) {
         boolean allowed = false;
@@ -127,6 +152,9 @@ public class RexsterApplicationGraph {
         return allowed;
     }
 
+    /**
+     * Gets an extension configuration given a namespace and extension name.
+     */
     public ExtensionConfiguration findExtensionConfiguration(final String namespace, final String extensionName) {
         ExtensionConfiguration extensionConfigurationFound = null;
 
@@ -143,6 +171,9 @@ public class RexsterApplicationGraph {
         return extensionConfigurationFound;
     }
 
+    /**
+     * Generally speaking this method should not be called directly.
+     */
     public void loadExtensionsConfigurations(final List<HierarchicalConfiguration> extensionConfigurations) {
         this.extensionConfigurations = new HashSet<ExtensionConfiguration>();
 
@@ -164,14 +195,9 @@ public class RexsterApplicationGraph {
         }
     }
 
-    private void initializeExtensionHypermediaCache() {
-        this.getExtensionHypermedia(ExtensionPoint.GRAPH, "");
-        this.getExtensionHypermedia(ExtensionPoint.VERTEX, "");
-        this.getExtensionHypermedia(ExtensionPoint.EDGE, "");
-    }
-
     /**
-     * Loads a list of namespaces extension patterns that are allowed for this graph.
+     * Loads a list of namespaces extension patterns that are allowed for this graph.  Generally speaking this
+     * method should not be called directly.
      */
     public void loadAllowableExtensions(final List allowableNamespaces) {
         this.extensionAllowables = new HashSet<ExtensionAllowed>();
@@ -194,6 +220,10 @@ public class RexsterApplicationGraph {
 
     public Set<ExtensionAllowed> getExtensionAllowables() {
         return this.extensionAllowables;
+    }
+
+    static Graph unwrapGraph(final Graph g) {
+        return g instanceof WrapperGraph ? unwrapGraph(((WrapperGraph) g).getBaseGraph()) : g;
     }
 
     protected JSONArray getExtensionHypermedia(final ExtensionPoint extensionPoint, final String baseUri) {
@@ -341,5 +371,11 @@ public class RexsterApplicationGraph {
         }
 
         return composedLinks;
+    }
+
+    private void initializeExtensionHypermediaCache() {
+        this.getExtensionHypermedia(ExtensionPoint.GRAPH, "");
+        this.getExtensionHypermedia(ExtensionPoint.VERTEX, "");
+        this.getExtensionHypermedia(ExtensionPoint.EDGE, "");
     }
 }

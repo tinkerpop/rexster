@@ -1,6 +1,8 @@
 package com.tinkerpop.rexster;
 
 /**
+ * String tokens used by Rexster.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */

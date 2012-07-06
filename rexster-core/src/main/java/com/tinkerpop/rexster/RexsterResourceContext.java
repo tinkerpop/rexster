@@ -9,6 +9,8 @@ import javax.ws.rs.core.UriInfo;
 
 /**
  * Context for a resource request.  Provides request information to an extension.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RexsterResourceContext {
     private final RexsterApplicationGraph rag;

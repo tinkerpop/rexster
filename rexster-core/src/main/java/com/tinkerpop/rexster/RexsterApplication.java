@@ -5,13 +5,15 @@ import com.tinkerpop.blueprints.Graph;
 import java.util.Set;
 
 /**
- * RexsterApplication is the class that Rexster's servlets all delegate to in order to actually
+ * RexsterApplication is the interface that Rexster's servlets all delegate to in order to actually
  * retrieve or query graphs. A RexsterApplication owns all of the Graph instances that Rexster
  * serves.
  * <p/>
  * Users interested in embedding Rexster into their graph store may want provide a custom
  * implementation of RexsterApplication that has logic to expose a Blueprints graph that
  * delegates to the relevant internal graph representations of their graph store.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public interface RexsterApplication {
     /**

@@ -235,7 +235,6 @@ public abstract class AbstractSubResource extends BaseResource {
                                      final ExtensionMethod methodToCall, final Edge edgeContext,
                                      final Vertex vertexContext)
             throws IllegalAccessException, InvocationTargetException {
-        rexsterApplicationGraph.trySetTransactionalModeAutomatic();
 
         final RexsterExtension rexsterExtension = methodToCall.getRexsterExtension();
         final Method method = methodToCall.getMethod();
