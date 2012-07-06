@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>rexster-protocol</artifactId>
-    <name>RexPro: Binary Protocol</name>
+    <name>Rexster: RexPro Binary Protocol</name>
     <description>RexPro is a binary protocol for Rexster graph server.</description>
     <inceptionYear>2012</inceptionYear>
     <contributors>
