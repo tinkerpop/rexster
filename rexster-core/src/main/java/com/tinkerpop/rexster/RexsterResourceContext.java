@@ -11,18 +11,18 @@ import javax.ws.rs.core.UriInfo;
  * Context for a resource request.  Provides request information to an extension.
  */
 public class RexsterResourceContext {
-    private RexsterApplicationGraph rag;
+    private final RexsterApplicationGraph rag;
 
-    private UriInfo uriInfo;
-    private HttpServletRequest request;
-    private JSONObject requestObject;
-    private JSONObject requestObjectFlat;
-    private ExtensionMethod extensionMethod;
-    private SecurityContext securityContext;
+    private final UriInfo uriInfo;
+    private final HttpServletRequest request;
+    private final JSONObject requestObject;
+    private final JSONObject requestObjectFlat;
+    private final ExtensionMethod extensionMethod;
+    private final SecurityContext securityContext;
 
-    public RexsterResourceContext(RexsterApplicationGraph rag, UriInfo uriInfo, HttpServletRequest request,
-                                  JSONObject requestObject, JSONObject requestObjectFlat, ExtensionMethod extensionMethod,
-                                  SecurityContext securityContext) {
+    public RexsterResourceContext(final RexsterApplicationGraph rag, final UriInfo uriInfo, final HttpServletRequest request,
+                                  final JSONObject requestObject, final JSONObject requestObjectFlat, final ExtensionMethod extensionMethod,
+                                  final SecurityContext securityContext) {
         this.rag = rag;
         this.uriInfo = uriInfo;
         this.request = request;

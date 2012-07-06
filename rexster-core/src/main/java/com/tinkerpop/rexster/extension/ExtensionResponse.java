@@ -14,20 +14,20 @@ import java.util.Map;
  */
 public class ExtensionResponse {
 
-    private Response jerseyResponse;
-    private boolean errorResponse;
+    private final Response jerseyResponse;
+    private final boolean errorResponse;
 
     /**
      * Create a non-error ExtensionResponse object.
      */
-    public ExtensionResponse(Response response) {
+    public ExtensionResponse(final Response response) {
         this(response, false);
     }
 
     /**
      * Create an ExtensionResponse object.
      */
-    public ExtensionResponse(Response response, boolean errorResponse) {
+    public ExtensionResponse(final Response response, final boolean errorResponse) {
         this.jerseyResponse = response;
         this.errorResponse = errorResponse;
     }
@@ -40,7 +40,7 @@ public class ExtensionResponse {
      * the response.  The override methods will not throw a WebApplicationException or do any standard
      * Rexster server side logging.
      */
-    public static ExtensionResponse override(Response response) {
+    public static ExtensionResponse override(final Response response) {
         if (response == null) {
             throw new IllegalArgumentException("Response cannot be null");
         }
@@ -51,14 +51,14 @@ public class ExtensionResponse {
     /**
      * Generates standard Rexster JSON error with an internal server error response code.
      */
-    public static ExtensionResponse error(String message) {
+    public static ExtensionResponse error(final String message) {
         return error(message, (Exception) null);
     }
 
     /**
      * Generates standard Rexster JSON error with an internal server error response code.
      */
-    public static ExtensionResponse error(String message, String appendKey, JSONObject appendJson) {
+    public static ExtensionResponse error(final String message, final String appendKey, final JSONObject appendJson) {
         return error(message, null, appendKey, appendJson);
     }
 
@@ -68,21 +68,21 @@ public class ExtensionResponse {
      * @param appendJson Additional JSON to push into the response. The root of the key values from this object
      *                   will be merged into the root of the resulting JSON.
      */
-    public static ExtensionResponse error(String message, JSONObject appendJson) {
+    public static ExtensionResponse error(final String message, final JSONObject appendJson) {
         return error(message, null, null, appendJson);
     }
 
     /**
      * Generates standard Rexster JSON error with an internal server error response code.
      */
-    public static ExtensionResponse error(Exception source) {
+    public static ExtensionResponse error(final Exception source) {
         return error("", source);
     }
 
     /**
      * Generates standard Rexster JSON error with an internal server error response code.
      */
-    public static ExtensionResponse error(Exception source, String appendKey, JSONObject appendJson) {
+    public static ExtensionResponse error(final Exception source, final String appendKey, final JSONObject appendJson) {
         return error("", source, appendKey, appendJson);
     }
 
@@ -92,14 +92,14 @@ public class ExtensionResponse {
      * @param appendJson Additional JSON to push into the response. The root of the key values from this object
      *                   will be merged into the root of the resulting JSON.
      */
-    public static ExtensionResponse error(Exception source, JSONObject appendJson) {
+    public static ExtensionResponse error(final Exception source, final JSONObject appendJson) {
         return error("", source, null, appendJson);
     }
 
     /**
      * Generates standard Rexster JSON error with an internal server error response code.
      */
-    public static ExtensionResponse error(String message, Exception source) {
+    public static ExtensionResponse error(final String message, final Exception source) {
         return error(message, source, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
     }
 
@@ -112,7 +112,7 @@ public class ExtensionResponse {
      *                   written at the root of the response object.
      * @param appendJson Additional JSON to push into the response.
      */
-    public static ExtensionResponse error(String message, Exception source, String appendKey, JSONObject appendJson) {
+    public static ExtensionResponse error(final String message, final Exception source, final String appendKey, final JSONObject appendJson) {
         return error(message, source, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), appendKey, appendJson);
     }
 
@@ -122,7 +122,7 @@ public class ExtensionResponse {
      * @param appendJson Additional JSON to push into the response. The root of the key values from this object
      *                   will be merged into the root of the resulting JSON.
      */
-    public static ExtensionResponse error(String message, Exception source, JSONObject appendJson) {
+    public static ExtensionResponse error(final String message, final Exception source, final JSONObject appendJson) {
         return error(message, source, null, appendJson);
     }
 
@@ -131,7 +131,7 @@ public class ExtensionResponse {
      * <p/>
      * The status code is not validated, so throw the right code.
      */
-    public static ExtensionResponse error(String message, Exception source, int statusCode) {
+    public static ExtensionResponse error(final String message, final Exception source, final int statusCode) {
         return error(message, source, statusCode, null, null);
     }
 
@@ -146,8 +146,9 @@ public class ExtensionResponse {
      *                   written at the root of the response object.
      * @param appendJson Additional JSON to push into the response.
      */
-    public static ExtensionResponse error(String message, Exception source, int statusCode, String appendKey, JSONObject appendJson) {
-        Map<String, Object> m = new HashMap<String, Object>();
+    public static ExtensionResponse error(final String message, final Exception source, final int statusCode,
+                                          final String appendKey, final JSONObject appendJson) {
+        final Map<String, Object> m = new HashMap<String, Object>();
         m.put(Tokens.MESSAGE, message);
 
         if (source != null) {
@@ -158,9 +159,9 @@ public class ExtensionResponse {
             if (appendKey != null && !appendKey.isEmpty()) {
                 m.put(appendKey, appendJson);
             } else {
-                Iterator keys = appendJson.keys();
+                final Iterator keys = appendJson.keys();
                 while (keys.hasNext()) {
-                    String key = (String) keys.next();
+                    final String key = (String) keys.next();
                     m.put(key, appendJson.opt(key));
                 }
             }
@@ -182,7 +183,7 @@ public class ExtensionResponse {
      * Generates an response with an OK status code.  Accepts a HashMap as the response value.
      * It is converted to JSON.
      */
-    public static ExtensionResponse ok(Map result) {
+    public static ExtensionResponse ok(final Map result) {
         if (result == null) {
             throw new IllegalArgumentException("result cannot be null");
         }
@@ -190,7 +191,7 @@ public class ExtensionResponse {
         return ok(new JSONObject(result));
     }
 
-    public static ExtensionResponse availableOptions(String... methods) {
+    public static ExtensionResponse availableOptions(final String... methods) {
         return new ExtensionResponse(Response.noContent()
                 .header("Access-Control-Allow-Methods", StringUtils.join(methods, ",")).build());
     }
@@ -198,7 +199,7 @@ public class ExtensionResponse {
     /**
      * Generates an response with an OK status code.
      */
-    public static ExtensionResponse ok(JSONObject result) {
+    public static ExtensionResponse ok(final JSONObject result) {
         return new ExtensionResponse(Response.ok(result).build());
     }
 

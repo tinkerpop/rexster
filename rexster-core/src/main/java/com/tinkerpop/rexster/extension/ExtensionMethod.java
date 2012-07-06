@@ -8,15 +8,17 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 
 public class ExtensionMethod {
-    private Method method;
+    private final Method method;
 
-    private ExtensionDefinition extensionDefinition;
+    private final ExtensionDefinition extensionDefinition;
 
-    private ExtensionDescriptor extensionDescriptor;
+    private final ExtensionDescriptor extensionDescriptor;
 
-    private RexsterExtension rexsterExtension;
+    private final RexsterExtension rexsterExtension;
 
-    public ExtensionMethod(Method method, ExtensionDefinition extensionDefinition, ExtensionDescriptor extensionDescriptor, RexsterExtension rexsterExtension) {
+    public ExtensionMethod(final Method method, final ExtensionDefinition extensionDefinition,
+                           final ExtensionDescriptor extensionDescriptor,
+                           final RexsterExtension rexsterExtension) {
         this.method = method;
         this.extensionDefinition = extensionDefinition;
         this.extensionDescriptor = extensionDescriptor;
@@ -42,12 +44,12 @@ public class ExtensionMethod {
     public JSONObject getExtensionApiAsJson() {
 
         JSONObject fullApi = null;
-        HashMap<String, Object> map = new HashMap<String, Object>();
+        final HashMap<String, Object> map = new HashMap<String, Object>();
         if (this.extensionDescriptor != null) {
             map.put(Tokens.DESCRIPTION, this.extensionDescriptor.description());
 
             JSONObject api = null;
-            HashMap<String, String> innerMap = new HashMap<String, String>();
+            final HashMap<String, String> innerMap = new HashMap<String, String>();
             if (this.extensionDescriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
                     || this.extensionDescriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_DESCRIPTOR_ONLY) {
 
@@ -61,12 +63,12 @@ public class ExtensionMethod {
 
             if (this.extensionDescriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
                     || this.extensionDescriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_PARAMETER_ONLY) {
-                Annotation[][] parametersAnnotations = method.getParameterAnnotations();
+                final Annotation[][] parametersAnnotations = method.getParameterAnnotations();
                 for (int ix = 0; ix < parametersAnnotations.length; ix++) {
-                    Annotation[] annotation = parametersAnnotations[ix];
+                    final Annotation[] annotation = parametersAnnotations[ix];
 
                     if (annotation != null && annotation[0] instanceof ExtensionRequestParameter) {
-                        ExtensionRequestParameter extensionRequestParameter = (ExtensionRequestParameter) annotation[0];
+                        final ExtensionRequestParameter extensionRequestParameter = (ExtensionRequestParameter) annotation[0];
                         innerMap.put(extensionRequestParameter.name(), extensionRequestParameter.description());
                     }
                 }

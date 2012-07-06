@@ -36,8 +36,8 @@ public class RexsterApplicationGraph {
 
     private static final Logger logger = Logger.getLogger(RexsterApplicationGraph.class);
 
-    private Graph graph;
-    private String graphName;
+    private final Graph graph;
+    private final String graphName;
     private Set<ExtensionAllowed> extensionAllowables;
     private Set<ExtensionConfiguration> extensionConfigurations;
 
@@ -46,7 +46,7 @@ public class RexsterApplicationGraph {
     private final Map<ExtensionPoint, List<HashMap<String, Object>>> hypermediaCache = new HashMap<ExtensionPoint, List<HashMap<String, Object>>>();
     private final Map<ExtensionSegmentSet, Boolean> extensionAllowedCache = new HashMap<ExtensionSegmentSet, Boolean>();
 
-    public RexsterApplicationGraph(String graphName, Graph graph) {
+    public RexsterApplicationGraph(final String graphName, final Graph graph) {
         this.graphName = graphName;
         this.graph = graph;
     }
@@ -63,7 +63,7 @@ public class RexsterApplicationGraph {
         return unwrapGraph(this.graph);
     }
 
-    public static Graph unwrapGraph(Graph g) {
+    public static Graph unwrapGraph(final Graph g) {
         return g instanceof WrapperGraph ? unwrapGraph(((WrapperGraph) g).getBaseGraph()) : g;
     }
 
@@ -77,12 +77,12 @@ public class RexsterApplicationGraph {
     }
 
     public boolean isTransactionalGraph() {
-        TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
+        final TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         return transactionalGraph != null;
     }
 
     public void tryStopTransactionSuccess() {
-        TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
+        final TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
             transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             //    transactionalGraph.setMaxBufferSize(1);
@@ -90,7 +90,7 @@ public class RexsterApplicationGraph {
     }
 
     public void tryStopTransactionFailure() {
-        TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
+        final TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
             transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
             //     transactionalGraph.setMaxBufferSize(1);
@@ -98,7 +98,7 @@ public class RexsterApplicationGraph {
     }
 
     public void trySetTransactionalModeAutomatic() {
-        TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
+        final TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
             //     transactionalGraph.setMaxBufferSize(1);
         }
@@ -109,7 +109,7 @@ public class RexsterApplicationGraph {
      * <p/>
      * Ensure that loadAllowableExtensions is called prior to this method.
      */
-    public boolean isExtensionAllowed(ExtensionSegmentSet extensionSegmentSet) {
+    public boolean isExtensionAllowed(final ExtensionSegmentSet extensionSegmentSet) {
         boolean allowed = false;
 
         if (!extensionAllowedCache.containsKey(extensionSegmentSet)) {
@@ -127,7 +127,7 @@ public class RexsterApplicationGraph {
         return allowed;
     }
 
-    public ExtensionConfiguration findExtensionConfiguration(String namespace, String extensionName) {
+    public ExtensionConfiguration findExtensionConfiguration(final String namespace, final String extensionName) {
         ExtensionConfiguration extensionConfigurationFound = null;
 
         if (this.extensionConfigurations != null) {
@@ -143,14 +143,14 @@ public class RexsterApplicationGraph {
         return extensionConfigurationFound;
     }
 
-    public void loadExtensionsConfigurations(List<HierarchicalConfiguration> extensionConfigurations) {
+    public void loadExtensionsConfigurations(final List<HierarchicalConfiguration> extensionConfigurations) {
         this.extensionConfigurations = new HashSet<ExtensionConfiguration>();
 
         if (extensionConfigurations != null) {
             for (HierarchicalConfiguration configuration : extensionConfigurations) {
-                String namespace = configuration.getString("namespace", "");
-                String name = configuration.getString("name", "");
-                HierarchicalConfiguration extensionConfig = configuration.configurationAt("configuration");
+                final String namespace = configuration.getString("namespace", "");
+                final String name = configuration.getString("name", "");
+                final HierarchicalConfiguration extensionConfig = configuration.configurationAt("configuration");
 
                 if (!namespace.isEmpty() && !name.isEmpty() && extensionConfig != null) {
                     this.extensionConfigurations.add(new ExtensionConfiguration(namespace, name, extensionConfig));
@@ -173,12 +173,12 @@ public class RexsterApplicationGraph {
     /**
      * Loads a list of namespaces extension patterns that are allowed for this graph.
      */
-    public void loadAllowableExtensions(List allowableNamespaces) {
+    public void loadAllowableExtensions(final List allowableNamespaces) {
         this.extensionAllowables = new HashSet<ExtensionAllowed>();
 
         if (allowableNamespaces != null) {
             for (int ix = 0; ix < allowableNamespaces.size(); ix++) {
-                String namespace = allowableNamespaces.get(ix).toString();
+                final String namespace = allowableNamespaces.get(ix).toString();
 
                 try {
                     this.getExtensionAllowables().add(new ExtensionAllowed(namespace));
@@ -196,7 +196,7 @@ public class RexsterApplicationGraph {
         return this.extensionAllowables;
     }
 
-    protected JSONArray getExtensionHypermedia(ExtensionPoint extensionPoint, String baseUri) {
+    protected JSONArray getExtensionHypermedia(final ExtensionPoint extensionPoint, final String baseUri) {
 
         List<HashMap<String, Object>> hypermediaLinks = new ArrayList<HashMap<String, Object>>();
         if (hypermediaCache.containsKey(extensionPoint)) {

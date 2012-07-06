@@ -12,7 +12,15 @@ public class ExtensionSegmentSet {
 
     private String extensionMethod;
 
-    public ExtensionSegmentSet(String namespace, String extension) {
+    public ExtensionSegmentSet(final String namespace, final String extension) {
+        this(namespace, extension, "");
+    }
+
+    public ExtensionSegmentSet(final String namespace, final String extension, final String extensionMethod) {
+
+        if (extensionMethod == null) {
+            throw new IllegalArgumentException("extensionMethod");
+        }
 
         if (namespace == null) {
             throw new IllegalArgumentException("namespace");
@@ -24,17 +32,6 @@ public class ExtensionSegmentSet {
 
         this.namespace = namespace;
         this.extension = extension;
-        this.extensionMethod = "";
-    }
-
-    public ExtensionSegmentSet(String namespace, String extension, String extensionMethod) {
-
-        this(namespace, extension);
-
-        if (extensionMethod == null) {
-            throw new IllegalArgumentException("extensionMethod");
-        }
-
         this.extensionMethod = extensionMethod;
     }
 
@@ -95,7 +92,7 @@ public class ExtensionSegmentSet {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ExtensionSegmentSet that = (ExtensionSegmentSet) o;
+        final ExtensionSegmentSet that = (ExtensionSegmentSet) o;
 
         if (!extension.equals(that.extension)) return false;
         if (!extensionMethod.equals(that.extensionMethod)) return false;

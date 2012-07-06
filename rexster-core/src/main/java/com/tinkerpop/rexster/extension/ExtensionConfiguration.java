@@ -11,19 +11,19 @@ import java.util.Map;
  * Holds information that details the configuration of an extension.
  */
 public class ExtensionConfiguration {
-    private static Logger logger = Logger.getLogger(ExtensionConfiguration.class);
+    private static final Logger logger = Logger.getLogger(ExtensionConfiguration.class);
 
-    private String namespace;
+    private final String namespace;
 
-    private String extensionName;
+    private final String extensionName;
 
-    private HierarchicalConfiguration configuration;
+    private final HierarchicalConfiguration configuration;
 
     /**
      * Initializes a new ExtensionConfiguration object as taken from rexster.xml.
      * This is the specific configuration for a particular extension in a specific graph.
      */
-    public ExtensionConfiguration(String namespace, String extensionName, HierarchicalConfiguration extensionConfiguration) {
+    public ExtensionConfiguration(final String namespace, final String extensionName, final HierarchicalConfiguration extensionConfiguration) {
 
         if (namespace == null || namespace.isEmpty()) {
             throw new IllegalArgumentException("Namespace cannot be null or empty.");
@@ -72,10 +72,9 @@ public class ExtensionConfiguration {
 
         Map<String, String> map = new HashMap<String, String>();
         try {
-            Iterator keys = this.configuration.getKeys();
+            final Iterator keys = this.configuration.getKeys();
             while (keys.hasNext()) {
-                String key = keys.next().toString();
-
+                final String key = keys.next().toString();
                 map.put(key, this.configuration.getString(key));
             }
         } catch (Exception ex) {

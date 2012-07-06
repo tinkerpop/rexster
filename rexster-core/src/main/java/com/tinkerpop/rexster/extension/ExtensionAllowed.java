@@ -4,13 +4,13 @@ package com.tinkerpop.rexster.extension;
  * Holds namespaces that define which extensions are allowed for a specific graph.
  */
 public class ExtensionAllowed {
-    private String namespace;
+    private final String namespace;
 
     /**
      * Initializes a new ExtensionAllowed object as taken from rexster.xml.
      * The namespace may be wildcarded to be one of the follows: *:*, namespace:*, namespace:extension
      */
-    public ExtensionAllowed(String namespace) {
+    public ExtensionAllowed(final String namespace) {
         // must match this format *:*, namespace:*, namespace:extension
         if (!(namespace.matches("([\\w-]+|\\*):([\\w-]+|\\*)")
                 && !(namespace.startsWith("*") && namespace.equals("*.*")))) {
@@ -27,7 +27,7 @@ public class ExtensionAllowed {
     /**
      * Determines if the namespace and extension are allowed given the configuration of the graph in rexster.xml.
      */
-    public boolean isExtensionAllowed(ExtensionSegmentSet extensionSegmentSet) {
+    public boolean isExtensionAllowed(final ExtensionSegmentSet extensionSegmentSet) {
         boolean allowed = false;
 
         if (this.namespace.equals("*:*")) {
