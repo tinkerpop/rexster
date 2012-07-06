@@ -11,6 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>rexster-core</artifactId>
     <name>Rexster: Core Components</name>
+    <description>Core components for extending Rexster.</description>
     <developers>
         <developer>
             <name>Stephen Mallette</name>
@@ -19,17 +20,6 @@
         </developer>
     </developers>
     <inceptionYear>2012</inceptionYear>
-    <licenses>
-        <license>
-            <name>BSD 3-Clause</name>
-            <url>http://www.opensource.org/licenses/BSD-3-Clause</url>
-        </license>
-    </licenses>
-    <scm>
-        <connection>scm:git:git@github.com:tinkerpop/rexster.git</connection>
-        <developerConnection>scm:git:git@github.com:tinkerpop/rexster.git</developerConnection>
-        <url>git@github.com:tinkerpop/rexster.git</url>
-    </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

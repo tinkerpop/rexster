@@ -13,10 +13,6 @@
     <packaging>jar</packaging>
     <url>http://rexster.tinkerpop.com</url>
     <name>Rexster: A Graph Server</name>
-    <description>
-        Rexster is a multi-faceted graph server that exposes any Blueprints graph (e.g. TinkerGraph, Neo4j, OrientDB,
-        DEX, and Sail RDF Stores) through several mechanisms with a general focus on REST.
-    </description>
     <developers>
         <developer>
             <name>Stephen Mallette</name>
@@ -29,18 +25,6 @@
             <url>http://markorodriguez.com</url>
         </developer>
     </developers>
-    <inceptionYear>2009</inceptionYear>
-    <licenses>
-        <license>
-            <name>BSD 3-Clause</name>
-            <url>http://www.opensource.org/licenses/BSD-3-Clause</url>
-        </license>
-    </licenses>
-    <scm>
-        <connection>scm:git:git@github.com:tinkerpop/rexster.git</connection>
-        <developerConnection>scm:git:git@github.com:tinkerpop/rexster.git</developerConnection>
-        <url>git@github.com:tinkerpop/rexster.git</url>
-    </scm>
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.rexster</groupId>
