@@ -19,7 +19,7 @@ h3. Version 2.1.0 (NOT OFFICIALLY RELEASED YET)
 * Configuration element of @rexster.xml@ to bind the rexpro hostname.
 * Vertex query API. 
 * Fixed issue with inconsistencies of PUT, POST, and DELETE around manual indices.
-* Restructured project to introduce rexster-core.
+* Restructured project to introduce rexster-core, rexster-console and rexster-protocol.
 
 ==<hr/>==
 
