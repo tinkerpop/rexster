@@ -4,6 +4,8 @@ CP=$( echo `dirname $0`/../lib/*.jar . | sed 's/ /:/g')
 CP=$CP:$(find `dirname $0`/../ext/ -name "*.jar" | tr '\n' ':')
 #echo $CP
 
+PUBLIC=`dirname $0`/../public/
+
 # Find Java
 if [ "$JAVA_HOME" = "" ] ; then
     JAVA="java -server"
@@ -17,7 +19,7 @@ if [ "$JAVA_OPTIONS" = "" ] ; then
 fi
 
 # Launch the application
-$JAVA $JAVA_OPTIONS -cp $CP com.tinkerpop.rexster.WebServer $@
+$JAVA $JAVA_OPTIONS -cp $CP com.tinkerpop.rexster.WebServer $@ -wr $PUBLIC
 
 # Return the program's exit code
 exit $?
