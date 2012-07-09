@@ -27,7 +27,7 @@ public class VertexResourceIntegrationTest extends AbstractGraphResourceIntegrat
     public void getVertexFoundStatusOk() {
         for (GraphTestHolder testGraph : this.testGraphs) {
             String id = testGraph.getVertexIdSet().values().iterator().next();
-            ClientResponse graphResponse = doGraphGet(testGraph, "vertices/" + id);
+            ClientResponse graphResponse = doGraphGet(testGraph, "vertices/" + encode(id));
 
             Assert.assertNotNull(graphResponse);
             Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
@@ -153,7 +153,7 @@ public class VertexResourceIntegrationTest extends AbstractGraphResourceIntegrat
             final String id = testGraph.getVertexIdSet().get("1");
 
             // get out vertices
-            ClientResponse graphResponse = doGraphGet(testGraph, "vertices/" + id + "/out");
+            ClientResponse graphResponse = doGraphGet(testGraph, "vertices/" + encode(id) + "/out");
 
             Assert.assertNotNull(graphResponse);
             Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
@@ -164,7 +164,7 @@ public class VertexResourceIntegrationTest extends AbstractGraphResourceIntegrat
             Assert.assertEquals(3, json.optJSONArray(Tokens.RESULTS).length());
 
             // get out edges
-            graphResponse = doGraphGet(testGraph, "vertices/" + id + "/outE");
+            graphResponse = doGraphGet(testGraph, "vertices/" + encode(id) + "/outE");
             Assert.assertEquals(Tokens.VERTEX, json.optJSONArray(Tokens.RESULTS).optJSONObject(0).optString(Tokens._TYPE));
 
             Assert.assertNotNull(graphResponse);
@@ -177,7 +177,7 @@ public class VertexResourceIntegrationTest extends AbstractGraphResourceIntegrat
             Assert.assertEquals(Tokens.EDGE, json.optJSONArray(Tokens.RESULTS).optJSONObject(0).optString(Tokens._TYPE));
 
             // get out vertices filtered by label
-            graphResponse = doGraphGet(testGraph, "vertices/" + id + "/out", "_label=[knows]");
+            graphResponse = doGraphGet(testGraph, "vertices/" + encode(id) + "/out", "_label=[knows]");
 
             Assert.assertNotNull(graphResponse);
             Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
@@ -189,7 +189,7 @@ public class VertexResourceIntegrationTest extends AbstractGraphResourceIntegrat
             Assert.assertEquals(Tokens.VERTEX, json.optJSONArray(Tokens.RESULTS).optJSONObject(0).optString(Tokens._TYPE));
 
             // get out vertices filtered by label and limited
-            graphResponse = doGraphGet(testGraph, "vertices/" + id + "/out", "_label=[knows]&_limit=1");
+            graphResponse = doGraphGet(testGraph, "vertices/" + encode(id) + "/out", "_label=[knows]&_limit=1");
 
             Assert.assertNotNull(graphResponse);
             Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
@@ -200,7 +200,7 @@ public class VertexResourceIntegrationTest extends AbstractGraphResourceIntegrat
             Assert.assertEquals(1, json.optJSONArray(Tokens.RESULTS).length());
 
             // get out vertices filtered by label and filtered by property (we lose "float" in graph creation)
-            graphResponse = doGraphGet(testGraph, "vertices/" + id + "/out", "_label=[knows]&_properties=[[weight,=,(d,1)]]");
+            graphResponse = doGraphGet(testGraph, "vertices/" + encode(id) + "/out", "_label=[knows]&_properties=[[weight,=,(d,1)]]");
 
             Assert.assertNotNull(graphResponse);
             Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
@@ -211,7 +211,7 @@ public class VertexResourceIntegrationTest extends AbstractGraphResourceIntegrat
             Assert.assertEquals(1, json.optJSONArray(Tokens.RESULTS).length());
 
             // get out count filtered by label counted
-            graphResponse = doGraphGet(testGraph, "vertices/" + id + "/outCount", "_label=[knows]");
+            graphResponse = doGraphGet(testGraph, "vertices/" + encode(id) + "/outCount", "_label=[knows]");
 
             Assert.assertNotNull(graphResponse);
             Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
@@ -222,7 +222,7 @@ public class VertexResourceIntegrationTest extends AbstractGraphResourceIntegrat
             Assert.assertEquals(2, json.optInt(Tokens.TOTAL_SIZE));
 
             // get out vertex ids filtered by label and weight
-            graphResponse = doGraphGet(testGraph, "vertices/" + id + "/outIds", "_label=[knows]&_properties=[[weight,=,(d,1)]]");
+            graphResponse = doGraphGet(testGraph, "vertices/" + encode(id) + "/outIds", "_label=[knows]&_properties=[[weight,=,(d,1)]]");
 
             Assert.assertNotNull(graphResponse);
             Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());

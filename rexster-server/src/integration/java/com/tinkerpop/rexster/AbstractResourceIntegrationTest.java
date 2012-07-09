@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URI;
+import java.net.URLEncoder;
 
 public abstract class AbstractResourceIntegrationTest extends JerseyTest {
 
@@ -193,5 +194,12 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
         }
 
         return uri;
+    }
+
+    public static String encode(final Object id) {
+        if (id instanceof String)
+            return URLEncoder.encode(id.toString());
+        else
+            return id.toString();
     }
 }

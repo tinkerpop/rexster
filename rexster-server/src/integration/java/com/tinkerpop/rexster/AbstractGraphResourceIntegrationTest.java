@@ -73,7 +73,7 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
             JSONObject verticesJson = response.getEntity(JSONObject.class);
             JSONArray verticesToDelete = verticesJson.optJSONArray(Tokens.RESULTS);
             for (int ix = 0; ix < verticesToDelete.length(); ix++) {
-                this.client().handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/vertices/" + verticesToDelete.optJSONObject(ix).optString(Tokens._ID)), "DELETE"));
+                this.client().handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/vertices/" + encode(verticesToDelete.optJSONObject(ix).optString(Tokens._ID))), "DELETE"));
             }
 
             response = doGraphGet(testGraph, "indices");
@@ -87,7 +87,7 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
             JSONObject keyIndicesVertexJson = response.getEntity(JSONObject.class);
             JSONArray keyIndicesVertexToDelete = keyIndicesVertexJson.optJSONArray(Tokens.RESULTS);
             for (int ix = 0; ix < keyIndicesVertexToDelete.length(); ix++) {
-                this.client().handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/keyindices/vertex/" + keyIndicesVertexToDelete.optString(ix)), "DELETE"));
+                this.client().handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/keyindices/vertex/" + encode(keyIndicesVertexToDelete.optString(ix))), "DELETE"));
             }
 
             response = doGraphGet(testGraph, "keyindices/edge");

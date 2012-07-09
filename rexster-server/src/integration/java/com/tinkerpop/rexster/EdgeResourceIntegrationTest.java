@@ -33,7 +33,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     public void getEdgeFoundStatusOk() {
         for (GraphTestHolder testGraph : this.testGraphs) {
             String id = testGraph.getEdgeIdSet().values().iterator().next();
-            ClientResponse graphResponse = doGraphGet(testGraph, "edges/" + id);
+            ClientResponse graphResponse = doGraphGet(testGraph, "edges/" + encode(id));
 
             Assert.assertNotNull(graphResponse);
             Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
@@ -157,7 +157,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     public void postEdgeEdgeExistingWithNoEdgePropertiesStatusConflict() {
         for (GraphTestHolder testGraph : this.testGraphs) {
             String id = testGraph.getEdgeIdSet().values().iterator().next();
-            ClientResponse response = this.doGraphPost(testGraph, "edges/" + id);
+            ClientResponse response = this.doGraphPost(testGraph, "edges/" + encode(id));
 
             Assert.assertNotNull(response);
             Assert.assertEquals(ClientResponse.Status.CONFLICT, response.getClientResponseStatus());
@@ -168,7 +168,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     public void postEdgeNewEdgeVerticesDoNotExistStatusConflict() {
         for (GraphTestHolder testGraph : this.testGraphs) {
             String id = testGraph.getEdgeIdSet().values().iterator().next();
-            ClientResponse response = this.doGraphPost(testGraph, "edges/" + id, "_outV=102notreal&_inV=123notreal");
+            ClientResponse response = this.doGraphPost(testGraph, "edges/" + encode(id), "_outV=102notreal&_inV=123notreal");
 
             Assert.assertNotNull(response);
             Assert.assertEquals(ClientResponse.Status.CONFLICT, response.getClientResponseStatus());
@@ -184,7 +184,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
 
             // post as URI
             String edgeProperty = "propertya=(i,123)&propertyb=(d,321.5)&propertyc=test";
-            ClientResponse response = this.doGraphPost(testGraph, "edges", "_outV=" + vertexIdOut + "&_inV=" + vertexIdIn + "&_label=uriPost&" + edgeProperty);
+            ClientResponse response = this.doGraphPost(testGraph, "edges", "_outV=" + encode(vertexIdOut) + "&_inV=" + encode(vertexIdIn) + "&_label=uriPost&" + edgeProperty);
             assertPostedEdge(vertexIdIn, vertexIdOut, response, true);
 
             // post as JSON
@@ -214,7 +214,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
                 // post as URI
                 String complexValue = "(map,(propertya=(i,123),propertyb=(d,321.5),propertyc=(list,(x,y,z)),propertyd=(map,(x=xyz))))";
                 String complexKeyValueUri = "&complex=" + complexValue;
-                ClientResponse response = this.doGraphPost(testGraph, "edges", "_outV=" + vertexIdOut + "&_inV=" + vertexIdIn + "&_label=uriPost" + complexKeyValueUri);
+                ClientResponse response = this.doGraphPost(testGraph, "edges", "_outV=" + encode(vertexIdOut) + "&_inV=" + encode(vertexIdIn) + "&_label=uriPost" + complexKeyValueUri);
                 assertPostedEdge(vertexIdIn, vertexIdOut, response, false);
     
                 // post as JSON
@@ -255,7 +255,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
 
             // put as URI
             String edgeProperty = "propertya=(i,123)&propertyb=(d,321.5)&propertyc=test";
-            ClientResponse response = this.doGraphPut(testGraph, "edges/" + firstEdgeId, edgeProperty);
+            ClientResponse response = this.doGraphPut(testGraph, "edges/" + encode(firstEdgeId), edgeProperty);
             assertPuttedEdge(firstEdgeId, response, true);
 
             // put as JSON
@@ -265,7 +265,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
             jsonEdgeData.put("propertyc", "test");
 
             JSONObject jsonEdgeToPut = new JSONObject(jsonEdgeData);
-            response = this.doGraphPutOfJson(testGraph, "edges/" + secondEdgeId, jsonEdgeToPut);
+            response = this.doGraphPutOfJson(testGraph, "edges/" + encode(secondEdgeId), jsonEdgeToPut);
             assertPuttedEdge(secondEdgeId, response, true);
         }
     }
@@ -281,7 +281,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
                 // put as URI
                 String complexValue = "(map,(propertya=(i,123),propertyb=(d,321.5),propertyc=(list,(x,y,z)),propertyd=(map,(x=xyz))))";
                 String complexKeyValueUri = "complex=" + complexValue;
-                ClientResponse response = this.doGraphPut(testGraph, "edges/" + firstEdgeId, complexKeyValueUri);
+                ClientResponse response = this.doGraphPut(testGraph, "edges/" + encode(firstEdgeId), complexKeyValueUri);
                 assertPuttedEdge(firstEdgeId, response, false);
 
                 // put as JSON
@@ -292,7 +292,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
                 jsonEdgeData.put("complex", complexJsonObject);
 
                 JSONObject jsonEdgeToPost = new JSONObject(jsonEdgeData);
-                response = this.doGraphPutOfJson(testGraph, "edges/" + secondEdgeId, jsonEdgeToPost);
+                response = this.doGraphPutOfJson(testGraph, "edges/" + encode(secondEdgeId), jsonEdgeToPost);
                 assertPuttedEdge(secondEdgeId, response, false);
             }
         }
@@ -313,7 +313,7 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
             Iterator<String> itty = testGraph.getEdgeIdSet().values().iterator();
             String edgeToDelete = itty.next();
 
-            ClientResponse responseGetEdge = this.doGraphGet(testGraph, "edges/" + edgeToDelete);
+            ClientResponse responseGetEdge = this.doGraphGet(testGraph, "edges/" + encode(edgeToDelete));
             Assert.assertEquals(ClientResponse.Status.OK, responseGetEdge.getClientResponseStatus());
             JSONObject edgeJson = responseGetEdge.getEntity(JSONObject.class);
 
@@ -329,10 +329,10 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
             }
 
             // delete the properties first
-            ClientResponse responsePropertyDelete = this.doGraphDelete(testGraph, "edges/" + edgeToDelete, keysToDeleteQueryString);
+            ClientResponse responsePropertyDelete = this.doGraphDelete(testGraph, "edges/" + encode(edgeToDelete), keysToDeleteQueryString);
             Assert.assertEquals(ClientResponse.Status.OK, responsePropertyDelete.getClientResponseStatus());
 
-            responseGetEdge = this.doGraphGet(testGraph, "edges/" + edgeToDelete);
+            responseGetEdge = this.doGraphGet(testGraph, "edges/" + encode(edgeToDelete));
             Assert.assertEquals(ClientResponse.Status.OK, responseGetEdge.getClientResponseStatus());
             edgeJson = responseGetEdge.getEntity(JSONObject.class).optJSONObject(Tokens.RESULTS);
 
@@ -341,10 +341,10 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
             }
 
             // delete the edge itself
-            responsePropertyDelete = this.doGraphDelete(testGraph, "edges/" + edgeToDelete);
+            responsePropertyDelete = this.doGraphDelete(testGraph, "edges/" + encode(edgeToDelete));
             Assert.assertEquals(ClientResponse.Status.OK, responsePropertyDelete.getClientResponseStatus());
 
-            responseGetEdge = this.doGraphGet(testGraph, "edges/" + edgeToDelete);
+            responseGetEdge = this.doGraphGet(testGraph, "edges/" + encode(edgeToDelete));
             Assert.assertEquals(ClientResponse.Status.NOT_FOUND, responseGetEdge.getClientResponseStatus());
         }
     }

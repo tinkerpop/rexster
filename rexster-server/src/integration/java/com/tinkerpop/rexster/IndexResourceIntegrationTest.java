@@ -38,7 +38,7 @@ public class IndexResourceIntegrationTest extends AbstractGraphResourceIntegrati
 
             String mappedId = testGraph.getVertexIdSet().get("1");
 
-            ClientResponse indexPutResponse = doGraphPut(testGraph, "indices/newindex", "key=name&value=marko&id=" + mappedId);
+            ClientResponse indexPutResponse = doGraphPut(testGraph, "indices/newindex", "key=name&value=marko&id=" + encode(mappedId));
 
             Assert.assertNotNull(indexPutResponse);
             Assert.assertEquals(ClientResponse.Status.OK, indexPutResponse.getClientResponseStatus());
@@ -68,7 +68,7 @@ public class IndexResourceIntegrationTest extends AbstractGraphResourceIntegrati
 
             String mappedId = testGraph.getVertexIdSet().get("1");
 
-            ClientResponse indexPutResponse = doGraphPut(testGraph, "indices/newindex", "key=name&value=marko&id=" + mappedId);
+            ClientResponse indexPutResponse = doGraphPut(testGraph, "indices/newindex", "key=name&value=marko&id=" + encode(mappedId));
 
             ClientResponse indexGetResponse = doGraphGet(testGraph, "indices/newindex", "key=name&value=marko");
             Assert.assertNotNull(indexGetResponse);
@@ -85,7 +85,7 @@ public class IndexResourceIntegrationTest extends AbstractGraphResourceIntegrati
             Assert.assertEquals(mappedId, marko.optString("_id"));
             Assert.assertEquals("marko", marko.optString("name"));
 
-            doGraphDelete(testGraph, "indices/newindex", "key=name&value=marko&id=" + mappedId);
+            doGraphDelete(testGraph, "indices/newindex", "key=name&value=marko&id=" + encode(mappedId));
 
             indexGetResponse = doGraphGet(testGraph, "indices/newindex", "key=name&value=marko");
             Assert.assertNotNull(indexGetResponse);
