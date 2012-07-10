@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.gremlin.converter;
 
 import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.util.io.graphson.GraphSONFactory;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
 import com.tinkerpop.pipes.util.structures.Row;
 import com.tinkerpop.pipes.util.structures.Table;
 import org.codehaus.jettison.json.JSONArray;
@@ -103,9 +103,9 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
         }
         if (object instanceof Element) {
             if (returnKeys == null) {
-                return GraphSONFactory.createJSONElement((Element) object, null, showTypes);
+                return GraphSONUtility.jsonFromElement((Element) object, null, showTypes);
             } else {
-                return GraphSONFactory.createJSONElement((Element) object, returnKeys, showTypes);
+                return GraphSONUtility.jsonFromElement((Element) object, returnKeys, showTypes);
             }
         } else if (object instanceof Map) {
             JSONObject jsonObject = new JSONObject();

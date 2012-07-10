@@ -6,7 +6,7 @@ import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.io.graphson.GraphSONFactory;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
 import com.tinkerpop.rexster.extension.ExtensionMethod;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
@@ -114,7 +114,7 @@ public class VertexResource extends AbstractSubResource {
             for (Vertex vertex : vertices) {
                 if (counter >= start && counter < end) {
                     wasInSection = true;
-                    vertexArray.put(GraphSONFactory.createJSONElement(vertex, returnKeys, showTypes));
+                    vertexArray.put(GraphSONUtility.jsonFromElement(vertex, returnKeys, showTypes));
                 } else if (wasInSection) {
                     break;
                 }
@@ -179,7 +179,7 @@ public class VertexResource extends AbstractSubResource {
                 JSONObject theRequestObject = this.getRequestObject();
                 List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
-                this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(vertex, returnKeys, showTypes));
+                this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(vertex, returnKeys, showTypes));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
                 if (showHypermedia) {
@@ -295,13 +295,13 @@ public class VertexResource extends AbstractSubResource {
 
         if (rag.isExtensionAllowed(extensionSegmentSet)) {
 
-            Object returnValue = null;
+            final Object returnValue;
 
             // namespace was allowed so try to run the extension
             try {
 
                 // look for the extension as loaded through serviceloader
-                List<RexsterExtension> rexsterExtensions = null;
+                final List<RexsterExtension> rexsterExtensions;
                 try {
                     rexsterExtensions = findExtensionClasses(extensionSegmentSet);
                 } catch (ServiceConfigurationError sce) {
@@ -463,7 +463,7 @@ public class VertexResource extends AbstractSubResource {
                 for (Vertex v : vertexQueryResults) {
                     if (counter >= start && counter < end) {
                         if (returnType.equals(ReturnType.VERTICES)) {
-                            elementArray.put(GraphSONFactory.createJSONElement(v, returnKeys, showTypes));
+                            elementArray.put(GraphSONUtility.jsonFromElement(v, returnKeys, showTypes));
                         } else {
                             elementArray.put(v.getId());
                         }
@@ -474,7 +474,7 @@ public class VertexResource extends AbstractSubResource {
                 final Iterable<Edge> edgeQueryResults = query.edges();
                 for (Edge e : edgeQueryResults) {
                     if (counter >= start && counter < end) {
-                        elementArray.put(GraphSONFactory.createJSONElement(e, returnKeys, showTypes));
+                        elementArray.put(GraphSONUtility.jsonFromElement(e, returnKeys, showTypes));
                     }
                     counter++;
                 }
@@ -626,7 +626,7 @@ public class VertexResource extends AbstractSubResource {
             rag.tryStopTransactionSuccess();
 
             List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-            this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(vertex, returnKeys, showTypes));
+            this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(vertex, returnKeys, showTypes));
 
             if (showHypermedia) {
                 JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX, this.getUriPath());
@@ -737,7 +737,7 @@ public class VertexResource extends AbstractSubResource {
             rag.tryStopTransactionSuccess();
 
             List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-            this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(vertex, returnKeys, showTypes));
+            this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(vertex, returnKeys, showTypes));
 
             if (showHypermedia) {
                 JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX, this.getUriPath());
@@ -849,7 +849,7 @@ public class VertexResource extends AbstractSubResource {
         return labels;
     }
 
-    private enum ReturnType { VERTICES, EDGES, COUNT, VERTEX_IDS };
+    private enum ReturnType { VERTICES, EDGES, COUNT, VERTEX_IDS }
     private final class VertexQueryArguments {
 
         private final Direction queryDirection;

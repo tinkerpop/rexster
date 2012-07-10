@@ -1,11 +1,10 @@
 package com.tinkerpop.rexster.kibbles.batch;
 
-
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.io.graphson.GraphSONFactory;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
@@ -79,7 +78,7 @@ public class BatchExtension extends AbstractRexsterExtension {
             for (int ix = 0; ix < idList.length(); ix++) {
                 Vertex vertexFound = graph.getVertex(idList.optString(ix));
                 if (vertexFound != null) {
-                    jsonArray.put(GraphSONFactory.createJSONElement(vertexFound, returnKeys, showDataTypes));
+                    jsonArray.put(GraphSONUtility.jsonFromElement(vertexFound, returnKeys, showDataTypes));
                 }
             }
 
@@ -130,7 +129,7 @@ public class BatchExtension extends AbstractRexsterExtension {
             for (int ix = 0; ix < idList.length(); ix++) {
                 Edge edgeFound = graph.getEdge(idList.optString(ix));
                 if (edgeFound != null) {
-                    jsonArray.put(GraphSONFactory.createJSONElement(edgeFound, returnKeys, showDataTypes));
+                    jsonArray.put(GraphSONUtility.jsonFromElement(edgeFound, returnKeys, showDataTypes));
                 }
             }
 

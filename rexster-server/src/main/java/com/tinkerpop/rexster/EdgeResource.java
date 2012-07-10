@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.io.graphson.GraphSONFactory;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
 import com.tinkerpop.rexster.extension.ExtensionMethod;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
@@ -110,7 +110,7 @@ public class EdgeResource extends AbstractSubResource {
             for (Edge edge : edges) {
                 if (counter >= start && counter < end) {
                     wasInSection = true;
-                    edgeArray.put(GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
+                    edgeArray.put(GraphSONUtility.jsonFromElement(edge, returnKeys, showTypes));
                 } else if (wasInSection) {
                     break;
                 }
@@ -171,7 +171,7 @@ public class EdgeResource extends AbstractSubResource {
                 JSONObject theRequestObject = this.getRequestObject();
                 List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
-                this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
+                this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(edge, returnKeys, showTypes));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
                 if (showHypermedia) {
@@ -286,13 +286,13 @@ public class EdgeResource extends AbstractSubResource {
 
         if (rag.isExtensionAllowed(extensionSegmentSet)) {
 
-            Object returnValue = null;
+            final Object returnValue;
 
             // namespace was allowed so try to run the extension
             try {
 
                 // look for the extension as loaded through serviceloader
-                List<RexsterExtension> rexsterExtensions = null;
+                final List<RexsterExtension> rexsterExtensions;
                 try {
                     rexsterExtensions = findExtensionClasses(extensionSegmentSet);
                 } catch (ServiceConfigurationError sce) {
@@ -528,7 +528,7 @@ public class EdgeResource extends AbstractSubResource {
                     rag.tryStopTransactionSuccess();
 
                     final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-                    this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
+                    this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(edge, returnKeys, showTypes));
                 } else {
                     // edge could not be found.  likely an error condition on the request
                     final JSONObject error = generateErrorObjectJsonFail(new Exception("Edge cannot be found or created.  Please check the format of the request."));
@@ -648,7 +648,7 @@ public class EdgeResource extends AbstractSubResource {
 
             rag.tryStopTransactionSuccess();
 
-            this.resultObject.put(Tokens.RESULTS, GraphSONFactory.createJSONElement(edge, returnKeys, showTypes));
+            this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(edge, returnKeys, showTypes));
 
             if (showHypermedia) {
                 JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE, this.getUriPath());

@@ -4,7 +4,7 @@ package com.tinkerpop.rexster.kibbles.sparql;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.sail.SailGraph;
-import com.tinkerpop.blueprints.util.io.graphson.GraphSONFactory;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
@@ -86,7 +86,7 @@ public class SparqlExtension extends AbstractRexsterExtension {
             for (Map<String, Vertex> map : sparqlResults) {
                 Map<String, JSONObject> mapOfJson = new HashMap<String, JSONObject>();
                 for (String key : map.keySet()) {
-                    mapOfJson.put(key, GraphSONFactory.createJSONElement(map.get(key), returnKeys, showDataTypes));
+                    mapOfJson.put(key, GraphSONUtility.jsonFromElement(map.get(key), returnKeys, showDataTypes));
                 }
 
                 jsonArray.put(new JSONObject(mapOfJson));
