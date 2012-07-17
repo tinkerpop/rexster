@@ -1,4 +1,5 @@
 :: Windows launcher script for Rexster
+@echo off
 
 set work=%CD%
 
