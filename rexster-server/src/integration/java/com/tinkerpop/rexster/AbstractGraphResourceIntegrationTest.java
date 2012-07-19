@@ -6,7 +6,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
-import com.tinkerpop.blueprints.util.io.graphson.GraphSONFactory;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -101,7 +101,7 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
 
     protected void postVertex(GraphTestHolder graphHolder, Vertex v) throws JSONException {
         ClientRequest request = ClientRequest.create().type(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON).build(createUri("/" + graphHolder.getGraphName() + "/vertices"), "POST");
-        request.setEntity(typeTheElement(GraphSONFactory.createJSONElement(v)));
+        request.setEntity(typeTheElement(GraphSONUtility.jsonFromElement(v)));
 
         ClientResponse response = this.client().handle(request);
 
@@ -115,7 +115,7 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
     protected void postEdge(GraphTestHolder graphHolder, Edge e) throws JSONException {
         ClientRequest request = ClientRequest.create().build(createUri("/" + graphHolder.getGraphName() + "/edges"), "POST");
 
-        JSONObject jsonEdge = typeTheElement(GraphSONFactory.createJSONElement(e));
+        JSONObject jsonEdge = typeTheElement(GraphSONUtility.jsonFromElement(e));
         jsonEdge.put(Tokens._IN_V, graphHolder.getVertexIdSet().get(jsonEdge.optString(Tokens._IN_V)));
         jsonEdge.put(Tokens._OUT_V, graphHolder.getVertexIdSet().get(jsonEdge.optString(Tokens._OUT_V)));
 
