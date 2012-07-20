@@ -22,134 +22,140 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     @Test
     public void getEdgeDoesNotExistStatusNotFound() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            ClientResponse graphResponse = doGraphGet(testGraph, "edges/123doesnotexist");
+            if (testGraph.getFeatures().supportsEdgeRetrieval) {
+                ClientResponse graphResponse = doGraphGet(testGraph, "edges/123doesnotexist");
 
-            Assert.assertNotNull(graphResponse);
-            Assert.assertEquals(ClientResponse.Status.NOT_FOUND, graphResponse.getClientResponseStatus());
+                Assert.assertNotNull(graphResponse);
+                Assert.assertEquals(ClientResponse.Status.NOT_FOUND, graphResponse.getClientResponseStatus());
+            }
         }
     }
 
     @Test
     public void getEdgeFoundStatusOk() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            String id = testGraph.getEdgeIdSet().values().iterator().next();
-            ClientResponse graphResponse = doGraphGet(testGraph, "edges/" + encode(id));
+            if (testGraph.getFeatures().supportsEdgeRetrieval) {
+                String id = testGraph.getEdgeIdSet().values().iterator().next();
+                ClientResponse graphResponse = doGraphGet(testGraph, "edges/" + encode(id));
 
-            Assert.assertNotNull(graphResponse);
-            Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
+                Assert.assertNotNull(graphResponse);
+                Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
 
-            JSONObject edgeJson = graphResponse.getEntity(JSONObject.class);
-            Assert.assertNotNull(edgeJson);
+                JSONObject edgeJson = graphResponse.getEntity(JSONObject.class);
+                Assert.assertNotNull(edgeJson);
 
-            JSONObject results = edgeJson.optJSONObject(Tokens.RESULTS);
-            Assert.assertEquals(id, results.optString(Tokens._ID));
-
+                JSONObject results = edgeJson.optJSONObject(Tokens.RESULTS);
+                Assert.assertEquals(id, results.optString(Tokens._ID));
+            }
         }
     }
 
     @Test
     public void getEdgesAllFoundStatusOk() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            ClientResponse graphResponse = doGraphGet(testGraph, "edges");
+            if (testGraph.getFeatures().supportsEdgeIteration) {
+                ClientResponse graphResponse = doGraphGet(testGraph, "edges");
 
-            Assert.assertNotNull(graphResponse);
-            Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
+                Assert.assertNotNull(graphResponse);
+                Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
 
-            JSONObject edgeJson = graphResponse.getEntity(JSONObject.class);
-            Assert.assertNotNull(edgeJson);
+                JSONObject edgeJson = graphResponse.getEntity(JSONObject.class);
+                Assert.assertNotNull(edgeJson);
 
-            Assert.assertEquals(6, edgeJson.optJSONArray(Tokens.RESULTS).length());
+                Assert.assertEquals(6, edgeJson.optJSONArray(Tokens.RESULTS).length());
+            }
         }
     }
 
     @Test
     public void getEdgesPagingStatusOk() {
         for (GraphTestHolder testGraph : this.testGraphs) {
+            if (testGraph.getFeatures().supportsEdgeIteration) {
+                ArrayList<String> uniqueIds = new ArrayList<String>();
 
-            ArrayList<String> uniqueIds = new ArrayList<String>();
+                // get the first two elements
+                ClientResponse graphResponse = doGraphGet(testGraph, "edges", "rexster.offset.start=0&rexster.offset.end=2");
 
-            // get the first two elements
-            ClientResponse graphResponse = doGraphGet(testGraph, "edges", "rexster.offset.start=0&rexster.offset.end=2");
+                Assert.assertNotNull(graphResponse);
+                Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
 
-            Assert.assertNotNull(graphResponse);
-            Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
+                JSONObject edgeJson = graphResponse.getEntity(JSONObject.class);
+                Assert.assertNotNull(edgeJson);
 
-            JSONObject edgeJson = graphResponse.getEntity(JSONObject.class);
-            Assert.assertNotNull(edgeJson);
+                JSONArray results = edgeJson.optJSONArray(Tokens.RESULTS);
+                Assert.assertEquals(2, results.length());
 
-            JSONArray results = edgeJson.optJSONArray(Tokens.RESULTS);
-            Assert.assertEquals(2, results.length());
+                uniqueIds.add(results.optJSONObject(0).optString(Tokens._ID));
 
-            uniqueIds.add(results.optJSONObject(0).optString(Tokens._ID));
+                Assert.assertFalse(uniqueIds.contains(results.optJSONObject(1).optString(Tokens._ID)));
+                uniqueIds.add(results.optJSONObject(1).optString(Tokens._ID));
 
-            Assert.assertFalse(uniqueIds.contains(results.optJSONObject(1).optString(Tokens._ID)));
-            uniqueIds.add(results.optJSONObject(1).optString(Tokens._ID));
+                // get the next two elements
+                graphResponse = doGraphGet(testGraph, "edges", "rexster.offset.start=2&rexster.offset.end=4");
 
-            // get the next two elements
-            graphResponse = doGraphGet(testGraph, "edges", "rexster.offset.start=2&rexster.offset.end=4");
+                Assert.assertNotNull(graphResponse);
+                Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
 
-            Assert.assertNotNull(graphResponse);
-            Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
+                edgeJson = graphResponse.getEntity(JSONObject.class);
+                Assert.assertNotNull(edgeJson);
 
-            edgeJson = graphResponse.getEntity(JSONObject.class);
-            Assert.assertNotNull(edgeJson);
+                results = edgeJson.optJSONArray(Tokens.RESULTS);
+                Assert.assertEquals(2, results.length());
 
-            results = edgeJson.optJSONArray(Tokens.RESULTS);
-            Assert.assertEquals(2, results.length());
+                Assert.assertFalse(uniqueIds.contains(results.optJSONObject(1).optString(Tokens._ID)));
+                uniqueIds.add(results.optJSONObject(0).optString(Tokens._ID));
 
-            Assert.assertFalse(uniqueIds.contains(results.optJSONObject(1).optString(Tokens._ID)));
-            uniqueIds.add(results.optJSONObject(0).optString(Tokens._ID));
+                Assert.assertFalse(uniqueIds.contains(results.optJSONObject(1).optString(Tokens._ID)));
+                uniqueIds.add(results.optJSONObject(1).optString(Tokens._ID));
 
-            Assert.assertFalse(uniqueIds.contains(results.optJSONObject(1).optString(Tokens._ID)));
-            uniqueIds.add(results.optJSONObject(1).optString(Tokens._ID));
+                // get the final two elements
+                graphResponse = doGraphGet(testGraph, "edges", "rexster.offset.start=4&rexster.offset.end=6");
 
-            // get the final two elements
-            graphResponse = doGraphGet(testGraph, "edges", "rexster.offset.start=4&rexster.offset.end=6");
+                Assert.assertNotNull(graphResponse);
+                Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
 
-            Assert.assertNotNull(graphResponse);
-            Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
+                edgeJson = graphResponse.getEntity(JSONObject.class);
+                Assert.assertNotNull(edgeJson);
 
-            edgeJson = graphResponse.getEntity(JSONObject.class);
-            Assert.assertNotNull(edgeJson);
+                results = edgeJson.optJSONArray(Tokens.RESULTS);
+                Assert.assertEquals(2, results.length());
 
-            results = edgeJson.optJSONArray(Tokens.RESULTS);
-            Assert.assertEquals(2, results.length());
+                Assert.assertFalse(uniqueIds.contains(results.optJSONObject(1).optString(Tokens._ID)));
+                uniqueIds.add(results.optJSONObject(0).optString(Tokens._ID));
 
-            Assert.assertFalse(uniqueIds.contains(results.optJSONObject(1).optString(Tokens._ID)));
-            uniqueIds.add(results.optJSONObject(0).optString(Tokens._ID));
+                Assert.assertFalse(uniqueIds.contains(results.optJSONObject(1).optString(Tokens._ID)));
+                uniqueIds.add(results.optJSONObject(1).optString(Tokens._ID));
 
-            Assert.assertFalse(uniqueIds.contains(results.optJSONObject(1).optString(Tokens._ID)));
-            uniqueIds.add(results.optJSONObject(1).optString(Tokens._ID));
+                // get the final two elements without specifying the end parameter
+                graphResponse = doGraphGet(testGraph, "edges", "rexster.offset.start=4");
 
-            // get the final two elements without specifying the end parameter
-            graphResponse = doGraphGet(testGraph, "edges", "rexster.offset.start=4");
+                Assert.assertNotNull(graphResponse);
+                Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
 
-            Assert.assertNotNull(graphResponse);
-            Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
+                edgeJson = graphResponse.getEntity(JSONObject.class);
+                Assert.assertNotNull(edgeJson);
 
-            edgeJson = graphResponse.getEntity(JSONObject.class);
-            Assert.assertNotNull(edgeJson);
+                results = edgeJson.optJSONArray(Tokens.RESULTS);
+                Assert.assertEquals(2, results.length());
 
-            results = edgeJson.optJSONArray(Tokens.RESULTS);
-            Assert.assertEquals(2, results.length());
+                Assert.assertEquals(uniqueIds.get(4), results.optJSONObject(0).optString(Tokens._ID));
+                Assert.assertEquals(uniqueIds.get(5), results.optJSONObject(1).optString(Tokens._ID));
 
-            Assert.assertEquals(uniqueIds.get(4), results.optJSONObject(0).optString(Tokens._ID));
-            Assert.assertEquals(uniqueIds.get(5), results.optJSONObject(1).optString(Tokens._ID));
+                // get the first two elements without specifying the start parameter
+                graphResponse = doGraphGet(testGraph, "edges", "rexster.offset.end=2");
 
-            // get the first two elements without specifying the start parameter
-            graphResponse = doGraphGet(testGraph, "edges", "rexster.offset.end=2");
+                Assert.assertNotNull(graphResponse);
+                Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
 
-            Assert.assertNotNull(graphResponse);
-            Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
+                edgeJson = graphResponse.getEntity(JSONObject.class);
+                Assert.assertNotNull(edgeJson);
 
-            edgeJson = graphResponse.getEntity(JSONObject.class);
-            Assert.assertNotNull(edgeJson);
+                results = edgeJson.optJSONArray(Tokens.RESULTS);
+                Assert.assertEquals(2, results.length());
 
-            results = edgeJson.optJSONArray(Tokens.RESULTS);
-            Assert.assertEquals(2, results.length());
-
-            Assert.assertEquals(uniqueIds.get(0), results.optJSONObject(0).optString(Tokens._ID));
-            Assert.assertEquals(uniqueIds.get(1), results.optJSONObject(1).optString(Tokens._ID));
+                Assert.assertEquals(uniqueIds.get(0), results.optJSONObject(0).optString(Tokens._ID));
+                Assert.assertEquals(uniqueIds.get(1), results.optJSONObject(1).optString(Tokens._ID));
+            }
         }
     }
 
@@ -310,42 +316,46 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     @Test
     public void deleteEdgeStatusOk() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            Iterator<String> itty = testGraph.getEdgeIdSet().values().iterator();
-            String edgeToDelete = itty.next();
+            // maybe make a test that doesn't do property deletes first so that this test doesn't
+            // need edge retrieval
+            if (testGraph.getFeatures().supportsEdgeRetrieval) {
+                Iterator<String> itty = testGraph.getEdgeIdSet().values().iterator();
+                String edgeToDelete = itty.next();
 
-            ClientResponse responseGetEdge = this.doGraphGet(testGraph, "edges/" + encode(edgeToDelete));
-            Assert.assertEquals(ClientResponse.Status.OK, responseGetEdge.getClientResponseStatus());
-            JSONObject edgeJson = responseGetEdge.getEntity(JSONObject.class);
+                ClientResponse responseGetEdge = this.doGraphGet(testGraph, "edges/" + encode(edgeToDelete));
+                Assert.assertEquals(ClientResponse.Status.OK, responseGetEdge.getClientResponseStatus());
+                JSONObject edgeJson = responseGetEdge.getEntity(JSONObject.class);
 
-            List<String> keysToRemove = new ArrayList<String>();
-            Iterator<String> propertyItty = edgeJson.optJSONObject(Tokens.RESULTS).keys();
-            String keysToDeleteQueryString = "";
-            while (propertyItty.hasNext()) {
-                String key = propertyItty.next();
-                if (!key.startsWith(Tokens.UNDERSCORE)) {
-                    keysToRemove.add(key);
-                    keysToDeleteQueryString = keysToDeleteQueryString + "&" + key;
+                List<String> keysToRemove = new ArrayList<String>();
+                Iterator<String> propertyItty = edgeJson.optJSONObject(Tokens.RESULTS).keys();
+                String keysToDeleteQueryString = "";
+                while (propertyItty.hasNext()) {
+                    String key = propertyItty.next();
+                    if (!key.startsWith(Tokens.UNDERSCORE)) {
+                        keysToRemove.add(key);
+                        keysToDeleteQueryString = keysToDeleteQueryString + "&" + key;
+                    }
                 }
+
+                // delete the properties first
+                ClientResponse responsePropertyDelete = this.doGraphDelete(testGraph, "edges/" + encode(edgeToDelete), keysToDeleteQueryString);
+                Assert.assertEquals(ClientResponse.Status.OK, responsePropertyDelete.getClientResponseStatus());
+
+                responseGetEdge = this.doGraphGet(testGraph, "edges/" + encode(edgeToDelete));
+                Assert.assertEquals(ClientResponse.Status.OK, responseGetEdge.getClientResponseStatus());
+                edgeJson = responseGetEdge.getEntity(JSONObject.class).optJSONObject(Tokens.RESULTS);
+
+                for (String key : keysToRemove) {
+                    Assert.assertFalse(edgeJson.has(key));
+                }
+
+                // delete the edge itself
+                responsePropertyDelete = this.doGraphDelete(testGraph, "edges/" + encode(edgeToDelete));
+                Assert.assertEquals(ClientResponse.Status.OK, responsePropertyDelete.getClientResponseStatus());
+
+                responseGetEdge = this.doGraphGet(testGraph, "edges/" + encode(edgeToDelete));
+                Assert.assertEquals(ClientResponse.Status.NOT_FOUND, responseGetEdge.getClientResponseStatus());
             }
-
-            // delete the properties first
-            ClientResponse responsePropertyDelete = this.doGraphDelete(testGraph, "edges/" + encode(edgeToDelete), keysToDeleteQueryString);
-            Assert.assertEquals(ClientResponse.Status.OK, responsePropertyDelete.getClientResponseStatus());
-
-            responseGetEdge = this.doGraphGet(testGraph, "edges/" + encode(edgeToDelete));
-            Assert.assertEquals(ClientResponse.Status.OK, responseGetEdge.getClientResponseStatus());
-            edgeJson = responseGetEdge.getEntity(JSONObject.class).optJSONObject(Tokens.RESULTS);
-
-            for (String key : keysToRemove) {
-                Assert.assertFalse(edgeJson.has(key));
-            }
-
-            // delete the edge itself
-            responsePropertyDelete = this.doGraphDelete(testGraph, "edges/" + encode(edgeToDelete));
-            Assert.assertEquals(ClientResponse.Status.OK, responsePropertyDelete.getClientResponseStatus());
-
-            responseGetEdge = this.doGraphGet(testGraph, "edges/" + encode(edgeToDelete));
-            Assert.assertEquals(ClientResponse.Status.NOT_FOUND, responseGetEdge.getClientResponseStatus());
         }
     }
 

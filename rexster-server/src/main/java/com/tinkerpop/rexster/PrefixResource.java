@@ -51,8 +51,9 @@ public class PrefixResource extends AbstractSubResource {
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response getPrefixes(@PathParam("graphname") String graphName) {
 
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+
         try {
-            final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
             final SailGraph graph = ((SailGraph) rag.getUnwrappedGraph());
             final JSONArray results = new JSONArray();
             for (final Map.Entry<String, String> entry : graph.getNamespaces().entrySet()) {
@@ -67,11 +68,11 @@ public class PrefixResource extends AbstractSubResource {
             return Response.ok(this.resultObject).build();
         } catch (JSONException ex) {
             logger.error(ex);
-            JSONObject error = generateErrorObjectJsonFail(ex);
+            final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (RuntimeException re) {
             logger.error(re);
-            JSONObject error = generateErrorObject(re.getMessage(), re);
+            final JSONObject error = generateErrorObject(re.getMessage(), re);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
     }
@@ -111,19 +112,24 @@ public class PrefixResource extends AbstractSubResource {
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response deleteSinglePrefix(@PathParam("graphname") String graphName, @PathParam("prefix") String prefix) {
 
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         try {
-            final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
             final SailGraph graph = ((SailGraph) rag.getUnwrappedGraph());
             graph.removeNamespace(prefix);
+
+            rag.tryStopTransactionSuccess();
+
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
             return Response.ok(this.resultObject).build();
         } catch (JSONException ex) {
             logger.error(ex);
+            rag.tryStopTransactionFailure();
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (RuntimeException re) {
             logger.error(re);
+            rag.tryStopTransactionFailure();
             JSONObject error = generateErrorObject(re.getMessage(), re);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
@@ -141,28 +147,30 @@ public class PrefixResource extends AbstractSubResource {
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response postSinglePrefix(@PathParam("graphname") String graphName) {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final JSONObject reqObject = this.getRequestObject();
+
+        if (!reqObject.has("prefix") || !reqObject.has("namespace")) {
+            final JSONObject error = generateErrorObject("Parameters 'prefix' and 'namespace' required");
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
+        }
 
         try {
             final SailGraph graph = ((SailGraph) rag.getUnwrappedGraph());
-
-            final JSONObject reqObject = this.getRequestObject();
-
-            if (!reqObject.has("prefix") || !reqObject.has("namespace")) {
-                JSONObject error = generateErrorObject("Parameters 'prefix' and 'namespace' required");
-                throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
-            }
             graph.addNamespace(reqObject.optString("prefix"), reqObject.optString("namespace"));
+
+            rag.tryStopTransactionSuccess();
+
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
             return Response.ok(this.resultObject).build();
         } catch (JSONException ex) {
             logger.error(ex);
+            rag.tryStopTransactionFailure();
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
-        } catch (WebApplicationException wae) {
-            throw wae;
         } catch (RuntimeException re) {
             logger.error(re);
+            rag.tryStopTransactionFailure();
             JSONObject error = generateErrorObject(re.getMessage(), re);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }

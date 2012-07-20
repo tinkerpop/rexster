@@ -615,9 +615,9 @@ public class VertexResource extends AbstractSubResource {
                 }
             }
 
-            Iterator keys = theRequestObject.keys();
+            final Iterator keys = theRequestObject.keys();
             while (keys.hasNext()) {
-                String key = keys.next().toString();
+                final String key = keys.next().toString();
                 if (!key.startsWith(Tokens.UNDERSCORE)) {
                     vertex.setProperty(key, ElementHelper.getTypedPropertyValue(theRequestObject.get(key), parseTypes));
                 }
@@ -625,11 +625,15 @@ public class VertexResource extends AbstractSubResource {
 
             rag.tryStopTransactionSuccess();
 
-            List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-            this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(vertex, returnKeys, showTypes));
+            // some graph implementations close scope at the close of the transaction so this has to be
+            // reconstituted
+            final Vertex reconstitutedElement = graph.getVertex(vertex.getId());
+
+            final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+            this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(reconstitutedElement, returnKeys, showTypes));
 
             if (showHypermedia) {
-                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX, this.getUriPath());
+                final JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX, this.getUriPath());
                 if (extensionsList != null) {
                     this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                 }
@@ -709,14 +713,13 @@ public class VertexResource extends AbstractSubResource {
                 || produces.equals(RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE);
 
         try {
-            //rag.tryStartTransaction();
             final Vertex vertex = graph.getVertex(id);
 
             if (null == vertex) {
-                String msg = "Vertex with [" + id + "] cannot be found.";
+                final String msg = "Vertex with [" + id + "] cannot be found.";
                 logger.info(msg);
 
-                JSONObject error = generateErrorObject(msg);
+                final JSONObject error = generateErrorObject(msg);
                 throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
             }
 
@@ -725,10 +728,10 @@ public class VertexResource extends AbstractSubResource {
                 add(vertex);
             }});
 
-            JSONObject theRequestObject = this.getRequestObject();
-            Iterator keys = theRequestObject.keys();
+            final JSONObject theRequestObject = this.getRequestObject();
+            final Iterator keys = theRequestObject.keys();
             while (keys.hasNext()) {
-                String key = keys.next().toString();
+                final String key = keys.next().toString();
                 if (!key.startsWith(Tokens.UNDERSCORE)) {
                     vertex.setProperty(key, ElementHelper.getTypedPropertyValue(theRequestObject.get(key), parseTypes));
                 }
@@ -736,11 +739,15 @@ public class VertexResource extends AbstractSubResource {
 
             rag.tryStopTransactionSuccess();
 
-            List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-            this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(vertex, returnKeys, showTypes));
+            // some graph implementations close scope at the close of the transaction so this has to be
+            // reconstituted
+            final Vertex reconstitutedElement = graph.getVertex(vertex.getId());
+
+            final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+            this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(reconstitutedElement, returnKeys, showTypes));
 
             if (showHypermedia) {
-                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX, this.getUriPath());
+                final JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX, this.getUriPath());
                 if (extensionsList != null) {
                     this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                 }
@@ -782,8 +789,6 @@ public class VertexResource extends AbstractSubResource {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         final Graph graph = rag.getGraph();
 
-        //rag.tryStartTransaction();
-
         try {
             final List<String> keys = this.getNonRexsterRequestKeys();
             final Vertex vertex = graph.getVertex(id);
@@ -813,7 +818,7 @@ public class VertexResource extends AbstractSubResource {
 
             logger.error(ex);
 
-            JSONObject error = generateErrorObjectJsonFail(ex);
+            final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (RuntimeException re) {
 
@@ -821,7 +826,7 @@ public class VertexResource extends AbstractSubResource {
 
             logger.error(re);
 
-            JSONObject error = generateErrorObject(re.getMessage(), re);
+            final JSONObject error = generateErrorObject(re.getMessage(), re);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 

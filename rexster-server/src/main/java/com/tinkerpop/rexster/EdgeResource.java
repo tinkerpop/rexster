@@ -489,7 +489,6 @@ public class EdgeResource extends AbstractSubResource {
         if (null != temp)
             label = temp.toString();
 
-        //rag.tryStartTransaction();
         try {
             // blueprints throws IllegalArgumentException if the id is null
             Edge edge = id == null ? null : graph.getEdge(id);
@@ -519,7 +518,7 @@ public class EdgeResource extends AbstractSubResource {
                 if (edge != null) {
                     final Iterator keys = theRequestObject.keys();
                     while (keys.hasNext()) {
-                        String key = keys.next().toString();
+                        final String key = keys.next().toString();
                         if (!key.startsWith(Tokens.UNDERSCORE)) {
                             edge.setProperty(key, ElementHelper.getTypedPropertyValue(theRequestObject.get(key), parseTypes));
                         }
@@ -527,8 +526,13 @@ public class EdgeResource extends AbstractSubResource {
 
                     rag.tryStopTransactionSuccess();
 
+                    // some graph implementations close scope at the close of the transaction so this has to be
+                    // reconstituted
+                    final Edge reconstitutedElement = graph.getEdge(edge.getId());
+
                     final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-                    this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(edge, returnKeys, showTypes));
+                    this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(reconstitutedElement, returnKeys, showTypes));
+
                 } else {
                     // edge could not be found.  likely an error condition on the request
                     final JSONObject error = generateErrorObjectJsonFail(new Exception("Edge cannot be found or created.  Please check the format of the request."));
@@ -546,7 +550,7 @@ public class EdgeResource extends AbstractSubResource {
             } catch (JSONException ex) {
                 logger.error(ex);
 
-                JSONObject error = generateErrorObjectJsonFail(ex);
+                final JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
 
@@ -620,7 +624,6 @@ public class EdgeResource extends AbstractSubResource {
         final boolean showHypermedia = produces.equals(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE)
                 || produces.equals(RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE);
 
-        //rag.tryStartTransaction();
         try {
             final Edge edge = graph.getEdge(id);
             if (edge == null) {
@@ -635,12 +638,12 @@ public class EdgeResource extends AbstractSubResource {
                 add(edge);
             }});
 
-            JSONObject theRequestObject = this.getRequestObject();
-            List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+            final JSONObject theRequestObject = this.getRequestObject();
+            final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
-            Iterator keys = theRequestObject.keys();
+            final Iterator keys = theRequestObject.keys();
             while (keys.hasNext()) {
-                String key = keys.next().toString();
+                final String key = keys.next().toString();
                 if (!key.startsWith(Tokens.UNDERSCORE)) {
                     edge.setProperty(key, ElementHelper.getTypedPropertyValue(theRequestObject.get(key), parseTypes));
                 }
@@ -648,10 +651,14 @@ public class EdgeResource extends AbstractSubResource {
 
             rag.tryStopTransactionSuccess();
 
-            this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(edge, returnKeys, showTypes));
+            // some graph implementations close scope at the close of the transaction so this has to be
+            // reconstituted
+            final Edge reconstitutedElement = graph.getEdge(edge.getId());
+
+            this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(reconstitutedElement, returnKeys, showTypes));
 
             if (showHypermedia) {
-                JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE, this.getUriPath());
+                final JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE, this.getUriPath());
                 if (extensionsList != null) {
                     this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                 }
@@ -667,7 +674,7 @@ public class EdgeResource extends AbstractSubResource {
 
             logger.error(ex);
 
-            JSONObject error = generateErrorObject(ex.getMessage(), ex);
+            final JSONObject error = generateErrorObject(ex.getMessage(), ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 
@@ -692,7 +699,6 @@ public class EdgeResource extends AbstractSubResource {
         final Graph graph = rag.getGraph();
 
         try {
-            //rag.tryStartTransaction();
             final List<String> keys = this.getNonRexsterRequestKeys();
             final Edge edge = graph.getEdge(id);
             if (null != edge) {
@@ -706,9 +712,9 @@ public class EdgeResource extends AbstractSubResource {
                     graph.removeEdge(edge);
                 }
             } else {
-                String msg = "Edge with id [" + id + "] cannot be found.";
+                final String msg = "Edge with id [" + id + "] cannot be found.";
                 logger.info(msg);
-                JSONObject error = generateErrorObject(msg);
+                final JSONObject error = generateErrorObject(msg);
                 throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
             }
 
@@ -720,14 +726,14 @@ public class EdgeResource extends AbstractSubResource {
 
             rag.tryStopTransactionFailure();
 
-            JSONObject error = generateErrorObjectJsonFail(ex);
+            final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (WebApplicationException wae) {
             rag.tryStopTransactionFailure();
             throw wae;
         } catch (Exception ex) {
             rag.tryStopTransactionFailure();
-            JSONObject error = generateErrorObject("Transaction failed on DELETE of edge.", ex);
+            final JSONObject error = generateErrorObject("Transaction failed on DELETE of edge.", ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
 
