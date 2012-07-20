@@ -12,6 +12,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.Sequence;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
 import org.junit.Before;
@@ -368,12 +369,16 @@ public class VertexResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(MediaType.APPLICATION_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = mockery.sequence("graph");
+        
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getVertex(with(any(Object.class)));
-            will(returnValue(null));
-            allowing(graph).addVertex(with(any(Object.class)));
+            oneOf(graph).addVertex(with(aNull(Object.class)));
+            inSequence(graphSequence);
+            will(returnValue(v));
+            oneOf(graph).getVertex(with(v.getId()));
+            inSequence(graphSequence);
             will(returnValue(v));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
@@ -406,12 +411,16 @@ public class VertexResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(MediaType.APPLICATION_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = mockery.sequence("graph");
+        
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getVertex(with(any(Object.class)));
-            will(returnValue(null));
-            allowing(graph).addVertex(with(any(Object.class)));
+            oneOf(graph).addVertex(with(aNull(Object.class)));
+            inSequence(graphSequence);
+            will(returnValue(v));
+            oneOf(graph).getVertex(with(v.getId()));
+            inSequence(graphSequence);
             will(returnValue(v));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
@@ -444,12 +453,16 @@ public class VertexResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(MediaType.APPLICATION_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getVertex(with(any(Object.class)));
-            will(returnValue(null));
-            allowing(graph).addVertex(with(any(Object.class)));
+            oneOf(graph).addVertex(with(aNull(Object.class)));
+            inSequence(graphSequence);
+            will(returnValue(v));
+            oneOf(graph).getVertex(with(v.getId()));
+            inSequence(graphSequence);
             will(returnValue(v));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
@@ -481,12 +494,16 @@ public class VertexResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getVertex(with(any(Object.class)));
-            will(returnValue(null));
-            allowing(graph).addVertex(with(any(Object.class)));
+            oneOf(graph).addVertex(with(aNull(Object.class)));
+            inSequence(graphSequence);
+            will(returnValue(v));
+            oneOf(graph).getVertex(with(v.getId()));
+            inSequence(graphSequence);
             will(returnValue(v));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
@@ -520,12 +537,16 @@ public class VertexResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getVertex(with(any(Object.class)));
-            will(returnValue(null));
-            allowing(graph).addVertex(with(any(Object.class)));
+            oneOf(graph).addVertex(with(aNull(Object.class)));
+            inSequence(graphSequence);
+            will(returnValue(v));
+            oneOf(graph).getVertex(with(v.getId()));
+            inSequence(graphSequence);
             will(returnValue(v));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
@@ -559,12 +580,16 @@ public class VertexResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getVertex(with(any(Object.class)));
-            will(returnValue(null));
-            allowing(graph).addVertex(with(any(Object.class)));
+            oneOf(graph).addVertex(with(aNull(Object.class)));
+            inSequence(graphSequence);
+            will(returnValue(v));
+            oneOf(graph).getVertex(with(v.getId()));
+            inSequence(graphSequence);
             will(returnValue(v));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
@@ -596,12 +621,16 @@ public class VertexResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getVertex(with(any(Object.class)));
-            will(returnValue(null));
-            allowing(graph).addVertex(with(any(Object.class)));
+            oneOf(graph).addVertex(with(aNull(Object.class)));
+            inSequence(graphSequence);
+            will(returnValue(v));
+            oneOf(graph).getVertex(with(v.getId()));
+            inSequence(graphSequence);
             will(returnValue(v));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
@@ -635,12 +664,16 @@ public class VertexResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getVertex(with(any(Object.class)));
-            will(returnValue(null));
-            allowing(graph).addVertex(with(any(Object.class)));
+            oneOf(graph).addVertex(with(aNull(Object.class)));
+            inSequence(graphSequence);
+            will(returnValue(v));
+            oneOf(graph).getVertex(with(v.getId()));
+            inSequence(graphSequence);
             will(returnValue(v));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
@@ -674,12 +707,16 @@ public class VertexResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getVertex(with(any(Object.class)));
-            will(returnValue(null));
-            allowing(graph).addVertex(with(any(Object.class)));
+            oneOf(graph).addVertex(with(aNull(Object.class)));
+            inSequence(graphSequence);
+            will(returnValue(v));
+            oneOf(graph).getVertex(with(v.getId()));
+            inSequence(graphSequence);
             will(returnValue(v));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));

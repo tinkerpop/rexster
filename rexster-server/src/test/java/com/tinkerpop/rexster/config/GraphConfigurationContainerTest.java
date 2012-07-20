@@ -27,7 +27,7 @@ public class GraphConfigurationContainerTest {
 
     @Test
     public void getApplicationGraphsNoGraphName() {
-        configList.add(constructTinkerGraphHierarchicalConfiguration("", "some-file"));
+        configList.add(constructTinkerGraphHierarchicalConfiguration(""));
 
         try {
             GraphConfigurationContainer container = new GraphConfigurationContainer(configList);
@@ -100,7 +100,7 @@ public class GraphConfigurationContainerTest {
 
     @Test
     public void getApplicationGraphsDynamicGraphs() {
-        configList.add(constructHierarchicalConfiguration("test", "some-file", "com.tinkerpop.rexster.config.MockGraphConfiguration", false));
+        configList.add(constructHierarchicalConfiguration("test", "com.tinkerpop.rexster.config.MockGraphConfiguration", false));
 
         try {
             GraphConfigurationContainer container = new GraphConfigurationContainer(configList);
@@ -113,7 +113,7 @@ public class GraphConfigurationContainerTest {
 
     @Test
     public void getApplicationGraphsReadOnlyGraphs() {
-        configList.add(constructHierarchicalConfiguration("test", "some-file", "com.tinkerpop.rexster.config.MockGraphConfiguration", true));
+        configList.add(constructHierarchicalConfiguration("test", "com.tinkerpop.rexster.config.MockGraphConfiguration", true));
 
         try {
             GraphConfigurationContainer container = new GraphConfigurationContainer(configList);
@@ -128,7 +128,7 @@ public class GraphConfigurationContainerTest {
 
     @Test
     public void getApplicationGraphsReadOnlyIndexableGraphs() {
-        configList.add(constructHierarchicalConfiguration("test", "some-file", "com.tinkerpop.rexster.config.MockIndexableGraphConfiguration", true));
+        configList.add(constructHierarchicalConfiguration("test", "com.tinkerpop.rexster.config.MockIndexableGraphConfiguration", true));
 
         try {
             GraphConfigurationContainer container = new GraphConfigurationContainer(configList);
@@ -142,7 +142,6 @@ public class GraphConfigurationContainerTest {
 
     private HierarchicalConfiguration constructBadHierarchicalConfiguration() {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
-        graphConfig.addProperty(Tokens.REXSTER_GRAPH_LOCATION, "bad");
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_NAME, "junk");
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_TYPE, "com.tinkerpop.rexster.config.MockBadGraphConfiguration");
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_READ_ONLY, false);
@@ -151,16 +150,15 @@ public class GraphConfigurationContainerTest {
     }
 
     private HierarchicalConfiguration constructDefaultTinkerGraphHierarchicalConfiguration(String graphName) {
-        return constructHierarchicalConfiguration(graphName, "data/graph-example-1", "tinkergraph", false);
+        return constructHierarchicalConfiguration(graphName, "tinkergraph", false);
     }
 
-    private HierarchicalConfiguration constructTinkerGraphHierarchicalConfiguration(String graphName, String fileName) {
-        return constructHierarchicalConfiguration(graphName, fileName, "tinkergraph", false);
+    private HierarchicalConfiguration constructTinkerGraphHierarchicalConfiguration(String graphName) {
+        return constructHierarchicalConfiguration(graphName, "tinkergraph", false);
     }
 
-    private HierarchicalConfiguration constructHierarchicalConfiguration(String graphName, String fileName, String graphType, boolean readOnly) {
+    private HierarchicalConfiguration constructHierarchicalConfiguration(String graphName, String graphType, boolean readOnly) {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
-        graphConfig.addProperty(Tokens.REXSTER_GRAPH_LOCATION, fileName);
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_NAME, graphName);
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_TYPE, graphType);
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_READ_ONLY, readOnly);

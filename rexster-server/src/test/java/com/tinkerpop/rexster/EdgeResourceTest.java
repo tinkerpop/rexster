@@ -12,6 +12,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.Sequence;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
 import org.junit.Before;
@@ -298,12 +299,12 @@ public class EdgeResourceTest {
 
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(MediaType.APPLICATION_JSON_TYPE, null, null);
+        
+        final Sequence graphSequence = this.mockery.sequence("graph");
 
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getEdge(with(any(Object.class)));
-            will(returnValue(null));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
@@ -311,6 +312,10 @@ public class EdgeResourceTest {
             allowing(graph).getVertex(with(equal("2")));
             will(returnValue(v2));
             allowing(graph).addEdge(null, v2, v1, "edge-label");
+            inSequence(graphSequence);
+            will(returnValue(returnEdge));
+            allowing(graph).getEdge(with(returnEdge.getId()));
+            inSequence(graphSequence);
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -344,11 +349,11 @@ public class EdgeResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(MediaType.APPLICATION_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = this.mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getEdge(with(any(Object.class)));
-            will(returnValue(null));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
@@ -356,6 +361,10 @@ public class EdgeResourceTest {
             allowing(graph).getVertex(with(equal("2")));
             will(returnValue(v2));
             allowing(graph).addEdge(null, v2, v1, "edge-label");
+            inSequence(graphSequence);
+            will(returnValue(returnEdge));
+            allowing(graph).getEdge(with(returnEdge.getId()));
+            inSequence(graphSequence);
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -389,11 +398,11 @@ public class EdgeResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(MediaType.APPLICATION_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = this.mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getEdge(with(any(Object.class)));
-            will(returnValue(null));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
@@ -401,6 +410,10 @@ public class EdgeResourceTest {
             allowing(graph).getVertex(with(equal("2")));
             will(returnValue(v2));
             allowing(graph).addEdge(null, v2, v1, "edge-label");
+            inSequence(graphSequence);
+            will(returnValue(returnEdge));
+            allowing(graph).getEdge(with(returnEdge.getId()));
+            inSequence(graphSequence);
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -434,11 +447,11 @@ public class EdgeResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = this.mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getEdge(with(any(Object.class)));
-            will(returnValue(null));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
@@ -446,6 +459,10 @@ public class EdgeResourceTest {
             allowing(graph).getVertex(with(equal("2")));
             will(returnValue(v2));
             allowing(graph).addEdge(null, v2, v1, "edge-label");
+            inSequence(graphSequence);
+            will(returnValue(returnEdge));
+            allowing(graph).getEdge(with(returnEdge.getId()));
+            inSequence(graphSequence);
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -480,11 +497,11 @@ public class EdgeResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = this.mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getEdge(with(any(Object.class)));
-            will(returnValue(null));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
@@ -492,6 +509,10 @@ public class EdgeResourceTest {
             allowing(graph).getVertex(with(equal("2")));
             will(returnValue(v2));
             allowing(graph).addEdge(null, v2, v1, "edge-label");
+            inSequence(graphSequence);
+            will(returnValue(returnEdge));
+            allowing(graph).getEdge(with(returnEdge.getId()));
+            inSequence(graphSequence);
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -526,11 +547,11 @@ public class EdgeResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(RexsterMediaType.APPLICATION_REXSTER_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = this.mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getEdge(with(any(Object.class)));
-            will(returnValue(null));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
@@ -538,6 +559,10 @@ public class EdgeResourceTest {
             allowing(graph).getVertex(with(equal("2")));
             will(returnValue(v2));
             allowing(graph).addEdge(null, v2, v1, "edge-label");
+            inSequence(graphSequence);
+            will(returnValue(returnEdge));
+            allowing(graph).getEdge(with(returnEdge.getId()));
+            inSequence(graphSequence);
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -572,11 +597,11 @@ public class EdgeResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = this.mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getEdge(with(any(Object.class)));
-            will(returnValue(null));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
@@ -584,6 +609,10 @@ public class EdgeResourceTest {
             allowing(graph).getVertex(with(equal("2")));
             will(returnValue(v2));
             allowing(graph).addEdge(null, v2, v1, "edge-label");
+            inSequence(graphSequence);
+            will(returnValue(returnEdge));
+            allowing(graph).getEdge(with(returnEdge.getId()));
+            inSequence(graphSequence);
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -618,11 +647,11 @@ public class EdgeResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = this.mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getEdge(with(any(Object.class)));
-            will(returnValue(null));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
@@ -630,6 +659,10 @@ public class EdgeResourceTest {
             allowing(graph).getVertex(with(equal("2")));
             will(returnValue(v2));
             allowing(graph).addEdge(null, v2, v1, "edge-label");
+            inSequence(graphSequence);
+            will(returnValue(returnEdge));
+            allowing(graph).getEdge(with(returnEdge.getId()));
+            inSequence(graphSequence);
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -664,11 +697,11 @@ public class EdgeResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = this.mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getEdge(with(any(Object.class)));
-            will(returnValue(null));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
@@ -676,6 +709,10 @@ public class EdgeResourceTest {
             allowing(graph).getVertex(with(equal("2")));
             will(returnValue(v2));
             allowing(graph).addEdge(null, v2, v1, "edge-label");
+            inSequence(graphSequence);
+            will(returnValue(returnEdge));
+            allowing(graph).getEdge(with(returnEdge.getId()));
+            inSequence(graphSequence);
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
@@ -708,18 +745,22 @@ public class EdgeResourceTest {
         final Request jsr311Request = this.mockery.mock(Request.class);
         final Variant variantJson = new Variant(MediaType.APPLICATION_JSON_TYPE, null, null);
 
+        final Sequence graphSequence = this.mockery.sequence("graph");
+
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
-            allowing(graph).getEdge(with(any(Object.class)));
-            will(returnValue(null));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
             allowing(graph).getVertex(with(equal("1")));
             will(returnValue(v1));
             allowing(graph).getVertex(with(equal("2")));
             will(returnValue(v2));
-            allowing(graph).addEdge("1", v2, v1, "edge-label");
+            allowing(graph).addEdge(null, v2, v1, "edge-label");
+            inSequence(graphSequence);
+            will(returnValue(returnEdge));
+            allowing(graph).getEdge(with(returnEdge.getId()));
+            inSequence(graphSequence);
             will(returnValue(returnEdge));
             allowing(jsr311Request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
