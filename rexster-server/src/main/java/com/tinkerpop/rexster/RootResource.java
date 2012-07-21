@@ -9,6 +9,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+/**
+ * The root resources for Rexster which shows the splash page for Rexster as HTML.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 @Path("/")
 public class RootResource extends BaseResource {
     public RootResource() {

@@ -46,6 +46,11 @@ import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.Set;
 
+/**
+ * Vertex resource.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 @Path("/graphs/{graphname}/vertices")
 public class VertexResource extends AbstractSubResource {
 

@@ -52,6 +52,7 @@ import java.util.logging.LogManager;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class WebServer {
 

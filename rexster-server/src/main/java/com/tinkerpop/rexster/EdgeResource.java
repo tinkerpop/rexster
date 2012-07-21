@@ -42,6 +42,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 
+/**
+ * Resource for edges.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 @Path("/graphs/{graphname}/edges")
 public class EdgeResource extends AbstractSubResource {
 

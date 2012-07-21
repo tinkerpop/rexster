@@ -2,6 +2,7 @@ package com.tinkerpop.rexster;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class StatisticsHelper {
 

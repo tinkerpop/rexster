@@ -34,6 +34,11 @@ import javax.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 
+/**
+ * Resource for graphs.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 @Path("/graphs/{graphname}")
 public class GraphResource extends AbstractSubResource {
 

@@ -24,6 +24,7 @@ import java.util.Map;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 
 @Path("/graphs/{graphname}/prefixes")

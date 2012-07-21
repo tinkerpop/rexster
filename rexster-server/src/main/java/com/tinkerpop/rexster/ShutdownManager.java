@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Manages the socket listening for incoming shutdown requests.
  * <p/>
  * Adapted from http://code.google.com/p/shutdown-listener/
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class ShutdownManager {
     protected final Logger logger = Logger.getLogger(this.getClass());

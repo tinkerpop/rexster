@@ -25,6 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Base resource from which most other resources extend.  Exposes the request/response object and other
+ * request and context information.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public abstract class BaseResource {
 
     private static Logger logger = Logger.getLogger(BaseResource.class);

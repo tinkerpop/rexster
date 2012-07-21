@@ -35,6 +35,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+/**
+ * Base "sub" resource class which contains helper methods for getting extensions, the RexsterApplicationGraph,
+ * and request object.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public abstract class AbstractSubResource extends BaseResource {
 
     private static final Logger logger = Logger.getLogger(AbstractSubResource.class);

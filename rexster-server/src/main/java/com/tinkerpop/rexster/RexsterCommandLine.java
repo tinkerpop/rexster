@@ -4,6 +4,11 @@ package com.tinkerpop.rexster;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 
+/**
+ * Holds command line options and parameters.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public class RexsterCommandLine {
     private CommandLine command;
 

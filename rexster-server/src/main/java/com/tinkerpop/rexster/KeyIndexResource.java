@@ -26,7 +26,9 @@ import javax.ws.rs.core.UriInfo;
 import java.util.HashMap;
 
 /**
- * @author Stephen Mallette
+ * Key index resource.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 @Path("/graphs/{graphname}/keyindices")
 public class KeyIndexResource extends AbstractSubResource {

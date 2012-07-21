@@ -39,7 +39,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Resource for graph indices.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 @Path("/graphs/{graphname}/indices")
 public class IndexResource extends AbstractSubResource {
