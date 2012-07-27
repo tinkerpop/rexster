@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public class RexProMessage {
     public static final UUID EMPTY_SESSION = new UUID(0, 0);
+    public static final byte[] EMPTY_SESSION_BYTES = BitWorks.convertUUIDToByteArray(EMPTY_SESSION);
 
     public byte Version;
 

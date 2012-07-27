@@ -220,7 +220,7 @@ public class WebServer {
         RexsterApplication application = provider.getValue();
 
         filterChainBuilder.add(new SessionFilter(application));
-        filterChainBuilder.add(new ScriptFilter());
+        filterChainBuilder.add(new ScriptFilter(application));
         filterChainBuilder.add(new EchoFilter());
 
         this.rexproServer = TCPNIOTransportBuilder.newInstance().build();

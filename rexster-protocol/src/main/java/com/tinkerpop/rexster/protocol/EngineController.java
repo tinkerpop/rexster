@@ -4,15 +4,17 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Manages the list of EngineHolder items for the current ScriptEngineManager.
  */
 public class EngineController {
     private final ScriptEngineManager manager = new ScriptEngineManager();
-    private final List<EngineHolder> engines = new ArrayList<EngineHolder>();
+    private final Map<String, EngineHolder> engines = new HashMap<String, EngineHolder>();
 
     /**
      * All gremlin engines are prefixed with this value.
@@ -35,7 +37,7 @@ public class EngineController {
 
             // only add engine factories for those languages that are gremlin based.
             if (gremlinEngineNames.contains(factory.getLanguageName())) {
-                this.engines.add(new EngineHolder(factory));
+                this.engines.put(factory.getLanguageName(), new EngineHolder(factory));
             }
         }
     }
@@ -49,16 +51,15 @@ public class EngineController {
     }
 
     public Iterator getAvailableEngineLanguages() {
-        List<String> languages = new ArrayList<String>();
-        for (EngineHolder engine : this.engines) {
-            String fullLanguageName = engine.getLanguageName();
+        final List<String> languages = new ArrayList<String>();
+        for (String fullLanguageName : this.engines.keySet()) {
             languages.add(fullLanguageName.substring(fullLanguageName.indexOf(ENGINE_NAME_PREFIX) + ENGINE_NAME_PREFIX.length()));
         }
 
         return languages.iterator();
     }
 
-    public boolean isEngineAvailable(String languageName) {
+    public boolean isEngineAvailable(final String languageName) {
         boolean available = false;
         try {
             getEngineByLanguageName(languageName);
@@ -70,12 +71,13 @@ public class EngineController {
         return available;
     }
 
-    public EngineHolder getEngineByLanguageName(String languageName) throws ScriptException {
-        for (EngineHolder engine : this.engines) {
-            if (engine.getLanguageName().equals(ENGINE_NAME_PREFIX + languageName))
-                return engine;
+    public EngineHolder getEngineByLanguageName(final String languageName) throws ScriptException {
+
+        final EngineHolder engine = this.engines.get(ENGINE_NAME_PREFIX + languageName);
+        if (engine == null) {
+            throw new ScriptException("No engine for the language: " + languageName);
         }
 
-        throw new ScriptException("No engine for the language: " + languageName);
+        return engine;
     }
 }

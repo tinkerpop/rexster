@@ -1,9 +1,15 @@
 package com.tinkerpop.rexster.protocol.filter;
 
+import com.tinkerpop.rexster.RexsterApplication;
+import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.protocol.BitWorks;
+import com.tinkerpop.rexster.protocol.EngineController;
+import com.tinkerpop.rexster.protocol.EngineHolder;
 import com.tinkerpop.rexster.protocol.RexProSession;
 import com.tinkerpop.rexster.protocol.RexProSessions;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MessageType;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
@@ -14,17 +20,57 @@ import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;
 
 import javax.script.ScriptException;
+import javax.script.SimpleBindings;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ScriptFilter extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(RexProSession.class);
+    private static final Logger logger = Logger.getLogger(ScriptFilter.class);
+
+    private static final EngineController engineController = EngineController.getInstance();
+
+    private final RexsterApplication rexsterApplication;
+
+    public ScriptFilter(final RexsterApplication rexsterApplication) {
+        this.rexsterApplication = rexsterApplication;
+    }
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
         final RexProMessage message = ctx.getMessage();
 
-        if (message instanceof ScriptRequestMessage) {
+        // short cut the session stuff
+        if (message.Flag == MessageType.NO_SESSION_SCRIPT_REQUEST) {
+            final ScriptRequestMessage specificMessage = (ScriptRequestMessage) message;
+
+            try {
+                final EngineHolder engineHolder = engineController.getEngineByLanguageName(specificMessage.LanguageName);
+                final SimpleBindings bindings = new SimpleBindings();
+                bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, this.rexsterApplication);
+                final Object result = engineHolder.getEngine().eval(specificMessage.Script, bindings);
+
+                final MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
+                msgPackScriptResponseMessage.Flag = MsgPackScriptResponseMessage.FLAG_COMPLETE_MESSAGE;
+                msgPackScriptResponseMessage.Session = SessionRequestMessage.EMPTY_SESSION_BYTES;
+                msgPackScriptResponseMessage.Request = specificMessage.Request;
+                msgPackScriptResponseMessage.Results = MsgPackScriptResponseMessage.convertResultToBytes(result);
+
+                final List<RexProMessage> messageList = new ArrayList<RexProMessage>();
+                messageList.add(msgPackScriptResponseMessage);
+                ctx.write(messageList);
+
+                return ctx.getStopAction();
+            } catch (ScriptException se) {
+                logger.error(se);
+            } catch (ClassNotFoundException cnfe) {
+                logger.error(cnfe);
+            } catch (Exception e) {
+                logger.error(e);
+            }
+        }
+
+        // below here is all session related requests
+        if (message.Flag == MessageType.IN_SESSION_SCRIPT_REQUEST) {
             ScriptRequestMessage specificMessage = (ScriptRequestMessage) message;
 
             RexProSession session = RexProSessions.getSession(specificMessage.sessionAsUUID().toString());

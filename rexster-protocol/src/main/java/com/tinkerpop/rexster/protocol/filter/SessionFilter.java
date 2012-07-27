@@ -4,6 +4,7 @@ import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.RexProSessions;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MessageType;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
@@ -18,15 +19,21 @@ import java.util.UUID;
 
 public class SessionFilter extends BaseFilter {
 
-    private RexsterApplication rexsterApplication;
+    private final RexsterApplication rexsterApplication;
 
-    public SessionFilter(RexsterApplication rexsterApplication) {
+    public SessionFilter(final RexsterApplication rexsterApplication) {
         this.rexsterApplication = rexsterApplication;
     }
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
         final RexProMessage message = ctx.getMessage();
 
+        // shortcut all the session stuff
+        if (message.Flag == MessageType.NO_SESSION_SCRIPT_REQUEST)  {
+            return ctx.getInvokeAction();
+        }
+
+        // everything from here forward is about session creation and checking
         if (message instanceof SessionRequestMessage) {
             SessionRequestMessage specificMessage = (SessionRequestMessage) message;
 

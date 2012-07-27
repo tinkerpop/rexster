@@ -63,14 +63,16 @@ public class RexProMessageFilter extends BaseFilter {
         sourceBuffer.position(5);
         sourceBuffer.get(messageAsBytes);
 
-        ByteArrayInputStream in = new ByteArrayInputStream(messageAsBytes);
-        Unpacker unpacker = msgpack.createUnpacker(in);
+        final ByteArrayInputStream in = new ByteArrayInputStream(messageAsBytes);
+        final Unpacker unpacker = msgpack.createUnpacker(in);
         unpacker.setArraySizeLimit(Integer.MAX_VALUE);
         unpacker.setMapSizeLimit(Integer.MAX_VALUE);
         unpacker.setRawSizeLimit(Integer.MAX_VALUE);
 
         RexProMessage message = null;
-        if (messageType == MessageType.SCRIPT_REQUEST) {
+        if (messageType == MessageType.NO_SESSION_SCRIPT_REQUEST) {
+            message = unpacker.read(ScriptRequestMessage.class);
+        } else if (messageType == MessageType.IN_SESSION_SCRIPT_REQUEST) {
             message = unpacker.read(ScriptRequestMessage.class);
         } else if (messageType == MessageType.SESSION_REQUEST) {
             message = unpacker.read(SessionRequestMessage.class);
@@ -87,7 +89,7 @@ public class RexProMessageFilter extends BaseFilter {
         if (message == null) {
             logger.warn("Message did not match an expected type.");
 
-            ErrorResponseMessage errorMessage = new ErrorResponseMessage();
+            final ErrorResponseMessage errorMessage = new ErrorResponseMessage();
             errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
             errorMessage.Request = new byte[0];
             errorMessage.ErrorMessage = "Message did not match an expected type.";
@@ -107,10 +109,10 @@ public class RexProMessageFilter extends BaseFilter {
         // Get the source message to be written
         final List<RexProMessage> messages = new ArrayList<RexProMessage>();
         try {
-            List<RexProMessage> msgs = ctx.getMessage();
+            final List<RexProMessage> msgs = ctx.getMessage();
             messages.addAll(msgs);
         } catch (ClassCastException cce) {
-            RexProMessage msg = ctx.getMessage();
+            final RexProMessage msg = ctx.getMessage();
             messages.add(msg);
         }
 
@@ -121,13 +123,13 @@ public class RexProMessageFilter extends BaseFilter {
             remainingMessages = messages.subList(1, messages.size());
         }
 
-        ByteArrayOutputStream rexProMessageStream = new ByteArrayOutputStream();
-        Packer packer = msgpack.createPacker(rexProMessageStream);
+        final ByteArrayOutputStream rexProMessageStream = new ByteArrayOutputStream();
+        final Packer packer = msgpack.createPacker(rexProMessageStream);
         packer.write(message);
         byte[] rexProMessageAsBytes = rexProMessageStream.toByteArray();
         rexProMessageStream.close();
 
-        ByteBuffer bb = ByteBuffer.allocate(5 + rexProMessageAsBytes.length);
+        final ByteBuffer bb = ByteBuffer.allocate(5 + rexProMessageAsBytes.length);
         if (message instanceof SessionResponseMessage) {
             bb.put(MessageType.SESSION_RESPONSE);
         } else if (message instanceof ConsoleScriptResponseMessage) {
@@ -135,7 +137,9 @@ public class RexProMessageFilter extends BaseFilter {
         } else if (message instanceof ErrorResponseMessage) {
             bb.put(MessageType.ERROR);
         } else if (message instanceof ScriptRequestMessage) {
-            bb.put(MessageType.SCRIPT_REQUEST);
+            bb.put(MessageType.NO_SESSION_SCRIPT_REQUEST);
+        } else if (message instanceof ScriptRequestMessage) {
+            bb.put(MessageType.IN_SESSION_SCRIPT_REQUEST);
         } else if (message instanceof SessionRequestMessage) {
             bb.put(MessageType.SESSION_REQUEST);
         } else if (message instanceof MsgPackScriptResponseMessage) {
@@ -145,7 +149,7 @@ public class RexProMessageFilter extends BaseFilter {
         bb.putInt(rexProMessageAsBytes.length);
         bb.put(rexProMessageAsBytes);
 
-        byte[] messageAsBytes = bb.array();
+        final byte[] messageAsBytes = bb.array();
         final int size = messageAsBytes.length;
 
         // Retrieve the memory manager
