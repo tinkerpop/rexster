@@ -73,20 +73,16 @@ public class WebServer {
     protected HttpServer rexsterServer;
     protected TCPNIOTransport rexproServer;
 
-    public WebServer(final XMLConfiguration properties, boolean user) throws Exception {
-        if (user) {
-            this.startUser(properties);
-        } else {
-            this.start(properties);
-        }
+    public WebServer(final XMLConfiguration properties) throws Exception {
+        this.start(properties);
 
         // initialize the session monitor for rexpro to clean up dead sessions.
-        Long rexProSessionMaxIdle = properties.getLong("rexpro-session-max-idle", new Long(1790000));
-        Long rexProSessionCheckInterval = properties.getLong("rexpro-session-check-interval", new Long(3000000));
+        final Long rexProSessionMaxIdle = properties.getLong("rexpro-session-max-idle", new Long(1790000));
+        final Long rexProSessionCheckInterval = properties.getLong("rexpro-session-check-interval", new Long(3000000));
         new RexProSessionMonitor(rexProSessionMaxIdle, rexProSessionCheckInterval);
 
-        Integer shutdownServerPort = properties.getInteger("rexster-shutdown-port", new Integer(8183));
-        String shutdownServerHost = properties.getString("rexster-shutdown-host", "127.0.0.1");
+        final Integer shutdownServerPort = properties.getInteger("rexster-shutdown-port", new Integer(8183));
+        final String shutdownServerHost = properties.getString("rexster-shutdown-host", "127.0.0.1");
         final ShutdownManager shutdownManager = new ShutdownManager(shutdownServerHost, shutdownServerPort);
 
         //Register a shutdown hook
@@ -106,10 +102,6 @@ public class WebServer {
 
     public static String getCharacterEncoding() {
         return characterEncoding;
-    }
-
-    private void startUser(final XMLConfiguration properties) throws Exception {
-        this.start(properties);
     }
 
     private void start(final XMLConfiguration properties) throws Exception {
@@ -325,7 +317,7 @@ public class WebServer {
             }
 
             try {
-                new WebServer(properties, true);
+                new WebServer(properties);
             } catch (BindException be) {
                 logger.fatal("Could not start Rexster Server.  A port that Rexster needs is in use.");
             } catch (Exception ex) {

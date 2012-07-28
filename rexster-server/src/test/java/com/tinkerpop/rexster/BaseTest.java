@@ -37,7 +37,7 @@ public abstract class BaseTest {
                 try {
                     XMLConfiguration properties = new XMLConfiguration();
                     properties.load(WebServer.class.getResourceAsStream("rexster.xml"));
-                    webServer = new WebServer(properties, false);
+                    webServer = new WebServer(properties);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
