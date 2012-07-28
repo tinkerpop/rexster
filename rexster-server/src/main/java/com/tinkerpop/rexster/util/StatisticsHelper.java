@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster;
+package com.tinkerpop.rexster.util;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

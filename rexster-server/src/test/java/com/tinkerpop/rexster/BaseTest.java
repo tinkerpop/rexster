@@ -3,7 +3,7 @@ package com.tinkerpop.rexster;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-import com.tinkerpop.rexster.server.RexsterApplicationImpl;
+import com.tinkerpop.rexster.util.StatisticsHelper;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
