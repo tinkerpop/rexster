@@ -9,8 +9,11 @@ import com.tinkerpop.rexster.protocol.RexProSessionMonitor;
 import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
 import com.tinkerpop.rexster.protocol.filter.ScriptFilter;
 import com.tinkerpop.rexster.protocol.filter.SessionFilter;
+import com.tinkerpop.rexster.server.HttpRexsterServer;
+import com.tinkerpop.rexster.server.RexProRexsterServer;
 import com.tinkerpop.rexster.server.RexsterApplicationImpl;
 import com.tinkerpop.rexster.server.RexsterCommandLine;
+import com.tinkerpop.rexster.server.RexsterServer;
 import com.tinkerpop.rexster.server.RexsterSettings;
 import com.tinkerpop.rexster.server.ShutdownManager;
 import com.tinkerpop.rexster.server.WebServerRexsterApplicationProvider;
@@ -62,19 +65,24 @@ public class WebServer {
 
     private static String characterEncoding;
 
-    private static final String DEFAULT_WEB_ROOT_PATH = "public";
-    private static final String DEFAULT_BASE_URI = "http://localhost";
-    private static Logger logger = Logger.getLogger(WebServer.class);
+    private static final Logger logger = Logger.getLogger(WebServer.class);
 
     static {
-        PropertyConfigurator.configure(RexsterApplication.class.getResource("log4j.properties"));
+        PropertyConfigurator.configure(WebServer.class.getResource("log4j.properties"));
     }
 
-    protected HttpServer rexsterServer;
-    protected TCPNIOTransport rexproServer;
+    private final RexsterServer httpServer;
+    private final RexsterServer rexproServer;
 
     public WebServer(final XMLConfiguration properties) throws Exception {
-        this.start(properties);
+        WebServerRexsterApplicationProvider.start(properties);
+        characterEncoding = properties.getString("character-set", "ISO-8859-1");
+
+        this.httpServer = new HttpRexsterServer(properties);
+        this.httpServer.start();
+
+        this.rexproServer = new RexProRexsterServer(properties);
+        this.rexproServer.start();
 
         // initialize the session monitor for rexpro to clean up dead sessions.
         final Long rexProSessionMaxIdle = properties.getLong("rexpro-session-max-idle", new Long(1790000));
@@ -104,133 +112,9 @@ public class WebServer {
         return characterEncoding;
     }
 
-    private void start(final XMLConfiguration properties) throws Exception {
-        WebServerRexsterApplicationProvider.start(properties);
-        final Integer rexsterServerPort = properties.getInteger("rexster-server-port", new Integer(8182));
-        final String rexsterServerHost = properties.getString("rexster-server-host", "0.0.0.0");
-        final Integer rexproServerPort = properties.getInteger("rexpro-server-port", new Integer(8184));
-        final String rexproServerHost = properties.getString("rexpro-server-host", "0.0.0.0");
-        final String webRootPath = properties.getString("web-root", DEFAULT_WEB_ROOT_PATH);
-        final String baseUri = properties.getString("base-uri", DEFAULT_BASE_URI);
-        characterEncoding = properties.getString("character-set", "ISO-8859-1");
-
-        this.startRexsterServer(properties, baseUri, rexsterServerPort, rexsterServerHost, webRootPath);
-        this.startRexProServer(properties, rexproServerPort, rexproServerHost);
-
-    }
-
-    private void startRexsterServer(final XMLConfiguration properties,
-                                    final String baseUri,
-                                    final Integer rexsterServerPort,
-                                    final String rexsterServerHost,
-                                    final String webRootPath) throws Exception {
-
-        ServletHandler jerseyHandler = new ServletHandler();
-        jerseyHandler.addInitParameter("com.sun.jersey.config.property.packages", "com.tinkerpop.rexster");
-        jerseyHandler.addInitParameter(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, HeaderResponseFilter.class.getName());
-        jerseyHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
-
-        HierarchicalConfiguration securityConfiguration = properties.configurationAt("security.authentication");
-        String securityFilterType = securityConfiguration.getString("type");
-        if (!securityFilterType.equals("none")) {
-            if (securityFilterType.equals("default")) {
-                jerseyHandler.addInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, DefaultSecurityFilter.class.getName());
-            } else {
-                jerseyHandler.addInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, securityFilterType);
-            }
-        }
-
-        jerseyHandler.setContextPath("/");
-        jerseyHandler.setServletInstance(new ServletContainer());
-
-        WebServerRexsterApplicationProvider provider = new WebServerRexsterApplicationProvider();
-        RexsterApplication application = provider.getValue();
-
-        // servlet that services all url from "main" by simply sending
-        // main.html back to the calling client.  main.html handles its own
-        // state given the uri
-        ServletHandler dogHouseHandler = new ServletHandler();
-        dogHouseHandler.setContextPath("/doghouse/main");
-        dogHouseHandler.setServletInstance(new DogHouseServlet());
-
-        // servlet for gremlin console
-        ServletHandler visualizationHandler = new ServletHandler();
-        visualizationHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
-
-        visualizationHandler.setContextPath("/doghouse/visualize");
-        visualizationHandler.setServletInstance(new VisualizationServlet(application));
-
-        // servlet for gremlin console
-        ServletHandler evaluatorHandler = new ServletHandler();
-        evaluatorHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
-
-        evaluatorHandler.setContextPath("/doghouse/exec");
-        evaluatorHandler.setServletInstance(new EvaluatorServlet(application));
-
-        String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
-        dogHouseHandler.addInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri", baseUri + ":" + rexsterServerPort.toString());
-
-        this.rexsterServer = new HttpServer();
-        final ServerConfiguration config = this.rexsterServer.getServerConfiguration();
-        config.addHttpHandler(jerseyHandler, "/");
-        config.addHttpHandler(new RexsterStaticHttpHandler(absoluteWebRootPath), "/doghouse");
-        config.addHttpHandler(dogHouseHandler, "/doghouse/main/*");
-        config.addHttpHandler(visualizationHandler, "/doghouse/visualize");
-        config.addHttpHandler(evaluatorHandler, "/doghouse/exec");
-
-        final NetworkListener listener = new NetworkListener("grizzly", rexsterServerHost, rexsterServerPort);
-        this.rexsterServer.addListener(listener);
-
-        this.rexsterServer.start();
-
-        logger.info("Rexster Server running on: [" + baseUri + ":" + rexsterServerPort + "]");
-    }
-
-    private void startRexProServer(final XMLConfiguration properties,
-                                   final Integer rexproServerPort,
-                                   final String rexproServerHost) throws Exception {
-        final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
-        filterChainBuilder.add(new TransportFilter());
-        filterChainBuilder.add(new RexProMessageFilter());
-
-        final HierarchicalConfiguration securityConfiguration = properties.configurationAt("security.authentication");
-        final String securityFilterType = securityConfiguration.getString("type");
-        if (securityFilterType.equals("none")) {
-            logger.info("Rexster configured with no security.");
-        } else {
-            final AbstractSecurityFilter filter;
-            if (securityFilterType.equals("default")) {
-                filter = new DefaultSecurityFilter();
-                filterChainBuilder.add(filter);
-            } else {
-                filter = (AbstractSecurityFilter) Class.forName(securityFilterType).newInstance();
-                filterChainBuilder.add(filter);
-            }
-
-            filter.configure(properties);
-
-            logger.info("Rexster configured with [" + filter.getName() + "].");
-        }
-
-        final WebServerRexsterApplicationProvider provider = new WebServerRexsterApplicationProvider();
-        final RexsterApplication application = provider.getValue();
-
-        filterChainBuilder.add(new SessionFilter(application));
-        filterChainBuilder.add(new ScriptFilter(application));
-
-        this.rexproServer = TCPNIOTransportBuilder.newInstance().build();
-        this.rexproServer.setIOStrategy(WorkerThreadIOStrategy.getInstance());
-        this.rexproServer.setProcessor(filterChainBuilder.build());
-        this.rexproServer.bind(rexproServerHost, rexproServerPort);
-
-        this.rexproServer.start();
-
-        logger.info("RexPro serving on port: [" + rexproServerPort + "]");
-    }
-
     protected void stop() {
         try {
-            this.rexsterServer.stop();
+            this.httpServer.stop();
         } catch (Exception ex) {
             logger.debug("Error shutting down Rexster Server ignored.", ex);
         }
