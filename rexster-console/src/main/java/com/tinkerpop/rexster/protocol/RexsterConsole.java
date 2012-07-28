@@ -277,7 +277,7 @@ public class RexsterConsole {
             scriptMessage.Script = script;
             scriptMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToByteArray(new RexsterBindings());
             scriptMessage.LanguageName = scriptEngineName;
-            scriptMessage.Flag = (byte) 0;
+            scriptMessage.Flag = ScriptRequestMessage.FLAG_IN_SESSION;
             scriptMessage.setRequestAsUUID(UUID.randomUUID());
 
             final RexProMessage resultMessage = session.sendRequest(scriptMessage, 3, 500);

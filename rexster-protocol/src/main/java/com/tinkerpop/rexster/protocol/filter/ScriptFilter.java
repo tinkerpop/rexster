@@ -72,7 +72,7 @@ public class ScriptFilter extends BaseFilter {
         }
 
         // below here is all session related requests
-        if (message.Flag == ScriptRequestMessage.FLAG_NO_SESSION) {
+        if (message.Flag == ScriptRequestMessage.FLAG_IN_SESSION) {
             final ScriptRequestMessage specificMessage = (ScriptRequestMessage) message;
             final RexProSession session = RexProSessions.getSession(specificMessage.sessionAsUUID().toString());
 
