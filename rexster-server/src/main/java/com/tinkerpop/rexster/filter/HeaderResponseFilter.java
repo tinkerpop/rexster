@@ -3,8 +3,8 @@ package com.tinkerpop.rexster.filter;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
+import com.tinkerpop.rexster.Application;
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.WebServer;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.core.MediaType;
@@ -27,7 +27,7 @@ public class HeaderResponseFilter implements ContainerResponseFilter {
         String acceptCharsetHeaderValue = request.getHeaderValue("Accept-Charset");
         if (acceptCharsetHeaderValue == null || acceptCharsetHeaderValue.isEmpty()) {
             // assign the default charset since none is specified.
-            acceptCharsetHeaderValue = WebServer.getCharacterEncoding();
+            acceptCharsetHeaderValue = Application.getCharacterEncoding();
         }
 
         CharsetHolder firstSupportedCharset = CharsetHolder.getFirstSupportedCharset(acceptCharsetHeaderValue);

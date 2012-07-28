@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  */
 public abstract class BaseTest {
 
-    private WebServer webServer;
+    private Application application;
     protected StatisticsHelper sh = new StatisticsHelper();
     private static Logger logger = Logger.getLogger(BaseTest.class.getName());
     public static final String baseURI = "http://localhost:8182/";
@@ -25,7 +25,7 @@ public abstract class BaseTest {
     public BaseTest() {
         try {
             XMLConfiguration properties = new XMLConfiguration();
-            properties.load(WebServer.class.getResourceAsStream("rexster.xml"));
+            properties.load(Application.class.getResourceAsStream("rexster.xml"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -36,8 +36,8 @@ public abstract class BaseTest {
             public void run() {
                 try {
                     XMLConfiguration properties = new XMLConfiguration();
-                    properties.load(WebServer.class.getResourceAsStream("rexster.xml"));
-                    webServer = new WebServer(properties);
+                    properties.load(Application.class.getResourceAsStream("rexster.xml"));
+                    application = new Application(properties);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -48,7 +48,7 @@ public abstract class BaseTest {
     }
 
     public void stopWebServer() throws Exception {
-        webServer.stop();
+        application.stop();
     }
 
     public static JSONObject getResource(String uri) throws Exception {
