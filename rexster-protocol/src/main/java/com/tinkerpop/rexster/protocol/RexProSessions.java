@@ -10,26 +10,26 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RexProSessions {
     private static final Logger logger = Logger.getLogger(RexProSessions.class);
 
-    protected static ConcurrentHashMap<String, RexProSession> sessions = new ConcurrentHashMap<String, RexProSession>();
+    protected final static ConcurrentHashMap<String, RexProSession> sessions = new ConcurrentHashMap<String, RexProSession>();
 
-    public static RexProSession getSession(String sessionKey) {
+    public static RexProSession getSession(final String sessionKey) {
         return sessions.get(sessionKey);
     }
 
-    public static void destroySession(String sessionKey) {
+    public static void destroySession(final String sessionKey) {
         sessions.remove(sessionKey);
         logger.info("RexPro Session destroyed: " + sessionKey);
     }
 
     public static void destroyAllSessions() {
-        Iterator<String> keys = sessions.keySet().iterator();
+        final Iterator<String> keys = sessions.keySet().iterator();
         while (keys.hasNext()) {
-            String keyToRemove = keys.next();
+            final String keyToRemove = keys.next();
             destroySession(keyToRemove);
         }
     }
 
-    public static boolean hasSessionKey(String sessionKey) {
+    public static boolean hasSessionKey(final String sessionKey) {
         return sessions.containsKey(sessionKey);
     }
 
@@ -37,17 +37,13 @@ public class RexProSessions {
         return sessions.keySet();
     }
 
-    public static void ensureSessionExists(String sessionKey, RexsterApplication rexsterApplication, byte sessionChannel, int chunkSize) {
+    public static void ensureSessionExists(final String sessionKey, final RexsterApplication rexsterApplication,
+                                           final byte sessionChannel, final int chunkSize) {
         if (!sessions.containsKey(sessionKey)) {
-
-            RexProSession session = new RexProSession(sessionKey, rexsterApplication, sessionChannel, chunkSize);
-            if (session == null) {
-                logger.warn("A RexPro Session could not be created because the requested channel is not valid.");
-                throw new RuntimeException("Requested channel is not valid.");
-            }
-
+            final RexProSession session = new RexProSession(sessionKey, rexsterApplication, sessionChannel, chunkSize);
             sessions.put(sessionKey, session);
-            logger.info("RexPro Session created: " + sessionKey.toString());
+
+            logger.info("RexPro Session created: " + sessionKey);
         }
     }
 

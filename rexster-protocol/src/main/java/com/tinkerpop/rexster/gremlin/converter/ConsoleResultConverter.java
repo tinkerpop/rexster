@@ -27,17 +27,17 @@ public class ConsoleResultConverter implements ResultConverter<List<String>> {
                 }
             } else if (result instanceof Iterator) {
                 // Table is handled through here and the toString() to get it formatted.
-                Iterator itty = (Iterator) result;
+                final Iterator itty = (Iterator) result;
                 while (itty.hasNext()) {
                     resultLines.add(itty.next());
                 }
             } else if (result.getClass().isArray()) {
-                int length = Array.getLength(result);
+                final int length = Array.getLength(result);
                 for (int ix = 0; ix < length; ix++) {
                     resultLines.add(Array.get(result, ix).toString());
                 }
             } else if (result instanceof Map) {
-                Map map = (Map) result;
+                final Map map = (Map) result;
                 for (Object key : map.keySet()) {
                     resultLines.add(key + "=" + map.get(key).toString());
                 }
@@ -48,10 +48,10 @@ public class ConsoleResultConverter implements ResultConverter<List<String>> {
             }
 
             // Handle output data
-            List<String> outputLines = new ArrayList<String>();
+            final List<String> outputLines = new ArrayList<String>();
 
             // Handle eval() result
-            String[] printLines = this.outputWriter.toString().split(LINE_SEPARATOR);
+            final String[] printLines = this.outputWriter.toString().split(LINE_SEPARATOR);
 
             if (printLines.length > 0 && printLines[0].length() > 0) {
                 for (String printLine : printLines) {
@@ -68,7 +68,7 @@ public class ConsoleResultConverter implements ResultConverter<List<String>> {
 
             return outputLines;
         } catch (Exception ex) {
-            ArrayList<String> resultList = new ArrayList<String>();
+            final ArrayList<String> resultList = new ArrayList<String>();
             resultList.add(ex.getMessage());
             return resultList;
         }

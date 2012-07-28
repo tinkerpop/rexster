@@ -25,12 +25,12 @@ public class MsgPackResultConverter implements ResultConverter<byte[]> {
     private final MessagePack msgpack = new MessagePack();
 
     public byte[] convert(final Object result) throws Exception {
-        BufferPacker packer = msgpack.createBufferPacker(1024);
+        final BufferPacker packer = msgpack.createBufferPacker(1024);
         prepareOutput(result, packer);
         return packer.toByteArray();
     }
 
-    private void prepareOutput(Object object, Packer packer) throws Exception {
+    private void prepareOutput(final Object object, final Packer packer) throws Exception {
         if (object == null) {
             packer.write(ValueFactory.createNilValue());
         } else if (object instanceof String || object instanceof Number || object instanceof Boolean) {

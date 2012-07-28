@@ -19,15 +19,13 @@ public class RexProSession {
 
     private final byte channel;
 
-    private final int chunkSize;
+    private final EngineController controller = EngineController.getInstance();
 
-    protected Date lastTimeUsed = new Date();
+    private Date lastTimeUsed = new Date();
 
     public RexProSession(final String sessionKey, final RexsterApplication rexsterApplication, final byte channel, final int chunkSize) {
         this.sessionKey = sessionKey;
         this.channel = channel;
-        this.chunkSize = chunkSize;
-
         this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, rexsterApplication);
     }
 
@@ -47,12 +45,10 @@ public class RexProSession {
         return (new Date()).getTime() - this.lastTimeUsed.getTime();
     }
 
-    public Object evaluate(String script, String languageName, RexsterBindings rexsterBindings) throws ScriptException {
-        EngineController controller = EngineController.getInstance();
-
+    public Object evaluate(final String script, final String languageName, final RexsterBindings rexsterBindings) throws ScriptException {
         Object result = null;
         try {
-            EngineHolder engine = controller.getEngineByLanguageName(languageName);
+            final EngineHolder engine = this.controller.getEngineByLanguageName(languageName);
 
             if (rexsterBindings != null) {
                 this.bindings.putAll(rexsterBindings);
