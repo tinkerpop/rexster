@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster;
+package com.tinkerpop.rexster.server;
 
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.core.spi.component.ComponentContext;
@@ -6,6 +6,8 @@ import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
+import com.tinkerpop.rexster.RexsterApplication;
+import com.tinkerpop.rexster.server.RexsterApplicationImpl;
 import org.apache.commons.configuration.XMLConfiguration;
 
 import javax.ws.rs.core.Context;

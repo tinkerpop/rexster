@@ -3,6 +3,7 @@ package com.tinkerpop.rexster;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.tinkerpop.rexster.server.RexsterApplicationImpl;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
@@ -24,7 +25,7 @@ public abstract class BaseTest {
     public BaseTest() {
         try {
             XMLConfiguration properties = new XMLConfiguration();
-            properties.load(RexsterApplicationImpl.class.getResourceAsStream("rexster.xml"));
+            properties.load(WebServer.class.getResourceAsStream("rexster.xml"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -35,7 +36,7 @@ public abstract class BaseTest {
             public void run() {
                 try {
                     XMLConfiguration properties = new XMLConfiguration();
-                    properties.load(RexsterApplicationImpl.class.getResourceAsStream("rexster.xml"));
+                    properties.load(WebServer.class.getResourceAsStream("rexster.xml"));
                     webServer = new WebServer(properties, false);
                 } catch (Exception e) {
                     e.printStackTrace();

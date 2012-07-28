@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.extension.HttpMethod;
+import com.tinkerpop.rexster.server.RexsterApplicationImpl;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.OPTIONS;

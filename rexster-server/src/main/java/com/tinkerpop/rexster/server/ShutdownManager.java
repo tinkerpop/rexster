@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster;
+package com.tinkerpop.rexster.server;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -43,10 +43,6 @@ public class ShutdownManager {
 
     private int port = 8183;
     private String host = "127.0.0.1";
-
-    static {
-        PropertyConfigurator.configure(RexsterApplicationImpl.class.getResource("log4j.properties"));
-    }
 
     public ShutdownManager(String host, int port) {
         this.port = port;
@@ -146,7 +142,7 @@ public class ShutdownManager {
     }
 
     /**
-     * Sort a {@link List} of {@link com.tinkerpop.rexster.ShutdownManager.ShutdownSocketListener} before {@link #runShutdownHandlers(Collection)} iterates over them.
+     * Sort a {@link List} of {@link ShutdownManager.ShutdownSocketListener} before {@link #runShutdownHandlers(Collection)} iterates over them.
      * Default implementation does nothing
      */
     protected void sortShutdownListeners(List<ShutdownListener> shutdownListeners) {

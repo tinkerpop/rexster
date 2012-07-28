@@ -1,6 +1,10 @@
-package com.tinkerpop.rexster;
+package com.tinkerpop.rexster.server;
 
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.rexster.RexsterApplication;
+import com.tinkerpop.rexster.RexsterApplicationGraph;
+import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.WebServer;
 import com.tinkerpop.rexster.config.GraphConfigurationContainer;
 import com.tinkerpop.rexster.config.GraphConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -25,10 +29,6 @@ public class RexsterApplicationImpl implements RexsterApplication {
     private final long startTime = System.currentTimeMillis();
 
     private Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
-
-    static {
-        PropertyConfigurator.configure(RexsterApplicationImpl.class.getResource("log4j.properties"));
-    }
 
     public RexsterApplicationImpl(final String graphName, final Graph graph) {
         RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph);

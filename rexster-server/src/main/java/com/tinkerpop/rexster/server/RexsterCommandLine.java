@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster;
+package com.tinkerpop.rexster.server;
 
 
 import org.apache.commons.cli.CommandLine;
