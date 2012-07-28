@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
-import com.tinkerpop.rexster.RexsterApplication;
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.Tokens;
 
 import javax.script.Bindings;

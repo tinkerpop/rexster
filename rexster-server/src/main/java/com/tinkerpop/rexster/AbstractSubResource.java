@@ -14,7 +14,7 @@ import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import com.tinkerpop.rexster.extension.RexsterExtension;
-import com.tinkerpop.rexster.server.RexsterApplicationImpl;
+import com.tinkerpop.rexster.server.*;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -48,7 +48,7 @@ public abstract class AbstractSubResource extends BaseResource {
 
     protected static final Map<ExtensionSegmentSet, List<RexsterExtension>> extensionCache = new HashMap<ExtensionSegmentSet, List<RexsterExtension>>();
 
-    protected AbstractSubResource(RexsterApplication ra) {
+    protected AbstractSubResource(com.tinkerpop.rexster.server.RexsterApplication ra) {
         super(ra);
 
         try {

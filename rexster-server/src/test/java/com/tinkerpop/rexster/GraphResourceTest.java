@@ -61,7 +61,7 @@ public class GraphResourceTest {
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
-        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
+        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
 
         this.mockery.checking(new Expectations() {{

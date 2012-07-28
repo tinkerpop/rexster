@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.server;
 
-import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.filter.AbstractSecurityFilter;
 import com.tinkerpop.rexster.filter.DefaultSecurityFilter;
 import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;

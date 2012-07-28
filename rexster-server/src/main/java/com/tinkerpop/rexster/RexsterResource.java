@@ -33,7 +33,7 @@ public class RexsterResource extends BaseResource {
         super(null);
     }
 
-    public RexsterResource(RexsterApplication ra) {
+    public RexsterResource(com.tinkerpop.rexster.server.RexsterApplication ra) {
         super(ra);
     }
 

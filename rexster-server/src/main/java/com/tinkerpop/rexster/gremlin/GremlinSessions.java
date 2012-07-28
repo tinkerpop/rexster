@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.gremlin;
 
-import com.tinkerpop.rexster.RexsterApplication;
+import com.tinkerpop.rexster.server.RexsterApplication;
 
 import java.util.Collection;
 import java.util.Iterator;

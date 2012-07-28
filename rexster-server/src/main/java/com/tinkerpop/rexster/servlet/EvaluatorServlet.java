@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.servlet;
 
-import com.tinkerpop.rexster.RexsterApplication;
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.gremlin.GremlinEvaluationJob;
 import com.tinkerpop.rexster.gremlin.GremlinSessions;
 import com.tinkerpop.rexster.gremlin.converter.ConsoleResultConverter;

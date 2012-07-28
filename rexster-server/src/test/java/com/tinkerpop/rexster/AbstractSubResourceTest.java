@@ -40,7 +40,7 @@ public class AbstractSubResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
+        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
 
         this.mockery.checking(new Expectations() {{
             allowing(req).getParameterMap();
@@ -273,7 +273,7 @@ public class AbstractSubResourceTest {
 
     private class MockAbstractSubResource extends AbstractSubResource {
 
-        public MockAbstractSubResource(UriInfo ui, HttpServletRequest req, RexsterApplication ra) {
+        public MockAbstractSubResource(UriInfo ui, HttpServletRequest req, com.tinkerpop.rexster.server.RexsterApplication ra) {
             super(ra);
             this.httpServletRequest = req;
             this.uriInfo = ui;

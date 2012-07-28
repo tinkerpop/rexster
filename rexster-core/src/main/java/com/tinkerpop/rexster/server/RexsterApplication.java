@@ -1,6 +1,7 @@
-package com.tinkerpop.rexster;
+package com.tinkerpop.rexster.server;
 
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.rexster.RexsterApplicationGraph;
 
 import java.util.Set;
 

@@ -1,47 +1,12 @@
 package com.tinkerpop.rexster;
 
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.spi.container.servlet.ServletContainer;
-import com.tinkerpop.rexster.filter.AbstractSecurityFilter;
-import com.tinkerpop.rexster.filter.DefaultSecurityFilter;
-import com.tinkerpop.rexster.filter.HeaderResponseFilter;
 import com.tinkerpop.rexster.protocol.RexProSessionMonitor;
-import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
-import com.tinkerpop.rexster.protocol.filter.ScriptFilter;
-import com.tinkerpop.rexster.protocol.filter.SessionFilter;
-import com.tinkerpop.rexster.server.HttpRexsterServer;
-import com.tinkerpop.rexster.server.RexProRexsterServer;
-import com.tinkerpop.rexster.server.RexsterApplicationImpl;
-import com.tinkerpop.rexster.server.RexsterCommandLine;
-import com.tinkerpop.rexster.server.RexsterServer;
-import com.tinkerpop.rexster.server.RexsterSettings;
-import com.tinkerpop.rexster.server.ShutdownManager;
-import com.tinkerpop.rexster.server.WebServerRexsterApplicationProvider;
-import com.tinkerpop.rexster.servlet.DogHouseServlet;
-import com.tinkerpop.rexster.servlet.EvaluatorServlet;
-import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
-import com.tinkerpop.rexster.servlet.VisualizationServlet;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
+import com.tinkerpop.rexster.server.*;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.glassfish.grizzly.filterchain.FilterChainBuilder;
-import org.glassfish.grizzly.filterchain.TransportFilter;
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.http.server.NetworkListener;
-import org.glassfish.grizzly.http.server.ServerConfiguration;
-import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
-import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
-import org.glassfish.grizzly.servlet.ServletHandler;
-import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -52,7 +17,6 @@ import java.io.PrintStream;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -174,7 +138,7 @@ public class WebServer {
                     // revert to the rexster.xml stored as a resource.  a good fall back for users just 
                     // getting started with rexster.
                     try {
-                        properties.load(RexsterApplication.class.getResourceAsStream(rexsterXmlFileLocation));
+                        properties.load(com.tinkerpop.rexster.server.RexsterApplication.class.getResourceAsStream(rexsterXmlFileLocation));
                         logger.info("Using [" + rexsterXmlFileLocation + "] resource as configuration source.");
                     } catch (Exception ex){
                         logger.fatal("None of the default rexster.xml can be found or read.");

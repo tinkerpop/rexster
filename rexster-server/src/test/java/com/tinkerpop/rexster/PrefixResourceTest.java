@@ -36,7 +36,7 @@ public class PrefixResourceTest {
         SailGraph sg = new MemoryStoreSailGraph();
         SailGraphFactory.createTinkerGraph(sg);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", sg);
-        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
+        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -71,7 +71,7 @@ public class PrefixResourceTest {
         SailGraph sg = new MemoryStoreSailGraph();
         SailGraphFactory.createTinkerGraph(sg);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", sg);
-        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
+        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -104,7 +104,7 @@ public class PrefixResourceTest {
         SailGraph sg = new MemoryStoreSailGraph();
         SailGraphFactory.createTinkerGraph(sg);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", sg);
-        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
+        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);

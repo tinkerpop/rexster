@@ -60,7 +60,7 @@ public class VertexResource extends AbstractSubResource {
         super(null);
     }
 
-    public VertexResource(UriInfo ui, HttpServletRequest req, RexsterApplication ra) {
+    public VertexResource(UriInfo ui, HttpServletRequest req, com.tinkerpop.rexster.server.RexsterApplication ra) {
         super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;

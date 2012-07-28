@@ -2,7 +2,6 @@ package com.tinkerpop.rexster.server;
 
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
-import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.filter.DefaultSecurityFilter;
 import com.tinkerpop.rexster.filter.HeaderResponseFilter;
 import com.tinkerpop.rexster.servlet.DogHouseServlet;
@@ -15,7 +14,6 @@ import org.apache.log4j.Logger;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
-import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.servlet.ServletHandler;
 
 import java.io.File;

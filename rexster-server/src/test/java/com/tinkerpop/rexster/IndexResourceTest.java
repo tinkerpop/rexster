@@ -33,7 +33,7 @@ public class IndexResourceTest {
     public void getAllIndicesNonIndexableGraph() {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
+        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
@@ -145,7 +145,7 @@ public class IndexResourceTest {
     private IndexResource constructMockGetAllIndicesScenario(int numberOfIndicesToGenerate, final HashMap<String, String> parameters) {
         final IndexableGraph graph = this.mockery.mock(IndexableGraph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
+        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);

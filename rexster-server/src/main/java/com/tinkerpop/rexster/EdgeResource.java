@@ -56,7 +56,7 @@ public class EdgeResource extends AbstractSubResource {
         super(null);
     }
 
-    public EdgeResource(UriInfo ui, HttpServletRequest req, RexsterApplication ra) {
+    public EdgeResource(UriInfo ui, HttpServletRequest req, com.tinkerpop.rexster.server.RexsterApplication ra) {
         super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;

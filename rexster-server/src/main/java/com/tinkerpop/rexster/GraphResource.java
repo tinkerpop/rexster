@@ -10,7 +10,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterExtension;
-import com.tinkerpop.rexster.server.RexsterApplicationImpl;
+import com.tinkerpop.rexster.server.*;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -49,7 +49,7 @@ public class GraphResource extends AbstractSubResource {
         super(null);
     }
 
-    public GraphResource(final UriInfo ui, final HttpServletRequest req, final RexsterApplication ra) {
+    public GraphResource(final UriInfo ui, final HttpServletRequest req, final com.tinkerpop.rexster.server.RexsterApplication ra) {
         super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;

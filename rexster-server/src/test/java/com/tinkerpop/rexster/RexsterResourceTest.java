@@ -27,7 +27,7 @@ public class RexsterResourceTest {
 
     @Test
     public void evaluateMultipleGraphs() {
-        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
+        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
         final Set<String> graphNames = new HashSet<String>();
         graphNames.add("graph1");
@@ -66,7 +66,7 @@ public class RexsterResourceTest {
 
     @Test
     public void evaluateNoGraphs() {
-        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
+        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
         final Set<String> graphNames = new HashSet<String>();
 

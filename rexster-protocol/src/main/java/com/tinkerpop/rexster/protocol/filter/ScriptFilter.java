@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.protocol.filter;
 
-import com.tinkerpop.rexster.RexsterApplication;
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.EngineHolder;
@@ -20,7 +20,6 @@ import org.glassfish.grizzly.filterchain.NextAction;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ScriptFilter extends BaseFilter {

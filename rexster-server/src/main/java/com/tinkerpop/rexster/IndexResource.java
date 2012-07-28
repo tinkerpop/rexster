@@ -53,7 +53,7 @@ public class IndexResource extends AbstractSubResource {
         super(null);
     }
 
-    public IndexResource(final UriInfo ui, final HttpServletRequest req, final RexsterApplication ra) {
+    public IndexResource(final UriInfo ui, final HttpServletRequest req, final com.tinkerpop.rexster.server.RexsterApplication ra) {
         super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;
