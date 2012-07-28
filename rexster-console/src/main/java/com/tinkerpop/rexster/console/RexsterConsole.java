@@ -82,19 +82,9 @@ public class RexsterConsole {
         this.session.open();
     }
 
-    public void primaryLoop() throws Exception {
+    private void primaryLoop() throws Exception {
 
-        final ConsoleReader reader = new ConsoleReader();
-        reader.setBellEnabled(false);
-        reader.setUseHistory(true);
-
-        try {
-            History history = new History();
-            history.setHistoryFile(new File(REXSTER_HISTORY));
-            reader.setHistory(history);
-        } catch (IOException e) {
-            System.err.println("Could not find history file");
-        }
+        final ConsoleReader reader = getInputReader();
 
         String line = "";
         this.output.println();
@@ -122,32 +112,16 @@ public class RexsterConsole {
                 if (line.isEmpty())
                     continue;
                 if (line.equals(Tokens.REXSTER_CONSOLE_QUIT)) {
-                    this.output.print("closing session with Rexster " + this.settings.getHostPort());
-                    if (this.session != null) {
-                        this.session.close();
-                        this.session = null;
-                    }
-                    this.output.println("--> done");
+                    this.closeConsole();
                     return;
                 } else if (line.equals(Tokens.REXSTER_CONSOLE_HELP)) {
                     this.printHelp();
                 } else if (line.equals(Tokens.REXSTER_CONSOLE_BINDINGS)) {
                     this.printBindings();
                 } else if (line.equals(Tokens.REXSTER_CONSOLE_RESET)) {
-                    this.output.print("resetting session with Rexster " + this.settings.getHostPort());
-                    if (this.session != null) {
-                        this.session.reset();
-                    } else {
-                        this.initAndOpenSessionFromSettings();
-                    }
-
-                    // reset binding cache in the console...it will come back fresh from the server on the 
-                    // next script eval
-                    this.currentBindings.clear();
-
-                    this.output.println("--> done");
+                    this.resetSessionWithRexster();
                 } else if (line.startsWith(Tokens.REXSTER_CONSOLE_EXECUTE)) {
-                    String fileToExecute = line.substring(Tokens.REXSTER_CONSOLE_EXECUTE.length()).trim();
+                    final String fileToExecute = line.substring(Tokens.REXSTER_CONSOLE_EXECUTE.length()).trim();
                     if (fileToExecute == null || fileToExecute.isEmpty()) {
                         this.output.print("specify the file to execute");
                     } else {
@@ -160,16 +134,7 @@ public class RexsterConsole {
                 } else if (line.equals(Tokens.REXSTER_CONSOLE_LANGUAGES)) {
                     this.printAvailableLanguages();
                 } else if (line.startsWith(Tokens.REXSTER_CONSOLE_LANGUAGE)) {
-                    String langToChangeTo = line.substring(1);
-                    if (langToChangeTo == null || langToChangeTo.isEmpty()) {
-                        this.output.println("specify a language on Rexster ?<language-name>");
-                        this.printAvailableLanguages();
-                    } else if (this.session.isAvailableLanguage(langToChangeTo)) {
-                        this.settings.setLanguage(langToChangeTo);
-                    } else {
-                        this.output.println("not a valid language on Rexster: [" + langToChangeTo + "].");
-                        this.printAvailableLanguages();
-                    }
+                    changeLanugage(line);
                 } else {
                     executeScript(line);
                 }
@@ -180,13 +145,65 @@ public class RexsterConsole {
         }
     }
 
-    private void executeScript(String line) {
+    private void changeLanugage(final String line) {
+        final String langToChangeTo = line.substring(1);
+        if (langToChangeTo == null || langToChangeTo.isEmpty()) {
+            this.output.println("specify a language on Rexster ?<language-name>");
+            this.printAvailableLanguages();
+        } else if (this.session.isAvailableLanguage(langToChangeTo)) {
+            this.settings.setLanguage(langToChangeTo);
+        } else {
+            this.output.println("not a valid language on Rexster: [" + langToChangeTo + "].");
+            this.printAvailableLanguages();
+        }
+    }
+
+    private void resetSessionWithRexster() {
+        this.output.print("resetting session with Rexster " + this.settings.getHostPort());
+        if (this.session != null) {
+            this.session.reset();
+        } else {
+            this.initAndOpenSessionFromSettings();
+        }
+
+        // reset binding cache in the console...it will come back fresh from the server on the
+        // next script eval
+        this.currentBindings.clear();
+
+        this.output.println("--> done");
+    }
+
+    private void closeConsole() {
+        this.output.print("closing session with Rexster " + this.settings.getHostPort());
+        if (this.session != null) {
+            this.session.close();
+            this.session = null;
+        }
+        this.output.println("--> done");
+    }
+
+    private ConsoleReader getInputReader() throws IOException {
+        final ConsoleReader reader = new ConsoleReader();
+        reader.setBellEnabled(false);
+        reader.setUseHistory(true);
+
+        try {
+            final History history = new History();
+            history.setHistoryFile(new File(REXSTER_HISTORY));
+            reader.setHistory(history);
+        } catch (IOException e) {
+            System.err.println("Could not find history file");
+        }
+        return reader;
+    }
+
+    private void executeScript(final String line) {
         executeScript(line, true);
     }
 
-    private void executeScript(String line, boolean showPrefix) {
-        ResultAndBindings result = eval(line, this.settings.getLanguage(), this.session);
-        Iterator itty;
+    private void executeScript(final String line, final boolean showPrefix) {
+        final ResultAndBindings result = eval(line, this.settings.getLanguage(), this.session);
+        final Iterator itty;
         if (result.getResult() instanceof Iterator) {
             itty = (Iterator) result.getResult();
         } else if (result.getResult() instanceof Iterable) {
@@ -214,7 +231,7 @@ public class RexsterConsole {
     private void printAvailableLanguages() {
         this.output.println("-= Available Languages =-");
 
-        Iterator<String> languages = this.session.getAvailableLanguages();
+        final Iterator<String> languages = this.session.getAvailableLanguages();
         while (languages.hasNext()) {
             this.output.println("?" + languages.next());
         }
@@ -248,15 +265,16 @@ public class RexsterConsole {
         return "rexster[" + this.settings.getLanguage() + "]> ";
     }
 
-    public static String makeSpace(int number) {
-        String space = new String();
+    public static String makeSpace(final int number) {
+        String space = "";
         for (int i = 0; i < number; i++) {
             space = space + " ";
         }
         return space;
     }
 
-    private static ResultAndBindings eval(String script, String scriptEngineName, RemoteRexsterSession session) {
+    private static ResultAndBindings eval(final String script, final String scriptEngineName,
+                                          final RemoteRexsterSession session) {
 
         ResultAndBindings returnValue = null;
 
@@ -307,19 +325,21 @@ public class RexsterConsole {
         return returnValue;
     }
 
-    private static String readFile(String file) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String line = null;
-        StringBuilder stringBuilder = new StringBuilder();
-        String ls = System.getProperty("line.separator");
+    private static String readFile(final String file) throws IOException {
+        final BufferedReader reader = new BufferedReader(new FileReader(file));
+        String line;
+
+        final StringBuilder stringBuilder = new StringBuilder();
+        final String ls = System.getProperty("line.separator");
         while ((line = reader.readLine()) != null) {
             stringBuilder.append(line);
             stringBuilder.append(ls);
         }
+
         return stringBuilder.toString();
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         try {
             final ConsoleSettings settings = new ConsoleSettings(args);
             new RexsterConsole(settings).start();
