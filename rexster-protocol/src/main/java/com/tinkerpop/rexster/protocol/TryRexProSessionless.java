@@ -1,13 +1,8 @@
 package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.MessageType;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
-import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONObject;
 import org.msgpack.MessagePack;
 import org.msgpack.type.Value;
 import org.msgpack.unpacker.BufferUnpacker;
@@ -92,7 +87,7 @@ public class TryRexProSessionless {
         scriptMessage.Script = script;
         scriptMessage.Bindings = emptyBindings;
         scriptMessage.LanguageName = "groovy";
-        scriptMessage.Flag = MessageType.NO_SESSION_SCRIPT_REQUEST;
+        scriptMessage.Flag = ScriptRequestMessage.FLAG_NO_SESSION;
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
         return scriptMessage;
     }

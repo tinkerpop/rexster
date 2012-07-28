@@ -9,6 +9,9 @@ import java.nio.ByteBuffer;
 
 @Message
 public class ScriptRequestMessage extends RexProMessage {
+    public static final byte FLAG_IN_SESSION = 0;
+    public static final byte FLAG_NO_SESSION = 1;
+
     public String LanguageName;
     public String Script;
     public byte[] Bindings;

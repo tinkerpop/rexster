@@ -9,6 +9,7 @@ import com.tinkerpop.rexster.protocol.RexProSessionMonitor;
 import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
 import com.tinkerpop.rexster.protocol.filter.ScriptFilter;
 import com.tinkerpop.rexster.protocol.filter.SessionFilter;
+import com.tinkerpop.rexster.protocol.filter.SingleRexProMessageFilter;
 import com.tinkerpop.rexster.servlet.DogHouseServlet;
 import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
@@ -195,7 +196,7 @@ public class WebServer {
                                    final String rexproServerHost) throws Exception {
         final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
         filterChainBuilder.add(new TransportFilter());
-        filterChainBuilder.add(new RexProMessageFilter());
+        filterChainBuilder.add(new SingleRexProMessageFilter());
 
         final HierarchicalConfiguration securityConfiguration = properties.configurationAt("security.authentication");
         final String securityFilterType = securityConfiguration.getString("type");

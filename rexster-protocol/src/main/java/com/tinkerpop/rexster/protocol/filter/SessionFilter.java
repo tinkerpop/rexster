@@ -6,6 +6,7 @@ import com.tinkerpop.rexster.protocol.RexProSessions;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MessageType;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import org.glassfish.grizzly.filterchain.BaseFilter;
@@ -29,7 +30,7 @@ public class SessionFilter extends BaseFilter {
         final RexProMessage message = ctx.getMessage();
 
         // shortcut all the session stuff
-        if (message.Flag == MessageType.NO_SESSION_SCRIPT_REQUEST)  {
+        if (message instanceof ScriptRequestMessage && message.Flag == ScriptRequestMessage.FLAG_NO_SESSION)  {
             return ctx.getInvokeAction();
         }
 

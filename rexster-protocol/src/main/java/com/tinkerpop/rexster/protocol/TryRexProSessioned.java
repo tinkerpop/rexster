@@ -2,22 +2,16 @@ package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.MessageType;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONObject;
 import org.msgpack.MessagePack;
 import org.msgpack.type.Value;
 import org.msgpack.unpacker.BufferUnpacker;
 import org.msgpack.unpacker.Converter;
-import org.msgpack.unpacker.Unpacker;
 import org.msgpack.unpacker.UnpackerIterator;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -141,7 +135,7 @@ public class TryRexProSessioned {
         scriptMessage.Script = script;
         scriptMessage.Bindings = emptyBindings;
         scriptMessage.LanguageName = "groovy";
-        scriptMessage.Flag = MessageType.IN_SESSION_SCRIPT_REQUEST;
+        scriptMessage.Flag = ScriptRequestMessage.FLAG_IN_SESSION;
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
         return scriptMessage;
     }

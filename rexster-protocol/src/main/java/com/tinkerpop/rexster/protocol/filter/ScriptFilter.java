@@ -2,14 +2,12 @@ package com.tinkerpop.rexster.protocol.filter;
 
 import com.tinkerpop.rexster.RexsterApplication;
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.EngineHolder;
 import com.tinkerpop.rexster.protocol.RexProSession;
 import com.tinkerpop.rexster.protocol.RexProSessions;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.MessageType;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
@@ -32,21 +30,27 @@ public class ScriptFilter extends BaseFilter {
 
     private final RexsterApplication rexsterApplication;
 
+    private final SimpleBindings bindings;
+
     public ScriptFilter(final RexsterApplication rexsterApplication) {
         this.rexsterApplication = rexsterApplication;
+
+        // reuse the bindings for the gremlin script engine
+        this.bindings = new SimpleBindings();
+        this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, this.rexsterApplication);
     }
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
         final RexProMessage message = ctx.getMessage();
 
+        // check message type to be ScriptRequestMessage
+
         // short cut the session stuff
-        if (message.Flag == MessageType.NO_SESSION_SCRIPT_REQUEST) {
+        if (message.Flag == ScriptRequestMessage.FLAG_NO_SESSION) {
             final ScriptRequestMessage specificMessage = (ScriptRequestMessage) message;
 
             try {
                 final EngineHolder engineHolder = engineController.getEngineByLanguageName(specificMessage.LanguageName);
-                final SimpleBindings bindings = new SimpleBindings();
-                bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, this.rexsterApplication);
                 final Object result = engineHolder.getEngine().eval(specificMessage.Script, bindings);
 
                 final MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
@@ -55,9 +59,7 @@ public class ScriptFilter extends BaseFilter {
                 msgPackScriptResponseMessage.Request = specificMessage.Request;
                 msgPackScriptResponseMessage.Results = MsgPackScriptResponseMessage.convertResultToBytes(result);
 
-                final List<RexProMessage> messageList = new ArrayList<RexProMessage>();
-                messageList.add(msgPackScriptResponseMessage);
-                ctx.write(messageList);
+                ctx.write(msgPackScriptResponseMessage);
 
                 return ctx.getStopAction();
             } catch (ScriptException se) {
@@ -70,44 +72,42 @@ public class ScriptFilter extends BaseFilter {
         }
 
         // below here is all session related requests
-        if (message.Flag == MessageType.IN_SESSION_SCRIPT_REQUEST) {
-            ScriptRequestMessage specificMessage = (ScriptRequestMessage) message;
-
-            RexProSession session = RexProSessions.getSession(specificMessage.sessionAsUUID().toString());
+        if (message.Flag == ScriptRequestMessage.FLAG_NO_SESSION) {
+            final ScriptRequestMessage specificMessage = (ScriptRequestMessage) message;
+            final RexProSession session = RexProSessions.getSession(specificMessage.sessionAsUUID().toString());
 
             try {
-                Object result = session.evaluate(specificMessage.Script, specificMessage.LanguageName, specificMessage.getBindings());
+                final Object result = session.evaluate(specificMessage.Script, specificMessage.LanguageName, specificMessage.getBindings());
 
-                List<RexProMessage> messageList = new ArrayList<RexProMessage>();
                 if (session.getChannel() == SessionRequestMessage.CHANNEL_CONSOLE) {
-                    ConsoleScriptResponseMessage consoleScriptResponseMessage = new ConsoleScriptResponseMessage();
+                    final ConsoleScriptResponseMessage consoleScriptResponseMessage = new ConsoleScriptResponseMessage();
                     consoleScriptResponseMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToByteArray(session.getBindings());
                     consoleScriptResponseMessage.Flag = ConsoleScriptResponseMessage.FLAG_COMPLETE_MESSAGE;
                     consoleScriptResponseMessage.Session = specificMessage.Session;
                     consoleScriptResponseMessage.Request = specificMessage.Request;
-                    List<String> consoleLines = ConsoleScriptResponseMessage.convertResultToConsoleLines(result);
+
+                    final List<String> consoleLines = ConsoleScriptResponseMessage.convertResultToConsoleLines(result);
                     consoleScriptResponseMessage.ConsoleLines = new String[consoleLines.size()];
                     consoleLines.toArray(consoleScriptResponseMessage.ConsoleLines);
 
-                    messageList.add(consoleScriptResponseMessage);
+                    ctx.write(consoleScriptResponseMessage);
                 } else if (session.getChannel() == SessionRequestMessage.CHANNEL_MSGPACK) {
-                    MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
+                    final MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
                     msgPackScriptResponseMessage.Flag = MsgPackScriptResponseMessage.FLAG_COMPLETE_MESSAGE;
                     msgPackScriptResponseMessage.Session = specificMessage.Session;
                     msgPackScriptResponseMessage.Request = specificMessage.Request;
                     msgPackScriptResponseMessage.Results = MsgPackScriptResponseMessage.convertResultToBytes(result);
-                    
-                    messageList.add(msgPackScriptResponseMessage);
+
+                    ctx.write(msgPackScriptResponseMessage);
                 }
 
-                ctx.write(messageList);
 
             } catch (ScriptException se) {
                 logger.warn("Could not process script [" + specificMessage.Script + "] for language ["
                         + specificMessage.LanguageName + "] on session [" + message.Session
                         + "] and request [" + message.Request + "]");
 
-                ErrorResponseMessage errorMessage = new ErrorResponseMessage();
+                final ErrorResponseMessage errorMessage = new ErrorResponseMessage();
                 errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
                 errorMessage.Request = message.Request;
                 errorMessage.ErrorMessage = "An error occurred while processing the script for language ["
