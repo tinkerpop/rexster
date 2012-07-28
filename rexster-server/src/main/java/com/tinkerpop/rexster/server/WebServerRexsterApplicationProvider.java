@@ -30,7 +30,7 @@ public class WebServerRexsterApplicationProvider
 
     private static XMLConfiguration configurationProperties;
 
-    public static void start(XMLConfiguration properties) {
+    public static void start(final XMLConfiguration properties) {
         configurationProperties = properties;
     }
 

@@ -49,12 +49,15 @@ public class Application {
         this.rexproServer.start();
 
         // initialize the session monitor for rexpro to clean up dead sessions.
-        final Long rexProSessionMaxIdle = properties.getLong("rexpro-session-max-idle", new Long(1790000));
-        final Long rexProSessionCheckInterval = properties.getLong("rexpro-session-check-interval", new Long(3000000));
+        final Long rexProSessionMaxIdle = properties.getLong("rexpro-session-max-idle",
+                new Long(RexsterSettings.DEFAULT_REXPRO_SESSION_MAX_IDLE));
+        final Long rexProSessionCheckInterval = properties.getLong("rexpro-session-check-interval",
+                new Long(RexsterSettings.DEFAULT_REXPRO_SESSION_CHECK_INTERVAL));
         new RexProSessionMonitor(rexProSessionMaxIdle, rexProSessionCheckInterval);
 
-        final Integer shutdownServerPort = properties.getInteger("rexster-shutdown-port", new Integer(8183));
-        final String shutdownServerHost = properties.getString("rexster-shutdown-host", "127.0.0.1");
+        final Integer shutdownServerPort = properties.getInteger("rexster-shutdown-port",
+                new Integer(RexsterSettings.DEFAULT_SHUTDOWN_PORT));
+        final String shutdownServerHost = properties.getString("rexster-shutdown-host", RexsterSettings.DEFAULT_HOST);
         final ShutdownManager shutdownManager = new ShutdownManager(shutdownServerHost, shutdownServerPort);
 
         //Register a shutdown hook
@@ -188,8 +191,8 @@ public class Application {
     }
 
     private static void issueControlCommand(RexsterCommandLine line, String command) {
-        String host = "127.0.0.1";
-        int port = 8183;
+        String host = RexsterSettings.DEFAULT_HOST;
+        int port = RexsterSettings.DEFAULT_SHUTDOWN_PORT;
 
         if (line.hasCommandParameters() && line.getCommandParameters().hasOption("host")) {
             host = line.getCommandParameters().getOptionValue("host");

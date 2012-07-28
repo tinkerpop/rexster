@@ -19,13 +19,12 @@ import org.glassfish.grizzly.servlet.ServletHandler;
 import java.io.File;
 
 /**
+ * Initializes the HTTP server for Rexster serving REST and Dog House.
+ *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class HttpRexsterServer implements RexsterServer {
     private static final Logger logger = Logger.getLogger(HttpRexsterServer.class);
-
-    private static final String DEFAULT_WEB_ROOT_PATH = "public";
-    private static final String DEFAULT_BASE_URI = "http://localhost";
 
     private final XMLConfiguration properties;
     private final Integer rexsterServerPort;
@@ -36,10 +35,10 @@ public class HttpRexsterServer implements RexsterServer {
 
     public HttpRexsterServer(final XMLConfiguration properties) {
         this.properties = properties;
-        rexsterServerPort = properties.getInteger("rexster-server-port", new Integer(8182));
+        rexsterServerPort = properties.getInteger("rexster-server-port", new Integer(RexsterSettings.DEFAULT_HTTP_PORT));
         rexsterServerHost = properties.getString("rexster-server-host", "0.0.0.0");
-        webRootPath = properties.getString("web-root", DEFAULT_WEB_ROOT_PATH);
-        baseUri = properties.getString("base-uri", DEFAULT_BASE_URI);
+        webRootPath = properties.getString("web-root", RexsterSettings.DEFAULT_WEB_ROOT_PATH);
+        baseUri = properties.getString("base-uri", RexsterSettings.DEFAULT_BASE_URI);
         this.httpServer = new HttpServer();
     }
 

@@ -15,6 +15,8 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
 
 /**
+ * Initializes the TCP server that serves RexPro.
+ *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RexProRexsterServer implements RexsterServer {
@@ -27,7 +29,7 @@ public class RexProRexsterServer implements RexsterServer {
 
     public RexProRexsterServer(final XMLConfiguration properties) {
         this.properties = properties;
-        this.rexproServerPort = properties.getInteger("rexpro-server-port", new Integer(8184));
+        this.rexproServerPort = properties.getInteger("rexpro-server-port", new Integer(RexsterSettings.DEFAULT_REXPRO_PORT));
         this.rexproServerHost = properties.getString("rexpro-server-host", "0.0.0.0");
         this.tcpTransport = TCPNIOTransportBuilder.newInstance().build();
     }
