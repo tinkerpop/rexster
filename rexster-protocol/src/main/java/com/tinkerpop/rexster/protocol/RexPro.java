@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
-import com.tinkerpop.rexster.protocol.filter.SingleRexProMessageFilter;
+import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.GrizzlyFuture;
@@ -65,7 +65,7 @@ final class RexPro {
         // Add TransportFilter, which is responsible
         // for reading and writing data to the connection
         filterChainBuilder.add(new TransportFilter());
-        filterChainBuilder.add(new SingleRexProMessageFilter());
+        filterChainBuilder.add(new RexProMessageFilter());
         filterChainBuilder.add(new CustomClientFilter(future));
 
         // Create TCP NIO transport

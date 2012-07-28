@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RexProMessageFilter extends BaseFilter {
-
     private static final Logger logger = Logger.getLogger(RexProSession.class);
     private static final MessagePack msgpack = new MessagePack();
 
@@ -83,7 +82,7 @@ public class RexProMessageFilter extends BaseFilter {
         } else if (messageType == MessageType.MSGPACK_SCRIPT_RESPONSE) {
             message = unpacker.read(MsgPackScriptResponseMessage.class);
         }
-        
+
         if (message == null) {
             logger.warn("Message did not match an expected type.");
 
@@ -105,40 +104,27 @@ public class RexProMessageFilter extends BaseFilter {
 
     public NextAction handleWrite(final FilterChainContext ctx) throws IOException {
         // Get the source message to be written
-        final List<RexProMessage> messages = new ArrayList<RexProMessage>();
-        try {
-            final List<RexProMessage> msgs = ctx.getMessage();
-            messages.addAll(msgs);
-        } catch (ClassCastException cce) {
-            final RexProMessage msg = ctx.getMessage();
-            messages.add(msg);
-        }
-
-        final RexProMessage message = messages.get(0);
-
-        List<RexProMessage> remainingMessages = null;
-        if (messages.size() > 1) {
-            remainingMessages = messages.subList(1, messages.size());
-        }
+        final RexProMessage msg = ctx.getMessage();
 
         final ByteArrayOutputStream rexProMessageStream = new ByteArrayOutputStream();
         final Packer packer = msgpack.createPacker(rexProMessageStream);
-        packer.write(message);
+        packer.write(msg);
         byte[] rexProMessageAsBytes = rexProMessageStream.toByteArray();
         rexProMessageStream.close();
 
         final ByteBuffer bb = ByteBuffer.allocate(5 + rexProMessageAsBytes.length);
-        if (message instanceof SessionResponseMessage) {
+
+        if (msg instanceof SessionResponseMessage) {
             bb.put(MessageType.SESSION_RESPONSE);
-        } else if (message instanceof ConsoleScriptResponseMessage) {
+        } else if (msg instanceof ConsoleScriptResponseMessage) {
             bb.put(MessageType.CONSOLE_SCRIPT_RESPONSE);
-        } else if (message instanceof ErrorResponseMessage) {
+        } else if (msg instanceof ErrorResponseMessage) {
             bb.put(MessageType.ERROR);
-        } else if (message instanceof ScriptRequestMessage) {
+        } else if (msg instanceof ScriptRequestMessage) {
             bb.put(MessageType.SCRIPT_REQUEST);
-        } else if (message instanceof SessionRequestMessage) {
+        } else if (msg instanceof SessionRequestMessage) {
             bb.put(MessageType.SESSION_REQUEST);
-        } else if (message instanceof MsgPackScriptResponseMessage) {
+        } else if (msg instanceof MsgPackScriptResponseMessage) {
             bb.put(MessageType.MSGPACK_SCRIPT_RESPONSE);
         }
 
@@ -163,6 +149,6 @@ public class RexProMessageFilter extends BaseFilter {
         ctx.setMessage(output.flip());
 
         // Instruct the FilterChain to call the next filter
-        return ctx.getInvokeAction(remainingMessages);
+        return ctx.getInvokeAction();
     }
 }
