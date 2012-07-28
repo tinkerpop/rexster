@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.protocol.filter.ScriptFilter;
 import com.tinkerpop.rexster.protocol.filter.SessionFilter;
 import com.tinkerpop.rexster.server.RexsterApplicationImpl;
 import com.tinkerpop.rexster.server.RexsterCommandLine;
+import com.tinkerpop.rexster.server.RexsterSettings;
 import com.tinkerpop.rexster.server.ShutdownManager;
 import com.tinkerpop.rexster.server.WebServerRexsterApplicationProvider;
 import com.tinkerpop.rexster.servlet.DogHouseServlet;
@@ -224,7 +225,6 @@ public class WebServer {
 
         filterChainBuilder.add(new SessionFilter(application));
         filterChainBuilder.add(new ScriptFilter(application));
-        //filterChainBuilder.add(new EchoFilter());
 
         this.rexproServer = TCPNIOTransportBuilder.newInstance().build();
         this.rexproServer.setIOStrategy(WorkerThreadIOStrategy.getInstance());
@@ -256,219 +256,13 @@ public class WebServer {
         }
     }
 
-    @SuppressWarnings("static-access")
-    private static Options getCliOptions() {
-        Option help = new Option("h", "help", false, "print this message");
-
-        Option rexsterStart = OptionBuilder.withArgName("parameters")
-                .hasOptionalArgs()
-                .withDescription("start rexster (learn more with start -h)")
-                .withLongOpt("start")
-                .create("s");
-
-        Option rexsterStop = OptionBuilder.withArgName("parameters")
-                .hasOptionalArgs()
-                .withDescription("stop rexster (learn more with stop -h)")
-                .withLongOpt("stop")
-                .create("x");
-
-        Option rexsterStatus = OptionBuilder.withArgName("parameters")
-                .hasOptionalArgs()
-                .withDescription("status of rexster (learn more with status -h)")
-                .withLongOpt("status")
-                .create("u");
-
-        Option rexsterVersion = new Option("v", "version", false, "print the version of rexster server");
-
-        Options options = new Options();
-        options.addOption(rexsterStart);
-        options.addOption(rexsterStop);
-        options.addOption(rexsterStatus);
-        options.addOption(rexsterVersion);
-        options.addOption(help);
-
-        return options;
-    }
-
-    @SuppressWarnings("static-access")
-    private static Options getStartCliOptions() {
-        Option help = new Option("h", "help", false, "print this message");
-
-        Option rexsterFile = OptionBuilder.withArgName("file")
-                .hasArg()
-                .withDescription("use given file for rexster.xml")
-                .withLongOpt("configuration")
-                .create("c");
-
-        Option webServerPort = OptionBuilder.withArgName("port")
-                .hasArg()
-                .withDescription("override port used for rexster-server-port in rexster.xml")
-                .withLongOpt("rexsterport")
-                .create("rp");
-
-        Option webRoot = OptionBuilder.withArgName("path")
-                .hasArg()
-                .withDescription("override web-root in rexster.xml")
-                .withLongOpt("webroot")
-                .create("wr");
-
-        Option debug = new Option("d", "debug", false, "run rexster with full console logging output from jersey");
-
-        Options options = new Options();
-        options.addOption(help);
-        options.addOption(rexsterFile);
-        options.addOption(webServerPort);
-        options.addOption(webRoot);
-        options.addOption(debug);
-
-        return options;
-    }
-
-    @SuppressWarnings("static-access")
-    private static Options getStopCliOptions() {
-        Option help = new Option("h", "help", false, "print this message");
-
-        Option rexsterFile = OptionBuilder.withArgName("host-name")
-                .hasArg()
-                .withDescription("rexster web server hostname or ip address (default is 127.0.0.1)")
-                .withLongOpt("rexsterhost")
-                .create("rh");
-
-        Option webServerPort = OptionBuilder.withArgName("port")
-                .hasArg()
-                .withDescription("rexster web server shutdown port (default is 8183)")
-                .withLongOpt("rexsterport")
-                .create("rp");
-
-        Option stopAndWait = new Option("w", "wait", false, "wait for server confirmation of shutdown");
-
-        Options options = new Options();
-        options.addOption(help);
-        options.addOption(rexsterFile);
-        options.addOption(webServerPort);
-        options.addOption(stopAndWait);
-
-        return options;
-    }
-
-    @SuppressWarnings("static-access")
-    private static Options getStatusCliOptions() {
-        Option help = new Option("h", "help", false, "print this message");
-
-        Option rexsterFile = OptionBuilder.withArgName("host-name")
-                .hasArg()
-                .withDescription("rexster web server hostname or ip address (default is 127.0.0.1)")
-                .withLongOpt("rexsterhost")
-                .create("rh");
-
-        Option webServerPort = OptionBuilder.withArgName("port")
-                .hasArg()
-                .withDescription("rexster web server status port (default is 8183)")
-                .withLongOpt("rexsterport")
-                .create("rp");
-
-        Options options = new Options();
-        options.addOption(help);
-        options.addOption(rexsterFile);
-        options.addOption(webServerPort);
-
-        return options;
-    }
-
-    private static RexsterCommandLine getCliInput(final String[] args) {
-        Options options = getCliOptions();
-        Options innerOptions = null;
-        GnuParser parser = new GnuParser();
-        CommandLine line = null;
-        CommandLine innerLine = null;
-        String commandText = "";
-
-        try {
-            // not sure why the stopAtNonOption should be set to true for the parse methods.
-            // would seem like the opposite setting makes more sense.
-            line = parser.parse(options, args, true);
-
-            if (line.hasOption("start")) {
-                commandText = "start";
-                innerOptions = getStartCliOptions();
-                String[] optionValues = line.getOptionValues("start");
-
-                if (optionValues != null && optionValues.length > 0) {
-                    innerLine = parser.parse(innerOptions, optionValues, true);
-                }
-            } else if (line.hasOption("stop")) {
-                commandText = "stop";
-                innerOptions = getStopCliOptions();
-                String[] optionValues = line.getOptionValues("stop");
-
-                if (optionValues != null && optionValues.length > 0) {
-                    innerLine = parser.parse(innerOptions, optionValues, true);
-                }
-            } else if (line.hasOption("status")) {
-                commandText = "status";
-                innerOptions = getStatusCliOptions();
-                String[] optionValues = line.getOptionValues("status");
-
-                if (optionValues != null && optionValues.length > 0) {
-                    innerLine = parser.parse(innerOptions, optionValues, true);
-                }
-            }
-
-        } catch (ParseException exp) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("rexster", options);
-            System.exit(0);
-        }
-
-        if (line.hasOption("help") && (line.hasOption("start") || line.hasOption("status") || line.hasOption("stop"))) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("rexster - " + commandText, innerOptions);
-            System.exit(0);
-        } else if (line.hasOption("help")) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("rexster", options);
-            System.exit(0);
-        }
-
-        return new RexsterCommandLine(line, innerLine, options);
-    }
-
-    private static String[] cleanArguments(String[] arguments) {
-
-        // this method is a bit of a hack to get around the global argument of
-        // -webroot which only applies to the -start command.  it pulls out -webroot
-        // of the argument list so the parser doesn't fail...kinda gross
-        ArrayList<String> cleanedArguments = new ArrayList<String>();
-
-        if (arguments != null && arguments.length > 0) {
-
-            if (!arguments[0].equals("-start") && !arguments[0].equals("--start") && !arguments[0].equals("-s")) {
-                for (int ix = 0; ix < arguments.length; ix++) {
-                    if (!arguments[ix].equals("-webroot")) {
-                        cleanedArguments.add(arguments[ix]);
-                    } else {
-                        ix++;
-                    }
-                }
-            } else {
-                for (String argument : arguments) {
-                    cleanedArguments.add(argument);
-                }
-            }
-        }
-
-        String[] cleanedArgumentsAsArray = new String[cleanedArguments.size()];
-        cleanedArguments.toArray(cleanedArgumentsAsArray);
-        return cleanedArgumentsAsArray;
-    }
-
     public static void main(final String[] args)  {
 
         logger.info(".:Welcome to Rexster:.");
 
         final XMLConfiguration properties = new XMLConfiguration();
-
-        final RexsterCommandLine line = getCliInput(cleanArguments(args));
+        final RexsterSettings settings = new RexsterSettings(args);
+        final RexsterCommandLine line = settings.getCommand();
 
         if (line.getCommand().hasOption("start")) {
             if (line.hasCommandParameters() && line.getCommandParameters().hasOption("debug")) {
