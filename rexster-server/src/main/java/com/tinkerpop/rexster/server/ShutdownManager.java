@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class ShutdownManager {
-    protected final Logger logger = Logger.getLogger(this.getClass());
+    protected final Logger logger = Logger.getLogger(ShutdownManager.class);
 
     private final CountDownLatch shutdownLatch = new CountDownLatch(1);
     private final AtomicBoolean shutdownRequested = new AtomicBoolean(false);
@@ -41,10 +41,10 @@ public class ShutdownManager {
     public static final String COMMAND_SHUTDOWN_NO_WAIT = "s";
     public static final String COMMAND_STATUS = "status";
 
-    private int port = 8183;
-    private String host = "127.0.0.1";
+    private final int port;
+    private final String host;
 
-    public ShutdownManager(String host, int port) {
+    public ShutdownManager(final String host, final int port) {
         this.port = port;
         this.host = host;
     }

@@ -2,11 +2,13 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.protocol.RexProSessionMonitor;
 import com.tinkerpop.rexster.server.*;
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.msgpack.template.IntegerTemplate;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,6 +19,7 @@ import java.io.PrintStream;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -190,27 +193,22 @@ public class Application {
         }
     }
 
-    private static void issueControlCommand(RexsterCommandLine line, String command) {
-        String host = RexsterSettings.DEFAULT_HOST;
-        int port = RexsterSettings.DEFAULT_SHUTDOWN_PORT;
-
-        if (line.hasCommandParameters() && line.getCommandParameters().hasOption("host")) {
-            host = line.getCommandParameters().getOptionValue("host");
+    private static int parseInt(final String intString, final int intDefault) {
+        try {
+            return Integer.parseInt(intString);
+        } catch (NumberFormatException nfe) {
+            return intDefault;
         }
+    }
 
-        if (line.hasCommandParameters() && line.getCommandParameters().hasOption("port")) {
-            String portString = line.getCommandParameters().getOptionValue("port");
+    private static void issueControlCommand(final RexsterCommandLine line, final String command) {
 
-            try {
-                port = Integer.parseInt(portString);
-            } catch (NumberFormatException nfe) {
-                logger.warn("The value of the <port> parameter was not a valid value.  Utilizing the default port of " + port + ".");
-            }
-        }
+        final String host = line.getCommandOption("rexsterhost", RexsterSettings.DEFAULT_HOST);
+        final String portString = line.getCommandOption("rexsterport", null);
 
-        if (line.hasCommandParameters() && line.getCommandParameters().hasOption("cmd")) {
-            command = line.getCommandParameters().getOptionValue("cmd");
-
+        final int port = parseInt(portString, RexsterSettings.DEFAULT_SHUTDOWN_PORT);
+        if (line.hasCommandOption("rexsterport") && !Integer.toString(port).equals(portString)) {
+            logger.warn("The value of the <port> parameter was not a valid value.  Utilizing the default port of " + port + ".");
         }
 
         Socket shutdownConnection = null;
@@ -238,8 +236,10 @@ public class Application {
                 IOUtils.closeQuietly(reader);
                 IOUtils.closeQuietly(writer);
             }
+        } catch (SocketException se) {
+            logger.debug(se);
         } catch (IOException ioe) {
-            System.out.println("Cannot connect to Rexster Server to issue command.  It may not be running.");
+            logger.warn("Cannot connect to Rexster Server to issue command.  It may not be running.");
         } finally {
             try {
                 if (shutdownConnection != null) {

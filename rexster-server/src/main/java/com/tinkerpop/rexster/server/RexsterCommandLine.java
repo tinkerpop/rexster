@@ -34,6 +34,14 @@ public class RexsterCommandLine {
         return commandParameters;
     }
 
+    public String getCommandOption(final String opt, final String defaultValue) {
+        return hasCommandParameters() ? commandParameters.getOptionValue(opt, defaultValue) : defaultValue;
+    }
+
+    public boolean hasCommandOption(final String opt) {
+        return hasCommandParameters() && commandParameters.hasOption(opt);
+    }
+
     public boolean hasCommandParameters() {
         return this.commandParameters != null;
     }

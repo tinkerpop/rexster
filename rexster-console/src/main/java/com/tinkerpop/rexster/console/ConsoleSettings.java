@@ -33,19 +33,19 @@ public class ConsoleSettings {
         final CommandLine line = getCliInput(commandLineArgs);
         this.host = line.getOptionValue("rexsterhost", DEFAULT_HOST);
 
-        final String portString = line.getOptionValue("rexsterport", Integer.toString(DEFAULT_PORT));
+        final String portString = line.getOptionValue("rexsterport");
         this.port = parseInt(portString, DEFAULT_PORT);
 
-        if (!Integer.toString(this.port).equals(portString)) {
+        if (line.hasOption("rexsterport") && !Integer.toString(this.port).equals(portString)) {
             System.out.println("the rexsterport parameter must be an integer value. Defaulting to: [" + port + "]");
         }
 
         this.language = line.getOptionValue("language", DEFAULT_LANGUAGE);
 
-        final String timeoutString = line.getOptionValue("timeout", Integer.toString(DEFAULT_TIMEOUT));
+        final String timeoutString = line.getOptionValue("timeout");
         this.timeout = parseInt(timeoutString, DEFAULT_TIMEOUT);
 
-        if (!Integer.toString(this.timeout).equals(timeoutString)){
+        if (line.hasOption("timeout") && !Integer.toString(this.timeout).equals(timeoutString)){
             System.out.println("the timeout parameter must be an integer value. Defaulting to: " + timeout);
         }
 
