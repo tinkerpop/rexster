@@ -103,6 +103,9 @@ public class RemoteRexsterSession {
         int tries = 0;
         RexProMessage rcvMessage = null;
 
+        // set the session for all incoming messages.
+        request.setSessionAsUUID(this.getSessionKey());
+
         while (rcvMessage == null && tries < maxRetries) {
             tries++;
 

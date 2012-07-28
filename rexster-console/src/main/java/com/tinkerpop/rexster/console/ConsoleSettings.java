@@ -23,11 +23,11 @@ public class ConsoleSettings {
 
     private final String host;
     private final int port;
-    private String language;
     private final int timeout;
     private final String username;
     private final String password;
     private final String fileToExecute;
+    private String language;
 
     public ConsoleSettings(final String [] commandLineArgs) throws Exception {
         final CommandLine line = getCliInput(commandLineArgs);

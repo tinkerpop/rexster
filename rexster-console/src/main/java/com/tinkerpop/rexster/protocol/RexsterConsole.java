@@ -269,9 +269,8 @@ public class RexsterConsole {
         try {
             session.open();
 
-            // pass in some dummy rexster bindings...not really fully working quite right for scriptengine usage
+            // the session field gets set by the RemoteRexsterSession class automatically
             final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
-            scriptMessage.setSessionAsUUID(session.getSessionKey());
             scriptMessage.Script = script;
             scriptMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToByteArray(new RexsterBindings());
             scriptMessage.LanguageName = scriptEngineName;
