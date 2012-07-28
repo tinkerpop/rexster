@@ -193,12 +193,12 @@ public class WebServer {
     private void startRexProServer(final XMLConfiguration properties,
                                    final Integer rexproServerPort,
                                    final String rexproServerHost) throws Exception {
-        FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
+        final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
         filterChainBuilder.add(new TransportFilter());
         filterChainBuilder.add(new RexProMessageFilter());
 
-        HierarchicalConfiguration securityConfiguration = properties.configurationAt("security.authentication");
-        String securityFilterType = securityConfiguration.getString("type");
+        final HierarchicalConfiguration securityConfiguration = properties.configurationAt("security.authentication");
+        final String securityFilterType = securityConfiguration.getString("type");
         if (securityFilterType.equals("none")) {
             logger.info("Rexster configured with no security.");
         } else {
@@ -216,12 +216,12 @@ public class WebServer {
             logger.info("Rexster configured with [" + filter.getName() + "].");
         }
 
-        WebServerRexsterApplicationProvider provider = new WebServerRexsterApplicationProvider();
-        RexsterApplication application = provider.getValue();
+        final WebServerRexsterApplicationProvider provider = new WebServerRexsterApplicationProvider();
+        final RexsterApplication application = provider.getValue();
 
         filterChainBuilder.add(new SessionFilter(application));
         filterChainBuilder.add(new ScriptFilter(application));
-        filterChainBuilder.add(new EchoFilter());
+        //filterChainBuilder.add(new EchoFilter());
 
         this.rexproServer = TCPNIOTransportBuilder.newInstance().build();
         this.rexproServer.setIOStrategy(WorkerThreadIOStrategy.getInstance());
