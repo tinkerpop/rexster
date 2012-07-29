@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.server;
 
 import com.tinkerpop.rexster.filter.AbstractSecurityFilter;
 import com.tinkerpop.rexster.filter.DefaultSecurityFilter;
+import com.tinkerpop.rexster.protocol.RexProSessionMonitor;
 import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
 import com.tinkerpop.rexster.protocol.filter.ScriptFilter;
 import com.tinkerpop.rexster.protocol.filter.SessionFilter;
@@ -75,6 +76,13 @@ public class RexProRexsterServer implements RexsterServer {
         this.tcpTransport.bind(rexproServerHost, rexproServerPort);
 
         this.tcpTransport.start();
+
+        // initialize the session monitor for rexpro to clean up dead sessions.
+        final Long rexProSessionMaxIdle = properties.getLong("rexpro-session-max-idle",
+                new Long(RexsterSettings.DEFAULT_REXPRO_SESSION_MAX_IDLE));
+        final Long rexProSessionCheckInterval = properties.getLong("rexpro-session-check-interval",
+                new Long(RexsterSettings.DEFAULT_REXPRO_SESSION_CHECK_INTERVAL));
+        new RexProSessionMonitor(rexProSessionMaxIdle, rexProSessionCheckInterval);
 
         logger.info("RexPro serving on port: [" + rexproServerPort + "]");
     }

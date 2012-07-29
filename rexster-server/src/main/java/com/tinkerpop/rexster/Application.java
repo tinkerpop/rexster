@@ -51,13 +51,10 @@ public class Application {
         this.rexproServer = new RexProRexsterServer(properties);
         this.rexproServer.start();
 
-        // initialize the session monitor for rexpro to clean up dead sessions.
-        final Long rexProSessionMaxIdle = properties.getLong("rexpro-session-max-idle",
-                new Long(RexsterSettings.DEFAULT_REXPRO_SESSION_MAX_IDLE));
-        final Long rexProSessionCheckInterval = properties.getLong("rexpro-session-check-interval",
-                new Long(RexsterSettings.DEFAULT_REXPRO_SESSION_CHECK_INTERVAL));
-        new RexProSessionMonitor(rexProSessionMaxIdle, rexProSessionCheckInterval);
+        startShutdownManager(properties);
+    }
 
+    private void startShutdownManager(final XMLConfiguration properties) throws Exception {
         final Integer shutdownServerPort = properties.getInteger("rexster-shutdown-port",
                 new Integer(RexsterSettings.DEFAULT_SHUTDOWN_PORT));
         final String shutdownServerHost = properties.getString("rexster-shutdown-host", RexsterSettings.DEFAULT_HOST);
