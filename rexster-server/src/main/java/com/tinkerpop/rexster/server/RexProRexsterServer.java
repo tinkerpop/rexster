@@ -27,8 +27,14 @@ public class RexProRexsterServer implements RexsterServer {
     private final Integer rexproServerPort;
     private final String rexproServerHost;
     private final TCPNIOTransport tcpTransport;
+    private final boolean allowSessions;
 
     public RexProRexsterServer(final XMLConfiguration properties) {
+        this(properties, true);
+    }
+
+    public RexProRexsterServer(final XMLConfiguration properties, final boolean allowSessions) {
+        this.allowSessions = allowSessions;
         this.properties = properties;
         this.rexproServerPort = properties.getInteger("rexpro-server-port", new Integer(RexsterSettings.DEFAULT_REXPRO_PORT));
         this.rexproServerHost = properties.getString("rexpro-server-host", "0.0.0.0");
@@ -65,7 +71,10 @@ public class RexProRexsterServer implements RexsterServer {
             logger.info("Rexster configured with [" + filter.getName() + "].");
         }
 
-        filterChainBuilder.add(new SessionFilter(application));
+        if (this.allowSessions) {
+            filterChainBuilder.add(new SessionFilter(application));
+        }
+
         filterChainBuilder.add(new ScriptFilter(application));
 
         this.tcpTransport.setIOStrategy(WorkerThreadIOStrategy.getInstance());
