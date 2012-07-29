@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Initializes and manages Graph instances.  Supplies these instances in the various
+ * contexts that Rexster requires them.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
@@ -24,31 +27,30 @@ public class DefaultRexsterApplication implements RexsterApplication {
 
     private final long startTime = System.currentTimeMillis();
 
-    private Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+    private final Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
 
     public DefaultRexsterApplication(final String graphName, final Graph graph) {
-        RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph);
+        final RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph);
         this.graphs.put(graphName, rag);
-        logger.info("Graph " + rag.getGraph() + " loaded");
+        logger.info(String.format("Graph [%s] loaded", rag.getGraph()));
     }
 
     public DefaultRexsterApplication(final XMLConfiguration properties) {
         // get the graph configurations from the XML config file
-        List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
+        final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
 
         try {
-            GraphConfigurationContainer container = new GraphConfigurationContainer(graphConfigs);
-            this.graphs = container.getApplicationGraphs();
+            final GraphConfigurationContainer container = new GraphConfigurationContainer(graphConfigs);
+            this.graphs.putAll(container.getApplicationGraphs());
         } catch (GraphConfigurationException gce) {
             logger.error("Graph initialization failed. Check the graph configuration in rexster.xml.");
         }
 
     }
 
-
     @Override
-    public Graph getGraph(String graphName) {
-        RexsterApplicationGraph g = getApplicationGraph(graphName);
+    public Graph getGraph(final String graphName) {
+        final RexsterApplicationGraph g = getApplicationGraph(graphName);
         if (g != null) {
             return g.getGraph();
         } else {
@@ -57,7 +59,7 @@ public class DefaultRexsterApplication implements RexsterApplication {
     }
 
     @Override
-    public RexsterApplicationGraph getApplicationGraph(String graphName) {
+    public RexsterApplicationGraph getApplicationGraph(final String graphName) {
         return this.graphs.get(graphName);
     }
 
@@ -78,7 +80,7 @@ public class DefaultRexsterApplication implements RexsterApplication {
         for (RexsterApplicationGraph rag : this.graphs.values()) {
 
             final Graph graph = rag.getGraph();
-            logger.info("Shutting down " + rag.getGraphName() + " - " + graph);
+            logger.info(String.format("Shutting down [%s] - [%s]", rag.getGraphName(), graph));
 
             // graph may not have been initialized properly if an exception gets tossed in
             // on graph creation
@@ -92,7 +94,6 @@ public class DefaultRexsterApplication implements RexsterApplication {
 
     @Override
     public String toString() {
-        return "RexsterServerContext{" +
-                "configured graphs=" + graphs.size() + '}';
+        return String.format("RexsterServerContext {configured graphs=%s}", graphs.size());
     }
 }

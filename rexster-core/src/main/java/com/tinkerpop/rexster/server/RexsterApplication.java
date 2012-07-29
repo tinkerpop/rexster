@@ -23,7 +23,7 @@ public interface RexsterApplication {
      * @param graphName the name of the graph to retrieve
      * @return the Graph whose name is graphName, or null if it doesn't exist
      */
-    Graph getGraph(String graphName);
+    Graph getGraph(final String graphName);
 
     /**
      * Retrieve a specific application graph
@@ -31,7 +31,7 @@ public interface RexsterApplication {
      * @param graphName the name of the application graph to retrieve
      * @return the RexsterApplicationGraph whose name is graphName, or null if it doesn't exist
      */
-    RexsterApplicationGraph getApplicationGraph(String graphName);
+    RexsterApplicationGraph getApplicationGraph(final String graphName);
 
     /**
      * Retrieve the names of all graphs that we are serving
