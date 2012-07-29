@@ -22,12 +22,18 @@ public class HeaderResponseFilter implements ContainerResponseFilter {
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String CHARSET = "charset";
 
+    private final String defaultCharacterEncoding;
+
+    public HeaderResponseFilter(final String defaultCharacterEncoding) {
+        this.defaultCharacterEncoding = defaultCharacterEncoding;
+    }
+
     public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
 
         String acceptCharsetHeaderValue = request.getHeaderValue("Accept-Charset");
         if (acceptCharsetHeaderValue == null || acceptCharsetHeaderValue.isEmpty()) {
             // assign the default charset since none is specified.
-            acceptCharsetHeaderValue = Application.getCharacterEncoding();
+            acceptCharsetHeaderValue = this.defaultCharacterEncoding;
         }
 
         CharsetHolder firstSupportedCharset = CharsetHolder.getFirstSupportedCharset(acceptCharsetHeaderValue);

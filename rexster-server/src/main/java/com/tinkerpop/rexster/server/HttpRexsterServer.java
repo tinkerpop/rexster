@@ -58,7 +58,9 @@ public class HttpRexsterServer implements RexsterServer {
 
         final ResourceConfig rc = new PackagesResourceConfig("com.tinkerpop.rexster");
         rc.getSingletons().add(new SingletonTypeInjectableProvider<Context, RexsterApplication>(RexsterApplication.class, application){});
-        rc.getContainerResponseFilters().add(new HeaderResponseFilter());
+
+        final String defaultCharacterEncoding = properties.getString("character-set", "ISO-8859-1");
+        rc.getContainerResponseFilters().add(new HeaderResponseFilter(defaultCharacterEncoding));
 
         final HierarchicalConfiguration securityConfiguration = properties.configurationAt("security.authentication");
         final String securityFilterType = securityConfiguration.getString("type");

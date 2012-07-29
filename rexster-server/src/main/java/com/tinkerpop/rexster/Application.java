@@ -25,12 +25,12 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 
 /**
+ * Main class for initializing, starting and stopping Rexster.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class Application {
-
-    private static String characterEncoding;
 
     private static final Logger logger = Logger.getLogger(Application.class);
 
@@ -48,8 +48,6 @@ public class Application {
         this.properties = properties;
         final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
         this.rexsterApplication = new DefaultRexsterApplication(graphConfigs);
-
-        characterEncoding = properties.getString("character-set", "ISO-8859-1");
 
         this.httpServer = new HttpRexsterServer(properties);
         this.rexproServer = new RexProRexsterServer(properties);
@@ -100,10 +98,6 @@ public class Application {
 
         //Wait for a shutdown request and all shutdown listeners to complete
         shutdownManager.waitForShutdown();
-    }
-
-    public static String getCharacterEncoding() {
-        return characterEncoding;
     }
 
     public static void main(final String[] args)  {
