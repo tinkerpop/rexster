@@ -2,6 +2,7 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.protocol.RexProSessionMonitor;
 import com.tinkerpop.rexster.server.*;
+import com.tinkerpop.rexster.server.RexsterApplication;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -40,16 +41,17 @@ public class Application {
 
     private final RexsterServer httpServer;
     private final RexsterServer rexproServer;
+    private final RexsterApplication rexsterApplication;
 
     public Application(final XMLConfiguration properties) throws Exception {
-        WebServerRexsterApplicationProvider.start(properties);
+        this.rexsterApplication = new RexsterApplicationImpl(properties);
         characterEncoding = properties.getString("character-set", "ISO-8859-1");
 
         this.httpServer = new HttpRexsterServer(properties);
-        this.httpServer.start();
+        this.httpServer.start(this.rexsterApplication);
 
         this.rexproServer = new RexProRexsterServer(properties);
-        this.rexproServer.start();
+        this.rexproServer.start(this.rexsterApplication);
 
         startShutdownManager(properties);
     }
@@ -93,7 +95,7 @@ public class Application {
         }
         
         try {
-            WebServerRexsterApplicationProvider.stop();
+            this.rexsterApplication.stop();
         } catch (Exception ex) {
             logger.warn("Error while shutting down graphs.  All graphs may not have been shutdown cleanly.");
         }

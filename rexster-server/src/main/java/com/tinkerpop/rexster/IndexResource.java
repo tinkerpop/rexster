@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
@@ -53,7 +54,7 @@ public class IndexResource extends AbstractSubResource {
         super(null);
     }
 
-    public IndexResource(final UriInfo ui, final HttpServletRequest req, final com.tinkerpop.rexster.server.RexsterApplication ra) {
+    public IndexResource(final UriInfo ui, final HttpServletRequest req, final RexsterApplication ra) {
         super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;

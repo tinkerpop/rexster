@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.blueprints.impls.sail.SailGraph;
 import com.tinkerpop.blueprints.impls.sail.SailGraphFactory;
 import com.tinkerpop.blueprints.impls.sail.impls.MemoryStoreSailGraph;
@@ -36,7 +37,7 @@ public class PrefixResourceTest {
         SailGraph sg = new MemoryStoreSailGraph();
         SailGraphFactory.createTinkerGraph(sg);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", sg);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -71,7 +72,7 @@ public class PrefixResourceTest {
         SailGraph sg = new MemoryStoreSailGraph();
         SailGraphFactory.createTinkerGraph(sg);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", sg);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -104,7 +105,7 @@ public class PrefixResourceTest {
         SailGraph sg = new MemoryStoreSailGraph();
         SailGraphFactory.createTinkerGraph(sg);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", sg);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);

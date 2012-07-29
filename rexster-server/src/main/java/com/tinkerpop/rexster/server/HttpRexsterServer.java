@@ -1,7 +1,10 @@
 package com.tinkerpop.rexster.server;
 
+import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import com.tinkerpop.rexster.filter.AbstractSecurityFilter;
 import com.tinkerpop.rexster.filter.DefaultSecurityFilter;
 import com.tinkerpop.rexster.filter.HeaderResponseFilter;
 import com.tinkerpop.rexster.servlet.DogHouseServlet;
@@ -16,6 +19,7 @@ import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
 import org.glassfish.grizzly.servlet.ServletHandler;
 
+import javax.ws.rs.core.Context;
 import java.io.File;
 
 /**
@@ -48,27 +52,30 @@ public class HttpRexsterServer implements RexsterServer {
     }
 
     @Override
-    public void start() throws Exception {
+    public void start(final RexsterApplication application) throws Exception {
         final ServletHandler jerseyHandler = new ServletHandler();
-        jerseyHandler.addInitParameter("com.sun.jersey.config.property.packages", "com.tinkerpop.rexster");
-        jerseyHandler.addInitParameter(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, HeaderResponseFilter.class.getName());
         jerseyHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
+
+        final ResourceConfig rc = new PackagesResourceConfig("com.tinkerpop.rexster");
+        rc.getSingletons().add(new SingletonTypeInjectableProvider<Context, RexsterApplication>(RexsterApplication.class, application){});
+        rc.getContainerResponseFilters().add(new HeaderResponseFilter());
 
         final HierarchicalConfiguration securityConfiguration = properties.configurationAt("security.authentication");
         final String securityFilterType = securityConfiguration.getString("type");
         if (!securityFilterType.equals("none")) {
             if (securityFilterType.equals("default")) {
                 jerseyHandler.addInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, DefaultSecurityFilter.class.getName());
+                rc.getContainerRequestFilters().add(new DefaultSecurityFilter());
             } else {
                 jerseyHandler.addInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, securityFilterType);
+                final Class clazz = Class.forName(securityFilterType, true, Thread.currentThread().getContextClassLoader());
+                final AbstractSecurityFilter securityFilter = (AbstractSecurityFilter) clazz.newInstance();
+                rc.getContainerRequestFilters().add(securityFilter);
             }
         }
 
         jerseyHandler.setContextPath("/");
-        jerseyHandler.setServletInstance(new ServletContainer());
-
-        final WebServerRexsterApplicationProvider provider = new WebServerRexsterApplicationProvider();
-        final RexsterApplication application = provider.getValue();
+        jerseyHandler.setServletInstance(new ServletContainer(rc));
 
         // servlet that services all url from "main" by simply sending
         // main.html back to the calling client.  main.html handles its own

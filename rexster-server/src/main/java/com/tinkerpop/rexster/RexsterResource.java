@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -33,7 +34,7 @@ public class RexsterResource extends BaseResource {
         super(null);
     }
 
-    public RexsterResource(com.tinkerpop.rexster.server.RexsterApplication ra) {
+    public RexsterResource(final RexsterApplication ra) {
         super(ra);
     }
 

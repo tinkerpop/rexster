@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
@@ -48,7 +49,7 @@ public abstract class AbstractSubResource extends BaseResource {
 
     protected static final Map<ExtensionSegmentSet, List<RexsterExtension>> extensionCache = new HashMap<ExtensionSegmentSet, List<RexsterExtension>>();
 
-    protected AbstractSubResource(com.tinkerpop.rexster.server.RexsterApplication ra) {
+    protected AbstractSubResource(final RexsterApplication ra) {
         super(ra);
 
         try {

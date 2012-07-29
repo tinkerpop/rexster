@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -33,7 +34,7 @@ public class KeyIndexResourceTest {
     public void getKeyIndexNonIndexableGraph() {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
@@ -55,7 +56,7 @@ public class KeyIndexResourceTest {
         final KeyIndexableGraph g = createKeyIndexableGraph();
         
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", g);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -95,7 +96,7 @@ public class KeyIndexResourceTest {
     public void getIndexKeysNonIndexableGraph() {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
@@ -117,7 +118,7 @@ public class KeyIndexResourceTest {
         final KeyIndexableGraph g = createKeyIndexableGraph();
 
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", g);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -151,7 +152,7 @@ public class KeyIndexResourceTest {
         final KeyIndexableGraph g = createKeyIndexableGraph();
 
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", g);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -183,7 +184,7 @@ public class KeyIndexResourceTest {
     public void deleteIndexKeyNonIndexableGraph() {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
@@ -205,7 +206,7 @@ public class KeyIndexResourceTest {
         final KeyIndexableGraph g = createKeyIndexableGraph();
 
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", g);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -236,7 +237,7 @@ public class KeyIndexResourceTest {
         final KeyIndexableGraph g = createKeyIndexableGraph();
 
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", g);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -266,7 +267,7 @@ public class KeyIndexResourceTest {
     public void postIndexKeyNonIndexableGraph() {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
@@ -288,7 +289,7 @@ public class KeyIndexResourceTest {
         final KeyIndexableGraph g = createKeyIndexableGraph();
 
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", g);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -321,7 +322,7 @@ public class KeyIndexResourceTest {
         final KeyIndexableGraph g = createKeyIndexableGraph();
 
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", g);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);

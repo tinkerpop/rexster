@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.extension.HttpMethod;
-import com.tinkerpop.rexster.server.*;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.OPTIONS;
@@ -21,7 +21,7 @@ public class RootResource extends BaseResource {
         super(null);
     }
 
-    public RootResource(com.tinkerpop.rexster.server.RexsterApplication ra) {
+    public RootResource(final RexsterApplication ra) {
         super(ra);
     }
 

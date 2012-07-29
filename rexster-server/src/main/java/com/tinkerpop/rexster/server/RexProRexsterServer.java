@@ -41,7 +41,7 @@ public class RexProRexsterServer implements RexsterServer {
     }
 
     @Override
-    public void start() throws Exception {
+    public void start(final RexsterApplication application) throws Exception {
         final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
         filterChainBuilder.add(new TransportFilter());
         filterChainBuilder.add(new RexProMessageFilter());
@@ -64,9 +64,6 @@ public class RexProRexsterServer implements RexsterServer {
 
             logger.info("Rexster configured with [" + filter.getName() + "].");
         }
-
-        final WebServerRexsterApplicationProvider provider = new WebServerRexsterApplicationProvider();
-        final RexsterApplication application = provider.getValue();
 
         filterChainBuilder.add(new SessionFilter(application));
         filterChainBuilder.add(new ScriptFilter(application));

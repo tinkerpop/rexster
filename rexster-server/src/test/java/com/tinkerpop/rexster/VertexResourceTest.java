@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -66,7 +67,7 @@ public class VertexResourceTest {
         graph.createKeyIndex("name", Vertex.class);
 
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 
@@ -360,7 +361,7 @@ public class VertexResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -402,7 +403,7 @@ public class VertexResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -444,7 +445,7 @@ public class VertexResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -485,7 +486,7 @@ public class VertexResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -528,7 +529,7 @@ public class VertexResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -571,7 +572,7 @@ public class VertexResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -612,7 +613,7 @@ public class VertexResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -655,7 +656,7 @@ public class VertexResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -698,7 +699,7 @@ public class VertexResourceTest {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
         initializeExtensionConfigurations(rag);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -739,7 +740,7 @@ public class VertexResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -772,7 +773,7 @@ public class VertexResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -820,7 +821,7 @@ public class VertexResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -850,7 +851,7 @@ public class VertexResourceTest {
     public void deleteVertexValid() {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -884,7 +885,7 @@ public class VertexResourceTest {
     public void deleteVertexNoVertexFound() {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -911,7 +912,7 @@ public class VertexResourceTest {
 
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
@@ -1106,7 +1107,7 @@ public class VertexResourceTest {
     private VertexResource constructMockGetSingleVertexScenario(final Vertex vertex, final HashMap<String, String> parameters) {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         List<String> namespaces = new ArrayList<String>();
         namespaces.add("*:*");
@@ -1138,7 +1139,7 @@ public class VertexResourceTest {
     private VertexResource constructMockGetVerticesScenario(final int numberOfVertices, final HashMap<String, String> parameters) {
         final Graph graph = this.mockery.mock(Graph.class);
         final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final com.tinkerpop.rexster.server.RexsterApplication ra = this.mockery.mock(com.tinkerpop.rexster.server.RexsterApplication.class);
+        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);
 

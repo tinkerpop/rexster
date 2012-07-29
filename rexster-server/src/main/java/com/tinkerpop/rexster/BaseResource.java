@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.extension.HttpMethod;
-import com.tinkerpop.rexster.server.*;
 import com.tinkerpop.rexster.util.StatisticsHelper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -57,7 +57,7 @@ public abstract class BaseResource {
     protected JSONObject resultObject = new JSONObject();
 
     @Context
-    private com.tinkerpop.rexster.server.RexsterApplication rexsterApplication;
+    private RexsterApplication rexsterApplication;
 
     @Context
     protected HttpServletRequest httpServletRequest;
@@ -71,8 +71,11 @@ public abstract class BaseResource {
     @Context
     protected SecurityContext securityContext;
 
-    public BaseResource(com.tinkerpop.rexster.server.RexsterApplication rexsterApplication) {
-        this.rexsterApplication = rexsterApplication;
+    public BaseResource(final RexsterApplication rexsterApplication) {
+        if (rexsterApplication != null) {
+            this.rexsterApplication = rexsterApplication;
+        }
+
         sh.stopWatch();
 
         try {
@@ -104,7 +107,7 @@ public abstract class BaseResource {
         return new JSONObject(m);
     }
 
-    protected com.tinkerpop.rexster.server.RexsterApplication getRexsterApplication() {
+    protected RexsterApplication getRexsterApplication() {
         return this.rexsterApplication;
     }
 

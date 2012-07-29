@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
@@ -49,7 +50,7 @@ public class GraphResource extends AbstractSubResource {
         super(null);
     }
 
-    public GraphResource(final UriInfo ui, final HttpServletRequest req, final com.tinkerpop.rexster.server.RexsterApplication ra) {
+    public GraphResource(final UriInfo ui, final HttpServletRequest req, final RexsterApplication ra) {
         super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;

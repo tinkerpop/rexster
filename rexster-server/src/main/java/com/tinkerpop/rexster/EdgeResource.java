@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
@@ -56,7 +57,7 @@ public class EdgeResource extends AbstractSubResource {
         super(null);
     }
 
-    public EdgeResource(UriInfo ui, HttpServletRequest req, com.tinkerpop.rexster.server.RexsterApplication ra) {
+    public EdgeResource(final UriInfo ui, final HttpServletRequest req, final RexsterApplication ra) {
         super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;

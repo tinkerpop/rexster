@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.blueprints.impls.sail.SailGraph;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import org.apache.log4j.Logger;
@@ -36,7 +37,7 @@ public class PrefixResource extends AbstractSubResource {
         super(null);
     }
 
-    public PrefixResource(UriInfo ui, HttpServletRequest req, com.tinkerpop.rexster.server.RexsterApplication ra) {
+    public PrefixResource(final UriInfo ui, final HttpServletRequest req, final RexsterApplication ra) {
         super(ra);
         this.httpServletRequest = req;
         this.uriInfo = ui;

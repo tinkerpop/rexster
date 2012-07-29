@@ -3,13 +3,18 @@ package com.tinkerpop.rexster;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.test.framework.JerseyTest;
+import com.sun.jersey.test.framework.WebAppDescriptor;
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.server.RexsterApplicationImpl;
-import com.tinkerpop.rexster.server.WebServerRexsterApplicationProvider;
+import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import javax.ws.rs.ext.Provider;
+import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.lang.Override;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -18,12 +23,36 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
 
     protected static String BASE_URI = "http://localhost:9998";
 
+    protected static RexsterApplication application;
+
     public AbstractResourceIntegrationTest() throws Exception {
-        super("com.tinkerpop.rexster");
+        //super("com.tinkerpop.rexster");
+        /*
+        super(new WebAppDescriptor.Builder("com.tinkerpop.rexster")
+            .initParam(ClassNamesResourceConfig.PROPERTY_CLASSNAMES,
+                    TestRexsterAppProvider.class.getName()).build());
+        */
 
         XMLConfiguration properties = new XMLConfiguration();
-        properties.load(RexsterApplicationImpl.class.getResourceAsStream("rexster-integration-test.xml"));
-        WebServerRexsterApplicationProvider.start(properties);
+        properties.load(Application.class.getResourceAsStream("rexster-integration-test.xml"));
+
+        if (application == null) {
+            application = new RexsterApplicationImpl(properties);
+        }
+    }
+
+    @Override
+    public WebAppDescriptor configure() {
+        return new WebAppDescriptor.Builder("com.tinkerpop.rexster")
+                .initParam(ClassNamesResourceConfig.PROPERTY_CLASSNAMES,
+                        TestRexsterAppProvider.class.getName()).build();
+    }
+
+    @Provider
+    public static class TestRexsterAppProvider extends SingletonTypeInjectableProvider {
+        public TestRexsterAppProvider() {
+            super(RexsterApplication.class, application);
+        }
     }
 
     protected URI createUri(String path) {
@@ -204,4 +233,5 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
         else
             return id.toString();
     }
+
 }
