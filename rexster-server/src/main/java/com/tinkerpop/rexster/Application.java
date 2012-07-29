@@ -3,6 +3,7 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.rexster.server.*;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -19,6 +20,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 
@@ -41,7 +43,10 @@ public class Application {
     private final RexsterApplication rexsterApplication;
 
     public Application(final XMLConfiguration properties) throws Exception {
-        this.rexsterApplication = new DefaultRexsterApplication(properties);
+        // get the graph configurations from the XML config file
+        final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
+        this.rexsterApplication = new DefaultRexsterApplication(graphConfigs);
+
         characterEncoding = properties.getString("character-set", "ISO-8859-1");
 
         this.httpServer = new HttpRexsterServer(properties);

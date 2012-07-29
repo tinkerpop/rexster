@@ -35,17 +35,13 @@ public class DefaultRexsterApplication implements RexsterApplication {
         logger.info(String.format("Graph [%s] loaded", rag.getGraph()));
     }
 
-    public DefaultRexsterApplication(final XMLConfiguration properties) {
-        // get the graph configurations from the XML config file
-        final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
-
+    public DefaultRexsterApplication(final List<HierarchicalConfiguration> graphConfigs) {
         try {
             final GraphConfigurationContainer container = new GraphConfigurationContainer(graphConfigs);
             this.graphs.putAll(container.getApplicationGraphs());
         } catch (GraphConfigurationException gce) {
             logger.error("Graph initialization failed. Check the graph configuration in rexster.xml.");
         }
-
     }
 
     @Override
