@@ -5,7 +5,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 import com.tinkerpop.rexster.server.RexsterApplication;
-import com.tinkerpop.rexster.server.RexsterApplicationImpl;
+import com.tinkerpop.rexster.server.DefaultRexsterApplication;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import javax.ws.rs.ext.Provider;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
@@ -37,7 +37,7 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
         properties.load(Application.class.getResourceAsStream("rexster-integration-test.xml"));
 
         if (application == null) {
-            application = new RexsterApplicationImpl(properties);
+            application = new DefaultRexsterApplication(properties);
         }
     }
 

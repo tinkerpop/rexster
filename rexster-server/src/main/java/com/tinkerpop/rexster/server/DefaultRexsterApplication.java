@@ -18,21 +18,21 @@ import java.util.Set;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class RexsterApplicationImpl implements RexsterApplication {
+public class DefaultRexsterApplication implements RexsterApplication {
 
-    protected static final Logger logger = Logger.getLogger(RexsterApplicationImpl.class);
+    protected static final Logger logger = Logger.getLogger(DefaultRexsterApplication.class);
 
     private final long startTime = System.currentTimeMillis();
 
     private Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
 
-    public RexsterApplicationImpl(final String graphName, final Graph graph) {
+    public DefaultRexsterApplication(final String graphName, final Graph graph) {
         RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph);
         this.graphs.put(graphName, rag);
         logger.info("Graph " + rag.getGraph() + " loaded");
     }
 
-    public RexsterApplicationImpl(final XMLConfiguration properties) {
+    public DefaultRexsterApplication(final XMLConfiguration properties) {
         // get the graph configurations from the XML config file
         List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
 

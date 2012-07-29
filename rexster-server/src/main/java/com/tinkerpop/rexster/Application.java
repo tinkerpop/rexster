@@ -1,15 +1,12 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.rexster.protocol.RexProSessionMonitor;
 import com.tinkerpop.rexster.server.*;
 import com.tinkerpop.rexster.server.RexsterApplication;
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.msgpack.template.IntegerTemplate;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -44,7 +41,7 @@ public class Application {
     private final RexsterApplication rexsterApplication;
 
     public Application(final XMLConfiguration properties) throws Exception {
-        this.rexsterApplication = new RexsterApplicationImpl(properties);
+        this.rexsterApplication = new DefaultRexsterApplication(properties);
         characterEncoding = properties.getString("character-set", "ISO-8859-1");
 
         this.httpServer = new HttpRexsterServer(properties);
