@@ -41,21 +41,44 @@ public class Application {
     private final RexsterServer httpServer;
     private final RexsterServer rexproServer;
     private final RexsterApplication rexsterApplication;
+    private final XMLConfiguration properties;
 
     public Application(final XMLConfiguration properties) throws Exception {
         // get the graph configurations from the XML config file
+        this.properties = properties;
         final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
         this.rexsterApplication = new DefaultRexsterApplication(graphConfigs);
 
         characterEncoding = properties.getString("character-set", "ISO-8859-1");
 
         this.httpServer = new HttpRexsterServer(properties);
-        this.httpServer.start(this.rexsterApplication);
-
         this.rexproServer = new RexProRexsterServer(properties);
-        this.rexproServer.start(this.rexsterApplication);
+    }
 
-        startShutdownManager(properties);
+    public void start() throws Exception {
+        this.httpServer.start(this.rexsterApplication);
+        this.rexproServer.start(this.rexsterApplication);
+        startShutdownManager(this.properties);
+    }
+
+    public void stop() {
+        try {
+            this.httpServer.stop();
+        } catch (Exception ex) {
+            logger.debug("Error shutting down Rexster Server ignored.", ex);
+        }
+
+        try {
+            this.rexproServer.stop();
+        } catch (Exception ex) {
+            logger.debug("Error shutting down RexPro Server ignored.", ex);
+        }
+
+        try {
+            this.rexsterApplication.stop();
+        } catch (Exception ex) {
+            logger.warn("Error while shutting down graphs.  All graphs may not have been shutdown cleanly.");
+        }
     }
 
     private void startShutdownManager(final XMLConfiguration properties) throws Exception {
@@ -83,114 +106,34 @@ public class Application {
         return characterEncoding;
     }
 
-    protected void stop() {
-        try {
-            this.httpServer.stop();
-        } catch (Exception ex) {
-            logger.debug("Error shutting down Rexster Server ignored.", ex);
-        }
-        
-        try {
-            this.rexproServer.stop();
-        } catch (Exception ex) {
-            logger.debug("Error shutting down RexPro Server ignored.", ex);
-        }
-        
-        try {
-            this.rexsterApplication.stop();
-        } catch (Exception ex) {
-            logger.warn("Error while shutting down graphs.  All graphs may not have been shutdown cleanly.");
-        }
-    }
-
     public static void main(final String[] args)  {
 
         logger.info(".:Welcome to Rexster:.");
 
-        final XMLConfiguration properties = new XMLConfiguration();
+        // properties from XML can be overriden by entries issued from the command line
         final RexsterSettings settings = new RexsterSettings(args);
         final RexsterCommandLine line = settings.getCommand();
 
-        if (line.getCommand().hasOption("start")) {
-            if (line.hasCommandParameters() && line.getCommandParameters().hasOption("debug")) {
-                // turn on all logging for jersey
-                for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
-                    java.util.logging.Logger.getLogger(l).setLevel(Level.ALL);
-                }
-            } else {
-                // turn off all logging for jersey
-                for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
-                    java.util.logging.Logger.getLogger(l).setLevel(Level.OFF);
-                }
-            }
-
-            final boolean rexsterXmlConfiguredFromCommandLine = line.hasCommandParameters() && line.getCommandParameters().hasOption("configuration");
-            final String rexsterXmlFileLocation = rexsterXmlConfiguredFromCommandLine ? line.getCommandParameters().getOptionValue("configuration") : "rexster.xml";
-            final File rexsterXmlFile = new File(rexsterXmlFileLocation);
-            
+        if (settings.getPrimeCommand().equals(RexsterSettings.COMMAND_START)) {
             try {
-                // load either the rexster.xml from the command line or the default rexster.xml in the root of the
-                // working directory
-                properties.load(new FileReader(rexsterXmlFileLocation));
-                logger.info("Using [" + rexsterXmlFile.getAbsolutePath() + "] as configuration source.");
-            } catch (Exception e) {
-                logger.warn("Could not load configuration from [" + rexsterXmlFile.getAbsolutePath() + "]");
-                
-                if (rexsterXmlConfiguredFromCommandLine) {
-                    // since an explicit value for rexster.xml was supplied and could not be found then 
-                    // we won't continue to load rexster.
-                    throw new RuntimeException("Could not load configuration from [" + rexsterXmlFile.getAbsolutePath() + "]");
-                } else {
-                    // since the default value for rexster.xml was supplied and could not be found, try to 
-                    // revert to the rexster.xml stored as a resource.  a good fall back for users just 
-                    // getting started with rexster.
-                    try {
-                        properties.load(com.tinkerpop.rexster.server.RexsterApplication.class.getResourceAsStream(rexsterXmlFileLocation));
-                        logger.info("Using [" + rexsterXmlFileLocation + "] resource as configuration source.");
-                    } catch (Exception ex){
-                        logger.fatal("None of the default rexster.xml can be found or read.");
-                    }
-                }
-            }
-
-            // reference the location of the xml file used to configure the server.
-            // this will allow the configuration to be passed into components that
-            // do not have access to the configuration file and need it for graph
-            // initialization preventing it from having to be explicitly defined
-            // in rexster.xml itself.  there's probably an even better way to do
-            // this *sigh*
-            properties.addProperty("self-xml", rexsterXmlFileLocation);
-
-            // overrides rexster-server-port from command line
-            if (line.hasCommandParameters() && line.getCommandParameters().hasOption("rexsterport")) {
-                properties.setProperty("rexster-server-port", line.getCommandParameters().getOptionValue("rexsterport"));
-            }
-
-            // overrides web-root from command line
-            if (line.hasCommandParameters() && line.getCommandParameters().hasOption("webroot")) {
-                properties.setProperty("web-root", line.getCommandParameters().getOptionValue("webroot"));
-            }
-
-            try {
-                new Application(properties);
+                new Application(settings.getProperties()).start();
             } catch (BindException be) {
                 logger.fatal("Could not start Rexster Server.  A port that Rexster needs is in use.");
             } catch (Exception ex) {
                 logger.fatal("The Rexster Server could not be started", ex);
             }
-        } else if (line.getCommand().hasOption("version")) {
-            System.out.println("Rexster version [" + Tokens.REXSTER_VERSION + "]");
-        } else if (line.getCommand().hasOption("stop")) {
+        } else if (settings.getPrimeCommand().equals(RexsterSettings.COMMAND_VERSION)) {
+            logger.info(String.format("Rexster version [%s]", Tokens.REXSTER_VERSION));
+        } else if (settings.getPrimeCommand().equals(RexsterSettings.COMMAND_STOP)) {
             if (line.hasCommandParameters() && line.getCommandParameters().hasOption("wait")) {
                 issueControlCommand(line, ShutdownManager.COMMAND_SHUTDOWN_WAIT);
             } else {
                 issueControlCommand(line, ShutdownManager.COMMAND_SHUTDOWN_NO_WAIT);
             }
-        } else if (line.getCommand().hasOption("status")) {
+        } else if (settings.getPrimeCommand().equals(RexsterSettings.COMMAND_STATUS)) {
             issueControlCommand(line, ShutdownManager.COMMAND_STATUS);
         } else {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("rexster", line.getCommandOptions());
+            settings.printHelp();
         }
     }
 

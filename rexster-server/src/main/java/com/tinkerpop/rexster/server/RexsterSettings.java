@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.server;
 
+import com.tinkerpop.rexster.Application;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -7,13 +8,22 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.log4j.Logger;
 
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RexsterSettings {
+
+    private static final Logger logger = Logger.getLogger(RexsterSettings.class);
 
     public static final int DEFAULT_HTTP_PORT = 8182;
     public static final int DEFAULT_SHUTDOWN_PORT = 8183;
@@ -24,6 +34,12 @@ public class RexsterSettings {
     public static final long DEFAULT_REXPRO_SESSION_CHECK_INTERVAL = 3000000;
     public static final String DEFAULT_HOST = "127.0.0.1";
 
+    public static final String COMMAND_START = "start";
+    public static final String COMMAND_VERSION = "version";
+    public static final String COMMAND_STOP = "stop";
+    public static final String COMMAND_STATUS = "status";
+    public static final String COMMAND_HELP = "help";
+
     private final RexsterCommandLine line;
 
     public RexsterSettings(final String[] arguments) {
@@ -32,6 +48,91 @@ public class RexsterSettings {
 
     public RexsterCommandLine getCommand(){
         return this.line;
+    }
+
+    public String getPrimeCommand() {
+        if (this.line.getCommand().hasOption(COMMAND_START)) {
+            return COMMAND_START;
+        } else if (this.line.getCommand().hasOption(COMMAND_VERSION)) {
+            return COMMAND_VERSION;
+        } else if (this.line.getCommand().hasOption(COMMAND_STOP)) {
+            return COMMAND_STOP;
+        } else if (this.line.getCommand().hasOption(COMMAND_STATUS)) {
+            return COMMAND_STATUS;
+        } else {
+            return COMMAND_HELP;
+        }
+    }
+
+    public void printHelp() {
+        final HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("rexster", line.getCommandOptions());
+    }
+
+    public XMLConfiguration getProperties() {
+
+        final XMLConfiguration properties = new XMLConfiguration();
+
+        if (line.hasCommandParameters() && line.getCommandParameters().hasOption("debug")) {
+            // turn on all logging for jersey
+            for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
+                java.util.logging.Logger.getLogger(l).setLevel(Level.ALL);
+            }
+        } else {
+            // turn off all logging for jersey
+            for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
+                java.util.logging.Logger.getLogger(l).setLevel(Level.OFF);
+            }
+        }
+
+        final boolean rexsterXmlConfiguredFromCommandLine = line.hasCommandParameters() && line.getCommandParameters().hasOption("configuration");
+        final String rexsterXmlFileLocation = rexsterXmlConfiguredFromCommandLine ? line.getCommandParameters().getOptionValue("configuration") : "rexster.xml";
+        final File rexsterXmlFile = new File(rexsterXmlFileLocation);
+
+        try {
+            // load either the rexster.xml from the command line or the default rexster.xml in the root of the
+            // working directory
+            properties.load(new FileReader(rexsterXmlFileLocation));
+            logger.info("Using [" + rexsterXmlFile.getAbsolutePath() + "] as configuration source.");
+        } catch (Exception e) {
+            logger.warn("Could not load configuration from [" + rexsterXmlFile.getAbsolutePath() + "]");
+
+            if (rexsterXmlConfiguredFromCommandLine) {
+                // since an explicit value for rexster.xml was supplied and could not be found then
+                // we won't continue to load rexster.
+                throw new RuntimeException("Could not load configuration from [" + rexsterXmlFile.getAbsolutePath() + "]");
+            } else {
+                // since the default value for rexster.xml was supplied and could not be found, try to
+                // revert to the rexster.xml stored as a resource.  a good fall back for users just
+                // getting started with rexster.
+                try {
+                    properties.load(Application.class.getResourceAsStream(rexsterXmlFileLocation));
+                    logger.info("Using [" + rexsterXmlFileLocation + "] resource as configuration source.");
+                } catch (Exception ex){
+                    logger.fatal("None of the default rexster.xml can be found or read.");
+                }
+            }
+        }
+
+        // reference the location of the xml file used to configure the server.
+        // this will allow the configuration to be passed into components that
+        // do not have access to the configuration file and need it for graph
+        // initialization preventing it from having to be explicitly defined
+        // in rexster.xml itself.  there's probably an even better way to do
+        // this *sigh*
+        properties.addProperty("self-xml", rexsterXmlFileLocation);
+
+        // overrides rexster-server-port from command line
+        if (line.hasCommandParameters() && line.getCommandParameters().hasOption("rexsterport")) {
+            properties.setProperty("rexster-server-port", line.getCommandParameters().getOptionValue("rexsterport"));
+        }
+
+        // overrides web-root from command line
+        if (line.hasCommandParameters() && line.getCommandParameters().hasOption("webroot")) {
+            properties.setProperty("web-root", line.getCommandParameters().getOptionValue("webroot"));
+        }
+
+        return properties;
     }
 
     @SuppressWarnings("static-access")
@@ -239,5 +340,4 @@ public class RexsterSettings {
         cleanedArguments.toArray(cleanedArgumentsAsArray);
         return cleanedArgumentsAsArray;
     }
-
 }
