@@ -102,7 +102,7 @@ public class GraphResource extends AbstractSubResource {
             this.resultObject.put(Tokens.TYPE, graphType);
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
             this.resultObject.put(Tokens.UP_TIME, this.getTimeAlive());
-            this.resultObject.put(Tokens.VERSION, RexsterApplicationImpl.getVersion());
+            this.resultObject.put(Tokens.VERSION, Tokens.REXSTER_VERSION);
 
             if (showHypermedia) {
                 final JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.GRAPH, this.getUriPath());

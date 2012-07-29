@@ -22,7 +22,6 @@ public class RexsterApplicationImpl implements RexsterApplication {
 
     protected static final Logger logger = Logger.getLogger(RexsterApplicationImpl.class);
 
-    private static final String version = Tokens.REXSTER_VERSION;
     private final long startTime = System.currentTimeMillis();
 
     private Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
@@ -46,9 +45,6 @@ public class RexsterApplicationImpl implements RexsterApplication {
 
     }
 
-    public static String getVersion() {
-        return version;
-    }
 
     @Override
     public Graph getGraph(String graphName) {

@@ -175,7 +175,7 @@ public class Application {
                 logger.fatal("The Rexster Server could not be started", ex);
             }
         } else if (line.getCommand().hasOption("version")) {
-            System.out.println("Rexster version [" + RexsterApplicationImpl.getVersion() + "]");
+            System.out.println("Rexster version [" + Tokens.REXSTER_VERSION + "]");
         } else if (line.getCommand().hasOption("stop")) {
             if (line.hasCommandParameters() && line.getCommandParameters().hasOption("wait")) {
                 issueControlCommand(line, ShutdownManager.COMMAND_SHUTDOWN_WAIT);

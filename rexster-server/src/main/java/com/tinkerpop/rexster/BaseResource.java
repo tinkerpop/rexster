@@ -76,7 +76,7 @@ public abstract class BaseResource {
         sh.stopWatch();
 
         try {
-            this.resultObject.put(Tokens.VERSION, RexsterApplicationImpl.getVersion());
+            this.resultObject.put(Tokens.VERSION, Tokens.REXSTER_VERSION);
         } catch (JSONException ex) {
             JSONObject error = generateErrorObject(ex.getMessage());
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());

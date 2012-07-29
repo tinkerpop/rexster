@@ -7,6 +7,7 @@ package com.tinkerpop.rexster.filter;
 import com.sun.jersey.core.util.Base64;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
+import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.server.RexsterApplicationImpl;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
@@ -182,7 +183,7 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
     private Response generateErrorResponse(final String message) {
         final Map<String, String> errorEntity = new HashMap<String, String>() {{
             put("message", message);
-            put("version", RexsterApplicationImpl.getVersion());
+            put(Tokens.VERSION, Tokens.REXSTER_VERSION);
         }};
 
         return Response.status(Response.Status.UNAUTHORIZED)
