@@ -12,6 +12,7 @@ import org.msgpack.unpacker.UnpackerIterator;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 
 import static org.msgpack.template.Templates.tMap;
 import static org.msgpack.template.Templates.TString;
@@ -35,12 +36,25 @@ public class TryRexProSessionless {
         emptyBindings = empty;
     }}
 
-    public static void main(String[] args) {
-        //bigCalls();
-        lotsOfCalls(false);
+    public static void main(final String[] args) throws Exception {
+        int c = Integer.parseInt(args[1]);
+        final CountDownLatch latch = new CountDownLatch(c);
+
+        for (int ix = 0; ix < c; ix++) {
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    lotsOfCalls(false, args[0]);
+                    latch.countDown();
+                }
+            }).start();
+        }
+
+        latch.await();
     }
 
-    private static void lotsOfCalls(boolean doJson){
+    private static void lotsOfCalls(boolean doJson, final String host){
 
         MessagePack msgpack = new MessagePack();
 
@@ -50,9 +64,8 @@ public class TryRexProSessionless {
 
         try {
 
-
             MsgPackScriptResponseMessage resultMessage = (MsgPackScriptResponseMessage)
-                    RexPro.sendMessage("127.0.0.1", 8184, createScriptRequestMessage("g=rexster.getGraph('gratefulgraph');g.V;"));
+                    RexPro.sendMessage(host, 8184, createScriptRequestMessage("g=rexster.getGraph('gratefulgraph');g.V;"));
 
             BufferUnpacker unpacker = msgpack.createBufferUnpacker(resultMessage.Results);
             unpacker.setArraySizeLimit(Integer.MAX_VALUE);
@@ -65,7 +78,7 @@ public class TryRexProSessionless {
                 final Map<String,Value> map = new Converter(msgpack, itty.next()).read(tMap(TString, TValue));
                 final String vId = map.get(Tokens._ID).asRawValue().getString();
 
-                MsgPackScriptResponseMessage vertexResultMessage = (MsgPackScriptResponseMessage) RexPro.sendMessage("127.0.0.1", 8184,
+                MsgPackScriptResponseMessage vertexResultMessage = (MsgPackScriptResponseMessage) RexPro.sendMessage(host, 8184,
                           createScriptRequestMessage("g=rexster.getGraph('gratefulgraph');g.v(" + vId + ")"), 100);
 
                 unpacker = msgpack.createBufferUnpacker(vertexResultMessage.Results);
