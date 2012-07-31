@@ -3,6 +3,7 @@ package com.tinkerpop.rexster;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.test.framework.JerseyTest;
+import com.tinkerpop.blueprints.Graph;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.server.DefaultRexsterApplication;
