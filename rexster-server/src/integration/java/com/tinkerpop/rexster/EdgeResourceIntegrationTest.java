@@ -162,22 +162,30 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     @Test
     public void postEdgeEdgeExistingWithNoEdgePropertiesStatusConflict() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            String id = testGraph.getEdgeIdSet().values().iterator().next();
-            ClientResponse response = this.doGraphPost(testGraph, "edges/" + encode(id));
+            // POST edge does a getEdge to determine if the edge was already posted with that ID
+            // and to allow new properties to be POSTed to the edge
+            if (testGraph.getFeatures().supportsEdgeRetrieval) {
+                String id = testGraph.getEdgeIdSet().values().iterator().next();
+                ClientResponse response = this.doGraphPost(testGraph, "edges/" + encode(id));
 
-            Assert.assertNotNull(response);
-            Assert.assertEquals(ClientResponse.Status.CONFLICT, response.getClientResponseStatus());
+                Assert.assertNotNull(response);
+                Assert.assertEquals(ClientResponse.Status.CONFLICT, response.getClientResponseStatus());
+            }
         }
     }
 
     @Test
     public void postEdgeNewEdgeVerticesDoNotExistStatusConflict() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            String id = testGraph.getEdgeIdSet().values().iterator().next();
-            ClientResponse response = this.doGraphPost(testGraph, "edges/" + encode(id), "_outV=102notreal&_inV=123notreal");
+            // POST edge does a getEdge to determine if the edge was already posted with that ID
+            // and to allow new properties to be POSTed to the edge
+            if (testGraph.getFeatures().supportsEdgeRetrieval) {
+                String id = testGraph.getEdgeIdSet().values().iterator().next();
+                ClientResponse response = this.doGraphPost(testGraph, "edges/" + encode(id), "_outV=102notreal&_inV=123notreal");
 
-            Assert.assertNotNull(response);
-            Assert.assertEquals(ClientResponse.Status.CONFLICT, response.getClientResponseStatus());
+                Assert.assertNotNull(response);
+                Assert.assertEquals(ClientResponse.Status.CONFLICT, response.getClientResponseStatus());
+            }
         }
     }
 
@@ -245,41 +253,48 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     @Test
     public void putEdgeStatusNotFound() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            String keyValueThatWillNeverUpdate = "&k1=v1";
-            ClientResponse response = this.doGraphPut(testGraph, "edges/1000notreal", keyValueThatWillNeverUpdate);
+            // A PUT has to get the edge before it can update it
+            if (testGraph.getFeatures().supportsEdgeRetrieval) {
+                String keyValueThatWillNeverUpdate = "&k1=v1";
+                ClientResponse response = this.doGraphPut(testGraph, "edges/1000notreal", keyValueThatWillNeverUpdate);
 
-            Assert.assertEquals(ClientResponse.Status.NOT_FOUND, response.getClientResponseStatus());
+                Assert.assertEquals(ClientResponse.Status.NOT_FOUND, response.getClientResponseStatus());
+            }
         }
     }
 
     @Test
     public void putEdgeSimpleStatusOk() throws JSONException {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            Iterator<String> itty = testGraph.getEdgeIdSet().values().iterator();
-            String firstEdgeId = itty.next();
-            String secondEdgeId = itty.next();
+            // A PUT has to get the edge before it can update it
+            if (testGraph.getFeatures().supportsEdgeRetrieval) {
+                Iterator<String> itty = testGraph.getEdgeIdSet().values().iterator();
+                String firstEdgeId = itty.next();
+                String secondEdgeId = itty.next();
 
-            // put as URI
-            String edgeProperty = "propertya=(i,123)&propertyb=(d,321.5)&propertyc=test";
-            ClientResponse response = this.doGraphPut(testGraph, "edges/" + encode(firstEdgeId), edgeProperty);
-            assertPuttedEdge(firstEdgeId, response, true);
+                // put as URI
+                String edgeProperty = "propertya=(i,123)&propertyb=(d,321.5)&propertyc=test";
+                ClientResponse response = this.doGraphPut(testGraph, "edges/" + encode(firstEdgeId), edgeProperty);
+                assertPuttedEdge(firstEdgeId, response, true);
 
-            // put as JSON
-            Map<String, Object> jsonEdgeData = new HashMap<String, Object>();
-            jsonEdgeData.put("propertya", 123);
-            jsonEdgeData.put("propertyb", 321.5);
-            jsonEdgeData.put("propertyc", "test");
+                // put as JSON
+                Map<String, Object> jsonEdgeData = new HashMap<String, Object>();
+                jsonEdgeData.put("propertya", 123);
+                jsonEdgeData.put("propertyb", 321.5);
+                jsonEdgeData.put("propertyc", "test");
 
-            JSONObject jsonEdgeToPut = new JSONObject(jsonEdgeData);
-            response = this.doGraphPutOfJson(testGraph, "edges/" + encode(secondEdgeId), jsonEdgeToPut);
-            assertPuttedEdge(secondEdgeId, response, true);
+                JSONObject jsonEdgeToPut = new JSONObject(jsonEdgeData);
+                response = this.doGraphPutOfJson(testGraph, "edges/" + encode(secondEdgeId), jsonEdgeToPut);
+                assertPuttedEdge(secondEdgeId, response, true);
+            }
         }
     }
 
     @Test
     public void putEdgeComplexStatusOk() throws JSONException {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            if (testGraph.getFeatures().supportsMapProperty) {
+            // A PUT has to get the edge before it can update it
+            if (testGraph.getFeatures().supportsEdgeRetrieval && testGraph.getFeatures().supportsMapProperty) {
                 Iterator<String> itty = testGraph.getEdgeIdSet().values().iterator();
                 String firstEdgeId = itty.next();
                 String secondEdgeId = itty.next();
@@ -307,9 +322,12 @@ public class EdgeResourceIntegrationTest extends AbstractGraphResourceIntegratio
     @Test
     public void deleteEdgeStatusNotFound() {
         for (GraphTestHolder testGraph : this.testGraphs) {
-            ClientResponse response = this.doGraphDelete(testGraph, "edges/1000notreal");
+            // A DELETE has to get the edge before it can remove it
+            if (testGraph.getFeatures().supportsEdgeRetrieval) {
+                ClientResponse response = this.doGraphDelete(testGraph, "edges/1000notreal");
 
-            Assert.assertEquals(ClientResponse.Status.NOT_FOUND, response.getClientResponseStatus());
+                Assert.assertEquals(ClientResponse.Status.NOT_FOUND, response.getClientResponseStatus());
+            }
         }
     }
 

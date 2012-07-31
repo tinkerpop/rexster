@@ -3,6 +3,7 @@ package com.tinkerpop.rexster;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.test.framework.JerseyTest;
+import com.tinkerpop.blueprints.Graph;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.codehaus.jettison.json.JSONObject;
 

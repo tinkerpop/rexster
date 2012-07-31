@@ -628,14 +628,17 @@ public class VertexResource extends AbstractSubResource {
                 }
             }
 
+            final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+            final JSONObject elementJson = GraphSONUtility.jsonFromElement(vertex, returnKeys, showTypes);
+
             rag.tryStopTransactionSuccess();
 
-            // some graph implementations close scope at the close of the transaction so this has to be
-            // reconstituted
-            final Vertex reconstitutedElement = graph.getVertex(vertex.getId());
+            // some graph implementations close scope at the close of the transaction so we generate the
+            // JSON before the transaction but set the id after for graphs that don't generate the id
+            // until the transaction is committed
+            elementJson.put(Tokens._ID, vertex.getId());
 
-            final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-            this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(reconstitutedElement, returnKeys, showTypes));
+            this.resultObject.put(Tokens.RESULTS, elementJson);
 
             if (showHypermedia) {
                 final JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX, this.getUriPath());

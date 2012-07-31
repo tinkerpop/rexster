@@ -529,14 +529,17 @@ public class EdgeResource extends AbstractSubResource {
                         }
                     }
 
+                    final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+                    final JSONObject elementJson = GraphSONUtility.jsonFromElement(edge, returnKeys, showTypes);
+
                     rag.tryStopTransactionSuccess();
 
-                    // some graph implementations close scope at the close of the transaction so this has to be
-                    // reconstituted
-                    final Edge reconstitutedElement = graph.getEdge(edge.getId());
+                    // some graph implementations close scope at the close of the transaction so we generate the
+                    // JSON before the transaction but set the id after for graphs that don't generate the id
+                    // until the transaction is committed
+                    elementJson.put(Tokens._ID, edge.getId());
 
-                    final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-                    this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(reconstitutedElement, returnKeys, showTypes));
+                    this.resultObject.put(Tokens.RESULTS, elementJson);
 
                 } else {
                     // edge could not be found.  likely an error condition on the request
@@ -654,13 +657,16 @@ public class EdgeResource extends AbstractSubResource {
                 }
             }
 
+            final JSONObject elementJson = GraphSONUtility.jsonFromElement(edge, returnKeys, showTypes);
+
             rag.tryStopTransactionSuccess();
 
-            // some graph implementations close scope at the close of the transaction so this has to be
-            // reconstituted
-            final Edge reconstitutedElement = graph.getEdge(edge.getId());
+            // some graph implementations close scope at the close of the transaction so we generate the
+            // JSON before the transaction but set the id after for graphs that don't generate the id
+            // until the transaction is committed
+            elementJson.put(Tokens._ID, edge.getId());
 
-            this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(reconstitutedElement, returnKeys, showTypes));
+            this.resultObject.put(Tokens.RESULTS, elementJson);
 
             if (showHypermedia) {
                 final JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE, this.getUriPath());
