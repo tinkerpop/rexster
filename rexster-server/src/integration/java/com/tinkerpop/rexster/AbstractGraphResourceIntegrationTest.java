@@ -139,6 +139,12 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
 
     }
 
+    protected void initKeyIndex(GraphTestHolder graphHolder) {
+        if (graphHolder.getFeatures().supportsKeyIndices) {
+            ClientRequest.create().build(createUri("/" + graphHolder.getGraphName() + "/keyindices/name"), "POST");
+        }
+    }
+
     public static JSONObject typeTheElement(JSONObject json) {
         // map is only one level deep for the test graph so this doesn't really need to be recursive
         final Iterator it = json.keys();

@@ -59,6 +59,23 @@ public class VertexResourceIntegrationTest extends AbstractGraphResourceIntegrat
     }
 
     @Test
+    public void getVerticesByKeyIndexStatusOk() {
+        for (GraphTestHolder testGraph : this.testGraphs) {
+            if (testGraph.getFeatures().supportsVertexIteration) {
+                ClientResponse graphResponse = doGraphGet(testGraph, "vertices", "key=name&value=marko");
+
+                Assert.assertNotNull(graphResponse);
+                Assert.assertEquals(ClientResponse.Status.OK, graphResponse.getClientResponseStatus());
+
+                JSONObject vertexJson = graphResponse.getEntity(JSONObject.class);
+                Assert.assertNotNull(vertexJson);
+
+                Assert.assertEquals(1, vertexJson.optJSONArray(Tokens.RESULTS).length());
+            }
+        }
+    }
+
+    @Test
     public void getVerticesPagingStatusOk() {
         for (GraphTestHolder testGraph : this.testGraphs) {
             if (testGraph.getFeatures().supportsVertexIteration) {
