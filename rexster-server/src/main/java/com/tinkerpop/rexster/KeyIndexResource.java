@@ -212,7 +212,7 @@ public class KeyIndexResource extends AbstractSubResource {
 
     private KeyIndexableGraph getKeyIndexableGraph(final String graphName) {
 
-        final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
+        final Graph graph = this.getRexsterApplicationGraph(graphName).getUnwrappedGraph();
         final KeyIndexableGraph idxGraph = graph instanceof KeyIndexableGraph ? (KeyIndexableGraph) graph : null;
 
         if (idxGraph == null) {

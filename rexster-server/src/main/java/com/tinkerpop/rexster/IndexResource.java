@@ -576,7 +576,7 @@ public class IndexResource extends AbstractSubResource {
 
     private Index getIndexFromGraph(final String graphName, final String name) {
 
-        final Graph graph = this.getRexsterApplicationGraph(graphName).getGraph();
+        final Graph graph = this.getRexsterApplicationGraph(graphName).getUnwrappedGraph();
         final IndexableGraph idxGraph = graph instanceof IndexableGraph ? (IndexableGraph) graph : null;
 
         if (idxGraph == null) {
