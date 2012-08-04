@@ -1,0 +1,54 @@
+!https://github.com/tinkerpop/gremlin/raw/master/doc/images/gremlin-logo.png!
+
+Its possible to write "Gremlin":http://gremlin.tinkerpop.com based extensions. To do so, you will need to make sure to make use of "GMaven":http://docs.codehaus.org/display/GMAVEN/Home in your @pom.xml@. For example:
+
+```xml
+<plugin>
+    <groupId>org.codehaus.gmaven</groupId>
+    <artifactId>gmaven-plugin</artifactId>
+    <version>1.3</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>generateStubs</goal>
+                <goal>compile</goal>
+                <goal>generateTestStubs</goal>
+                <goal>testCompile</goal>
+            </goals>
+            <configuration>
+                <providerSelection>1.7</providerSelection>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
+
+Next you can then create a Gremlin-based extension.
+
+```java
+@ExtensionNaming(namespace = "ex", name = "gremlinExample")
+public class GremlinBasedExtension extends AbstractRexsterExtension {
+
+    static {
+        Gremlin.load();
+    }
+
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX)
+    @ExtensionDescriptor(description = "Traversal with native Gremlin")
+    public ExtensionResponse evaluate(@RexsterContext RexsterResourceContext context,
+                                      @RexsterContext Vertex v) {
+
+        JSONObject results = new JSONObject();
+        results.put("foaf count", v.out('knows').out('knows').count())
+        return ExtensionResponse.ok(results);
+    }
+}
+```
+
+*NOTE* Like all extensions, don't forget to add the extension's full class name to your
+
+```text
+src/resources/META-INF/services/com.tinkerpop.rexster.extension.RexsterExtension
+```
+
+Please see [[Deploying an Extension]] for more details

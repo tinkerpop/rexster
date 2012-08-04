@@ -3,6 +3,7 @@
 /data
 /rexster-server/release
 /rexster-server/target
+/rexster-kibbles/target
 /rexster-kibbles/*/target
 /rexster-core/target
 /rexster-console/target
