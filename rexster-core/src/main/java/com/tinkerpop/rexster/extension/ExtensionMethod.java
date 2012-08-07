@@ -7,13 +7,30 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
+/**
+ * Holds the reflected method for the extension service call and its associated
+ * extension attributes.
+ */
 public class ExtensionMethod {
+
+    /**
+     * The service method.
+     */
     private final Method method;
 
+    /**
+     * The definition of the extension.
+     */
     private final ExtensionDefinition extensionDefinition;
 
+    /**
+     * The descriptor for the extension.
+     */
     private final ExtensionDescriptor extensionDescriptor;
 
+    /**
+     * The extension class that owns this method.
+     */
     private final RexsterExtension rexsterExtension;
 
     public ExtensionMethod(final Method method, final ExtensionDefinition extensionDefinition,
@@ -31,10 +48,6 @@ public class ExtensionMethod {
 
     public ExtensionDefinition getExtensionDefinition() {
         return this.extensionDefinition;
-    }
-
-    public ExtensionDescriptor getExtensionDescriptor() {
-        return this.extensionDescriptor;
     }
 
     public RexsterExtension getRexsterExtension() {

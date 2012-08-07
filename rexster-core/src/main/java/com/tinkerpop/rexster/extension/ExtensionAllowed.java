@@ -22,10 +22,6 @@ public class ExtensionAllowed {
         this.namespace = namespace;
     }
 
-    public String getNamespace() {
-        return namespace;
-    }
-
     /**
      * Determines if the namespace and extension are allowed given the configuration of the graph in rexster.xml.
      */
