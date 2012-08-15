@@ -4,6 +4,7 @@ package com.tinkerpop.rexster.kibbles.sparql;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.sail.SailGraph;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
@@ -26,6 +27,7 @@ import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The SPARQL Extension allows execution of SPARQL queries to Sail implementations.
@@ -49,11 +51,11 @@ public class SparqlExtension extends AbstractRexsterExtension {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.SHOW_TYPES, description = API_SHOW_TYPES),
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS)
             })
-    public ExtensionResponse evaluateSparql(@RexsterContext RexsterResourceContext context,
-                                            @RexsterContext Graph graph,
-                                            @ExtensionRequestParameter(name = "query", description = API_QUERY) String queryString) {
+    public ExtensionResponse evaluateSparql(@RexsterContext final RexsterResourceContext context,
+                                            @RexsterContext final Graph graph,
+                                            @ExtensionRequestParameter(name = "query", description = API_QUERY) final String queryString) {
         if (queryString == null || queryString.isEmpty()) {
-            ExtensionMethod extMethod = context.getExtensionMethod();
+            final ExtensionMethod extMethod = context.getExtensionMethod();
             return ExtensionResponse.error(
                     "the query parameter cannot be empty",
                     null,
@@ -62,12 +64,13 @@ public class SparqlExtension extends AbstractRexsterExtension {
                     generateErrorJson(extMethod.getExtensionApiAsJson()));
         }
 
-        JSONObject requestObject = context.getRequestObject();
-        boolean showDataTypes = RequestObjectHelper.getShowTypes(requestObject);
-        List<String> returnKeys = RequestObjectHelper.getReturnKeys(requestObject, WILDCARD);
+        final JSONObject requestObject = context.getRequestObject();
+        final boolean showTypes = RequestObjectHelper.getShowTypes(requestObject);
+        final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
+        final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(requestObject, WILDCARD);
 
         if (!(graph instanceof SailGraph)) {
-            ExtensionMethod extMethod = context.getExtensionMethod();
+            final ExtensionMethod extMethod = context.getExtensionMethod();
             return ExtensionResponse.error(
                     "the graph to which this extension is applied is not a SailGraph implementation",
                     null,
@@ -78,25 +81,25 @@ public class SparqlExtension extends AbstractRexsterExtension {
 
         try {
 
-            SailGraph sailGraph = (SailGraph) graph;
-            List<Map<String, Vertex>> sparqlResults = sailGraph.executeSparql(queryString);
+            final SailGraph sailGraph = (SailGraph) graph;
+            final List<Map<String, Vertex>> sparqlResults = sailGraph.executeSparql(queryString);
 
-            JSONArray jsonArray = new JSONArray();
+            final JSONArray jsonArray = new JSONArray();
 
             for (Map<String, Vertex> map : sparqlResults) {
                 Map<String, JSONObject> mapOfJson = new HashMap<String, JSONObject>();
                 for (String key : map.keySet()) {
-                    mapOfJson.put(key, GraphSONUtility.jsonFromElement(map.get(key), returnKeys, showDataTypes));
+                    mapOfJson.put(key, GraphSONUtility.jsonFromElement(map.get(key), returnKeys, mode));
                 }
 
                 jsonArray.put(new JSONObject(mapOfJson));
             }
 
-            HashMap<String, Object> resultMap = new HashMap<String, Object>();
+            final HashMap<String, Object> resultMap = new HashMap<String, Object>();
             resultMap.put(Tokens.SUCCESS, true);
             resultMap.put(Tokens.RESULTS, jsonArray);
 
-            JSONObject resultObject = new JSONObject(resultMap);
+            final JSONObject resultObject = new JSONObject(resultMap);
             return ExtensionResponse.ok(resultObject);
 
         } catch (Exception mqe) {

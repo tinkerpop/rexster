@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.gremlin.converter;
 
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.pipes.util.structures.Table;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -13,8 +14,8 @@ import java.util.Map;
 
 public class JSONResultConverterTest {
 
-    private JSONResultConverter converterNotPaged = new JSONResultConverter(false, 0, Long.MAX_VALUE, null);
-    private JSONResultConverter converterPaged = new JSONResultConverter(false, 1, 3, null);
+    private JSONResultConverter converterNotPaged = new JSONResultConverter(GraphSONMode.NORMAL, 0, Long.MAX_VALUE, null);
+    private JSONResultConverter converterPaged = new JSONResultConverter(GraphSONMode.NORMAL, 1, 3, null);
 
     @Test
     public void convertNullResultReturnsNull() throws Exception {

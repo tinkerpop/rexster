@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
@@ -159,7 +160,8 @@ public class IndexResource extends AbstractSubResource {
 
         final Long start = RequestObjectHelper.getStartOffset(theRequestObject);
         final Long end = RequestObjectHelper.getEndOffset(theRequestObject);
-        final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+        final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+        final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
 
         long counter = 0l;
 
@@ -169,7 +171,7 @@ public class IndexResource extends AbstractSubResource {
                 final JSONArray elementArray = new JSONArray();
                 for (Element element : (Iterable<Element>) index.get(key, value)) {
                     if (counter >= start && counter < end) {
-                        elementArray.put(GraphSONUtility.jsonFromElement(element, returnKeys, showTypes));
+                        elementArray.put(GraphSONUtility.jsonFromElement(element, returnKeys, mode));
                     }
                     counter++;
                 }

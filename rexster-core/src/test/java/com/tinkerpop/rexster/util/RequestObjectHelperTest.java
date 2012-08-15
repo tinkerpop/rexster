@@ -8,6 +8,7 @@ import org.codehaus.jettison.json.JSONTokener;
 import org.junit.Test;
 
 import javax.ws.rs.WebApplicationException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -57,12 +58,14 @@ public class RequestObjectHelperTest {
     @Test
     public void getReturnKeysValid() {
         JSONObject jsonWithTwoKeys = buildJSONObjectFromString("{\"rexster\": { \"" + Tokens.RETURN_KEYS + "\": [\"k1\",\"k2\"]}}");
-        List<String> keys = RequestObjectHelper.getReturnKeys(jsonWithTwoKeys);
+        Set<String> keys = RequestObjectHelper.getReturnKeys(jsonWithTwoKeys);
         Assert.assertNotNull(keys);
         Assert.assertEquals(2, keys.size());
 
-        Assert.assertEquals("k1", keys.get(0));
-        Assert.assertEquals("k2", keys.get(1));
+        List<String> listKeys = new ArrayList<String>(keys);
+
+        Assert.assertEquals("k1", listKeys.get(0));
+        Assert.assertEquals("k2", listKeys.get(1));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.gremlin.converter;
 
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
 import com.tinkerpop.pipes.util.structures.Row;
 import com.tinkerpop.pipes.util.structures.Table;
@@ -9,23 +10,26 @@ import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Converts a result from Gremlin to a JSONArray using GraphSON format.
  */
 public class JSONResultConverter implements ResultConverter<JSONArray> {
 
-    private boolean showTypes = false;
+    private GraphSONMode mode = GraphSONMode.NORMAL;
     private long offsetStart = 0L;
     private long offsetEnd = Long.MAX_VALUE;
-    private List<String> returnKeys = new ArrayList<String>();
+    private final Set<String> returnKeys;
 
 
-    public JSONResultConverter(boolean showTypes, long offsetStart, long offsetEnd, List<String> returnKeys) {
-        this.showTypes = showTypes;
+    public JSONResultConverter(final GraphSONMode mode, final long offsetStart, final long offsetEnd,
+                               final Set<String> returnKeys) {
+        this.mode = mode;
         this.offsetEnd = offsetEnd;
         this.offsetStart = offsetStart;
         this.returnKeys = returnKeys;
@@ -102,11 +106,7 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
             return null;
         }
         if (object instanceof Element) {
-            if (returnKeys == null) {
-                return GraphSONUtility.jsonFromElement((Element) object, null, showTypes);
-            } else {
-                return GraphSONUtility.jsonFromElement((Element) object, returnKeys, showTypes);
-            }
+            return GraphSONUtility.jsonFromElement((Element) object, returnKeys, this.mode);
         } else if (object instanceof Map) {
             JSONObject jsonObject = new JSONObject();
             Map map = (Map) object;

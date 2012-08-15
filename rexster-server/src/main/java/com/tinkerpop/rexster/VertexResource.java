@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
@@ -92,11 +93,13 @@ public class VertexResource extends AbstractSubResource {
     private Response getVertices(final String graphName, final boolean showTypes) {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         final Graph graph = rag.getGraph();
+
+        final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
         
         final JSONObject theRequestObject = this.getRequestObject();
         final Long start = RequestObjectHelper.getStartOffset(theRequestObject);
         final Long end = RequestObjectHelper.getEndOffset(theRequestObject);
-        final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+        final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
         String key = null;
         Object value = null;
@@ -120,7 +123,7 @@ public class VertexResource extends AbstractSubResource {
             for (Vertex vertex : vertices) {
                 if (counter >= start && counter < end) {
                     wasInSection = true;
-                    vertexArray.put(GraphSONUtility.jsonFromElement(vertex, returnKeys, showTypes));
+                    vertexArray.put(GraphSONUtility.jsonFromElement(vertex, returnKeys, mode));
                 } else if (wasInSection) {
                     break;
                 }
@@ -183,9 +186,10 @@ public class VertexResource extends AbstractSubResource {
             try {
 
                 JSONObject theRequestObject = this.getRequestObject();
-                List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+                final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
+                Set<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
-                this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(vertex, returnKeys, showTypes));
+                this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(vertex, returnKeys, mode));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
                 if (showHypermedia) {
@@ -423,10 +427,11 @@ public class VertexResource extends AbstractSubResource {
         }
 
         try {
+            final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
             final JSONObject theRequestObject = this.getRequestObject();
             final Long start = RequestObjectHelper.getStartOffset(theRequestObject);
             final Long end = RequestObjectHelper.getEndOffset(theRequestObject);
-            final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+            final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
             // accept either an array of labels or just one label
             final String[] labels = getLabelsFromRequest(theRequestObject);
@@ -469,7 +474,7 @@ public class VertexResource extends AbstractSubResource {
                 for (Vertex v : vertexQueryResults) {
                     if (counter >= start && counter < end) {
                         if (returnType.equals(ReturnType.VERTICES)) {
-                            elementArray.put(GraphSONUtility.jsonFromElement(v, returnKeys, showTypes));
+                            elementArray.put(GraphSONUtility.jsonFromElement(v, returnKeys, mode));
                         } else {
                             elementArray.put(v.getId());
                         }
@@ -480,7 +485,7 @@ public class VertexResource extends AbstractSubResource {
                 final Iterable<Edge> edgeQueryResults = query.edges();
                 for (Edge e : edgeQueryResults) {
                     if (counter >= start && counter < end) {
-                        elementArray.put(GraphSONUtility.jsonFromElement(e, returnKeys, showTypes));
+                        elementArray.put(GraphSONUtility.jsonFromElement(e, returnKeys, mode));
                     }
                     counter++;
                 }
@@ -629,8 +634,9 @@ public class VertexResource extends AbstractSubResource {
                 }
             }
 
-            final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-            final JSONObject elementJson = GraphSONUtility.jsonFromElement(vertex, returnKeys, showTypes);
+            final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
+            final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+            final JSONObject elementJson = GraphSONUtility.jsonFromElement(vertex, returnKeys, mode);
 
             rag.tryStopTransactionSuccess();
 
@@ -752,8 +758,9 @@ public class VertexResource extends AbstractSubResource {
             // reconstituted
             final Vertex reconstitutedElement = graph.getVertex(vertex.getId());
 
-            final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-            this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(reconstitutedElement, returnKeys, showTypes));
+            final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
+            final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+            this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(reconstitutedElement, returnKeys, mode));
 
             if (showHypermedia) {
                 final JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.VERTEX, this.getUriPath());

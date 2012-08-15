@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
@@ -27,8 +28,8 @@ import org.codehaus.jettison.json.JSONObject;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This extension allows batch/transactional operations on a graph.
@@ -36,7 +37,7 @@ import java.util.Map;
 @ExtensionNaming(namespace = BatchExtension.EXTENSION_NAMESPACE, name = BatchExtension.EXTENSION_NAME)
 public class BatchExtension extends AbstractRexsterExtension {
 
-    private static Logger logger = Logger.getLogger(BatchExtension.class);
+    private static final Logger logger = Logger.getLogger(BatchExtension.class);
 
     public static final String EXTENSION_NAMESPACE = "tp";
     public static final String EXTENSION_NAME = "batch";
@@ -53,13 +54,13 @@ public class BatchExtension extends AbstractRexsterExtension {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = "idList", description = API_IDENTIFIERS)
             })
-    public ExtensionResponse getVertices(@RexsterContext RexsterResourceContext context,
-                                         @RexsterContext Graph graph) {
+    public ExtensionResponse getVertices(@RexsterContext final RexsterResourceContext context,
+                                         @RexsterContext final Graph graph) {
 
-        JSONObject requestObject = context.getRequestObject();
-        JSONArray idList = requestObject.optJSONArray("idList");
+        final JSONObject requestObject = context.getRequestObject();
+        final JSONArray idList = requestObject.optJSONArray("idList");
         if (idList == null || idList.length() == 0) {
-            ExtensionMethod extMethod = context.getExtensionMethod();
+            final ExtensionMethod extMethod = context.getExtensionMethod();
             return ExtensionResponse.error(
                     "the idList parameter cannot be empty",
                     null,
@@ -68,25 +69,26 @@ public class BatchExtension extends AbstractRexsterExtension {
                     generateErrorJson(extMethod.getExtensionApiAsJson()));
         }
 
-        boolean showDataTypes = RequestObjectHelper.getShowTypes(requestObject);
-        List<String> returnKeys = RequestObjectHelper.getReturnKeys(requestObject, WILDCARD);
+        final boolean showTypes = RequestObjectHelper.getShowTypes(requestObject);
+        final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
+        final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(requestObject, WILDCARD);
 
         try {
 
-            JSONArray jsonArray = new JSONArray();
+            final JSONArray jsonArray = new JSONArray();
 
             for (int ix = 0; ix < idList.length(); ix++) {
-                Vertex vertexFound = graph.getVertex(idList.optString(ix));
+                final Vertex vertexFound = graph.getVertex(idList.optString(ix));
                 if (vertexFound != null) {
-                    jsonArray.put(GraphSONUtility.jsonFromElement(vertexFound, returnKeys, showDataTypes));
+                    jsonArray.put(GraphSONUtility.jsonFromElement(vertexFound, returnKeys, mode));
                 }
             }
 
-            HashMap<String, Object> resultMap = new HashMap<String, Object>();
+            final HashMap<String, Object> resultMap = new HashMap<String, Object>();
             resultMap.put(Tokens.SUCCESS, true);
             resultMap.put(Tokens.RESULTS, jsonArray);
 
-            JSONObject resultObject = new JSONObject(resultMap);
+            final JSONObject resultObject = new JSONObject(resultMap);
             return ExtensionResponse.ok(resultObject);
 
         } catch (Exception mqe) {
@@ -104,13 +106,13 @@ public class BatchExtension extends AbstractRexsterExtension {
                     @ExtensionApi(parameterName = Tokens.REXSTER + "." + Tokens.RETURN_KEYS, description = API_RETURN_KEYS),
                     @ExtensionApi(parameterName = "idList", description = API_IDENTIFIERS)
             })
-    public ExtensionResponse getEdges(@RexsterContext RexsterResourceContext context,
-                                      @RexsterContext Graph graph) {
+    public ExtensionResponse getEdges(@RexsterContext final RexsterResourceContext context,
+                                      @RexsterContext final Graph graph) {
 
-        JSONObject requestObject = context.getRequestObject();
-        JSONArray idList = requestObject.optJSONArray("idList");
+        final JSONObject requestObject = context.getRequestObject();
+        final JSONArray idList = requestObject.optJSONArray("idList");
         if (idList == null || idList.length() == 0) {
-            ExtensionMethod extMethod = context.getExtensionMethod();
+            final ExtensionMethod extMethod = context.getExtensionMethod();
             return ExtensionResponse.error(
                     "the idList parameter cannot be empty",
                     null,
@@ -119,25 +121,26 @@ public class BatchExtension extends AbstractRexsterExtension {
                     generateErrorJson(extMethod.getExtensionApiAsJson()));
         }
 
-        boolean showDataTypes = RequestObjectHelper.getShowTypes(requestObject);
-        List<String> returnKeys = RequestObjectHelper.getReturnKeys(requestObject, WILDCARD);
+        final boolean showTypes = RequestObjectHelper.getShowTypes(requestObject);
+        final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
+        final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(requestObject, WILDCARD);
 
         try {
 
-            JSONArray jsonArray = new JSONArray();
+            final JSONArray jsonArray = new JSONArray();
 
             for (int ix = 0; ix < idList.length(); ix++) {
-                Edge edgeFound = graph.getEdge(idList.optString(ix));
+                final Edge edgeFound = graph.getEdge(idList.optString(ix));
                 if (edgeFound != null) {
-                    jsonArray.put(GraphSONUtility.jsonFromElement(edgeFound, returnKeys, showDataTypes));
+                    jsonArray.put(GraphSONUtility.jsonFromElement(edgeFound, returnKeys, mode));
                 }
             }
 
-            HashMap<String, Object> resultMap = new HashMap<String, Object>();
+            final HashMap<String, Object> resultMap = new HashMap<String, Object>();
             resultMap.put(Tokens.SUCCESS, true);
             resultMap.put(Tokens.RESULTS, jsonArray);
 
-            JSONObject resultObject = new JSONObject(resultMap);
+            final JSONObject resultObject = new JSONObject(resultMap);
             return ExtensionResponse.ok(resultObject);
 
         } catch (Exception mqe) {
@@ -154,9 +157,9 @@ public class BatchExtension extends AbstractRexsterExtension {
                                     @RexsterContext Graph graph,
                                     @RexsterContext RexsterApplicationGraph rag) {
 
-        JSONObject transactionJson = context.getRequestObject();
+        final JSONObject transactionJson = context.getRequestObject();
         if (transactionJson == null) {
-            ExtensionMethod extMethod = context.getExtensionMethod();
+            final ExtensionMethod extMethod = context.getExtensionMethod();
             return ExtensionResponse.error(
                     "no transaction JSON posted",
                     null,
@@ -166,12 +169,10 @@ public class BatchExtension extends AbstractRexsterExtension {
         }
 
         try {
-            //rag.tryStartTransaction();
-
-            JSONArray txArray = transactionJson.optJSONArray("tx");
+            final JSONArray txArray = transactionJson.optJSONArray("tx");
             String currentAction;
             for (int ix = 0; ix < txArray.length(); ix++) {
-                JSONObject txElement = txArray.optJSONObject(ix);
+                final JSONObject txElement = txArray.optJSONObject(ix);
                 currentAction = txElement.optString("_action");
                 if (currentAction.equals("create")) {
                     create(txElement, graph);
@@ -184,7 +185,7 @@ public class BatchExtension extends AbstractRexsterExtension {
 
             rag.tryStopTransactionSuccess();
 
-            Map<String, Object> resultMap = new HashMap<String, Object>();
+            final Map<String, Object> resultMap = new HashMap<String, Object>();
             resultMap.put(Tokens.SUCCESS, true);
             resultMap.put("txProcessed", txArray.length());
 
@@ -195,7 +196,7 @@ public class BatchExtension extends AbstractRexsterExtension {
 
             logger.error(iae);
 
-            ExtensionMethod extMethod = context.getExtensionMethod();
+            final ExtensionMethod extMethod = context.getExtensionMethod();
             return ExtensionResponse.error(
                     iae.getMessage(),
                     null,
@@ -211,9 +212,9 @@ public class BatchExtension extends AbstractRexsterExtension {
         }
     }
 
-    private void create(JSONObject elementAsJson, Graph graph) throws Exception {
-        String id = elementAsJson.optString(Tokens._ID);
-        String elementType = elementAsJson.optString(Tokens._TYPE);
+    private void create(final JSONObject elementAsJson, final Graph graph) throws Exception {
+        final String id = elementAsJson.optString(Tokens._ID);
+        final String elementType = elementAsJson.optString(Tokens._TYPE);
 
         if (elementType == null) {
             throw new IllegalArgumentException("each element in the transaction must have an " + Tokens._TYPE + " key");
@@ -282,13 +283,13 @@ public class BatchExtension extends AbstractRexsterExtension {
         }
     }
 
-    private void update(JSONObject elementAsJson, Graph graph) throws Exception {
-        String id = elementAsJson.optString(Tokens._ID);
+    private void update(final JSONObject elementAsJson, final Graph graph) throws Exception {
+        final String id = elementAsJson.optString(Tokens._ID);
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("each element in the transaction must have an " + Tokens._ID + " key");
         }
 
-        String elementType = elementAsJson.optString(Tokens._TYPE);
+        final String elementType = elementAsJson.optString(Tokens._TYPE);
 
         if (elementType == null) {
             throw new IllegalArgumentException("each element in the transaction must have an " + Tokens._TYPE + " key");
@@ -316,13 +317,13 @@ public class BatchExtension extends AbstractRexsterExtension {
         }
     }
 
-    private void delete(JSONObject elementAsJson, Graph graph) throws Exception {
-        String id = elementAsJson.optString(Tokens._ID);
+    private void delete(final JSONObject elementAsJson, final Graph graph) throws Exception {
+        final String id = elementAsJson.optString(Tokens._ID);
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("each element in the transaction must have an " + Tokens._ID + " key");
         }
 
-        String elementType = elementAsJson.optString(Tokens._TYPE);
+        final String elementType = elementAsJson.optString(Tokens._TYPE);
 
         if (elementType == null) {
             throw new IllegalArgumentException("each element in the transaction must have an " + Tokens._TYPE + " key");
@@ -332,7 +333,7 @@ public class BatchExtension extends AbstractRexsterExtension {
             throw new IllegalArgumentException("the " + Tokens._TYPE + " element in the transaction must be either " + Tokens.VERTEX + " or " + Tokens.EDGE);
         }
 
-        JSONArray keysToDelete = elementAsJson.optJSONArray("_keys");
+        final JSONArray keysToDelete = elementAsJson.optJSONArray("_keys");
 
         Element graphElementDeleted = null;
         if (elementType.equals(Tokens.VERTEX)) {

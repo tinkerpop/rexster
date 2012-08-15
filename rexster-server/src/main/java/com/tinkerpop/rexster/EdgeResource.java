@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceConfigurationError;
+import java.util.Set;
 
 /**
  * Resource for edges.
@@ -93,7 +95,8 @@ public class EdgeResource extends AbstractSubResource {
         final JSONObject theRequestObject = this.getRequestObject();
         final Long start = RequestObjectHelper.getStartOffset(theRequestObject);
         final Long end = RequestObjectHelper.getEndOffset(theRequestObject);
-        final List<String> returnKeys = RequestObjectHelper.getReturnKeys(this.getRequestObject());
+        final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
+        final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(this.getRequestObject());
 
         String key = null;
         Object value = null;
@@ -116,7 +119,7 @@ public class EdgeResource extends AbstractSubResource {
             for (Edge edge : edges) {
                 if (counter >= start && counter < end) {
                     wasInSection = true;
-                    edgeArray.put(GraphSONUtility.jsonFromElement(edge, returnKeys, showTypes));
+                    edgeArray.put(GraphSONUtility.jsonFromElement(edge, returnKeys, mode));
                 } else if (wasInSection) {
                     break;
                 }
@@ -170,19 +173,20 @@ public class EdgeResource extends AbstractSubResource {
     }
 
     private Response getSingleEdge(String graphName, String id, boolean showTypes, boolean showHypermedia) {
-        final Edge edge = this.getRexsterApplicationGraph(graphName).getGraph().getEdge(id);
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        final Edge edge = rag.getGraph().getEdge(id);
 
         if (null != edge) {
             try {
-                JSONObject theRequestObject = this.getRequestObject();
-                List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+                final JSONObject theRequestObject = this.getRequestObject();
+                final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
+                final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
-                this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(edge, returnKeys, showTypes));
+                this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(edge, returnKeys, mode));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
                 if (showHypermedia) {
-                    RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
-                    JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE, this.getUriPath());
+                    final JSONArray extensionsList = rag.getExtensionHypermedia(ExtensionPoint.EDGE, this.getUriPath());
                     if (extensionsList != null) {
                         this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                     }
@@ -530,8 +534,9 @@ public class EdgeResource extends AbstractSubResource {
                         }
                     }
 
-                    final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
-                    final JSONObject elementJson = GraphSONUtility.jsonFromElement(edge, returnKeys, showTypes);
+                    final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
+                    final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+                    final JSONObject elementJson = GraphSONUtility.jsonFromElement(edge, returnKeys, mode);
 
                     rag.tryStopTransactionSuccess();
 
@@ -648,7 +653,8 @@ public class EdgeResource extends AbstractSubResource {
             }});
 
             final JSONObject theRequestObject = this.getRequestObject();
-            final List<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+            final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
+            final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
             final Iterator keys = theRequestObject.keys();
             while (keys.hasNext()) {
@@ -658,7 +664,7 @@ public class EdgeResource extends AbstractSubResource {
                 }
             }
 
-            final JSONObject elementJson = GraphSONUtility.jsonFromElement(edge, returnKeys, showTypes);
+            final JSONObject elementJson = GraphSONUtility.jsonFromElement(edge, returnKeys, mode);
 
             rag.tryStopTransactionSuccess();
 

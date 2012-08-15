@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.extension;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.Tokens;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @ExtensionNaming(namespace = GremlinExtension.EXTENSION_NAMESPACE, name = GremlinExtension.EXTENSION_NAME)
 public class GremlinExtension extends AbstractRexsterExtension {
@@ -173,8 +175,10 @@ public class GremlinExtension extends AbstractRexsterExtension {
         final long offsetStart = RequestObjectHelper.getStartOffset(requestObject);
         final long offsetEnd = RequestObjectHelper.getEndOffset(requestObject);
 
+        final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
+
         // read the return keys from the request object
-        final List<String> returnKeys = RequestObjectHelper.getReturnKeys(requestObject, WILDCARD);
+        final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(requestObject, WILDCARD);
 
         final String languageToExecuteWith = getLanguageToExecuteWith(requestObject);
 
@@ -236,7 +240,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
                 result = engineHolder.getEngine().eval(script, bindings);
             }
 
-            JSONArray results = new JSONResultConverter(showTypes, offsetStart, offsetEnd, returnKeys).convert(result);
+            JSONArray results = new JSONResultConverter(mode, offsetStart, offsetEnd, returnKeys).convert(result);
 
             HashMap<String, Object> resultMap = new HashMap<String, Object>();
             resultMap.put(Tokens.SUCCESS, true);

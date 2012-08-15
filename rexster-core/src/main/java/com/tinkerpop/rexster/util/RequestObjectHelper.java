@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.util;
 
 import com.tinkerpop.blueprints.Query;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
@@ -42,7 +43,7 @@ public class RequestObjectHelper {
      * @param requestObject the request object
      * @return the return keys
      */
-    public static List<String> getReturnKeys(final JSONObject requestObject) {
+    public static Set<String> getReturnKeys(final JSONObject requestObject) {
         return getReturnKeys(requestObject, Tokens.WILDCARD);
     }
 
@@ -53,7 +54,7 @@ public class RequestObjectHelper {
      * @param wildcard      a value that represents the specification of all keys
      * @return the return keys
      */
-    public static List<String> getReturnKeys(final JSONObject requestObject, final String wildcard) {
+    public static Set<String> getReturnKeys(final JSONObject requestObject, final String wildcard) {
 
         final JSONObject rexsterRequestObject = getRexsterRequest(requestObject);
 
@@ -78,23 +79,20 @@ public class RequestObjectHelper {
      * @param wildcard    a value that represents the specification of all keys
      * @return the return keys
      */
-    public static List<String> getReturnKeys(final JSONArray arrayOfKeys, final String wildcard) {
-        List<String> returnKeys = null;
+    public static Set<String> getReturnKeys(final JSONArray arrayOfKeys, final String wildcard) {
+        Set<String> returnKeys = null;
         if (arrayOfKeys != null) {
-            returnKeys = new ArrayList<String>();
+            returnKeys = new HashSet<String>();
 
-            if (arrayOfKeys != null) {
-                for (int ix = 0; ix < arrayOfKeys.length(); ix++) {
-                    returnKeys.add(arrayOfKeys.optString(ix));
-                }
-            } else {
-                returnKeys = null;
+            for (int ix = 0; ix < arrayOfKeys.length(); ix++) {
+                returnKeys.add(arrayOfKeys.optString(ix));
             }
 
-            if (returnKeys != null && returnKeys.size() == 1
-                    && returnKeys.get(0).equals(wildcard)) {
+            if (returnKeys.size() == 1 && returnKeys.contains(wildcard)) {
                 returnKeys = null;
             }
+        } else {
+            returnKeys = null;
         }
 
         return returnKeys;
