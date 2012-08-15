@@ -17,26 +17,30 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Basic class for sending and receiving messages via RexPro.
+ */
 final class RexPro {
 
     public static final int DEFAULT_TIMEOUT_SECONDS = 100;
 
-    public static RexProMessage sendMessage(String rexProHost, int rexProPort, RexProMessage messageToSend) {
+    public static RexProMessage sendMessage(final String rexProHost, final int rexProPort, final RexProMessage messageToSend) {
         return sendMessage(rexProHost, rexProPort, messageToSend, DEFAULT_TIMEOUT_SECONDS);
     }
 
-    public static RexProMessage sendMessage(String rexProHost, int rexProPort, RexProMessage messageToSend, int timeoutSeconds) {
+    public static RexProMessage sendMessage(final String rexProHost, final int rexProPort,
+                                            final RexProMessage messageToSend, final int timeoutSeconds) {
         final FutureImpl<RexProMessage> sessionMessageFuture = SafeFutureImpl.create();
 
         Connection connection = null;
-        TCPNIOTransport transport = getTransport(sessionMessageFuture);
+        final TCPNIOTransport transport = getTransport(sessionMessageFuture);
 
         try {
             // start transport
             transport.start();
 
             // Connect client to the server
-            GrizzlyFuture<Connection> future = transport.connect(rexProHost, rexProPort);
+            final GrizzlyFuture<Connection> future = transport.connect(rexProHost, rexProPort);
 
             connection = future.get(timeoutSeconds, TimeUnit.SECONDS);
 
@@ -59,9 +63,10 @@ final class RexPro {
         }
     }
 
-    public static TCPNIOTransport getTransport(FutureImpl<RexProMessage> future) {
+    public static TCPNIOTransport getTransport(final FutureImpl<RexProMessage> future) {
         // Create a FilterChain using FilterChainBuilder
-        FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
+        final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
+
         // Add TransportFilter, which is responsible
         // for reading and writing data to the connection
         filterChainBuilder.add(new TransportFilter());
@@ -79,7 +84,7 @@ final class RexPro {
     private static final class CustomClientFilter extends BaseFilter {
         private final FutureImpl<RexProMessage> resultFuture;
 
-        public CustomClientFilter(FutureImpl<RexProMessage> resultFuture) {
+        public CustomClientFilter(final FutureImpl<RexProMessage> resultFuture) {
             this.resultFuture = resultFuture;
         }
 
