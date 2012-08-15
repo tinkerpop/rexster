@@ -54,7 +54,7 @@ public class ScriptFilter extends BaseFilter {
 
                 final MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
                 msgPackScriptResponseMessage.Flag = MsgPackScriptResponseMessage.FLAG_COMPLETE_MESSAGE;
-                msgPackScriptResponseMessage.Session = SessionRequestMessage.EMPTY_SESSION_BYTES;
+                msgPackScriptResponseMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
                 msgPackScriptResponseMessage.Request = specificMessage.Request;
                 msgPackScriptResponseMessage.Results = MsgPackScriptResponseMessage.convertResultToBytes(result);
 

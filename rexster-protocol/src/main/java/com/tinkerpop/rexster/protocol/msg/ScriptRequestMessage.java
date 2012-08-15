@@ -7,6 +7,9 @@ import org.msgpack.annotation.Message;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+/**
+ * Represents a request to process a script.
+ */
 @Message
 public class ScriptRequestMessage extends RexProMessage {
     public static final byte FLAG_IN_SESSION = 0;

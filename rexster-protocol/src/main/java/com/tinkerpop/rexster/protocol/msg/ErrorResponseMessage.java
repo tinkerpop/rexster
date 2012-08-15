@@ -2,6 +2,9 @@ package com.tinkerpop.rexster.protocol.msg;
 
 import org.msgpack.annotation.Message;
 
+/**
+ * Represents an Error message.
+ */
 @Message
 public class ErrorResponseMessage extends RexProMessage {
     public static final byte FLAG_ERROR_MESSAGE_VALIDATION = (byte) 0;

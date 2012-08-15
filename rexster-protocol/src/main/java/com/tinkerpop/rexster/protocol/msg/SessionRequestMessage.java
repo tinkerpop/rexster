@@ -2,6 +2,9 @@ package com.tinkerpop.rexster.protocol.msg;
 
 import org.msgpack.annotation.Message;
 
+/**
+ * Represents a request to open or close a session.
+ */
 @Message
 public class SessionRequestMessage extends RexProMessage {
     public static final int DEFAULT_CHUNK_SIZE = 8192;

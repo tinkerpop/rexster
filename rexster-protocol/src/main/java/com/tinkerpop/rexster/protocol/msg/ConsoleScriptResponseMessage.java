@@ -12,6 +12,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a response to a script request for use in a console where each results is serialized to a
+ * string value in an array of strings.
+ */
 @Message
 public class ConsoleScriptResponseMessage extends RexProMessage {
     public static final byte FLAG_COMPLETE_MESSAGE = 0;

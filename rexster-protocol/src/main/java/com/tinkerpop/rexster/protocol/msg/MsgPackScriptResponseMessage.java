@@ -3,6 +3,9 @@ package com.tinkerpop.rexster.protocol.msg;
 import com.tinkerpop.rexster.gremlin.converter.MsgPackResultConverter;
 import org.msgpack.annotation.Message;
 
+/**
+ * Represents a response to a script request that formats results to MsgPack format.
+ */
 @Message
 public class MsgPackScriptResponseMessage extends RexProMessage {
     private static final MsgPackResultConverter converter = new MsgPackResultConverter();
