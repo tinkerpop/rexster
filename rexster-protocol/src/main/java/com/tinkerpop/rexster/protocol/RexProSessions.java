@@ -18,7 +18,7 @@ public class RexProSessions {
 
     public static void destroySession(final String sessionKey) {
         sessions.remove(sessionKey);
-        logger.info("RexPro Session destroyed: " + sessionKey);
+        logger.info(String.format("RexPro Session destroyed: %s", sessionKey));
     }
 
     public static void destroyAllSessions() {
@@ -43,7 +43,7 @@ public class RexProSessions {
             final RexProSession session = new RexProSession(sessionKey, rexsterApplication, sessionChannel, chunkSize);
             sessions.put(sessionKey, session);
 
-            logger.info("RexPro Session created: " + sessionKey);
+            logger.info(String.format("RexPro Session created: %s", sessionKey));
         }
     }
 
