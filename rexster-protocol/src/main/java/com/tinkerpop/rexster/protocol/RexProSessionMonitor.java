@@ -4,6 +4,8 @@ import java.util.Collection;
 
 /**
  * Monitors RexPro sessions and cleans up ones that have been idle.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RexProSessionMonitor extends Thread {
     private static final long MIN_UPDATE_INTERVAL = 1000;

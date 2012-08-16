@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol.filter;
 
+import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.RexProSessions;
@@ -29,7 +30,7 @@ public class SessionFilter extends BaseFilter {
         final RexProMessage message = ctx.getMessage();
 
         // shortcut all the session stuff
-        if (message instanceof ScriptRequestMessage && message.Flag == ScriptRequestMessage.FLAG_NO_SESSION)  {
+        if (message instanceof ScriptRequestMessage && message.Flag == MessageFlag.SCRIPT_REQUEST_NO_SESSION)  {
             return ctx.getInvokeAction();
         }
 
@@ -37,7 +38,7 @@ public class SessionFilter extends BaseFilter {
         if (message instanceof SessionRequestMessage) {
             SessionRequestMessage specificMessage = (SessionRequestMessage) message;
 
-            if (specificMessage.Flag == SessionRequestMessage.FLAG_NEW_SESSION) {
+            if (specificMessage.Flag == MessageFlag.SESSION_REQUEST_NEW_SESSION) {
                 UUID sessionKey = UUID.randomUUID();
 
                 // construct a session with the right channel
@@ -60,7 +61,7 @@ public class SessionFilter extends BaseFilter {
 
                 ctx.write(responseMessage);
 
-            } else if (specificMessage.Flag == SessionRequestMessage.FLAG_KILL_SESSION) {
+            } else if (specificMessage.Flag == MessageFlag.SESSION_REQUEST_KILL_SESSION) {
                 RexProSessions.destroySession(specificMessage.sessionAsUUID().toString());
                 SessionResponseMessage responseMessage = new SessionResponseMessage();
                 responseMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
@@ -75,7 +76,7 @@ public class SessionFilter extends BaseFilter {
                 errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
                 errorMessage.Request = specificMessage.Request;
                 errorMessage.ErrorMessage = "The message has an invalid flag.";
-                errorMessage.Flag = ErrorResponseMessage.FLAG_ERROR_MESSAGE_VALIDATION;
+                errorMessage.Flag = MessageFlag.ERROR_MESSAGE_VALIDATION;
 
                 ctx.write(errorMessage);
             }
@@ -90,7 +91,7 @@ public class SessionFilter extends BaseFilter {
             errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
             errorMessage.Request = message.Request;
             errorMessage.ErrorMessage = "The message does not specify a session.";
-            errorMessage.Flag = ErrorResponseMessage.FLAG_ERROR_MESSAGE_VALIDATION;
+            errorMessage.Flag = MessageFlag.ERROR_MESSAGE_VALIDATION;
 
             ctx.write(errorMessage);
 
@@ -103,7 +104,7 @@ public class SessionFilter extends BaseFilter {
             errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
             errorMessage.Request = message.Request;
             errorMessage.ErrorMessage = "The session on the request does not exist or has otherwise expired.";
-            errorMessage.Flag = ErrorResponseMessage.FLAG_ERROR_INVALID_SESSION;
+            errorMessage.Flag = MessageFlag.ERROR_INVALID_SESSION;
 
             ctx.write(errorMessage);
 

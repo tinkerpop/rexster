@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol.filter;
 
+import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.EngineController;
@@ -45,7 +46,7 @@ public class ScriptFilter extends BaseFilter {
         // check message type to be ScriptRequestMessage
 
         // short cut the session stuff
-        if (message.Flag == ScriptRequestMessage.FLAG_NO_SESSION) {
+        if (message.Flag == MessageFlag.SCRIPT_REQUEST_NO_SESSION) {
             final ScriptRequestMessage specificMessage = (ScriptRequestMessage) message;
 
             try {
@@ -53,7 +54,7 @@ public class ScriptFilter extends BaseFilter {
                 final Object result = engineHolder.getEngine().eval(specificMessage.Script, bindings);
 
                 final MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
-                msgPackScriptResponseMessage.Flag = MsgPackScriptResponseMessage.FLAG_COMPLETE_MESSAGE;
+                msgPackScriptResponseMessage.Flag = MessageFlag.SCRIPT_RESPONSE_COMPLETE_MESSAGE;
                 msgPackScriptResponseMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
                 msgPackScriptResponseMessage.Request = specificMessage.Request;
                 msgPackScriptResponseMessage.Results = MsgPackScriptResponseMessage.convertResultToBytes(result);
@@ -71,7 +72,7 @@ public class ScriptFilter extends BaseFilter {
         }
 
         // below here is all session related requests
-        if (message.Flag == ScriptRequestMessage.FLAG_IN_SESSION) {
+        if (message.Flag == MessageFlag.SCRIPT_REQUEST_IN_SESSION) {
             final ScriptRequestMessage specificMessage = (ScriptRequestMessage) message;
             final RexProSession session = RexProSessions.getSession(specificMessage.sessionAsUUID().toString());
 
@@ -81,7 +82,7 @@ public class ScriptFilter extends BaseFilter {
                 if (session.getChannel() == SessionRequestMessage.CHANNEL_CONSOLE) {
                     final ConsoleScriptResponseMessage consoleScriptResponseMessage = new ConsoleScriptResponseMessage();
                     consoleScriptResponseMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToByteArray(session.getBindings());
-                    consoleScriptResponseMessage.Flag = ConsoleScriptResponseMessage.FLAG_COMPLETE_MESSAGE;
+                    consoleScriptResponseMessage.Flag = MessageFlag.SCRIPT_RESPONSE_COMPLETE_MESSAGE;
                     consoleScriptResponseMessage.Session = specificMessage.Session;
                     consoleScriptResponseMessage.Request = specificMessage.Request;
 
@@ -92,7 +93,7 @@ public class ScriptFilter extends BaseFilter {
                     ctx.write(consoleScriptResponseMessage);
                 } else if (session.getChannel() == SessionRequestMessage.CHANNEL_MSGPACK) {
                     final MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
-                    msgPackScriptResponseMessage.Flag = MsgPackScriptResponseMessage.FLAG_COMPLETE_MESSAGE;
+                    msgPackScriptResponseMessage.Flag = MessageFlag.SCRIPT_RESPONSE_COMPLETE_MESSAGE;
                     msgPackScriptResponseMessage.Session = specificMessage.Session;
                     msgPackScriptResponseMessage.Request = specificMessage.Request;
                     msgPackScriptResponseMessage.Results = MsgPackScriptResponseMessage.convertResultToBytes(result);
@@ -111,7 +112,7 @@ public class ScriptFilter extends BaseFilter {
                 errorMessage.Request = message.Request;
                 errorMessage.ErrorMessage = "An error occurred while processing the script for language ["
                         + specificMessage.LanguageName + "]: " + se.getMessage();
-                errorMessage.Flag = ErrorResponseMessage.FLAG_ERROR_SCRIPT_FAILURE;
+                errorMessage.Flag = MessageFlag.ERROR_SCRIPT_FAILURE;
 
                 ctx.write(errorMessage);
 

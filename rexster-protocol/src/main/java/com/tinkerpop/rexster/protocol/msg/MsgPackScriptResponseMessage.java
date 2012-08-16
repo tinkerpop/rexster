@@ -5,11 +5,13 @@ import org.msgpack.annotation.Message;
 
 /**
  * Represents a response to a script request that formats results to MsgPack format.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 @Message
 public class MsgPackScriptResponseMessage extends RexProMessage {
     private static final MsgPackResultConverter converter = new MsgPackResultConverter();
-    public static final byte FLAG_COMPLETE_MESSAGE = 0;
+
     public byte[] Results;
     public byte[] Bindings;
 

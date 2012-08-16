@@ -9,12 +9,11 @@ import java.nio.ByteBuffer;
 
 /**
  * Represents a request to process a script.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 @Message
 public class ScriptRequestMessage extends RexProMessage {
-    public static final byte FLAG_IN_SESSION = 0;
-    public static final byte FLAG_NO_SESSION = 1;
-
     public String LanguageName;
     public String Script;
     public byte[] Bindings;

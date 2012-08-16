@@ -6,6 +6,8 @@ import java.util.UUID;
 
 /**
  * A basic RexProMessage containing the basic components of every message that Rexster can process.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RexProMessage {
 

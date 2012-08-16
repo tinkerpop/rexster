@@ -15,10 +15,11 @@ import java.util.List;
 /**
  * Represents a response to a script request for use in a console where each results is serialized to a
  * string value in an array of strings.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 @Message
 public class ConsoleScriptResponseMessage extends RexProMessage {
-    public static final byte FLAG_COMPLETE_MESSAGE = 0;
 
     public String[] ConsoleLines;
     public byte[] Bindings;

@@ -9,6 +9,7 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -89,7 +90,7 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
         if (message instanceof SessionRequestMessage && !message.hasSession()) {
             final SessionRequestMessage specificMessage = (SessionRequestMessage) message;
 
-            if (specificMessage.Flag == SessionRequestMessage.FLAG_NEW_SESSION) {
+            if (specificMessage.Flag == MessageFlag.SESSION_REQUEST_NEW_SESSION) {
                 final String username = specificMessage.Username;
                 final String password = specificMessage.Password;
                 if (!authenticate(username, password)) {
@@ -98,7 +99,7 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
                     errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
                     errorMessage.Request = specificMessage.Request;
                     errorMessage.ErrorMessage = "Invalid username or password.";
-                    errorMessage.Flag = ErrorResponseMessage.FLAG_ERROR_AUTHENTICATION_FAILURE;
+                    errorMessage.Flag = MessageFlag.ERROR_AUTHENTICATION_FAILURE;
 
                     ctx.write(errorMessage);
 

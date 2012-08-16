@@ -7,6 +7,8 @@ import javax.script.ScriptEngineFactory;
  * Holder class for different script engines.  It keeps track of the number of scripts that have been
  * evaluated against it and re-instantiates it to clear memory that it may hang on to.  This is an
  * issue that is prevalent in gremlin-groovy.  Unsure if it carries over to other implementations.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class EngineHolder {
 

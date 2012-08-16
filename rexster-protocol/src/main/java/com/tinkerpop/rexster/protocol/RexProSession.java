@@ -10,6 +10,8 @@ import java.util.Date;
 
 /**
  * Server-side rexster session.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RexProSession {
 

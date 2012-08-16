@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
+import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
@@ -11,6 +12,8 @@ import java.util.UUID;
 
 /**
  * Client-side session with Rexster.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RemoteRexsterSession {
 
@@ -49,7 +52,7 @@ public class RemoteRexsterSession {
             sessionRequestMessageToSend.Password = this.password;
             sessionRequestMessageToSend.setSessionAsUUID(SessionRequestMessage.EMPTY_SESSION);
             sessionRequestMessageToSend.Channel = channel;
-            sessionRequestMessageToSend.Flag = SessionRequestMessage.FLAG_NEW_SESSION;
+            sessionRequestMessageToSend.Flag = MessageFlag.SESSION_REQUEST_NEW_SESSION;
             sessionRequestMessageToSend.setRequestAsUUID(UUID.randomUUID());
 
             final RexProMessage rcvMessage = sendRequest(sessionRequestMessageToSend, 3);
@@ -143,7 +146,7 @@ public class RemoteRexsterSession {
         try {
             if (sessionKey != RexProMessage.EMPTY_SESSION) {
                 SessionRequestMessage sessionKillMessageToSend = new SessionRequestMessage();
-                sessionKillMessageToSend.Flag = SessionRequestMessage.FLAG_KILL_SESSION;
+                sessionKillMessageToSend.Flag = MessageFlag.SESSION_REQUEST_KILL_SESSION;
                 sessionKillMessageToSend.setRequestAsUUID(UUID.randomUUID());
 
                 // need to set the session here so that the server knows which one to delete.

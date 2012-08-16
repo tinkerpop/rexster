@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import org.msgpack.MessagePack;
@@ -100,7 +101,7 @@ public class TryRexProSessionless {
         scriptMessage.Script = script;
         scriptMessage.Bindings = emptyBindings;
         scriptMessage.LanguageName = "groovy";
-        scriptMessage.Flag = ScriptRequestMessage.FLAG_NO_SESSION;
+        scriptMessage.Flag = MessageFlag.SCRIPT_REQUEST_NO_SESSION;
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
         return scriptMessage;
     }

@@ -19,6 +19,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Basic class for sending and receiving messages via RexPro.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 final class RexPro {
 

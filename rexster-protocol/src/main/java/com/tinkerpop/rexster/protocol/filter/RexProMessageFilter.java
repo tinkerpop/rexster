@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.protocol.filter;
 import com.tinkerpop.rexster.protocol.RexProSession;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.MessageType;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
@@ -90,7 +91,7 @@ public class RexProMessageFilter extends BaseFilter {
             errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
             errorMessage.Request = new byte[0];
             errorMessage.ErrorMessage = "Message did not match an expected type.";
-            errorMessage.Flag = ErrorResponseMessage.FLAG_ERROR_MESSAGE_VALIDATION;
+            errorMessage.Flag = MessageFlag.ERROR_MESSAGE_VALIDATION;
 
             ctx.write(errorMessage);
         }

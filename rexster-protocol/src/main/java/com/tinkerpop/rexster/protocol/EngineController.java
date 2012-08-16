@@ -11,6 +11,8 @@ import java.util.Map;
 
 /**
  * Manages the list of EngineHolder items for the current ScriptEngineManager.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class EngineController {
     private final ScriptEngineManager manager = new ScriptEngineManager();
