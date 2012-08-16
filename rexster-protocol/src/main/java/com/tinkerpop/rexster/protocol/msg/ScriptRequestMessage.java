@@ -19,9 +19,9 @@ public class ScriptRequestMessage extends RexProMessage {
     public byte[] Bindings;
 
     public RexsterBindings getBindings() throws IOException, ClassNotFoundException {
-        ByteBuffer buffer = ByteBuffer.wrap(this.Bindings);
+        final ByteBuffer buffer = ByteBuffer.wrap(this.Bindings);
 
-        byte[] theRest = new byte[buffer.remaining()];
+        final byte[] theRest = new byte[buffer.remaining()];
         buffer.get(theRest);
         return BitWorks.convertByteArrayToRexsterBindings(theRest);
     }

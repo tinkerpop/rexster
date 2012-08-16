@@ -34,13 +34,13 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
     }
 
     public List<String> BindingsAsList() {
-        List<String> bindings = new ArrayList<String>();
+        final List<String> bindings = new ArrayList<String>();
 
-        ByteBuffer bb = ByteBuffer.wrap(this.Bindings);
+        final ByteBuffer bb = ByteBuffer.wrap(this.Bindings);
 
         while (bb.hasRemaining()) {
-            int segmentLength = bb.getInt();
-            byte[] segmentBytes = new byte[segmentLength];
+            final int segmentLength = bb.getInt();
+            final byte[] segmentBytes = new byte[segmentLength];
             bb.get(segmentBytes);
 
             bindings.add(new String(segmentBytes));
@@ -49,7 +49,7 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
         return bindings;
     }
 
-    public static byte[] convertBindingsToByteArray(Bindings bindings) throws IOException {
+    public static byte[] convertBindingsToByteArray(final Bindings bindings) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         for (String key : bindings.keySet()) {
@@ -60,8 +60,8 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
         return baos.toByteArray();
     }
 
-    public static List<String> convertResultToConsoleLines(Object result) throws Exception {
-        ConsoleResultConverter converter = new ConsoleResultConverter(new StringWriter());
+    public static List<String> convertResultToConsoleLines(final Object result) throws Exception {
+        final ConsoleResultConverter converter = new ConsoleResultConverter(new StringWriter());
         return converter.convert(result);
     }
 }
