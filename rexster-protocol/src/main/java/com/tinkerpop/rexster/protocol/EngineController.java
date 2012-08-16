@@ -4,6 +4,7 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -52,13 +53,13 @@ public class EngineController {
         return engineController;
     }
 
-    public Iterator getAvailableEngineLanguages() {
+    public List<String> getAvailableEngineLanguages() {
         final List<String> languages = new ArrayList<String>();
         for (String fullLanguageName : this.engines.keySet()) {
             languages.add(fullLanguageName.substring(fullLanguageName.indexOf(ENGINE_NAME_PREFIX) + ENGINE_NAME_PREFIX.length()));
         }
 
-        return languages.iterator();
+        return Collections.unmodifiableList(languages);
     }
 
     public boolean isEngineAvailable(final String languageName) {

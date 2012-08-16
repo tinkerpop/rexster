@@ -23,6 +23,11 @@ import javax.script.SimpleBindings;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Processes a ScriptRequestMessage against the script engine for the channel.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public class ScriptFilter extends BaseFilter {
     private static final Logger logger = Logger.getLogger(ScriptFilter.class);
 

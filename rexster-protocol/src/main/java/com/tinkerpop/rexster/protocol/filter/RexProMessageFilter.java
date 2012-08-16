@@ -27,8 +27,13 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Handles incoming/outgoing RexProMessage instances.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public class RexProMessageFilter extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(RexProSession.class);
+    private static final Logger logger = Logger.getLogger(RexProMessageFilter.class);
     private static final MessagePack msgpack = new MessagePack();
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
