@@ -303,75 +303,127 @@ public abstract class AbstractSubResource extends BaseResource {
                     } else if (parameterTypes[ix].equals(Integer.class)) {
                         if (this.getRequestObject().has(extensionRequestParameter.name())) {
                             if (extensionRequestParameter.parseToJson()) {
-                                int intValue = this.getRequestObject().optInt(extensionRequestParameter.name(), Integer.parseInt(defaultValue));
+                                int intValue = this.getRequestObject().optInt(extensionRequestParameter.name());
                                 methodToCallParams.add(new Integer(intValue));
                             } else {
-                                int intValue = this.getRequestObjectFlat().optInt(extensionRequestParameter.name(), Integer.parseInt(defaultValue));
+                                int intValue = this.getRequestObjectFlat().optInt(extensionRequestParameter.name());
                                 methodToCallParams.add(new Integer(intValue));
                             }
                         } else {
-                            methodToCallParams.add(null);
+                            if (defaultValue != null) {
+                                methodToCallParams.add(new Integer(Integer.parseInt(defaultValue)));
+                            } else {
+                                methodToCallParams.add(null);
+                            }
                         }
                     } else if (parameterTypes[ix].equals(Float.class)) {
                         if (this.getRequestObject().has(extensionRequestParameter.name())) {
                             if (extensionRequestParameter.parseToJson()) {
-                                float floatValue = (float) this.getRequestObject().optDouble(extensionRequestParameter.name(), Float.parseFloat(defaultValue));
+                                float floatValue = (float) this.getRequestObject().optDouble(extensionRequestParameter.name());
                                 methodToCallParams.add(new Float(floatValue));
                             } else {
-                                float floatValue = (float) this.getRequestObjectFlat().optDouble(extensionRequestParameter.name(), Float.parseFloat(defaultValue));
+                                float floatValue = (float) this.getRequestObjectFlat().optDouble(extensionRequestParameter.name());
                                 methodToCallParams.add(new Float(floatValue));
                             }
                         } else {
-                            methodToCallParams.add(null);
+                            if (defaultValue != null) {
+                                methodToCallParams.add(new Float(Float.parseFloat(defaultValue)));
+                            } else {
+                                methodToCallParams.add(null);
+                            }
                         }
                     } else if (parameterTypes[ix].equals(Double.class)) {
                         if (this.getRequestObject().has(extensionRequestParameter.name())) {
                             if (extensionRequestParameter.parseToJson()) {
-                                double doubleValue = this.getRequestObject().optDouble(extensionRequestParameter.name(), Double.parseDouble(defaultValue));
+                                double doubleValue = this.getRequestObject().optDouble(extensionRequestParameter.name());
                                 methodToCallParams.add(new Double(doubleValue));
                             } else {
-                                double doubleValue = this.getRequestObjectFlat().optDouble(extensionRequestParameter.name(), Double.parseDouble(defaultValue));
+                                double doubleValue = this.getRequestObjectFlat().optDouble(extensionRequestParameter.name());
                                 methodToCallParams.add(new Double(doubleValue));
                             }
                         } else {
-                            methodToCallParams.add(null);
+                            if (defaultValue != null) {
+                                methodToCallParams.add(new Double(Double.parseDouble(defaultValue)));
+                            } else {
+                                methodToCallParams.add(null);
+                            }
                         }
                     } else if (parameterTypes[ix].equals(Long.class)) {
                         if (this.getRequestObject().has(extensionRequestParameter.name())) {
                             if (extensionRequestParameter.parseToJson()) {
-                                long longValue = this.getRequestObject().optLong(extensionRequestParameter.name(), Long.parseLong(defaultValue));
+                                long longValue = this.getRequestObject().optLong(extensionRequestParameter.name());
                                 methodToCallParams.add(new Long(longValue));
                             } else {
-                                long longValue = this.getRequestObjectFlat().optLong(extensionRequestParameter.name(), Long.parseLong(defaultValue));
+                                long longValue = this.getRequestObjectFlat().optLong(extensionRequestParameter.name());
                                 methodToCallParams.add(new Long(longValue));
                             }
                         } else {
-                            methodToCallParams.add(null);
+                            if (defaultValue != null) {
+                                methodToCallParams.add(new Long(Long.parseLong(defaultValue)));
+                            } else {
+                                methodToCallParams.add(null);
+                            }
                         }
                     } else if (parameterTypes[ix].equals(Boolean.class)) {
                         if (this.getRequestObject().has(extensionRequestParameter.name())) {
                             if (extensionRequestParameter.parseToJson()) {
-                                boolean booleanValue = this.getRequestObject().optBoolean(extensionRequestParameter.name(), Boolean.parseBoolean(defaultValue));
+                                boolean booleanValue = this.getRequestObject().optBoolean(extensionRequestParameter.name());
                                 methodToCallParams.add(new Boolean(booleanValue));
                             } else {
-                                boolean booleanValue = this.getRequestObjectFlat().optBoolean(extensionRequestParameter.name(), Boolean.parseBoolean(defaultValue));
+                                boolean booleanValue = this.getRequestObjectFlat().optBoolean(extensionRequestParameter.name());
                                 methodToCallParams.add(new Boolean(booleanValue));
                             }
                         } else {
-                            methodToCallParams.add(null);
+                            if (defaultValue != null) {
+                                methodToCallParams.add(new Boolean(Boolean.parseBoolean(defaultValue)));
+                            } else {
+                                methodToCallParams.add(null);
+                            }
                         }
                     } else if (parameterTypes[ix].equals(JSONObject.class)) {
+                        JSONObject jsonToUse;
+
                         if (extensionRequestParameter.parseToJson()) {
-                            methodToCallParams.add(this.getRequestObject().optJSONObject(extensionRequestParameter.name()));
+                            jsonToUse = this.getRequestObject().optJSONObject(extensionRequestParameter.name());
                         } else {
-                            methodToCallParams.add(this.getRequestObjectFlat().optJSONObject(extensionRequestParameter.name()));
+                            jsonToUse = this.getRequestObjectFlat().optJSONObject(extensionRequestParameter.name());
                         }
+
+                        if (jsonToUse == null && defaultValue != null) {
+                            // there is no request json, try to use the default
+                            try {
+                                jsonToUse = new JSONObject(defaultValue);
+                            } catch (JSONException jse) {
+                                logger.error(String.format("Could not parse default JSON value for %s on %s: %s",
+                                        extensionRequestParameter.name(), methodToCall.getExtensionDefinition().path(),
+                                        defaultValue));
+                                throw new RuntimeException("Extension error. See log for details.");
+                            }
+                        }
+
+                        methodToCallParams.add(jsonToUse);
                     } else if (parameterTypes[ix].equals(JSONArray.class)) {
+                        JSONArray jsonToUse;
+
                         if (extensionRequestParameter.parseToJson()) {
-                            methodToCallParams.add(this.getRequestObject().optJSONArray(extensionRequestParameter.name()));
+                            jsonToUse = this.getRequestObject().optJSONArray(extensionRequestParameter.name());
                         } else {
-                            methodToCallParams.add(this.getRequestObjectFlat().optJSONArray(extensionRequestParameter.name()));
+                            jsonToUse = this.getRequestObjectFlat().optJSONArray(extensionRequestParameter.name());
                         }
+
+                        if (jsonToUse == null && defaultValue != null) {
+                            // there is no request json, try to use the default
+                            try {
+                                jsonToUse = new JSONArray(defaultValue);
+                            } catch (JSONException jse) {
+                                logger.error(String.format("Could not parse default JSON value for %s on %s: %s",
+                                        extensionRequestParameter.name(), methodToCall.getExtensionDefinition().path(),
+                                        defaultValue));
+                                throw new RuntimeException("Extension error. See log for details.");
+                            }
+                        }
+
+                        methodToCallParams.add(jsonToUse);
                     } else {
                         // don't know what it is so just push a null
                         methodToCallParams.add(null);
