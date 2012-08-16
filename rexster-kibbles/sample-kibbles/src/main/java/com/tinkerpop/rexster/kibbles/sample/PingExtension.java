@@ -36,7 +36,7 @@ public class PingExtension extends AbstractSampleExtension {
     @ExtensionDescriptor(description = "a simple ping extension.")
     public ExtensionResponse evaluatePing(@RexsterContext RexsterResourceContext context,
                                           @RexsterContext Graph graph,
-                                          @ExtensionRequestParameter(name = "reply", description = "a value to reply with") String reply) {
+                                          @ExtensionRequestParameter(name = "reply", defaultValue = "pong (default)", description = "a value to reply with") String reply) {
         if (reply == null || reply.isEmpty()) {
             ExtensionMethod extMethod = context.getExtensionMethod();
             return ExtensionResponse.error(

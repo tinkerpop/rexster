@@ -17,5 +17,13 @@ public @interface ExtensionRequestParameter {
 
     String description() default "";
 
+    /**
+     * This value can only be set to primitive/string values.  Values are set as a string, but
+     * will be coerced to the type connected to this annotation.   Even though this is an array
+     * it is treated as a single value so that it can be evaluated to null. Only the first value
+     * is used if more than one is specified.
+     */
+    String[] defaultValue() default {};
+
     boolean parseToJson() default true;
 }

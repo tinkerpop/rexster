@@ -257,7 +257,7 @@ public abstract class AbstractSubResource extends BaseResource {
                 this.securityContext);
 
         final Annotation[][] parametersAnnotations = method.getParameterAnnotations();
-        final ArrayList methodToCallParams = new ArrayList();
+        final ArrayList<Object> methodToCallParams = new ArrayList<Object>();
         for (int ix = 0; ix < parametersAnnotations.length; ix++) {
             final Annotation[] annotation = parametersAnnotations[ix];
             final Class[] parameterTypes = method.getParameterTypes();
@@ -288,19 +288,25 @@ public abstract class AbstractSubResource extends BaseResource {
                     }
                 } else if (annotation[0] instanceof ExtensionRequestParameter) {
                     final ExtensionRequestParameter extensionRequestParameter = (ExtensionRequestParameter) annotation[0];
+
+                    // check if the default value is set.  if it is, then only grab the first value from it.
+                    // this is a workaround for java not allowing null defaults.
+                    final String defaultValue = extensionRequestParameter.defaultValue().length == 0 ? null
+                            : extensionRequestParameter.defaultValue()[0];
+
                     if (parameterTypes[ix].equals(String.class)) {
                         if (extensionRequestParameter.parseToJson()) {
-                            methodToCallParams.add(this.getRequestObject().optString(extensionRequestParameter.name()));
+                            methodToCallParams.add(this.getRequestObject().optString(extensionRequestParameter.name(), defaultValue));
                         } else {
-                            methodToCallParams.add(this.getRequestObjectFlat().optString(extensionRequestParameter.name()));
+                            methodToCallParams.add(this.getRequestObjectFlat().optString(extensionRequestParameter.name(), defaultValue));
                         }
                     } else if (parameterTypes[ix].equals(Integer.class)) {
                         if (this.getRequestObject().has(extensionRequestParameter.name())) {
                             if (extensionRequestParameter.parseToJson()) {
-                                int intValue = this.getRequestObject().optInt(extensionRequestParameter.name());
+                                int intValue = this.getRequestObject().optInt(extensionRequestParameter.name(), Integer.parseInt(defaultValue));
                                 methodToCallParams.add(new Integer(intValue));
                             } else {
-                                int intValue = this.getRequestObjectFlat().optInt(extensionRequestParameter.name());
+                                int intValue = this.getRequestObjectFlat().optInt(extensionRequestParameter.name(), Integer.parseInt(defaultValue));
                                 methodToCallParams.add(new Integer(intValue));
                             }
                         } else {
@@ -309,10 +315,10 @@ public abstract class AbstractSubResource extends BaseResource {
                     } else if (parameterTypes[ix].equals(Float.class)) {
                         if (this.getRequestObject().has(extensionRequestParameter.name())) {
                             if (extensionRequestParameter.parseToJson()) {
-                                float floatValue = (float) this.getRequestObject().optDouble(extensionRequestParameter.name());
+                                float floatValue = (float) this.getRequestObject().optDouble(extensionRequestParameter.name(), Float.parseFloat(defaultValue));
                                 methodToCallParams.add(new Float(floatValue));
                             } else {
-                                float floatValue = (float) this.getRequestObjectFlat().optDouble(extensionRequestParameter.name());
+                                float floatValue = (float) this.getRequestObjectFlat().optDouble(extensionRequestParameter.name(), Float.parseFloat(defaultValue));
                                 methodToCallParams.add(new Float(floatValue));
                             }
                         } else {
@@ -321,10 +327,10 @@ public abstract class AbstractSubResource extends BaseResource {
                     } else if (parameterTypes[ix].equals(Double.class)) {
                         if (this.getRequestObject().has(extensionRequestParameter.name())) {
                             if (extensionRequestParameter.parseToJson()) {
-                                double doubleValue = this.getRequestObject().optDouble(extensionRequestParameter.name());
+                                double doubleValue = this.getRequestObject().optDouble(extensionRequestParameter.name(), Double.parseDouble(defaultValue));
                                 methodToCallParams.add(new Double(doubleValue));
                             } else {
-                                double doubleValue = this.getRequestObjectFlat().optDouble(extensionRequestParameter.name());
+                                double doubleValue = this.getRequestObjectFlat().optDouble(extensionRequestParameter.name(), Double.parseDouble(defaultValue));
                                 methodToCallParams.add(new Double(doubleValue));
                             }
                         } else {
@@ -333,10 +339,10 @@ public abstract class AbstractSubResource extends BaseResource {
                     } else if (parameterTypes[ix].equals(Long.class)) {
                         if (this.getRequestObject().has(extensionRequestParameter.name())) {
                             if (extensionRequestParameter.parseToJson()) {
-                                long longValue = this.getRequestObject().optLong(extensionRequestParameter.name());
+                                long longValue = this.getRequestObject().optLong(extensionRequestParameter.name(), Long.parseLong(defaultValue));
                                 methodToCallParams.add(new Long(longValue));
                             } else {
-                                long longValue = this.getRequestObjectFlat().optLong(extensionRequestParameter.name());
+                                long longValue = this.getRequestObjectFlat().optLong(extensionRequestParameter.name(), Long.parseLong(defaultValue));
                                 methodToCallParams.add(new Long(longValue));
                             }
                         } else {
@@ -345,10 +351,10 @@ public abstract class AbstractSubResource extends BaseResource {
                     } else if (parameterTypes[ix].equals(Boolean.class)) {
                         if (this.getRequestObject().has(extensionRequestParameter.name())) {
                             if (extensionRequestParameter.parseToJson()) {
-                                boolean booleanValue = this.getRequestObject().optBoolean(extensionRequestParameter.name());
+                                boolean booleanValue = this.getRequestObject().optBoolean(extensionRequestParameter.name(), Boolean.parseBoolean(defaultValue));
                                 methodToCallParams.add(new Boolean(booleanValue));
                             } else {
-                                boolean booleanValue = this.getRequestObjectFlat().optBoolean(extensionRequestParameter.name());
+                                boolean booleanValue = this.getRequestObjectFlat().optBoolean(extensionRequestParameter.name(), Boolean.parseBoolean(defaultValue));
                                 methodToCallParams.add(new Boolean(booleanValue));
                             }
                         } else {
