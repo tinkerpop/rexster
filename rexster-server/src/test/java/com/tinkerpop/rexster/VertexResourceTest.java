@@ -1,75 +1,26 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
-import com.tinkerpop.rexster.server.DefaultRexsterApplication;
-import com.tinkerpop.rexster.server.RexsterApplication;
-import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.XMLConfiguration;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.Sequence;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Variant;
-import java.io.StringReader;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 /**
  * Tests vertex resource.  Should not need to test any specific returns values as they are
  * covered under other unit tests.  The format of the results themselves should be covered
  * under the ElementJSONObject.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class VertexResourceTest {
-
-    private Mockery mockery = new JUnit4Mockery();
-    private final String baseUri = "http://localhost/mock";
-
-    private final URI requestUriPath = URI.create("http://localhost/graphs/mock/vertices");
-
-    private static final String graphName = "graph";
-
-    private Graph toyGraph;
-    private Graph emptyGraph;
-    private RexsterApplication raToyGraph;
-    private RexsterApplication raEmptyGraph;
-
-    @Before
-    public void init() {
-        this.mockery = new JUnit4Mockery();
-
-        this.toyGraph = TinkerGraphFactory.createTinkerGraph();
-        this.raToyGraph = new DefaultRexsterApplication(graphName, this.toyGraph);
-
-        this.emptyGraph = new TinkerGraph();
-        this.raEmptyGraph = new DefaultRexsterApplication(graphName, this.emptyGraph);
-
-        final List<String> namespaces = new ArrayList<String>();
-        namespaces.add("*:*");
-        this.raToyGraph.getApplicationGraph(graphName).loadAllowableExtensions(namespaces);
-        this.raEmptyGraph.getApplicationGraph(graphName).loadAllowableExtensions(namespaces);
-    }
-
+public class VertexResourceTest extends BaseTest {
     @Test
     public void getVerticesAll() {
         final VertexResource resource = this.constructResourceWithToyGraph().getResource();
@@ -326,10 +277,10 @@ public class VertexResourceTest {
     public void postNullVertexOnUriAcceptTypedJsonValid() {
         // types are always parsed on the URI
         final HashMap<String, Object> parameters = generateVertexParametersToPost(true);
-        final ResourceHolder holder = constructResource(false, parameters,
+        final ResourceHolder<VertexResource> holder = constructResource(false, parameters,
                 RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE);
         final VertexResource resource = holder.getResource();
-        final Response response = resource.postNullVertexOnUri(holder.request, graphName);
+        final Response response = resource.postNullVertexOnUri(holder.getRequest(), graphName);
 
         assertPostVertexProducesJson(response, false, true);
     }
@@ -338,7 +289,7 @@ public class VertexResourceTest {
     public void postNullVertexRexsterConsumesJsonAcceptJsonValid() {
         final HashMap<String, Object> parameters = generateVertexParametersToPost(false);
         final JSONObject jsonToPost = new JSONObject(parameters);
-        final ResourceHolder holder = constructResource(false, parameters);
+        final ResourceHolder<VertexResource> holder = constructResource(false, parameters);
         final VertexResource resource = holder.getResource();
         final Response response = resource.postNullVertexRexsterConsumesJson(holder.getRequest(), graphName, jsonToPost);
         assertPostVertexProducesJson(response, false, false);
@@ -348,7 +299,7 @@ public class VertexResourceTest {
     public void postNullVertexRexsterConsumesTypedJsonAcceptTypedJsonValid() {
         final HashMap<String, Object> parameters = generateVertexParametersToPost(true);
         final JSONObject jsonToPost = new JSONObject(parameters);
-        final ResourceHolder holder = constructResource(false, parameters, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE);
+        final ResourceHolder<VertexResource> holder = constructResource(false, parameters, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE);
         final VertexResource resource = holder.getResource();
         final Response response = resource.postNullVertexRexsterConsumesTypedJson(holder.getRequest(), graphName, jsonToPost);
         assertPostVertexProducesJson(response, false, true);
@@ -358,7 +309,7 @@ public class VertexResourceTest {
     public void postVertexOnUriButHasElementProperties() {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put(Tokens._ID, "300");
-        final ResourceHolder holder = constructResource(true, parameters);
+        final ResourceHolder<VertexResource> holder = constructResource(true, parameters);
         final VertexResource resource = holder.getResource();
         resource.postVertexOnUri(holder.getRequest(), graphName, "1");
     }
@@ -367,7 +318,7 @@ public class VertexResourceTest {
     public void putVertexConsumesUriValid() {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("some-property", "300a");
-        final ResourceHolder holder = this.constructResource(true, parameters);
+        final ResourceHolder<VertexResource> holder = this.constructResource(true, parameters);
 
         final VertexResource resource = holder.getResource();
         final Response response = resource.putVertexConsumesUri(holder.getRequest(), graphName, "1");
@@ -391,13 +342,13 @@ public class VertexResourceTest {
     @Test(expected = WebApplicationException.class)
     public void putVertexConsumesUriNoVertexFound() {
         final HashMap<String, Object> parameters = generateVertexParametersToPost(false);
-        final ResourceHolder holder = constructResource(false, parameters);
+        final ResourceHolder<VertexResource> holder = constructResource(false, parameters);
         holder.getResource().putVertexConsumesUri(holder.getRequest(), graphName, "1");
     }
 
     @Test
     public void deleteVertexValid() {
-        final ResourceHolder holder = this.constructResourceWithToyGraph();
+        final ResourceHolder<VertexResource> holder = this.constructResourceWithToyGraph();
         final VertexResource resource = holder.getResource();
         final Response response = resource.deleteVertex(graphName, "1");
 
@@ -412,7 +363,7 @@ public class VertexResourceTest {
 
     @Test(expected = WebApplicationException.class)
     public void deleteVertexNoVertexFound() {
-        final ResourceHolder holder = this.constructResourceWithToyGraph();
+        final ResourceHolder<VertexResource> holder = this.constructResourceWithToyGraph();
         final VertexResource resource = holder.getResource();
         resource.deleteVertex(graphName, "100");
     }
@@ -421,7 +372,7 @@ public class VertexResourceTest {
     public void deleteVertexPropertiesValid() {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("name", "");
-        final ResourceHolder holder = this.constructResource(true, parameters);
+        final ResourceHolder<VertexResource> holder = this.constructResource(true, parameters);
         final VertexResource resource = holder.getResource();
         final Response response = resource.deleteVertex(graphName, "1");
 
@@ -516,78 +467,5 @@ public class VertexResourceTest {
 
         JSONArray jsonResults = json.optJSONArray(Tokens.RESULTS);
         Assert.assertEquals(numberOfVerticesReturned, jsonResults.length());
-    }
-
-    private ResourceHolder constructResourceWithToyGraph() {
-        return this.constructResource(true, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
-    }
-
-    private ResourceHolder constructResourceWithEmptyGraph() {
-        return this.constructResource(false, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
-    }
-
-    private ResourceHolder constructResource(final boolean useToyGraph,
-                                             final HashMap<String, Object> parameters){
-        return this.constructResource(useToyGraph, parameters, MediaType.APPLICATION_JSON_TYPE);
-    }
-
-    private ResourceHolder constructResource(final boolean useToyGraph,
-                                             final HashMap<String, Object> parameters,
-                                             final MediaType mediaType) {
-        final UriInfo uri = this.mockery.mock(UriInfo.class);
-        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
-
-        final Request request = this.mockery.mock(Request.class);
-        final Variant variantJson = new Variant(mediaType, null, null);
-
-        this.mockery.checking(new Expectations() {{
-            allowing(httpServletRequest).getParameterMap();
-            will(returnValue(parameters));
-            allowing(request).selectVariant(with(any(List.class)));
-            will(returnValue(variantJson));
-            allowing(uri).getAbsolutePath();
-            will(returnValue(requestUriPath));
-        }});
-
-        final VertexResource resource = useToyGraph ? new VertexResource(uri, httpServletRequest, this.raToyGraph)
-                : new VertexResource(uri, httpServletRequest, this.raEmptyGraph);
-        return new ResourceHolder(resource, request);
-    }
-
-    private void assertFoundElementsInResults(final JSONArray jsonResultArray, final String elementType,
-                                              final String... expectedIds) {
-        Assert.assertNotNull(jsonResultArray);
-        Assert.assertEquals(expectedIds.length, jsonResultArray.length());
-
-        final List<String> foundIds = new ArrayList<String>();
-        for (int ix = 0; ix < jsonResultArray.length(); ix++) {
-            final JSONObject jsonResult = jsonResultArray.optJSONObject(ix);
-            Assert.assertNotNull(jsonResult);
-            Assert.assertEquals(elementType, jsonResult.optString(Tokens._TYPE));
-            Assert.assertTrue(jsonResult.has(Tokens._ID));
-            foundIds.add(jsonResult.optString(Tokens._ID));
-        }
-
-        for (String expectedId : expectedIds) {
-            Assert.assertTrue(foundIds.contains(expectedId));
-        }
-    }
-
-    private class ResourceHolder {
-        private final VertexResource resource;
-        private final Request request;
-
-        public ResourceHolder(final VertexResource resource, final Request request) {
-            this.resource = resource;
-            this.request = request;
-        }
-
-        public VertexResource getResource() {
-            return resource;
-        }
-
-        public Request getRequest() {
-            return request;
-        }
     }
 }

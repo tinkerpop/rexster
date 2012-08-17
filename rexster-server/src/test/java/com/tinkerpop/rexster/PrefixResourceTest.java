@@ -20,11 +20,12 @@ import java.util.HashMap;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class PrefixResourceTest {
 
+    private static final String graphName = "graph";
     protected Mockery mockery = new JUnit4Mockery();
-    protected final String baseUri = "http://localhost/mock";
 
     @Before
     public void init() {
@@ -33,10 +34,9 @@ public class PrefixResourceTest {
 
     @Test
     public void getPrefixesValid() {
-
-        SailGraph sg = new MemoryStoreSailGraph();
+        final SailGraph sg = new MemoryStoreSailGraph();
         SailGraphFactory.createTinkerGraph(sg);
-        final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", sg);
+        final RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, sg);
         final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
 
         final UriInfo uri = this.mockery.mock(UriInfo.class);

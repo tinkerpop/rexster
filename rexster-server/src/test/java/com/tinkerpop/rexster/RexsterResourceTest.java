@@ -17,9 +17,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public class RexsterResourceTest {
     protected Mockery mockery = new JUnit4Mockery();
-    protected final String baseUri = "http://localhost/mock";
 
     @Before
     public void init() {
@@ -46,22 +48,22 @@ public class RexsterResourceTest {
             will(returnValue(startTime));
         }});
 
-        RexsterResource resource = new RexsterResource(ra);
-        Response response = resource.getRexsterRoot();
+        final RexsterResource resource = new RexsterResource(ra);
+        final Response response = resource.getRexsterRoot();
 
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertNotNull(response.getEntity());
         Assert.assertTrue(response.getEntity() instanceof JSONObject);
 
-        JSONObject json = (JSONObject) response.getEntity();
+        final JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
         Assert.assertTrue(json.has("name"));
         Assert.assertTrue(json.has("graphs"));
         Assert.assertTrue(json.has(Tokens.UP_TIME));
         Assert.assertNotNull(json.optJSONArray("graphs"));
 
-        JSONArray jsonArray = json.optJSONArray("graphs");
+        final JSONArray jsonArray = json.optJSONArray("graphs");
         Assert.assertEquals(3, jsonArray.length());
     }
 
@@ -82,22 +84,22 @@ public class RexsterResourceTest {
             will(returnValue(startTime));
         }});
 
-        RexsterResource resource = new RexsterResource(ra);
-        Response response = resource.getRexsterRoot();
+        final RexsterResource resource = new RexsterResource(ra);
+        final Response response = resource.getRexsterRoot();
 
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertNotNull(response.getEntity());
         Assert.assertTrue(response.getEntity() instanceof JSONObject);
 
-        JSONObject json = (JSONObject) response.getEntity();
+        final JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
         Assert.assertTrue(json.has("name"));
         Assert.assertTrue(json.has("graphs"));
         Assert.assertTrue(json.has(Tokens.UP_TIME));
         Assert.assertNotNull(json.optJSONArray("graphs"));
 
-        JSONArray jsonArray = json.optJSONArray("graphs");
+        final JSONArray jsonArray = json.optJSONArray("graphs");
         Assert.assertEquals(0, jsonArray.length());
     }
 }

@@ -1,99 +1,61 @@
 package com.tinkerpop.rexster;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
+import com.tinkerpop.rexster.server.DefaultRexsterApplication;
+import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.util.StatisticsHelper;
-import org.apache.commons.configuration.XMLConfiguration;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONTokener;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.Assert;
+import org.junit.Before;
 
-import java.io.IOException;
-import java.io.InputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Variant;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public abstract class BaseTest {
 
-    private Application application;
-    protected StatisticsHelper sh = new StatisticsHelper();
     private static Logger logger = Logger.getLogger(BaseTest.class.getName());
-    public static final String baseURI = "http://localhost:8182/";
+    protected static final String graphName = "graph";
 
-    public BaseTest() {
-        try {
-            XMLConfiguration properties = new XMLConfiguration();
-            properties.load(Application.class.getResourceAsStream("rexster.xml"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    protected Mockery mockery = new JUnit4Mockery();
+    protected StatisticsHelper sh = new StatisticsHelper();
 
-    public void startWebServer() throws Exception {
-        Thread thread = new Thread() {
-            public void run() {
-                try {
-                    XMLConfiguration properties = new XMLConfiguration();
-                    properties.load(Application.class.getResourceAsStream("rexster.xml"));
-                    application = new Application(properties);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        thread.start();
-        Thread.sleep(1500);
-    }
+    protected Graph toyGraph;
+    protected Graph emptyGraph;
+    protected RexsterApplication raToyGraph;
+    protected RexsterApplication raEmptyGraph;
 
-    public void stopWebServer() throws Exception {
-        application.stop();
-    }
+    @Before
+    public void init() {
+        this.mockery = new JUnit4Mockery();
 
-    public static JSONObject getResource(String uri) throws Exception {
-        Client c = Client.create();
-        WebResource r = c.resource(uri);
+        this.toyGraph = TinkerGraphFactory.createTinkerGraph();
+        this.raToyGraph = new DefaultRexsterApplication(graphName, this.toyGraph);
 
-        ClientResponse response = r.get(ClientResponse.class);
-        InputStream stream = response.getEntityInputStream();
+        this.emptyGraph = new TinkerGraph();
+        this.raEmptyGraph = new DefaultRexsterApplication(graphName, this.emptyGraph);
 
-        String entity = readToString(stream);
-
-        JSONTokener tokener = new JSONTokener(entity);
-        return new JSONObject(tokener);
-    }
-
-    public static JSONObject postResource(String uri) throws Exception {
-        Client c = Client.create();
-        WebResource r = c.resource(uri);
-
-        ClientResponse response = r.post(ClientResponse.class);
-        InputStream stream = response.getEntityInputStream();
-
-        String entity = readToString(stream);
-
-        JSONTokener tokener = new JSONTokener(entity);
-        return new JSONObject(tokener);
-    }
-
-    public static void deleteResource(String uri) throws Exception {
-        Client c = Client.create();
-        WebResource r = c.resource(uri);
-        r.delete();
-    }
-
-    public static String createURI(String extension) {
-        return createURI("gratefulgraph", extension);
-    }
-
-    public static String createURI(String graphName, String extension) {
-        String uri = baseURI + graphName;
-        if (extension != null && extension.trim().length() > 0) {
-            return uri + "/" + extension;
-        }
-
-        return uri;
+        final List<String> namespaces = new ArrayList<String>();
+        namespaces.add("*:*");
+        this.raToyGraph.getApplicationGraph(graphName).loadAllowableExtensions(namespaces);
+        this.raEmptyGraph.getApplicationGraph(graphName).loadAllowableExtensions(namespaces);
     }
 
     public static void printPerformance(String name, Integer events, String eventName, double timeInMilliseconds) {
@@ -103,30 +65,59 @@ public abstract class BaseTest {
             logger.info(name + ": " + eventName + " in " + timeInMilliseconds + "ms");
     }
 
-    public static String readToString(InputStream in) throws IOException {
-        StringBuffer out = new StringBuffer();
-        byte[] b = new byte[4096];
-        for (int n; (n = in.read(b)) != -1; ) {
-            out.append(new String(b, 0, n));
-        }
-        return out.toString();
+    protected ResourceHolder<VertexResource> constructResourceWithToyGraph() {
+        return this.constructResource(true, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
     }
 
-    public class ThreadQuery implements Runnable {
-        private final String uri;
-
-        public ThreadQuery(String uri) {
-            this.uri = uri;
-        }
-
-        public void run() {
-            try {
-                BaseTest.getResource(this.uri);
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-        }
+    protected ResourceHolder<VertexResource> constructResourceWithEmptyGraph() {
+        return this.constructResource(false, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
     }
 
+    protected ResourceHolder<VertexResource> constructResource(final boolean useToyGraph,
+                                                               final HashMap<String, Object> parameters){
+        return this.constructResource(useToyGraph, parameters, MediaType.APPLICATION_JSON_TYPE);
+    }
 
+    protected ResourceHolder<VertexResource> constructResource(final boolean useToyGraph,
+                                                               final HashMap<String, Object> parameters,
+                                                               final MediaType mediaType) {
+        final UriInfo uri = this.mockery.mock(UriInfo.class);
+        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+
+        final Request request = this.mockery.mock(Request.class);
+        final Variant variantJson = new Variant(mediaType, null, null);
+        final URI requestUriPath = URI.create("http://localhost/graphs/graph/vertices");
+
+        this.mockery.checking(new Expectations() {{
+            allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(request).selectVariant(with(any(List.class)));
+            will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
+        }});
+
+        final VertexResource resource = useToyGraph ? new VertexResource(uri, httpServletRequest, this.raToyGraph)
+                : new VertexResource(uri, httpServletRequest, this.raEmptyGraph);
+        return new ResourceHolder<VertexResource>(resource, request);
+    }
+
+    protected void assertFoundElementsInResults(final JSONArray jsonResultArray, final String elementType,
+                                                final String... expectedIds) {
+        Assert.assertNotNull(jsonResultArray);
+        Assert.assertEquals(expectedIds.length, jsonResultArray.length());
+
+        final List<String> foundIds = new ArrayList<String>();
+        for (int ix = 0; ix < jsonResultArray.length(); ix++) {
+            final JSONObject jsonResult = jsonResultArray.optJSONObject(ix);
+            Assert.assertNotNull(jsonResult);
+            Assert.assertEquals(elementType, jsonResult.optString(Tokens._TYPE));
+            Assert.assertTrue(jsonResult.has(Tokens._ID));
+            foundIds.add(jsonResult.optString(Tokens._ID));
+        }
+
+        for (String expectedId : expectedIds) {
+            Assert.assertTrue(foundIds.contains(expectedId));
+        }
+    }
 }
