@@ -151,7 +151,7 @@ public class BatchExtension extends AbstractRexsterExtension {
 
     }
 
-    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST, path = "tx")
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST, path = "tx", autoCommitTransaction = true)
     @ExtensionDescriptor(description = "post a transaction to the graph.")
     public ExtensionResponse postTx(@RexsterContext RexsterResourceContext context,
                                     @RexsterContext Graph graph,
@@ -183,8 +183,6 @@ public class BatchExtension extends AbstractRexsterExtension {
                 }
             }
 
-            rag.tryStopTransactionSuccess();
-
             final Map<String, Object> resultMap = new HashMap<String, Object>();
             resultMap.put(Tokens.SUCCESS, true);
             resultMap.put("txProcessed", txArray.length());
@@ -192,8 +190,6 @@ public class BatchExtension extends AbstractRexsterExtension {
             return ExtensionResponse.ok(new JSONObject(resultMap));
 
         } catch (IllegalArgumentException iae) {
-            rag.tryStopTransactionFailure();
-
             logger.error(iae);
 
             final ExtensionMethod extMethod = context.getExtensionMethod();
@@ -204,8 +200,6 @@ public class BatchExtension extends AbstractRexsterExtension {
                     null,
                     generateErrorJson(extMethod.getExtensionApiAsJson()));
         } catch (Exception ex) {
-            rag.tryStopTransactionFailure();
-
             logger.error(ex);
             return ExtensionResponse.error(
                     "Error executing transaction: " + ex.getMessage(), generateErrorJson());

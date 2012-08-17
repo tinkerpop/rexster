@@ -25,6 +25,9 @@ public class BatchExtensionTest {
 
     @Before
     public void beforeTest() {
+        // tests for batch extension use tinkergraph which is non-transactional.  batch extension uses
+        // autocommit option which relies on rexster to handle commits so even tests that used a
+        // transactional graph will need to take that into account.
         this.graph = TinkerGraphFactory.createTinkerGraph();
     }
 

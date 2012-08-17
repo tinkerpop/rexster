@@ -218,7 +218,7 @@ public class GraphResource extends AbstractSubResource {
                     rexsterExtensions = findExtensionClasses(extensionSegmentSet);
                 } catch (ServiceConfigurationError sce) {
                     logger.error("ServiceLoader could not find a class referenced in com.tinkerpop.rexster.extension.RexsterExtension.");
-                    JSONObject error = generateErrorObject(
+                    final JSONObject error = generateErrorObject(
                             "Class specified in com.tinkerpop.rexster.extension.RexsterExtension could not be found.",
                             sce);
                     throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
@@ -227,7 +227,7 @@ public class GraphResource extends AbstractSubResource {
                 if (rexsterExtensions == null || rexsterExtensions.size() == 0) {
                     // extension was not found for some reason
                     logger.error("The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
-                    JSONObject error = generateErrorObject(
+                    final JSONObject error = generateErrorObject(
                             "The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "]");
                     throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
                 }
@@ -238,26 +238,30 @@ public class GraphResource extends AbstractSubResource {
                 if (methodToCall == null) {
                     // extension method was not found for some reason
                     logger.error("The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "] with a HTTP method of [" + httpMethodRequested.name() + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
-                    JSONObject error = generateErrorObject(
+                    final JSONObject error = generateErrorObject(
                             "The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "] with a HTTP method of [" + httpMethodRequested.name() + "]");
                     throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
                 }
 
                 // found the method...time to do work
                 returnValue = invokeExtension(rag, methodToCall);
+                rag.tryStopTransactionSuccess();
 
             } catch (WebApplicationException wae) {
                 // already logged this...just throw it  up.
+                rag.tryStopTransactionFailure();
                 throw wae;
             } catch (Exception ex) {
                 logger.error("Dynamic invocation of the [" + extensionSegmentSet + "] extension failed.", ex);
 
                 if (ex.getCause() != null) {
-                    Throwable cause = ex.getCause();
+                    final Throwable cause = ex.getCause();
                     logger.error("It would be smart to trap this this exception within the extension and supply a good response to the user:" + cause.getMessage(), cause);
                 }
 
-                JSONObject error = generateErrorObjectJsonFail(ex);
+                rag.tryStopTransactionFailure();
+
+                final JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
 
@@ -267,12 +271,21 @@ public class GraphResource extends AbstractSubResource {
                 if (extResponse.isErrorResponse()) {
                     // an error was raised within the extension.  pass it back out as an error.
                     logger.warn("The [" + extensionSegmentSet + "] extension raised an error response.");
+
+                    if (methodToCall.getExtensionDefinition().autoCommitTransaction()) {
+                        rag.tryStopTransactionFailure();
+                    }
+
                     throw new WebApplicationException(Response.fromResponse(extResponse.getJerseyResponse()).build());
+                }
+
+                if (methodToCall.getExtensionDefinition().autoCommitTransaction()) {
+                    rag.tryStopTransactionSuccess();
                 }
             } else {
                 // extension method is not returning the correct type...needs to be an ExtensionResponse
                 logger.error("The [" + extensionSegmentSet + "] extension does not return an ExtensionResponse.");
-                JSONObject error = generateErrorObject(
+                final JSONObject error = generateErrorObject(
                         "The [" + extensionSegmentSet + "] extension does not return an ExtensionResponse.");
                 throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
@@ -280,7 +293,7 @@ public class GraphResource extends AbstractSubResource {
         } else {
             // namespace was not allowed
             logger.error("The [" + extensionSegmentSet + "] extension was not configured for [" + graphName + "]");
-            JSONObject error = generateErrorObject(
+            final JSONObject error = generateErrorObject(
                     "The [" + extensionSegmentSet + "] extension was not configured for [" + graphName + "]");
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }

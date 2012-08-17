@@ -46,5 +46,9 @@ public @interface ExtensionDefinition {
      */
     String produces() default javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
-
+    /**
+     * When set to true, the transaction will commit with success or failure when the extension completes.
+     * Untrapped errors will always commit with failure.
+     */
+    boolean autoCommitTransaction() default true;
 }
