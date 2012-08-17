@@ -1,9 +1,17 @@
 package com.tinkerpop.rexster.server;
 
-import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import com.tinkerpop.rexster.EdgeResource;
+import com.tinkerpop.rexster.GraphResource;
+import com.tinkerpop.rexster.IndexResource;
+import com.tinkerpop.rexster.KeyIndexResource;
+import com.tinkerpop.rexster.PrefixResource;
+import com.tinkerpop.rexster.RexsterResource;
+import com.tinkerpop.rexster.RootResource;
+import com.tinkerpop.rexster.VertexResource;
 import com.tinkerpop.rexster.filter.AbstractSecurityFilter;
 import com.tinkerpop.rexster.filter.DefaultSecurityFilter;
 import com.tinkerpop.rexster.filter.HeaderResponseFilter;
@@ -56,8 +64,22 @@ public class HttpRexsterServer implements RexsterServer {
         final ServletHandler jerseyHandler = new ServletHandler();
         jerseyHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
 
-        final ResourceConfig rc = new PackagesResourceConfig("com.tinkerpop.rexster");
-        rc.getSingletons().add(new SingletonTypeInjectableProvider<Context, RexsterApplication>(RexsterApplication.class, application){});
+        // explicitly load resources so that the "RexsterApplicationProvider" class is not loaded
+        final ResourceConfig rc = new ClassNamesResourceConfig(
+                EdgeResource.class,
+                GraphResource.class,
+                IndexResource.class,
+                KeyIndexResource.class,
+                PrefixResource.class,
+                RexsterResource.class,
+                RootResource.class,
+                VertexResource.class);
+
+        // constructs an injectable for the RexsterApplication instance.  This get constructed externally
+        // and is passed into the HttpRexsterServer.  The SingletonTypeInjectableProvider is responsible for
+        // pushing that instance into the context.
+        rc.getSingletons().add(new SingletonTypeInjectableProvider<Context, RexsterApplication>(
+                RexsterApplication.class, application){});
 
         final String defaultCharacterEncoding = properties.getString("character-set", "ISO-8859-1");
         rc.getContainerResponseFilters().add(new HeaderResponseFilter(defaultCharacterEncoding));
