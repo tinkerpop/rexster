@@ -23,7 +23,7 @@ import java.util.Set;
 public class VertexResourceTest extends BaseTest {
     @Test
     public void getVerticesAll() {
-        final VertexResource resource = this.constructResourceWithToyGraph().getResource();
+        final VertexResource resource = this.constructVertexResourceWithToyGraph().getResource();
 
         final Response response = resource.getVertices(graphName);
         this.assertVerticesOkResponseJsonStructure(6, 6, response);
@@ -39,7 +39,7 @@ public class VertexResourceTest extends BaseTest {
         parameters.put(Tokens.KEY, "name");
         parameters.put(Tokens.VALUE, "marko");
 
-        final VertexResource resource = this.constructResource(true, parameters).getResource();
+        final VertexResource resource = this.constructVertexResource(true, parameters).getResource();
         final KeyIndexableGraph graph = (KeyIndexableGraph) this.toyGraph;
         graph.createKeyIndex("name", Vertex.class);
 
@@ -53,7 +53,7 @@ public class VertexResourceTest extends BaseTest {
 
     @Test
     public void getVerticesNoResults() {
-        final VertexResource resource = this.constructResourceWithEmptyGraph().getResource();
+        final VertexResource resource = this.constructVertexResourceWithEmptyGraph().getResource();
         final Response response = resource.getVertices(graphName);
         this.assertVerticesOkResponseJsonStructure(0, 0, response);
     }
@@ -64,7 +64,7 @@ public class VertexResourceTest extends BaseTest {
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_START, "1");
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "3");
 
-        final VertexResource resource = this.constructResource(true, parameters).getResource();
+        final VertexResource resource = this.constructVertexResource(true, parameters).getResource();
 
         final Response response = resource.getVertices(graphName);
         this.assertVerticesOkResponseJsonStructure(2, 2, response);
@@ -79,7 +79,7 @@ public class VertexResourceTest extends BaseTest {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_START, "10");
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
-        final VertexResource resource = this.constructResource(true, parameters).getResource();
+        final VertexResource resource = this.constructVertexResource(true, parameters).getResource();
 
         final Response response = resource.getVertices(graphName);
         this.assertVerticesOkResponseJsonStructure(0, 0, response);
@@ -90,7 +90,7 @@ public class VertexResourceTest extends BaseTest {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_START, "100");
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
-        final VertexResource resource = this.constructResource(true, parameters).getResource();
+        final VertexResource resource = this.constructVertexResource(true, parameters).getResource();
 
         final Response response = resource.getVertices(graphName);
         this.assertVerticesOkResponseJsonStructure(0, 0, response);
@@ -98,13 +98,13 @@ public class VertexResourceTest extends BaseTest {
 
     @Test(expected = WebApplicationException.class)
     public void getSingleVertexNotFound() {
-        final VertexResource resource = this.constructResourceWithToyGraph().getResource();
+        final VertexResource resource = this.constructVertexResourceWithToyGraph().getResource();
         resource.getSingleVertex(graphName, "id-does-not-match-any");
     }
 
     @Test
     public void getSingleVertexFound() {
-        final VertexResource resource = this.constructResourceWithToyGraph().getResource();
+        final VertexResource resource = this.constructVertexResourceWithToyGraph().getResource();
 
         final Response response = resource.getSingleVertex(graphName, "1");
         Assert.assertNotNull(response);
@@ -124,13 +124,13 @@ public class VertexResourceTest extends BaseTest {
 
     @Test(expected = WebApplicationException.class)
     public void getVertexEdgesNotFound() {
-        final VertexResource resource = this.constructResourceWithToyGraph().getResource();
+        final VertexResource resource = this.constructVertexResourceWithToyGraph().getResource();
         resource.getSingleVertex(graphName, "id-does-not-match-any");
     }
 
     @Test
     public void getVertexEdgesFoundVertexReturnInEdgesNoOffset() {
-        final VertexResource resource = this.constructResourceWithToyGraph().getResource();
+        final VertexResource resource = this.constructVertexResourceWithToyGraph().getResource();
 
         final Response response = resource.getVertexEdges(graphName, "3", Tokens.IN_E);
         final JSONObject json = assertEdgesOkResponseJsonStructure(response, 3);
@@ -145,7 +145,7 @@ public class VertexResourceTest extends BaseTest {
             put(Tokens._LABEL, "created");
         }};
 
-        final VertexResource resource = this.constructResource(true, map).getResource();
+        final VertexResource resource = this.constructVertexResource(true, map).getResource();
 
         final Response response = resource.getVertexEdges(graphName, "1", Tokens.OUT_E);
         final JSONObject json = assertEdgesOkResponseJsonStructure(response, 1);
@@ -156,7 +156,7 @@ public class VertexResourceTest extends BaseTest {
 
     @Test
     public void getVertexEdgesFoundVertexReturnInVerticesNoOffset() {
-        final VertexResource resource = this.constructResourceWithToyGraph().getResource();
+        final VertexResource resource = this.constructVertexResourceWithToyGraph().getResource();
 
         final Response response = resource.getVertexEdges(graphName, "3", Tokens.IN);
         final JSONObject json = assertEdgesOkResponseJsonStructure(response, 3);
@@ -176,7 +176,7 @@ public class VertexResourceTest extends BaseTest {
             put(Tokens._LABEL, "knows");
         }};
 
-        final VertexResource resource = this.constructResource(true, map).getResource();
+        final VertexResource resource = this.constructVertexResource(true, map).getResource();
 
         final Response response = resource.getVertexEdges("graph", "1", Tokens.IN);
         final JSONObject json = assertEdgesOkResponseJsonStructure(response, 1);
@@ -187,7 +187,7 @@ public class VertexResourceTest extends BaseTest {
 
     @Test
     public void getVertexEdgesFoundVertexOutEdgesNoOffset() {
-        final VertexResource resource = this.constructResourceWithToyGraph().getResource();
+        final VertexResource resource = this.constructVertexResourceWithToyGraph().getResource();
 
         final Response response = resource.getVertexEdges(graphName, "6", Tokens.OUT_E);
         final JSONObject json = assertEdgesOkResponseJsonStructure(response, 1);
@@ -198,7 +198,7 @@ public class VertexResourceTest extends BaseTest {
 
     @Test
     public void getVertexEdgesFoundVertexOutVerticesNoOffset() {
-        final VertexResource resource = this.constructResourceWithToyGraph().getResource();
+        final VertexResource resource = this.constructVertexResourceWithToyGraph().getResource();
 
         final Response response = resource.getVertexEdges(graphName, "6", Tokens.OUT);
         final JSONObject json = assertEdgesOkResponseJsonStructure(response, 1);
@@ -209,7 +209,7 @@ public class VertexResourceTest extends BaseTest {
 
     @Test
     public void getVertexEdgesFoundVertexBothEdgesNoOffset() {
-        final VertexResource resource = this.constructResourceWithToyGraph().getResource();
+        final VertexResource resource = this.constructVertexResourceWithToyGraph().getResource();
 
         final Response response = resource.getVertexEdges(graphName, "4", Tokens.BOTH_E);
         final JSONObject json = assertEdgesOkResponseJsonStructure(response, 3);
@@ -220,7 +220,7 @@ public class VertexResourceTest extends BaseTest {
 
     @Test
     public void getVertexEdgesFoundVertexBothVerticesNoOffset() {
-        final VertexResource resource = this.constructResourceWithToyGraph().getResource();
+        final VertexResource resource = this.constructVertexResourceWithToyGraph().getResource();
 
         final Response response = resource.getVertexEdges(graphName, "4", Tokens.BOTH);
         final JSONObject json = assertEdgesOkResponseJsonStructure(response, 3);
@@ -234,7 +234,7 @@ public class VertexResourceTest extends BaseTest {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_START, "1");
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "3");
-        final VertexResource resource = this.constructResource(true, parameters).getResource();
+        final VertexResource resource = this.constructVertexResource(true, parameters).getResource();
 
         final Response response = resource.getVertexEdges(graphName, "1", Tokens.BOTH_E);
         final JSONObject json = assertEdgesOkResponseJsonStructure(response, 3);
@@ -248,7 +248,7 @@ public class VertexResourceTest extends BaseTest {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_START, "10");
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
-        final VertexResource resource = this.constructResource(true, parameters).getResource();
+        final VertexResource resource = this.constructVertexResource(true, parameters).getResource();
 
         final Response response = resource.getVertexEdges(graphName, "1", Tokens.BOTH_E);
         final JSONObject json = assertEdgesOkResponseJsonStructure(response, 3);
@@ -263,7 +263,7 @@ public class VertexResourceTest extends BaseTest {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_START, "30");
         parameters.put(Tokens.REXSTER + "." + Tokens.OFFSET_END, "20");
-        final VertexResource resource = this.constructResource(true, parameters).getResource();
+        final VertexResource resource = this.constructVertexResource(true, parameters).getResource();
 
         final Response response = resource.getVertexEdges(graphName, "1", Tokens.BOTH_E);
         final JSONObject json = assertEdgesOkResponseJsonStructure(response, 3);
@@ -277,7 +277,7 @@ public class VertexResourceTest extends BaseTest {
     public void postNullVertexOnUriAcceptTypedJsonValid() {
         // types are always parsed on the URI
         final HashMap<String, Object> parameters = generateVertexParametersToPost(true);
-        final ResourceHolder<VertexResource> holder = constructResource(false, parameters,
+        final ResourceHolder<VertexResource> holder = constructVertexResource(false, parameters,
                 RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE);
         final VertexResource resource = holder.getResource();
         final Response response = resource.postNullVertexOnUri(holder.getRequest(), graphName);
@@ -289,7 +289,7 @@ public class VertexResourceTest extends BaseTest {
     public void postNullVertexRexsterConsumesJsonAcceptJsonValid() {
         final HashMap<String, Object> parameters = generateVertexParametersToPost(false);
         final JSONObject jsonToPost = new JSONObject(parameters);
-        final ResourceHolder<VertexResource> holder = constructResource(false, parameters);
+        final ResourceHolder<VertexResource> holder = constructVertexResource(false, parameters);
         final VertexResource resource = holder.getResource();
         final Response response = resource.postNullVertexRexsterConsumesJson(holder.getRequest(), graphName, jsonToPost);
         assertPostVertexProducesJson(response, false, false);
@@ -299,7 +299,7 @@ public class VertexResourceTest extends BaseTest {
     public void postNullVertexRexsterConsumesTypedJsonAcceptTypedJsonValid() {
         final HashMap<String, Object> parameters = generateVertexParametersToPost(true);
         final JSONObject jsonToPost = new JSONObject(parameters);
-        final ResourceHolder<VertexResource> holder = constructResource(false, parameters, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE);
+        final ResourceHolder<VertexResource> holder = constructVertexResource(false, parameters, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON_TYPE);
         final VertexResource resource = holder.getResource();
         final Response response = resource.postNullVertexRexsterConsumesTypedJson(holder.getRequest(), graphName, jsonToPost);
         assertPostVertexProducesJson(response, false, true);
@@ -309,7 +309,7 @@ public class VertexResourceTest extends BaseTest {
     public void postVertexOnUriButHasElementProperties() {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put(Tokens._ID, "300");
-        final ResourceHolder<VertexResource> holder = constructResource(true, parameters);
+        final ResourceHolder<VertexResource> holder = constructVertexResource(true, parameters);
         final VertexResource resource = holder.getResource();
         resource.postVertexOnUri(holder.getRequest(), graphName, "1");
     }
@@ -318,7 +318,7 @@ public class VertexResourceTest extends BaseTest {
     public void putVertexConsumesUriValid() {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("some-property", "300a");
-        final ResourceHolder<VertexResource> holder = this.constructResource(true, parameters);
+        final ResourceHolder<VertexResource> holder = this.constructVertexResource(true, parameters);
 
         final VertexResource resource = holder.getResource();
         final Response response = resource.putVertexConsumesUri(holder.getRequest(), graphName, "1");
@@ -342,13 +342,13 @@ public class VertexResourceTest extends BaseTest {
     @Test(expected = WebApplicationException.class)
     public void putVertexConsumesUriNoVertexFound() {
         final HashMap<String, Object> parameters = generateVertexParametersToPost(false);
-        final ResourceHolder<VertexResource> holder = constructResource(false, parameters);
+        final ResourceHolder<VertexResource> holder = constructVertexResource(false, parameters);
         holder.getResource().putVertexConsumesUri(holder.getRequest(), graphName, "1");
     }
 
     @Test
     public void deleteVertexValid() {
-        final ResourceHolder<VertexResource> holder = this.constructResourceWithToyGraph();
+        final ResourceHolder<VertexResource> holder = this.constructVertexResourceWithToyGraph();
         final VertexResource resource = holder.getResource();
         final Response response = resource.deleteVertex(graphName, "1");
 
@@ -363,7 +363,7 @@ public class VertexResourceTest extends BaseTest {
 
     @Test(expected = WebApplicationException.class)
     public void deleteVertexNoVertexFound() {
-        final ResourceHolder<VertexResource> holder = this.constructResourceWithToyGraph();
+        final ResourceHolder<VertexResource> holder = this.constructVertexResourceWithToyGraph();
         final VertexResource resource = holder.getResource();
         resource.deleteVertex(graphName, "100");
     }
@@ -372,7 +372,7 @@ public class VertexResourceTest extends BaseTest {
     public void deleteVertexPropertiesValid() {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("name", "");
-        final ResourceHolder<VertexResource> holder = this.constructResource(true, parameters);
+        final ResourceHolder<VertexResource> holder = this.constructVertexResource(true, parameters);
         final VertexResource resource = holder.getResource();
         final Response response = resource.deleteVertex(graphName, "1");
 

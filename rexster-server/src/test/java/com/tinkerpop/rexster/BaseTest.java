@@ -1,6 +1,9 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.impls.sail.SailGraph;
+import com.tinkerpop.blueprints.impls.sail.SailGraphFactory;
+import com.tinkerpop.blueprints.impls.sail.impls.MemoryStoreSailGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.rexster.server.DefaultRexsterApplication;
@@ -11,6 +14,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
@@ -45,17 +49,13 @@ public abstract class BaseTest {
     @Before
     public void init() {
         this.mockery = new JUnit4Mockery();
+        this.createDefaultGraphs(TinkerGraphFactory.createTinkerGraph(), new TinkerGraph());
+    }
 
-        this.toyGraph = TinkerGraphFactory.createTinkerGraph();
-        this.raToyGraph = new DefaultRexsterApplication(graphName, this.toyGraph);
-
-        this.emptyGraph = new TinkerGraph();
-        this.raEmptyGraph = new DefaultRexsterApplication(graphName, this.emptyGraph);
-
-        final List<String> namespaces = new ArrayList<String>();
-        namespaces.add("*:*");
-        this.raToyGraph.getApplicationGraph(graphName).loadAllowableExtensions(namespaces);
-        this.raEmptyGraph.getApplicationGraph(graphName).loadAllowableExtensions(namespaces);
+    @After
+    public void tearDown() {
+        this.toyGraph.shutdown();
+        this.emptyGraph.shutdown();
     }
 
     public static void printPerformance(String name, Integer events, String eventName, double timeInMilliseconds) {
@@ -65,22 +65,45 @@ public abstract class BaseTest {
             logger.info(name + ": " + eventName + " in " + timeInMilliseconds + "ms");
     }
 
-    protected ResourceHolder<VertexResource> constructResourceWithToyGraph() {
-        return this.constructResource(true, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
+    protected ResourceHolder<PrefixResource> constructPrefixResource() {
+        final SailGraph sg = new MemoryStoreSailGraph();
+        SailGraphFactory.createTinkerGraph(sg);
+
+        // have to reset with a sail graph for prefixes to work. empty graph is not used
+        // in these tests so no need to reset.
+        this.createDefaultGraphs(sg, this.emptyGraph);
+
+        final UriInfo uri = this.mockery.mock(UriInfo.class);
+        final URI requestUriPath = URI.create("http://localhost/graphs/graph/prefixes");
+        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+
+        this.mockery.checking(new Expectations() {{
+            allowing(httpServletRequest).getParameterMap();
+            will(returnValue(new HashMap<String, String>()));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
+        }});
+
+        final PrefixResource resource = new PrefixResource(uri, httpServletRequest, this.raToyGraph);
+        return new ResourceHolder<PrefixResource>(resource, null);
     }
 
-    protected ResourceHolder<VertexResource> constructResourceWithEmptyGraph() {
-        return this.constructResource(false, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
+    protected ResourceHolder<VertexResource> constructVertexResourceWithToyGraph() {
+        return this.constructVertexResource(true, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
     }
 
-    protected ResourceHolder<VertexResource> constructResource(final boolean useToyGraph,
-                                                               final HashMap<String, Object> parameters){
-        return this.constructResource(useToyGraph, parameters, MediaType.APPLICATION_JSON_TYPE);
+    protected ResourceHolder<VertexResource> constructVertexResourceWithEmptyGraph() {
+        return this.constructVertexResource(false, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
     }
 
-    protected ResourceHolder<VertexResource> constructResource(final boolean useToyGraph,
-                                                               final HashMap<String, Object> parameters,
-                                                               final MediaType mediaType) {
+    protected ResourceHolder<VertexResource> constructVertexResource(final boolean useToyGraph,
+                                                                     final HashMap<String, Object> parameters){
+        return this.constructVertexResource(useToyGraph, parameters, MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    protected ResourceHolder<VertexResource> constructVertexResource(final boolean useToyGraph,
+                                                                     final HashMap<String, Object> parameters,
+                                                                     final MediaType mediaType) {
         final UriInfo uri = this.mockery.mock(UriInfo.class);
         final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
 
@@ -119,5 +142,18 @@ public abstract class BaseTest {
         for (String expectedId : expectedIds) {
             Assert.assertTrue(foundIds.contains(expectedId));
         }
+    }
+
+    private void createDefaultGraphs(final Graph toy, final Graph empty) {
+        this.toyGraph = toy;
+        this.emptyGraph = empty;
+
+        this.raToyGraph = new DefaultRexsterApplication(graphName, toy);
+        this.raEmptyGraph = new DefaultRexsterApplication(graphName, empty);
+
+        final List<String> namespaces = new ArrayList<String>();
+        namespaces.add("*:*");
+        this.raToyGraph.getApplicationGraph(graphName).loadAllowableExtensions(namespaces);
+        this.raEmptyGraph.getApplicationGraph(graphName).loadAllowableExtensions(namespaces);
     }
 }
