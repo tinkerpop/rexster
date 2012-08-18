@@ -2,6 +2,8 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Index;
+import com.tinkerpop.blueprints.IndexableGraph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.sail.SailGraph;
@@ -169,6 +171,76 @@ public abstract class BaseTest {
         final KeyIndexResource resource = useToyGraph ? new KeyIndexResource(uri, httpServletRequest, this.raToyGraph)
                 : new KeyIndexResource(uri, httpServletRequest, this.raEmptyGraph);
         return new ResourceHolder<KeyIndexResource>(resource, request);
+    }
+
+    protected ResourceHolder<IndexResource> constructIndexResourceWithToyGraph() {
+        return this.constructIndexResource(true, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    protected ResourceHolder<IndexResource> constructIndexResourceWithEmptyGraph() {
+        return this.constructIndexResource(false, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    protected ResourceHolder<IndexResource> constructIndexResource(final boolean useToyGraph,
+                                                                     final HashMap<String, Object> parameters){
+        return this.constructIndexResource(useToyGraph, parameters, MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    protected ResourceHolder<IndexResource> constructIndexResource(final boolean useToyGraph,
+                                                                     final HashMap<String, Object> parameters,
+                                                                     final MediaType mediaType) {
+        final IndexableGraph indexableGraph = (IndexableGraph) this.toyGraph;
+        final Index<Vertex> basicNameIndex = indexableGraph.createIndex("index-name-0", Vertex.class);
+        indexableGraph.createIndex("index-name-1", Vertex.class);
+        indexableGraph.createIndex("index-name-2", Vertex.class);
+        indexableGraph.createIndex("index-name-3", Vertex.class);
+        indexableGraph.createIndex("index-name-4", Vertex.class);
+        final Index<Edge> edgeIndex = indexableGraph.createIndex("index-name-5", Edge.class);
+        indexableGraph.createIndex("index-name-6", Vertex.class);
+        indexableGraph.createIndex("index-name-7", Vertex.class);
+        indexableGraph.createIndex("index-name-8", Vertex.class);
+        final Index<Vertex> madeUpIndex = indexableGraph.createIndex("index-name-9", Vertex.class);
+
+        basicNameIndex.put("name", "marko", this.toyGraph.getVertex(1));
+        basicNameIndex.put("name", "vadas", this.toyGraph.getVertex(2));
+        basicNameIndex.put("name", "lop", this.toyGraph.getVertex(3));
+        basicNameIndex.put("name", "josh", this.toyGraph.getVertex(4));
+        basicNameIndex.put("name", "ripple", this.toyGraph.getVertex(5));
+        basicNameIndex.put("name", "peter", this.toyGraph.getVertex(6));
+
+        madeUpIndex.put("field", "X", this.toyGraph.getVertex(1));
+        madeUpIndex.put("field", "X", this.toyGraph.getVertex(2));
+        madeUpIndex.put("field", "Y", this.toyGraph.getVertex(3));
+        madeUpIndex.put("field", "X", this.toyGraph.getVertex(4));
+        madeUpIndex.put("field", "Y", this.toyGraph.getVertex(5));
+        madeUpIndex.put("field", "X", this.toyGraph.getVertex(6));
+
+        edgeIndex.put("weight", 0.4, this.toyGraph.getEdge(9));
+        edgeIndex.put("weight", 0.2, this.toyGraph.getEdge(12));
+        edgeIndex.put("weight", 0.4, this.toyGraph.getEdge(11));
+        edgeIndex.put("weight", 1.0, this.toyGraph.getEdge(8));
+        edgeIndex.put("weight", 0.5, this.toyGraph.getEdge(7));
+        edgeIndex.put("weight", 1.0, this.toyGraph.getEdge(10));
+
+        final UriInfo uri = this.mockery.mock(UriInfo.class);
+        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+
+        final Request request = this.mockery.mock(Request.class);
+        final Variant variantJson = new Variant(mediaType, null, null);
+        final URI requestUriPath = URI.create("http://localhost/graphs/graph/indices");
+
+        this.mockery.checking(new Expectations() {{
+            allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(request).selectVariant(with(any(List.class)));
+            will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
+        }});
+
+        final IndexResource resource = useToyGraph ? new IndexResource(uri, httpServletRequest, this.raToyGraph)
+                : new IndexResource(uri, httpServletRequest, this.raEmptyGraph);
+        return new ResourceHolder<IndexResource>(resource, request);
     }
 
     protected void assertFoundElementsInResults(final JSONArray jsonResultArray, final String elementType,
