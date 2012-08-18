@@ -1,6 +1,9 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.sail.SailGraph;
 import com.tinkerpop.blueprints.impls.sail.SailGraphFactory;
 import com.tinkerpop.blueprints.impls.sail.impls.MemoryStoreSailGraph;
@@ -123,6 +126,49 @@ public abstract class BaseTest {
         final VertexResource resource = useToyGraph ? new VertexResource(uri, httpServletRequest, this.raToyGraph)
                 : new VertexResource(uri, httpServletRequest, this.raEmptyGraph);
         return new ResourceHolder<VertexResource>(resource, request);
+    }
+
+    protected ResourceHolder<KeyIndexResource> constructKeyIndexResourceWithToyGraph() {
+        return this.constructKeyIndexResource(true, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    protected ResourceHolder<KeyIndexResource> constructKeyIndexResourceWithEmptyGraph() {
+        return this.constructKeyIndexResource(false, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    protected ResourceHolder<KeyIndexResource> constructKeyIndexResource(final boolean useToyGraph,
+                                                                       final HashMap<String, Object> parameters){
+        return this.constructKeyIndexResource(useToyGraph, parameters, MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    protected ResourceHolder<KeyIndexResource> constructKeyIndexResource(final boolean useToyGraph,
+                                                                       final HashMap<String, Object> parameters,
+                                                                       final MediaType mediaType) {
+        // add key indices to the toy graph
+        final KeyIndexableGraph keyIndexableGraph = (KeyIndexableGraph) this.toyGraph;
+        keyIndexableGraph.createKeyIndex("name", Vertex.class);
+        keyIndexableGraph.createKeyIndex("test", Vertex.class);
+        keyIndexableGraph.createKeyIndex("weight", Edge.class);
+
+        final UriInfo uri = this.mockery.mock(UriInfo.class);
+        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+
+        final Request request = this.mockery.mock(Request.class);
+        final Variant variantJson = new Variant(mediaType, null, null);
+        final URI requestUriPath = URI.create("http://localhost/graphs/graph/vertices");
+
+        this.mockery.checking(new Expectations() {{
+            allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(request).selectVariant(with(any(List.class)));
+            will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
+        }});
+
+        final KeyIndexResource resource = useToyGraph ? new KeyIndexResource(uri, httpServletRequest, this.raToyGraph)
+                : new KeyIndexResource(uri, httpServletRequest, this.raEmptyGraph);
+        return new ResourceHolder<KeyIndexResource>(resource, request);
     }
 
     protected void assertFoundElementsInResults(final JSONArray jsonResultArray, final String elementType,
