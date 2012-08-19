@@ -38,6 +38,8 @@ import java.util.List;
  * Tests edge resource.  Should not need to test any specific returns values as they are
  * covered under other unit tests.  The format of the results themselves should be covered
  * under the ElementJSONObject.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class EdgeResourceTest {
 

@@ -243,6 +243,34 @@ public abstract class BaseTest {
         return new ResourceHolder<IndexResource>(resource, request);
     }
 
+    protected ResourceHolder<GraphResource> constructGraphResourceWithToyGraph() {
+        return constructGraphResource(true, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    protected ResourceHolder<GraphResource> constructGraphResource(final boolean useToyGraph,
+                                                                   final HashMap<String, Object> parameters,
+                                                                   final MediaType mediaType) {
+        final UriInfo uri = this.mockery.mock(UriInfo.class);
+        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+
+        final Request request = this.mockery.mock(Request.class);
+        final Variant variantJson = new Variant(mediaType, null, null);
+        final URI requestUriPath = URI.create("http://localhost/graphs/graph");
+
+        this.mockery.checking(new Expectations() {{
+            allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(request).selectVariant(with(any(List.class)));
+            will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
+        }});
+
+        final GraphResource resource = useToyGraph ? new GraphResource(uri, httpServletRequest, this.raToyGraph)
+                : new GraphResource(uri, httpServletRequest, this.raEmptyGraph);
+        return new ResourceHolder<GraphResource>(resource, request);
+    }
+
     protected void assertFoundElementsInResults(final JSONArray jsonResultArray, final String elementType,
                                                 final String... expectedIds) {
         Assert.assertNotNull(jsonResultArray);

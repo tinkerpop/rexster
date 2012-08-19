@@ -17,6 +17,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.HashMap;
 
+/**
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public class KeyIndexResourceTest extends BaseTest {
 
     @Test(expected = WebApplicationException.class)

@@ -28,6 +28,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public class AbstractSubResourceTest {
     private Mockery mockery = new JUnit4Mockery();
     private MockAbstractSubResource mockResource;
