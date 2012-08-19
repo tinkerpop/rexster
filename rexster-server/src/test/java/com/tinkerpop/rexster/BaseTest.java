@@ -191,7 +191,7 @@ public abstract class BaseTest {
                                                                      final MediaType mediaType) {
         final IndexableGraph indexableGraph = (IndexableGraph) this.toyGraph;
         final Index<Vertex> basicNameIndex = indexableGraph.createIndex("index-name-0", Vertex.class);
-        indexableGraph.createIndex("index-name-1", Vertex.class);
+        indexableGraph.createIndex("index-name-1", Edge.class);
         indexableGraph.createIndex("index-name-2", Vertex.class);
         indexableGraph.createIndex("index-name-3", Vertex.class);
         indexableGraph.createIndex("index-name-4", Vertex.class);

@@ -240,6 +240,100 @@ public class IndexResourceTest extends BaseTest {
         Assert.assertFalse(edges.iterator().hasNext());
     }
 
+    @Test(expected = WebApplicationException.class)
+    public void postIndexIdxKeysNotAnArray() {
+        final HashMap<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("class", "vertex");
+        parameters.put("keys", "name");
+        final IndexResource resource = constructIndexResource(true, parameters).getResource();
+        resource.postIndex(graphName, "index-name-0");
+    }
+
+    @Test
+    public void postIndexNewVertexIndex() {
+        final HashMap<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("class", "vertex");
+        parameters.put("keys", "[name]");
+        final IndexResource resource = constructIndexResource(true, parameters).getResource();
+        resource.postIndex(graphName, "index-name-100");
+
+        final Index idx = ((IndexableGraph) this.toyGraph).getIndex("index-name-100", Vertex.class);
+        Assert.assertNotNull(idx);
+    }
+
+    @Test
+    public void postIndexNewEdgeIndex() {
+        final HashMap<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("class", "edge");
+        parameters.put("keys", "[weight]");
+        final IndexResource resource = constructIndexResource(true, parameters).getResource();
+        resource.postIndex(graphName, "index-name-100");
+
+        final Index idx = ((IndexableGraph) this.toyGraph).getIndex("index-name-100", Edge.class);
+        Assert.assertNotNull(idx);
+    }
+
+    @Test(expected = WebApplicationException.class)
+    public void postIndexAlreadyExists() {
+        final HashMap<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("class", "vertex");
+        parameters.put("keys", "[name]");
+        final IndexResource resource = constructIndexResource(true, parameters).getResource();
+        resource.postIndex(graphName, "index-name-1");
+    }
+
+    @Test(expected = WebApplicationException.class)
+    public void putElementInIndexNoIndex() {
+        final HashMap<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("class", "vertex");
+        parameters.put("key", "name");
+        parameters.put("value", "marko");
+        parameters.put("id", "1");
+        final IndexResource resource = constructIndexResource(true, parameters).getResource();
+        resource.putElementInIndex(graphName, "index-name-100");
+    }
+
+    @Test(expected = WebApplicationException.class)
+    public void putElementInIndexBadClass() {
+        final HashMap<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("class", "nonsense");
+        parameters.put("key", "name");
+        parameters.put("value", "marko");
+        parameters.put("id", "1");
+        final IndexResource resource = constructIndexResource(true, parameters).getResource();
+        resource.postIndex(graphName, "index-name-1");
+    }
+
+    @Test
+    public void putElementInIndexVertexItem() {
+        final HashMap<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("class", "vertex");
+        parameters.put("key", "name");
+        parameters.put("value", "marko");
+        parameters.put("id", "1");
+        final IndexResource resource = constructIndexResource(true, parameters).getResource();
+        resource.putElementInIndex(graphName, "index-name-2");
+
+        final Index<Vertex> idx = ((IndexableGraph) this.toyGraph).getIndex("index-name-2", Vertex.class);
+        final Vertex v = idx.get("name", "marko").iterator().next();
+        Assert.assertEquals(this.toyGraph.getVertex(1), v);
+    }
+
+    @Test
+    public void putElementInIndexEdgeItem() {
+        final HashMap<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("class", "edge");
+        parameters.put("key", "weight");
+        parameters.put("value", "(f,0.2)");
+        parameters.put("id", "12");
+        final IndexResource resource = constructIndexResource(true, parameters).getResource();
+        resource.putElementInIndex(graphName, "index-name-1");
+
+        final Index<Edge> idx = ((IndexableGraph) this.toyGraph).getIndex("index-name-1", Edge.class);
+        final Edge e = idx.get("weight", 0.2f).iterator().next();
+        Assert.assertEquals(this.toyGraph.getEdge(12), e);
+    }
+
     private JSONObject assertIndexOkResponseJsonStructure(final int numberOfIndicesReturned,
                                                           final int numberOfIndicesTotal, final Response response) {
         Assert.assertNotNull(response);

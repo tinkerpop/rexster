@@ -358,14 +358,6 @@ public class IndexResource extends AbstractSubResource {
 
     }
 
-    /**
-     * POST http://host/graph/indices/indexName?key=key1&value=value1&class=vertex&id=id1
-     * Index index = graph.getIndex(indexName,...);
-     * index.put(key,value,graph.getVertex(id1));
-     * <p/>
-     * POST http://host/graph/indices/indexName?class=vertex&type=automatic&keys=[name,age]
-     * graph.createIndex(indexName,Vertex.class,AUTOMATIC, {name, age})
-     */
     @POST
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
@@ -384,7 +376,7 @@ public class IndexResource extends AbstractSubResource {
     public Response postIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
         String clazz = null;
         Set<String> keys = null;
-        Parameter<Object, Object>[] indexParameters = new Parameter[0];
+        Parameter[] indexParameters = new Parameter[0];
 
         final JSONObject theRequestObject = this.getRequestObject();
 
