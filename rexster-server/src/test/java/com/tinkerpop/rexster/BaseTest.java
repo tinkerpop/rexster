@@ -130,6 +130,44 @@ public abstract class BaseTest {
         return new ResourceHolder<VertexResource>(resource, request);
     }
 
+    protected ResourceHolder<EdgeResource> constructEdgeResourceWithToyGraph() {
+        return this.constructEdgeResource(true, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    protected ResourceHolder<EdgeResource> constructEdgeResourceWithEmptyGraph() {
+        return this.constructEdgeResource(false, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    protected ResourceHolder<EdgeResource> constructEdgeResource(final boolean useToyGraph,
+                                                                     final HashMap<String, Object> parameters){
+        return this.constructEdgeResource(useToyGraph, parameters, MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    protected ResourceHolder<EdgeResource> constructEdgeResource(final boolean useToyGraph,
+                                                                     final HashMap<String, Object> parameters,
+                                                                     final MediaType mediaType) {
+        final UriInfo uri = this.mockery.mock(UriInfo.class);
+        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
+
+        final Request request = this.mockery.mock(Request.class);
+        final Variant variantJson = new Variant(mediaType, null, null);
+        final URI requestUriPath = URI.create("http://localhost/graphs/graph/edges");
+
+        this.mockery.checking(new Expectations() {{
+            allowing(httpServletRequest).getParameterMap();
+            will(returnValue(parameters));
+            allowing(request).selectVariant(with(any(List.class)));
+            will(returnValue(variantJson));
+            allowing(uri).getAbsolutePath();
+            will(returnValue(requestUriPath));
+        }});
+
+        final EdgeResource resource = useToyGraph ? new EdgeResource(uri, httpServletRequest, this.raToyGraph)
+                : new EdgeResource(uri, httpServletRequest, this.raEmptyGraph);
+        return new ResourceHolder<EdgeResource>(resource, request);
+    }
+
+
     protected ResourceHolder<KeyIndexResource> constructKeyIndexResourceWithToyGraph() {
         return this.constructKeyIndexResource(true, new HashMap<String, Object>(), MediaType.APPLICATION_JSON_TYPE);
     }

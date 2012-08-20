@@ -403,7 +403,8 @@ public class EdgeResource extends AbstractSubResource {
     @POST
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
-    public Response postNullEdgeConsumesJson(@Context Request request, @PathParam("graphname") String graphName, JSONObject json) {
+    public Response postNullEdgeConsumesJson(@Context final Request request,
+                                             @PathParam("graphname") final String graphName, final JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
@@ -419,7 +420,8 @@ public class EdgeResource extends AbstractSubResource {
     @POST
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response postNullEdgeConsumesTypedJson(@Context Request request, @PathParam("graphname") String graphName, JSONObject json) {
+    public Response postNullEdgeConsumesTypedJson(@Context final Request request,
+                                                  @PathParam("graphname") final String graphName, final JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
@@ -435,7 +437,7 @@ public class EdgeResource extends AbstractSubResource {
      */
     @POST
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response postNullEdgeConsumesUri(@Context Request request, @PathParam("graphname") String graphName) {
+    public Response postNullEdgeConsumesUri(@Context final Request request, @PathParam("graphname") final String graphName) {
         Variant v = request.selectVariant(producesVariantList);
         return this.postEdge(graphName, null, true, v);
     }
@@ -449,7 +451,9 @@ public class EdgeResource extends AbstractSubResource {
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
-    public Response postEdgeConsumesJson(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response postEdgeConsumesJson(@Context final Request request,
+                                         @PathParam("graphname") final String graphName,
+                                         @PathParam("id") final String id, final JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
         // have already been established.
@@ -467,7 +471,9 @@ public class EdgeResource extends AbstractSubResource {
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response postEdgeConsumesTypedJson(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response postEdgeConsumesTypedJson(@Context final Request request,
+                                              @PathParam("graphname") final String graphName,
+                                              @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         Variant v = request.selectVariant(producesVariantList);
         return postEdge(graphName, id, true, v);
@@ -481,12 +487,15 @@ public class EdgeResource extends AbstractSubResource {
     @POST
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response postEdgeConsumesUri(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response postEdgeConsumesUri(@Context final Request request,
+                                        @PathParam("graphname") final String graphName,
+                                        @PathParam("id") final String id) {
         Variant v = request.selectVariant(producesVariantList);
         return postEdge(graphName, id, true, v);
     }
 
-    private Response postEdge(final @PathParam("graphname") String graphName, final @PathParam("id") String id, final boolean parseTypes, final Variant variant) {
+    private Response postEdge(final @PathParam("graphname") String graphName, final @PathParam("id") String id,
+                              final boolean parseTypes, final Variant variant) {
 
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         final Graph graph = rag.getGraph();
