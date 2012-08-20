@@ -1,38 +1,17 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.XMLConfiguration;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.Sequence;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Variant;
-import java.io.StringReader;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
 
 /**
  * Tests edge resource.  Should not need to test any specific returns values as they are
@@ -42,7 +21,6 @@ import java.util.List;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class EdgeResourceTest extends BaseTest {
-    private final String requestUriPath = "";
 
     @Test
     public void getAllEdgesNoOffset() {
@@ -297,26 +275,27 @@ public class EdgeResourceTest extends BaseTest {
         Assert.assertFalse(this.emptyGraph.getEdge(1).getPropertyKeys().contains("to-delete"));
     }
 
-    private static void assertPostEdgeProducesJson(Response response, boolean hasHypermedia, boolean hasTypes) {
+    private static void assertPostEdgeProducesJson(final Response response, final boolean hasHypermedia,
+                                                   final boolean hasTypes) {
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertNotNull(response.getEntity());
         Assert.assertTrue(response.getEntity() instanceof JSONObject);
 
-        JSONObject json = (JSONObject) response.getEntity();
+        final JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
 
         Assert.assertTrue(json.has(Tokens.RESULTS));
         Assert.assertFalse(json.isNull(Tokens.RESULTS));
 
-        JSONObject postedEdge = json.optJSONObject(Tokens.RESULTS);
+        final JSONObject postedEdge = json.optJSONObject(Tokens.RESULTS);
 
         if (hasTypes) {
-            JSONObject somePropertyJson = postedEdge.optJSONObject("some-property");
+            final JSONObject somePropertyJson = postedEdge.optJSONObject("some-property");
             Assert.assertEquals("string", somePropertyJson.optString("type"));
             Assert.assertEquals("300a", somePropertyJson.optString("value"));
 
-            JSONObject intPropertyJson = postedEdge.optJSONObject("int-property");
+            final JSONObject intPropertyJson = postedEdge.optJSONObject("int-property");
             Assert.assertEquals("integer", intPropertyJson.optString("type"));
             Assert.assertEquals(300, intPropertyJson.optInt("value"));
         } else {
@@ -329,7 +308,7 @@ public class EdgeResourceTest extends BaseTest {
         }
     }
 
-    private static HashMap<String, Object> generateEdgeParametersToPost(boolean rexsterTyped) {
+    private static HashMap<String, Object> generateEdgeParametersToPost(final boolean rexsterTyped) {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put(Tokens._IN_V, "1");
         parameters.put(Tokens._OUT_V, "2");
@@ -346,111 +325,14 @@ public class EdgeResourceTest extends BaseTest {
         return parameters;
     }
 
-    private static void initializeExtensionConfigurations(RexsterApplicationGraph rag) {
-        String xmlString = "<extension><namespace>tp</namespace><name>extensionname</name><configuration><test>1</test></configuration></extension>";
-
-        XMLConfiguration xmlConfig = new XMLConfiguration();
-
-        try {
-            xmlConfig.load(new StringReader(xmlString));
-        } catch (ConfigurationException ex) {
-            Assert.fail(ex.getMessage());
-        }
-
-        List<HierarchicalConfiguration> list = new ArrayList<HierarchicalConfiguration>();
-        list.add(xmlConfig);
-
-        List allowables = new ArrayList();
-        allowables.add("tp:*");
-        rag.loadAllowableExtensions(allowables);
-
-        rag.loadExtensionsConfigurations(list);
-    }
-
-    private EdgeResource constructMockDeleteEdgeScenario(final Edge edge, final HashMap<String, String> parameters) {
-
-        final Graph graph = this.mockery.mock(Graph.class);
-        final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
-
-        final UriInfo uri = this.mockery.mock(UriInfo.class);
-        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
-
-        this.mockery.checking(new Expectations() {{
-            allowing(httpServletRequest).getParameterMap();
-            will(returnValue(parameters));
-            allowing(graph).getEdge(with(any(Object.class)));
-            will(returnValue(edge));
-            allowing(ra).getApplicationGraph(with(any(String.class)));
-            will(returnValue(rag));
-            allowing(uri).getAbsolutePath();
-            will(returnValue(requestUriPath));
-        }});
-
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
-        return resource;
-    }
-
-    private EdgeResource constructMockGetSingleEdgeScenario(final Edge edge, final HashMap<String, String> parameters) {
-        final Graph graph = this.mockery.mock(Graph.class);
-        final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-
-        List<String> namespaces = new ArrayList<String>();
-        namespaces.add("*:*");
-        rag.loadAllowableExtensions(namespaces);
-
-        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
-
-        final UriInfo uri = this.mockery.mock(UriInfo.class);
-
-        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
-
-        this.mockery.checking(new Expectations() {{
-            allowing(httpServletRequest).getParameterMap();
-            will(returnValue(parameters));
-            allowing(graph).getEdge(with(any(Object.class)));
-            will(returnValue(edge));
-            allowing(ra).getApplicationGraph(with(any(String.class)));
-            will(returnValue(rag));
-            allowing(uri).getAbsolutePath();
-            will(returnValue(requestUriPath));
-        }});
-
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
-        return resource;
-    }
-
-    private EdgeResource constructMockGetAllEdgesScenario(final int numberOfEdges, final HashMap<String, Object> parameters) {
-        final Graph graph = this.mockery.mock(Graph.class);
-        final RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", graph);
-        final RexsterApplication ra = this.mockery.mock(RexsterApplication.class);
-
-        final UriInfo uri = this.mockery.mock(UriInfo.class);
-
-        final HttpServletRequest httpServletRequest = this.mockery.mock(HttpServletRequest.class);
-
-        this.mockery.checking(new Expectations() {{
-            allowing(httpServletRequest).getParameterMap();
-            will(returnValue(parameters));
-            allowing(graph).getEdges();
-            will(returnValue(generateMockedEdges(numberOfEdges)));
-            allowing(ra).getApplicationGraph(with(any(String.class)));
-            will(returnValue(rag));
-            allowing(uri).getAbsolutePath();
-            will(returnValue(requestUriPath));
-        }});
-
-        EdgeResource resource = new EdgeResource(uri, httpServletRequest, ra);
-        return resource;
-    }
-
-    private void assertEdgesOkResponseJsonStructure(int numberOfEdgesReturned, int numberOfEdgesTotal, Response response) {
+    private void assertEdgesOkResponseJsonStructure(final int numberOfEdgesReturned,
+                                                    final int numberOfEdgesTotal, final Response response) {
         Assert.assertNotNull(response);
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertNotNull(response.getEntity());
         Assert.assertTrue(response.getEntity() instanceof JSONObject);
 
-        JSONObject json = (JSONObject) response.getEntity();
+        final JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.TOTAL_SIZE));
         Assert.assertEquals(numberOfEdgesTotal, json.optInt(Tokens.TOTAL_SIZE));
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
@@ -458,21 +340,7 @@ public class EdgeResourceTest extends BaseTest {
         Assert.assertTrue(json.has(Tokens.RESULTS));
         Assert.assertFalse(json.isNull(Tokens.RESULTS));
 
-        JSONArray jsonResults = json.optJSONArray(Tokens.RESULTS);
+        final JSONArray jsonResults = json.optJSONArray(Tokens.RESULTS);
         Assert.assertEquals(numberOfEdgesReturned, jsonResults.length());
-    }
-
-    private static Iterable<Edge> generateMockedEdges(int numberOfEdges) {
-        ArrayList<Edge> edges = new ArrayList<Edge>();
-
-        MockVertex v1 = new MockVertex("1");
-        MockVertex v2 = new MockVertex("2");
-
-        for (int ix = 0; ix < numberOfEdges; ix++) {
-            MockEdge e = new MockEdge(new Integer(ix).toString(), "label-" + new Integer(ix).toString(), new Hashtable<String, Object>(), v1, v2);
-            edges.add(e);
-        }
-
-        return edges;
     }
 }
