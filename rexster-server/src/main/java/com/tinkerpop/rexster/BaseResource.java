@@ -324,9 +324,9 @@ public abstract class BaseResource {
                 HttpMethod.PUT.toString());
     }
 
-    protected Response buildOptionsResponse(String... methods) {
-        return Response.noContent()
-                .header("Access-Control-Allow-Methods", StringUtils.join(methods, ","))
+    protected Response buildOptionsResponse(final String... methods) {
+        return Response.ok()
+                .header("Access-Control-Allow-Methods", "OPTIONS," + StringUtils.join(methods, ","))
                 .header("Access-Control-Allow-Headers", "*")
                 .header("Access-Control-Max-Age", "1728000").build();
     }

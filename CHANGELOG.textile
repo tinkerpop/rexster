@@ -17,6 +17,7 @@ h3. Version 2.2.0 (NOT OFFICIALLY RELEASED YET)
 
 * Major refactoring and renaming of core "server" classes.
 * @ExtensionRequestParameter@ now supports a @defaultValue@.
+* Requests with @OPTIONS@ now returns @OPTIONS@ in the @Access-Control-Allow-Methods@ and a response 200 instead of 204.
 
 h3. Version 2.1.0 (August 4, 2012)
 
