@@ -325,9 +325,11 @@ public abstract class BaseResource {
     }
 
     protected Response buildOptionsResponse(final String... methods) {
+        final String requestHeaders = this.httpServletRequest.getHeader("Access-Control-Request-Headers");
+        final String allowHeaders = requestHeaders == null ? "*" : requestHeaders;
         return Response.ok()
                 .header("Access-Control-Allow-Methods", "OPTIONS," + StringUtils.join(methods, ","))
-                .header("Access-Control-Allow-Headers", "*")
+                .header("Access-Control-Allow-Headers", allowHeaders)
                 .header("Access-Control-Max-Age", "1728000").build();
     }
 }
