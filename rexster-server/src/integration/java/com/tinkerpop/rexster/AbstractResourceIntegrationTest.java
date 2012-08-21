@@ -1,89 +1,52 @@
 package com.tinkerpop.rexster;
 
+import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.test.framework.JerseyTest;
-import com.tinkerpop.blueprints.Graph;
-import com.sun.jersey.test.framework.WebAppDescriptor;
-import com.tinkerpop.rexster.server.RexsterApplication;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.tinkerpop.rexster.server.DefaultRexsterApplication;
-import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
-import javax.ws.rs.ext.Provider;
-import com.sun.jersey.api.core.ClassNamesResourceConfig;
+import com.tinkerpop.rexster.server.HttpRexsterServer;
+import com.tinkerpop.rexster.server.RexsterApplication;
+import com.tinkerpop.rexster.server.RexsterServer;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.codehaus.jettison.json.JSONObject;
+import org.junit.After;
+import org.junit.Before;
 
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
-import java.lang.Override;
-import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.util.List;
 
-public abstract class AbstractResourceIntegrationTest extends JerseyTest {
+public abstract class AbstractResourceIntegrationTest {
 
-    protected static String BASE_URI = "http://localhost:9998";
+    protected static String BASE_URI = "http://127.0.0.1:8182";
+    protected RexsterServer rexsterServer;
+    protected final ClientConfig clientConfiguration = new DefaultClientConfig();
+    protected Client client;
 
-    protected static RexsterApplication application;
-
-    public AbstractResourceIntegrationTest() throws Exception {
-        //super("com.tinkerpop.rexster");
-        /*
-        super(new WebAppDescriptor.Builder("com.tinkerpop.rexster")
-            .initParam(ClassNamesResourceConfig.PROPERTY_CLASSNAMES,
-                    TestRexsterAppProvider.class.getName()).build());
-        */
-
-        XMLConfiguration properties = new XMLConfiguration();
+    @Before
+    public void setUp() throws Exception {
+        final XMLConfiguration properties = new XMLConfiguration();
         properties.load(Application.class.getResourceAsStream("rexster-integration-test.xml"));
+        rexsterServer = new HttpRexsterServer(properties);
 
-        if (application == null) {
-            application = new DefaultRexsterApplication(properties);
-        }
+        final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
+        final RexsterApplication application = new DefaultRexsterApplication(graphConfigs);
+        rexsterServer.start(application);
+
+        client = Client.create(clientConfiguration);
     }
 
-    @Override
-    public WebAppDescriptor configure() {
-        return new WebAppDescriptor.Builder("com.tinkerpop.rexster")
-                .initParam(ClassNamesResourceConfig.PROPERTY_CLASSNAMES,
-                        TestRexsterAppProvider.class.getName()).build();
-    }
-
-    @Provider
-    public static class TestRexsterAppProvider extends SingletonTypeInjectableProvider {
-        public TestRexsterAppProvider() {
-            super(RexsterApplication.class, application);
-        }
+    @After
+    public void tearDown() throws Exception {
+        rexsterServer.stop();
     }
 
     protected URI createUri(String path) {
         return URI.create(BASE_URI + "/graphs" + path);
-    }
-
-    @Override
-    protected int getPort(int defaultPort) {
-
-        ServerSocket server = null;
-        int port = -1;
-        try {
-            server = new ServerSocket(defaultPort);
-            port = server.getLocalPort();
-        } catch (IOException e) {
-            // ignore
-        } finally {
-            if (server != null) {
-                try {
-                    server.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
-        }
-        if ((port != -1) || (defaultPort == 0)) {
-            BASE_URI = "http://localhost:" + port;
-            return port;
-        }
-        return getPort(0);
     }
 
     protected ClientResponse doGraphGet(GraphTestHolder testGraph, String path) {
@@ -160,28 +123,28 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
         String uri = makeUriString(path, query);
 
         ClientRequest graphRequest = ClientRequest.create().build(createUri("/" + uri), "GET");
-        return this.client().handle(graphRequest);
+        return this.client.handle(graphRequest);
     }
 
     protected ClientResponse doPost(String path, String query) {
         String uri = makeUriString(path, query);
 
         ClientRequest graphRequest = ClientRequest.create().build(createUri("/" + uri), "POST");
-        return this.client().handle(graphRequest);
+        return this.client.handle(graphRequest);
     }
 
     protected ClientResponse doPut(String path, String query) {
         String uri = makeUriString(path, query);
 
         ClientRequest graphRequest = ClientRequest.create().build(createUri("/" + uri), "PUT");
-        return this.client().handle(graphRequest);
+        return this.client.handle(graphRequest);
     }
 
     protected ClientResponse doDelete(String path, String query) {
         String uri = makeUriString(path, query);
 
         ClientRequest graphRequest = ClientRequest.create().build(createUri("/" + uri), "DELETE");
-        return this.client().handle(graphRequest);
+        return this.client.handle(graphRequest);
     }
 
     protected ClientResponse doPostOfJson(String path, String query, JSONObject jsonToPost) {
@@ -190,7 +153,7 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
         ClientRequest graphRequest = ClientRequest.create().type(MediaType.APPLICATION_JSON_TYPE).build(createUri("/" + uri), "POST");
         graphRequest.setEntity(jsonToPost);
 
-        return this.client().handle(graphRequest);
+        return this.client.handle(graphRequest);
     }
 
     protected ClientResponse doPutOfJson(String path, String query, JSONObject jsonToPost) {
@@ -199,7 +162,7 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
         ClientRequest graphRequest = ClientRequest.create().type(MediaType.APPLICATION_JSON_TYPE).build(createUri("/" + uri), "PUT");
         graphRequest.setEntity(jsonToPost);
 
-        return this.client().handle(graphRequest);
+        return this.client.handle(graphRequest);
     }
 
     protected ClientResponse doDeleteOfJson(String path, String query, JSONObject jsonToDelete) {
@@ -208,7 +171,7 @@ public abstract class AbstractResourceIntegrationTest extends JerseyTest {
         ClientRequest graphRequest = ClientRequest.create().type(MediaType.APPLICATION_JSON_TYPE).build(createUri("/" + uri), "DELETE");
         graphRequest.setEntity(jsonToDelete);
 
-        return this.client().handle(graphRequest);
+        return this.client.handle(graphRequest);
     }
 
     private String makeGraphUriString(GraphTestHolder testGraph, String path) {

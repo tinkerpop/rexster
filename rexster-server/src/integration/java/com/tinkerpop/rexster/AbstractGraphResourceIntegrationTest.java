@@ -1,12 +1,19 @@
 package com.tinkerpop.rexster;
 
+import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
+import com.tinkerpop.rexster.server.DefaultRexsterApplication;
+import com.tinkerpop.rexster.server.HttpRexsterServer;
+import com.tinkerpop.rexster.server.RexsterApplication;
+import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -28,9 +35,12 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
     }
 
     @Before
-    public void setUp() throws JSONException {
+    public void setUp() throws Exception {
+
+        super.setUp();
+
         ClientRequest request = ClientRequest.create().build(createUri("/"), "GET");
-        ClientResponse response = this.client().handle(request);
+        ClientResponse response = this.client.handle(request);
 
         JSONObject json = response.getEntity(JSONObject.class);
         JSONArray jsonArray = json.optJSONArray("graphs");
@@ -40,7 +50,7 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
         this.testGraphs = new ArrayList<GraphTestHolder>();
         for (int ix = 0; ix < jsonArray.length(); ix++) {
             ClientRequest graphRequest = ClientRequest.create().build(createUri("/" + jsonArray.optString(ix)), "GET");
-            ClientResponse graphResponse = this.client().handle(graphRequest);
+            ClientResponse graphResponse = this.client.handle(graphRequest);
 
             JSONObject graphJson = graphResponse.getEntity(JSONObject.class);
 
@@ -67,13 +77,13 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
         for (GraphTestHolder testGraph : this.testGraphs) {
             ClientResponse response = doGraphGet(testGraph, "vertices");
             JSONObject verticesJson = response.getEntity(JSONObject.class);
             JSONArray verticesToDelete = verticesJson.optJSONArray(Tokens.RESULTS);
             for (int ix = 0; ix < verticesToDelete.length(); ix++) {
-                this.client().handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/vertices/" + encode(verticesToDelete.optJSONObject(ix).optString(Tokens._ID))), "DELETE"));
+                this.client.handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/vertices/" + encode(verticesToDelete.optJSONObject(ix).optString(Tokens._ID))), "DELETE"));
             }
 
             if (testGraph.getFeatures().supportsIndices) {
@@ -81,7 +91,7 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
                 JSONObject indicesJson = response.getEntity(JSONObject.class);
                 JSONArray indicesToDelete = indicesJson.optJSONArray(Tokens.RESULTS);
                 for (int ix = 0; ix < indicesToDelete.length(); ix++) {
-                    this.client().handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/indices/" + indicesToDelete.optJSONObject(ix).optString("name")), "DELETE"));
+                    this.client.handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/indices/" + indicesToDelete.optJSONObject(ix).optString("name")), "DELETE"));
                 }
             }
 
@@ -91,24 +101,26 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
                 JSONObject keyIndicesVertexJson = response.getEntity(JSONObject.class);
                 JSONArray keyIndicesVertexToDelete = keyIndicesVertexJson.optJSONArray(Tokens.RESULTS);
                 for (int ix = 0; ix < keyIndicesVertexToDelete.length(); ix++) {
-                    this.client().handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/keyindices/vertex/" + encode(keyIndicesVertexToDelete.optString(ix))), "DELETE"));
+                    this.client.handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/keyindices/vertex/" + encode(keyIndicesVertexToDelete.optString(ix))), "DELETE"));
                 }
 
                 response = doGraphGet(testGraph, "keyindices/edge");
                 JSONObject keyIndicesEdgeJson = response.getEntity(JSONObject.class);
                 JSONArray keyIndicesEdgeToDelete = keyIndicesEdgeJson.optJSONArray(Tokens.RESULTS);
                 for (int ix = 0; ix < keyIndicesEdgeToDelete.length(); ix++) {
-                    this.client().handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/keyindices/edge/" + keyIndicesEdgeToDelete.optString(ix)), "DELETE"));
+                    this.client.handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/keyindices/edge/" + keyIndicesEdgeToDelete.optString(ix)), "DELETE"));
                 }
             }
         }
+
+        super.tearDown();
     }
 
     protected void postVertex(GraphTestHolder graphHolder, Vertex v) throws JSONException {
         ClientRequest request = ClientRequest.create().type(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON).build(createUri("/" + graphHolder.getGraphName() + "/vertices"), "POST");
-        request.setEntity(typeTheElement(GraphSONUtility.jsonFromElement(v)));
+        request.setEntity(typeTheElement(GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL)));
 
-        ClientResponse response = this.client().handle(request);
+        ClientResponse response = this.client.handle(request);
 
         JSONObject jsonObject = response.getEntity(JSONObject.class);
         String id = jsonObject.optJSONObject(Tokens.RESULTS).optString(Tokens._ID);
@@ -120,7 +132,7 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
     protected void postEdge(GraphTestHolder graphHolder, Edge e) throws JSONException {
         ClientRequest request = ClientRequest.create().build(createUri("/" + graphHolder.getGraphName() + "/edges"), "POST");
 
-        JSONObject jsonEdge = typeTheElement(GraphSONUtility.jsonFromElement(e));
+        JSONObject jsonEdge = typeTheElement(GraphSONUtility.jsonFromElement(e, null, GraphSONMode.NORMAL));
         jsonEdge.put(Tokens._IN_V, graphHolder.getVertexIdSet().get(jsonEdge.optString(Tokens._IN_V)));
         jsonEdge.put(Tokens._OUT_V, graphHolder.getVertexIdSet().get(jsonEdge.optString(Tokens._OUT_V)));
 
@@ -130,7 +142,7 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
         }};
         request.getHeaders().put("Content-Type", headerValue);
 
-        ClientResponse response = this.client().handle(request);
+        ClientResponse response = this.client.handle(request);
 
         JSONObject jsonObject = response.getEntity(JSONObject.class);
         String id = jsonObject.optJSONObject(Tokens.RESULTS).optString(Tokens._ID);

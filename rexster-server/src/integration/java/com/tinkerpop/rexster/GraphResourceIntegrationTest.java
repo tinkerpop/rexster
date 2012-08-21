@@ -16,7 +16,7 @@ public class GraphResourceIntegrationTest extends AbstractGraphResourceIntegrati
     public void getGraph() {
         for (GraphTestHolder tg : this.testGraphs) {
             ClientRequest request = ClientRequest.create().build(createUri("/" + tg.getGraphName()), "GET");
-            ClientResponse response = this.client().handle(request);
+            ClientResponse response = this.client.handle(request);
 
             Assert.assertNotNull(response);
             Assert.assertEquals(ClientResponse.Status.OK, response.getClientResponseStatus());

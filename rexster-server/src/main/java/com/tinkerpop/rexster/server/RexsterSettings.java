@@ -114,14 +114,6 @@ public class RexsterSettings {
             }
         }
 
-        // reference the location of the xml file used to configure the server.
-        // this will allow the configuration to be passed into components that
-        // do not have access to the configuration file and need it for graph
-        // initialization preventing it from having to be explicitly defined
-        // in rexster.xml itself.  there's probably an even better way to do
-        // this *sigh*
-        properties.addProperty("self-xml", rexsterXmlFileLocation);
-
         // overrides rexster-server-port from command line
         if (line.hasCommandParameters() && line.getCommandParameters().hasOption("rexsterport")) {
             properties.setProperty("rexster-server-port", line.getCommandParameters().getOptionValue("rexsterport"));

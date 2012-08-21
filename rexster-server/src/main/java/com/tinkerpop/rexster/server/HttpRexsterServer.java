@@ -62,7 +62,6 @@ public class HttpRexsterServer implements RexsterServer {
     @Override
     public void start(final RexsterApplication application) throws Exception {
         final ServletHandler jerseyHandler = new ServletHandler();
-        jerseyHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
 
         // explicitly load resources so that the "RexsterApplicationProvider" class is not loaded
         final ResourceConfig rc = new ClassNamesResourceConfig(
@@ -110,14 +109,12 @@ public class HttpRexsterServer implements RexsterServer {
 
         // servlet for gremlin console
         final ServletHandler visualizationHandler = new ServletHandler();
-        visualizationHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
 
         visualizationHandler.setContextPath("/doghouse/visualize");
         visualizationHandler.setServletInstance(new VisualizationServlet(application));
 
         // servlet for gremlin console
         final ServletHandler evaluatorHandler = new ServletHandler();
-        evaluatorHandler.addInitParameter("com.tinkerpop.rexster.config", properties.getString("self-xml"));
 
         evaluatorHandler.setContextPath("/doghouse/exec");
         evaluatorHandler.setServletInstance(new EvaluatorServlet(application));

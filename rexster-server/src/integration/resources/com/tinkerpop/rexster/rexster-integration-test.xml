@@ -11,6 +11,19 @@
     <base-uri>http://localhost</base-uri>
     <web-root>public</web-root>
     <character-set>UTF-8</character-set>
+    <security>
+        <authentication>
+            <type>none</type>
+            <configuration>
+                <users>
+                    <user>
+                        <username>rexster</username>
+                        <password>rexster</password>
+                    </user>
+                </users>
+            </configuration>
+        </authentication>
+    </security>
     <graphs>
         <graph>
             <graph-enabled>true</graph-enabled>
