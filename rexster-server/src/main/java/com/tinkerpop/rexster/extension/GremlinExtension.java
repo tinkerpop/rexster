@@ -30,9 +30,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 @ExtensionNaming(namespace = GremlinExtension.EXTENSION_NAMESPACE, name = GremlinExtension.EXTENSION_NAME)
 public class GremlinExtension extends AbstractRexsterExtension {
-    protected static Logger logger = Logger.getLogger(GremlinExtension.class);
+    protected static final Logger logger = Logger.getLogger(GremlinExtension.class);
 
     public static final String EXTENSION_NAMESPACE = "tp";
     public static final String EXTENSION_NAME = "gremlin";
@@ -176,35 +179,23 @@ public class GremlinExtension extends AbstractRexsterExtension {
         final long offsetEnd = RequestObjectHelper.getEndOffset(requestObject);
 
         final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
-
-        // read the return keys from the request object
         final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(requestObject, WILDCARD);
 
         final String languageToExecuteWith = getLanguageToExecuteWith(requestObject);
-
-        final Bindings bindings = new SimpleBindings();
-        bindings.put(GRAPH_VARIABLE, graph);
-
-        if (vertex != null) {
-            bindings.put(VERTEX_VARIABLE, vertex);
-        }
-
-        if (edge != null) {
-            bindings.put(EDGE_VARIABLE, edge);
-        }
+        final Bindings bindings = createBindings(graph, vertex, edge);
 
         // add all keys not defined by this request as bindings to the script engine
         placeParametersOnBinding(requestObject, bindings, showTypes);
 
         // get the list of "stored procedures" to run
-        RexsterApplicationGraph rag = rexsterResourceContext.getRexsterApplicationGraph();
+        final RexsterApplicationGraph rag = rexsterResourceContext.getRexsterApplicationGraph();
 
         final ExtensionMethod extensionMethod = rexsterResourceContext.getExtensionMethod();
         Map configurationMap = null;
 
         Iterator<String> scriptsToRun = null;
         try {
-            ExtensionConfiguration extensionConfiguration = rag != null ? rag.findExtensionConfiguration(EXTENSION_NAMESPACE, EXTENSION_NAME) : null;
+            final ExtensionConfiguration extensionConfiguration = rag != null ? rag.findExtensionConfiguration(EXTENSION_NAMESPACE, EXTENSION_NAME) : null;
             if (extensionConfiguration != null) {
                 configurationMap = extensionConfiguration.tryGetMapFromConfiguration();
                 scriptsToRun = getScriptsToRun(requestObject, configurationMap);
@@ -240,21 +231,36 @@ public class GremlinExtension extends AbstractRexsterExtension {
                 result = engineHolder.getEngine().eval(script, bindings);
             }
 
-            JSONArray results = new JSONResultConverter(mode, offsetStart, offsetEnd, returnKeys).convert(result);
+            final JSONArray results = new JSONResultConverter(mode, offsetStart, offsetEnd, returnKeys).convert(result);
 
-            HashMap<String, Object> resultMap = new HashMap<String, Object>();
+            final HashMap<String, Object> resultMap = new HashMap<String, Object>();
             resultMap.put(Tokens.SUCCESS, true);
             resultMap.put(Tokens.RESULTS, results);
 
-            JSONObject resultObject = new JSONObject(resultMap);
+            final JSONObject resultObject = new JSONObject(resultMap);
             extensionResponse = ExtensionResponse.ok(resultObject);
 
         } catch (Exception e) {
+            logger.error(String.format("Gremlin Extension: %s", e.getMessage()), e);
             extensionResponse = ExtensionResponse.error(e,
                     generateErrorJson(extensionMethod.getExtensionApiAsJson()));
         }
 
         return extensionResponse;
+    }
+
+    private static Bindings createBindings(final Graph graph, final Vertex vertex, final Edge edge) {
+        final Bindings bindings = new SimpleBindings();
+        bindings.put(GRAPH_VARIABLE, graph);
+
+        if (vertex != null) {
+            bindings.put(VERTEX_VARIABLE, vertex);
+        }
+
+        if (edge != null) {
+            bindings.put(EDGE_VARIABLE, edge);
+        }
+        return bindings;
     }
 
     /*
