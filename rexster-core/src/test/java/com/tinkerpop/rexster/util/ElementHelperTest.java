@@ -439,4 +439,56 @@ public class ElementHelperTest {
         List list = (List) map.get("g");
         Assert.assertEquals("innera", list.get(0));
     }
+
+    @Test
+    public void getTypedPropertValueRawJSONObjectTypeConversion() {
+        JSONObject json = new JSONObject();
+
+        try {
+            json.put("a", "testa");
+            json.put("b", "(integer,2)");
+            JSONObject inner = new JSONObject();
+            inner.put("a", "inner");
+            inner.put("b", "(integer,3)");
+            json.put("c", inner);
+        } catch (JSONException jse) {
+        }
+
+        Object typedPropertyValue = ElementHelper.getTypedPropertyValue(json,true);
+
+        Assert.assertTrue(typedPropertyValue instanceof Map);
+        Map map = (Map) typedPropertyValue;
+
+        Assert.assertEquals("testa", map.get("a"));
+        Assert.assertEquals(2, map.get("b"));
+        Map innerMap = (Map) map.get("c");
+        Assert.assertEquals("inner", innerMap.get("a"));
+        Assert.assertEquals(3, innerMap.get("b"));
+    }
+
+    @Test
+    public void getTypedPropertValueRawJSONObjectNoTypeConversion() {
+        JSONObject json = new JSONObject();
+
+        try {
+            json.put("a", "testa");
+            json.put("b", "(integer,testa)");
+            JSONObject inner = new JSONObject();
+            inner.put("a", "inner");
+            inner.put("b", "(6-4,inner)");
+            json.put("c", inner);
+        } catch (JSONException jse) {
+        }
+
+        Object typedPropertyValue = ElementHelper.getTypedPropertyValue(json,false);
+
+        Assert.assertTrue(typedPropertyValue instanceof Map);
+        Map map = (Map) typedPropertyValue;
+
+        Assert.assertEquals("testa", map.get("a"));
+        Assert.assertEquals("(integer,testa)", map.get("b"));
+        Map innerMap = (Map) map.get("c");
+        Assert.assertEquals("inner", innerMap.get("a"));
+        Assert.assertEquals("(6-4,inner)", innerMap.get("b"));
+    }
 }

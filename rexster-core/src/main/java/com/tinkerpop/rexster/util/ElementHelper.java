@@ -109,7 +109,7 @@ public class ElementHelper {
                 Iterator itty = innerJson.keys();
                 while (itty.hasNext()) {
                     String key = (String) itty.next();
-                    properties.put(key, getTypedPropertyValue(innerJson.opt(key)));
+                    properties.put(key, getTypedPropertyValue(innerJson.opt(key), parseTypes));
                 }
 
                 typedPropertyValue = properties;
@@ -118,7 +118,7 @@ public class ElementHelper {
                 ArrayList typedItems = new ArrayList();
 
                 for (int ix = 0; ix < innerJson.length(); ix++) {
-                    typedItems.add(getTypedPropertyValue(innerJson.opt(ix)));
+                    typedItems.add(getTypedPropertyValue(innerJson.opt(ix), parseTypes));
                 }
 
                 typedPropertyValue = typedItems;
