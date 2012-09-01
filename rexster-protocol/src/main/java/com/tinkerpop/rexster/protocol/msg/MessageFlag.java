@@ -18,4 +18,6 @@ public class MessageFlag {
 
     public static final byte SESSION_REQUEST_NEW_SESSION = 0;
     public static final byte SESSION_REQUEST_KILL_SESSION = 1;
+
+    public static final byte SESSION_RESPONSE_NO_FLAG = 0;
 }

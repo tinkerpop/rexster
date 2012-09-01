@@ -47,33 +47,21 @@ public class SessionFilter extends BaseFilter {
             final SessionRequestMessage specificMessage = (SessionRequestMessage) message;
 
             if (specificMessage.Flag == MessageFlag.SESSION_REQUEST_NEW_SESSION) {
-                final UUID sessionKey = UUID.randomUUID();
-
-                // construct a session with the right channel
-                RexProSessions.ensureSessionExists(sessionKey.toString(),
-                        this.rexsterApplication, specificMessage.Channel);
-
                 final EngineController engineController = EngineController.getInstance();
                 final List<String> engineLanguages = engineController.getAvailableEngineLanguages();
 
-                final SessionResponseMessage responseMessage = new SessionResponseMessage();
-                responseMessage.setSessionAsUUID(sessionKey);
-                responseMessage.Request = specificMessage.Request;
-                responseMessage.Flag = (byte) 0;
-                responseMessage.Languages = new String[engineLanguages.size()];
-                engineLanguages.toArray(responseMessage.Languages);
+                final SessionResponseMessage responseMessage = MessageUtil.createNewSession(
+                        specificMessage.Request, engineLanguages);
+
+                // construct a session with the right channel
+                RexProSessions.ensureSessionExists(responseMessage.sessionAsUUID().toString(),
+                        this.rexsterApplication, specificMessage.Channel);
 
                 ctx.write(responseMessage);
 
             } else if (specificMessage.Flag == MessageFlag.SESSION_REQUEST_KILL_SESSION) {
                 RexProSessions.destroySession(specificMessage.sessionAsUUID().toString());
-                final SessionResponseMessage responseMessage = new SessionResponseMessage();
-                responseMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
-                responseMessage.Request = specificMessage.Request;
-                responseMessage.Languages = new String[0];
-                responseMessage.Flag = (byte) 0;
-
-                ctx.write(responseMessage);
+                ctx.write(MessageUtil.createEmptySession(specificMessage.Request));
             } else {
                 // there is no session to this message...that's a problem
                 ctx.write(MessageUtil.createErrorResponse(specificMessage.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
