@@ -39,6 +39,9 @@ public class RexsterApplicationGraph {
 
     private static final Logger logger = Logger.getLogger(RexsterApplicationGraph.class);
 
+    private static final String QUERY_STRING_PARAMETER_NAME = "name";
+    private static final String QUERY_STRING_PARAMETER_DESCRIPTION = "description";
+
     private final Graph graph;
     private final String graphName;
     private Set<ExtensionAllowed> extensionAllowables;
@@ -227,137 +230,154 @@ public class RexsterApplicationGraph {
     }
 
     protected JSONArray getExtensionHypermedia(final ExtensionPoint extensionPoint, final String baseUri) {
+        final List<HashMap<String, Object>> hypermediaLinks = hypermediaCache.containsKey(extensionPoint) ?
+            hypermediaCache.get(extensionPoint) : createHyperMediaLinks(extensionPoint);
+        return getComposedLinks(baseUri, hypermediaLinks);
+    }
 
-        List<HashMap<String, Object>> hypermediaLinks = new ArrayList<HashMap<String, Object>>();
-        if (hypermediaCache.containsKey(extensionPoint)) {
-            hypermediaLinks = hypermediaCache.get(extensionPoint);
-        } else {
+    private List<HashMap<String, Object>> createHyperMediaLinks(final ExtensionPoint extensionPoint) {
+        final List<HashMap<String, Object>> hypermediaLinks = new ArrayList<HashMap<String, Object>>();
+        for (RexsterExtension extension : extensions) {
 
-            for (RexsterExtension extension : extensions) {
+            final Class clazz = extension.getClass();
+            final ExtensionNaming extensionNaming = (ExtensionNaming) clazz.getAnnotation(ExtensionNaming.class);
 
-                Class clazz = extension.getClass();
-                ExtensionNaming extensionNaming = (ExtensionNaming) clazz.getAnnotation(ExtensionNaming.class);
+            // initialize the defaults
+            String currentExtensionNamespace = "g";
+            String currentExtensionName = clazz.getName();
 
-                // initialize the defaults
-                String currentExtensionNamespace = "g";
-                String currentExtensionName = clazz.getName();
+            if (extensionNaming != null) {
 
-                if (extensionNaming != null) {
-
-                    // naming annotation is present to try to override the defaults
-                    // if the values are valid.
-                    if (extensionNaming.name() != null && !extensionNaming.name().isEmpty()) {
-                        currentExtensionName = extensionNaming.name();
-                    }
-
-                    // naming annotation is defaulted to "g" anyway but checking anyway to make sure
-                    // no one tries to pull any funny business.
-                    if (extensionNaming.namespace() != null && !extensionNaming.namespace().isEmpty()) {
-                        currentExtensionNamespace = extensionNaming.namespace();
-                    }
+                // naming annotation is present to try to override the defaults
+                // if the values are valid.
+                if (extensionNaming.name() != null && !extensionNaming.name().isEmpty()) {
+                    currentExtensionName = extensionNaming.name();
                 }
 
-                // test the configuration to see if the extension should even be available
-                ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(
-                        currentExtensionNamespace, currentExtensionName);
-
-                if (this.isExtensionAllowed(extensionSegmentSet)) {
-                    ExtensionConfiguration extensionConfig = this.findExtensionConfiguration(
-                            currentExtensionNamespace, currentExtensionName);
-                    RexsterExtension rexsterExtension = null;
-                    try {
-                        rexsterExtension = (RexsterExtension) clazz.newInstance();
-                    } catch (Exception ex) {
-                        logger.warn("Failed extension configuration check for " + currentExtensionNamespace + ":"
-                                + currentExtensionName + "on graph " + graphName);
-                    }
-
-                    if (rexsterExtension != null) {
-                        if (rexsterExtension.isConfigurationValid(extensionConfig)) {
-                            Method[] methods = clazz.getMethods();
-                            for (Method method : methods) {
-                                ExtensionDescriptor descriptor = method.getAnnotation(ExtensionDescriptor.class);
-                                ExtensionDefinition definition = method.getAnnotation(ExtensionDefinition.class);
-
-                                if (definition != null && definition.extensionPoint() == extensionPoint) {
-                                    String href = currentExtensionNamespace + "/" + currentExtensionName;
-                                    if (!definition.path().isEmpty()) {
-                                        href = href + "/" + definition.path();
-                                    }
-
-                                    final HashMap<String, Object> hypermediaLink = new HashMap<String, Object>();
-                                    hypermediaLink.put("href", href);
-                                    hypermediaLink.put("op", definition.method().name());
-                                    hypermediaLink.put("namespace", currentExtensionNamespace);
-                                    hypermediaLink.put("name", currentExtensionName);
-
-                                    String path = definition.path();
-                                    if (path != null && !path.isEmpty()) {
-                                        hypermediaLink.put("path", path);
-                                        hypermediaLink.put("title", currentExtensionNamespace + ":" + currentExtensionName + "-" + path);
-                                    } else {
-                                        hypermediaLink.put("title", currentExtensionNamespace + ":" + currentExtensionName);
-                                    }
-
-                                    // descriptor is not a required annotation for extensions.
-                                    if (descriptor != null) {
-                                        hypermediaLink.put("description", descriptor.description());
-                                    }
-
-                                    hypermediaLinks.add(hypermediaLink);
-
-                                    final JSONArray queryStringParameters = new JSONArray();
-                                    if (descriptor != null && (descriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
-                                            || descriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_DESCRIPTOR_ONLY)) {
-                                        for (final ExtensionApi extensionApi : descriptor.api()) {
-                                            queryStringParameters.put(new HashMap<String, String>() {{
-                                                put("name", extensionApi.parameterName());
-                                                put("description", extensionApi.description());
-                                            }});
-                                        }
-                                    }
-
-                                    if (descriptor != null && (descriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
-                                            || descriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_PARAMETER_ONLY)) {
-                                        final Annotation[][] parametersAnnotationSets = method.getParameterAnnotations();
-                                        for (Annotation[] parameterAnnotationSet : parametersAnnotationSets) {
-                                            for (Annotation annotation : parameterAnnotationSet) {
-                                                if (annotation instanceof ExtensionRequestParameter) {
-                                                    final ExtensionRequestParameter extensionRequestParameter = (ExtensionRequestParameter) annotation;
-                                                    queryStringParameters.put(new HashMap<String, String>() {{
-                                                        put("name", extensionRequestParameter.name());
-                                                        put("description", extensionRequestParameter.description());
-                                                    }});
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    if (queryStringParameters.length() > 0) {
-                                        hypermediaLink.put("parameters", queryStringParameters);
-                                    }
-                                }
-                            }
-                        } else {
-                            logger.warn("An extension [" + currentExtensionNamespace + ":" + currentExtensionName + "] does not have a valid configuration.  Check rexster.xml and ensure that the configuration section matches what the extension expects.");
-                        }
-                    }
+                // naming annotation is defaulted to "g" anyway but checking anyway to make sure
+                // no one tries to pull any funny business.
+                if (extensionNaming.namespace() != null && !extensionNaming.namespace().isEmpty()) {
+                    currentExtensionNamespace = extensionNaming.namespace();
                 }
             }
 
-            if (hypermediaLinks.size() == 0) {
-                hypermediaCache.put(extensionPoint, null);
-            } else {
-                hypermediaCache.put(extensionPoint, hypermediaLinks);
+            final String currentNamespaceAndName = makeExtensionName(currentExtensionNamespace, currentExtensionName);
+
+            // test the configuration to see if the extension should even be available
+            final ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(
+                    currentExtensionNamespace, currentExtensionName);
+
+            if (this.isExtensionAllowed(extensionSegmentSet)) {
+                final ExtensionConfiguration extensionConfig = this.findExtensionConfiguration(
+                        currentExtensionNamespace, currentExtensionName);
+                RexsterExtension rexsterExtension = null;
+                try {
+                    rexsterExtension = (RexsterExtension) clazz.newInstance();
+                } catch (Exception ex) {
+                    logger.warn(String.format("Failed extension configuration check for %s on graph %s",
+                            currentNamespaceAndName, graphName));
+                }
+
+                if (rexsterExtension != null) {
+                    if (rexsterExtension.isConfigurationValid(extensionConfig)) {
+                        final Method[] methods = clazz.getMethods();
+                        for (Method method : methods) {
+                            final ExtensionDescriptor descriptor = method.getAnnotation(ExtensionDescriptor.class);
+                            final ExtensionDefinition definition = method.getAnnotation(ExtensionDefinition.class);
+
+                            if (definition != null && definition.extensionPoint() == extensionPoint) {
+                                String href = currentExtensionNamespace + "/" + currentExtensionName;
+                                if (!definition.path().isEmpty()) {
+                                    href = href + "/" + definition.path();
+                                }
+
+                                final HashMap<String, Object> hypermediaLink = new HashMap<String, Object>();
+                                hypermediaLink.put("href", href);
+                                hypermediaLink.put("op", definition.method().name());
+                                hypermediaLink.put("namespace", currentExtensionNamespace);
+                                hypermediaLink.put("name", currentExtensionName);
+
+                                final String path = definition.path();
+                                if (path != null && !path.isEmpty()) {
+                                    hypermediaLink.put("path", path);
+                                    hypermediaLink.put("title", currentNamespaceAndName + "-" + path);
+                                } else {
+                                    hypermediaLink.put("title", currentNamespaceAndName);
+                                }
+
+                                // descriptor is not a required annotation for extensions.
+                                if (descriptor != null) {
+                                    hypermediaLink.put("description", descriptor.description());
+                                }
+
+                                final JSONArray queryStringParameters = buildQueryStringParameters(method, descriptor);
+                                if (queryStringParameters.length() > 0) {
+                                    hypermediaLink.put("parameters", queryStringParameters);
+                                }
+
+                                hypermediaLinks.add(hypermediaLink);
+                            }
+                        }
+                    } else {
+                        logger.warn(String.format("An extension [%s] does not have a valid configuration.  Check rexster.xml and ensure that the configuration section matches what the extension expects.",
+                                currentNamespaceAndName));
+                    }
+                }
             }
         }
 
+        // only put something in the cache if there are actually links to
+        if (hypermediaLinks.size() == 0) {
+            hypermediaCache.put(extensionPoint, null);
+        } else {
+            hypermediaCache.put(extensionPoint, hypermediaLinks);
+        }
+
+        return hypermediaLinks;
+    }
+
+    private String makeExtensionName(final String extensionNamespace, String extensionName) {
+        return String.format("%s:%s", extensionNamespace, extensionName);
+    }
+
+    private JSONArray buildQueryStringParameters(final Method method, final ExtensionDescriptor descriptor) {
+        final JSONArray queryStringParameters = new JSONArray();
+        if (descriptor != null && (descriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
+                || descriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_DESCRIPTOR_ONLY)) {
+            for (final ExtensionApi extensionApi : descriptor.api()) {
+                queryStringParameters.put(new HashMap<String, String>() {{
+                    put(QUERY_STRING_PARAMETER_NAME, extensionApi.parameterName());
+                    put(QUERY_STRING_PARAMETER_DESCRIPTION, extensionApi.description());
+                }});
+            }
+        }
+
+        // possible override for the previous settings
+        if (descriptor != null && (descriptor.apiBehavior() == ExtensionApiBehavior.DEFAULT
+                || descriptor.apiBehavior() == ExtensionApiBehavior.EXTENSION_PARAMETER_ONLY)) {
+            final Annotation[][] parametersAnnotationSets = method.getParameterAnnotations();
+            for (Annotation[] parameterAnnotationSet : parametersAnnotationSets) {
+                for (Annotation annotation : parameterAnnotationSet) {
+                    if (annotation instanceof ExtensionRequestParameter) {
+                        final ExtensionRequestParameter extensionRequestParameter = (ExtensionRequestParameter) annotation;
+                        queryStringParameters.put(new HashMap<String, String>() {{
+                            put(QUERY_STRING_PARAMETER_NAME, extensionRequestParameter.name());
+                            put(QUERY_STRING_PARAMETER_DESCRIPTION, extensionRequestParameter.description());
+                        }});
+                    }
+                }
+            }
+        }
+        return queryStringParameters;
+    }
+
+    private JSONArray getComposedLinks(final String baseUri, final List<HashMap<String, Object>> hypermediaLinks) {
         JSONArray composedLinks = null;
 
         if (hypermediaLinks != null) {
             composedLinks = new JSONArray();
             for (Map<String, Object> hypermediaLink : hypermediaLinks) {
-                HashMap link = new HashMap();
+                final HashMap<String, Object> link = new HashMap<String, Object>();
                 for (Map.Entry<String, Object> linkEntry : hypermediaLink.entrySet()) {
                     if (linkEntry.getKey().equals("href")) {
                         link.put(linkEntry.getKey(), baseUri + linkEntry.getValue());
