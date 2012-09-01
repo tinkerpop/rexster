@@ -1,6 +1,8 @@
 package com.tinkerpop.rexster.protocol.filter;
 
 import com.tinkerpop.rexster.protocol.msg.MessageFlag;
+import com.tinkerpop.rexster.protocol.msg.MessageTokens;
+import com.tinkerpop.rexster.protocol.msg.MessageUtil;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.EngineController;
@@ -112,14 +114,9 @@ public class ScriptFilter extends BaseFilter {
                         + specificMessage.LanguageName + "] on session [" + message.Session
                         + "] and request [" + message.Request + "]");
 
-                final ErrorResponseMessage errorMessage = new ErrorResponseMessage();
-                errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
-                errorMessage.Request = message.Request;
-                errorMessage.ErrorMessage = "An error occurred while processing the script for language ["
-                        + specificMessage.LanguageName + "]: " + se.getMessage();
-                errorMessage.Flag = MessageFlag.ERROR_SCRIPT_FAILURE;
-
-                ctx.write(errorMessage);
+                ctx.write(MessageUtil.createErrorResponse(message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                        MessageFlag.ERROR_SCRIPT_FAILURE, String.format(MessageTokens.ERROR_IN_SCRIPT_PROCESSING,
+                        specificMessage.LanguageName, se.getMessage())));
 
                 return ctx.getStopAction();
             } catch (ClassNotFoundException cnfe) {

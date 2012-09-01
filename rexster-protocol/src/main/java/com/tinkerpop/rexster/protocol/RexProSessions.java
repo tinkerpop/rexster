@@ -38,9 +38,9 @@ public class RexProSessions {
     }
 
     public static void ensureSessionExists(final String sessionKey, final RexsterApplication rexsterApplication,
-                                           final byte sessionChannel, final int chunkSize) {
+                                           final byte sessionChannel) {
         if (!sessions.containsKey(sessionKey)) {
-            final RexProSession session = new RexProSession(sessionKey, rexsterApplication, sessionChannel, chunkSize);
+            final RexProSession session = new RexProSession(sessionKey, rexsterApplication, sessionChannel);
             sessions.put(sessionKey, session);
 
             logger.info(String.format("RexPro Session created: %s", sessionKey));

@@ -9,10 +9,7 @@ import org.msgpack.annotation.Message;
  */
 @Message
 public class SessionRequestMessage extends RexProMessage {
-    public static final int DEFAULT_CHUNK_SIZE = 8192;
-
     public static final byte CHANNEL_NONE = 0;
-
     public static final byte CHANNEL_CONSOLE = 1;
     public static final byte CHANNEL_MSGPACK = 2;
 

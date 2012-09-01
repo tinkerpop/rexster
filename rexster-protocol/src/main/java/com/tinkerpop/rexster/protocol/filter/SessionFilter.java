@@ -1,6 +1,8 @@
 package com.tinkerpop.rexster.protocol.filter;
 
 import com.tinkerpop.rexster.protocol.msg.MessageFlag;
+import com.tinkerpop.rexster.protocol.msg.MessageTokens;
+import com.tinkerpop.rexster.protocol.msg.MessageUtil;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.RexProSessions;
@@ -48,8 +50,8 @@ public class SessionFilter extends BaseFilter {
                 final UUID sessionKey = UUID.randomUUID();
 
                 // construct a session with the right channel
-                RexProSessions.ensureSessionExists(sessionKey.toString(), this.rexsterApplication,
-                        specificMessage.Channel, SessionRequestMessage.DEFAULT_CHUNK_SIZE);
+                RexProSessions.ensureSessionExists(sessionKey.toString(),
+                        this.rexsterApplication, specificMessage.Channel);
 
                 final EngineController engineController = EngineController.getInstance();
                 final List<String> engineLanguages = engineController.getAvailableEngineLanguages();
@@ -74,13 +76,8 @@ public class SessionFilter extends BaseFilter {
                 ctx.write(responseMessage);
             } else {
                 // there is no session to this message...that's a problem
-                final ErrorResponseMessage errorMessage = new ErrorResponseMessage();
-                errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
-                errorMessage.Request = specificMessage.Request;
-                errorMessage.ErrorMessage = "The message has an invalid flag.";
-                errorMessage.Flag = MessageFlag.ERROR_MESSAGE_VALIDATION;
-
-                ctx.write(errorMessage);
+                ctx.write(MessageUtil.createErrorResponse(specificMessage.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                        MessageFlag.ERROR_MESSAGE_VALIDATION, MessageTokens.ERROR_INVALID_TAG));
             }
 
             // nothing left to do...session was created
@@ -89,26 +86,16 @@ public class SessionFilter extends BaseFilter {
 
         if (!message.hasSession()) {
             // there is no session to this message...that's a problem
-            final ErrorResponseMessage errorMessage = new ErrorResponseMessage();
-            errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
-            errorMessage.Request = message.Request;
-            errorMessage.ErrorMessage = "The message does not specify a session.";
-            errorMessage.Flag = MessageFlag.ERROR_MESSAGE_VALIDATION;
-
-            ctx.write(errorMessage);
+            ctx.write(MessageUtil.createErrorResponse(message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                    MessageFlag.ERROR_MESSAGE_VALIDATION, MessageTokens.ERROR_SESSION_NOT_SPECIFIED));
 
             return ctx.getStopAction();
         }
 
         if (!RexProSessions.hasSessionKey(message.sessionAsUUID().toString())) {
             // the message is assigned a session that does not exist on the server
-            final ErrorResponseMessage errorMessage = new ErrorResponseMessage();
-            errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
-            errorMessage.Request = message.Request;
-            errorMessage.ErrorMessage = "The session on the request does not exist or has otherwise expired.";
-            errorMessage.Flag = MessageFlag.ERROR_INVALID_SESSION;
-
-            ctx.write(errorMessage);
+            ctx.write(MessageUtil.createErrorResponse(message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                    MessageFlag.ERROR_INVALID_SESSION, MessageTokens.ERROR_SESSION_INVALID));
 
             return ctx.getStopAction();
         }

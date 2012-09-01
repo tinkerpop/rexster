@@ -1,10 +1,11 @@
 package com.tinkerpop.rexster.protocol.filter;
 
-import com.tinkerpop.rexster.protocol.RexProSession;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MessageFlag;
+import com.tinkerpop.rexster.protocol.msg.MessageTokens;
 import com.tinkerpop.rexster.protocol.msg.MessageType;
+import com.tinkerpop.rexster.protocol.msg.MessageUtil;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
@@ -24,8 +25,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Handles incoming/outgoing RexProMessage instances.
@@ -92,13 +91,9 @@ public class RexProMessageFilter extends BaseFilter {
         if (message == null) {
             logger.warn("Message did not match an expected type.");
 
-            final ErrorResponseMessage errorMessage = new ErrorResponseMessage();
-            errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
-            errorMessage.Request = new byte[0];
-            errorMessage.ErrorMessage = "Message did not match an expected type.";
-            errorMessage.Flag = MessageFlag.ERROR_MESSAGE_VALIDATION;
-
-            ctx.write(errorMessage);
+            ctx.write(MessageUtil.createErrorResponse(RexProMessage.EMPTY_REQUEST_AS_BYTES,
+                    RexProMessage.EMPTY_SESSION_AS_BYTES, MessageFlag.ERROR_MESSAGE_VALIDATION,
+                    MessageTokens.ERROR_UNEXPECTED_MESSAGE_TYPE));
         }
 
         ctx.setMessage(message);

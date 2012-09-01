@@ -25,7 +25,7 @@ public class RexProSession {
 
     private Date lastTimeUsed = new Date();
 
-    public RexProSession(final String sessionKey, final RexsterApplication rexsterApplication, final byte channel, final int chunkSize) {
+    public RexProSession(final String sessionKey, final RexsterApplication rexsterApplication, final byte channel) {
         this.sessionKey = sessionKey;
         this.channel = channel;
         this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, rexsterApplication);

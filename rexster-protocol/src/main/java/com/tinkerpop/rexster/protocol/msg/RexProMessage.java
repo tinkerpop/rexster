@@ -15,6 +15,10 @@ public class RexProMessage {
      * The standard value for an empty session.
      */
     public static final UUID EMPTY_SESSION = new UUID(0, 0);
+    public static final byte[] EMPTY_SESSION_AS_BYTES = BitWorks.convertUUIDToByteArray(EMPTY_SESSION);
+
+    public static final UUID EMPTY_REQUEST = new UUID(0, 0);
+    public static final byte[] EMPTY_REQUEST_AS_BYTES = BitWorks.convertUUIDToByteArray(EMPTY_REQUEST);
 
     /**
      * Denotes the version of RexPro that is being used.
