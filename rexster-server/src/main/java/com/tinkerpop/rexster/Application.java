@@ -1,8 +1,13 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.rexster.server.*;
+import com.tinkerpop.rexster.server.DefaultRexsterApplication;
+import com.tinkerpop.rexster.server.HttpRexsterServer;
+import com.tinkerpop.rexster.server.RexProRexsterServer;
 import com.tinkerpop.rexster.server.RexsterApplication;
-import org.apache.commons.cli.HelpFormatter;
+import com.tinkerpop.rexster.server.RexsterCommandLine;
+import com.tinkerpop.rexster.server.RexsterServer;
+import com.tinkerpop.rexster.server.RexsterSettings;
+import com.tinkerpop.rexster.server.ShutdownManager;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.IOUtils;
@@ -10,8 +15,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -19,10 +22,7 @@ import java.net.BindException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
 
 /**
  * Main class for initializing, starting and stopping Rexster.
