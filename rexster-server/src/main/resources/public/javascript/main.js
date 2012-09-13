@@ -1,5 +1,5 @@
 require.config({
-    baseUrl: "/doghouse/javascript",
+    baseUrl: "/static/javascript",
     paths: {
         "jquery-ui": "lib/jquery-ui-1.8.7.custom",
         "jquery-url": "lib/jquery.url",

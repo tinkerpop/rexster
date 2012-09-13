@@ -1,15 +1,22 @@
 package com.tinkerpop.rexster.servlet;
 
+import org.glassfish.grizzly.Buffer;
+import org.glassfish.grizzly.WriteHandler;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.server.StaticHttpHandler;
+import org.glassfish.grizzly.http.server.io.NIOOutputStream;
 import org.glassfish.grizzly.http.server.io.OutputBuffer;
 import org.glassfish.grizzly.http.server.util.MimeType;
 import org.glassfish.grizzly.http.util.HttpStatus;
+import org.glassfish.grizzly.memory.MemoryManager;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 
 /**
  * This class is a near replica of the StaticHttpHandler.  The only difference is that it does not cache resources.
@@ -17,6 +24,10 @@ import java.io.IOException;
  * all resources were being returned as "text/html" even if they were clearly css/png/etc.
  * <p/>
  * Will drop this class when problem with StaticHttpHandler is resolved.
+ * <p/>
+ * As of 2.2.18 the issue described above seems resolved, but now an error exists where certain resources
+ * throw a PendingWriteQueueLimitExceededException.  Modified this class to support that fix.  According to
+ * the issue tracker for grizzly it seems that the issue is fixed, but it doesn't seem to work :/
  */
 public class RexsterStaticHttpHandler extends StaticHttpHandler {
     public RexsterStaticHttpHandler(String path) {
@@ -106,17 +117,17 @@ public class RexsterStaticHttpHandler extends StaticHttpHandler {
                 response.setContentType(MimeType.get("html"));
             }
 
-            final long length = file.length();
-            response.setContentLengthLong(length);
-
-            final OutputBuffer outputBuffer = response.getOutputBuffer();
-
+            response.setContentLengthLong(file.length());
+            final OutputStream outputStream = response.getOutputStream();
             byte b[] = new byte[8192];
             int rd;
             while ((rd = fis.read(b)) > 0) {
-                //chunk.setBytes(b, 0, rd);
-                outputBuffer.write(b, 0, rd);
+                outputStream.write(b, 0, rd);
             }
+
+            outputStream.flush();
+            outputStream.close();
+
         } finally {
             try {
                 fis.close();

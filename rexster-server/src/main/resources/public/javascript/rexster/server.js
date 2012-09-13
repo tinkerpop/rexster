@@ -6,7 +6,7 @@ define(
         return {
             servers : [{
                            serverName : "localhost",
-                           uri : BASE_URI
+                           uri : BASE_URI + "graphs/"
                        }],
 	        getBaseUri : function(ix){
                 return this.servers[ix].uri;

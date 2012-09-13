@@ -29,7 +29,7 @@ public class DogHouseServlet extends HttpServlet {
             baseRexsterApiUri = baseRexsterApiUri + "/";
         }
 
-        baseRexsterApiUri = baseRexsterApiUri + "graphs/";
+        baseRexsterApiUri = baseRexsterApiUri;
 
         ServletContext ctx = this.getServletContext();
 

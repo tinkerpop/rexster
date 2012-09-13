@@ -29,34 +29,6 @@ var ReadLine = function(options, history) {
     }
     */
     
-    if(/visualize/.test(v)) {
-      var vertex = ".";
-      var parts = v.split(' ');
-      var state = history.getApplicationState();
-      
-      if(parts.length == 2) {
-        vertex = parts[1];
-      }
-
-      $.get('/doghouse/visualize', { v : vertex, "g" : state.graph }, function(value) {
-        if(/Could not/.test(value)) {
-          h.insertResponse(value);   
-        } else {
-          ht.loadJSON(value);
-          ht.refresh();
-          $('#graph').show();
-          h.insertResponse('true');
-        }
-
-        h.history.push(v);
-        h.historyPtr = h.history.length;
-
-        h.newPromptLine();
-      }, "json");
-
-      return null;
-    }
-   
     req = '';
 
     if(scope == true) {

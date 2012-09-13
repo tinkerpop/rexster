@@ -18,14 +18,15 @@ import com.tinkerpop.rexster.filter.HeaderResponseFilter;
 import com.tinkerpop.rexster.servlet.DogHouseServlet;
 import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
-import com.tinkerpop.rexster.servlet.VisualizationServlet;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
-import org.glassfish.grizzly.servlet.ServletHandler;
+import org.glassfish.grizzly.servlet.ServletRegistration;
+import org.glassfish.grizzly.servlet.WebappContext;
+import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 
 import javax.ws.rs.core.Context;
 import java.io.File;
@@ -61,7 +62,12 @@ public class HttpRexsterServer implements RexsterServer {
 
     @Override
     public void start(final RexsterApplication application) throws Exception {
-        final ServletHandler jerseyHandler = new ServletHandler();
+
+        final String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
+        final ServerConfiguration config = this.httpServer.getServerConfiguration();
+        config.addHttpHandler(new RexsterStaticHttpHandler(absoluteWebRootPath), "/static");
+
+        final WebappContext wacJersey = new WebappContext("jersey", "");
 
         // explicitly load resources so that the "RexsterApplicationProvider" class is not loaded
         final ResourceConfig rc = new ClassNamesResourceConfig(
@@ -87,49 +93,36 @@ public class HttpRexsterServer implements RexsterServer {
         final String securityFilterType = securityConfiguration.getString("type");
         if (!securityFilterType.equals("none")) {
             if (securityFilterType.equals("default")) {
-                jerseyHandler.addInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, DefaultSecurityFilter.class.getName());
+                wacJersey.addContextInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, DefaultSecurityFilter.class.getName());
                 rc.getContainerRequestFilters().add(new DefaultSecurityFilter());
             } else {
-                jerseyHandler.addInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, securityFilterType);
+                wacJersey.addContextInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, securityFilterType);
                 final Class clazz = Class.forName(securityFilterType, true, Thread.currentThread().getContextClassLoader());
                 final AbstractSecurityFilter securityFilter = (AbstractSecurityFilter) clazz.newInstance();
                 rc.getContainerRequestFilters().add(securityFilter);
             }
         }
 
-        jerseyHandler.setContextPath("/");
-        jerseyHandler.setServletInstance(new ServletContainer(rc));
+        final ServletRegistration sg = wacJersey.addServlet("jersey", new ServletContainer(rc));
+        sg.addMapping("/*");
+        wacJersey.deploy(this.httpServer);
 
         // servlet that services all url from "main" by simply sending
         // main.html back to the calling client.  main.html handles its own
         // state given the uri
-        final ServletHandler dogHouseHandler = new ServletHandler();
-        dogHouseHandler.setContextPath("/doghouse/main");
-        dogHouseHandler.setServletInstance(new DogHouseServlet());
+        final WebappContext wacDogHouse = new WebappContext("doghouse", "");
+        final ServletRegistration sgDogHouse = wacDogHouse.addServlet("doghouse", new DogHouseServlet());
+        sgDogHouse.addMapping("/doghouse/*");
+        sgDogHouse.setInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri", baseUri + ":" + rexsterServerPort.toString());
 
-        // servlet for gremlin console
-        final ServletHandler visualizationHandler = new ServletHandler();
+        final ServletRegistration sgDogHouseEval = wacDogHouse.addServlet("doghouse-evaluator", new EvaluatorServlet(application));
+        sgDogHouseEval.addMapping("/doghouse/exec");
 
-        visualizationHandler.setContextPath("/doghouse/visualize");
-        visualizationHandler.setServletInstance(new VisualizationServlet(application));
-
-        // servlet for gremlin console
-        final ServletHandler evaluatorHandler = new ServletHandler();
-
-        evaluatorHandler.setContextPath("/doghouse/exec");
-        evaluatorHandler.setServletInstance(new EvaluatorServlet(application));
-
-        final String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
-        dogHouseHandler.addInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri", baseUri + ":" + rexsterServerPort.toString());
-
-        final ServerConfiguration config = this.httpServer.getServerConfiguration();
-        config.addHttpHandler(jerseyHandler, "/");
-        config.addHttpHandler(new RexsterStaticHttpHandler(absoluteWebRootPath), "/doghouse");
-        config.addHttpHandler(dogHouseHandler, "/doghouse/main/*");
-        config.addHttpHandler(visualizationHandler, "/doghouse/visualize");
-        config.addHttpHandler(evaluatorHandler, "/doghouse/exec");
+        wacDogHouse.deploy(this.httpServer);
 
         final NetworkListener listener = new NetworkListener("grizzly", rexsterServerHost, rexsterServerPort);
+        final ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig().setCorePoolSize(8).setMaxPoolSize(256);
+        listener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
         this.httpServer.addListener(listener);
 
         this.httpServer.start();

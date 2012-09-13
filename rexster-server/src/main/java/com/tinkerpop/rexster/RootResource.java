@@ -37,7 +37,7 @@ public class RootResource extends BaseResource {
         sb.append("<html style=\"background-color:#111111\">");
         sb.append("<head><meta charset=\"UTF-8\"><title>Rexster</title><link rel=\"shortcut icon\" type=\"image/x-icon\" href=\"/doghouse/favicon.ico\"></head>");
         sb.append("<body>");
-        sb.append("<div align=\"center\"><a href=\"http://tinkerpop.com\"><img src=\"/doghouse/img/tinkerpop-splash.png\"/></a></div>");
+        sb.append("<div align=\"center\"><a href=\"http://tinkerpop.com\"><img src=\"/static/img/tinkerpop-splash.png\"/></a></div>");
         sb.append("<div align=\"center\">");
         sb.append("<h3 style=\"color:#B5B5B5\">Rexster - " + Tokens.REXSTER_VERSION + "</h3>");
         sb.append("<p><a style=\"color:#B5B5B5\" href=\"/doghouse\">The Dog House</a></p>");
