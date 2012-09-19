@@ -44,6 +44,11 @@ public class HttpRexsterServer implements RexsterServer {
     private final String rexsterServerHost;
     private final String webRootPath;
     private final String baseUri;
+    private final int maxWorkerThreadPoolSize;
+    private final int coreWorkerThreadPoolSize;
+    private final int maxKernalThreadPoolSize;
+    private final int coreKernalThreadPoolSize;
+    private final boolean enableJmx;
     private final HttpServer httpServer;
 
     public HttpRexsterServer(final XMLConfiguration properties) {
@@ -52,6 +57,11 @@ public class HttpRexsterServer implements RexsterServer {
         rexsterServerHost = properties.getString("rexster-server-host", "0.0.0.0");
         webRootPath = properties.getString("web-root", RexsterSettings.DEFAULT_WEB_ROOT_PATH);
         baseUri = properties.getString("base-uri", RexsterSettings.DEFAULT_BASE_URI);
+        coreWorkerThreadPoolSize = properties.getInt("thread-pool.worker.core-size", 8);
+        maxWorkerThreadPoolSize = properties.getInt("thread-pool.worker.max-size", 8);
+        coreKernalThreadPoolSize = properties.getInt("thread-pool.kernal.core-size", 4);
+        maxKernalThreadPoolSize = properties.getInt("thread-pool.kernal.max-size", 4);
+        enableJmx = properties.getBoolean("enable-jmx", false);
         this.httpServer = new HttpServer();
     }
 
@@ -63,6 +73,18 @@ public class HttpRexsterServer implements RexsterServer {
     @Override
     public void start(final RexsterApplication application) throws Exception {
 
+        deployRestApi(application);
+        deployDogHouse(application);
+
+        final NetworkListener listener = configureNetworkListener();
+        this.httpServer.addListener(listener);
+        this.httpServer.getServerConfiguration().setJmxEnabled(enableJmx);
+        this.httpServer.start();
+
+        logger.info("Rexster Server running on: [" + baseUri + ":" + rexsterServerPort + "]");
+    }
+
+    private void deployRestApi(final RexsterApplication application) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         final String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
         final ServerConfiguration config = this.httpServer.getServerConfiguration();
         config.addHttpHandler(new RexsterStaticHttpHandler(absoluteWebRootPath), "/static");
@@ -106,7 +128,9 @@ public class HttpRexsterServer implements RexsterServer {
         final ServletRegistration sg = wacJersey.addServlet("jersey", new ServletContainer(rc));
         sg.addMapping("/*");
         wacJersey.deploy(this.httpServer);
+    }
 
+    private void deployDogHouse(RexsterApplication application) {
         // servlet that services all url from "main" by simply sending
         // main.html back to the calling client.  main.html handles its own
         // state given the uri
@@ -119,16 +143,18 @@ public class HttpRexsterServer implements RexsterServer {
         sgDogHouseEval.addMapping("/doghouse/exec");
 
         wacDogHouse.deploy(this.httpServer);
+    }
 
+    private NetworkListener configureNetworkListener() {
         final NetworkListener listener = new NetworkListener("grizzly", rexsterServerHost, rexsterServerPort);
-        final ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig().setCorePoolSize(8).setMaxPoolSize(256);
-        listener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
-        this.httpServer.addListener(listener);
-
-        this.httpServer.getServerConfiguration().setJmxEnabled(true);
-
-        this.httpServer.start();
-
-        logger.info("Rexster Server running on: [" + baseUri + ":" + rexsterServerPort + "]");
+        final ThreadPoolConfig workerThreadPoolConfig = ThreadPoolConfig.defaultConfig()
+                .setCorePoolSize(coreWorkerThreadPoolSize)
+                .setMaxPoolSize(maxWorkerThreadPoolSize);
+        listener.getTransport().setWorkerThreadPoolConfig(workerThreadPoolConfig);
+        final ThreadPoolConfig kernalThreadPoolConfig = ThreadPoolConfig.defaultConfig()
+                .setCorePoolSize(coreKernalThreadPoolSize)
+                .setMaxPoolSize(maxKernalThreadPoolSize);
+        listener.getTransport().setKernelThreadPoolConfig(kernalThreadPoolConfig);
+        return listener;
     }
 }

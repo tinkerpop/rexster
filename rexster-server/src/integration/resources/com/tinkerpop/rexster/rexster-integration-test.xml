@@ -11,6 +11,17 @@
     <base-uri>http://localhost</base-uri>
     <web-root>public</web-root>
     <character-set>UTF-8</character-set>
+    <enable-jmx>false</enable-jmx>
+    <thread-pool>
+        <worker>
+            <core-size>8</core-size>
+            <max-size>8</max-size>
+        </worker>
+        <kernal>
+            <core-size>4</core-size>
+            <max-size>4</max-size>
+        </kernal>
+    </thread-pool>
     <security>
         <authentication>
             <type>none</type>

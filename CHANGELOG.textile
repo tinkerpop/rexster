@@ -18,6 +18,10 @@ h3. Version 2.2.0 (NOT OFFICIALLY RELEASED YET)
 * Major refactoring and renaming of core "server" classes.
 * @ExtensionRequestParameter@ now supports a @defaultValue@.
 * Requests with @OPTIONS@ now returns @OPTIONS@ in the @Access-Control-Allow-Methods@ and a response 200 instead of 204.
+* Upgrade to Grizzly 2.2.18 and Jersey 1.14.
+* Include new configuration options in @rexster.xml@
+** @enable-jmx@ tells Rexster to turn on or turn off JMX monitoring.
+** @thread-pool@ section gives control over how many threads are allocated to Rexster.
 
 h3. Version 2.1.0 (August 4, 2012)
 
