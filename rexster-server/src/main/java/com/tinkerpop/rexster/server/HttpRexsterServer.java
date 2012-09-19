@@ -125,6 +125,8 @@ public class HttpRexsterServer implements RexsterServer {
         listener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
         this.httpServer.addListener(listener);
 
+        this.httpServer.getServerConfiguration().setJmxEnabled(true);
+
         this.httpServer.start();
 
         logger.info("Rexster Server running on: [" + baseUri + ":" + rexsterServerPort + "]");
