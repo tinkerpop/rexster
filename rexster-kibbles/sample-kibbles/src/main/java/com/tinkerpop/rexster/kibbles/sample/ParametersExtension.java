@@ -74,7 +74,7 @@ public class ParametersExtension extends AbstractSampleExtension {
     /**
      * http://localhost/graphs/tinkergraph/tp-sample/parameters/float?some-float=test
      */
-    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "float", method = HttpMethod.POST)
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "float")
     @ExtensionDescriptor(description = "pass a string parameter to be used in the response.")
     public ExtensionResponse evaluateSomeFloat(@RexsterContext RexsterResourceContext context,
                                                @RexsterContext Graph graph,
