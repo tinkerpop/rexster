@@ -30,7 +30,8 @@ public class ConsoleResultConverterTest {
         List<String> converted = this.converter.convert(null);
 
         Assert.assertNotNull(converted);
-        Assert.assertEquals(0, converted.size());
+        Assert.assertEquals(1, converted.size());
+        Assert.assertEquals("null", converted.get(0));
     }
 
     @Test
@@ -131,9 +132,10 @@ public class ConsoleResultConverterTest {
         List<String> converted = this.converter.convert(null);
 
         Assert.assertNotNull(converted);
-        Assert.assertEquals(2, converted.size());
+        Assert.assertEquals(3, converted.size());
         Assert.assertEquals("x", converted.get(0));
         Assert.assertEquals("y", converted.get(1));
+        Assert.assertEquals("null", converted.get(2));
     }
 
     private class FunObject {

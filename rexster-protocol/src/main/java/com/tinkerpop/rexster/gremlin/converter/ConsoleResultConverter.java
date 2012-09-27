@@ -21,6 +21,7 @@ public class ConsoleResultConverter implements ResultConverter<List<String>> {
             List<Object> resultLines = new ArrayList<Object>();
             if (result == null) {
                 resultLines = new ArrayList<Object>();
+                resultLines.add("null");
             } else if (result instanceof Iterable) {
                 for (Object o : (Iterable) result) {
                     resultLines.add(o);
