@@ -178,18 +178,19 @@ public abstract class AbstractSubResource extends BaseResource {
      * @param httpMethodRequested The HTTP method made on the request.
      * @return The method to call or null if it cannot be found.
      */
-    protected static ExtensionMethod findExtensionMethod(List<RexsterExtension> rexsterExtensions,
-                                                         ExtensionPoint extensionPoint,
-                                                         String extensionAction, HttpMethod httpMethodRequested) {
+    protected static ExtensionMethod findExtensionMethod(final List<RexsterExtension> rexsterExtensions,
+                                                         final ExtensionPoint extensionPoint,
+                                                         final String extensionAction,
+                                                         final HttpMethod httpMethodRequested) {
         ExtensionMethod methodToCall = null;
         for (RexsterExtension rexsterExtension : rexsterExtensions) {
-            Class rexsterExtensionClass = rexsterExtension.getClass();
-            Method[] methods = rexsterExtensionClass.getMethods();
+            final Class rexsterExtensionClass = rexsterExtension.getClass();
+            final Method[] methods = rexsterExtensionClass.getMethods();
 
             for (Method method : methods) {
                 // looks for the first method that matches.  methods that multi-match will be ignored right now
-                ExtensionDefinition extensionDefinition = method.getAnnotation(ExtensionDefinition.class);
-                ExtensionDescriptor extensionDescriptor = method.getAnnotation(ExtensionDescriptor.class);
+                final ExtensionDefinition extensionDefinition = method.getAnnotation(ExtensionDefinition.class);
+                final ExtensionDescriptor extensionDescriptor = method.getAnnotation(ExtensionDescriptor.class);
 
                 // checks if the extension point is graph, and if the method path matches the specified action on
                 // the uri (if it exists) or if the method has no path.
@@ -206,8 +207,8 @@ public abstract class AbstractSubResource extends BaseResource {
 
             if (methodToCall == null) {
                 for (Method method : methods) {
-                    ExtensionDefinition extensionDefinition = method.getAnnotation(ExtensionDefinition.class);
-                    ExtensionDescriptor extensionDescriptor = method.getAnnotation(ExtensionDescriptor.class);
+                    final ExtensionDefinition extensionDefinition = method.getAnnotation(ExtensionDefinition.class);
+                    final ExtensionDescriptor extensionDescriptor = method.getAnnotation(ExtensionDescriptor.class);
 
                     if (extensionDefinition != null && extensionDefinition.extensionPoint() == extensionPoint
                             && (extensionDefinition.method() == HttpMethod.ANY || extensionDefinition.method() == httpMethodRequested)) {
