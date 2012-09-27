@@ -29,12 +29,24 @@ public class DefaultRexsterApplication implements RexsterApplication {
 
     private final Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
 
+    /**
+     * Configure a single existing graph into Rexster.  Useful in configuring Rexster for embedded applications.
+     *
+     * @param graphName the name the graph will have in various Rexster contexts.
+     * @param graph a graph instance.
+     */
     public DefaultRexsterApplication(final String graphName, final Graph graph) {
         final RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph);
         this.graphs.put(graphName, rag);
         logger.info(String.format("Graph [%s] loaded", rag.getGraph()));
     }
 
+    /**
+     * Configure multiple graphs in rexster via XML based configuration.  This is the standard way Rexster is
+     * configured in standalone operations.
+     *
+     * @param graphConfigs  graph configuration settings.
+     */
     public DefaultRexsterApplication(final List<HierarchicalConfiguration> graphConfigs) {
         try {
             final GraphConfigurationContainer container = new GraphConfigurationContainer(graphConfigs);
