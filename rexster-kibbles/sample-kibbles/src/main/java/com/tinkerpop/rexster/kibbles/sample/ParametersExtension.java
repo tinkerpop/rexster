@@ -9,6 +9,7 @@ import com.tinkerpop.rexster.extension.ExtensionNaming;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
+import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -25,7 +26,7 @@ public class ParametersExtension extends AbstractSampleExtension {
     public static final String EXTENSION_NAME = "parameters";
 
     /**
-     * http://localhost/graphs/tinkergraph/tp-sample/parameters/list?some-string=test
+     * http://localhost/graphs/tinkergraph/tp-sample/parameters/string?some-string=test
      */
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "string")
     @ExtensionDescriptor(description = "pass a string parameter to be used in the response.")
@@ -48,7 +49,7 @@ public class ParametersExtension extends AbstractSampleExtension {
     }
 
     /**
-     * http://localhost/graphs/tinkergraph/tp-sample/parameters/list?some-integer=1
+     * http://localhost/graphs/tinkergraph/tp-sample/parameters/integer?some-integer=1
      */
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "integer")
     @ExtensionDescriptor(description = "pass an integer parameter to be used in the response.")
@@ -67,6 +68,19 @@ public class ParametersExtension extends AbstractSampleExtension {
 
         Map<String, Integer> map = new HashMap<String, Integer>();
         map.put("some-integer", reply.intValue());
+        return ExtensionResponse.ok(map);
+    }
+
+    /**
+     * http://localhost/graphs/tinkergraph/tp-sample/parameters/float?some-float=test
+     */
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "float", method = HttpMethod.POST)
+    @ExtensionDescriptor(description = "pass a string parameter to be used in the response.")
+    public ExtensionResponse evaluateSomeFloat(@RexsterContext RexsterResourceContext context,
+                                               @RexsterContext Graph graph,
+                                               @ExtensionRequestParameter(name = "some-float", description = "a float to reply with") Float reply) {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("some-float", reply.toString());
         return ExtensionResponse.ok(map);
     }
 
