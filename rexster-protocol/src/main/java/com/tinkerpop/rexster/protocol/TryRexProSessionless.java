@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
@@ -11,6 +12,7 @@ import org.msgpack.unpacker.Converter;
 import org.msgpack.unpacker.UnpackerIterator;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -24,19 +26,6 @@ import static org.msgpack.template.Templates.TValue;
  */
 public class TryRexProSessionless {
 
-    private static final byte[] emptyBindings;
-
-    static {{
-        byte [] empty;
-        try {
-            empty = BitWorks.convertSerializableBindingsToByteArray(new RexsterBindings());
-        } catch (IOException ioe) {
-            empty = new byte[0];
-        }
-
-        emptyBindings = empty;
-    }}
-
     public static void main(final String[] args) throws Exception {
         int c = Integer.parseInt(args[1]);
         final CountDownLatch latch = new CountDownLatch(c);
@@ -46,7 +35,7 @@ public class TryRexProSessionless {
 
                 @Override
                 public void run() {
-                    lotsOfCalls(false, args[0]);
+                    lotsOfCalls(args[0].split(","));
                     latch.countDown();
                 }
             }).start();
@@ -55,36 +44,20 @@ public class TryRexProSessionless {
         latch.await();
     }
 
-    private static void lotsOfCalls(boolean doJson, final String host){
-
-        MessagePack msgpack = new MessagePack();
+    private static void lotsOfCalls(final String[] hosts){
 
         long start = System.currentTimeMillis();
-
         long checkpoint = System.currentTimeMillis();
 
         try {
 
-            MsgPackScriptResponseMessage resultMessage = (MsgPackScriptResponseMessage)
-                    RexPro.sendMessage(host, 8184, createScriptRequestMessage("g=rexster.getGraph('gratefulgraph');g.V;"));
-
-            BufferUnpacker unpacker = msgpack.createBufferUnpacker(resultMessage.Results);
-            unpacker.setArraySizeLimit(Integer.MAX_VALUE);
-            unpacker.setMapSizeLimit(Integer.MAX_VALUE);
-            unpacker.setRawSizeLimit(Integer.MAX_VALUE);
-
+            final RexsterClient client = new RexsterClient(hosts);
+            final List<Map<String, Value>> results = client.gremlin("g=rexster.getGraph('gratefulgraph');g.V;");
             int counter = 1;
-            UnpackerIterator itty = unpacker.iterator();
-            while (itty.hasNext()){
-                final Map<String,Value> map = new Converter(msgpack, itty.next()).read(tMap(TString, TValue));
-                final String vId = map.get(Tokens._ID).asRawValue().getString();
-
-                MsgPackScriptResponseMessage vertexResultMessage = (MsgPackScriptResponseMessage) RexPro.sendMessage(host, 8184,
-                          createScriptRequestMessage("g=rexster.getGraph('gratefulgraph');g.v(" + vId + ")"), 100);
-
-                unpacker = msgpack.createBufferUnpacker(vertexResultMessage.Results);
-                System.out.println(unpacker.read(tMap(TString, TValue)));
-
+            for (Map<String, Value> result : results) {
+                final String vId = result.get(Tokens._ID).asRawValue().getString();
+                final List<Map<String, Value>> innerResults = client.gremlin(String.format("g=rexster.getGraph('gratefulgraph');g.v(%s)", vId));
+                System.out.println(innerResults.get(0));
                 counter++;
             }
 
@@ -94,15 +67,5 @@ public class TryRexProSessionless {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }
-
-    private static ScriptRequestMessage createScriptRequestMessage(String script) throws IOException {
-        ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
-        scriptMessage.Script = script;
-        scriptMessage.Bindings = emptyBindings;
-        scriptMessage.LanguageName = "groovy";
-        scriptMessage.Flag = MessageFlag.SCRIPT_REQUEST_NO_SESSION;
-        scriptMessage.setRequestAsUUID(UUID.randomUUID());
-        return scriptMessage;
     }
 }

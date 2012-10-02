@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-final class RexPro {
+public final class RexPro {
 
     public static final int DEFAULT_TIMEOUT_SECONDS = 100;
 
