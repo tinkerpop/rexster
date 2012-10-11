@@ -31,6 +31,7 @@ import javax.ws.rs.core.Variant;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -85,6 +86,8 @@ public abstract class BaseTest {
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(new HashMap<String, String>()));
+            allowing(httpServletRequest).getParameterNames();
+            will(returnValue(new Hashtable().keys()));
             allowing(uri).getAbsolutePath();
             will(returnValue(requestUriPath));
         }});
@@ -119,6 +122,8 @@ public abstract class BaseTest {
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
+            allowing(httpServletRequest).getParameterNames();
+            will(returnValue(new Hashtable(parameters).keys()));
             allowing(request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
             allowing(uri).getAbsolutePath();
@@ -156,6 +161,8 @@ public abstract class BaseTest {
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
+            allowing(httpServletRequest).getParameterNames();
+            will(returnValue(new Hashtable(parameters).keys()));
             allowing(request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
             allowing(uri).getAbsolutePath();
@@ -200,6 +207,8 @@ public abstract class BaseTest {
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
+            allowing(httpServletRequest).getParameterNames();
+            will(returnValue(new Hashtable(parameters).keys()));
             allowing(request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
             allowing(uri).getAbsolutePath();
@@ -270,6 +279,8 @@ public abstract class BaseTest {
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
+            allowing(httpServletRequest).getParameterNames();
+            will(returnValue(new Hashtable(parameters).keys()));
             allowing(request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
             allowing(uri).getAbsolutePath();
@@ -298,6 +309,8 @@ public abstract class BaseTest {
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(parameters));
+            allowing(httpServletRequest).getParameterNames();
+            will(returnValue(new Hashtable(parameters).keys()));
             allowing(request).selectVariant(with(any(List.class)));
             will(returnValue(variantJson));
             allowing(uri).getAbsolutePath();

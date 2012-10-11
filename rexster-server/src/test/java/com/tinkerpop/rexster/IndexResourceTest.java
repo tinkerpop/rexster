@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
 /**
@@ -39,6 +40,8 @@ public class IndexResourceTest extends BaseTest {
         this.mockery.checking(new Expectations() {{
             allowing(httpServletRequest).getParameterMap();
             will(returnValue(new HashMap<String, String>()));
+            allowing(httpServletRequest).getParameterNames();
+            will(returnValue(new Hashtable().keys()));
             allowing(ra).getApplicationGraph(with(any(String.class)));
             will(returnValue(rag));
         }});
