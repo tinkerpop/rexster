@@ -159,7 +159,7 @@ public abstract class BaseResource {
                 this.requestObject = new JSONObject();
                 this.requestObjectFlat = new JSONObject();
 
-                if (this.httpServletRequest != null) {
+                if (this.httpServletRequest != null && this.httpServletRequest.getParameterNames().hasMoreElements()) {
                     // unclear if this block of code is still necessary ???
                     Map<String, String[]> queryParameters = this.httpServletRequest.getParameterMap();
                     this.buildRequestObject(queryParameters);
