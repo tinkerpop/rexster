@@ -9,10 +9,12 @@ import com.tinkerpop.rexster.protocol.filter.SessionFilter;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
+import org.glassfish.grizzly.IOStrategy;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
+import org.glassfish.grizzly.strategies.SameThreadIOStrategy;
 import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 
@@ -33,6 +35,7 @@ public class RexProRexsterServer implements RexsterServer {
     private final int coreWorkerThreadPoolSize;
     private final int maxKernalThreadPoolSize;
     private final int coreKernalThreadPoolSize;
+    private final String ioStrategy;
 
     public RexProRexsterServer(final XMLConfiguration properties) {
         this(properties, true);
@@ -47,6 +50,7 @@ public class RexProRexsterServer implements RexsterServer {
         this.maxWorkerThreadPoolSize = properties.getInt("rexpro.thread-pool.worker.max-size", 8);
         this.coreKernalThreadPoolSize = properties.getInt("rexpro.thread-pool.kernal.core-size", 4);
         this.maxKernalThreadPoolSize = properties.getInt("rexpro.thread-pool.kernal.max-size", 4);
+        this.ioStrategy = properties.getString("rexpro.io-strategy", "worker");
 
         this.tcpTransport = configureTransport();
     }
@@ -87,7 +91,11 @@ public class RexProRexsterServer implements RexsterServer {
 
         filterChainBuilder.add(new ScriptFilter(application));
 
-        this.tcpTransport.setIOStrategy(WorkerThreadIOStrategy.getInstance());
+        final IOStrategy strategy = GrizzlyIoStrategyFactory.createIoStrategy(this.ioStrategy);
+
+        logger.info(String.format("Using %s IOStrategy for RexPro.", strategy.getClass().getName()));
+
+        this.tcpTransport.setIOStrategy(strategy);
         this.tcpTransport.setProcessor(filterChainBuilder.build());
         this.tcpTransport.bind(rexproServerHost, rexproServerPort);
 

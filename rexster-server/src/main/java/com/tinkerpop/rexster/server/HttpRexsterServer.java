@@ -21,6 +21,7 @@ import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
+import org.glassfish.grizzly.IOStrategy;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
@@ -49,6 +50,7 @@ public class HttpRexsterServer implements RexsterServer {
     private final int maxKernalThreadPoolSize;
     private final int coreKernalThreadPoolSize;
     private final boolean enableJmx;
+    private final String ioStrategy;
     private final HttpServer httpServer;
 
     public HttpRexsterServer(final XMLConfiguration properties) {
@@ -62,6 +64,8 @@ public class HttpRexsterServer implements RexsterServer {
         coreKernalThreadPoolSize = properties.getInt("http.thread-pool.kernal.core-size", 4);
         maxKernalThreadPoolSize = properties.getInt("http.thread-pool.kernal.max-size", 4);
         enableJmx = properties.getBoolean("http.enable-jmx", false);
+        this.ioStrategy = properties.getString("http.io-strategy", "worker");
+
         this.httpServer = new HttpServer();
     }
 
@@ -77,6 +81,11 @@ public class HttpRexsterServer implements RexsterServer {
         deployDogHouse(application);
 
         final NetworkListener listener = configureNetworkListener();
+        final IOStrategy strategy = GrizzlyIoStrategyFactory.createIoStrategy(this.ioStrategy);
+
+        logger.info(String.format("Using %s IOStrategy for HTTP/REST.", strategy.getClass().getName()));
+
+        configureNetworkListener().getTransport().setIOStrategy(strategy);
         this.httpServer.addListener(listener);
         this.httpServer.getServerConfiguration().setJmxEnabled(enableJmx);
         this.httpServer.start();

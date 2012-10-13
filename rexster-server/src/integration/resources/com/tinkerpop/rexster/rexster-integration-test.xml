@@ -17,6 +17,7 @@
                 <max-size>4</max-size>
             </kernal>
         </thread-pool>
+        <io-strategy>worker</io-strategy>
     </http>
     <rexpro>
         <server-port>8184</server-port>
@@ -33,6 +34,7 @@
                 <max-size>4</max-size>
             </kernal>
         </thread-pool>
+        <io-strategy>worker</io-strategy>
     </rexpro>
     <shutdown-port>8183</shutdown-port>
     <shutdown-host>127.0.0.1</shutdown-host>
