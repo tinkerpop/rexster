@@ -1,27 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rexster>
-    <rexster-server-port>8182</rexster-server-port>
-    <rexster-server-host>0.0.0.0</rexster-server-host>
-    <rexster-shutdown-port>8183</rexster-shutdown-port>
-    <rexster-shutdown-host>127.0.0.1</rexster-shutdown-host>
-    <rexpro-server-port>8184</rexpro-server-port>
-    <rexpro-server-host>0.0.0.0</rexpro-server-host>
-    <rexpro-session-max-idle>1790000</rexpro-session-max-idle>
-    <rexpro-session-check-interval>3000000</rexpro-session-check-interval>
-    <base-uri>http://localhost</base-uri>
-    <web-root>public</web-root>
-    <character-set>UTF-8</character-set>
-    <enable-jmx>false</enable-jmx>
-    <thread-pool>
-        <worker>
-            <core-size>8</core-size>
-            <max-size>8</max-size>
-        </worker>
-        <kernal>
-            <core-size>4</core-size>
-            <max-size>4</max-size>
-        </kernal>
-    </thread-pool>
+    <http>
+        <server-port>8182</server-port>
+        <server-host>0.0.0.0</server-host>
+        <base-uri>http://localhost</base-uri>
+        <web-root>public</web-root>
+        <character-set>UTF-8</character-set>
+        <enable-jmx>false</enable-jmx>
+        <thread-pool>
+            <worker>
+                <core-size>8</core-size>
+                <max-size>8</max-size>
+            </worker>
+            <kernal>
+                <core-size>4</core-size>
+                <max-size>4</max-size>
+            </kernal>
+        </thread-pool>
+    </http>
+    <rexpro>
+        <server-port>8184</server-port>
+        <server-host>0.0.0.0</server-host>
+        <session-max-idle>1790000</session-max-idle>
+        <session-check-interval>3000000</session-check-interval>
+        <thread-pool>
+            <worker>
+                <core-size>8</core-size>
+                <max-size>8</max-size>
+            </worker>
+            <kernal>
+                <core-size>4</core-size>
+                <max-size>4</max-size>
+            </kernal>
+        </thread-pool>
+    </rexpro>
+    <shutdown-port>8183</shutdown-port>
+    <shutdown-host>127.0.0.1</shutdown-host>
     <security>
         <authentication>
             <type>none</type>

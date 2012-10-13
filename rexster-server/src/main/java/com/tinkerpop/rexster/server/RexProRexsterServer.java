@@ -14,6 +14,7 @@ import org.glassfish.grizzly.filterchain.TransportFilter;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
+import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 
 /**
  * Initializes the TCP server that serves RexPro.
@@ -28,6 +29,10 @@ public class RexProRexsterServer implements RexsterServer {
     private final String rexproServerHost;
     private final TCPNIOTransport tcpTransport;
     private final boolean allowSessions;
+    private final int maxWorkerThreadPoolSize;
+    private final int coreWorkerThreadPoolSize;
+    private final int maxKernalThreadPoolSize;
+    private final int coreKernalThreadPoolSize;
 
     public RexProRexsterServer(final XMLConfiguration properties) {
         this(properties, true);
@@ -36,9 +41,14 @@ public class RexProRexsterServer implements RexsterServer {
     public RexProRexsterServer(final XMLConfiguration properties, final boolean allowSessions) {
         this.allowSessions = allowSessions;
         this.properties = properties;
-        this.rexproServerPort = properties.getInteger("rexpro-server-port", new Integer(RexsterSettings.DEFAULT_REXPRO_PORT));
-        this.rexproServerHost = properties.getString("rexpro-server-host", "0.0.0.0");
-        this.tcpTransport = TCPNIOTransportBuilder.newInstance().build();
+        this.rexproServerPort = properties.getInteger("rexpro.server-port", new Integer(RexsterSettings.DEFAULT_REXPRO_PORT));
+        this.rexproServerHost = properties.getString("rexpro.server-host", "0.0.0.0");
+        this.coreWorkerThreadPoolSize = properties.getInt("rexpro.thread-pool.worker.core-size", 8);
+        this.maxWorkerThreadPoolSize = properties.getInt("rexpro.thread-pool.worker.max-size", 8);
+        this.coreKernalThreadPoolSize = properties.getInt("rexpro.thread-pool.kernal.core-size", 4);
+        this.maxKernalThreadPoolSize = properties.getInt("rexpro.thread-pool.kernal.max-size", 4);
+
+        this.tcpTransport = configureTransport();
     }
 
     @Override
@@ -84,12 +94,26 @@ public class RexProRexsterServer implements RexsterServer {
         this.tcpTransport.start();
 
         // initialize the session monitor for rexpro to clean up dead sessions.
-        final Long rexProSessionMaxIdle = properties.getLong("rexpro-session-max-idle",
+        final Long rexProSessionMaxIdle = properties.getLong("rexpro.session-max-idle",
                 new Long(RexsterSettings.DEFAULT_REXPRO_SESSION_MAX_IDLE));
-        final Long rexProSessionCheckInterval = properties.getLong("rexpro-session-check-interval",
+        final Long rexProSessionCheckInterval = properties.getLong("rexpro.session-check-interval",
                 new Long(RexsterSettings.DEFAULT_REXPRO_SESSION_CHECK_INTERVAL));
         new RexProSessionMonitor(rexProSessionMaxIdle, rexProSessionCheckInterval);
 
         logger.info("RexPro serving on port: [" + rexproServerPort + "]");
+    }
+
+    private TCPNIOTransport configureTransport() {
+        final TCPNIOTransport tcpTransport = TCPNIOTransportBuilder.newInstance().build();
+        final ThreadPoolConfig workerThreadPoolConfig = ThreadPoolConfig.defaultConfig()
+                .setCorePoolSize(coreWorkerThreadPoolSize)
+                .setMaxPoolSize(maxWorkerThreadPoolSize);
+        tcpTransport.setWorkerThreadPoolConfig(workerThreadPoolConfig);
+        final ThreadPoolConfig kernalThreadPoolConfig = ThreadPoolConfig.defaultConfig()
+                .setCorePoolSize(coreKernalThreadPoolSize)
+                .setMaxPoolSize(maxKernalThreadPoolSize);
+        tcpTransport.setKernelThreadPoolConfig(kernalThreadPoolConfig);
+
+        return tcpTransport;
     }
 }
