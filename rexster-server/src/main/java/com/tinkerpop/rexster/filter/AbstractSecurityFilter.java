@@ -21,6 +21,7 @@ import org.glassfish.grizzly.filterchain.NextAction;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -51,6 +52,9 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
 
     @Context
     protected HttpServletRequest httpServletRequest;
+
+    @Context
+    protected HttpServletResponse httpServletResponse;
 
     private boolean isConfigured = false;
 
