@@ -690,9 +690,9 @@ define(
              */
             initGraphList : function(onInitComplete){
 
-                mediator.resetMenuGraph();
                 ajax.getGraphs(function(result){
 
+                    mediator.resetMenuGraph();
                     var ix = 0,
                         max = 0,
                         graphs = [],
