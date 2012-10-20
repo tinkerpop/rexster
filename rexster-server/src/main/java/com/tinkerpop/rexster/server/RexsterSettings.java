@@ -116,12 +116,12 @@ public class RexsterSettings {
 
         // overrides rexster-server-port from command line
         if (line.hasCommandParameters() && line.getCommandParameters().hasOption("rexsterport")) {
-            properties.setProperty("rexster-server-port", line.getCommandParameters().getOptionValue("rexsterport"));
+            properties.setProperty("http.server-port", line.getCommandParameters().getOptionValue("rexsterport"));
         }
 
         // overrides web-root from command line
         if (line.hasCommandParameters() && line.getCommandParameters().hasOption("webroot")) {
-            properties.setProperty("web-root", line.getCommandParameters().getOptionValue("webroot"));
+            properties.setProperty("http.web-root", line.getCommandParameters().getOptionValue("webroot"));
         }
 
         return properties;
