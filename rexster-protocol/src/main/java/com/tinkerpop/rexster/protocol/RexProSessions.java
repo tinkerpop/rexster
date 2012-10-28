@@ -7,6 +7,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Manager for sessions of RexPro.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public class RexProSessions {
     private static final Logger logger = Logger.getLogger(RexProSessions.class);
 
@@ -17,6 +22,8 @@ public class RexProSessions {
     }
 
     public static void destroySession(final String sessionKey) {
+        final RexProSession session = getSession(sessionKey);
+        session.kill();
         sessions.remove(sessionKey);
         logger.info(String.format("RexPro Session destroyed: %s", sessionKey));
     }

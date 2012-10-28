@@ -23,6 +23,7 @@ h3. Version 2.2.0 (NOT OFFICIALLY RELEASED YET)
 ** @enable-jmx@ tells Rexster to turn on or turn off JMX monitoring.
 ** @thread-pool@ section gives control over how many threads are allocated to Rexster.
 * Fixed Rexster Console where some @null@ results were not being rendered back to it.
+* Fixed Rexster Console issues where transactions were not executing properly as requests within a session were not being bound to specific threads.
 
 h3. Version 2.1.0 (August 4, 2012)
 
