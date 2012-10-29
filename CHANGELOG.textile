@@ -20,8 +20,11 @@ h3. Version 2.2.0 (NOT OFFICIALLY RELEASED YET)
 * Requests with @OPTIONS@ now returns @OPTIONS@ in the @Access-Control-Allow-Methods@ and a response 200 instead of 204.
 * Upgrade to Grizzly 2.2.18 and Jersey 1.14.
 * Include new configuration options in @rexster.xml@
-** @enable-jmx@ tells Rexster to turn on or turn off JMX monitoring.
+** @enable-jmx@ element turns on or turns off JMX monitoring.
 ** @thread-pool@ section gives control over how many threads are allocated to Rexster.
+** @max-post-size@ element controls the size of the data that can be POSTed to Rexster.
+** @max-header-size@ element controls the size of the request header that can be sent to Rexster.
+** @upload-timeout-millis@ element represents the length of the time in milliseconds that Rexster will wait for an upload to occur.
 * Fixed Rexster Console where some @null@ results were not being rendered back to it.
 * Fixed Rexster Console issues where transactions were not executing properly as requests within a session were not being bound to specific threads.
 

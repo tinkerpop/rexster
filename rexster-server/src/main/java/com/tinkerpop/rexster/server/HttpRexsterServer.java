@@ -49,6 +49,9 @@ public class HttpRexsterServer implements RexsterServer {
     private final int coreWorkerThreadPoolSize;
     private final int maxKernalThreadPoolSize;
     private final int coreKernalThreadPoolSize;
+    private final int maxPostSize;
+    private final int maxHeaderSize;
+    private final int uploadTimeoutMillis;
     private final boolean enableJmx;
     private final String ioStrategy;
     private final HttpServer httpServer;
@@ -63,6 +66,9 @@ public class HttpRexsterServer implements RexsterServer {
         maxWorkerThreadPoolSize = properties.getInt("http.thread-pool.worker.max-size", 8);
         coreKernalThreadPoolSize = properties.getInt("http.thread-pool.kernal.core-size", 4);
         maxKernalThreadPoolSize = properties.getInt("http.thread-pool.kernal.max-size", 4);
+        maxPostSize = properties.getInt("http.max-post-size", 2097152);
+        maxHeaderSize = properties.getInt("http.max-header-size", 8192);
+        uploadTimeoutMillis = properties.getInt("http.upload-timeout-millis", 300000);
         enableJmx = properties.getBoolean("http.enable-jmx", false);
         this.ioStrategy = properties.getString("http.io-strategy", "worker");
 
@@ -85,9 +91,10 @@ public class HttpRexsterServer implements RexsterServer {
 
         logger.info(String.format("Using %s IOStrategy for HTTP/REST.", strategy.getClass().getName()));
 
-        configureNetworkListener().getTransport().setIOStrategy(strategy);
+        listener.getTransport().setIOStrategy(strategy);
         this.httpServer.addListener(listener);
         this.httpServer.getServerConfiguration().setJmxEnabled(enableJmx);
+
         this.httpServer.start();
 
         logger.info("Rexster Server running on: [" + baseUri + ":" + rexsterServerPort + "]");
@@ -164,6 +171,12 @@ public class HttpRexsterServer implements RexsterServer {
                 .setCorePoolSize(coreKernalThreadPoolSize)
                 .setMaxPoolSize(maxKernalThreadPoolSize);
         listener.getTransport().setKernelThreadPoolConfig(kernalThreadPoolConfig);
+
+        listener.setMaxPostSize(maxPostSize);
+        listener.setMaxHttpHeaderSize(maxHeaderSize);
+        listener.setUploadTimeout(uploadTimeoutMillis);
+        listener.setDisableUploadTimeout(false);
+
         return listener;
     }
 }
