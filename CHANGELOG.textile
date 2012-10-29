@@ -27,6 +27,7 @@ h3. Version 2.2.0 (NOT OFFICIALLY RELEASED YET)
 ** @upload-timeout-millis@ element represents the length of the time in milliseconds that Rexster will wait for an upload to occur.
 * Fixed Rexster Console where some @null@ results were not being rendered back to it.
 * Fixed Rexster Console issues where transactions were not executing properly as requests within a session were not being bound to specific threads.
+* Update the Dex configuration of @rexster.xml@ to accept an external configuration file.
 
 h3. Version 2.1.0 (August 4, 2012)
 
