@@ -5,6 +5,9 @@ import com.tinkerpop.blueprints.impls.rexster.RexsterGraph;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.configuration.Configuration;
 
+/**
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public class RexsterGraphGraphConfiguration implements GraphConfiguration {
 
     public static final int DEFAULT_BUFFER_SIZE = 100;

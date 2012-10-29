@@ -11,6 +11,9 @@ import org.apache.commons.configuration.SubnodeConfiguration;
 import java.util.HashMap;
 import java.util.Iterator;
 
+/**
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public class Neo4jGraphConfiguration implements GraphConfiguration {
 
     public Graph configureGraphInstance(final Configuration properties) throws GraphConfigurationException {

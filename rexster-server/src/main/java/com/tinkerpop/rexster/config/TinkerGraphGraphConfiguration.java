@@ -7,6 +7,9 @@ import com.tinkerpop.rexster.util.MockTinkerTransactionalGraph;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConversionException;
 
+/**
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public class TinkerGraphGraphConfiguration implements GraphConfiguration {
 
     public Graph configureGraphInstance(final Configuration properties) throws GraphConfigurationException {

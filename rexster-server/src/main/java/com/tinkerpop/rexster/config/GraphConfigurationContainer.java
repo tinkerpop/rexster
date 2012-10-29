@@ -15,6 +15,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public class GraphConfigurationContainer {
 
     protected static final Logger logger = Logger.getLogger(GraphConfigurationContainer.class);

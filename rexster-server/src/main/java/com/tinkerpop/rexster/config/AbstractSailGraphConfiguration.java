@@ -11,6 +11,9 @@ import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.log4j.Logger;
 
+/**
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public abstract class AbstractSailGraphConfiguration implements GraphConfiguration {
     private static final Logger logger = Logger.getLogger(AbstractSailGraphConfiguration.class);
 

@@ -8,6 +8,9 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 
+/**
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public class OrientGraphConfiguration implements GraphConfiguration {
 
     public Graph configureGraphInstance(final Configuration properties) throws GraphConfigurationException {

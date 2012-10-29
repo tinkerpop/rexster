@@ -9,6 +9,7 @@ import org.apache.commons.configuration.SubnodeConfiguration;
 
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Sergio Gomez Vilamor (https://github.com/sgomezvillamor)
  */
 public class DexGraphConfiguration implements GraphConfiguration {
 
