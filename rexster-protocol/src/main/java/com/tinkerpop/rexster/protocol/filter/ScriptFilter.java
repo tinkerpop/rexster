@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol.filter;
 
+import com.tinkerpop.rexster.protocol.msg.GraphSONScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.MessageTokens;
 import com.tinkerpop.rexster.protocol.msg.MessageUtil;
@@ -85,30 +86,13 @@ public class ScriptFilter extends BaseFilter {
 
             try {
                 final Object result = session.evaluate(specificMessage.Script, specificMessage.LanguageName, specificMessage.getBindings());
-
                 if (session.getChannel() == SessionRequestMessage.CHANNEL_CONSOLE) {
-                    final ConsoleScriptResponseMessage consoleScriptResponseMessage = new ConsoleScriptResponseMessage();
-                    consoleScriptResponseMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToByteArray(session.getBindings());
-                    consoleScriptResponseMessage.Flag = MessageFlag.SCRIPT_RESPONSE_COMPLETE_MESSAGE;
-                    consoleScriptResponseMessage.Session = specificMessage.Session;
-                    consoleScriptResponseMessage.Request = specificMessage.Request;
-
-                    final List<String> consoleLines = ConsoleScriptResponseMessage.convertResultToConsoleLines(result);
-                    consoleScriptResponseMessage.ConsoleLines = new String[consoleLines.size()];
-                    consoleLines.toArray(consoleScriptResponseMessage.ConsoleLines);
-
-                    ctx.write(consoleScriptResponseMessage);
+                    ctx.write(formatForConsoleChannel(specificMessage, session, result));
                 } else if (session.getChannel() == SessionRequestMessage.CHANNEL_MSGPACK) {
-                    final MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
-                    msgPackScriptResponseMessage.Flag = MessageFlag.SCRIPT_RESPONSE_COMPLETE_MESSAGE;
-                    msgPackScriptResponseMessage.Session = specificMessage.Session;
-                    msgPackScriptResponseMessage.Request = specificMessage.Request;
-                    msgPackScriptResponseMessage.Results = MsgPackScriptResponseMessage.convertResultToBytes(result);
-
-                    ctx.write(msgPackScriptResponseMessage);
+                    ctx.write(formatForMsgPackChannel(specificMessage, result));
+                }  else if (session.getChannel() == SessionRequestMessage.CHANNEL_GRAPHSON) {
+                    ctx.write(formatForGraphSONChannel(specificMessage, result));
                 }
-
-
             } catch (ScriptException se) {
                 logger.warn("Could not process script [" + specificMessage.Script + "] for language ["
                         + specificMessage.LanguageName + "] on session [" + message.Session
@@ -131,5 +115,36 @@ public class ScriptFilter extends BaseFilter {
         }
 
         return ctx.getInvokeAction();
+    }
+
+    private static GraphSONScriptResponseMessage formatForGraphSONChannel(final ScriptRequestMessage specificMessage, final Object result) throws Exception {
+        final GraphSONScriptResponseMessage graphSONScriptResponseMessage = new GraphSONScriptResponseMessage();
+        graphSONScriptResponseMessage.Flag = MessageFlag.SCRIPT_RESPONSE_COMPLETE_MESSAGE;
+        graphSONScriptResponseMessage.Session = specificMessage.Session;
+        graphSONScriptResponseMessage.Request = specificMessage.Request;
+        graphSONScriptResponseMessage.Results = GraphSONScriptResponseMessage.convertResultToBytes(result);
+        return graphSONScriptResponseMessage;
+    }
+
+    private static MsgPackScriptResponseMessage formatForMsgPackChannel(final ScriptRequestMessage specificMessage, final Object result) throws Exception {
+        final MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
+        msgPackScriptResponseMessage.Flag = MessageFlag.SCRIPT_RESPONSE_COMPLETE_MESSAGE;
+        msgPackScriptResponseMessage.Session = specificMessage.Session;
+        msgPackScriptResponseMessage.Request = specificMessage.Request;
+        msgPackScriptResponseMessage.Results = MsgPackScriptResponseMessage.convertResultToBytes(result);
+        return msgPackScriptResponseMessage;
+    }
+
+    private static ConsoleScriptResponseMessage formatForConsoleChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
+        final ConsoleScriptResponseMessage consoleScriptResponseMessage = new ConsoleScriptResponseMessage();
+        consoleScriptResponseMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToByteArray(session.getBindings());
+        consoleScriptResponseMessage.Flag = MessageFlag.SCRIPT_RESPONSE_COMPLETE_MESSAGE;
+        consoleScriptResponseMessage.Session = specificMessage.Session;
+        consoleScriptResponseMessage.Request = specificMessage.Request;
+
+        final List<String> consoleLines = ConsoleScriptResponseMessage.convertResultToConsoleLines(result);
+        consoleScriptResponseMessage.ConsoleLines = new String[consoleLines.size()];
+        consoleLines.toArray(consoleScriptResponseMessage.ConsoleLines);
+        return consoleScriptResponseMessage;
     }
 }

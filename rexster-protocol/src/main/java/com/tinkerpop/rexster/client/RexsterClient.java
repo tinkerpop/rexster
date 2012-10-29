@@ -1,14 +1,11 @@
 package com.tinkerpop.rexster.client;
 
-import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.BitWorks;
-import com.tinkerpop.rexster.protocol.RemoteRexsterSession;
 import com.tinkerpop.rexster.protocol.RexPro;
 import com.tinkerpop.rexster.protocol.RexsterBindings;
 import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
-import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import org.msgpack.MessagePack;
 import org.msgpack.type.Value;
 import org.msgpack.unpacker.BufferUnpacker;
