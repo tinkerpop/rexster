@@ -1,5 +1,7 @@
 package com.tinkerpop.rexster.protocol;
 
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.Tokens;
 
@@ -30,12 +32,15 @@ public class RexProSession {
 
     private Date lastTimeUsed = new Date();
 
+    private final RexsterApplication rexsterApplication;
+
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public RexProSession(final String sessionKey, final RexsterApplication rexsterApplication, final byte channel) {
         this.sessionKey = sessionKey;
         this.channel = channel;
         this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, rexsterApplication);
+        this.rexsterApplication = rexsterApplication;
     }
 
     public String getSessionKey() {
@@ -69,8 +74,19 @@ public class RexProSession {
 
             final Future future = this.executor.submit(new Evaluator(engine.getEngine(), script, this.bindings));
             result = future.get();
-        } catch (Exception se) {
-            throw new RuntimeException(se);
+        } catch (Exception e) {
+            // attempt to abort the transaction across all graphs since a new thread will be created on the next request.
+            // don't want transactions lingering about, though this seems like a brute force way to deal with it.
+            for (String graphName : this.rexsterApplication.getGraphNames()) {
+                try {
+                    final Graph g = this.rexsterApplication.getGraph(graphName);
+                    if (g instanceof TransactionalGraph) {
+                        ((TransactionalGraph) g).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+                    }
+                } catch (Throwable t) { }
+            }
+
+            throw new ScriptException(e);
         } finally {
             this.lastTimeUsed = new Date();
         }
