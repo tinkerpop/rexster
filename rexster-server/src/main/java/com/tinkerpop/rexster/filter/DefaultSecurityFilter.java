@@ -25,6 +25,8 @@ import java.util.Map;
  * </configuration>
  * </authentication>
  * </security>
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class DefaultSecurityFilter extends AbstractSecurityFilter {
 

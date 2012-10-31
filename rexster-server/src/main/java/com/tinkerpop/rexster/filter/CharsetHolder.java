@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
+/**
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public class CharsetHolder implements Comparable<CharsetHolder> {
     private static final Logger logger = Logger.getLogger(CharsetHolder.class);
 

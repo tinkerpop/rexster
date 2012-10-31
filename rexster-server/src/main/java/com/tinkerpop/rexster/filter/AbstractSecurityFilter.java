@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.tinkerpop.rexster.filter;
 
 import com.sun.jersey.core.util.Base64;
@@ -39,6 +35,8 @@ import java.util.Map;
  * This is a bit of sketchy implementation of two semi-related bits of Grizzly/Jersey.  Trying to unify the
  * implementation of security within the system for RexPro/REST/Dog House.  Could be a better way to do this,
  * but it's not clear just yet.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public abstract class AbstractSecurityFilter extends BaseFilter implements ContainerRequestFilter {
 
