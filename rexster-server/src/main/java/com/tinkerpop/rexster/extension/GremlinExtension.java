@@ -42,7 +42,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
 
     private static final Map<String, String> cachedScripts = new HashMap<String, String>();
 
-    private static final EngineController enginerController = EngineController.getInstance();
+    private static final EngineController engineController = EngineController.getInstance();
     private static final String GRAPH_VARIABLE = "g";
     private static final String VERTEX_VARIABLE = "v";
     private static final String EDGE_VARIABLE = "e";
@@ -212,12 +212,12 @@ public class GremlinExtension extends AbstractRexsterExtension {
         }
 
         try {
-            if (!enginerController.isEngineAvailable(languageToExecuteWith)) {
+            if (!engineController.isEngineAvailable(languageToExecuteWith)) {
                 return ExtensionResponse.error("language requested is not available on the server",
                         generateErrorJson(extensionMethod.getExtensionApiAsJson()));
             }
 
-            final EngineHolder engineHolder = enginerController.getEngineByLanguageName(languageToExecuteWith);
+            final EngineHolder engineHolder = engineController.getEngineByLanguageName(languageToExecuteWith);
 
             // result is either the ad-hoc script on the query string or the last "stored procedure"
             Object result = null;
