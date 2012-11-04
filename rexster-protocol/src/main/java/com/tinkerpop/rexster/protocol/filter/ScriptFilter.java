@@ -59,7 +59,7 @@ public class ScriptFilter extends BaseFilter {
                 final Bindings bindings = scriptEngine.createBindings();
                 bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, this.rexsterApplication);
 
-                final Object result = engineHolder.getEngine().eval(specificMessage.Script, bindings);
+                final Object result = scriptEngine.eval(specificMessage.Script, bindings);
 
                 final MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
                 msgPackScriptResponseMessage.Flag = MessageFlag.SCRIPT_RESPONSE_COMPLETE_MESSAGE;
