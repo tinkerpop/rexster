@@ -21,6 +21,8 @@ import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;
 
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import java.io.IOException;
@@ -38,14 +40,8 @@ public class ScriptFilter extends BaseFilter {
 
     private final RexsterApplication rexsterApplication;
 
-    private final SimpleBindings bindings;
-
     public ScriptFilter(final RexsterApplication rexsterApplication) {
         this.rexsterApplication = rexsterApplication;
-
-        // reuse the bindings for the gremlin script engine
-        this.bindings = new SimpleBindings();
-        this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, this.rexsterApplication);
     }
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
@@ -59,6 +55,10 @@ public class ScriptFilter extends BaseFilter {
 
             try {
                 final EngineHolder engineHolder = engineController.getEngineByLanguageName(specificMessage.LanguageName);
+                final ScriptEngine scriptEngine = engineHolder.getEngine();
+                final Bindings bindings = scriptEngine.createBindings();
+                bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, this.rexsterApplication);
+
                 final Object result = engineHolder.getEngine().eval(specificMessage.Script, bindings);
 
                 final MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
