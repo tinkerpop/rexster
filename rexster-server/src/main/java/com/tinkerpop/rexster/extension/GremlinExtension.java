@@ -18,6 +18,8 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import java.io.File;
 import java.io.FileInputStream;
@@ -182,7 +184,20 @@ public class GremlinExtension extends AbstractRexsterExtension {
         final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(requestObject, WILDCARD);
 
         final String languageToExecuteWith = getLanguageToExecuteWith(requestObject);
-        final Bindings bindings = createBindings(graph, vertex, edge);
+        final EngineHolder engineHolder;
+        final ScriptEngine scriptEngine;
+        try {
+            if (!engineController.isEngineAvailable(languageToExecuteWith)) {
+                return ExtensionResponse.error("language requested is not available on the server");
+            }
+
+            engineHolder = engineController.getEngineByLanguageName(languageToExecuteWith);
+            scriptEngine = engineHolder.getEngine();
+        } catch (ScriptException se) {
+            return ExtensionResponse.error("could not get request script engine");
+        }
+
+        final Bindings bindings = createBindings(graph, vertex, edge, scriptEngine);
 
         // add all keys not defined by this request as bindings to the script engine
         placeParametersOnBinding(requestObject, bindings, showTypes);
@@ -212,13 +227,6 @@ public class GremlinExtension extends AbstractRexsterExtension {
         }
 
         try {
-            if (!engineController.isEngineAvailable(languageToExecuteWith)) {
-                return ExtensionResponse.error("language requested is not available on the server",
-                        generateErrorJson(extensionMethod.getExtensionApiAsJson()));
-            }
-
-            final EngineHolder engineHolder = engineController.getEngineByLanguageName(languageToExecuteWith);
-
             // result is either the ad-hoc script on the query string or the last "stored procedure"
             Object result = null;
             if (scriptsToRun != null) {
@@ -249,8 +257,9 @@ public class GremlinExtension extends AbstractRexsterExtension {
         return extensionResponse;
     }
 
-    private static Bindings createBindings(final Graph graph, final Vertex vertex, final Edge edge) {
-        final Bindings bindings = new SimpleBindings();
+    private static Bindings createBindings(final Graph graph, final Vertex vertex, final Edge edge,
+                                           final ScriptEngine scriptEngine) {
+        final Bindings bindings = scriptEngine.createBindings();
         bindings.put(GRAPH_VARIABLE, graph);
 
         if (vertex != null) {
