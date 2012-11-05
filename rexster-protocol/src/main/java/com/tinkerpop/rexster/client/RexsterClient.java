@@ -9,6 +9,7 @@ import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import org.msgpack.MessagePack;
+import org.msgpack.template.Template;
 import org.msgpack.type.Value;
 import org.msgpack.unpacker.BufferUnpacker;
 import org.msgpack.unpacker.Converter;
@@ -54,7 +55,11 @@ public class RexsterClient {
         }
     }
 
-    public List<Map<String, Value>> gremlin(final String script) throws IOException {
+    public List<Map<String,Value>> gremlin(final String script) throws IOException {
+        return gremlin(script, tMap(TString,TValue));
+    }
+
+    public <T> List<T> gremlin(final String script, final Template template) throws IOException {
         final RexProInfo server = nextServer();
 
         final RexProMessage resultMessage = RexPro.sendMessage(server.getHost(), server.getPort(),
@@ -66,11 +71,12 @@ public class RexsterClient {
             unpacker.setMapSizeLimit(Integer.MAX_VALUE);
             unpacker.setRawSizeLimit(Integer.MAX_VALUE);
 
-            final List<Map<String, Value>> results = new ArrayList<Map<String, Value>>();
+            final List<T> results = new ArrayList<T>();
             final UnpackerIterator itty = unpacker.iterator();
             while (itty.hasNext()){
-                final Map<String,Value> map = new Converter(msgpack, itty.next()).read(tMap(TString, TValue));
-                results.add(map);
+                final T t = (T) new Converter(msgpack, itty.next()).read(template);
+                //final Map<String,Value> map = new Converter(msgpack, itty.next()).read(tMap(TString, TValue));
+                results.add(t);
             }
 
             return results;
@@ -104,10 +110,10 @@ public class RexsterClient {
     /*
     public static void main(final String [] args) throws Exception {
         RexsterClient client = new RexsterClient(new String[] {"localhost:8184"});
-        List<Map<String, Value>> maps = client.gremlin("g = rexster.getGraph('tinkergraph');g.V");
+        List<Map<String, Value>> maps = client.gremlin("g = rexster.getGraph('tinkergraph');g.V", tMap(TString, TValue));
         System.out.println(maps);
-        maps = client.gremlin("g = rexster.getGraph('tinkergraph');g.d()");
-        System.out.println("huh");
+        List<String> names = client.gremlin("g = rexster.getGraph('tinkergraph');g.v(1).name", TString);
+        System.out.println(names);
     }
     */
 
