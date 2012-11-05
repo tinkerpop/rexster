@@ -3,8 +3,10 @@ package com.tinkerpop.rexster.client;
 import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.RexPro;
 import com.tinkerpop.rexster.protocol.RexsterBindings;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import org.msgpack.MessagePack;
 import org.msgpack.type.Value;
@@ -55,23 +57,28 @@ public class RexsterClient {
     public List<Map<String, Value>> gremlin(final String script) throws IOException {
         final RexProInfo server = nextServer();
 
-        final MsgPackScriptResponseMessage resultMessage = (MsgPackScriptResponseMessage)
-                RexPro.sendMessage(server.getHost(), server.getPort(),
+        final RexProMessage resultMessage = RexPro.sendMessage(server.getHost(), server.getPort(),
                 createScriptRequestMessage(script));
+        if (resultMessage instanceof MsgPackScriptResponseMessage) {
+            final MsgPackScriptResponseMessage msg = (MsgPackScriptResponseMessage) resultMessage;
+            final BufferUnpacker unpacker = msgpack.createBufferUnpacker(msg.Results);
+            unpacker.setArraySizeLimit(Integer.MAX_VALUE);
+            unpacker.setMapSizeLimit(Integer.MAX_VALUE);
+            unpacker.setRawSizeLimit(Integer.MAX_VALUE);
 
-        final BufferUnpacker unpacker = msgpack.createBufferUnpacker(resultMessage.Results);
-        unpacker.setArraySizeLimit(Integer.MAX_VALUE);
-        unpacker.setMapSizeLimit(Integer.MAX_VALUE);
-        unpacker.setRawSizeLimit(Integer.MAX_VALUE);
+            final List<Map<String, Value>> results = new ArrayList<Map<String, Value>>();
+            final UnpackerIterator itty = unpacker.iterator();
+            while (itty.hasNext()){
+                final Map<String,Value> map = new Converter(msgpack, itty.next()).read(tMap(TString, TValue));
+                results.add(map);
+            }
 
-        final List<Map<String, Value>> results = new ArrayList<Map<String, Value>>();
-        final UnpackerIterator itty = unpacker.iterator();
-        while (itty.hasNext()){
-            final Map<String,Value> map = new Converter(msgpack, itty.next()).read(tMap(TString, TValue));
-            results.add(map);
+            return results;
+        } else if (resultMessage instanceof ErrorResponseMessage) {
+            throw new IOException(((ErrorResponseMessage) resultMessage).ErrorMessage);
+        } else {
+            throw new RuntimeException("RexsterClient doesn't support the message type returned.");
         }
-
-        return results;
     }
 
     private RexProInfo nextServer() {
@@ -93,6 +100,16 @@ public class RexsterClient {
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
         return scriptMessage;
     }
+
+    /*
+    public static void main(final String [] args) throws Exception {
+        RexsterClient client = new RexsterClient(new String[] {"localhost:8184"});
+        List<Map<String, Value>> maps = client.gremlin("g = rexster.getGraph('tinkergraph');g.V");
+        System.out.println(maps);
+        maps = client.gremlin("g = rexster.getGraph('tinkergraph');g.d()");
+        System.out.println("huh");
+    }
+    */
 
     private class RexProInfo {
         private final String host;
