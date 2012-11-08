@@ -44,7 +44,12 @@ public class MsgPackResultConverter implements ResultConverter<byte[]> {
 
             packer.writeMapBegin(elementSize);
             packer.write(Tokens._ID);
-            packer.write(element.getId());
+            final Object id = element.getId();
+            if (id.getClass().isPrimitive()) {
+                packer.write(id);
+            } else {
+                packer.write(id.toString());
+            }
             
             if (isVertex) {
                 packer.write(Tokens._TYPE);
