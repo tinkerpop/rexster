@@ -35,6 +35,7 @@ public class RexsterClient {
     private final MessagePack msgpack = new MessagePack();
     private final List<RexProInfo> rexProInfos = new ArrayList<RexProInfo>();
     private int currentServer = 0;
+    private int timeout;
 
     private static final byte[] emptyBindings;
 
@@ -50,6 +51,14 @@ public class RexsterClient {
     }}
 
     public RexsterClient(final String[] hostsAndPorts) {
+        this(hostsAndPorts, RexPro.DEFAULT_TIMEOUT_SECONDS);
+        for (String hostAndPort : hostsAndPorts) {
+            rexProInfos.add(new RexProInfo(hostAndPort));
+        }
+    }
+
+    public RexsterClient(final String[] hostsAndPorts, final int timeout) {
+        this.timeout = timeout;
         for (String hostAndPort : hostsAndPorts) {
             rexProInfos.add(new RexProInfo(hostAndPort));
         }
@@ -63,7 +72,7 @@ public class RexsterClient {
         final RexProInfo server = nextServer();
 
         final RexProMessage resultMessage = RexPro.sendMessage(server.getHost(), server.getPort(),
-                createScriptRequestMessage(script));
+                createScriptRequestMessage(script), this.timeout);
         if (resultMessage instanceof MsgPackScriptResponseMessage) {
             final MsgPackScriptResponseMessage msg = (MsgPackScriptResponseMessage) resultMessage;
             final BufferUnpacker unpacker = msgpack.createBufferUnpacker(msg.Results);
