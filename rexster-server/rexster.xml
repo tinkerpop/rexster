@@ -27,7 +27,7 @@
         <server-host>0.0.0.0</server-host>
         <session-max-idle>1790000</session-max-idle>
         <session-check-interval>3000000</session-check-interval>
-        <enable-jmx>true</enable-jmx>
+        <enable-jmx>false</enable-jmx>
         <thread-pool>
             <worker>
                 <core-size>8</core-size>
