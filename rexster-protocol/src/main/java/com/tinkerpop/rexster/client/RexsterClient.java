@@ -52,9 +52,6 @@ public class RexsterClient {
 
     public RexsterClient(final String[] hostsAndPorts) {
         this(hostsAndPorts, RexPro.DEFAULT_TIMEOUT_SECONDS);
-        for (String hostAndPort : hostsAndPorts) {
-            rexProInfos.add(new RexProInfo(hostAndPort));
-        }
     }
 
     public RexsterClient(final String[] hostsAndPorts, final int timeout) {
