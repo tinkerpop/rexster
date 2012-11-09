@@ -94,13 +94,10 @@ public class RexsterClient {
     }
 
     private RexProInfo nextServer() {
-        final RexProInfo server = this.rexProInfos.get(this.currentServer);
-        this.currentServer++;
-        if (this.currentServer >= this.rexProInfos.size()) {
-            this.currentServer = 0;
+        synchronized(rexProInfos) {
+            currentServer = (currentServer + 1) % rexProInfos.size();
+            return rexProInfos.get(currentServer);
         }
-
-        return server;
     }
 
     private static ScriptRequestMessage createScriptRequestMessage(final String script) {
