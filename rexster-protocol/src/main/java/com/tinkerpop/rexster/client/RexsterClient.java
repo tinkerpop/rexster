@@ -95,6 +95,7 @@ public class RexsterClient {
 
     private RexProInfo nextServer() {
         synchronized(rexProInfos) {
+            if (currentServer == Integer.MAX_VALUE) { currentServer = 0; }
             currentServer = (currentServer + 1) % rexProInfos.size();
             return rexProInfos.get(currentServer);
         }
