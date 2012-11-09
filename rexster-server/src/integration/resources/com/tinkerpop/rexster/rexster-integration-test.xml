@@ -27,6 +27,7 @@
         <server-host>0.0.0.0</server-host>
         <session-max-idle>1790000</session-max-idle>
         <session-check-interval>3000000</session-check-interval>
+        <enable-jmx>false</enable-jmx>
         <thread-pool>
             <worker>
                 <core-size>8</core-size>
@@ -56,10 +57,41 @@
     </security>
     <graphs>
         <graph>
-            <graph-enabled>true</graph-enabled>
+            <graph-name>emptygraph</graph-name>
+            <graph-type>tinkergraph</graph-type>
+            <graph-mock-tx>true</graph-mock-tx>
+            <extensions>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
+            </extensions>
+        </graph>
+        <graph>
             <graph-name>tinkergraph</graph-name>
             <graph-type>tinkergraph</graph-type>
-            <graph-file>/tmp/integration-test/tinkergraph</graph-file>
+            <graph-location>data/graph-example-1</graph-location>
+            <graph-mock-tx>true</graph-mock-tx>
+            <extensions>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
+            </extensions>
+        </graph>
+        <graph>
+            <graph-name>tinkergraph-readonly</graph-name>
+            <graph-read-only>true</graph-read-only>
+            <graph-type>tinkergraph</graph-type>
+            <graph-location>data/graph-example-1</graph-location>
+            <extensions>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
+            </extensions>
+        </graph>
+        <graph>
+            <graph-name>gratefulgraph</graph-name>
+            <graph-type>com.tinkerpop.rexster.config.TinkerGraphGraphConfiguration</graph-type>
+            <graph-location>data/graph-example-2</graph-location>
             <extensions>
                 <allows>
                     <allow>tp:gremlin</allow>
@@ -68,25 +100,20 @@
         </graph>
         <graph>
             <graph-enabled>false</graph-enabled>
-            <graph-name>titanexample</graph-name>
-            <graph-type>com.thinkaurelius.titan.tinkerpop.rexster.TitanGraphConfiguration</graph-type>
-            <graph-location>/tmp/integration-test/titan</graph-location>
-            <graph-read-only>false</graph-read-only>
-            <properties>
-                <storage.backend>local</storage.backend>
-                <buffer-size>100</buffer-size>
-            </properties>
-            <extensions>
-                <allows>
-                    <allow>tp:gremlin</allow>
-                </allows>
-            </extensions>
+            <graph-name>emptysailgraph</graph-name>
+            <graph-type>memorystoresailgraph</graph-type>
         </graph>
         <graph>
-            <graph-enabled>true</graph-enabled>
+            <graph-enabled>false</graph-enabled>
+            <graph-name>sailgraph</graph-name>
+            <graph-type>nativestoresailgraph</graph-type>
+            <graph-location>data/sailgraph</graph-location>
+        </graph>
+        <graph>
+            <graph-enabled>false</graph-enabled>
             <graph-name>orientdbsample</graph-name>
             <graph-type>orientgraph</graph-type>
-            <graph-location>local:/tmp/integration-test/orientdb</graph-location>
+            <graph-location>local:/tmp/orientdb-graph</graph-location>
             <properties>
                 <username>admin</username>
                 <password>admin</password>
@@ -98,10 +125,10 @@
             </extensions>
         </graph>
         <graph>
-            <graph-enabled>true</graph-enabled>
+            <graph-enabled>false</graph-enabled>
             <graph-name>neo4jsample</graph-name>
             <graph-type>neo4jgraph</graph-type>
-            <graph-location>/tmp/integration-test/neo4j</graph-location>
+            <graph-location>/tmp/neo4j-graph</graph-location>
             <properties>
                 <!-- Memory mapped I/O settings -->
                 <!-- For high traversal speed it is important to have the nodestore.db and relationshipstore.db files. -->
@@ -157,10 +184,22 @@
             </extensions>
         </graph>
         <graph>
-            <graph-enabled>true</graph-enabled>
+            <graph-enabled>false</graph-enabled>
             <graph-name>dexsample</graph-name>
             <graph-type>dexgraph</graph-type>
-            <graph-location>/tmp/integration-test/neo4j</graph-location>
+            <graph-location>/tmp/graph.dex</graph-location>
+            <extensions>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
+            </extensions>
+        </graph>
+        <graph>
+            <graph-enabled>false</graph-enabled>
+            <graph-name>remotetinkergraph</graph-name>
+            <graph-type>rexstergraph</graph-type>
+            <graph-buffer-size>100</graph-buffer-size>
+            <graph-location>http://remoteserver:8182/tinkergraph</graph-location>
             <extensions>
                 <allows>
                     <allow>tp:gremlin</allow>
