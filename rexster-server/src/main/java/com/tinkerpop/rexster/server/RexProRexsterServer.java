@@ -12,6 +12,8 @@ import org.apache.log4j.Logger;
 import org.glassfish.grizzly.IOStrategy;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
+import org.glassfish.grizzly.monitoring.jmx.GrizzlyJmxManager;
+import org.glassfish.grizzly.monitoring.jmx.JmxObject;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.strategies.SameThreadIOStrategy;
@@ -35,6 +37,7 @@ public class RexProRexsterServer implements RexsterServer {
     private final int coreWorkerThreadPoolSize;
     private final int maxKernalThreadPoolSize;
     private final int coreKernalThreadPoolSize;
+    private final boolean enableJmx;
     private final String ioStrategy;
 
     public RexProRexsterServer(final XMLConfiguration properties) {
@@ -50,6 +53,7 @@ public class RexProRexsterServer implements RexsterServer {
         this.maxWorkerThreadPoolSize = properties.getInt("rexpro.thread-pool.worker.max-size", 8);
         this.coreKernalThreadPoolSize = properties.getInt("rexpro.thread-pool.kernal.core-size", 4);
         this.maxKernalThreadPoolSize = properties.getInt("rexpro.thread-pool.kernal.max-size", 4);
+        this.enableJmx = properties.getBoolean("rexpro.enable-jmx", false);
         this.ioStrategy = properties.getString("rexpro.io-strategy", "worker");
 
         this.tcpTransport = configureTransport();
@@ -98,6 +102,11 @@ public class RexProRexsterServer implements RexsterServer {
         this.tcpTransport.setIOStrategy(strategy);
         this.tcpTransport.setProcessor(filterChainBuilder.build());
         this.tcpTransport.bind(rexproServerHost, rexproServerPort);
+
+        if (this.enableJmx) {
+            final JmxObject jmx = this.tcpTransport.getMonitoringConfig().createManagementObject();
+            GrizzlyJmxManager.instance().registerAtRoot(jmx, "RexPro");
+        }
 
         this.tcpTransport.start();
 
