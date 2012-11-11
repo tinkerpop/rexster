@@ -6,10 +6,12 @@ import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import org.msgpack.MessagePack;
+import org.msgpack.template.IntegerTemplate;
 import org.msgpack.type.Value;
 import org.msgpack.unpacker.BufferUnpacker;
 import org.msgpack.unpacker.Converter;
 import org.msgpack.unpacker.UnpackerIterator;
+import sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,44 +30,49 @@ public class TryRexProSessionless {
 
     public static void main(final String[] args) throws Exception {
         int c = Integer.parseInt(args[1]);
-        final CountDownLatch latch = new CountDownLatch(c);
+        final int exerciseTime = Integer.parseInt(args[2]) * 60 * 1000;
 
         for (int ix = 0; ix < c; ix++) {
             new Thread(new Runnable() {
 
                 @Override
                 public void run() {
-                    lotsOfCalls(args[0].split(","));
-                    latch.countDown();
+                    lotsOfCalls(args[0].split(","), exerciseTime);
                 }
             }).start();
         }
 
-        latch.await();
+        Thread.currentThread().join();
     }
 
-    private static void lotsOfCalls(final String[] hosts){
+    private static void lotsOfCalls(final String[] hosts, final int exerciseTime){
 
-        long start = System.currentTimeMillis();
+        final long start = System.currentTimeMillis();
         long checkpoint = System.currentTimeMillis();
+        int cycle = 0;
 
-        try {
+        while ((start - checkpoint) < exerciseTime) {
+            cycle++;
+            System.out.println("Exercise cycle: " + cycle);
 
-            final RexsterClient client = new RexsterClient(hosts);
-            final List<Map<String, Value>> results = client.gremlin("g=rexster.getGraph('gratefulgraph');g.V;");
-            int counter = 1;
-            for (Map<String, Value> result : results) {
-                final String vId = result.get(Tokens._ID).asRawValue().getString();
-                final List<Map<String, Value>> innerResults = client.gremlin(String.format("g=rexster.getGraph('gratefulgraph');g.v(%s)", vId));
-                System.out.println(innerResults.get(0));
-                counter++;
+            try {
+
+                final RexsterClient client = new RexsterClient(hosts);
+                final List<Map<String, Value>> results = client.gremlin("g=rexster.getGraph('gratefulgraph');g.V;");
+                int counter = 1;
+                for (Map<String, Value> result : results) {
+                    final String vId = result.get(Tokens._ID).asRawValue().getString();
+                    final List<Map<String, Value>> innerResults = client.gremlin(String.format("g=rexster.getGraph('gratefulgraph');g.v(%s)", vId));
+                    System.out.println(innerResults.get(0));
+                    counter++;
+                }
+
+                long end = System.currentTimeMillis() - checkpoint;
+                System.out.println((checkpoint - start) + ":" + end);
+                System.out.println(counter / (end / 1000));
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-
-            long end = System.currentTimeMillis() - checkpoint;
-            System.out.println((checkpoint - start) + ":" + end);
-            System.out.println(counter / (end / 1000));
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 }

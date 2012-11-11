@@ -43,15 +43,12 @@ public final class RexPro {
 
             // Connect client to the server
             final GrizzlyFuture<Connection> future = transport.connect(rexProHost, rexProPort);
-
             connection = future.get(timeoutSeconds, TimeUnit.SECONDS);
-
             connection.write(messageToSend);
-
             return sessionMessageFuture.get(timeoutSeconds, TimeUnit.SECONDS);
 
         } catch (Exception e) {
-            throw new RuntimeException("Could not open session with Rexster at " + rexProHost + ":" + rexProPort, e);
+            throw new RuntimeException("Request to Rexster failed [" + rexProHost + ":" + rexProPort + "] - " + e.getMessage(), e);
         } finally {
             try {
                 if (connection != null) {
@@ -60,7 +57,7 @@ public final class RexPro {
 
                 transport.stop();
             } catch (IOException ioe) {
-                // log??
+                //
             }
         }
     }
