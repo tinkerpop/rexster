@@ -35,7 +35,7 @@ public class TryRexProSessionless {
         final long start = System.currentTimeMillis();
         long checkpoint = System.currentTimeMillis();
 
-        while ((start - checkpoint) < exerciseTime) {
+        while ((System.currentTimeMillis() - start) < exerciseTime) {
             cycle++;
             System.out.println("Exercise cycle: " + cycle);
 
@@ -51,11 +51,15 @@ public class TryRexProSessionless {
                     counter++;
                 }
 
-                long end = System.currentTimeMillis() - checkpoint;
+                final long end = System.currentTimeMillis() - checkpoint;
                 System.out.println((checkpoint - start) + ":" + end);
                 System.out.println(counter / (end / 1000));
             } catch (Exception ex) {
                 ex.printStackTrace();
+                if (ex.getCause() != null) {
+                    System.out.println("Inner Exception follows........");
+                    ex.getCause().printStackTrace();
+                }
             }
         }
     }
