@@ -2,26 +2,9 @@ package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.client.RexsterClient;
-import com.tinkerpop.rexster.protocol.msg.MessageFlag;
-import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
-import org.msgpack.MessagePack;
-import org.msgpack.template.IntegerTemplate;
 import org.msgpack.type.Value;
-import org.msgpack.unpacker.BufferUnpacker;
-import org.msgpack.unpacker.Converter;
-import org.msgpack.unpacker.UnpackerIterator;
-import sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl;
-
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-
-import static org.msgpack.template.Templates.tMap;
-import static org.msgpack.template.Templates.TString;
-import static org.msgpack.template.Templates.TValue;
 
 /**
  * A bit of an experiment.
