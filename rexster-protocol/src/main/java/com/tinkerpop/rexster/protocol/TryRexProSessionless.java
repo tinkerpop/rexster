@@ -11,6 +11,8 @@ import java.util.Map;
  */
 public class TryRexProSessionless {
 
+    private static int cycle = 0;
+
     public static void main(final String[] args) throws Exception {
         int c = Integer.parseInt(args[1]);
         final int exerciseTime = Integer.parseInt(args[2]) * 60 * 1000;
@@ -32,7 +34,6 @@ public class TryRexProSessionless {
 
         final long start = System.currentTimeMillis();
         long checkpoint = System.currentTimeMillis();
-        int cycle = 0;
 
         while ((start - checkpoint) < exerciseTime) {
             cycle++;
