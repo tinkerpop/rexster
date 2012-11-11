@@ -29,7 +29,7 @@
         <session-check-interval>3000000</session-check-interval>
         <connection-max-idle>180000</connection-max-idle>
         <connection-check-interval>3000000</connection-check-interval>
-        <enable-jmx>true</enable-jmx>
+        <enable-jmx>false</enable-jmx>
         <thread-pool>
             <worker>
                 <core-size>8</core-size>
