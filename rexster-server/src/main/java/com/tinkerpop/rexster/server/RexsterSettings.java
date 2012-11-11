@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 
@@ -77,6 +78,10 @@ public class RexsterSettings {
             // turn on all logging for jersey
             for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
                 java.util.logging.Logger.getLogger(l).setLevel(Level.ALL);
+
+                final ConsoleHandler consoleHandler = new ConsoleHandler();
+                consoleHandler.setLevel(Level.ALL);
+                java.util.logging.Logger.getLogger(l).addHandler(consoleHandler);
             }
         } else {
             // turn off all logging for jersey
