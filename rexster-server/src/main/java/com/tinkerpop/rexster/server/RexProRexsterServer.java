@@ -16,9 +16,10 @@ import org.glassfish.grizzly.monitoring.jmx.GrizzlyJmxManager;
 import org.glassfish.grizzly.monitoring.jmx.JmxObject;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
-import org.glassfish.grizzly.strategies.SameThreadIOStrategy;
-import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
+import org.glassfish.grizzly.utils.IdleTimeoutFilter;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Initializes the TCP server that serves RexPro.
@@ -37,6 +38,8 @@ public class RexProRexsterServer implements RexsterServer {
     private final int coreWorkerThreadPoolSize;
     private final int maxKernalThreadPoolSize;
     private final int coreKernalThreadPoolSize;
+    private final int connectionIdleMax;
+    private final int connectionIdleInterval;
     private final boolean enableJmx;
     private final String ioStrategy;
 
@@ -53,6 +56,8 @@ public class RexProRexsterServer implements RexsterServer {
         this.maxWorkerThreadPoolSize = properties.getInt("rexpro.thread-pool.worker.max-size", 8);
         this.coreKernalThreadPoolSize = properties.getInt("rexpro.thread-pool.kernal.core-size", 4);
         this.maxKernalThreadPoolSize = properties.getInt("rexpro.thread-pool.kernal.max-size", 4);
+        this.connectionIdleMax = properties.getInt("rexpro.connection-max-idle", 180000);
+        this.connectionIdleInterval = properties.getInt("rexpro.connection-check-interval", 3000000);
         this.enableJmx = properties.getBoolean("rexpro.enable-jmx", false);
         this.ioStrategy = properties.getString("rexpro.io-strategy", "worker");
 
@@ -68,6 +73,9 @@ public class RexProRexsterServer implements RexsterServer {
     public void start(final RexsterApplication application) throws Exception {
         final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
         filterChainBuilder.add(new TransportFilter());
+        filterChainBuilder.add(new IdleTimeoutFilter(
+                IdleTimeoutFilter.createDefaultIdleDelayedExecutor(this.connectionIdleInterval, TimeUnit.MILLISECONDS),
+                this.connectionIdleMax, TimeUnit.MILLISECONDS));
         filterChainBuilder.add(new RexProMessageFilter());
 
         final HierarchicalConfiguration securityConfiguration = properties.configurationAt("security.authentication");
