@@ -15,6 +15,7 @@ import org.msgpack.unpacker.BufferUnpacker;
 import org.msgpack.unpacker.Converter;
 import org.msgpack.unpacker.UnpackerIterator;
 
+import javax.script.Bindings;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,10 +67,14 @@ public class RexsterClient {
     }
 
     public <T> List<T> gremlin(final String script, final Template template) throws IOException {
+        return gremlin(script, null, template);
+    }
+
+    public <T> List<T> gremlin(final String script, final Map<String, Object> scriptArgs, final Template template) throws IOException {
         final RexProInfo server = nextServer();
 
         final RexProMessage resultMessage = RexPro.sendMessage(server.getHost(), server.getPort(),
-                createScriptRequestMessage(script), this.timeout);
+                createScriptRequestMessage(script, scriptArgs), this.timeout);
         if (resultMessage instanceof MsgPackScriptResponseMessage) {
             final MsgPackScriptResponseMessage msg = (MsgPackScriptResponseMessage) resultMessage;
             final BufferUnpacker unpacker = msgpack.createBufferUnpacker(msg.Results);
@@ -101,10 +106,20 @@ public class RexsterClient {
         }
     }
 
-    private static ScriptRequestMessage createScriptRequestMessage(final String script) {
-        ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
+    private static ScriptRequestMessage createScriptRequestMessage(final String script) throws IOException {
+        return createScriptRequestMessage(script, null);
+    }
+
+    private static ScriptRequestMessage createScriptRequestMessage(final String script,
+                                                                   final Map<String, Object> scriptArguments) throws IOException{
+        final Bindings bindings = new RexsterBindings();
+        if (scriptArguments != null) {
+            bindings.putAll(scriptArguments);
+        }
+
+        final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = script;
-        scriptMessage.Bindings = emptyBindings;
+        scriptMessage.Bindings = BitWorks.convertSerializableBindingsToByteArray(bindings);
         scriptMessage.LanguageName = "groovy";
         scriptMessage.Flag = MessageFlag.SCRIPT_REQUEST_NO_SESSION;
         scriptMessage.setRequestAsUUID(UUID.randomUUID());

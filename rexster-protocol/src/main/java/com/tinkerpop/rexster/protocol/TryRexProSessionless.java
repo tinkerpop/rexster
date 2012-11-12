@@ -3,37 +3,52 @@ package com.tinkerpop.rexster.protocol;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.client.RexsterClient;
 import org.msgpack.type.Value;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
+import static org.msgpack.template.Templates.TString;
+import static org.msgpack.template.Templates.TValue;
+import static org.msgpack.template.Templates.tMap;
 
 /**
  * A bit of an experiment.
  */
-public class TryRexProSessionless {
+public class TryRexProSessionless implements Runnable {
 
-    private static int cycle = 0;
+    private int cycle = 0;
+    private final String[] hosts;
+    private final int exerciseTime;
+
 
     public static void main(final String[] args) throws Exception {
         int c = Integer.parseInt(args[1]);
         final int exerciseTime = Integer.parseInt(args[2]) * 60 * 1000;
 
         for (int ix = 0; ix < c; ix++) {
-            new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    lotsOfCalls(args[0].split(","), exerciseTime);
-                }
-            }).start();
+            new Thread(new TryRexProSessionless(args[0].split(","), exerciseTime)).start();
         }
 
         Thread.currentThread().join();
     }
 
-    private static void lotsOfCalls(final String[] hosts, final int exerciseTime){
+    public TryRexProSessionless(final String[] hosts, final int exerciseTime) {
+        this.exerciseTime = exerciseTime;
+        this.hosts = hosts;
+    }
+
+    @Override
+    public void run() {
+        this.lotsOfCalls();
+    }
+
+    private void lotsOfCalls(){
 
         final long start = System.currentTimeMillis();
         long checkpoint = System.currentTimeMillis();
+        final Random random = new Random();
 
         while ((System.currentTimeMillis() - start) < exerciseTime) {
             cycle++;
@@ -41,12 +56,22 @@ public class TryRexProSessionless {
 
             try {
 
-                final RexsterClient client = new RexsterClient(hosts);
-                final List<Map<String, Value>> results = client.gremlin("g=rexster.getGraph('gratefulgraph');g.V;");
+                final RexsterClient client = new RexsterClient(hosts, 5);
                 int counter = 1;
-                for (Map<String, Value> result : results) {
-                    final String vId = result.get(Tokens._ID).asRawValue().getString();
-                    final List<Map<String, Value>> innerResults = client.gremlin(String.format("g=rexster.getGraph('gratefulgraph');g.v(%s)", vId));
+                final int vRequestCount = random.nextInt(500);
+                for (int iv = 1; iv < vRequestCount; iv++) {
+                    final Map<String,Object> scriptArgs = new HashMap<String, Object>();
+                    scriptArgs.put("id", random.nextInt(800));
+                    final List<Map<String, Value>> innerResults = client.gremlin("g=rexster.getGraph('gratefulgraph');g.v(id)", scriptArgs, tMap(TString, TValue));
+                    System.out.println(innerResults.get(0));
+                    counter++;
+                }
+
+                final int eRequestCount = random.nextInt(500);
+                for (int ie = 1; ie < eRequestCount; ie++) {
+                    final Map<String,Object> scriptArgs = new HashMap<String, Object>();
+                    scriptArgs.put("id", random.nextInt(8000));
+                    final List<Map<String, Value>> innerResults = client.gremlin("g=rexster.getGraph('gratefulgraph');g.e(id)", scriptArgs, tMap(TString, TValue));
                     System.out.println(innerResults.get(0));
                     counter++;
                 }
@@ -60,6 +85,9 @@ public class TryRexProSessionless {
                     System.out.println("Inner Exception follows........");
                     ex.getCause().printStackTrace();
                 }
+
+                System.out.println("STOP ON ERROR");
+                System.exit(0);
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol.filter;
 
+import com.tinkerpop.rexster.protocol.RexsterBindings;
 import com.tinkerpop.rexster.protocol.msg.GraphSONScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.MessageTokens;
@@ -27,6 +28,7 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Processes a ScriptRequestMessage against the script engine for the channel.
@@ -57,6 +59,10 @@ public class ScriptFilter extends BaseFilter {
                 final EngineHolder engineHolder = engineController.getEngineByLanguageName(specificMessage.LanguageName);
                 final ScriptEngine scriptEngine = engineHolder.getEngine();
                 final Bindings bindings = scriptEngine.createBindings();
+                final RexsterBindings rexsterBindings = specificMessage.getBindings();
+                for (Map.Entry<String,Object> e : rexsterBindings.entrySet()) {
+                    bindings.put(e.getKey(), e.getValue());
+                }
                 bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, this.rexsterApplication);
 
                 final Object result = scriptEngine.eval(specificMessage.Script, bindings);
