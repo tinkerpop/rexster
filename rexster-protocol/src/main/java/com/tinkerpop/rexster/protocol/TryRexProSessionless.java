@@ -22,7 +22,6 @@ public class TryRexProSessionless implements Runnable {
     private final String[] hosts;
     private final int exerciseTime;
 
-
     public static void main(final String[] args) throws Exception {
         int c = Integer.parseInt(args[1]);
         final int exerciseTime = Integer.parseInt(args[2]) * 60 * 1000;
@@ -32,6 +31,7 @@ public class TryRexProSessionless implements Runnable {
         }
 
         Thread.currentThread().join();
+        System.exit(0);
     }
 
     public TryRexProSessionless(final String[] hosts, final int exerciseTime) {
@@ -80,14 +80,12 @@ public class TryRexProSessionless implements Runnable {
                 System.out.println((checkpoint - start) + ":" + end);
                 System.out.println(counter / (end / 1000));
             } catch (Exception ex) {
+                System.out.println("Error during TEST CYCLE (stack trace follows)");
                 ex.printStackTrace();
                 if (ex.getCause() != null) {
-                    System.out.println("Inner Exception follows........");
+                    System.out.println("There is an inner exception (stack trace follows)");
                     ex.getCause().printStackTrace();
                 }
-
-                System.out.println("STOP ON ERROR");
-                System.exit(0);
             }
         }
     }

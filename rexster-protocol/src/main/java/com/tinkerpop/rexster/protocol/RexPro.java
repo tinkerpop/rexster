@@ -54,6 +54,10 @@ public final class RexPro {
                 throw new RuntimeException("Request [" + messageToSend.getClass().getName() + "] to Rexster failed [" + rexProHost + ":" + rexProPort + "] - " + e.getMessage(), e);
             }
         } finally {
+            if (connection != null) {
+                connection.close();
+            }
+
             transport.stop();
         }
     }

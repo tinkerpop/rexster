@@ -26,8 +26,14 @@ public class MsgPackResultConverter implements ResultConverter<byte[]> {
 
     public byte[] convert(final Object result) throws Exception {
         final BufferPacker packer = msgpack.createBufferPacker(1024);
-        prepareOutput(result, packer);
-        return packer.toByteArray();
+        try {
+            prepareOutput(result, packer);
+            return packer.toByteArray();
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            packer.close();
+        }
     }
 
     private void prepareOutput(final Object object, final Packer packer) throws Exception {

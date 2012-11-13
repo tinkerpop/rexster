@@ -38,19 +38,6 @@ public class RexsterClient {
     private int currentServer = 0;
     private int timeout;
 
-    private static final byte[] emptyBindings;
-
-    static {{
-        byte [] empty;
-        try {
-            empty = BitWorks.convertSerializableBindingsToByteArray(new RexsterBindings());
-        } catch (IOException ioe) {
-            empty = new byte[0];
-        }
-
-        emptyBindings = empty;
-    }}
-
     public RexsterClient(final String[] hostsAndPorts) {
         this(hostsAndPorts, RexPro.DEFAULT_TIMEOUT_SECONDS);
     }
@@ -85,10 +72,13 @@ public class RexsterClient {
             final List<T> results = new ArrayList<T>();
             final UnpackerIterator itty = unpacker.iterator();
             while (itty.hasNext()){
-                final T t = (T) new Converter(msgpack, itty.next()).read(template);
-                //final Map<String,Value> map = new Converter(msgpack, itty.next()).read(tMap(TString, TValue));
+                final Converter converter = new Converter(msgpack, itty.next());
+                final T t = (T) converter.read(template);
+                converter.close();
                 results.add(t);
             }
+
+            unpacker.close();
 
             return results;
         } else if (resultMessage instanceof ErrorResponseMessage) {

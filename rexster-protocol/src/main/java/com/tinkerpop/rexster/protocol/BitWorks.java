@@ -53,38 +53,46 @@ public class BitWorks {
     public static byte[] convertStringsToByteArray(final String... values) throws IOException {
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-        for (String value : values) {
-            final byte[] valueAsBytes = value.getBytes(Charset.forName("UTF-8"));
-            stream.write(ByteBuffer.allocate(4).putInt(valueAsBytes.length).array());
-            stream.write(valueAsBytes);
-        }
+        try {
+            for (String value : values) {
+                final byte[] valueAsBytes = value.getBytes(Charset.forName("UTF-8"));
+                stream.write(ByteBuffer.allocate(4).putInt(valueAsBytes.length).array());
+                stream.write(valueAsBytes);
+            }
 
-        return stream.toByteArray();
+            return stream.toByteArray();
+        } finally {
+            stream.close();
+        }
     }
 
     public static byte[] convertSerializableBindingsToByteArray(final Bindings bindings) throws IOException {
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-        for (String key : bindings.keySet()) {
-            // don't serialize the rexster key...doesn't make sense to send that back to the client
-            // as it is a server side resource
-            if (!key.equals(Tokens.REXPRO_REXSTER_CONTEXT)) {
-                final Object objectToSerialize = bindings.get(key);
-                if (objectToSerialize instanceof Serializable
-                        && !(objectToSerialize instanceof Graph)
-                        && !(objectToSerialize instanceof Edge)
-                        && !(objectToSerialize instanceof Vertex)
-                        && !(objectToSerialize instanceof Index)) {
-                    stream.write(ByteBuffer.allocate(4).putInt(key.length()).array());
-                    stream.write(key.getBytes());
+        try {
+            for (String key : bindings.keySet()) {
+                // don't serialize the rexster key...doesn't make sense to send that back to the client
+                // as it is a server side resource
+                if (!key.equals(Tokens.REXPRO_REXSTER_CONTEXT)) {
+                    final Object objectToSerialize = bindings.get(key);
+                    if (objectToSerialize instanceof Serializable
+                            && !(objectToSerialize instanceof Graph)
+                            && !(objectToSerialize instanceof Edge)
+                            && !(objectToSerialize instanceof Vertex)
+                            && !(objectToSerialize instanceof Index)) {
+                        stream.write(ByteBuffer.allocate(4).putInt(key.length()).array());
+                        stream.write(key.getBytes());
 
-                    final byte[] objectBytes = getFilteredBytesWithLength(objectToSerialize);
-                    stream.write(objectBytes);
+                        final byte[] objectBytes = getFilteredBytesWithLength(objectToSerialize);
+                        stream.write(objectBytes);
+                    }
                 }
             }
-        }
 
-        return stream.toByteArray();
+            return stream.toByteArray();
+        } finally {
+            stream.close();
+        }
     }
 
     public static RexsterBindings convertByteArrayToRexsterBindings(final byte[] bytes) throws IOException, ClassNotFoundException {
@@ -101,12 +109,16 @@ public class BitWorks {
             final int lenOfBinding = bb.getInt();
             final byte[] bindingItem = new byte[lenOfBinding];
             bb.get(bindingItem);
+
             final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bindingItem);
             final ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
 
-            final Object o = objectInputStream.readObject();
-
-            bindings.put(key, o);
+            try {
+                final Object o = objectInputStream.readObject();
+                bindings.put(key, o);
+            } finally {
+                objectInputStream.close();
+            }
         }
 
         return bindings;
@@ -138,13 +150,16 @@ public class BitWorks {
 
         final ByteArrayOutputStream byteOuputStream = new ByteArrayOutputStream();
         final ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOuputStream);
-        objectOutputStream.writeObject(result);
-        objectOutputStream.close();
 
-        final ByteBuffer bb = ByteBuffer.allocate(4 + byteOuputStream.size());
-        bb.putInt(byteOuputStream.size());
-        bb.put(byteOuputStream.toByteArray());
+        try {
+            objectOutputStream.writeObject(result);
 
-        return bb.array();
+            final ByteBuffer bb = ByteBuffer.allocate(4 + byteOuputStream.size());
+            bb.putInt(byteOuputStream.size());
+            bb.put(byteOuputStream.toByteArray());
+            return bb.array();
+        } finally {
+            objectOutputStream.close();
+        }
     }
 }

@@ -69,38 +69,43 @@ public class RexProMessageFilter extends BaseFilter {
 
         final ByteArrayInputStream in = new ByteArrayInputStream(messageAsBytes);
         final Unpacker unpacker = msgpack.createUnpacker(in);
-        unpacker.setArraySizeLimit(Integer.MAX_VALUE);
-        unpacker.setMapSizeLimit(Integer.MAX_VALUE);
-        unpacker.setRawSizeLimit(Integer.MAX_VALUE);
 
-        RexProMessage message = null;
-        if (messageType == MessageType.SCRIPT_REQUEST) {
-            message = unpacker.read(ScriptRequestMessage.class);
-        } else if (messageType == MessageType.SESSION_REQUEST) {
-            message = unpacker.read(SessionRequestMessage.class);
-        } else if (messageType == MessageType.CONSOLE_SCRIPT_RESPONSE) {
-            message = unpacker.read(ConsoleScriptResponseMessage.class);
-        } else if (messageType == MessageType.SESSION_RESPONSE) {
-            message = unpacker.read(SessionResponseMessage.class);
-        } else if (messageType == MessageType.ERROR) {
-            message = unpacker.read(ErrorResponseMessage.class);
-        } else if (messageType == MessageType.MSGPACK_SCRIPT_RESPONSE) {
-            message = unpacker.read(MsgPackScriptResponseMessage.class);
+        try {
+            unpacker.setArraySizeLimit(Integer.MAX_VALUE);
+            unpacker.setMapSizeLimit(Integer.MAX_VALUE);
+            unpacker.setRawSizeLimit(Integer.MAX_VALUE);
+
+            RexProMessage message = null;
+            if (messageType == MessageType.SCRIPT_REQUEST) {
+                message = unpacker.read(ScriptRequestMessage.class);
+            } else if (messageType == MessageType.SESSION_REQUEST) {
+                message = unpacker.read(SessionRequestMessage.class);
+            } else if (messageType == MessageType.CONSOLE_SCRIPT_RESPONSE) {
+                message = unpacker.read(ConsoleScriptResponseMessage.class);
+            } else if (messageType == MessageType.SESSION_RESPONSE) {
+                message = unpacker.read(SessionResponseMessage.class);
+            } else if (messageType == MessageType.ERROR) {
+                message = unpacker.read(ErrorResponseMessage.class);
+            } else if (messageType == MessageType.MSGPACK_SCRIPT_RESPONSE) {
+                message = unpacker.read(MsgPackScriptResponseMessage.class);
+            }
+
+            if (message == null) {
+                logger.warn("Message did not match an expected type.");
+
+                ctx.write(MessageUtil.createErrorResponse(RexProMessage.EMPTY_REQUEST_AS_BYTES,
+                        RexProMessage.EMPTY_SESSION_AS_BYTES, MessageFlag.ERROR_MESSAGE_VALIDATION,
+                        MessageTokens.ERROR_UNEXPECTED_MESSAGE_TYPE));
+            }
+
+            ctx.setMessage(message);
+
+            sourceBuffer.tryDispose();
+
+            return ctx.getInvokeAction(remainder);
+        } finally {
+            unpacker.close();
         }
-
-        if (message == null) {
-            logger.warn("Message did not match an expected type.");
-
-            ctx.write(MessageUtil.createErrorResponse(RexProMessage.EMPTY_REQUEST_AS_BYTES,
-                    RexProMessage.EMPTY_SESSION_AS_BYTES, MessageFlag.ERROR_MESSAGE_VALIDATION,
-                    MessageTokens.ERROR_UNEXPECTED_MESSAGE_TYPE));
-        }
-
-        ctx.setMessage(message);
-
-        sourceBuffer.tryDispose();
-
-        return ctx.getInvokeAction(remainder);
     }
 
     public NextAction handleWrite(final FilterChainContext ctx) throws IOException {
@@ -109,9 +114,14 @@ public class RexProMessageFilter extends BaseFilter {
 
         final ByteArrayOutputStream rexProMessageStream = new ByteArrayOutputStream();
         final Packer packer = msgpack.createPacker(rexProMessageStream);
-        packer.write(msg);
-        byte[] rexProMessageAsBytes = rexProMessageStream.toByteArray();
-        rexProMessageStream.close();
+        byte[] rexProMessageAsBytes;
+
+        try {
+            packer.write(msg);
+            rexProMessageAsBytes = rexProMessageStream.toByteArray();
+        } finally {
+            packer.close();
+        }
 
         final ByteBuffer bb = ByteBuffer.allocate(5 + rexProMessageAsBytes.length);
 
