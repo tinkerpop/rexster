@@ -24,7 +24,6 @@ import org.msgpack.unpacker.Unpacker;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 /**
  * Handles incoming/outgoing RexProMessage instances.
@@ -123,7 +122,10 @@ public class RexProMessageFilter extends BaseFilter {
             packer.close();
         }
 
-        final ByteBuffer bb = ByteBuffer.allocate(5 + rexProMessageAsBytes.length);
+        // Retrieve the memory manager
+        final MemoryManager memoryManager =
+                ctx.getConnection().getTransport().getMemoryManager();
+        final Buffer bb = memoryManager.allocate(5 + rexProMessageAsBytes.length);
 
         if (msg instanceof SessionResponseMessage) {
             bb.put(MessageType.SESSION_RESPONSE);
@@ -142,22 +144,11 @@ public class RexProMessageFilter extends BaseFilter {
         bb.putInt(rexProMessageAsBytes.length);
         bb.put(rexProMessageAsBytes);
 
-        final byte[] messageAsBytes = bb.array();
-        final int size = messageAsBytes.length;
-
-        // Retrieve the memory manager
-        final MemoryManager memoryManager =
-                ctx.getConnection().getTransport().getMemoryManager();
-
-        // allocate the buffer of required size
-        final Buffer output = memoryManager.allocate(size);
-        output.put(messageAsBytes);
-
         // Allow Grizzly core to dispose the buffer, once it's written
-        output.allowBufferDispose(true);
+        bb.allowBufferDispose(true);
 
         // Set the Buffer as a context message
-        ctx.setMessage(output.flip());
+        ctx.setMessage(bb.flip());
 
         // Instruct the FilterChain to call the next filter
         return ctx.getInvokeAction();
