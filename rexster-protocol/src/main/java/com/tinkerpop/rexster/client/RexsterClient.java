@@ -38,9 +38,10 @@ import static org.msgpack.template.Templates.tMap;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RexsterClient {
+
+    private static final String DEFAULT_GREMLIN = "groovy";
+
     private final MessagePack msgpack = new MessagePack();
-    private String host;
-    private int port;
     private Connection<Object> connection;
     private int timeout;
     private Transport transport;
@@ -48,19 +49,12 @@ public class RexsterClient {
     protected static ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>> responses =
             new ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>>();
 
-    public RexsterClient(final String host, final int port, final int timeout,
-                         final Connection<Object> connection, final Transport transport) {
+    protected RexsterClient(final int timeout, final Connection<Object> connection, final Transport transport) {
         this.timeout = timeout;
-        this.host = host;
-        this.port = port;
         this.connection = connection;
         this.transport = transport;
     }
 
-    private void sendRequest(final RexProMessage toSend) throws Exception {
-        final GrizzlyFuture future = connection.write(toSend);
-        future.get(this.timeout, TimeUnit.SECONDS);
-    }
     public List<Map<String,Value>> gremlin(final String script) throws Exception {
         return gremlin(script, tMap(TString,TValue));
     }
@@ -72,7 +66,7 @@ public class RexsterClient {
     public <T> List<T> gremlin(final String script, final Map<String, Object> scriptArgs, final Template template) throws Exception {
         final long beginTime = System.currentTimeMillis();
         final ArrayBlockingQueue<Object> responseQueue = new ArrayBlockingQueue<Object>(1);
-        final RexProMessage msgToSend = createScriptRequestMessage(script, scriptArgs);
+        final RexProMessage msgToSend = createNoSessionScriptRequest(script, scriptArgs);
         final UUID requestId = msgToSend.requestAsUUID();
         responses.put(requestId, responseQueue);
 
@@ -83,18 +77,18 @@ public class RexsterClient {
             throw e;
         }
 
-        Object resultMessage = null;
+        Object resultMessage;
         try {
             resultMessage = responseQueue.poll((this.timeout * 1000) - (System.currentTimeMillis() - beginTime), TimeUnit.MILLISECONDS);
         } catch (Exception ex) {
             responses.remove(requestId);
-            throw ex;
+            throw new IOException(ex);
         }
 
         responses.remove(requestId);
 
         if (resultMessage == null) {
-            throw new RuntimeException("NULL GUY");
+            throw new IOException(String.format("Message received response timeout (%s s)", this.timeout));
         }
 
         if (resultMessage instanceof MsgPackScriptResponseMessage) {
@@ -119,41 +113,34 @@ public class RexsterClient {
         } else if (resultMessage instanceof ErrorResponseMessage) {
             throw new IOException(((ErrorResponseMessage) resultMessage).ErrorMessage);
         } else {
-            throw new RuntimeException("RexsterClient doesn't support the message type returned.");
+            throw new IOException("RexsterClient doesn't support the message type returned.");
         }
     }
 
-    public void putResponse(RexProMessage response) throws Exception {
+    void putResponse(final RexProMessage response) throws Exception {
         final UUID requestId = response.requestAsUUID();
         if (!responses.containsKey(requestId)) {
-            // LOGGER.warn("give up the response,request id is:" + wrapper.getRequestId() + ",maybe because timeout!");
-            System.out.println("WTF");
+            // probably a timeout if we get here... ???
             return;
         }
+
         try {
             final ArrayBlockingQueue<Object> queue = responses.get(requestId);
             if (queue != null) {
                 queue.put(response);
             }
             else {
-                //LOGGER.warn("give up the response,request id is:" + requestId + ",because queue is null");
+                // no queue for some reason....why ???
             }
         }
         catch (InterruptedException e) {
-            //LOGGER.error("put response error,request id is:" + wrapper.getRequestId(), e);
+            // just trap this one ???
         }
     }
 
-    public String getHost() {
-        return host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public int getTimeout() {
-        return timeout;
+    private void sendRequest(final RexProMessage toSend) throws Exception {
+        final GrizzlyFuture future = connection.write(toSend);
+        future.get(this.timeout, TimeUnit.SECONDS);
     }
 
     public void close() throws IOException {
@@ -161,8 +148,8 @@ public class RexsterClient {
         this.transport.stop();
     }
 
-    private static ScriptRequestMessage createScriptRequestMessage(final String script,
-                                                                   final Map<String, Object> scriptArguments) throws IOException{
+    private static ScriptRequestMessage createNoSessionScriptRequest(final String script,
+                                                                     final Map<String, Object> scriptArguments) throws IOException{
         final Bindings bindings = new RexsterBindings();
         if (scriptArguments != null) {
             bindings.putAll(scriptArguments);
@@ -171,7 +158,7 @@ public class RexsterClient {
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = script;
         scriptMessage.Bindings = BitWorks.convertSerializableBindingsToByteArray(bindings);
-        scriptMessage.LanguageName = "groovy";
+        scriptMessage.LanguageName = DEFAULT_GREMLIN;
         scriptMessage.Flag = MessageFlag.SCRIPT_REQUEST_NO_SESSION;
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
         return scriptMessage;

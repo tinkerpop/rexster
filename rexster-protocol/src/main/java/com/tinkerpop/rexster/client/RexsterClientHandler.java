@@ -13,7 +13,7 @@ import java.io.IOException;
 public class RexsterClientHandler extends BaseFilter {
     private RexsterClient client;
 
-    public void setClient(RexsterClient client) {
+    public void setClient(final RexsterClient client) {
          this.client = client;
     }
 
@@ -24,6 +24,7 @@ public class RexsterClientHandler extends BaseFilter {
         catch (Exception e) {
             e.printStackTrace();
         }
+
         return ctx.getStopAction();
     }
 }
