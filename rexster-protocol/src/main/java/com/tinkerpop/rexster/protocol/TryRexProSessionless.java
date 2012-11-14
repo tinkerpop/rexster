@@ -54,9 +54,8 @@ public class TryRexProSessionless implements Runnable {
             cycle++;
             System.out.println("Exercise cycle: " + cycle);
 
+            final RexsterClient client = new RexsterClient(hosts, 5);
             try {
-
-                final RexsterClient client = new RexsterClient(hosts, 5);
                 int counter = 1;
                 final int vRequestCount = random.nextInt(500);
                 for (int iv = 1; iv < vRequestCount; iv++) {
