@@ -54,46 +54,51 @@ public class TryRexProSessionless implements Runnable {
         long checkpoint = System.currentTimeMillis();
         final Random random = new Random();
 
-        while ((System.currentTimeMillis() - start) < exerciseTime) {
-            cycle++;
-            System.out.println("Exercise cycle: " + cycle);
+        RexsterClient client = null;
+        try {
+            client = RexsterClientFactory.getInstance().createClient(host, port, 5);
 
-            RexsterClient client = null;
-            try {
-                client = RexsterClientFactory.getInstance().createClient(host, port, 5);
-                int counter = 1;
-                final int vRequestCount = random.nextInt(500);
-                for (int iv = 1; iv < vRequestCount; iv++) {
-                    final Map<String,Object> scriptArgs = new HashMap<String, Object>();
-                    scriptArgs.put("id", random.nextInt(800));
-                    final List<Map<String, Value>> innerResults = client.gremlin("g=rexster.getGraph('gratefulgraph');g.v(id)", scriptArgs, tMap(TString, TValue));
-                    System.out.println(innerResults.get(0));
-                    counter++;
-                }
+            while ((System.currentTimeMillis() - start) < exerciseTime) {
+                cycle++;
+                System.out.println("Exercise cycle: " + cycle);
 
-                final int eRequestCount = random.nextInt(500);
-                for (int ie = 1; ie < eRequestCount; ie++) {
-                    final Map<String,Object> scriptArgs = new HashMap<String, Object>();
-                    scriptArgs.put("id", random.nextInt(8000));
-                    final List<Map<String, Value>> innerResults = client.gremlin("g=rexster.getGraph('gratefulgraph');g.e(id)", scriptArgs, tMap(TString, TValue));
-                    System.out.println(innerResults.get(0));
-                    counter++;
-                }
+                try {
+                    int counter = 1;
+                    final int vRequestCount = random.nextInt(500);
+                    for (int iv = 1; iv < vRequestCount; iv++) {
+                        final Map<String,Object> scriptArgs = new HashMap<String, Object>();
+                        scriptArgs.put("id", random.nextInt(800));
+                        final List<Map<String, Value>> innerResults = client.gremlin("g=rexster.getGraph('gratefulgraph');g.v(id)", scriptArgs, tMap(TString, TValue));
+                        System.out.println(innerResults.get(0));
+                        counter++;
+                    }
 
-                final long end = System.currentTimeMillis() - checkpoint;
-                System.out.println((checkpoint - start) + ":" + end);
-                System.out.println(counter / (end / 1000));
-            } catch (Exception ex) {
-                System.out.println("Error during TEST CYCLE (stack trace follows)");
-                ex.printStackTrace();
-                if (ex.getCause() != null) {
-                    System.out.println("There is an inner exception (stack trace follows)");
-                    ex.getCause().printStackTrace();
+                    final int eRequestCount = random.nextInt(500);
+                    for (int ie = 1; ie < eRequestCount; ie++) {
+                        final Map<String,Object> scriptArgs = new HashMap<String, Object>();
+                        scriptArgs.put("id", random.nextInt(8000));
+                        final List<Map<String, Value>> innerResults = client.gremlin("g=rexster.getGraph('gratefulgraph');g.e(id)", scriptArgs, tMap(TString, TValue));
+                        System.out.println(innerResults.get(0));
+                        counter++;
+                    }
+
+                    final long end = System.currentTimeMillis() - checkpoint;
+                    System.out.println((checkpoint - start) + ":" + end);
+                    System.out.println(counter / (end / 1000));
+                } catch (Exception ex) {
+                    System.out.println("Error during TEST CYCLE (stack trace follows)");
+                    ex.printStackTrace();
+                    if (ex.getCause() != null) {
+                        System.out.println("There is an inner exception (stack trace follows)");
+                        ex.getCause().printStackTrace();
+                    }
                 }
-            } finally {
-                if (client != null) {
-                    try { client.close(); } catch(Exception e) {}
-                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (client != null) {
+                try { client.close(); } catch(Exception e) {}
             }
         }
     }
