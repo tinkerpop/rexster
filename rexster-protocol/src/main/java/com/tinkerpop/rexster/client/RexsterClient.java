@@ -1,9 +1,7 @@
 package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.protocol.BitWorks;
-import com.tinkerpop.rexster.protocol.RexPro;
 import com.tinkerpop.rexster.protocol.RexsterBindings;
-import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
@@ -11,15 +9,7 @@ import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.GrizzlyFuture;
-import org.glassfish.grizzly.filterchain.BaseFilter;
-import org.glassfish.grizzly.filterchain.FilterChainBuilder;
-import org.glassfish.grizzly.filterchain.FilterChainContext;
-import org.glassfish.grizzly.filterchain.NextAction;
-import org.glassfish.grizzly.filterchain.TransportFilter;
-import org.glassfish.grizzly.impl.FutureImpl;
-import org.glassfish.grizzly.impl.SafeFutureImpl;
-import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
-import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
+import org.glassfish.grizzly.Transport;
 import org.msgpack.MessagePack;
 import org.msgpack.template.Template;
 import org.msgpack.type.Value;
@@ -33,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import static org.msgpack.template.Templates.TString;
@@ -47,38 +39,64 @@ import static org.msgpack.template.Templates.tMap;
  */
 public class RexsterClient {
     private final MessagePack msgpack = new MessagePack();
-    private final List<RexProInfo> rexProInfos = new ArrayList<RexProInfo>();
-    private int currentServer = 0;
+    private String host;
+    private int port;
+    private Connection<Object> connection;
     private int timeout;
+    private Transport transport;
 
-    private final TCPNIOTransport transport = TCPNIOTransportBuilder.newInstance().build();
-    private final TransportFilter transportFilter = new TransportFilter();
-    private final RexProMessageFilter rpFilter = new RexProMessageFilter();
+    protected static ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>> responses =
+            new ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>>();
 
-    public RexsterClient(final String[] hostsAndPorts) {
-        this(hostsAndPorts, RexPro.DEFAULT_TIMEOUT_SECONDS);
-    }
-
-    public RexsterClient(final String[] hostsAndPorts, final int timeout) {
+    public RexsterClient(final String host, final int port, final int timeout,
+                         final Connection<Object> connection, final Transport transport) {
         this.timeout = timeout;
-        for (String hostAndPort : hostsAndPorts) {
-            rexProInfos.add(new RexProInfo(hostAndPort));
-        }
+        this.host = host;
+        this.port = port;
+        this.connection = connection;
+        this.transport = transport;
     }
 
-    public List<Map<String,Value>> gremlin(final String script) throws IOException {
+    private void sendRequest(final RexProMessage toSend) throws Exception {
+        final GrizzlyFuture future = connection.write(toSend);
+        future.get(this.timeout, TimeUnit.SECONDS);
+    }
+    public List<Map<String,Value>> gremlin(final String script) throws Exception {
         return gremlin(script, tMap(TString,TValue));
     }
 
-    public <T> List<T> gremlin(final String script, final Template template) throws IOException {
+    public <T> List<T> gremlin(final String script, final Template template) throws Exception {
         return gremlin(script, null, template);
     }
 
-    public <T> List<T> gremlin(final String script, final Map<String, Object> scriptArgs, final Template template) throws IOException {
-        final RexProInfo server = nextServer();
+    public <T> List<T> gremlin(final String script, final Map<String, Object> scriptArgs, final Template template) throws Exception {
+        final long beginTime = System.currentTimeMillis();
+        final ArrayBlockingQueue<Object> responseQueue = new ArrayBlockingQueue<Object>(1);
+        final RexProMessage msgToSend = createScriptRequestMessage(script, scriptArgs);
+        final UUID requestId = msgToSend.requestAsUUID();
+        responses.put(requestId, responseQueue);
 
-        final RexProMessage resultMessage = this.sendMessage(server.getHost(), server.getPort(),
-                createScriptRequestMessage(script, scriptArgs));
+        try {
+            this.sendRequest(msgToSend);
+        } catch (Exception e) {
+            responses.remove(requestId);
+            throw e;
+        }
+
+        Object resultMessage = null;
+        try {
+            resultMessage = responseQueue.poll((this.timeout * 1000) - (System.currentTimeMillis() - beginTime), TimeUnit.MILLISECONDS);
+        } catch (Exception ex) {
+            responses.remove(requestId);
+            throw ex;
+        }
+
+        responses.remove(requestId);
+
+        if (resultMessage == null) {
+            throw new RuntimeException("NULL GUY");
+        }
+
         if (resultMessage instanceof MsgPackScriptResponseMessage) {
             final MsgPackScriptResponseMessage msg = (MsgPackScriptResponseMessage) resultMessage;
             final BufferUnpacker unpacker = msgpack.createBufferUnpacker(msg.Results);
@@ -105,52 +123,42 @@ public class RexsterClient {
         }
     }
 
-    private RexProMessage sendMessage(final String host, final int port, final RexProMessage toSend) throws IOException {
-
-        final FutureImpl<RexProMessage> sessionMessageFuture = SafeFutureImpl.create();
-
-        // Create a FilterChain using FilterChainBuilder
-        final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
-
-        // Add TransportFilter, which is responsible
-        // for reading and writing data to the connection
-        filterChainBuilder.add(transportFilter);
-        filterChainBuilder.add(rpFilter);
-        filterChainBuilder.add(new CustomClientFilter(toSend, sessionMessageFuture));
-
-        transport.setProcessor(filterChainBuilder.build());
-
-        Connection connection = null;
-
+    public void putResponse(RexProMessage response) throws Exception {
+        final UUID requestId = response.requestAsUUID();
+        if (!responses.containsKey(requestId)) {
+            // LOGGER.warn("give up the response,request id is:" + wrapper.getRequestId() + ",maybe because timeout!");
+            System.out.println("WTF");
+            return;
+        }
         try {
-            this.transport.start();
-
-            // Connect client to the server
-            final GrizzlyFuture<Connection> futureConnect = transport.connect(host, port);
-            connection = futureConnect.get(this.timeout, TimeUnit.SECONDS);
-            return sessionMessageFuture.get(this.timeout, TimeUnit.SECONDS);
-
-        } catch (Exception e) {
-            if (connection == null) {
-                throw new RuntimeException("Can not connect via RexPro - " + e.getMessage(), e);
-            } else {
-                throw new RuntimeException("Request [" + toSend.getClass().getName() + "] to Rexster failed [" + host + ":" + port + "] - " + e.getMessage(), e);
+            final ArrayBlockingQueue<Object> queue = responses.get(requestId);
+            if (queue != null) {
+                queue.put(response);
             }
-        } finally {
-            if (connection != null) {
-                connection.close();
+            else {
+                //LOGGER.warn("give up the response,request id is:" + requestId + ",because queue is null");
             }
-
-            transport.stop();
+        }
+        catch (InterruptedException e) {
+            //LOGGER.error("put response error,request id is:" + wrapper.getRequestId(), e);
         }
     }
 
-    private RexProInfo nextServer() {
-        synchronized(rexProInfos) {
-            if (currentServer == Integer.MAX_VALUE) { currentServer = 0; }
-            currentServer = (currentServer + 1) % rexProInfos.size();
-            return rexProInfos.get(currentServer);
-        }
+    public String getHost() {
+        return host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void close() throws IOException {
+        this.connection.close();
+        this.transport.stop();
     }
 
     private static ScriptRequestMessage createScriptRequestMessage(final String script,
@@ -167,52 +175,5 @@ public class RexsterClient {
         scriptMessage.Flag = MessageFlag.SCRIPT_REQUEST_NO_SESSION;
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
         return scriptMessage;
-    }
-
-    private class RexProInfo {
-        private final String host;
-        private final int port;
-
-        public RexProInfo(final String host, final int port) {
-            this.host = host;
-            this.port = port;
-        }
-
-        public RexProInfo(final String hostAndPort) {
-            final String[] hostPortPair = hostAndPort.split(":");
-            this.host = hostPortPair[0];
-            this.port = Integer.parseInt(hostPortPair[1]);
-        }
-
-        public int getPort() {
-            return port;
-        }
-
-        public String getHost() {
-            return host;
-        }
-    }
-
-    private final class CustomClientFilter extends BaseFilter {
-        private final FutureImpl<RexProMessage> resultFuture;
-        private final RexProMessage toSend;
-
-        public CustomClientFilter(final RexProMessage toSend, final FutureImpl<RexProMessage> resultFuture) {
-            this.resultFuture = resultFuture;
-            this.toSend = toSend;
-        }
-
-        @Override
-        public NextAction handleConnect(FilterChainContext ctx) throws IOException {
-            ctx.write(this.toSend);
-            return ctx.getStopAction();
-        }
-
-        @Override
-        public NextAction handleRead(FilterChainContext ctx) throws IOException {
-            final RexProMessage message = ctx.getMessage();
-            resultFuture.result(message);
-            return ctx.getStopAction();
-        }
     }
 }

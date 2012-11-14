@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.client.RexsterClient;
+import com.tinkerpop.rexster.client.RexsterClientFactory;
 import org.msgpack.type.Value;
 
 import java.util.HashMap;
@@ -19,7 +20,8 @@ import static org.msgpack.template.Templates.tMap;
 public class TryRexProSessionless implements Runnable {
 
     private int cycle = 0;
-    private final String[] hosts;
+    private final String host;
+    private final int port;
     private final int exerciseTime;
 
     public static void main(final String[] args) throws Exception {
@@ -27,24 +29,26 @@ public class TryRexProSessionless implements Runnable {
         final int exerciseTime = Integer.parseInt(args[2]) * 60 * 1000;
 
         for (int ix = 0; ix < c; ix++) {
-            new Thread(new TryRexProSessionless(args[0].split(","), exerciseTime)).start();
+            String[] pair = args[0].split(":");
+            new Thread(new TryRexProSessionless(pair[0], Integer.parseInt(pair[1]), exerciseTime)).start();
         }
 
         Thread.currentThread().join();
         System.exit(0);
     }
 
-    public TryRexProSessionless(final String[] hosts, final int exerciseTime) {
+    public TryRexProSessionless(final String host, final int port, final int exerciseTime) {
         this.exerciseTime = exerciseTime;
-        this.hosts = hosts;
+        this.host = host;
+        this.port = port;
     }
 
     @Override
-    public void run() {
+    public void run()  {
         this.lotsOfCalls();
     }
 
-    private void lotsOfCalls(){
+    private void lotsOfCalls() {
 
         final long start = System.currentTimeMillis();
         long checkpoint = System.currentTimeMillis();
@@ -54,8 +58,9 @@ public class TryRexProSessionless implements Runnable {
             cycle++;
             System.out.println("Exercise cycle: " + cycle);
 
-            final RexsterClient client = new RexsterClient(hosts, 5);
+            RexsterClient client = null;
             try {
+                client = RexsterClientFactory.getInstance().createClient(host, port, 5);
                 int counter = 1;
                 final int vRequestCount = random.nextInt(500);
                 for (int iv = 1; iv < vRequestCount; iv++) {
@@ -84,6 +89,10 @@ public class TryRexProSessionless implements Runnable {
                 if (ex.getCause() != null) {
                     System.out.println("There is an inner exception (stack trace follows)");
                     ex.getCause().printStackTrace();
+                }
+            } finally {
+                if (client != null) {
+                    try { client.close(); } catch(Exception e) {}
                 }
             }
         }
