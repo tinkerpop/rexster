@@ -19,4 +19,9 @@ public class GraphSONScriptResponseMessage extends RexProMessage {
     public static byte[] convertResultToBytes(final Object result) throws Exception {
         return converter.convert(result).toString().getBytes();
     }
+
+    @Override
+    public int estimateMessageSize() {
+        return BASE_MESSAGE_SIZE + (Results == null ? 0 : Results.length) + (Bindings == null ? 0 : Bindings.length);
+    }
 }

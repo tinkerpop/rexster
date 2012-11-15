@@ -64,4 +64,20 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
         final ConsoleResultConverter converter = new ConsoleResultConverter(new StringWriter());
         return converter.convert(result);
     }
+
+    @Override
+    public int estimateMessageSize() {
+        return BASE_MESSAGE_SIZE + (Bindings == null ? 0 : Bindings.length) + estimateConsoleLineSize();
+    }
+
+    private int estimateConsoleLineSize() {
+        int size = 0;
+        if (ConsoleLines != null) {
+            for(String cl : ConsoleLines) {
+                size = size + cl.length();
+            }
+        }
+
+        return size;
+    }
 }

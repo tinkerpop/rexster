@@ -27,7 +27,10 @@ public class ScriptRequestMessage extends RexProMessage {
     }
 
     @Override
-    public int estimateSize() {
-        return super.estimateSize() + LanguageName.length() + Script.length() + Bindings.length;
+    public int estimateMessageSize() {
+        return BASE_MESSAGE_SIZE
+                + (LanguageName == null ? 0 : LanguageName.length())
+                + (Script == null ? 0 :Script.length())
+                + (Bindings == null ? 0 : Bindings.length);
     }
 }

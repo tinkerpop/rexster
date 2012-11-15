@@ -44,7 +44,7 @@ public class RexsterClientFactory {
         final NIOConnection connection = (NIOConnection) future.get(connectTimeout, TimeUnit.SECONDS);
         connection.setMaxAsyncWriteQueueSize(1000000);
 
-        final RexsterClient client = new RexsterClient(connectTimeout, connection, transport);
+        final RexsterClient client = new RexsterClient(host, port, connectTimeout, connection, transport);
         handler.setClient(client);
         return client;
     }

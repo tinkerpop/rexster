@@ -17,4 +17,11 @@ public class SessionRequestMessage extends RexProMessage {
     public byte Channel;
     public String Username;
     public String Password;
+
+    @Override
+    public int estimateMessageSize() {
+        return BASE_MESSAGE_SIZE + 1
+                + (Username == null ? 0 : Username.length())
+                + (Password == null ? 0 :Password.length());
+    }
 }

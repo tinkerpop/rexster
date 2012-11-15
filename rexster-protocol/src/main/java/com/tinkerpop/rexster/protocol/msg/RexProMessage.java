@@ -9,7 +9,12 @@ import java.util.UUID;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class RexProMessage {
+public abstract class RexProMessage {
+
+    /**
+     * Constant that represents the size of a RexProMessage.
+     */
+    protected static final int BASE_MESSAGE_SIZE = 36;
 
     /**
      * The standard value for an empty session.
@@ -61,7 +66,8 @@ public class RexProMessage {
         this.Request = BitWorks.convertUUIDToByteArray(request);
     }
 
-    public int estimateSize() {
-        return 16;
-    }
+    /**
+     * @return the estimated size of the message in bytes.
+     */
+    public abstract int estimateMessageSize();
 }

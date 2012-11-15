@@ -12,6 +12,7 @@ import org.glassfish.grizzly.GrizzlyFuture;
 import org.glassfish.grizzly.Transport;
 import org.glassfish.grizzly.WriteHandler;
 import org.glassfish.grizzly.nio.NIOConnection;
+import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.msgpack.MessagePack;
 import org.msgpack.template.Template;
 import org.msgpack.type.Value;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static org.msgpack.template.Templates.TString;
@@ -45,16 +47,20 @@ public class RexsterClient {
 
     private final MessagePack msgpack = new MessagePack();
     private NIOConnection connection;
-    private int timeout;
-    private Transport transport;
+    private final int timeout;
+    private final TCPNIOTransport transport;
+    private final String host;
+    private final int port;
 
     protected static ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>> responses =
             new ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>>();
 
-    protected RexsterClient(final int timeout, final NIOConnection connection, final Transport transport) {
+    protected RexsterClient(final String host, final int port, final int timeout, final NIOConnection connection, final TCPNIOTransport transport) {
         this.timeout = timeout;
         this.connection = connection;
         this.transport = transport;
+        this.host = host;
+        this.port = port;
     }
 
     public List<Map<String,Value>> gremlin(final String script) throws Exception {
@@ -72,11 +78,22 @@ public class RexsterClient {
         final UUID requestId = msgToSend.requestAsUUID();
         responses.put(requestId, responseQueue);
 
-        try {
-            this.sendRequest(msgToSend);
-        } catch (Exception e) {
-            responses.remove(requestId);
-            throw e;
+        boolean sent = false;
+        int tries = 15;
+        while (tries > 0 && !sent) {
+            try {
+                this.sendRequest(msgToSend);
+                sent = true;
+            } catch (Exception e) {
+                tries--;
+                if (tries == 0) {
+                    responses.remove(requestId);
+                    throw e;
+                } else {
+                    Thread.sleep(1000);
+                    reopenConnectionSafe();
+                }
+            }
         }
 
         Object resultMessage;
@@ -140,11 +157,21 @@ public class RexsterClient {
         }
     }
 
+    private void reopenConnectionSafe() {
+        try {
+            final Future<Connection> future = this.transport.connect(host, port);
+            this.connection = (NIOConnection) future.get(this.timeout, TimeUnit.SECONDS);
+            this.connection.setMaxAsyncWriteQueueSize(1000000);
+        } catch (Exception e) {
+            // safe call to reopen...just swallow this
+        }
+    }
+
     private void sendRequest(final RexProMessage toSend) throws Exception {
         boolean sent = false;
         int tries = 10;
         while (tries > 0 && !sent) {
-            if (toSend.estimateSize() + this.connection.getAsyncWriteQueue().spaceInBytes() <= this.connection.getMaxAsyncWriteQueueSize()) {
+            if (toSend.estimateMessageSize() + this.connection.getAsyncWriteQueue().spaceInBytes() <= this.connection.getMaxAsyncWriteQueueSize()) {
                 final GrizzlyFuture future = connection.write(toSend);
                 future.get(this.timeout, TimeUnit.SECONDS);
                 sent = true;
