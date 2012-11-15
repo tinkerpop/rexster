@@ -82,6 +82,15 @@ public class TryRexProSessionless implements Runnable {
                         counter++;
                     }
 
+                    final int gRequestCount = random.nextInt(1000);
+                    for (int ig = 1; ig < gRequestCount; ig++) {
+                        final Map<String,Object> scriptArgs = new HashMap<String, Object>();
+                        scriptArgs.put("id", random.nextInt(800));
+                        final List<Map<String, Value>> innerResults = client.gremlin("g=rexster.getGraph('gratefulgraph');g.v(id).out('followed_by').loop(1){it.loops<3}[0..10]", scriptArgs, tMap(TString, TValue));
+                        System.out.println(innerResults.size() > 0 ? innerResults.get(0) : "no results");
+                        counter++;
+                    }
+
                     final long end = System.currentTimeMillis() - checkpoint;
                     System.out.println((checkpoint - start) + ":" + end);
                     System.out.println(counter / (end / 1000));

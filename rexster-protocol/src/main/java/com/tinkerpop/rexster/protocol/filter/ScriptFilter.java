@@ -72,7 +72,6 @@ public class ScriptFilter extends BaseFilter {
                 msgPackScriptResponseMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
                 msgPackScriptResponseMessage.Request = specificMessage.Request;
                 msgPackScriptResponseMessage.Results = MsgPackScriptResponseMessage.convertResultToBytes(result);
-                logger.info(specificMessage.requestAsUUID());
 
                 ctx.write(msgPackScriptResponseMessage);
 
