@@ -25,4 +25,9 @@ public class ScriptRequestMessage extends RexProMessage {
         buffer.get(theRest);
         return BitWorks.convertByteArrayToRexsterBindings(theRest);
     }
+
+    @Override
+    public int estimateSize() {
+        return super.estimateSize() + LanguageName.length() + Script.length() + Bindings.length;
+    }
 }

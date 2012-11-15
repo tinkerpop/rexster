@@ -4,6 +4,7 @@ import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
+import org.glassfish.grizzly.nio.NIOConnection;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.strategies.SameThreadIOStrategy;
@@ -40,7 +41,8 @@ public class RexsterClientFactory {
         transport.start();
 
         final Future<Connection> future = transport.connect(host, port);
-        final Connection connection = future.get(connectTimeout, TimeUnit.SECONDS);
+        final NIOConnection connection = (NIOConnection) future.get(connectTimeout, TimeUnit.SECONDS);
+        connection.setMaxAsyncWriteQueueSize(1000000);
 
         final RexsterClient client = new RexsterClient(connectTimeout, connection, transport);
         handler.setClient(client);

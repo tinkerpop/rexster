@@ -10,6 +10,8 @@ import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.GrizzlyFuture;
 import org.glassfish.grizzly.Transport;
+import org.glassfish.grizzly.WriteHandler;
+import org.glassfish.grizzly.nio.NIOConnection;
 import org.msgpack.MessagePack;
 import org.msgpack.template.Template;
 import org.msgpack.type.Value;
@@ -42,14 +44,14 @@ public class RexsterClient {
     private static final String DEFAULT_GREMLIN = "groovy";
 
     private final MessagePack msgpack = new MessagePack();
-    private Connection<Object> connection;
+    private NIOConnection connection;
     private int timeout;
     private Transport transport;
 
     protected static ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>> responses =
             new ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>>();
 
-    protected RexsterClient(final int timeout, final Connection<Object> connection, final Transport transport) {
+    protected RexsterClient(final int timeout, final NIOConnection connection, final Transport transport) {
         this.timeout = timeout;
         this.connection = connection;
         this.transport = transport;
@@ -139,8 +141,23 @@ public class RexsterClient {
     }
 
     private void sendRequest(final RexProMessage toSend) throws Exception {
-        final GrizzlyFuture future = connection.write(toSend);
-        future.get(this.timeout, TimeUnit.SECONDS);
+        boolean sent = false;
+        int tries = 10;
+        while (tries > 0 && !sent) {
+            if (toSend.estimateSize() + this.connection.getAsyncWriteQueue().spaceInBytes() <= this.connection.getMaxAsyncWriteQueueSize()) {
+                final GrizzlyFuture future = connection.write(toSend);
+                future.get(this.timeout, TimeUnit.SECONDS);
+                sent = true;
+            } else {
+                tries--;
+                Thread.sleep(50);
+            }
+        }
+
+        if (!sent) {
+            throw new Exception("Could not write to queue.  Perhaps there are network performance problems.  Please retry the request.");
+        }
+
     }
 
     public void close() throws IOException {

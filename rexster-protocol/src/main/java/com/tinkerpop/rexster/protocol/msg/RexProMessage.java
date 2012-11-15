@@ -60,4 +60,8 @@ public class RexProMessage {
     public void setRequestAsUUID(final UUID request) {
         this.Request = BitWorks.convertUUIDToByteArray(request);
     }
+
+    public int estimateSize() {
+        return 16;
+    }
 }
