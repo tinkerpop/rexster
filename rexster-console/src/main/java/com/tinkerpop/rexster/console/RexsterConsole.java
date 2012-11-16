@@ -298,8 +298,8 @@ public class RexsterConsole {
                 if (resultMessage instanceof ConsoleScriptResponseMessage) {
                     final ConsoleScriptResponseMessage responseMessage = (ConsoleScriptResponseMessage) resultMessage;
 
-                    bindings = responseMessage.BindingsAsList();
-                    lines = responseMessage.ConsoleLinesAsList();
+                    bindings = responseMessage.bindingsAsList();
+                    lines = responseMessage.consoleLinesAsList();
                 } else if (resultMessage instanceof ErrorResponseMessage) {
                     final ErrorResponseMessage errorMessage = (ErrorResponseMessage) resultMessage;
                     lines = new ArrayList() {{

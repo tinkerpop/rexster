@@ -24,8 +24,8 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
     public String[] ConsoleLines;
     public byte[] Bindings;
 
-    public List<String> ConsoleLinesAsList() {
-        List<String> list = new ArrayList<String>();
+    public List<String> consoleLinesAsList() {
+        final List<String> list = new ArrayList<String>();
         for (String line : ConsoleLines) {
             list.add(line);
         }
@@ -33,7 +33,7 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
         return list;
     }
 
-    public List<String> BindingsAsList() {
+    public List<String> bindingsAsList() {
         final List<String> bindings = new ArrayList<String>();
 
         final ByteBuffer bb = ByteBuffer.wrap(this.Bindings);

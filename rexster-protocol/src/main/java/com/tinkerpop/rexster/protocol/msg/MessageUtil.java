@@ -1,7 +1,5 @@
 package com.tinkerpop.rexster.protocol.msg;
 
-import com.tinkerpop.rexster.protocol.RexProSessions;
-
 import java.util.List;
 import java.util.UUID;
 
