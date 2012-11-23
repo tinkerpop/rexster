@@ -7,10 +7,9 @@ import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import org.apache.commons.configuration.Configuration;
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.GrizzlyFuture;
-import org.glassfish.grizzly.Transport;
-import org.glassfish.grizzly.WriteHandler;
 import org.glassfish.grizzly.nio.NIOConnection;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.msgpack.MessagePack;
@@ -45,22 +44,36 @@ public class RexsterClient {
 
     private static final String DEFAULT_GREMLIN = "groovy";
 
+    private final NIOConnection[] connections;
+    private int currentConnection = 0;
+
     private final MessagePack msgpack = new MessagePack();
-    private NIOConnection connection;
-    private final int timeout;
+    private final int timeoutConnection;
+    private final int timeoutWrite;
+    private final int timeoutRead;
+    private final int retries;
+    private final int waitBetweenRetries;
+    private final int asyncWriteQueueMaxBytes;
     private final TCPNIOTransport transport;
-    private final String host;
+    private final String[] hosts;
     private final int port;
 
-    protected static ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>> responses =
-            new ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>>();
+    protected static ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>> responses = new ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>>();
 
-    protected RexsterClient(final String host, final int port, final int timeout, final NIOConnection connection, final TCPNIOTransport transport) {
-        this.timeout = timeout;
-        this.connection = connection;
+    protected RexsterClient(final Configuration configuration, final TCPNIOTransport transport) {
+        this.timeoutConnection = configuration.getInt(RexsterClientTokens.CONFIG_TIMEOUT_CONNECTION_MS);
+        this.timeoutRead = configuration.getInt(RexsterClientTokens.CONFIG_TIMEOUT_READ_MS);
+        this.timeoutWrite = configuration.getInt(RexsterClientTokens.CONFIG_TIMEOUT_WRITE_MS);
+        this.retries = configuration.getInt(RexsterClientTokens.CONFIG_MESSAGE_RETRY_COUNT);
+        this.waitBetweenRetries = configuration.getInt(RexsterClientTokens.CONFIG_MESSAGE_RETRY_WAIT_MS);
+        this.asyncWriteQueueMaxBytes = configuration.getInt(RexsterClientTokens.CONFIG_MAX_ASYNC_WRITE_QUEUE_BYTES);
+        this.port = configuration.getInt(RexsterClientTokens.CONFIG_PORT);
         this.transport = transport;
-        this.host = host;
-        this.port = port;
+
+        final String hostname = configuration.getString(RexsterClientTokens.CONFIG_HOSTNAME);
+        this.hosts = hostname.split(",");
+
+        this.connections = new NIOConnection[this.hosts.length];
     }
 
     public List<Map<String,Value>> gremlin(final String script) throws Exception {
@@ -72,33 +85,17 @@ public class RexsterClient {
     }
 
     public <T> List<T> gremlin(final String script, final Map<String, Object> scriptArgs, final Template template) throws Exception {
-        final long beginTime = System.currentTimeMillis();
         final ArrayBlockingQueue<Object> responseQueue = new ArrayBlockingQueue<Object>(1);
         final RexProMessage msgToSend = createNoSessionScriptRequest(script, scriptArgs);
         final UUID requestId = msgToSend.requestAsUUID();
         responses.put(requestId, responseQueue);
 
-        boolean sent = false;
-        int tries = 15;
-        while (tries > 0 && !sent) {
-            try {
-                this.sendRequest(msgToSend);
-                sent = true;
-            } catch (Exception e) {
-                tries--;
-                if (tries == 0) {
-                    responses.remove(requestId);
-                    throw e;
-                } else {
-                    Thread.sleep(1000);
-                    reopenConnectionSafe();
-                }
-            }
-        }
+        this.sendRequest(msgToSend);
 
         Object resultMessage;
         try {
-            resultMessage = responseQueue.poll((this.timeout * 1000) - (System.currentTimeMillis() - beginTime), TimeUnit.MILLISECONDS);
+            final long beginTime = System.currentTimeMillis();
+            resultMessage = responseQueue.poll(this.timeoutRead - (System.currentTimeMillis() - beginTime), TimeUnit.MILLISECONDS);
         } catch (Exception ex) {
             responses.remove(requestId);
             throw new IOException(ex);
@@ -107,7 +104,7 @@ public class RexsterClient {
         responses.remove(requestId);
 
         if (resultMessage == null) {
-            throw new IOException(String.format("Message received response timeout (%s s)", this.timeout));
+            throw new IOException(String.format("Message received response timeoutConnection (%s s)", this.timeoutConnection));
         }
 
         if (resultMessage instanceof MsgPackScriptResponseMessage) {
@@ -157,38 +154,68 @@ public class RexsterClient {
         }
     }
 
-    private void reopenConnectionSafe() {
+    private NIOConnection nextConnection() {
+        synchronized(connections) {
+            if (currentConnection == Integer.MAX_VALUE) { currentConnection = 0; }
+            currentConnection = (currentConnection + 1) % hosts.length;
+
+            final NIOConnection connection = connections[currentConnection];
+            if (connection == null || !connection.isOpen()) {
+                connections[currentConnection] = openConnection(this.hosts[currentConnection]);
+            }
+
+            return connections[currentConnection];
+        }
+    }
+
+    private NIOConnection openConnection(final String host) {
         try {
             final Future<Connection> future = this.transport.connect(host, port);
-            this.connection = (NIOConnection) future.get(this.timeout, TimeUnit.SECONDS);
-            this.connection.setMaxAsyncWriteQueueSize(1000000);
+            final NIOConnection connection = (NIOConnection) future.get(this.timeoutConnection, TimeUnit.MILLISECONDS);
+            connection.setMaxAsyncWriteQueueSize(asyncWriteQueueMaxBytes);
+            return connection;
         } catch (Exception e) {
-            // safe call to reopen...just swallow this
+            return null;
         }
     }
 
     private void sendRequest(final RexProMessage toSend) throws Exception {
         boolean sent = false;
-        int tries = 10;
+        int tries = this.retries;
         while (tries > 0 && !sent) {
-            if (toSend.estimateMessageSize() + this.connection.getAsyncWriteQueue().spaceInBytes() <= this.connection.getMaxAsyncWriteQueueSize()) {
-                final GrizzlyFuture future = connection.write(toSend);
-                future.get(this.timeout, TimeUnit.SECONDS);
-                sent = true;
-            } else {
+            try {
+                final NIOConnection connection = nextConnection();
+                if (connection != null && connection.isOpen()) {
+                    if (toSend.estimateMessageSize() + connection.getAsyncWriteQueue().spaceInBytes() <= connection.getMaxAsyncWriteQueueSize()) {
+                        final GrizzlyFuture future = connection.write(toSend);
+                        future.get(this.timeoutWrite, TimeUnit.MILLISECONDS);
+                        sent = true;
+                    } else {
+                        throw new Exception("internal");
+                    }
+                }
+            } catch (Exception ex) {
                 tries--;
-                Thread.sleep(50);
+                final UUID requestId = toSend.requestAsUUID();
+                if (tries == 0) {
+                    responses.remove(requestId);
+                } else {
+                    Thread.sleep(this.waitBetweenRetries);
+                }
             }
         }
 
         if (!sent) {
-            throw new Exception("Could not write to queue.  Perhaps there are network performance problems.  Please retry the request.");
+            throw new Exception("Could not send message.");
         }
 
     }
 
     public void close() throws IOException {
-        this.connection.close();
+        for (NIOConnection connection : this.connections) {
+            connection.close();
+        }
+
         this.transport.stop();
     }
 
