@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.protocol;
 
-import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
 import org.msgpack.type.Value;

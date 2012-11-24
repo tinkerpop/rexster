@@ -34,8 +34,6 @@ public class RexsterClientFactory {
         addProperty(RexsterClientTokens.CONFIG_DESERIALIZE_RAW_SIZE_LIMIT, 134217728);
     }};
 
-
-
     private RexsterClientFactory() {
 
     }
