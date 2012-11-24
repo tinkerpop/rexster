@@ -5,17 +5,13 @@ import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.MapConfiguration;
-import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
-import org.glassfish.grizzly.nio.NIOConnection;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.strategies.SameThreadIOStrategy;
 
 import java.util.Map;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
@@ -33,6 +29,9 @@ public class RexsterClientFactory {
         addProperty(RexsterClientTokens.CONFIG_MAX_ASYNC_WRITE_QUEUE_BYTES, 512000);
         addProperty(RexsterClientTokens.CONFIG_MESSAGE_RETRY_COUNT, 16);
         addProperty(RexsterClientTokens.CONFIG_MESSAGE_RETRY_WAIT_MS, 50);
+        addProperty(RexsterClientTokens.CONFIG_DESERIALIZE_ARRAY_SIZE_LIMIT, 4194304);
+        addProperty(RexsterClientTokens.CONFIG_DESERIALIZE_MAP_SIZE_LIMIT, 2097152);
+        addProperty(RexsterClientTokens.CONFIG_DESERIALIZE_RAW_SIZE_LIMIT, 134217728);
     }};
 
 

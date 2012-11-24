@@ -18,6 +18,7 @@ import org.msgpack.type.Value;
 import org.msgpack.unpacker.BufferUnpacker;
 import org.msgpack.unpacker.Converter;
 import org.msgpack.unpacker.UnpackerIterator;
+import org.omg.CORBA.PRIVATE_MEMBER;
 
 import javax.script.Bindings;
 import java.io.IOException;
@@ -54,6 +55,10 @@ public class RexsterClient {
     private final int retries;
     private final int waitBetweenRetries;
     private final int asyncWriteQueueMaxBytes;
+    private final int arraySizeLimit;
+    private final int mapSizeLimit;
+    private final int rawSizeLimit;
+
     private final TCPNIOTransport transport;
     private final String[] hosts;
     private final int port;
@@ -67,9 +72,12 @@ public class RexsterClient {
         this.retries = configuration.getInt(RexsterClientTokens.CONFIG_MESSAGE_RETRY_COUNT);
         this.waitBetweenRetries = configuration.getInt(RexsterClientTokens.CONFIG_MESSAGE_RETRY_WAIT_MS);
         this.asyncWriteQueueMaxBytes = configuration.getInt(RexsterClientTokens.CONFIG_MAX_ASYNC_WRITE_QUEUE_BYTES);
-        this.port = configuration.getInt(RexsterClientTokens.CONFIG_PORT);
-        this.transport = transport;
+        this.arraySizeLimit = configuration.getInt(RexsterClientTokens.CONFIG_DESERIALIZE_ARRAY_SIZE_LIMIT);
+        this.mapSizeLimit = configuration.getInt(RexsterClientTokens.CONFIG_DESERIALIZE_MAP_SIZE_LIMIT);
+        this.rawSizeLimit = configuration.getInt(RexsterClientTokens.CONFIG_DESERIALIZE_RAW_SIZE_LIMIT);
 
+        this.transport = transport;
+        this.port = configuration.getInt(RexsterClientTokens.CONFIG_PORT);
         final String hostname = configuration.getString(RexsterClientTokens.CONFIG_HOSTNAME);
         this.hosts = hostname.split(",");
 
@@ -110,9 +118,9 @@ public class RexsterClient {
         if (resultMessage instanceof MsgPackScriptResponseMessage) {
             final MsgPackScriptResponseMessage msg = (MsgPackScriptResponseMessage) resultMessage;
             final BufferUnpacker unpacker = msgpack.createBufferUnpacker(msg.Results);
-            unpacker.setArraySizeLimit(Integer.MAX_VALUE);
-            unpacker.setMapSizeLimit(Integer.MAX_VALUE);
-            unpacker.setRawSizeLimit(Integer.MAX_VALUE);
+            unpacker.setArraySizeLimit(this.arraySizeLimit);
+            unpacker.setMapSizeLimit(this.mapSizeLimit);
+            unpacker.setRawSizeLimit(this.rawSizeLimit);
 
             final List<T> results = new ArrayList<T>();
             final UnpackerIterator itty = unpacker.iterator();
