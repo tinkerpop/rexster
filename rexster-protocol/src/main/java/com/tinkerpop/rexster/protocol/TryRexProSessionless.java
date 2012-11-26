@@ -2,6 +2,8 @@ package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.PropertyConfigurator;
 import org.msgpack.type.Value;
 
 import java.util.HashMap;
@@ -17,6 +19,10 @@ import static org.msgpack.template.Templates.tMap;
  * A bit of an experiment.
  */
 public class TryRexProSessionless implements Runnable {
+
+    static {
+        BasicConfigurator.configure();
+    }
 
     private int cycle = 0;
     private final String host;

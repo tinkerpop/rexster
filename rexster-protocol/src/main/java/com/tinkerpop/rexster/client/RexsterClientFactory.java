@@ -4,7 +4,9 @@ import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationUtils;
 import org.apache.commons.configuration.MapConfiguration;
+import org.apache.log4j.Logger;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
@@ -14,9 +16,12 @@ import org.glassfish.grizzly.strategies.SameThreadIOStrategy;
 import java.util.Map;
 
 /**
+ * Creates RexsterClient instances.
+ *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RexsterClientFactory {
+    private static final Logger logger = Logger.getLogger(RexsterClientFactory.class);
 
     private static final RexsterClientFactory factory = new RexsterClientFactory();
 
@@ -86,6 +91,9 @@ public class RexsterClientFactory {
 
         final RexsterClient client = new RexsterClient(configuration, transport);
         handler.setClient(client);
+
+        logger.info(String.format("Create RexsterClient instance: [%s]", ConfigurationUtils.toString(configuration)));
+
         return client;
     }
 }
