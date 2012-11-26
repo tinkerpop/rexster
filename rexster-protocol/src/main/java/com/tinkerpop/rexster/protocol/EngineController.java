@@ -16,6 +16,9 @@ import java.util.Map;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class EngineController {
+
+    public static final int RESET_NEVER = -1;
+
     private final ScriptEngineManager manager = new ScriptEngineManager();
     private final Map<String, EngineHolder> engines = new HashMap<String, EngineHolder>();
 
@@ -32,6 +35,7 @@ public class EngineController {
     }};
 
     private static EngineController engineController;
+    private static int engineResetThreshold = RESET_NEVER;
 
     private EngineController() {
         // for ruby
@@ -40,9 +44,16 @@ public class EngineController {
 
             // only add engine factories for those languages that are gremlin based.
             if (gremlinEngineNames.contains(factory.getLanguageName())) {
-                this.engines.put(factory.getLanguageName(), new EngineHolder(factory));
+                this.engines.put(factory.getLanguageName(), new EngineHolder(factory, engineResetThreshold));
             }
         }
+    }
+
+    /**
+     * Must call this before a call to getInstance() if the reset count is to be taken into account.
+     */
+    public static void configure(final int resetCount){
+        engineResetThreshold = resetCount;
     }
 
     public static EngineController getInstance() {
@@ -63,7 +74,7 @@ public class EngineController {
     }
 
     public boolean isEngineAvailable(final String languageName) {
-        boolean available = false;
+        boolean available;
         try {
             getEngineByLanguageName(languageName);
             available = true;

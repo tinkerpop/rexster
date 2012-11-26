@@ -18,7 +18,7 @@ public class EngineHolderTest {
 
         // counter at 1
         for (int iy = 0; iy < 10; iy++) {
-            for (int ix = 1; ix < EngineHolder.ENGINE_RESET_THRESHOLD; ix++) {
+            for (int ix = 1; ix < 100; ix++) {
                 ScriptEngine sameEngine = holder.getEngine();
                 Assert.assertSame(engine, sameEngine);
             }

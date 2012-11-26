@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.server.DefaultRexsterApplication;
 import com.tinkerpop.rexster.server.HttpRexsterServer;
 import com.tinkerpop.rexster.server.RexProRexsterServer;
@@ -54,6 +55,16 @@ public class Application {
     }
 
     public void start() throws Exception {
+
+        // the EngineController needs to be configured statically before requests start serving so that it can
+        // properly construct ScriptEngine objects with the correct reset policy.
+        final int scriptEngineThreshold = this.properties.getInt("script-engine-reset-threshold", EngineController.RESET_NEVER);
+        EngineController.configure(scriptEngineThreshold);
+
+        logger.info(String.format(
+                "Gremlin ScriptEngine configured to reset every [%s] requests. Set to -1 to never reset.",
+                scriptEngineThreshold));
+
         this.httpServer.start(this.rexsterApplication);
         this.rexproServer.start(this.rexsterApplication);
         startShutdownManager(this.properties);

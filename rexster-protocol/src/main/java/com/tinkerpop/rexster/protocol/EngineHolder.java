@@ -17,18 +17,19 @@ public class EngineHolder {
     private final String engineName;
     private final String engineVersion;
     private final ScriptEngineFactory factory;
-    public static final int ENGINE_RESET_THRESHOLD = 1000;
+    private final int engineResetThreshold;
 
     private ScriptEngine engine;
     private int numberOfScriptsEvaluated = 0;
 
-    public EngineHolder(final ScriptEngineFactory factory) {
+    public EngineHolder(final ScriptEngineFactory factory, final int engineResetThreshold) {
         this.languageName = factory.getLanguageName();
         this.languageVersion = factory.getLanguageVersion();
         this.engineName = factory.getEngineName();
         this.engineVersion = factory.getEngineVersion();
         this.engine = factory.getScriptEngine();
         this.factory = factory;
+        this.engineResetThreshold = engineResetThreshold;
     }
 
     public String getEngineName() {
@@ -44,7 +45,7 @@ public class EngineHolder {
     }
 
     public ScriptEngine getEngine() {
-        if (numberOfScriptsEvaluated >= ENGINE_RESET_THRESHOLD) {
+        if (engineResetThreshold > EngineController.RESET_NEVER && numberOfScriptsEvaluated >= engineResetThreshold) {
             // IMPORTANT: assumes that the factory implementation is not pooling engine instances
             this.engine = this.factory.getScriptEngine();
             numberOfScriptsEvaluated = 1;
