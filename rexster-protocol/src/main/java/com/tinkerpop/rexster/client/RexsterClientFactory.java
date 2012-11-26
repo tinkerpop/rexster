@@ -32,6 +32,7 @@ public class RexsterClientFactory {
         addProperty(RexsterClientTokens.CONFIG_DESERIALIZE_ARRAY_SIZE_LIMIT, 4194304);
         addProperty(RexsterClientTokens.CONFIG_DESERIALIZE_MAP_SIZE_LIMIT, 2097152);
         addProperty(RexsterClientTokens.CONFIG_DESERIALIZE_RAW_SIZE_LIMIT, 134217728);
+        addProperty(RexsterClientTokens.CONFIG_LANGUAGE, "groovy");
     }};
 
     private RexsterClientFactory() {

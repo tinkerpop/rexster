@@ -16,4 +16,5 @@ public class RexsterClientTokens {
     public static final String CONFIG_DESERIALIZE_ARRAY_SIZE_LIMIT = "deserialize-array-size-limit";
     public static final String CONFIG_DESERIALIZE_MAP_SIZE_LIMIT = "deserialize-map-size-limit";
     public static final String CONFIG_DESERIALIZE_RAW_SIZE_LIMIT = "deserialize-raw-size-limit";
+    public static final String CONFIG_LANGUAGE = "language";
 }

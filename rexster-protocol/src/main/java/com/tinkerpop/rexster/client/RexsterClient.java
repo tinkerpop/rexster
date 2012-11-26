@@ -37,13 +37,15 @@ import static org.msgpack.template.Templates.tMap;
 
 /**
  * Basic client for sending Gremlin scripts to Rexster and receiving results as Map objects with String
- * keys and MsgPack Value objects.
+ * keys and MsgPack Value objects. This client is only for sessionless communication with Rexster and
+ * therefore all Gremlin scripts sent as requests to Rexster should be careful to handle their own
+ * transactional semantics.  In other words, do not count on sending a script that mutates some aspect of the
+ * graph in one request and then a second request later to commit the transaction as there is no guarantee that
+ * the transaction will be handled properly.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RexsterClient {
-
-    private static final String DEFAULT_GREMLIN = "groovy";
 
     private final NIOConnection[] connections;
     private int currentConnection = 0;
@@ -58,6 +60,7 @@ public class RexsterClient {
     private final int arraySizeLimit;
     private final int mapSizeLimit;
     private final int rawSizeLimit;
+    private final String language;
 
     private final TCPNIOTransport transport;
     private final String[] hosts;
@@ -75,6 +78,7 @@ public class RexsterClient {
         this.arraySizeLimit = configuration.getInt(RexsterClientTokens.CONFIG_DESERIALIZE_ARRAY_SIZE_LIMIT);
         this.mapSizeLimit = configuration.getInt(RexsterClientTokens.CONFIG_DESERIALIZE_MAP_SIZE_LIMIT);
         this.rawSizeLimit = configuration.getInt(RexsterClientTokens.CONFIG_DESERIALIZE_RAW_SIZE_LIMIT);
+        this.language = configuration.getString(RexsterClientTokens.CONFIG_LANGUAGE);
 
         this.transport = transport;
         this.port = configuration.getInt(RexsterClientTokens.CONFIG_PORT);
@@ -227,8 +231,8 @@ public class RexsterClient {
         this.transport.stop();
     }
 
-    private static ScriptRequestMessage createNoSessionScriptRequest(final String script,
-                                                                     final Map<String, Object> scriptArguments) throws IOException{
+    private ScriptRequestMessage createNoSessionScriptRequest(final String script,
+                                                              final Map<String, Object> scriptArguments) throws IOException{
         final Bindings bindings = new RexsterBindings();
         if (scriptArguments != null) {
             bindings.putAll(scriptArguments);
@@ -237,7 +241,7 @@ public class RexsterClient {
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = script;
         scriptMessage.Bindings = BitWorks.convertSerializableBindingsToByteArray(bindings);
-        scriptMessage.LanguageName = DEFAULT_GREMLIN;
+        scriptMessage.LanguageName = this.language;
         scriptMessage.Flag = MessageFlag.SCRIPT_REQUEST_NO_SESSION;
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
         return scriptMessage;
