@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Manages the list of EngineHolder items for the current ScriptEngineManager.
+ * Manages the list of EngineHolder items for the current ScriptEngineManager. By default, the ScriptEngine instance
+ * is never reset.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */

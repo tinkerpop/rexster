@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.protocol;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Holder class for different script engines.  It keeps track of the number of scripts that have been
@@ -20,7 +21,7 @@ public class EngineHolder {
     private final int engineResetThreshold;
 
     private ScriptEngine engine;
-    private int numberOfScriptsEvaluated = 0;
+    private AtomicInteger numberOfScriptsEvaluated = new AtomicInteger(1);
 
     public EngineHolder(final ScriptEngineFactory factory, final int engineResetThreshold) {
         this.languageName = factory.getLanguageName();
@@ -45,12 +46,15 @@ public class EngineHolder {
     }
 
     public ScriptEngine getEngine() {
-        if (engineResetThreshold > EngineController.RESET_NEVER && numberOfScriptsEvaluated >= engineResetThreshold) {
-            // IMPORTANT: assumes that the factory implementation is not pooling engine instances
-            this.engine = this.factory.getScriptEngine();
-            numberOfScriptsEvaluated = 1;
-        } else {
-            numberOfScriptsEvaluated++;
+        if (engineResetThreshold > EngineController.RESET_NEVER) {
+            // determine if a reset is necessary.
+            if (numberOfScriptsEvaluated.get() >= engineResetThreshold) {
+                // IMPORTANT: assumes that the factory implementation is not pooling engine instances
+                this.engine = this.factory.getScriptEngine();
+                numberOfScriptsEvaluated.set(1);
+            } else {
+                numberOfScriptsEvaluated.incrementAndGet();
+            }
         }
 
         return this.engine;
