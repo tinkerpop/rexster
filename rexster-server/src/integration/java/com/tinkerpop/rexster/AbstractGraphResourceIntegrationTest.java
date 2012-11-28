@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster;
 
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.tinkerpop.blueprints.Edge;
@@ -9,11 +8,6 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
-import com.tinkerpop.rexster.server.DefaultRexsterApplication;
-import com.tinkerpop.rexster.server.HttpRexsterServer;
-import com.tinkerpop.rexster.server.RexsterApplication;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.XMLConfiguration;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
