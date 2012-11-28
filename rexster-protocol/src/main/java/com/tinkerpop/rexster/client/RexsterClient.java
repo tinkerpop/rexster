@@ -18,7 +18,6 @@ import org.msgpack.type.Value;
 import org.msgpack.unpacker.BufferUnpacker;
 import org.msgpack.unpacker.Converter;
 import org.msgpack.unpacker.UnpackerIterator;
-import org.omg.CORBA.PRIVATE_MEMBER;
 
 import javax.script.Bindings;
 import java.io.IOException;
@@ -88,15 +87,15 @@ public class RexsterClient {
         this.connections = new NIOConnection[this.hosts.length];
     }
 
-    public List<Map<String,Value>> gremlin(final String script) throws Exception {
-        return gremlin(script, tMap(TString,TValue));
+    public List<Map<String,Value>> execute(final String script) throws Exception {
+        return execute(script, tMap(TString, TValue));
     }
 
-    public <T> List<T> gremlin(final String script, final Template template) throws Exception {
-        return gremlin(script, null, template);
+    public <T> List<T> execute(final String script, final Template template) throws Exception {
+        return execute(script, null, template);
     }
 
-    public <T> List<T> gremlin(final String script, final Map<String, Object> scriptArgs, final Template template) throws Exception {
+    public <T> List<T> execute(final String script, final Map<String, Object> scriptArgs, final Template template) throws Exception {
         final ArrayBlockingQueue<Object> responseQueue = new ArrayBlockingQueue<Object>(1);
         final RexProMessage msgToSend = createNoSessionScriptRequest(script, scriptArgs);
         final UUID requestId = msgToSend.requestAsUUID();

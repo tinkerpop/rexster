@@ -3,7 +3,6 @@ package com.tinkerpop.rexster.protocol;
 import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
 import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.PropertyConfigurator;
 import org.msgpack.type.Value;
 
 import java.util.HashMap;
@@ -70,7 +69,7 @@ public class TryRexProSessionless implements Runnable {
                     for (int iv = 1; iv < vRequestCount; iv++) {
                         final Map<String,Object> scriptArgs = new HashMap<String, Object>();
                         scriptArgs.put("id", random.nextInt(800));
-                        final List<Map<String, Value>> innerResults = client.gremlin("g=rexster.getGraph('gratefulgraph');g.v(id)", scriptArgs, tMap(TString, TValue));
+                        final List<Map<String, Value>> innerResults = client.execute("g=rexster.getGraph('gratefulgraph');g.v(id)", scriptArgs, tMap(TString, TValue));
                         System.out.println(innerResults.get(0));
                         counter++;
                     }
@@ -79,7 +78,7 @@ public class TryRexProSessionless implements Runnable {
                     for (int ie = 1; ie < eRequestCount; ie++) {
                         final Map<String,Object> scriptArgs = new HashMap<String, Object>();
                         scriptArgs.put("id", random.nextInt(8000));
-                        final List<Map<String, Value>> innerResults = client.gremlin("g=rexster.getGraph('gratefulgraph');g.e(id)", scriptArgs, tMap(TString, TValue));
+                        final List<Map<String, Value>> innerResults = client.execute("g=rexster.getGraph('gratefulgraph');g.e(id)", scriptArgs, tMap(TString, TValue));
                         System.out.println(innerResults.get(0));
                         counter++;
                     }
@@ -88,7 +87,7 @@ public class TryRexProSessionless implements Runnable {
                     for (int ig = 1; ig < gRequestCount; ig++) {
                         final Map<String,Object> scriptArgs = new HashMap<String, Object>();
                         scriptArgs.put("id", random.nextInt(800));
-                        final List<Map<String, Value>> innerResults = client.gremlin("g=rexster.getGraph('gratefulgraph');g.v(id).out('followed_by').loop(1){it.loops<3}[0..10]", scriptArgs, tMap(TString, TValue));
+                        final List<Map<String, Value>> innerResults = client.execute("g=rexster.getGraph('gratefulgraph');g.v(id).out('followed_by').loop(1){it.loops<3}[0..10]", scriptArgs, tMap(TString, TValue));
                         System.out.println(innerResults.size() > 0 ? innerResults.get(0) : "no results");
                         counter++;
                     }
