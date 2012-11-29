@@ -30,7 +30,7 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
 
     @Before
     public void setUp() throws Exception {
-
+        // the @Before in the superclass should be called automatically before this...but isn't
         super.setUp();
 
         ClientRequest request = ClientRequest.create().build(createUri("/"), "GET");

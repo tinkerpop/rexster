@@ -88,7 +88,7 @@
             <graph-enabled>true</graph-enabled>
             <graph-name>neo4jsample</graph-name>
             <graph-type>neo4jgraph</graph-type>
-            <graph-location>/tmp/neo4j-graph</graph-location>
+            <graph-location>/tmp/rexster-integration-tests/neo4j-graph</graph-location>
             <properties>
                 <!-- Memory mapped I/O settings -->
                 <!-- For high traversal speed it is important to have the nodestore.db and relationshipstore.db files. -->
@@ -147,7 +147,7 @@
             <graph-enabled>false</graph-enabled>
             <graph-name>dexsample</graph-name>
             <graph-type>dexgraph</graph-type>
-            <graph-location>/tmp/graph.dex</graph-location>
+            <graph-location>/tmp/rexster-integration-tests/graph.dex</graph-location>
             <extensions>
                 <allows>
                     <allow>tp:gremlin</allow>
