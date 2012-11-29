@@ -40,7 +40,7 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         final MessagePack msgpack = new MessagePack();
         final Template<Map<String, Value>> mapTmpl = tMap(TString, TValue);
 
-        final List<Map<String, Value>> vertexResults = client.execute("g=rexster.getGraph(\"tinkergraph\");g.v(1)");
+        final List<Map<String, Value>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1)");
         Assert.assertEquals(1, vertexResults.size());
         final Map<String, Value> vertexResult = vertexResults.get(0);
         Assert.assertEquals("vertex", vertexResult.get("_type").asRawValue().getString());
