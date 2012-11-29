@@ -8,6 +8,7 @@ import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import org.apache.commons.configuration.Configuration;
+import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.GrizzlyFuture;
 import org.glassfish.grizzly.nio.NIOConnection;
@@ -45,6 +46,7 @@ import static org.msgpack.template.Templates.tMap;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RexsterClient {
+    private static final Logger logger = Logger.getLogger(RexsterClient.class);
 
     private final NIOConnection[] connections;
     private int currentConnection = 0;
@@ -87,21 +89,26 @@ public class RexsterClient {
         this.connections = new NIOConnection[this.hosts.length];
     }
 
-    public List<Map<String,Value>> execute(final String script) throws Exception {
+    public List<Map<String,Value>> execute(final String script) throws RexProException, IOException {
         return execute(script, tMap(TString, TValue));
     }
 
-    public <T> List<T> execute(final String script, final Template template) throws Exception {
+    public <T> List<T> execute(final String script, final Template template) throws RexProException, IOException {
         return execute(script, null, template);
     }
 
-    public <T> List<T> execute(final String script, final Map<String, Object> scriptArgs, final Template template) throws Exception {
+    public <T> List<T> execute(final String script, final Map<String, Object> scriptArgs,
+                               final Template template) throws RexProException, IOException {
         final ArrayBlockingQueue<Object> responseQueue = new ArrayBlockingQueue<Object>(1);
         final RexProMessage msgToSend = createNoSessionScriptRequest(script, scriptArgs);
         final UUID requestId = msgToSend.requestAsUUID();
         responses.put(requestId, responseQueue);
 
-        this.sendRequest(msgToSend);
+        try {
+            this.sendRequest(msgToSend);
+        } catch (Throwable t) {
+            throw new IOException(t);
+        }
 
         Object resultMessage;
         try {
@@ -138,9 +145,12 @@ public class RexsterClient {
 
             return results;
         } else if (resultMessage instanceof ErrorResponseMessage) {
-            throw new IOException(((ErrorResponseMessage) resultMessage).ErrorMessage);
+            logger.warn(String.format("Rexster returned an error response for [%s] with params [%s]",
+                    script, scriptArgs));
+            throw new RexProException(((ErrorResponseMessage) resultMessage).ErrorMessage);
         } else {
-            throw new IOException("RexsterClient doesn't support the message type returned.");
+            logger.error(String.format("Rexster returned a message of type [%s]", resultMessage.getClass().getName()));
+            throw new RexProException("RexsterClient doesn't support the message type returned.");
         }
     }
 
@@ -231,7 +241,7 @@ public class RexsterClient {
     }
 
     private ScriptRequestMessage createNoSessionScriptRequest(final String script,
-                                                              final Map<String, Object> scriptArguments) throws IOException{
+                                                              final Map<String, Object> scriptArguments) throws IOException {
         final Bindings bindings = new RexsterBindings();
         if (scriptArguments != null) {
             bindings.putAll(scriptArguments);
