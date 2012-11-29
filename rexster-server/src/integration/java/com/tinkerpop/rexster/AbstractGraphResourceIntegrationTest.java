@@ -72,42 +72,44 @@ public abstract class AbstractGraphResourceIntegrationTest extends AbstractResou
 
     @After
     public void tearDown() throws Exception {
-        for (GraphTestHolder testGraph : this.testGraphs) {
-            ClientResponse response = doGraphGet(testGraph, "vertices");
-            JSONObject verticesJson = response.getEntity(JSONObject.class);
-            JSONArray verticesToDelete = verticesJson.optJSONArray(Tokens.RESULTS);
-            for (int ix = 0; ix < verticesToDelete.length(); ix++) {
-                this.client.handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/vertices/" + encode(verticesToDelete.optJSONObject(ix).optString(Tokens._ID))), "DELETE"));
-            }
-
-            if (testGraph.getFeatures().supportsIndices) {
-                response = doGraphGet(testGraph, "indices");
-                JSONObject indicesJson = response.getEntity(JSONObject.class);
-                JSONArray indicesToDelete = indicesJson.optJSONArray(Tokens.RESULTS);
-                for (int ix = 0; ix < indicesToDelete.length(); ix++) {
-                    this.client.handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/indices/" + indicesToDelete.optJSONObject(ix).optString("name")), "DELETE"));
-                }
-            }
-
-            // todo: hack around titan inability to drop key indices
-            if (!testGraph.getGraphType().equals("com.thinkaurelius.titan.graphdb.database.StandardTitanGraph")) {
-                response = doGraphGet(testGraph, "keyindices/vertex");
-                JSONObject keyIndicesVertexJson = response.getEntity(JSONObject.class);
-                JSONArray keyIndicesVertexToDelete = keyIndicesVertexJson.optJSONArray(Tokens.RESULTS);
-                for (int ix = 0; ix < keyIndicesVertexToDelete.length(); ix++) {
-                    this.client.handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/keyindices/vertex/" + encode(keyIndicesVertexToDelete.optString(ix))), "DELETE"));
+        try {
+            for (GraphTestHolder testGraph : this.testGraphs) {
+                ClientResponse response = doGraphGet(testGraph, "vertices");
+                JSONObject verticesJson = response.getEntity(JSONObject.class);
+                JSONArray verticesToDelete = verticesJson.optJSONArray(Tokens.RESULTS);
+                for (int ix = 0; ix < verticesToDelete.length(); ix++) {
+                    this.client.handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/vertices/" + encode(verticesToDelete.optJSONObject(ix).optString(Tokens._ID))), "DELETE"));
                 }
 
-                response = doGraphGet(testGraph, "keyindices/edge");
-                JSONObject keyIndicesEdgeJson = response.getEntity(JSONObject.class);
-                JSONArray keyIndicesEdgeToDelete = keyIndicesEdgeJson.optJSONArray(Tokens.RESULTS);
-                for (int ix = 0; ix < keyIndicesEdgeToDelete.length(); ix++) {
-                    this.client.handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/keyindices/edge/" + keyIndicesEdgeToDelete.optString(ix)), "DELETE"));
+                if (testGraph.getFeatures().supportsIndices) {
+                    response = doGraphGet(testGraph, "indices");
+                    JSONObject indicesJson = response.getEntity(JSONObject.class);
+                    JSONArray indicesToDelete = indicesJson.optJSONArray(Tokens.RESULTS);
+                    for (int ix = 0; ix < indicesToDelete.length(); ix++) {
+                        this.client.handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/indices/" + indicesToDelete.optJSONObject(ix).optString("name")), "DELETE"));
+                    }
+                }
+
+                // todo: hack around titan inability to drop key indices
+                if (!testGraph.getGraphType().equals("com.thinkaurelius.titan.graphdb.database.StandardTitanGraph")) {
+                    response = doGraphGet(testGraph, "keyindices/vertex");
+                    JSONObject keyIndicesVertexJson = response.getEntity(JSONObject.class);
+                    JSONArray keyIndicesVertexToDelete = keyIndicesVertexJson.optJSONArray(Tokens.RESULTS);
+                    for (int ix = 0; ix < keyIndicesVertexToDelete.length(); ix++) {
+                        this.client.handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/keyindices/vertex/" + encode(keyIndicesVertexToDelete.optString(ix))), "DELETE"));
+                    }
+
+                    response = doGraphGet(testGraph, "keyindices/edge");
+                    JSONObject keyIndicesEdgeJson = response.getEntity(JSONObject.class);
+                    JSONArray keyIndicesEdgeToDelete = keyIndicesEdgeJson.optJSONArray(Tokens.RESULTS);
+                    for (int ix = 0; ix < keyIndicesEdgeToDelete.length(); ix++) {
+                        this.client.handle(ClientRequest.create().build(createUri("/" + testGraph.getGraphName() + "/keyindices/edge/" + keyIndicesEdgeToDelete.optString(ix)), "DELETE"));
+                    }
                 }
             }
+        } finally {
+            super.tearDown();
         }
-
-        super.tearDown();
     }
 
     protected void postVertex(GraphTestHolder graphHolder, Vertex v) throws JSONException {
