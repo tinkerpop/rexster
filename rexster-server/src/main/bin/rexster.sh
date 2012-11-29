@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CP=$( echo `dirname $0`/../lib/*.jar . | sed 's/ /:/g')
-CP=$CP:$(find `dirname $0`/../ext/ -name "*.jar" | tr '\n' ':')
+CP=$CP:$(find -L `dirname $0`/../ext/ -name "*.jar" | tr '\n' ':')
 #echo $CP
 
 PUBLIC=`dirname $0`/../public/
