@@ -36,6 +36,7 @@ public class EngineController {
     }};
 
     private static EngineController engineController;
+    private static String initializationScriptFile;
     private static int engineResetThreshold = RESET_NEVER;
 
     private EngineController() {
@@ -45,7 +46,8 @@ public class EngineController {
 
             // only add engine factories for those languages that are gremlin based.
             if (gremlinEngineNames.contains(factory.getLanguageName())) {
-                this.engines.put(factory.getLanguageName(), new EngineHolder(factory, engineResetThreshold));
+                this.engines.put(factory.getLanguageName(), new EngineHolder(
+                        factory, engineResetThreshold, initializationScriptFile));
             }
         }
     }
@@ -53,8 +55,9 @@ public class EngineController {
     /**
      * Must call this before a call to getInstance() if the reset count is to be taken into account.
      */
-    public static void configure(final int resetCount){
+    public static void configure(final int resetCount, final String initScriptFile){
         engineResetThreshold = resetCount;
+        initializationScriptFile = initScriptFile;
     }
 
     public static EngineController getInstance() {

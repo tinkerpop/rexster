@@ -44,7 +44,6 @@ public class GremlinExtension extends AbstractRexsterExtension {
 
     private static final Map<String, String> cachedScripts = new HashMap<String, String>();
 
-    private static final EngineController engineController = EngineController.getInstance();
     private static final String GRAPH_VARIABLE = "g";
     private static final String VERTEX_VARIABLE = "v";
     private static final String EDGE_VARIABLE = "e";
@@ -175,6 +174,10 @@ public class GremlinExtension extends AbstractRexsterExtension {
         ExtensionResponse extensionResponse;
 
         final JSONObject requestObject = rexsterResourceContext.getRequestObject();
+
+        // can't initialize this statically because the configure() method won't get called before it.
+        // need to think a bit on how to best initialized the controller.
+        final EngineController engineController = EngineController.getInstance();
 
         final boolean showTypes = RequestObjectHelper.getShowTypes(requestObject);
         final long offsetStart = RequestObjectHelper.getStartOffset(requestObject);
