@@ -56,10 +56,7 @@ public class RexsterClientFactory {
         final BaseConfiguration specificConfiguration = new BaseConfiguration();
         specificConfiguration.addProperty(RexsterClientTokens.CONFIG_HOSTNAME, host);
 
-        final CompositeConfiguration jointConfig = new CompositeConfiguration();
-        jointConfig.addConfiguration(specificConfiguration);
-        jointConfig.addConfiguration(defaultConfiguration);
-        return createClient(jointConfig);
+        return createClient(specificConfiguration);
     }
 
     public RexsterClient createClient(final String host, final int port) throws Exception {
@@ -67,17 +64,19 @@ public class RexsterClientFactory {
         specificConfiguration.addProperty(RexsterClientTokens.CONFIG_HOSTNAME, host);
         specificConfiguration.addProperty(RexsterClientTokens.CONFIG_PORT, port);
 
-        final CompositeConfiguration jointConfig = new CompositeConfiguration();
-        jointConfig.addConfiguration(specificConfiguration);
-        jointConfig.addConfiguration(defaultConfiguration);
-        return createClient(jointConfig);
+        return createClient(specificConfiguration);
     }
 
     public RexsterClient createClient(final Map<String,Object> configuration) throws Exception {
         return createClient(new MapConfiguration(configuration));
     }
 
-    public RexsterClient createClient(final Configuration configuration) throws Exception {
+    public RexsterClient createClient(final Configuration specificConfiguration) throws Exception {
+
+        final CompositeConfiguration jointConfig = new CompositeConfiguration();
+        jointConfig.addConfiguration(specificConfiguration);
+        jointConfig.addConfiguration(defaultConfiguration);
+
         final RexsterClientHandler handler = new RexsterClientHandler();
         final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
         filterChainBuilder.add(new TransportFilter());
@@ -89,10 +88,10 @@ public class RexsterClientFactory {
         transport.setProcessor(filterChainBuilder.build());
         transport.start();
 
-        final RexsterClient client = new RexsterClient(configuration, transport);
+        final RexsterClient client = new RexsterClient(jointConfig, transport);
         handler.setClient(client);
 
-        logger.info(String.format("Create RexsterClient instance: [%s]", ConfigurationUtils.toString(configuration)));
+        logger.info(String.format("Create RexsterClient instance: [%s]", ConfigurationUtils.toString(jointConfig)));
 
         return client;
     }
