@@ -1,6 +1,6 @@
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/dog-on-leash.png!
 
-The Rexster distribution comes with a "Grateful Dead dataset":https://github.com/tinkerpop/gremlin/wiki/Defining-a-More-Complex-Property-Graph. The raw data is located "here":https://github.com/tinkerpop/rexster/raw/master/rexster-server/data/graph-example-2.xml. This section will describe the basics of loading up the Rexster web server and accessing some basic services.
+The Rexster distribution comes configured with the "TinkerPop Toy Graph":https://github.com/tinkerpop/blueprints/wiki/Property-Graph-Model and the "Grateful Dead dataset":https://github.com/tinkerpop/gremlin/wiki/Defining-a-More-Complex-Property-Graph. This section will describe the basics of loading up the Rexster web server and accessing some basic services.
 
 h1. Building and Installing Rexster
 
@@ -29,8 +29,9 @@ Note that using the @rexster.bat@ requires backslashes instead of forwardslashes
 ```
 
 ```text
-[INFO] WebServer - .:Welcome to Rexster:.
-[INFO] WebServer - Using [/rexster/rexster-server/rexster.xml] as configuration source.
+[INFO] Application - .:Welcome to Rexster:.
+[WARN] RexsterSettings - Could not load configuration from [C:\git\tp\rexster\rexster-server\target\rexster-server-2.2.0-SNAPSHOT-standalone\rexster.xml]
+[INFO] RexsterSettings - Using [rexster.xml] resource as configuration source.
 [INFO] RexsterApplicationGraph - Graph [emptygraph] - configured with allowable namespace [tp:gremlin]
 [INFO] GraphConfigurationContainer - Graph emptygraph - mocktinkertransactionalgraph[vertices:0 edges:0] loaded
 [INFO] RexsterApplicationGraph - Graph [tinkergraph] - configured with allowable namespace [tp:gremlin]
@@ -45,9 +46,12 @@ Note that using the @rexster.bat@ requires backslashes instead of forwardslashes
 [INFO] GraphConfigurationContainer - Graph neo4jsample -  not enabled and not loaded.
 [INFO] GraphConfigurationContainer - Graph dexsample -  not enabled and not loaded.
 [INFO] GraphConfigurationContainer - Graph remotetinkergraph -  not enabled and not loaded.
-[INFO] WebServer - Rexster Server running on: [http://localhost:8182]
-[INFO] WebServer - Rexster configured with no security.
-[INFO] WebServer - RexPro serving on port: [8184]
+[INFO] Application - Gremlin ScriptEngine configured to reset every [500] requests. Set to -1 to never reset.
+[INFO] HttpRexsterServer - Using org.glassfish.grizzly.strategies.WorkerThreadIOStrategy IOStrategy for HTTP/REST.
+[INFO] HttpRexsterServer - Rexster Server running on: [http://localhost:8182]
+[INFO] RexProRexsterServer - Rexster configured with no security.
+[INFO] RexProRexsterServer - Using org.glassfish.grizzly.strategies.WorkerThreadIOStrategy IOStrategy for RexPro.
+[INFO] RexProRexsterServer - RexPro serving on port: [8184]
 [INFO] ShutdownManager$ShutdownSocketListener - Bound shutdown socket to /127.0.0.1:8183. Starting listener thread for shutdown requests.
 ```
 
@@ -74,7 +78,7 @@ The result of GETing this base-URI should look as follows (consider using the "J
 }
 ```
 
-To look at the properties of an individual graph and what [[Extensions]] it has associated with it, then append the names of one of the values from the "graphs" array above to the base-URI as in:
+To look at the properties of an individual graph, append the names of one of the values from the "graphs" array above to the base-URI as in:
 
 @http://localhost:8182/graphs/tinkergraph@
 
@@ -143,16 +147,15 @@ This will properly release resources and shutdown the server and exit.  The foll
 
 ```text
 [INFO] ShutdownManager$ShutdownSocketHandler - Received request for shutdown
-[INFO] ShutdownManager - Calling ShutdownListener: com.tinkerpop.rexster.WebServer$1@6437a04c
-INFO: Stopped listener bound to [0.0.0.0:8182]
-[INFO] RexsterApplicationImpl - Shutting down tinkergraph - mocktinkertransactionalgraph[vertices:6 edges:6 directory:data/graph-example-1]
-[INFO] RexsterApplicationImpl - Shutting down gratefulgraph - tinkergraph[vertices:809 edges:8049 directory:data/graph-example-2]
-[INFO] RexsterApplicationImpl - Shutting down tinkergraph-readonly - readonlyindexablegraph[tinkergraph[vertices:6 edges:6 directory:data/graph-example-1]]
-[INFO] RexsterApplicationImpl - Shutting down emptygraph - mocktinkertransactionalgraph[vertices:0 edges:0]
-[INFO] ShutdownManager - ShutdownListener com.tinkerpop.rexster.WebServer$1@6437a04c complete
+[INFO] ShutdownManager - Calling ShutdownListener: com.tinkerpop.rexster.Application$1@4a93837b
+[INFO] DefaultRexsterApplication - Shutting down [tinkergraph] - [mocktinkertransactionalgraph[vertices:6 edges:6 directory:data/graph-example-1]]
+[INFO] DefaultRexsterApplication - Shutting down [tinkergraph-readonly] - [readonlyindexablegraph[tinkergraph[vertices:6 edges:6 directory:data/graph-example-1]]]
+[INFO] DefaultRexsterApplication - Shutting down [gratefulgraph] - [tinkergraph[vertices:809 edges:8049 directory:data/graph-example-2]]
+[INFO] DefaultRexsterApplication - Shutting down [emptygraph] - [mocktinkertransactionalgraph[vertices:0 edges:0]]
+[INFO] ShutdownManager - ShutdownListener com.tinkerpop.rexster.Application$1@4a93837b complete
 [INFO] ShutdownManager - Calling ShutdownListener: ShutdownListener [bindHost=/127.0.0.1, port=8183]
+[INFO] ShutdownManager$ShutdownSocketListener - Caught SocketException on shutdownSocket, assuming close() was called: java.net.SocketException: socket closed
 [INFO] ShutdownManager - ShutdownListener ShutdownListener [bindHost=/127.0.0.1, port=8183] complete
 [INFO] ShutdownManager - Calling ShutdownListener: JVM Shutdown Hook Remover
-[INFO] ShutdownManager$ShutdownSocketListener - Caught SocketException on shutdownSocket, assuming close() was called: java.net.SocketException: socket closed
 [INFO] ShutdownManager - ShutdownListener JVM Shutdown Hook Remover complete
 ```

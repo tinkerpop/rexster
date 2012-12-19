@@ -1,17 +1,17 @@
 Rexster: A Graph Server
 "http://rexster.tinkerpop.com":http://rexster.tinkerpop.com
 
-h2. Rexster 0.y.z
+h2. Rexster 2.y.z
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-2.png!
 
-h3. Version 2.2.0 (NOT OFFICIALLY RELEASED YET)
+h3. Version 2.2.0 (December 19, 2012)
 
 ```xml
 <dependency>
   <groupId>com.tinkerpop.rexster</groupId>
   <artifactId>rexster</artifactId>
-  <version>2.2.0-SNAPSHOT</version>
+  <version>2.2.0</version>
 </dependency>
 ```
 
@@ -28,6 +28,8 @@ h3. Version 2.2.0 (NOT OFFICIALLY RELEASED YET)
 * Fixed Rexster Console where some @null@ results were not being rendered back to it.
 * Fixed Rexster Console issues where transactions were not executing properly as requests within a session were not being bound to specific threads.
 * Update the Dex configuration of @rexster.xml@ to accept an external configuration file.
+
+==<hr/>==
 
 h3. Version 2.1.0 (August 4, 2012)
 

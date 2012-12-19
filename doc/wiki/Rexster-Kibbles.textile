@@ -2,11 +2,11 @@
 
 Rexster Kibbles is a collection of general-purpose [[extensions|Extensions]] for "Rexster":http://rexster.tinkerpop.com. Each "kibble" is its own self-contained project in the repository. To install a kibble:
 
-# Download the kibble @jar@ (or build the project)
+# Download the Kibble @jar@ (or build the project)
 # Drop the @jar@ into the @ext/@ directory of Rexster
 # Start (or restart) the server.
 
-See also [[Deploying an Extension]] for information on configuration of rexster.xml
+See also [[Deploying an Extension]] for information on configuration of @rexster.xml@.
 
 h1. The Kibbles
 
@@ -16,4 +16,4 @@ h1. The Kibbles
 * "Batch Kibble":https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/batch-kibble - execute a series of operations in a batch/transaction.
 * more to come!
 
-Documentation on usage and configuration for individual kibbles can be found in each kibble's respective @README.textile@.
+Documentation on usage and configuration for individual Kibbles can be found in each Kibble's respective @README.textile@.

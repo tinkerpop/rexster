@@ -6,8 +6,8 @@ Extensions are identified by implementing the @RexsterExtension@ interface and a
 | @@ExtensionNaming@ | @namespace@, @name@ | class | defines the namespace and identifying extension name |
 | @@ExtensionDescriptor@ | @description@, @api@, @apiBehavior@ | method | meta-data exposed through REST |
 | @@ExtensionApi@ | @parameterName@, @description@ | @ExtensionDescriptor.api@ | defines the parameters of the extension |
-| @@ExtensionDefinition@ | @extensionPoint@, @path@, @tryIncludeRexsterAttributes@, @produces@ | method | defines how the extension is exposed in the REST API |
+| @@ExtensionDefinition@ | @extensionPoint@, @path@, @tryIncludeRexsterAttributes@, @produces@, @method@, @autoCommitTransaction@ | method | defines how the extension is exposed in the REST API |
 | @@RexsterContext@ | | parameter | Rexster will try to inject variables from its context into method parameters |
-| @@ExtensionRequestParameter@ | @name@, @description@ | parameter | Rexster will try to inject the value of the @name@ from the request parameters |
+| @@ExtensionRequestParameter@ | @name@, @description@, @defaultValue@, @parseToJson@ | parameter | Rexster will try to inject the value of the @name@ from the request parameters |
 
 

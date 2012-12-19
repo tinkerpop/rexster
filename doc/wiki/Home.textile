@@ -1,4 +1,4 @@
-[[https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-logo.png|height=149px]] <a href="https://github.com/tinkerpop/rexster/downloads">[[https://github.com/tinkerpop/blueprints/raw/master/doc/images/tinkerpop-download.png|align=right|float]]</a>
+[[https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-logo.png|height=149px]] <a href="https://github.com/tinkerpop/rexster/wiki/Downloads">[[https://github.com/tinkerpop/blueprints/raw/master/doc/images/tinkerpop-download.png|align=right|float]]</a>
 
 Rexster is a multi-faceted graph server that exposes any "Blueprints":http://blueprints.tinkerpop.com graph (e.g. "TinkerGraph":https://github.com/tinkerpop/blueprints/wiki/TinkerGraph, "Neo4j":http://neo4j.org, "OrientDB":http://www.orientechnologies.com/orient-db.htm, "DEX":http://www.sparsity-technologies.com/dex, "Titan":http://thinkaurelius.github.com/titan/, and "Sail RDF Stores":http://www.openrdf.org) through several mechanisms with a general focus on "REST":http://en.wikipedia.org/wiki/Representational_State_Transfer. This "HTTP":http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol "web service":http://en.wikipedia.org/wiki/Web_service provides standard low-level GET, POST, PUT, and DELETE methods, a flexible [[extensions]] model which allows plug-in like development for external services (such as adhoc graph queries through "Gremlin":http://gremlin.tinkerpop.com), server-side "stored procedures" written in Gremlin, and a browser-based interface called [[The Dog House]]. [[Rexster Console]] makes it possible to do remote script evaluation against configured graphs inside of a Rexster Server.[1]
 
@@ -23,6 +23,10 @@ http://localhost:8182/graphs/tinkergraph/vertices/1
 }
 ```
 
+Rexster JavaDoc: "2.2.0":http://tinkerpop.com/docs/javadocs/rexster/2.2.0/
+Older JavaDocs (2.x): "2.1.0":http://tinkerpop.com/docs/javadocs/rexster/2.1.0/ - "2.0.0":http://tinkerpop.com/docs/javadocs/rexster/2.0.0/
+For previous wikidocs, use the following URL schema: "http://tinkerpop.com/docs/wikidocs/rexster/${version}/Home.html":http://tinkerpop.com/docs/wikidocs/rexster/${version}/Home.html
+
 !https://secure.travis-ci.org/tinkerpop/rexster.png!:http://travis-ci.org/tinkerpop/rexster
 
 ==<hr/>==
@@ -31,6 +35,7 @@ http://localhost:8182/graphs/tinkergraph/vertices/1
   ** [[The Benefits of Rexster]]
   ** [[Getting Started]]
   ** [[Rexster Configuration]]
+    *** [[Specific Graph Configurations]]
   ** [[Command Line]]
   ** [[The Dog House]]
   ** [[Rexster Console]]
@@ -55,9 +60,9 @@ http://localhost:8182/graphs/tinkergraph/vertices/1
   ** TinkerPop Extensions
     *** [[Gremlin Extension]]
     *** [[Rexster Kibbles]]
-* Rexster Client - "Bulbflow Python Framework":http://bulbflow.com
-* Deployment
-  ** [[Wrapping as a Windows Service]]
+* Rexster Clients
+  ** "Bulbflow Python Framework":http://bulbflow.com
+  ** "rexster-ruby":http://github.com/mavenik/rexster-ruby
 * Conclusion
   ** [[Troubleshooting]]
   ** [[Acknowledgments]]
@@ -69,10 +74,10 @@ http://localhost:8182/graphs/tinkergraph/vertices/1
 <dependency>
    <groupId>com.tinkerpop.rexster</groupId>
    <artifactId>rexster-core</artifactId>
-   <version>2.0.0</version>
+   <version>2.2.0</version>
 </dependency>
 ```
 
 Non-Maven users can get the raw jars from Apache's "Central Repository":http://search.maven.org/#browse%7C1398694123.
 
-fn1. Rexster documentation is up to date with the current Rexster "codebase":http://github.com/tinkerpop/rexster/tree/master, not with the latest Rexster "release":http://github.com/tinkerpop/rexster/downloads.
+fn1. Rexster documentation is up to date with the current Rexster "codebase":http://github.com/tinkerpop/rexster/tree/master, not with the latest Rexster "release":https://github.com/tinkerpop/rexster/wiki/Downloads.

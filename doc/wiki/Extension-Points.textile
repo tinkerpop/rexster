@@ -49,6 +49,12 @@ Method DELETE is not allowed by Access-Control-Allow-Methods
 ```
 By implementing OPTIONS, the "pre-flight check":https://developer.mozilla.org/En/HTTP_access_control#Preflighted_requests made by some browsers will succeed and allow the advanced methods to be serviced.  The @ExtensionResponse@ helper class has a static method called @availableOptions@ to help construct the required [[response|Extension Response]].
 
+h1. Extensions and Transactions
+
+By default, Rexster will auto-commit a transaction with success if the extension method returns a non-error @ExtensionResponse@.  If the @ExtensionResponse@ is an error or the extension throws an untrapped exception it will auto-commit with failure.  
+
+To turn off this behavior, set the @autoCommitTransaction@ value on the @ExtensionDefinition@ to @false@.  When set to false, the extension method itself is responsible for committing transaction, though untrapped exceptions will still commit with failure.
+
 h1. Types of Extensions
 
 There are multiple types of extensions.  The type of extension is driven by a combination of the settings in the @ExtensionDefinition@.  

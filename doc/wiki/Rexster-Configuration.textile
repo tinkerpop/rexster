@@ -6,6 +6,12 @@ By default, Rexster will first try to read @rexster.xml@ from the root of the wo
 rexster.sh -s -c my-rexster.xml
 ```
 
+The source of many problems with starting Rexster can be traced to Rexster referencing the incorrect @rexster.xml file.  When Rexster starts, it outputs the path of the @rexster.xml@ file that it is using:
+
+```text
+[INFO] RexsterSettings - Using [/home/rexster/rexster.xml] resource as configuration source.
+```
+
 h1. XML Configuration
 
 The XML configuration file has a basic structure as follows:
@@ -13,17 +19,49 @@ The XML configuration file has a basic structure as follows:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <rexster>
-  <rexster-server-port>8182</rexster-server-port>
-  <rexster-server-host>0.0.0.0</rexster-server-host>
-  <rexster-shutdown-port>8183</rexster-shutdown-port>
-  <rexster-shutdown-host>127.0.0.1</rexster-shutdown-host>
-  <rexpro-server-port>8184</rexpro-server-port>
-  <rexpro-server-host>0.0.0.0</rexpro-server-host>
-  <rexpro-session-max-idle>1790000</rexpro-session-max-idle>
-  <rexpro-session-check-interval>3000000</rexpro-session-check-interval>
-  <base-uri>http://localhost</base-uri>
-  <web-root>public</web-root>
-  <character-set>UTF-8</character-set>
+  <http>
+    <server-port>8182</server-port>
+    <server-host>0.0.0.0</server-host>
+    <base-uri>http://localhost</base-uri>
+    <web-root>public</web-root>
+    <character-set>UTF-8</character-set>
+    <enable-jmx>false</enable-jmx>
+    <max-post-size>2097152</max-post-size>
+    <max-header-size>8192</max-header-size>
+    <upload-timeout-millis>30000</upload-timeout-millis>
+    <thread-pool>
+      <worker>
+        <core-size>8</core-size>
+        <max-size>8</max-size>
+      </worker>
+      <kernal>
+        <core-size>4</core-size>
+        <max-size>4</max-size>
+      </kernal>
+    </thread-pool>
+    <io-strategy>worker</io-strategy>
+  </http>
+  <rexpro>
+    <server-port>8184</server-port>
+    <server-host>0.0.0.0</server-host>
+    <session-max-idle>1790000</session-max-idle>
+    <session-check-interval>3000000</session-check-interval>
+    <enable-jmx>false</enable-jmx>
+    <thread-pool>
+      <worker>
+          <core-size>8</core-size>
+        <max-size>8</max-size>
+      </worker>
+      <kernal>
+        <core-size>4</core-size>
+        <max-size>4</max-size>
+      </kernal>
+    </thread-pool>
+    <io-strategy>worker</io-strategy>
+  </rexpro>
+  <shutdown-port>8183</shutdown-port>
+  <shutdown-host>127.0.0.1</shutdown-host>
+  <script-engine-reset-threshold>500</script-engine-reset-threshold>
   <security>
     <authentication>
         <type>default</type>
@@ -54,13 +92,48 @@ The XML configuration file has a basic structure as follows:
 </rexster>
 ```
 
-The @<rexster-server-port>@ and @<rexster-server-host>@ allows configuration of the port and host on which Rexster will serve.  The @<rexster-shutdown-port>@ and @<rexster-shutdown-host>@ allows configuration of the port and host on which Rexster will accept shutdown requests.  The @<rexpro-server-port>@ and @<rexpro-server-host>@ represents the port and host on which the [[Rexster Console]] communicates to the Rexster server.  This port utilizes RexPro, short for Rexster Protocol, which is a binary protocol.  
+h2. http Section
 
-The @<rexpro-session-max-idle>@ specifies the number of milliseconds that a RexPro session can stay idle before the session is destroyed.  If this value is not specified, the default value of thirty minutes is used.  The <rexpro-session-check-interval> specifies the number of milliseconds between session idle checks.  If this value is not specified, the default value of 50 minutes is used.  In both cases, neither value can be set to anything less than one second.
+The @<http>@ section of @rexster.xml@ controls REST API and Dog House configurations.  The @<server-port>@ and @<server-host>@ allows configuration of the port and host on which Rexster will serve.  
 
 The @<base-uri>@ defines the prefix for the URI that the Dog House will use for connecting to Rexster services.  If this value is not specified, it will default to @http://localhost@.  If this value is pointed at @http://localhost@, it is important to note that the Dog House will not be accessible from browsers other than the one on the local machine.  To allow browsers on remote machines to connect, consider using the IP address of the machine that Rexster is installed upon. Furthermore, in standalone mode, Rexster assumes that both servers are being served through the same base URI in the same instance of Grizzly on different ports. 
 
 The @<web-root>@ allows specification of the directory where the root of administration web site web site exists.  The @<character-set>@ configures the character set the request/response from Rexster REST services will support.  If it is not specified then the Rexster will revert to ISO-8859-1.  Rexster will also respect the @Accept-Charset@ request header and revert back to the value of @<character-set>@ if the header is not specified.
+
+The @<max-post-size>@ controls the maximum size in bytes of the data being sent in POST operations to the REST API.  The default value is about 2M.
+
+The @<max-header-size@ is the maximum size in bytes of the request header that Rexster will accept.  The default value is 8K.
+
+The @<upload-timeout-millis@ is the number of milliseconds the REST API will accept an upload for.  The default value is thirty seconds.
+
+h2. rexpro Section
+
+The @<server-port>@ and @<server-host>@ represents the port and host on which the [[Rexster Console]] communicates to the Rexster server.  This port utilizes RexPro, short for Rexster Protocol, which is a binary protocol.  
+
+The @<session-max-idle>@ specifies the number of milliseconds that a RexPro session can stay idle before the session is destroyed.  If this value is not specified, the default value of thirty minutes is used.  The @<session-check-interval>@ specifies the number of milliseconds between session idle checks.  If this value is not specified, the default value of 50 minutes is used.  In both cases, neither value can be set to anything less than one second.
+
+h2. Common Sections
+
+Some elements are common to both the @<http>@ and @<rexpro>@ sections of @rexster.xml@.
+
+The @<thread-pool>@ element has multiple sub-sections beneath it and allow configuration of the number of available threads in the Grizzly thread pool.  The settings are defaulted to the initial values provided by Grizzly.  The available settings and the meanings of those settings for the @<worker>@ pool and the @<kernal>@ pool are identical. In both cases, the @<core-size>@ represents the initial number of threads that will be present with the specified thread pool is created and the @<max-size>@ represents the maximum number threads that may be maintained by the specified thread pool.
+
+The @<io-strategy>@ element offers way to configure the Grizzly threading operations.  This value can be set to one of the following values:
+
+* worker
+* same
+* dynamic
+* leader-follower
+
+Generally speaking, the @worker@ strategy and the related default settings are best applicable to most usage scenarios.  Please see the "Grizzly User Guide":http://grizzly.java.net/nonav/docs/docbkx2.2/html/grizzly-docs.html) for more information on these settings.
+
+The @<enable-jmx>@ element can be set to @true@ or @false@ (with the default being @false@).  When set to @true@, Rexster will expose underlying Grizzly "JMX":http://en.wikipedia.org/wiki/Java_Management_Extensions MBeans in the @com.sun.grizzly@ root.
+
+h2. Other Elements
+
+The @<rexster-shutdown-port>@ and @<rexster-shutdown-host>@ allows configuration of the port and host on which Rexster will accept shutdown requests.  
+
+The @<script-engine-reset-threshold>@ defines how often the Gremlin ScriptEngine should be reset.  This configuration is important when processing large numbers of ad-hoc Gremlin scripts via the Gremlin Extension.  An ad-hoc script is one that is not parameterized with script variables.  Such scripts can lead to an @OutOfMemoryException@ triggered by a bug in the Groovy script engine implementation itself (outside of the control of TinkerPop).  By resetting the script engine after the configured number of requests, this problem can be bypassed.  A good value to set this threshold is generally between 500 and 1000 depending on the memory that Rexster has available to it.  The reset does not come without a performance penalty, so it is therefore recommended to use parameterized scripts whenever possible and to turn off the reset function by setting this value to "-1".
 
 [[Rexster Security]] is managed through the @<security>@ element. By default it is configured to be set to @none@ as in:
 
@@ -92,7 +165,9 @@ When configured in this fashion, Rexster accepts all incoming requests.  The oth
 
 The @<users>@ element allows specification of one or more @<user>@ child elements which each must contain a @<username>@ and @<password>@ combination.  These @<user>@ elements represent the list of users that will have access to Rexster.  
 
-The @<graphs>@ element will contain any number of @<graph>@ configurations.  Each @<graph>@ element will equate to one graph being configured within Rexster.  The exact contents of the @<graph>@ element is dependent upon the type of graph implementation ("OrientDB":http://www.orientechnologies.com/, "neo4j":http://neo4j.org/, etc.) utilized.  However, some key general rules exist for all graph configurations
+h2. graphs Section 
+
+The @<graphs>@ element will contain any number of @<graph>@ configurations.  Each @<graph>@ element will equate to one graph being configured within Rexster.  The exact contents of the @<graph>@ element is dependent upon the type of graph implementation ("OrientDB":http://www.orientechnologies.com/, "neo4j":http://neo4j.org/, etc.) utilized (see [[Specific Graph Configurations]]).  However, some key general rules exist for all graph configurations
 
 * The @<graph-name>@ element must be unique within the list of configured graphs.  
 * The @<graph-enabled>@ element may be applied to any @<graph>@.  Setting its contents to "false" will prevent that graph from loading to Rexster.  If the element is not present at all (or set explicitly to true) the graph will be loaded.
@@ -104,246 +179,3 @@ The @<graphs>@ element will contain any number of @<graph>@ configurations.  Eac
 *** The @<namespace>@ element defines the namespace of the extension to be configured.
 *** The @<name>@ element defines the name of the extension to be configured.
 *** The <@configuration>@ contains Extension specific configuration options (refer to the specific Extension for what the contents of this element should be.
-
-h1. TinkerPop Configurations
-
-The following sections define the common settings for each available graph type supported by TinkerPop.
-
-h2. TinkerGraph
-
-A "TinkerGraph":https://github.com/tinkerpop/blueprints/wiki/tinkergraph would be configured as follows:
-
-```xml
-<graph>
-  <graph-name>gratefulgraph</graph-name>
-  <graph-type>tinkergraph</graph-type>
-  <graph-location>data/graph-example-2</graph-location>
-  <graph-mock-tx>true</graph-mock-tx>
-  <extensions>...</extensions>
-</graph>
-```
-
-The @<graph-type>@ could also be explicitly specified as:
-
-```text
-<graph-type>com.tinkerpop.rexster.config.TinkerGraphGraphConfiguration</graph-type>
-```
-
-The @<graph-location>@ element contains the location of the TinkerGraph.  If this value is not specified, then the TinkerGraph will behave as an in-memory graph only.  The @</graph-mock-tx>@ element allows the TinkerGraph to behave as a "mock":https://github.com/tinkerpop/rexster/blob/master/src/main/java/com/tinkerpop/rexster/util/MockTinkerTransactionalGraph.java @TransactionalGraph@.  This implementation is *NOT* actually transactional.  It is for testing purposes only.
-
-h2. Neo4j
-
-A "Neo4j":http://neo4j.org/ graph would be configured as follows:
-
-```xml
-<graph>
-  <graph-name>neo4jsample</graph-name>
-  <graph-type>neo4jgraph</graph-type>
-  <graph-location>/tmp/rexster-graph</graph-location>
-  <extensions>...</extensions>
-  <properties>
-    <!-- Memory mapped I/O settings -->
-    <!-- For high traversal speed it is important to have the nodestore.db and relationshipstore.db files. -->
-    <neostore.nodestore.db.mapped_memory>285M</neostore.nodestore.db.mapped_memory>
-    <neostore.relationshipstore.db.mapped_memory>285M</neostore.relationshipstore.db.mapped_memory>
-    <neostore.propertystore.db.mapped_memory>100M</neostore.propertystore.db.mapped_memory>
-    <neostore.propertystore.db.strings.mapped_memory>100M</neostore.propertystore.db.strings.mapped_memory>
-    <neostore.propertystore.db.arrays.mapped_memory>10M</neostore.propertystore.db.arrays.mapped_memory>
-    <neostore.propertystore.db.index.mapped_memory>10M</neostore.propertystore.db.index.mapped_memory>
-    <neostore.propertystore.db.index.keys.mapped_memory>10M</neostore.propertystore.db.index.keys.mapped_memory>
-    ...
-    </properties>
-</graph>
-```
-
-The @<graph-type>@ could also be explicitly specified as:
-
-```text
-<graph-type>com.tinkerpop.rexster.config.Neo4jGraphConfiguration</graph-type>
-```
-
-The @<properties>@ element contains neo4j specific configuration values.  Any entries placed here will be converted to name/value pairs to be passed into neo4j for its configuration.  Set any properties here as would have been done in a neo4j.properties file.
-
-h3. Neo4j High Availability Cluster
-
-The configuration for "Neo4j HA":http://docs.neo4j.org/chunked/stable/ha.html is quite similar to setting up a standard Neo4j configuration within Rexster.  Once a cluster is established, there are just two exceptions to consider when doing the Rexster-side configuration.
-
-First, in the @<graph>@ element include the @<graph-high-availability>@ element to tell Rexster to use HA connectivity as follows:
-
-```xml
-<graph>
-  <graph-name>neo4jsample</graph-name>
-  <graph-type>neo4jgraph</graph-type>
-  <graph-location>/tmp/rexster-graph</graph-location>
-  <graph-high-availability>true</graph-high-availability>
-  ...
-</graph>
-```
-
-If this element is not present, Rexster assumes this value to be false.
-
-Second, include the Neo4j HA settings in the @<properties>@ section:
-
-```xml
-<graph>
-  ...
-  <properties>
-    <neostore.nodestore.db.mapped_memory>285M</neostore.nodestore.db.mapped_memory>
-    <neostore.relationshipstore.db.mapped_memory>285M</neostore.relationshipstore.db.mapped_memory>
-    <neostore.propertystore.db.mapped_memory>100M</neostore.propertystore.db.mapped_memory>
-    ...
-    <ha.machine_id>1</ha.machine_id>
-    <ha.server>localhost:6001</ha.server>
-    <ha.zoo_keeper_servers>localhost:2181,localhost:2182,localhost:2183</ha.zoo_keeper_servers>
-  </properties>
-</graph>
-```
-
-You may need to provide the following dependencies to Rexster in the classpath:
-
-```xml
-<dependency>
-  <groupId>org.neo4j</groupId>
-  <artifactId>neo4j-ha</artifactId>
-  <version>1.3</version>
-</dependency>
-<dependency>
-  <groupId>org.neo4j</groupId>
-  <artifactId>neo4j-management</artifactId>
-  <version>1.3</version>
-</dependency>
-```
-
-h2. Sail
-
-There are several "Sail":http://www.openrdf.org/doc/sesame2/2.3.0/users/ch08.html configurations available: Memory Store, Native Store and SPARQL Repository.
-
-h3. Memory Store
-
-```xml
-<graph>
-  <graph-name>sailsample</graph-name>
-  <graph-type>memorystoresailgraph</graph-type>
-  <extensions>...</extensions>
-</graph>
-```
-
-The @<graph-type>@ could also be explicitly specified as:
-
-```text
-<graph-type>com.tinkerpop.rexster.config.MemoryStoreSailGraphConfiguration</graph-type>
-```
-
-h3. Native Store Sail Graph
-
-```xml
-<graph>
-  <graph-name>sailsample</graph-name>
-  <graph-type>nativestoresailgraph</graph-type>
-  <graph-location>tmp/data/sail</graph-location>
-  <extensions>...</extensions>
-</graph>
-```
-
-The @<graph-type>@ could also be explicitly specified as:
-
-```text
-<graph-type>com.tinkerpop.rexster.config.NativeStoreSailGraphConfiguration</graph-type>
-```
-
-The @<graph-location>@ element is location of the directory containing the Sail data which will be loaded to Rexster .  This value is a required element of configuration.
-
-h3. SPARQL Repository Sail Graph
-
-```xml
-<graph>
-  <graph-name>sailsample</graph-name>
-  <graph-type>sparqlrepositorysailgraph</graph-type>
-  <graph-location>http://dbpedia.org/sparql</graph-location>
-  <extensions>...</extensions>
-</graph>
-```
-
-The @<graph-type>@ could also be explicitly specified as:
-
-```text
-<graph-type>com.tinkerpop.rexster.config.SparqlRepositorySailGraphConfiguration</graph-type>
-```
-
-The @<graph-location>@ element is URI to the SPARQL repository which will be loaded to Rexster .  This value is a required element of configuration.
-
-h2. OrientDB
-
-An "OrientDB":http://www.orientechnologies.com/ graph would be configured as follows:
-
-```xml
-<graph>
-  <graph-name>orientdbsample</graph-name>
-  <graph-type>orientgraph</graph-type>
-  <graph-location>local:C:/data/graph/graph</graph-location>
-  <extensions>...</extensions>
-  <properties>
-    <username>admin</username>
-    <password>admin</password>
-  </properties>
-</graph>
-```
-
-The @<graph-type>@ could also be explicitly specified as:
-
-```text
-<graph-type>com.tinkerpop.rexster.config.OrientGraphConfiguration</graph-type>
-```
-
-The @<graph-location>@ element is the URI to the OrientDB database Rexster is expected to connect to.  The @<properties>@ element requires two elements @<username>@ and @<password>@ to access the OrientDB graph instance.  
-
-TinkerPop does not officially support remote connections.
-
-h2. DEX
-
-A "DEX":http://www.sparsity-technologies.com/dex graph would be configured as follows:
-
-```xml
-<graph>
-  <graph-name>dexsample</graph-name>
-  <graph-type>dexgraph</graph-type>
-  <graph-location>/tmp/graph.dex</graph-location>
-  <extensions>...</extensions>
-</graph>
-```
-
-The @<graph-type>@ could also be explicitly specified as:
-
-```text
-<graph-type>com.tinkerpop.rexster.config.DexGraphConfiguration</graph-type>
-```
-
-The @<graph-location>@ element contains the path to the DEX file name.
-
-h2. RexsterGraph
-
-A "RexsterGraph":https://github.com/tinkerpop/blueprints/wiki/Rexster-Implementation graph would be configured as follows:
-
-```xml
-<graph>
-  <graph-name>remotetinkergraph</graph-name>
-  <graph-type>rexstergraph</graph-type>
-  <graph-buffer-size>100</graph-buffer-size>
-  <graph-location>http://remoterexsterserver:8182/tinkergraph</graph-location>
-  <extensions>...</extensions>
-</graph>
-```
-
-The @<graph-type>@ could also be explicitly specified as:
-
-```text
-<graph-type>com.tinkerpop.rexster.config.RexsterGraphGraphConfiguration</graph-type>
-```
-
-The @<graph-location>@ element contains the URI to the specific graph hosted within the remote Rexster instance.
-
-The @<graph-buffer-size>@ element defines the buffer size property for the @RexsterGraph@.
-
-h1. External Configurations
-
-In addition to graph configurations managed by TinkerPop, Rexster can also be configured for other Blueprints graph configurations such as [[Titan|https://github.com/thinkaurelius/titan/wiki/Rexster-Graph-Server]]

@@ -66,7 +66,7 @@ As the screenshot above shows, there are three configured extensions:
 * @tp:batch-vertices@ - the "Batch Kibble":https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/batch-kibble for vertices.
 * @tp:batch-edges@ - the "Batch Kibble":https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/batch-kibble for edges.
 
-It is important to note that the extensions listed are sensitive to what is currently being browsed in Dog House.  In other words, if a graph in selected then extensions configured to the graph [[extension point|Extension Points]] are shown and if viewing a vertex or edge within a graph then extensions configured to the vertex or edge extension points are shown.  Extensions shown in Dog House are further limited to @GET@ operations that return JSON.  For example, if an extension only executes via @POST@ it will not be displayed.
+It is important to note that the extensions listed are sensitive to what is currently being browsed in Dog House.  In other words, if a graph is selected then extensions configured to the graph [[extension point|Extension Points]] are shown and if viewing a vertex or edge within a graph then extensions configured to the vertex or edge extension points are shown.  Extensions shown in Dog House are further limited to @GET@ operations that return JSON.  For example, if an extension only executes via @POST@ it will not be displayed.
 
 Selecting an extension will expand the accordion and display the URI to the extension and the expected parameters as extracted from the [[extension API|Extension Documentation]].  Tooltips on the textboxes for parameters show descriptions from the API.
 
@@ -98,4 +98,6 @@ gremlin> for(int i=0; i<10; i++) { println i; }
 
 h1. Limitations
 
-The Dog House works best with "Google Chrome":http://www.google.com/chrome/ 19.x or better, but has been shown to work well with "Firefox":http://www.mozilla.com/ 13.x.  
+* The Dog House works best with "Google Chrome":http://www.google.com/chrome/ 19.x or better, but has been shown to work well with "Firefox":http://www.mozilla.com/ 13.x. 
+* Not all Blueprints graph implementations support all the features that Dog House needs to operate.  Therefore, some features of Dog House may not be available depending upon the graph implementation being accessed.
+ 

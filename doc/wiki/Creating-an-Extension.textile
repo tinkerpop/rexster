@@ -36,10 +36,10 @@ h2. A Simple Ping Extension
 
 ```java
 @ExtensionNaming(namespace = "ex", name = "ping")
-@ExtensionDescriptor(description = "Ping me.")
 public class PingExtension extends AbstractRexsterExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
+    @ExtensionDescriptor(description = "Ping me.")
     public ExtensionResponse evaluatePing(@RexsterContext RexsterResourceContext context,
                                           @RexsterContext Graph graph) {
         Map<String, String> map = new HashMap<String, String>();
@@ -71,7 +71,6 @@ h2. Automatic Parameter Parsing and Self-Documenting Extensions
 
 ```java
 @ExtensionNaming(namespace = "ex", name = "ping")
-@ExtensionDescriptor(description = "Ping me")
 public class PingExtension extends AbstractRexsterExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)

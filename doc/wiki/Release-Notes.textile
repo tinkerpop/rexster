@@ -1,9 +1,35 @@
 Rexster: A Graph Server
 "http://rexster.tinkerpop.com":http://rexster.tinkerpop.com
 
-h2. Rexster 0.y.z
+h2. Rexster 2.y.z
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-2.png!
+
+h3. Version 2.2.0 (December 19, 2012)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop.rexster</groupId>
+  <artifactId>rexster</artifactId>
+  <version>2.2.0</version>
+</dependency>
+```
+
+* Major refactoring and renaming of core "server" classes.
+* @ExtensionRequestParameter@ now supports a @defaultValue@.
+* Requests with @OPTIONS@ now returns @OPTIONS@ in the @Access-Control-Allow-Methods@ and a response 200 instead of 204.
+* Upgrade to Grizzly 2.2.18 and Jersey 1.14.
+* Include new configuration options in @rexster.xml@
+** @enable-jmx@ element turns on or turns off JMX monitoring.
+** @thread-pool@ section gives control over how many threads are allocated to Rexster.
+** @max-post-size@ element controls the size of the data that can be POSTed to Rexster.
+** @max-header-size@ element controls the size of the request header that can be sent to Rexster.
+** @upload-timeout-millis@ element represents the length of the time in milliseconds that Rexster will wait for an upload to occur.
+* Fixed Rexster Console where some @null@ results were not being rendered back to it.
+* Fixed Rexster Console issues where transactions were not executing properly as requests within a session were not being bound to specific threads.
+* Update the Dex configuration of @rexster.xml@ to accept an external configuration file.
+
+==<hr/>==
 
 h3. Version 2.1.0 (August 4, 2012)
 

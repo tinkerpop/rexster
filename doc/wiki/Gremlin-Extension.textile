@@ -277,7 +277,7 @@ To use the [[Rexster type system|Property Data Types]] for parameters to be plac
 
 h2. Load Parameter
 
-It is possible to execute "stored procedures" by utilizing the @load@ parameter.  The load parameter accepts an array of Gremlin script file names that must exist in the configured @scripts@ directory of @rexster.xml@ (as part of the Gremlin configuration described above).  Those script files are executed in order prior to the execution of the Gremlin script passed on the @script@ argument.  In the event that no @script@ parameter is supplied the return value of the Gremlin Extension ends up being the output of the final script passed to @load@ parameter.
+It is possible to execute "stored procedures" by utilizing the @load@ parameter.  The load parameter accepts an array of Gremlin script file names that must exist in the configured @scripts@ directory of @rexster.xml@ (as part of the Gremlin configuration described above).  Those script files are executed in order prior to the execution of the Gremlin script passed on the @script@ argument.  In the event that no @script@ parameter is supplied or if @<allow-client-script>@ is set to false, the return value of the Gremlin Extension ends up being the output of the final script passed to @load@ parameter.
 
 The benefit of storing these scripts on the server is that globally reusable functions and algorithms can be centralized and protected on the server.  In doing this, it makes it possible to keep heavy logic on the server (which may amount to many lines of Gremlin) and simply reference those functions from the @script@ argument.  
 
