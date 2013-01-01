@@ -23,4 +23,10 @@ public class MockTinkerTransactionalGraph extends TinkerGraph implements Transac
     public void stopTransaction(final Conclusion conclusion) {
 
     }
+
+    public void commit() {
+    }
+
+    public void rollback() {
+    }
 }
