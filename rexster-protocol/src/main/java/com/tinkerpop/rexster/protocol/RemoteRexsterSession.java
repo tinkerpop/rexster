@@ -4,6 +4,7 @@ import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,6 +17,7 @@ import java.util.UUID;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RemoteRexsterSession {
+    private static final Logger logger = Logger.getLogger(RemoteRexsterSession.class);
 
     private int rexProPort = 8184;
     private int timeout;
@@ -23,6 +25,8 @@ public class RemoteRexsterSession {
     private String username = "";
     private String password = "";
     private byte channel;
+
+    private final RexPro rexProConnection;
 
     private UUID sessionKey = RexProMessage.EMPTY_SESSION;
 
@@ -43,6 +47,7 @@ public class RemoteRexsterSession {
         this.username = username;
         this.password = password;
         this.channel = channel;
+        this.rexProConnection = new RexPro(rexProHost, rexProPort);
     }
 
     public void open() {
@@ -59,7 +64,7 @@ public class RemoteRexsterSession {
 
             if (rcvMessage != null && rcvMessage instanceof SessionResponseMessage) {
                 final SessionResponseMessage sessionResponseMessage = (SessionResponseMessage) rcvMessage;
-                this.availableLanguages = new ArrayList();
+                this.availableLanguages = new ArrayList<String>();
                 for (String lang : sessionResponseMessage.Languages) {
                     this.availableLanguages.add(lang);
                 }
@@ -113,14 +118,15 @@ public class RemoteRexsterSession {
             tries++;
 
             try {
-                rcvMessage = RexPro.sendMessage(this.rexProHost, this.rexProPort, request);
+                rcvMessage = rexProConnection.sendMessage(request);
             } catch (Exception ex) {
-
                 String logMessage = "Failure sending message via RexPro. Attempt [" + tries + "] of [" + maxRetries + "].";
 
                 if (tries < maxRetries) {
                     logMessage = logMessage + " Trying again in " + waitMsBetweenTries + " (ms)";
                 }
+
+                logger.error(logMessage);
 
                 rcvMessage = null;
 
@@ -157,6 +163,8 @@ public class RemoteRexsterSession {
                 if (rcvMessage instanceof SessionResponseMessage) {
                     this.sessionKey = rcvMessage.sessionAsUUID();
                 }
+
+                rexProConnection.close();
             }
         } catch (Exception ex) {
             // likely fail is a null pointer on the session

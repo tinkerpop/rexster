@@ -280,7 +280,7 @@ public class RexsterConsole {
         ResultAndBindings returnValue = null;
 
         try {
-            session.open();
+            assert session.isOpen();
 
             // the session field gets set by the RemoteRexsterSession class automatically
             final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
@@ -302,7 +302,7 @@ public class RexsterConsole {
                     lines = responseMessage.consoleLinesAsList();
                 } else if (resultMessage instanceof ErrorResponseMessage) {
                     final ErrorResponseMessage errorMessage = (ErrorResponseMessage) resultMessage;
-                    lines = new ArrayList() {{
+                    lines = new ArrayList<String>() {{
                         add(errorMessage.ErrorMessage);
                     }};
                 }
