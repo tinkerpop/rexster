@@ -326,6 +326,12 @@ public class EdgeResource extends AbstractSubResource {
 
                 if (methodToCall == null) {
                     // extension method was not found for some reason
+                    if (httpMethodRequested == HttpMethod.OPTIONS) {
+                        // intercept the options call and return the standard business
+                        // no need to stop the transaction here
+                        return buildOptionsResponse();
+                    }
+
                     logger.error("The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "] with a HTTP method of [" + httpMethodRequested.name() + "].  Check com.tinkerpop.rexster.extension.RexsterExtension file in META-INF.services.");
                     final JSONObject error = generateErrorObject(
                             "The [" + extensionSegmentSet + "] extension was not found for [" + graphName + "] with a HTTP method of [" + httpMethodRequested.name() + "]");
