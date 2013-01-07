@@ -11,7 +11,6 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterExtension;
-import com.tinkerpop.rexster.server.*;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -251,11 +250,11 @@ public class GraphResource extends AbstractSubResource {
 
                 // found the method...time to do work
                 returnValue = invokeExtension(rag, methodToCall);
-                rag.tryStopTransactionSuccess();
+                rag.tryCommit();
 
             } catch (WebApplicationException wae) {
                 // already logged this...just throw it  up.
-                rag.tryStopTransactionFailure();
+                rag.tryRollback();
                 throw wae;
             } catch (Exception ex) {
                 logger.error("Dynamic invocation of the [" + extensionSegmentSet + "] extension failed.", ex);
@@ -265,7 +264,7 @@ public class GraphResource extends AbstractSubResource {
                     logger.error("It would be smart to trap this this exception within the extension and supply a good response to the user:" + cause.getMessage(), cause);
                 }
 
-                rag.tryStopTransactionFailure();
+                rag.tryRollback();
 
                 final JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
@@ -279,14 +278,14 @@ public class GraphResource extends AbstractSubResource {
                     logger.warn("The [" + extensionSegmentSet + "] extension raised an error response.");
 
                     if (methodToCall.getExtensionDefinition().autoCommitTransaction()) {
-                        rag.tryStopTransactionFailure();
+                        rag.tryRollback();
                     }
 
                     throw new WebApplicationException(Response.fromResponse(extResponse.getJerseyResponse()).build());
                 }
 
                 if (methodToCall.getExtensionDefinition().autoCommitTransaction()) {
-                    rag.tryStopTransactionSuccess();
+                    rag.tryCommit();
                 }
             } else {
                 // extension method is not returning the correct type...needs to be an ExtensionResponse

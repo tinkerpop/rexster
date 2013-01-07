@@ -352,7 +352,7 @@ public class VertexResource extends AbstractSubResource {
 
             } catch (WebApplicationException wae) {
                 // already logged this...just throw it  up.
-                rag.tryStopTransactionFailure();
+                rag.tryRollback();
                 throw wae;
             } catch (Exception ex) {
                 logger.error("Dynamic invocation of the [" + extensionSegmentSet + "] extension failed.", ex);
@@ -362,7 +362,7 @@ public class VertexResource extends AbstractSubResource {
                     logger.error("It would be smart to trap this this exception within the extension and supply a good response to the user:" + cause.getMessage(), cause);
                 }
 
-                rag.tryStopTransactionFailure();
+                rag.tryRollback();
 
                 final JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
@@ -376,14 +376,14 @@ public class VertexResource extends AbstractSubResource {
                     logger.warn("The [" + extensionSegmentSet + "] extension raised an error response.");
 
                     if (methodToCall.getExtensionDefinition().autoCommitTransaction()) {
-                        rag.tryStopTransactionFailure();
+                        rag.tryRollback();
                     }
 
                     throw new WebApplicationException(Response.fromResponse(extResponse.getJerseyResponse()).build());
                 }
 
                 if (methodToCall.getExtensionDefinition().autoCommitTransaction()) {
-                    rag.tryStopTransactionSuccess();
+                    rag.tryCommit();
                 }
 
             } else {
@@ -392,7 +392,7 @@ public class VertexResource extends AbstractSubResource {
                 final JSONObject error = generateErrorObject(
                         "The [" + extensionSegmentSet + "] extension does not return an ExtensionResponse.");
 
-                rag.tryStopTransactionFailure();
+                rag.tryRollback();
 
                 throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
             }
@@ -660,7 +660,7 @@ public class VertexResource extends AbstractSubResource {
             final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
             final JSONObject elementJson = GraphSONUtility.jsonFromElement(vertex, returnKeys, mode);
 
-            rag.tryStopTransactionSuccess();
+            rag.tryCommit();
 
             // some graph implementations close scope at the close of the transaction so we generate the
             // JSON before the transaction but set the id after for graphs that don't generate the id
@@ -678,14 +678,14 @@ public class VertexResource extends AbstractSubResource {
 
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
 
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (RuntimeException re) {
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
 
             logger.error(re);
 
@@ -774,7 +774,7 @@ public class VertexResource extends AbstractSubResource {
                 }
             }
 
-            rag.tryStopTransactionSuccess();
+            rag.tryCommit();
 
             // some graph implementations close scope at the close of the transaction so this has to be
             // reconstituted
@@ -793,14 +793,14 @@ public class VertexResource extends AbstractSubResource {
 
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
 
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (RuntimeException re) {
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
 
             logger.error(re);
 
@@ -848,11 +848,11 @@ public class VertexResource extends AbstractSubResource {
                 throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
             }
 
-            rag.tryStopTransactionSuccess();
+            rag.tryCommit();
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
 
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
 
             logger.error(ex);
 
@@ -860,7 +860,7 @@ public class VertexResource extends AbstractSubResource {
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (RuntimeException re) {
 
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
 
             logger.error(re);
 

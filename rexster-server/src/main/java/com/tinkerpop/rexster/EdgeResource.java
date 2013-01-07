@@ -343,7 +343,7 @@ public class EdgeResource extends AbstractSubResource {
 
             } catch (WebApplicationException wae) {
                 // already logged this...just throw it  up.
-                rag.tryStopTransactionFailure();
+                rag.tryRollback();
                 throw wae;
             } catch (Exception ex) {
                 logger.error("Dynamic invocation of the [" + extensionSegmentSet + "] extension failed.", ex);
@@ -353,7 +353,7 @@ public class EdgeResource extends AbstractSubResource {
                     logger.error("It would be smart to trap this this exception within the extension and supply a good response to the user:" + cause.getMessage(), cause);
                 }
 
-                rag.tryStopTransactionFailure();
+                rag.tryRollback();
 
                 final JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
@@ -367,14 +367,14 @@ public class EdgeResource extends AbstractSubResource {
                     logger.warn("The [" + extensionSegmentSet + "] extension raised an error response.");
 
                     if (methodToCall.getExtensionDefinition().autoCommitTransaction()) {
-                        rag.tryStopTransactionFailure();
+                        rag.tryRollback();
                     }
 
                     throw new WebApplicationException(Response.fromResponse(extResponse.getJerseyResponse()).build());
                 }
 
                 if (methodToCall.getExtensionDefinition().autoCommitTransaction()) {
-                    rag.tryStopTransactionSuccess();
+                    rag.tryCommit();
                 }
 
             } else {
@@ -566,7 +566,7 @@ public class EdgeResource extends AbstractSubResource {
                     final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
                     final JSONObject elementJson = GraphSONUtility.jsonFromElement(edge, returnKeys, mode);
 
-                    rag.tryStopTransactionSuccess();
+                    rag.tryCommit();
 
                     // some graph implementations close scope at the close of the transaction so we generate the
                     // JSON before the transaction but set the id after for graphs that don't generate the id
@@ -598,10 +598,10 @@ public class EdgeResource extends AbstractSubResource {
 
 
         } catch (WebApplicationException wae) {
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
             throw wae;
         } catch (Exception ex) {
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
             JSONObject error = generateErrorObject("Transaction failed on POST of edge.", ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
@@ -694,7 +694,7 @@ public class EdgeResource extends AbstractSubResource {
 
             final JSONObject elementJson = GraphSONUtility.jsonFromElement(edge, returnKeys, mode);
 
-            rag.tryStopTransactionSuccess();
+            rag.tryCommit();
 
             // some graph implementations close scope at the close of the transaction so we generate the
             // JSON before the transaction but set the id after for graphs that don't generate the id
@@ -713,10 +713,10 @@ public class EdgeResource extends AbstractSubResource {
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
 
         } catch (WebApplicationException wae) {
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
             throw wae;
         } catch (Exception ex) {
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
 
             logger.error(ex);
 
@@ -764,21 +764,21 @@ public class EdgeResource extends AbstractSubResource {
                 throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
             }
 
-            rag.tryStopTransactionSuccess();
+            rag.tryCommit();
 
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);
 
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
 
             final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (WebApplicationException wae) {
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
             throw wae;
         } catch (Exception ex) {
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
             final JSONObject error = generateErrorObject("Transaction failed on DELETE of edge.", ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }

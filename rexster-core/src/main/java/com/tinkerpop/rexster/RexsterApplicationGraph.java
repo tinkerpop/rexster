@@ -115,10 +115,10 @@ public class RexsterApplicationGraph {
      * Stops a transaction with success if the graph is transactional.  If the graph is not transactional,
      * the method does nothing.
      */
-    public void tryStopTransactionSuccess() {
+    public void tryCommit() {
         final TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
-            transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            transactionalGraph.commit();
         }
     }
 
@@ -126,10 +126,10 @@ public class RexsterApplicationGraph {
      * Stops a transaction with failure if the graph is transactional.  If the graph is not transactional,
      * the method does nothing.
      */
-    public void tryStopTransactionFailure() {
+    public void tryRollback() {
         final TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
-            transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            transactionalGraph.rollback();
         }
     }
 

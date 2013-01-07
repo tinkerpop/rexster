@@ -155,13 +155,13 @@ public class KeyIndexResource extends AbstractSubResource {
         try {
             graph.dropKeyIndex(keyName, keyClass);
 
-            rag.tryStopTransactionSuccess();
+            rag.tryCommit();
 
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);
 
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
 
             final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
@@ -196,13 +196,13 @@ public class KeyIndexResource extends AbstractSubResource {
         try {
             graph.createKeyIndex(keyName, keyClass);
 
-            rag.tryStopTransactionSuccess();
+            rag.tryCommit();
 
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
         } catch (JSONException ex) {
             logger.error(ex);
 
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
 
             final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());

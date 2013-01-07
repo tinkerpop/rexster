@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -319,11 +318,11 @@ public class IndexResource extends AbstractSubResource {
         if (key == null && value == null && id == null) {
             try {
                 graph.dropIndex(indexName);
-                rag.tryStopTransactionSuccess();
+                rag.tryCommit();
             } catch (Exception ex) {
                 logger.error(ex);
 
-                rag.tryStopTransactionFailure();
+                rag.tryRollback();
 
                 final JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
@@ -335,13 +334,13 @@ public class IndexResource extends AbstractSubResource {
                 else
                     index.remove(key, value, graph.getEdge(id));
 
-                rag.tryStopTransactionSuccess();
+                rag.tryCommit();
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
             } catch (JSONException ex) {
                 logger.error(ex);
 
-                rag.tryStopTransactionFailure();
+                rag.tryRollback();
 
                 final JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
@@ -445,11 +444,11 @@ public class IndexResource extends AbstractSubResource {
                 final Index newIndex;
                 try {
                     newIndex = graph.createIndex(indexName, c, indexParameters);
-                    rag.tryStopTransactionSuccess();
+                    rag.tryCommit();
                 } catch (Exception e) {
                     logger.info(e.getMessage());
 
-                    rag.tryStopTransactionFailure();
+                    rag.tryRollback();
 
                     final JSONObject error = generateErrorObject(e.getMessage());
                     throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
@@ -528,12 +527,12 @@ public class IndexResource extends AbstractSubResource {
             try {
                 if (index.getIndexClass().equals(Vertex.class)) {
                     index.put(key, value, graph.getVertex(id));
-                    rag.tryStopTransactionSuccess();
+                    rag.tryCommit();
                 } else if (index.getIndexClass().equals(Edge.class)) {
                     index.put(key, value, graph.getEdge(id));
-                    rag.tryStopTransactionSuccess();
+                    rag.tryCommit();
                 } else {
-                    rag.tryStopTransactionFailure();
+                    rag.tryRollback();
                     final JSONObject error = generateErrorObject("Index class must be either vertex or edge");
                     throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
                 }

@@ -119,19 +119,19 @@ public class PrefixResource extends AbstractSubResource {
             final SailGraph graph = ((SailGraph) rag.getUnwrappedGraph());
             graph.removeNamespace(prefix);
 
-            rag.tryStopTransactionSuccess();
+            rag.tryCommit();
 
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
             return Response.ok(this.resultObject).build();
         } catch (JSONException ex) {
             logger.error(ex);
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (RuntimeException re) {
             logger.error(re);
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
             JSONObject error = generateErrorObject(re.getMessage(), re);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
@@ -160,19 +160,19 @@ public class PrefixResource extends AbstractSubResource {
             final SailGraph graph = ((SailGraph) rag.getUnwrappedGraph());
             graph.addNamespace(reqObject.optString("prefix"), reqObject.optString("namespace"));
 
-            rag.tryStopTransactionSuccess();
+            rag.tryCommit();
 
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
 
             return Response.ok(this.resultObject).build();
         } catch (JSONException ex) {
             logger.error(ex);
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (RuntimeException re) {
             logger.error(re);
-            rag.tryStopTransactionFailure();
+            rag.tryRollback();
             JSONObject error = generateErrorObject(re.getMessage(), re);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
