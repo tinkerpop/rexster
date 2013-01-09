@@ -8,7 +8,7 @@ import com.tinkerpop.rexster.extension.ExtensionMethod;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
-import com.tinkerpop.rexster.extension.GremlinExtension;
+import com.tinkerpop.rexster.gremlin.GremlinExtension;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterExtension;
 import junit.framework.Assert;
