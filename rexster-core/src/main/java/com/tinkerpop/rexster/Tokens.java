@@ -41,6 +41,10 @@ public class Tokens {
     public static final String REXSTER_GRAPH_BUFFER_SIZE = "graph-buffer-size";
     public static final String REXSTER_GRAPH_HA = "graph-high-availability";
 
+    public static final String REXSTER_SECURITY_NONE = "none";
+    public static final String REXSTER_SECURITY_DEFAULT = "default";
+    public static final String REXSTER_SECURITY_AUTH = "security.authentication";
+
     public static final String REXPRO_REXSTER_CONTEXT = "rexster";
 
     public static final String REXSTER_CONSOLE_BINDINGS = "?b";

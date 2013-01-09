@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.KeyIndexResource;
 import com.tinkerpop.rexster.PrefixResource;
 import com.tinkerpop.rexster.RexsterResource;
 import com.tinkerpop.rexster.RootResource;
+import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.VertexResource;
 import com.tinkerpop.rexster.filter.AbstractSecurityFilter;
 import com.tinkerpop.rexster.filter.DefaultSecurityFilter;
@@ -127,10 +128,16 @@ public class HttpRexsterServer implements RexsterServer {
         final String defaultCharacterEncoding = properties.getString("http.character-set", "ISO-8859-1");
         rc.getContainerResponseFilters().add(new HeaderResponseFilter(defaultCharacterEncoding));
 
-        final HierarchicalConfiguration securityConfiguration = properties.configurationAt("security.authentication");
-        final String securityFilterType = securityConfiguration.getString("type");
-        if (!securityFilterType.equals("none")) {
-            if (securityFilterType.equals("default")) {
+        HierarchicalConfiguration securityConfiguration = null;
+        try {
+            securityConfiguration = properties.configurationAt(Tokens.REXSTER_SECURITY_AUTH);
+        } catch (IllegalArgumentException iae) {
+            // do nothing...null is cool
+        }
+
+        final String securityFilterType = securityConfiguration != null ? securityConfiguration.getString("type") : Tokens.REXSTER_SECURITY_NONE;
+        if (!securityFilterType.equals(Tokens.REXSTER_SECURITY_NONE)) {
+            if (securityFilterType.equals(Tokens.REXSTER_SECURITY_DEFAULT)) {
                 wacJersey.addContextInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, DefaultSecurityFilter.class.getName());
                 rc.getContainerRequestFilters().add(new DefaultSecurityFilter());
             } else {

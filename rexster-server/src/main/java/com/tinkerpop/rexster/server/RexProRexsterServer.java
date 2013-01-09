@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.server;
 
+import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.filter.AbstractSecurityFilter;
 import com.tinkerpop.rexster.filter.DefaultSecurityFilter;
 import com.tinkerpop.rexster.protocol.RexProSessionMonitor;
@@ -78,13 +79,19 @@ public class RexProRexsterServer implements RexsterServer {
                 this.connectionIdleMax, TimeUnit.MILLISECONDS));
         filterChainBuilder.add(new RexProMessageFilter());
 
-        final HierarchicalConfiguration securityConfiguration = properties.configurationAt("security.authentication");
-        final String securityFilterType = securityConfiguration.getString("type");
-        if (securityFilterType.equals("none")) {
+        HierarchicalConfiguration securityConfiguration = null;
+        try {
+            securityConfiguration = properties.configurationAt(Tokens.REXSTER_SECURITY_AUTH);
+        } catch (IllegalArgumentException iae) {
+            // do nothing...null is cool
+        }
+
+        final String securityFilterType = securityConfiguration != null ? securityConfiguration.getString("type") : Tokens.REXSTER_SECURITY_NONE;
+        if (securityFilterType.equals(Tokens.REXSTER_SECURITY_NONE)) {
             logger.info("Rexster configured with no security.");
         } else {
             final AbstractSecurityFilter filter;
-            if (securityFilterType.equals("default")) {
+            if (securityFilterType.equals(Tokens.REXSTER_SECURITY_DEFAULT)) {
                 filter = new DefaultSecurityFilter();
                 filterChainBuilder.add(filter);
             } else {
