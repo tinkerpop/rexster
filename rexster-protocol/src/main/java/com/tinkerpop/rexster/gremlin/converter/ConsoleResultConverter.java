@@ -1,5 +1,8 @@
 package com.tinkerpop.rexster.gremlin.converter;
 
+import com.tinkerpop.pipes.util.iterators.SingleIterator;
+import org.apache.commons.collections.iterators.ArrayIterator;
+
 import java.io.Writer;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -18,34 +21,24 @@ public class ConsoleResultConverter implements ResultConverter<List<String>> {
 
     public List<String> convert(final Object result) throws Exception {
         try {
-            List<Object> resultLines = new ArrayList<Object>();
-            if (result == null) {
-                resultLines = new ArrayList<Object>();
-                resultLines.add("null");
-            } else if (result instanceof Iterable) {
-                for (Object o : (Iterable) result) {
-                    resultLines.add(o);
-                }
+            final List<Object> resultLines = new ArrayList<Object>();
+            final Iterator itty;
+            if (result instanceof Iterable) {
+                itty = ((Iterable) result).iterator();
             } else if (result instanceof Iterator) {
-                // Table is handled through here and the toString() to get it formatted.
-                final Iterator itty = (Iterator) result;
-                while (itty.hasNext()) {
-                    resultLines.add(itty.next());
-                }
-            } else if (result.getClass().isArray()) {
-                final int length = Array.getLength(result);
-                for (int ix = 0; ix < length; ix++) {
-                    resultLines.add(Array.get(result, ix).toString());
-                }
+                itty = (Iterator) result;
+            } else if (result instanceof Object[]) {
+                itty = new ArrayIterator((Object[]) result);
             } else if (result instanceof Map) {
-                final Map map = (Map) result;
-                for (Object key : map.keySet()) {
-                    resultLines.add(key + "=" + map.get(key).toString());
-                }
+                itty = ((Map) result).entrySet().iterator();
             } else if (result instanceof Throwable) {
-                resultLines.add(((Throwable) result).getMessage());
+                itty = new SingleIterator<Object>(((Throwable) result).getMessage());
             } else {
-                resultLines.add(result);
+                itty = new SingleIterator<Object>(result);
+            }
+
+            while (itty.hasNext()) {
+                resultLines.add(itty.next());
             }
 
             // Handle output data
