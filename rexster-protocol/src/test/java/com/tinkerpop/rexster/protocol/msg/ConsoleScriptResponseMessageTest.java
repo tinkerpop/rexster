@@ -5,9 +5,7 @@ import org.junit.Test;
 
 import javax.script.Bindings;
 import javax.script.SimpleBindings;
-import java.io.IOError;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,7 +33,7 @@ public class ConsoleScriptResponseMessageTest {
         b.put("b", "bbb");
         b.put("c", 3);
 
-        msg.Bindings = ConsoleScriptResponseMessage.convertBindingsToByteArray(b);
+        msg.Bindings = ConsoleScriptResponseMessage.convertBindingsToConsoleLineByteArray(b);
 
         final List<String> bindingsList = msg.bindingsAsList();
         Assert.assertEquals(3, bindingsList.size());
@@ -54,7 +52,7 @@ public class ConsoleScriptResponseMessageTest {
         b.put("b", "bbb");
         b.put("c", 3);
 
-        msg.Bindings = ConsoleScriptResponseMessage.convertBindingsToByteArray(b);
+        msg.Bindings = ConsoleScriptResponseMessage.convertBindingsToConsoleLineByteArray(b);
 
         Assert.assertEquals(64, msg.estimateMessageSize());
     }

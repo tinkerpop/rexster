@@ -49,7 +49,7 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
         return bindings;
     }
 
-    public static byte[] convertBindingsToByteArray(final Bindings bindings) throws IOException {
+    public static byte[] convertBindingsToConsoleLineByteArray(final Bindings bindings) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         for (String key : bindings.keySet()) {

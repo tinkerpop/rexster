@@ -138,7 +138,7 @@ public class TryRexProSessioned {
         //RexsterBindings bindings = new RexsterBindings();
         //bindings.put("x", 5);
         //scriptMessage.Bindings = BitWorks.convertSerializableBindingsToByteArray(bindings);
-        //scriptMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToByteArray(bindings);
+        //scriptMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToConsoleLineByteArray(bindings);
         scriptMessage.Bindings = emptyBindings;
         scriptMessage.LanguageName = "groovy";
         scriptMessage.Flag = MessageFlag.SCRIPT_REQUEST_IN_SESSION;

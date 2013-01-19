@@ -12,7 +12,6 @@ import com.tinkerpop.rexster.protocol.EngineHolder;
 import com.tinkerpop.rexster.protocol.RexProSession;
 import com.tinkerpop.rexster.protocol.RexProSessions;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
@@ -25,7 +24,6 @@ import org.glassfish.grizzly.filterchain.NextAction;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -151,7 +149,7 @@ public class ScriptFilter extends BaseFilter {
 
     private static ConsoleScriptResponseMessage formatForConsoleChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
         final ConsoleScriptResponseMessage consoleScriptResponseMessage = new ConsoleScriptResponseMessage();
-        consoleScriptResponseMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToByteArray(session.getBindings());
+        consoleScriptResponseMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToConsoleLineByteArray(session.getBindings());
         consoleScriptResponseMessage.Flag = MessageFlag.SCRIPT_RESPONSE_COMPLETE_MESSAGE;
         consoleScriptResponseMessage.Session = specificMessage.Session;
         consoleScriptResponseMessage.Request = specificMessage.Request;
