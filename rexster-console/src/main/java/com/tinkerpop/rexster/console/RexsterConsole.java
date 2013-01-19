@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.console;
 
 import com.tinkerpop.pipes.util.iterators.SingleIterator;
 import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.RemoteRexsterSession;
 import com.tinkerpop.rexster.protocol.ResultAndBindings;
 import com.tinkerpop.rexster.protocol.RexsterBindings;
@@ -25,6 +26,18 @@ import java.util.Map;
 import java.util.UUID;
 
 public class RexsterConsole {
+    private static final byte[] emptyBindings;
+
+    static {{
+        byte [] empty;
+        try {
+            empty = BitWorks.convertSerializableBindingsToByteArray(new RexsterBindings());
+        } catch (IOException ioe) {
+            empty = new byte[0];
+        }
+
+        emptyBindings = empty;
+    }};
 
     private RemoteRexsterSession session = null;
     private List<String> currentBindings = new ArrayList<String>();
@@ -285,7 +298,7 @@ public class RexsterConsole {
             // the session field gets set by the RemoteRexsterSession class automatically
             final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
             scriptMessage.Script = script;
-            scriptMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToByteArray(new RexsterBindings());
+            scriptMessage.Bindings = emptyBindings;
             scriptMessage.LanguageName = scriptEngineName;
             scriptMessage.Flag = MessageFlag.SCRIPT_REQUEST_IN_SESSION;
             scriptMessage.setRequestAsUUID(UUID.randomUUID());

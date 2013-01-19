@@ -30,7 +30,7 @@ public class TryRexProSessioned {
     static {{
         byte [] empty;
         try {
-            empty = ConsoleScriptResponseMessage.convertBindingsToByteArray(new RexsterBindings());
+            empty = BitWorks.convertSerializableBindingsToByteArray(new RexsterBindings());
         } catch (IOException ioe) {
             empty = new byte[0];
         }
@@ -134,6 +134,11 @@ public class TryRexProSessioned {
         ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.setSessionAsUUID(session.getSessionKey());
         scriptMessage.Script = script;
+
+        //RexsterBindings bindings = new RexsterBindings();
+        //bindings.put("x", 5);
+        //scriptMessage.Bindings = BitWorks.convertSerializableBindingsToByteArray(bindings);
+        //scriptMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToByteArray(bindings);
         scriptMessage.Bindings = emptyBindings;
         scriptMessage.LanguageName = "groovy";
         scriptMessage.Flag = MessageFlag.SCRIPT_REQUEST_IN_SESSION;
