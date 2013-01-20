@@ -81,7 +81,7 @@ public class RexProSession {
                 try {
                     final Graph g = this.rexsterApplication.getGraph(graphName);
                     if (g instanceof TransactionalGraph) {
-                        ((TransactionalGraph) g).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+                        ((TransactionalGraph) g).rollback();
                     }
                 } catch (Throwable t) { }
             }
