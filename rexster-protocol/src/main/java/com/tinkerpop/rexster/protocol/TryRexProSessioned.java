@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
@@ -30,7 +29,7 @@ public class TryRexProSessioned {
     static {{
         byte [] empty;
         try {
-            empty = BitWorks.convertSerializableBindingsToByteArray(new RexsterBindings());
+            empty = BitWorks.convertBindingsToByteArray(new RexsterBindings());
         } catch (IOException ioe) {
             empty = new byte[0];
         }
@@ -137,7 +136,7 @@ public class TryRexProSessioned {
 
         //RexsterBindings bindings = new RexsterBindings();
         //bindings.put("x", 5);
-        //scriptMessage.Bindings = BitWorks.convertSerializableBindingsToByteArray(bindings);
+        //scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(bindings);
         //scriptMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToConsoleLineByteArray(bindings);
         scriptMessage.Bindings = emptyBindings;
         scriptMessage.LanguageName = "groovy";

@@ -249,7 +249,7 @@ public class RexsterClient {
 
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = script;
-        scriptMessage.Bindings = BitWorks.convertSerializableBindingsToByteArray(bindings);
+        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(bindings);
         scriptMessage.LanguageName = this.language;
         scriptMessage.Flag = MessageFlag.SCRIPT_REQUEST_NO_SESSION;
         scriptMessage.setRequestAsUUID(UUID.randomUUID());

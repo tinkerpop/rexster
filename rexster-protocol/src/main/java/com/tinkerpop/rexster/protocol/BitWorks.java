@@ -1,10 +1,5 @@
 package com.tinkerpop.rexster.protocol;
 
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.rexster.Tokens;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
 import org.msgpack.template.Template;
@@ -15,10 +10,7 @@ import javax.script.Bindings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -35,6 +27,7 @@ import static org.msgpack.template.Templates.TString;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class BitWorks {
+    private static final MessagePack msgpack = new MessagePack();
 
     /**
      * Converts a UUID to bytes.
@@ -77,12 +70,11 @@ public class BitWorks {
         }
     }
 
-    public static byte[] convertSerializableBindingsToByteArray(final Bindings bindings) throws IOException {
+    public static byte[] convertBindingsToByteArray(final Bindings bindings) throws IOException {
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
         try {
             final Map<String, Object> mapOfBindings = new HashMap<String, Object>();
-            final MessagePack msgpack = new MessagePack();
             final Packer packer = msgpack.createPacker(stream);
 
             for (String key : bindings.keySet()) {
@@ -105,7 +97,7 @@ public class BitWorks {
         }
     }
 
-    public static RexsterBindings convertByteArrayToRexsterBindings(final byte[] bytes) throws IOException {
+    public static RexsterBindings convertBytesToBindings(final byte[] bytes) throws IOException {
 
         final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         final MessagePack msgpack = new MessagePack();
@@ -134,25 +126,6 @@ public class BitWorks {
         }
 
         return bindings;
-    }
-
-    static byte[] getFilteredBytesWithLength(final Object result) throws IOException {
-
-        if (result instanceof Serializable
-                && !(result instanceof Graph)
-                && !(result instanceof Edge)
-                && !(result instanceof Vertex)
-                && !(result instanceof Index)) {
-
-            try {
-                return getBytesWithLength(result);
-            } catch (NotSerializableException nse) {
-                // com.sun.script.javascript.ExternalScriptable throws this sometimes...just toString() it
-                return getBytesWithLength(result.toString());
-            }
-        } else {
-            return getBytesWithLength(result.toString());
-        }
     }
 
     static byte[] getBytesWithLength(final Object result) throws IOException {

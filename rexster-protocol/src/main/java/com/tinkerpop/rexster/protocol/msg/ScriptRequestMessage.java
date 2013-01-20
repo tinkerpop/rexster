@@ -23,7 +23,7 @@ public class ScriptRequestMessage extends RexProMessage {
 
         final byte[] theRest = new byte[buffer.remaining()];
         buffer.get(theRest);
-        return BitWorks.convertByteArrayToRexsterBindings(theRest);
+        return BitWorks.convertBytesToBindings(theRest);
     }
 
     @Override

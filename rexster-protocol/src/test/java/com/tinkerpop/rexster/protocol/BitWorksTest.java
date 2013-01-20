@@ -106,7 +106,7 @@ public class BitWorksTest {
         packer.write(mapOfBindings);
         byte[] b = stream.toByteArray();
 
-        final RexsterBindings bindings = BitWorks.convertByteArrayToRexsterBindings(b);
+        final RexsterBindings bindings = BitWorks.convertBytesToBindings(b);
 
         Assert.assertNotNull(bindings);
         Assert.assertEquals("xxx", bindings.get("s"));

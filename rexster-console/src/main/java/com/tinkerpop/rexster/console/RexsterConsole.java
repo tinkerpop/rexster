@@ -31,7 +31,7 @@ public class RexsterConsole {
     static {{
         byte [] empty;
         try {
-            empty = BitWorks.convertSerializableBindingsToByteArray(new RexsterBindings());
+            empty = BitWorks.convertBindingsToByteArray(new RexsterBindings());
         } catch (IOException ioe) {
             empty = new byte[0];
         }
