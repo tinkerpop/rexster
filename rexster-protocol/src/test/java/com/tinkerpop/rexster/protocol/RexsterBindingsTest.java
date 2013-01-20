@@ -25,12 +25,6 @@ public class RexsterBindingsTest {
         Assert.assertEquals("z", bindings.get("ok").toString());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void putEnforceRexsterBindingsInstance() {
-        Bindings bindings = new RexsterBindings();
-        bindings.put("fail", new WontSerialize());
-    }
-
     @Test
     public void putAllSerializableInstance() {
         Bindings bindings = new RexsterBindings();

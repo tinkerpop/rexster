@@ -5,6 +5,11 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.rexster.Tokens;
+import org.msgpack.MessagePack;
+import org.msgpack.packer.Packer;
+import org.msgpack.template.Template;
+import org.msgpack.type.Value;
+import org.msgpack.unpacker.Unpacker;
 
 import javax.script.Bindings;
 import java.io.ByteArrayInputStream;
@@ -16,7 +21,13 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+
+import static org.msgpack.template.Templates.TValue;
+import static org.msgpack.template.Templates.tMap;
+import static org.msgpack.template.Templates.TString;
 
 /**
  * Helper class for for common byte operations.
@@ -70,24 +81,23 @@ public class BitWorks {
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
         try {
-            for (String key : bindings.keySet()) {
-                // don't serialize the rexster key...doesn't make sense to send that back to the client
-                // as it is a server side resource
-                if (!key.equals(Tokens.REXPRO_REXSTER_CONTEXT)) {
-                    final Object objectToSerialize = bindings.get(key);
-                    if (objectToSerialize instanceof Serializable
-                            && !(objectToSerialize instanceof Graph)
-                            && !(objectToSerialize instanceof Edge)
-                            && !(objectToSerialize instanceof Vertex)
-                            && !(objectToSerialize instanceof Index)) {
-                        stream.write(ByteBuffer.allocate(4).putInt(key.length()).array());
-                        stream.write(key.getBytes());
+            final Map<String, Object> mapOfBindings = new HashMap<String, Object>();
+            final MessagePack msgpack = new MessagePack();
+            final Packer packer = msgpack.createPacker(stream);
 
-                        final byte[] objectBytes = getFilteredBytesWithLength(objectToSerialize);
-                        stream.write(objectBytes);
-                    }
+            for (String key : bindings.keySet()) {
+                final Object objectToSerialize = bindings.get(key);
+                if (objectToSerialize instanceof String
+                        || objectToSerialize instanceof Integer
+                        || objectToSerialize instanceof Double
+                        || objectToSerialize instanceof Float
+                        || objectToSerialize instanceof Boolean
+                        || objectToSerialize instanceof Long) {
+                    mapOfBindings.put(key, objectToSerialize);
                 }
             }
+
+            packer.write(mapOfBindings);
 
             return stream.toByteArray();
         } finally {
@@ -95,30 +105,32 @@ public class BitWorks {
         }
     }
 
-    public static RexsterBindings convertByteArrayToRexsterBindings(final byte[] bytes) throws IOException, ClassNotFoundException {
-        final ByteBuffer bb = ByteBuffer.wrap(bytes);
+    public static RexsterBindings convertByteArrayToRexsterBindings(final byte[] bytes) throws IOException {
+
+        final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+        final MessagePack msgpack = new MessagePack();
+        final Unpacker unpacker = msgpack.createUnpacker(in);
+
+        final Template<Map<String, Value>> mapTmpl = tMap(TString, TValue);
+
+        final Map<String, Value> dstMap = unpacker.read(mapTmpl);
         final RexsterBindings bindings = new RexsterBindings();
 
-        while (bb.hasRemaining()) {
-            final int lenOfKeyBinding = bb.getInt();
-            final byte[] bindingKeyItem = new byte[lenOfKeyBinding];
-            bb.get(bindingKeyItem);
-
-            final String key = new String(bindingKeyItem);
-
-            final int lenOfBinding = bb.getInt();
-            final byte[] bindingItem = new byte[lenOfBinding];
-            bb.get(bindingItem);
-
-            final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bindingItem);
-            final ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-
-            try {
-                final Object o = objectInputStream.readObject();
-                bindings.put(key, o);
-            } finally {
-                objectInputStream.close();
+        for (Map.Entry<String,Value> entry : dstMap.entrySet()) {
+            final Value v = entry.getValue();
+            Object o;
+            if (v.isBooleanValue()) {
+                o = v.asBooleanValue().getBoolean();
+            } else if (v.isFloatValue()) {
+                o = v.asFloatValue().getDouble();
+            } else if (v.isIntegerValue()) {
+                o = v.asIntegerValue().getInt();
+            } else {
+                // includes raw value
+                o = v.asRawValue().getString();
             }
+
+            bindings.put(entry.getKey(), o);
         }
 
         return bindings;
