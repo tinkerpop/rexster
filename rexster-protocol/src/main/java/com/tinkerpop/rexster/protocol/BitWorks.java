@@ -7,6 +7,7 @@ import org.msgpack.type.Value;
 import org.msgpack.unpacker.Unpacker;
 
 import javax.script.Bindings;
+import javax.script.SimpleBindings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -97,7 +98,7 @@ public class BitWorks {
         }
     }
 
-    public static RexsterBindings convertBytesToBindings(final byte[] bytes) throws IOException {
+    public static Bindings convertBytesToBindings(final byte[] bytes) throws IOException {
 
         final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         final MessagePack msgpack = new MessagePack();
@@ -106,7 +107,7 @@ public class BitWorks {
         final Template<Map<String, Value>> mapTmpl = tMap(TString, TValue);
 
         final Map<String, Value> dstMap = unpacker.read(mapTmpl);
-        final RexsterBindings bindings = new RexsterBindings();
+        final Bindings bindings = new SimpleBindings();
 
         for (Map.Entry<String,Value> entry : dstMap.entrySet()) {
             final Value v = entry.getValue();

@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.protocol.filter;
 
-import com.tinkerpop.rexster.protocol.RexsterBindings;
 import com.tinkerpop.rexster.protocol.msg.GraphSONScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.MessageTokens;
@@ -57,7 +56,7 @@ public class ScriptFilter extends BaseFilter {
                 final EngineHolder engineHolder = engineController.getEngineByLanguageName(specificMessage.LanguageName);
                 final ScriptEngine scriptEngine = engineHolder.getEngine();
                 final Bindings bindings = scriptEngine.createBindings();
-                final RexsterBindings rexsterBindings = specificMessage.getBindings();
+                final Bindings rexsterBindings = specificMessage.getBindings();
                 for (Map.Entry<String,Object> e : rexsterBindings.entrySet()) {
                     bindings.put(e.getKey(), e.getValue());
                 }

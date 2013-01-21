@@ -63,7 +63,7 @@ public class RexProSession {
         this.executor.shutdown();
     }
 
-    public Object evaluate(final String script, final String languageName, final RexsterBindings rexsterBindings) throws ScriptException {
+    public Object evaluate(final String script, final String languageName, final Bindings rexsterBindings) throws ScriptException {
         Object result = null;
         try {
             final EngineHolder engine = this.controller.getEngineByLanguageName(languageName);

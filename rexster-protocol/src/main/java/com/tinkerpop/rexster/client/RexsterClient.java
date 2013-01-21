@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.protocol.BitWorks;
-import com.tinkerpop.rexster.protocol.RexsterBindings;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
@@ -21,6 +20,7 @@ import org.msgpack.unpacker.Converter;
 import org.msgpack.unpacker.UnpackerIterator;
 
 import javax.script.Bindings;
+import javax.script.SimpleBindings;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -242,7 +242,7 @@ public class RexsterClient {
 
     private ScriptRequestMessage createNoSessionScriptRequest(final String script,
                                                               final Map<String, Object> scriptArguments) throws IOException {
-        final Bindings bindings = new RexsterBindings();
+        final Bindings bindings = new SimpleBindings();
         if (scriptArguments != null) {
             bindings.putAll(scriptArguments);
         }

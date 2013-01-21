@@ -11,6 +11,7 @@ import org.msgpack.unpacker.BufferUnpacker;
 import org.msgpack.unpacker.Converter;
 import org.msgpack.unpacker.UnpackerIterator;
 
+import javax.script.SimpleBindings;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
@@ -29,7 +30,7 @@ public class TryRexProSessioned {
     static {{
         byte [] empty;
         try {
-            empty = BitWorks.convertBindingsToByteArray(new RexsterBindings());
+            empty = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         } catch (IOException ioe) {
             empty = new byte[0];
         }

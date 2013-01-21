@@ -5,7 +5,6 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.RemoteRexsterSession;
 import com.tinkerpop.rexster.protocol.ResultAndBindings;
-import com.tinkerpop.rexster.protocol.RexsterBindings;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MessageFlag;
@@ -14,6 +13,7 @@ import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import jline.ConsoleReader;
 import jline.History;
 
+import javax.script.SimpleBindings;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -31,7 +31,7 @@ public class RexsterConsole {
     static {{
         byte [] empty;
         try {
-            empty = BitWorks.convertBindingsToByteArray(new RexsterBindings());
+            empty = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         } catch (IOException ioe) {
             empty = new byte[0];
         }
