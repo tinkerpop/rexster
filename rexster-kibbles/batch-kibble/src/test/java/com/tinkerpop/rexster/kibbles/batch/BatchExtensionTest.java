@@ -55,6 +55,20 @@ public class BatchExtensionTest {
     }
 
     @Test
+    public void getVerticesNoValuesInvalid() throws Exception {
+        BatchExtension batchExtension = new BatchExtension();
+
+        JSONObject requestObject = new JSONObject();
+
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+
+        ExtensionResponse response = batchExtension.getVertices(this.ctx, graph);
+
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getJerseyResponse().getStatus());
+
+    }
+
+    @Test
     public void getVerticesNoTypeValid() throws Exception {
         BatchExtension batchExtension = new BatchExtension();
 
@@ -104,6 +118,22 @@ public class BatchExtensionTest {
     }
 
     @Test
+    public void getVerticesTypeIndexNoKeyInvalid() throws Exception {
+        BatchExtension batchExtension = new BatchExtension();
+
+        JSONObject requestObject = new JSONObject();
+        requestObject.put("values", "(list,((i,27),(i,29),(i,50)))");
+        requestObject.put("type", "index");
+
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+
+        ExtensionResponse response = batchExtension.getVertices(this.ctx, indexGraph);
+
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getJerseyResponse().getStatus());
+
+    }
+
+    @Test
     public void getVerticesTypeIndexValid() throws Exception {
         BatchExtension batchExtension = new BatchExtension();
 
@@ -130,6 +160,22 @@ public class BatchExtensionTest {
     }
 
     @Test
+    public void getVerticesTypeKeyIndexNoKeyInvalid() throws Exception {
+        BatchExtension batchExtension = new BatchExtension();
+
+        JSONObject requestObject = new JSONObject();
+        requestObject.put("values", "(list,(marko,peter,nobody))");
+        requestObject.put("type", "keyindex");
+
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+
+        ExtensionResponse response = batchExtension.getVertices(this.ctx, keyIndexGraph);
+
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getJerseyResponse().getStatus());
+
+    }
+
+    @Test
     public void getVerticesTypeKeyIndexValid() throws Exception {
         BatchExtension batchExtension = new BatchExtension();
 
@@ -152,6 +198,20 @@ public class BatchExtensionTest {
 
         Assert.assertNotNull(results);
         Assert.assertEquals(2, results.length());
+
+    }
+
+    @Test
+    public void getEdgesNoValuesInvalid() throws Exception {
+        BatchExtension batchExtension = new BatchExtension();
+
+        JSONObject requestObject = new JSONObject();
+
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+
+        ExtensionResponse response = batchExtension.getEdges(this.ctx, graph);
+
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getJerseyResponse().getStatus());
 
     }
 
@@ -206,6 +266,22 @@ public class BatchExtensionTest {
     }
 
     @Test
+    public void getEdgesTypeIndexNoKeyInvalid() throws Exception {
+        BatchExtension batchExtension = new BatchExtension();
+
+        JSONObject requestObject = new JSONObject();
+        requestObject.put("values", "(list,((f,0.2),(f,0.5),(f,0.7)))");
+        requestObject.put("type", "index");
+
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+
+        ExtensionResponse response = batchExtension.getEdges(this.ctx, indexGraph);
+
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getJerseyResponse().getStatus());
+
+    }
+
+    @Test
     public void getEdgesTypeIndexValid() throws Exception {
         BatchExtension batchExtension = new BatchExtension();
 
@@ -228,6 +304,22 @@ public class BatchExtensionTest {
 
         Assert.assertNotNull(results);
         Assert.assertEquals(2, results.length());
+
+    }
+
+    @Test
+    public void getEdgesTypeKeyIndexNoKeyInvalid() throws Exception {
+        BatchExtension batchExtension = new BatchExtension();
+
+        JSONObject requestObject = new JSONObject();
+        requestObject.put("values", "(list,((f,0.2),(f,0.5),(f,0.7)))");
+        requestObject.put("type", "keyindex");
+
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+
+        ExtensionResponse response = batchExtension.getEdges(this.ctx, keyIndexGraph);
+
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getJerseyResponse().getStatus());
 
     }
 

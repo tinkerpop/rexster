@@ -64,19 +64,13 @@ public class BatchExtension extends AbstractRexsterExtension {
 
         final JSONObject requestObject = context.getRequestObject();
 
-        final ArrayList valueList = (ArrayList)ElementHelper.getTypedPropertyValue(requestObject.optString("values"));
+        final Object valueList = ElementHelper.getTypedPropertyValue(requestObject.optString("values"));
         final String type = requestObject.optString("type", "id");
         final String key = requestObject.optString("key");
 
-        final String error = checkParameters(valueList, type, key);
+        final ExtensionResponse error = checkParameters(context, valueList, type, key);
         if (error != null) {
-            final ExtensionMethod extMethod = context.getExtensionMethod();
-            return ExtensionResponse.error(
-                    error,
-                    null,
-                    Response.Status.BAD_REQUEST.getStatusCode(),
-                    null,
-                    generateErrorJson(extMethod.getExtensionApiAsJson()));
+            return error;
         }
 
         final boolean showTypes = RequestObjectHelper.getShowTypes(requestObject);
@@ -87,19 +81,18 @@ public class BatchExtension extends AbstractRexsterExtension {
 
             final JSONArray jsonArray = new JSONArray();
 
-            if (type == "id") {
-                for (Iterator values = valueList.iterator(); values.hasNext();) {
-                    final Vertex vertexFound = graph.getVertex(values.next());
+            if (type.equals("id")) {
+                for (Object value : (ArrayList) valueList) {
+                    final Vertex vertexFound = graph.getVertex(value);
                     if (vertexFound != null) {
                         jsonArray.put(GraphSONUtility.jsonFromElement(vertexFound, returnKeys, mode));
                     }
                 }
-            } else if (type == "index" || type == "keyindex") {
-                for (Iterator values = valueList.iterator(); values.hasNext();) {
-                    Iterable<Vertex> verticesFound = graph.getVertices(key, values.next());
-
-                    for (Iterator<Vertex> vertices = verticesFound.iterator(); vertices.hasNext(); ) {
-                        jsonArray.put(GraphSONUtility.jsonFromElement(vertices.next(), returnKeys, mode));
+            } else if (type.equals("index") || type.equals("keyindex")) {
+                for (Object value : (ArrayList) valueList) {
+                    Iterable<Vertex> verticesFound = graph.getVertices(key, value);
+                    for (Vertex vertex : verticesFound) {
+                        jsonArray.put(GraphSONUtility.jsonFromElement(vertex, returnKeys, mode));
                     }
                 }
             }
@@ -133,19 +126,13 @@ public class BatchExtension extends AbstractRexsterExtension {
 
         final JSONObject requestObject = context.getRequestObject();
 
-        final ArrayList valueList =  (ArrayList)ElementHelper.getTypedPropertyValue(requestObject.optString("values"));
+        final Object valueList =  ElementHelper.getTypedPropertyValue(requestObject.optString("values"));
         final String type = requestObject.optString("type", "id");
         final String key = requestObject.optString("key");
 
-        final String error = checkParameters(valueList, type, key);
+        final ExtensionResponse error = checkParameters(context, valueList, type, key);
         if (error != null) {
-            final ExtensionMethod extMethod = context.getExtensionMethod();
-            return ExtensionResponse.error(
-                    error,
-                    null,
-                    Response.Status.BAD_REQUEST.getStatusCode(),
-                    null,
-                    generateErrorJson(extMethod.getExtensionApiAsJson()));
+            return error;
         }
 
         final boolean showTypes = RequestObjectHelper.getShowTypes(requestObject);
@@ -156,20 +143,19 @@ public class BatchExtension extends AbstractRexsterExtension {
 
             final JSONArray jsonArray = new JSONArray();
 
-            if (type == "id") {
-                for (Iterator values = valueList.iterator(); values.hasNext();) {
-                    final Edge edgeFound = graph.getEdge(values.next());
+            if (type.equals("id")) {
+                for (Object value : (ArrayList) valueList) {
+                    final Edge edgeFound = graph.getEdge(value);
                     if (edgeFound != null) {
                         jsonArray.put(GraphSONUtility.jsonFromElement(edgeFound, returnKeys, mode));
                     }
                 }
             }
-            else if (type == "index" || type == "keyindex") {
-                for (Iterator values = valueList.iterator(); values.hasNext();) {
-                    Iterable<Edge> edgesFound = graph.getEdges(key, values.next());
-
-                    for (Iterator<Edge> edges = edgesFound.iterator(); edges.hasNext(); ) {
-                        jsonArray.put(GraphSONUtility.jsonFromElement(edges.next(), returnKeys, mode));
+            else if (type.equals("index") || type.equals("keyindex")) {
+                for (Object value : (ArrayList) valueList) {
+                    Iterable<Edge> edgesFound = graph.getEdges(key, value);
+                    for (Edge edge : edgesFound) {
+                        jsonArray.put(GraphSONUtility.jsonFromElement(edge, returnKeys, mode));
                     }
                 }
             }
@@ -391,15 +377,23 @@ public class BatchExtension extends AbstractRexsterExtension {
         }
     }
 
-    private String checkParameters(ArrayList valueList, String type, String key) {
-        if (valueList == null || valueList.isEmpty()) {
-            return "the values parameter cannot be empty";
+    private ExtensionResponse checkParameters(RexsterResourceContext context, Object valueList, String type, String key) {
+        final ExtensionMethod extMethod = context.getExtensionMethod();
+        String errorMessage = null;
+
+        if (!(valueList instanceof ArrayList) || ((ArrayList) valueList).isEmpty()) {
+            errorMessage = "the values parameter cannot be empty";
+        }  else if ((type.equals("index") || type.equals("keyindex")) && key.isEmpty()) {
+            errorMessage = "the key parameter cannot be empty";
         }
 
-        if ((type == "index" || type == "keyindex") && (key == "")) {
-            return "the key parameter cannot be empty";
-        }
-
-        return null;
+        return (errorMessage != null)
+            ? ExtensionResponse.error(
+                    errorMessage,
+                    null,
+                    Response.Status.BAD_REQUEST.getStatusCode(),
+                    null,
+                    extMethod != null ? generateErrorJson(extMethod.getExtensionApiAsJson()) : null)
+            : null;
     }
 }
