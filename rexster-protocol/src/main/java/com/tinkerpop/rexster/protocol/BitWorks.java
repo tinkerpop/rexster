@@ -4,6 +4,8 @@ import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
 import org.msgpack.template.Template;
 import org.msgpack.type.Value;
+import org.msgpack.type.MapValue;
+import org.msgpack.type.ArrayValue;
 import org.msgpack.unpacker.Unpacker;
 
 import javax.script.Bindings;
@@ -14,6 +16,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -98,6 +101,42 @@ public class BitWorks {
         }
     }
 
+    public static Object deserializeObject(Value v) {
+        Object o;
+
+        //check for null first to avoid NullPointerException
+        if (v == null) {
+            o = null;
+        } else if (v.isBooleanValue()) {
+            o = v.asBooleanValue().getBoolean();
+        } else if (v.isFloatValue()) {
+            o = v.asFloatValue().getDouble();
+        } else if (v.isIntegerValue()) {
+            o = v.asIntegerValue().getInt();
+        } else if (v.isArrayValue()) {
+            ArrayValue src = v.asArrayValue();
+            ArrayList<Object> dst = new ArrayList<Object>(src.size());
+            for (int i=0; i<src.size(); i++) {
+                Object val = deserializeObject(src.get(i));
+                dst.add(i, val);
+            }
+            o = dst;
+        } else if (v.isMapValue()) {
+            MapValue src = v.asMapValue();
+            HashMap<Object, Object> dst = new HashMap<Object, Object>(src.size());
+            for (Map.Entry<Value, Value> entry : src.entrySet()) {
+                Object key = deserializeObject(entry.getKey());
+                Object val = deserializeObject(entry.getValue());
+                dst.put(key, val);
+            }
+            o = dst;
+        } else {
+            // includes raw value
+            o = v.asRawValue().getString();
+        }
+        return o;
+    }
+
     public static Bindings convertBytesToBindings(final byte[] bytes) throws IOException {
 
         final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
@@ -111,18 +150,7 @@ public class BitWorks {
 
         for (Map.Entry<String,Value> entry : dstMap.entrySet()) {
             final Value v = entry.getValue();
-            Object o;
-            if (v.isBooleanValue()) {
-                o = v.asBooleanValue().getBoolean();
-            } else if (v.isFloatValue()) {
-                o = v.asFloatValue().getDouble();
-            } else if (v.isIntegerValue()) {
-                o = v.asIntegerValue().getInt();
-            } else {
-                // includes raw value
-                o = v.asRawValue().getString();
-            }
-
+            Object o = deserializeObject(v);
             bindings.put(entry.getKey(), o);
         }
 

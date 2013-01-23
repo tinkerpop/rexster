@@ -85,8 +85,14 @@ public class ScriptFilter extends BaseFilter {
                 return ctx.getStopAction();
             } catch (ClassNotFoundException cnfe) {
                 logger.error(cnfe);
+                ctx.write(MessageUtil.createErrorResponse(message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                        MessageFlag.ERROR_SCRIPT_FAILURE, String.format(MessageTokens.ERROR_IN_SCRIPT_PROCESSING,
+                        specificMessage.LanguageName, cnfe.toString())));
             } catch (Exception e) {
                 logger.error(e);
+                ctx.write(MessageUtil.createErrorResponse(message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                        MessageFlag.ERROR_SCRIPT_FAILURE, String.format(MessageTokens.ERROR_IN_SCRIPT_PROCESSING,
+                        specificMessage.LanguageName, e.toString())));
             }
         }
 
@@ -116,10 +122,20 @@ public class ScriptFilter extends BaseFilter {
                 return ctx.getStopAction();
             } catch (ClassNotFoundException cnfe) {
                 logger.error(cnfe);
+                ctx.write(MessageUtil.createErrorResponse(message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                        MessageFlag.ERROR_SCRIPT_FAILURE, String.format(MessageTokens.ERROR_IN_SCRIPT_PROCESSING,
+                        specificMessage.LanguageName, cnfe.toString())));
             } catch (IOException ioe) {
                 logger.error(ioe);
+                ctx.write(MessageUtil.createErrorResponse(message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                        MessageFlag.ERROR_SCRIPT_FAILURE, String.format(MessageTokens.ERROR_IN_SCRIPT_PROCESSING,
+                        specificMessage.LanguageName, ioe.toString())));
             } catch (Throwable t) {
                 logger.error(t);
+                //don't leave the client hanging!
+                ctx.write(MessageUtil.createErrorResponse(message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                        MessageFlag.ERROR_SCRIPT_FAILURE, String.format(MessageTokens.ERROR_IN_SCRIPT_PROCESSING,
+                        specificMessage.LanguageName, t.toString())));
             }
 
             return ctx.getStopAction();
