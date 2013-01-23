@@ -101,7 +101,7 @@ public class BitWorks {
         }
     }
 
-    public static Object deserializeObject(Value v) {
+    public static Object deserializeObject(final Value v) {
         Object o;
 
         //check for null first to avoid NullPointerException
@@ -114,19 +114,19 @@ public class BitWorks {
         } else if (v.isIntegerValue()) {
             o = v.asIntegerValue().getInt();
         } else if (v.isArrayValue()) {
-            ArrayValue src = v.asArrayValue();
-            ArrayList<Object> dst = new ArrayList<Object>(src.size());
-            for (int i=0; i<src.size(); i++) {
-                Object val = deserializeObject(src.get(i));
+            final ArrayValue src = v.asArrayValue();
+            final ArrayList<Object> dst = new ArrayList<Object>(src.size());
+            for (int i = 0; i < src.size(); i++) {
+                final Object val = deserializeObject(src.get(i));
                 dst.add(i, val);
             }
             o = dst;
         } else if (v.isMapValue()) {
-            MapValue src = v.asMapValue();
-            HashMap<Object, Object> dst = new HashMap<Object, Object>(src.size());
+            final MapValue src = v.asMapValue();
+            final HashMap<Object, Object> dst = new HashMap<Object, Object>(src.size());
             for (Map.Entry<Value, Value> entry : src.entrySet()) {
-                Object key = deserializeObject(entry.getKey());
-                Object val = deserializeObject(entry.getValue());
+                final Object key = deserializeObject(entry.getKey());
+                final Object val = deserializeObject(entry.getValue());
                 dst.put(key, val);
             }
             o = dst;
