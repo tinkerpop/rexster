@@ -2,7 +2,7 @@
 
 The Batch Kibble makes it possible to execute multiple operations over REST.  More specifically, it is possible to do the following:
 
-* Retrieve a group of vertices or edges by identifier, index, or key index, in a single call.
+* Retrieve a group of vertices or edges by identifier, index, or key index in a single call.
 * Execute a series of create, update, and delete operations within a single request transaction.
 
 h2. REST API
@@ -15,9 +15,11 @@ h3. GET Operations
 | edges | @http://base/graphs/graph/tp/batch/edges?values=(list,(5,6,7))@ | retrieve edges with _id 5, 6, and 7 |
 | edges | @http://base/graphs/graph/tp/batch/edges?values=(list,((f,0.2),(f,0.5)))&type=index&key=weight@ | retrieve edges by index with weight of 0.2 and 0.5 |
 
-The @values@ parameter is specified using the "property data types":https://github.com/tinkerpop/rexster/wiki/Property-Data-Types format. Please note that if elements identified in @values@ cannot be found the extension will simply ignore the value for purpose of sending the return results.  In other words, if a request is made for vertices with three identifiers but Rexster can only locate one of the three then only one vertex will be returned in the results array.
+The @values@ parameter is specified using the "property data types":https://github.com/tinkerpop/rexster/wiki/Property-Data-Types format. Please note that if elements identified in @values@ cannot be found the extension will simply ignore the value for purpose of sending the return results.  For example, if a request is made for vertices with three identifiers but Rexster can only locate one of the three then only one vertex will be returned in the results array.
 
-The @type@ parameter may be one of @id@, @index@, or @keyindex@.
+The @type@ parameter may be one of @id@, @index@, or @keyindex@.  The @type@ parameter defaults to @id@ if not specified.
+
+The @key@ paramter is required when the @type@ is @index@ or @keyindex@.
 
 h3. POST Operations
 
