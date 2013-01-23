@@ -63,12 +63,11 @@ public class BatchExtension extends AbstractRexsterExtension {
                                          @RexsterContext final Graph graph) {
 
         final JSONObject requestObject = context.getRequestObject();
-
-        final Object valueList = ElementHelper.getTypedPropertyValue(requestObject.optString("values"));
+        final JSONArray values = requestObject.optJSONArray("values");
         final String type = requestObject.optString("type", "id");
         final String key = requestObject.optString("key");
 
-        final ExtensionResponse error = checkParameters(context, valueList, type, key);
+        final ExtensionResponse error = checkParameters(context, values, type, key);
         if (error != null) {
             return error;
         }
@@ -82,15 +81,15 @@ public class BatchExtension extends AbstractRexsterExtension {
             final JSONArray jsonArray = new JSONArray();
 
             if (type.equals("id")) {
-                for (Object value : (ArrayList) valueList) {
-                    final Vertex vertexFound = graph.getVertex(value);
+                for (int ix = 0; ix < values.length(); ix++) {
+                    final Vertex vertexFound = graph.getVertex(ElementHelper.getTypedPropertyValue(values.optString(ix)));
                     if (vertexFound != null) {
                         jsonArray.put(GraphSONUtility.jsonFromElement(vertexFound, returnKeys, mode));
                     }
                 }
             } else if (type.equals("index") || type.equals("keyindex")) {
-                for (Object value : (ArrayList) valueList) {
-                    Iterable<Vertex> verticesFound = graph.getVertices(key, value);
+                for (int ix = 0; ix < values.length(); ix++) {
+                    Iterable<Vertex> verticesFound = graph.getVertices(key, ElementHelper.getTypedPropertyValue(values.optString(ix)));
                     for (Vertex vertex : verticesFound) {
                         jsonArray.put(GraphSONUtility.jsonFromElement(vertex, returnKeys, mode));
                     }
@@ -107,7 +106,7 @@ public class BatchExtension extends AbstractRexsterExtension {
         } catch (Exception mqe) {
             logger.error(mqe);
             return ExtensionResponse.error(
-                    "Error retrieving batch of vertices [" + valueList + "]", generateErrorJson());
+                    "Error retrieving batch of vertices [" + values + "]", generateErrorJson());
         }
 
     }
@@ -125,12 +124,11 @@ public class BatchExtension extends AbstractRexsterExtension {
                                       @RexsterContext final Graph graph) {
 
         final JSONObject requestObject = context.getRequestObject();
-
-        final Object valueList =  ElementHelper.getTypedPropertyValue(requestObject.optString("values"));
+        final JSONArray values = requestObject.optJSONArray("values");
         final String type = requestObject.optString("type", "id");
         final String key = requestObject.optString("key");
 
-        final ExtensionResponse error = checkParameters(context, valueList, type, key);
+        final ExtensionResponse error = checkParameters(context, values, type, key);
         if (error != null) {
             return error;
         }
@@ -144,16 +142,16 @@ public class BatchExtension extends AbstractRexsterExtension {
             final JSONArray jsonArray = new JSONArray();
 
             if (type.equals("id")) {
-                for (Object value : (ArrayList) valueList) {
-                    final Edge edgeFound = graph.getEdge(value);
+                for (int ix = 0; ix < values.length(); ix++) {
+                    final Edge edgeFound = graph.getEdge(ElementHelper.getTypedPropertyValue(values.optString(ix)));
                     if (edgeFound != null) {
                         jsonArray.put(GraphSONUtility.jsonFromElement(edgeFound, returnKeys, mode));
                     }
                 }
             }
             else if (type.equals("index") || type.equals("keyindex")) {
-                for (Object value : (ArrayList) valueList) {
-                    Iterable<Edge> edgesFound = graph.getEdges(key, value);
+                for (int ix = 0; ix < values.length(); ix++) {
+                    Iterable<Edge> edgesFound = graph.getEdges(key, ElementHelper.getTypedPropertyValue(values.optString(ix)));
                     for (Edge edge : edgesFound) {
                         jsonArray.put(GraphSONUtility.jsonFromElement(edge, returnKeys, mode));
                     }
@@ -170,7 +168,7 @@ public class BatchExtension extends AbstractRexsterExtension {
         } catch (Exception mqe) {
             logger.error(mqe);
             return ExtensionResponse.error(
-                    "Error retrieving batch of edges [" + valueList + "]", generateErrorJson());
+                    "Error retrieving batch of edges [" + values + "]", generateErrorJson());
         }
 
     }
@@ -377,11 +375,11 @@ public class BatchExtension extends AbstractRexsterExtension {
         }
     }
 
-    private ExtensionResponse checkParameters(RexsterResourceContext context, Object valueList, String type, String key) {
+    private ExtensionResponse checkParameters(RexsterResourceContext context, JSONArray values, String type, String key) {
         final ExtensionMethod extMethod = context.getExtensionMethod();
         String errorMessage = null;
 
-        if (!(valueList instanceof ArrayList) || ((ArrayList) valueList).isEmpty()) {
+        if (values == null || values.length() == 0) {
             errorMessage = "the values parameter cannot be empty";
         }  else if ((type.equals("index") || type.equals("keyindex")) && key.isEmpty()) {
             errorMessage = "the key parameter cannot be empty";

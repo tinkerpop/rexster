@@ -69,11 +69,15 @@ public class BatchExtensionTest {
     }
 
     @Test
-    public void getVerticesNoTypeValid() throws Exception {
+    public void getVerticesDefaultTypeValid() throws Exception {
         BatchExtension batchExtension = new BatchExtension();
 
         JSONObject requestObject = new JSONObject();
-        requestObject.put("values", "(list,((i,1),(i,2),(i,100000)))");
+        JSONArray values = new JSONArray();
+        values.put(1);
+        values.put(2);
+        values.put(100000);
+        requestObject.put("values", values);
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
 
@@ -97,7 +101,11 @@ public class BatchExtensionTest {
         BatchExtension batchExtension = new BatchExtension();
 
         JSONObject requestObject = new JSONObject();
-        requestObject.put("values", "(list,((i,1),(i,2),(i,100000)))");
+        JSONArray values = new JSONArray();
+        values.put(1);
+        values.put(2);
+        values.put(100000);
+        requestObject.put("values", values);
         requestObject.put("type", "id");
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
@@ -122,7 +130,11 @@ public class BatchExtensionTest {
         BatchExtension batchExtension = new BatchExtension();
 
         JSONObject requestObject = new JSONObject();
-        requestObject.put("values", "(list,((i,27),(i,29),(i,50)))");
+        JSONArray values = new JSONArray();
+        values.put("(i,27)");
+        values.put("(i,29)");
+        values.put("(i,50)");
+        requestObject.put("values", values);
         requestObject.put("type", "index");
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
@@ -138,7 +150,11 @@ public class BatchExtensionTest {
         BatchExtension batchExtension = new BatchExtension();
 
         JSONObject requestObject = new JSONObject();
-        requestObject.put("values", "(list,((i,27),(i,29),(i,50)))");
+        JSONArray values = new JSONArray();
+        values.put("(i,27)");
+        values.put("(i,29)");
+        values.put("(i,50)");
+        requestObject.put("values", values);
         requestObject.put("type", "index");
         requestObject.put("key", "age");
 
@@ -164,7 +180,11 @@ public class BatchExtensionTest {
         BatchExtension batchExtension = new BatchExtension();
 
         JSONObject requestObject = new JSONObject();
-        requestObject.put("values", "(list,(marko,peter,nobody))");
+        JSONArray values = new JSONArray();
+        values.put("marko");
+        values.put("peter");
+        values.put("nobody");
+        requestObject.put("values", values);
         requestObject.put("type", "keyindex");
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
@@ -180,7 +200,11 @@ public class BatchExtensionTest {
         BatchExtension batchExtension = new BatchExtension();
 
         JSONObject requestObject = new JSONObject();
-        requestObject.put("values", "(list,(marko,peter,nobody))");
+        JSONArray values = new JSONArray();
+        values.put("marko");
+        values.put("peter");
+        values.put("nobody");
+        requestObject.put("values", values);
         requestObject.put("type", "keyindex");
         requestObject.put("key", "name");
 
@@ -216,12 +240,15 @@ public class BatchExtensionTest {
     }
 
     @Test
-    public void getEdgesNoTypeValid() throws Exception {
+    public void getEdgesDefaultTypeValid() throws Exception {
         BatchExtension batchExtension = new BatchExtension();
 
         JSONObject requestObject = new JSONObject();
-        requestObject.put("values", "(list,((i,7),(i,8),(i,100000)))");
-
+        JSONArray values = new JSONArray();
+        values.put(7);
+        values.put(8);
+        values.put(100000);
+        requestObject.put("values", values);
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
 
@@ -245,7 +272,11 @@ public class BatchExtensionTest {
         BatchExtension batchExtension = new BatchExtension();
 
         JSONObject requestObject = new JSONObject();
-        requestObject.put("values", "(list,((i,7),(i,8),(i,100000)))");
+        JSONArray values = new JSONArray();
+        values.put(7);
+        values.put(8);
+        values.put(100000);
+        requestObject.put("values", values);
         requestObject.put("type", "id");
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
@@ -270,7 +301,11 @@ public class BatchExtensionTest {
         BatchExtension batchExtension = new BatchExtension();
 
         JSONObject requestObject = new JSONObject();
-        requestObject.put("values", "(list,((f,0.2),(f,0.5),(f,0.7)))");
+        JSONArray values = new JSONArray();
+        values.put("(f,0.2)");
+        values.put("(f,0.5)");
+        values.put("(f,0.7)");
+        requestObject.put("values", values);
         requestObject.put("type", "index");
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
@@ -286,7 +321,11 @@ public class BatchExtensionTest {
         BatchExtension batchExtension = new BatchExtension();
 
         JSONObject requestObject = new JSONObject();
-        requestObject.put("values", "(list,((f,0.2),(f,0.5),(f,0.7)))");
+        JSONArray values = new JSONArray();
+        values.put("(f,0.2)");
+        values.put("(f,0.5)");
+        values.put("(f,0.7)");
+        requestObject.put("values", values);
         requestObject.put("type", "index");
         requestObject.put("key", "weight");
 
@@ -312,7 +351,11 @@ public class BatchExtensionTest {
         BatchExtension batchExtension = new BatchExtension();
 
         JSONObject requestObject = new JSONObject();
-        requestObject.put("values", "(list,((f,0.2),(f,0.5),(f,0.7)))");
+        JSONArray values = new JSONArray();
+        values.put("(f,0.2)");
+        values.put("(f,0.5)");
+        values.put("(f,0.7)");
+        requestObject.put("values", values);
         requestObject.put("type", "keyindex");
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
@@ -328,7 +371,11 @@ public class BatchExtensionTest {
         BatchExtension batchExtension = new BatchExtension();
 
         JSONObject requestObject = new JSONObject();
-        requestObject.put("values", "(list,((f,0.2),(f,0.5),(f,0.7)))");
+        JSONArray values = new JSONArray();
+        values.put("(f,0.2)");
+        values.put("(f,0.5)");
+        values.put("(f,0.7)");
+        requestObject.put("values", values);
         requestObject.put("type", "keyindex");
         requestObject.put("key", "weight");
 
