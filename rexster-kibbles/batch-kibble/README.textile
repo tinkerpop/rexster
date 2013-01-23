@@ -2,7 +2,7 @@
 
 The Batch Kibble makes it possible to execute multiple operations over REST.  More specifically, it is possible to do the following:
 
-* Retrieve a group of vertices or edges by identifier in a single call.
+* Retrieve a group of vertices or edges by identifier, index, or key index in a single call.
 * Execute a series of create, update, and delete operations within a single request transaction.
 
 h2. REST API
@@ -10,10 +10,16 @@ h2. REST API
 h3. GET Operations
 
 |_. returns |_. uri |_. description |
-| vertices | @http://base/graphs/graph/tp/batch/vertices?idList=[1,2,3]@ | retrieve vertices with _id 1, 2 and 3 |
-| edges | @http://base/graphs/graph/tp/batch/edges?idList=[5,6,7]@ | retrieve edges with _id 5, 6, and 7 |
+| vertices | @http://base/graphs/graph/tp/batch/vertices?values=[1,2,3]@ | retrieve vertices with _id 1, 2 and 3 |
+| vertices | @http://base/graphs/graph/tp/batch/vertices?values=[marko,peter]&type=keyindex&key=name@ | retrieve vertices by key index with name of marko and peter |
+| edges | @http://base/graphs/graph/tp/batch/edges?values=[5,6,7]@ | retrieve edges with _id 5, 6, and 7 |
+| edges | @http://base/graphs/graph/tp/batch/edges?values=[(f,0.2),(f,0.5)]&type=index&key=weight@ | retrieve edges by index with weight of 0.2 and 0.5 |
 
-Please note that if elements identified in the @idList@ cannot be found the extension will simply ignore the identifier for purpose of sending the return results.  In other words, if a request is made for vertices with three identifiers but Rexster can only locate one of the three then only one vertex will be returned in the results array.
+The elements of the @values@ parameter are specified using the "property data types":https://github.com/tinkerpop/rexster/wiki/Property-Data-Types format. Elements that do not have a specified data type are interpreted as strings. Also note that if elements identified in @values@ cannot be found the extension will simply ignore the element for purpose of sending the return results.  For example, if a request is made for vertices with three identifiers but Rexster can only locate one of the three then only one vertex will be returned in the results array.
+
+The @type@ parameter may be one of @id@, @index@, or @keyindex@.  The @type@ parameter defaults to @id@ if not specified.
+
+The @key@ paramter is required when the @type@ is @index@ or @keyindex@.
 
 h3. POST Operations
 
