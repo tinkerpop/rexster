@@ -85,16 +85,16 @@ public class MsgPackResultConverter implements ResultConverter<byte[]> {
 
                 packer.writeMapEnd(false);
             }
-
             packer.writeMapEnd(false);
         } else if (object instanceof Map) {
             final Map map = (Map) object;
 
             packer.writeMapBegin(map.size());
             for (Object key : map.keySet()) {
-                packer.write(key == null ? null : key.toString());
+                packer.write(key);
                 this.prepareOutput(map.get(key), packer);
             }
+            packer.writeMapEnd();
         } else if (object instanceof Table) {
             final Table table = (Table) object;
             final Iterator<Row> rows = table.iterator();
@@ -113,14 +113,35 @@ public class MsgPackResultConverter implements ResultConverter<byte[]> {
                 packer.writeMapEnd(false);
             }
         } else if (object instanceof Iterable) {
+            int size;
+            if (object instanceof Collection) {
+                size = ((Collection) object).size();
+            } else {
+                size = 0;
+                for (Object o : (Iterable) object) size++;
+            }
+
+            packer.writeArrayBegin(size);
             for (Object o : (Iterable) object) {
                 prepareOutput(o, packer);
             }
+            packer.writeArrayEnd();
+
         } else if (object instanceof Iterator) {
+            //we need to know the array size before beginning serialization
+            ArrayList<Object> contents = new ArrayList<Object>();
+
             final Iterator itty = (Iterator) object;
             while (itty.hasNext()) {
-                prepareOutput(itty.next(), packer);
+                contents.add(itty.next());
             }
+
+            packer.writeArrayBegin(contents.size());
+            for (Object o : contents) {
+                prepareOutput(o, packer);
+            }
+            packer.writeArrayEnd();
+
         } else if (object instanceof NilValue) {
             packer.write((NilValue) object);
         } else {
