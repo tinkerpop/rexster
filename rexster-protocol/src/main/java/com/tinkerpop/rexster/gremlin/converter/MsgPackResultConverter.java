@@ -13,6 +13,8 @@ import org.msgpack.packer.Packer;
 import org.msgpack.type.NilValue;
 import org.msgpack.type.ValueFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
