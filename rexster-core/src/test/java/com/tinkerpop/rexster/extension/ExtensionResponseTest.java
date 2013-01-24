@@ -1,11 +1,18 @@
 package com.tinkerpop.rexster.extension;
 
+import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
+import com.tinkerpop.rexster.Tokens;
 import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONArray;
 import org.junit.Assert;
 import org.junit.Test;
 
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class ExtensionResponseTest {
     @Test(expected = IllegalArgumentException.class)
@@ -216,6 +223,49 @@ public class ExtensionResponseTest {
         Assert.assertNotNull(entity);
         Assert.assertTrue(entity.has("this"));
         Assert.assertEquals("that", entity.optString("this"));
+    }
+
+    @Test
+    public void okForGraphElement() {
+        final Graph g = TinkerGraphFactory.createTinkerGraph();
+
+        final ExtensionResponse er = ExtensionResponse.ok(g.getVertex(1));
+        Assert.assertNotNull(er);
+        Assert.assertFalse(er.isErrorResponse());
+
+        final Response r = er.getJerseyResponse();
+        Assert.assertNotNull(r);
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+
+        final JSONObject entity = (JSONObject) r.getEntity();
+        Assert.assertNotNull(entity);
+        Assert.assertEquals("marko", entity.optString("name"));
+        Assert.assertEquals(29, entity.optInt("age"));
+    }
+
+    @Test
+    public void okForGraphElements() {
+        final Graph g = TinkerGraphFactory.createTinkerGraph();
+
+        List<Element> elements = new ArrayList<Element>();
+        elements.add(g.getVertex(1));
+        elements.add(g.getVertex(2));
+
+        final ExtensionResponse er = ExtensionResponse.ok(elements.iterator());
+        Assert.assertNotNull(er);
+        Assert.assertFalse(er.isErrorResponse());
+
+        final Response r = er.getJerseyResponse();
+        Assert.assertNotNull(r);
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+
+        final JSONObject entity = (JSONObject) r.getEntity();
+        Assert.assertNotNull(entity);
+
+        final JSONArray jsonArray = entity.optJSONArray(Tokens.RESULTS);
+        Assert.assertEquals(2, jsonArray.length());
+        Assert.assertEquals("marko", jsonArray.optJSONObject(0).optString("name"));
+        Assert.assertEquals("vadas", jsonArray.optJSONObject(1).optString("name"));
     }
 
     @Test

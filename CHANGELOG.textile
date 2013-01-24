@@ -17,6 +17,9 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 
 * Both RexPro and HTTP Server can be started independently with out configuration parameters, as all now have default values.
 * OPTIONS for extensions returns a default response.
+* Batch Kibble allows for multiple lookups within an manual or key index.
+* Rexster can initialize the Gremlin Script Engine with a script file referenced in @rexster.xml@.
+* More convenience methods for @ExtensionResponse@ to help simplify writing extensions.
 
 h3. Version 2.2.0 (December 19, 2012)
 
