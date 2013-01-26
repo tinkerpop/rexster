@@ -37,6 +37,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -80,13 +81,13 @@ public class VertexResource extends AbstractSubResource {
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
-    public Response getVertices(@PathParam("graphname") String graphName) {
+    public Response getVertices(@PathParam("graphname") final String graphName) {
         return getVertices(graphName, false);
     }
 
     @GET
     @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response getVerticesRexsterJson(@PathParam("graphname") String graphName) {
+    public Response getVerticesRexsterJson(@PathParam("graphname") final String graphName) {
         return getVertices(graphName, true);
     }
 
@@ -161,25 +162,25 @@ public class VertexResource extends AbstractSubResource {
     @GET
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON})
-    public Response getSingleVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response getSingleVertex(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return getSingleVertex(graphName, id, false, false);
     }
 
     @GET
     @Path("/{id}")
     @Produces({RexsterMediaType.APPLICATION_REXSTER_JSON})
-    public Response getSingleVertexRexsterJson(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response getSingleVertexRexsterJson(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return getSingleVertex(graphName, id, false, true);
     }
 
     @GET
     @Path("/{id}")
     @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response getSingleVertexRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response getSingleVertexRexsterTypedJson(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return getSingleVertex(graphName, id, true, true);
     }
 
-    private Response getSingleVertex(String graphName, String id, boolean showTypes, boolean showHypermedia) {
+    private Response getSingleVertex(final String graphName, final String id, final boolean showTypes, final boolean showHypermedia) {
         RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         Vertex vertex = rag.getGraph().getVertex(id);
         if (null != vertex) {
@@ -219,76 +220,92 @@ public class VertexResource extends AbstractSubResource {
     @HEAD
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response headVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response headVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeVertexExtension(graphName, id, HttpMethod.HEAD);
     }
 
     @HEAD
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
-    public Response headVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response headVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.HEAD);
     }
 
     @PUT
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response putVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response putVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeVertexExtension(graphName, id, HttpMethod.PUT);
     }
 
     @PUT
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
-    public Response putVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response putVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final MultivaluedMap<String, String> formParams) {
+        this.setRequestObject(formParams);
+        return this.executeVertexExtension(graphName, id, HttpMethod.PUT);
+    }
+
+    @PUT
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
+    public Response putVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.PUT);
     }
 
     @OPTIONS
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response optionsVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response optionsVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeVertexExtension(graphName, id, HttpMethod.OPTIONS);
     }
 
     @OPTIONS
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
-    public Response optionsVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response optionsVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.OPTIONS);
     }
 
     @DELETE
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response deleteVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeVertexExtension(graphName, id, HttpMethod.DELETE);
     }
 
     @DELETE
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
-    public Response deleteVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response deleteVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.DELETE);
     }
 
     @POST
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response postVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeVertexExtension(graphName, id, HttpMethod.POST);
     }
 
     @POST
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
-    public Response postVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response postVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final MultivaluedMap<String, String> formParams) {
+        this.setRequestObject(formParams);
+        return this.executeVertexExtension(graphName, id, HttpMethod.POST);
+    }
+
+    @POST
+    @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
+    public Response postVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.POST);
     }
 
     @GET
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
-    public Response getVertexExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response getVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.GET);
     }
 

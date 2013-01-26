@@ -29,6 +29,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -63,7 +64,7 @@ public class GraphResource extends AbstractSubResource {
 
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    public Response getGraphProducesJson(@PathParam("graphname") String graphName) {
+    public Response getGraphProducesJson(@PathParam("graphname") final  String graphName) {
         return getGraph(graphName, false);
     }
 
@@ -122,76 +123,92 @@ public class GraphResource extends AbstractSubResource {
     @HEAD
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response headGraphExtension(@PathParam("graphname") String graphName, JSONObject json) {
+    public Response headGraphExtension(@PathParam("graphname") final String graphName, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeGraphExtension(graphName, HttpMethod.HEAD);
     }
 
     @HEAD
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
-    public Response headGraphExtension(@PathParam("graphname") String graphName) {
+    public Response headGraphExtension(@PathParam("graphname") final String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.HEAD);
     }
 
     @PUT
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response putGraphExtension(@PathParam("graphname") String graphName, JSONObject json) {
+    public Response putGraphExtension(@PathParam("graphname") final String graphName, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeGraphExtension(graphName, HttpMethod.PUT);
     }
 
     @PUT
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
-    public Response putGraphExtension(@PathParam("graphname") String graphName) {
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response putGraphExtension(@PathParam("graphname") final String graphName, final MultivaluedMap<String, String> formParams) {
+        this.setRequestObject(formParams);
+        return this.executeGraphExtension(graphName, HttpMethod.PUT);
+    }
+
+    @PUT
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
+    public Response putGraphExtension(@PathParam("graphname") final String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.PUT);
     }
 
     @OPTIONS
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response optionsGraphExtension(@PathParam("graphname") String graphName, JSONObject json) {
+    public Response optionsGraphExtension(@PathParam("graphname") final String graphName, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeGraphExtension(graphName, HttpMethod.OPTIONS);
     }
 
     @OPTIONS
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
-    public Response optionsGraphExtension(@PathParam("graphname") String graphName) {
+    public Response optionsGraphExtension(@PathParam("graphname") final String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.OPTIONS);
     }
 
     @DELETE
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteGraphExtension(@PathParam("graphname") String graphName, JSONObject json) {
+    public Response deleteGraphExtension(@PathParam("graphname") final String graphName, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeGraphExtension(graphName, HttpMethod.DELETE);
     }
 
     @DELETE
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
-    public Response deleteGraphExtension(@PathParam("graphname") String graphName) {
+    public Response deleteGraphExtension(@PathParam("graphname") final String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.DELETE);
     }
 
     @POST
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postGraphExtension(@PathParam("graphname") String graphName, JSONObject json) {
+    public Response postGraphExtension(@PathParam("graphname") final String graphName, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeGraphExtension(graphName, HttpMethod.POST);
     }
 
     @POST
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
-    public Response postGraphExtension(@PathParam("graphname") String graphName) {
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response postGraphExtension(@PathParam("graphname") String graphName, final MultivaluedMap<String, String> formParams) {
+        this.setRequestObject(formParams);
+        return this.executeGraphExtension(graphName, HttpMethod.POST);
+    }
+
+    @POST
+    @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
+    public Response postGraphExtension(@PathParam("graphname") final String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.POST);
     }
 
     @GET
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
-    public Response getGraphExtension(@PathParam("graphname") String graphName) {
+    public Response getGraphExtension(@PathParam("graphname") final String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.GET);
     }
 

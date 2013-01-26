@@ -34,6 +34,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -77,13 +78,13 @@ public class EdgeResource extends AbstractSubResource {
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
-    public Response getAllEdges(@PathParam("graphname") String graphName) {
+    public Response getAllEdges(@PathParam("graphname") final String graphName) {
         return this.getAllEdges(graphName, false);
     }
 
     @GET
     @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response getAllEdgesRexsterTypedJson(@PathParam("graphname") String graphName) {
+    public Response getAllEdgesRexsterTypedJson(@PathParam("graphname") final String graphName) {
         return this.getAllEdges(graphName, true);
     }
 
@@ -154,25 +155,25 @@ public class EdgeResource extends AbstractSubResource {
     @GET
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON})
-    public Response getSingleEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response getSingleEdge(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return getSingleEdge(graphName, id, false, false);
     }
 
     @GET
     @Path("/{id}")
     @Produces({RexsterMediaType.APPLICATION_REXSTER_JSON})
-    public Response getSingleEdgeRexsterJson(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response getSingleEdgeRexsterJson(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return getSingleEdge(graphName, id, false, true);
     }
 
     @GET
     @Path("/{id}")
     @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
-    public Response getSingleEdgeRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response getSingleEdgeRexsterTypedJson(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return getSingleEdge(graphName, id, true, true);
     }
 
-    private Response getSingleEdge(String graphName, String id, boolean showTypes, boolean showHypermedia) {
+    private Response getSingleEdge(final String graphName, final String id, final boolean showTypes, final boolean showHypermedia) {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         final Edge edge = rag.getGraph().getEdge(id);
 
@@ -210,76 +211,92 @@ public class EdgeResource extends AbstractSubResource {
     @HEAD
     @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response headEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response headEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeEdgeExtension(graphName, id, HttpMethod.HEAD);
     }
 
     @HEAD
     @Path("/{id}/{extension: .+}")
-    public Response headEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response headEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeEdgeExtension(graphName, id, HttpMethod.HEAD);
     }
 
     @PUT
     @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response putEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response putEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeEdgeExtension(graphName, id, HttpMethod.PUT);
     }
 
     @PUT
     @Path("/{id}/{extension: .+}")
-    public Response putEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response putEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final MultivaluedMap<String, String> formParams) {
+        this.setRequestObject(formParams);
+        return this.executeEdgeExtension(graphName, id, HttpMethod.PUT);
+    }
+
+    @PUT
+    @Path("/{id}/{extension: .+}")
+    public Response putEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeEdgeExtension(graphName, id, HttpMethod.PUT);
     }
 
     @OPTIONS
     @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response optionsEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response optionsEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeEdgeExtension(graphName, id, HttpMethod.OPTIONS);
     }
 
     @OPTIONS
     @Path("/{id}/{extension: .+}")
-    public Response optionsEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response optionsEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeEdgeExtension(graphName, id, HttpMethod.OPTIONS);
     }
 
     @DELETE
     @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response deleteEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeEdgeExtension(graphName, id, HttpMethod.DELETE);
     }
 
     @DELETE
     @Path("/{id}/{extension: .+}")
-    public Response deleteEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response deleteEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeEdgeExtension(graphName, id, HttpMethod.DELETE);
     }
 
     @POST
     @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
+    public Response postEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeEdgeExtension(graphName, id, HttpMethod.POST);
     }
 
     @POST
     @Path("/{id}/{extension: .+}")
-    public Response postEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response postEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final MultivaluedMap<String, String> formParams) {
+        this.setRequestObject(formParams);
+        return this.executeEdgeExtension(graphName, id, HttpMethod.POST);
+    }
+
+    @POST
+    @Path("/{id}/{extension: .+}")
+    public Response postEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeEdgeExtension(graphName, id, HttpMethod.POST);
     }
 
     @GET
     @Path("/{id}/{extension: .+}")
-    public Response getEdgeExtension(@PathParam("graphname") String graphName, @PathParam("id") String id) {
+    public Response getEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeEdgeExtension(graphName, id, HttpMethod.GET);
     }
 
