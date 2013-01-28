@@ -44,7 +44,7 @@
     </rexpro>
     <shutdown-port>8183</shutdown-port>
     <shutdown-host>127.0.0.1</shutdown-host>
-    <script-engine-reset-threshold>500</script-engine-reset-threshold>
+    <script-engine-reset-threshold>-1</script-engine-reset-threshold>
     <script-engine-init>data/init.groovy</script-engine-init>
     <security>
         <authentication>

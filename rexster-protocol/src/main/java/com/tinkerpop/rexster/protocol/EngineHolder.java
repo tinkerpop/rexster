@@ -58,6 +58,8 @@ public class EngineHolder {
     }
 
     public ScriptEngine getEngine() {
+        /*
+        // commit in Gremlin in 2.3.0-SNAPSHOT removes the need for this reset.
         if (engineResetThreshold > EngineController.RESET_NEVER) {
             // determine if a reset is necessary.
             if (numberOfScriptsEvaluated.get() >= engineResetThreshold) {
@@ -67,6 +69,12 @@ public class EngineHolder {
             } else {
                 numberOfScriptsEvaluated.incrementAndGet();
             }
+        }
+        */
+
+        if (engine == null) {
+            // IMPORTANT: assumes that the factory implementation is not pooling engine instances
+            this.engine = initEngine(this.factory, this.initializationScriptFile);
         }
 
         return this.engine;
