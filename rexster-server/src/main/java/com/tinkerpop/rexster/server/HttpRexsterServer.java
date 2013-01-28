@@ -71,7 +71,7 @@ public class HttpRexsterServer implements RexsterServer {
         maxHeaderSize = properties.getInt("http.max-header-size", 8192);
         uploadTimeoutMillis = properties.getInt("http.upload-timeout-millis", 300000);
         enableJmx = properties.getBoolean("http.enable-jmx", false);
-        this.ioStrategy = properties.getString("http.io-strategy", "worker");
+        this.ioStrategy = properties.getString("http.io-strategy", "leader-follower");
 
         this.httpServer = new HttpServer();
     }

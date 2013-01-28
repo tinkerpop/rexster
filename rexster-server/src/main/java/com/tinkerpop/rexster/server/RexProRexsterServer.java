@@ -60,7 +60,7 @@ public class RexProRexsterServer implements RexsterServer {
         this.connectionIdleMax = properties.getInt("rexpro.connection-max-idle", 180000);
         this.connectionIdleInterval = properties.getInt("rexpro.connection-check-interval", 3000000);
         this.enableJmx = properties.getBoolean("rexpro.enable-jmx", false);
-        this.ioStrategy = properties.getString("rexpro.io-strategy", "worker");
+        this.ioStrategy = properties.getString("rexpro.io-strategy", "leader-follower");
 
         this.tcpTransport = configureTransport();
     }
