@@ -61,21 +61,6 @@
     </security>
     <graphs>
         <graph>
-      <graph-name>titanexample</graph-name>
-      <graph-type>com.thinkaurelius.titan.tinkerpop.rexster.TitanGraphConfiguration</graph-type>
-      <graph-location>tmp/titanyyy</graph-location>
-      <graph-read-only>false</graph-read-only>
-      <properties>
-            <storage.backend>local</storage.backend>
-            <buffer-size>100</buffer-size>
-      </properties>
-      <extensions>
-        <allows>
-          <allow>tp:gremlin</allow>
-        </allows>
-      </extensions>
-    </graph>
-        <graph>
             <graph-name>emptygraph</graph-name>
             <graph-type>tinkergraph</graph-type>
             <graph-mock-tx>true</graph-mock-tx>
