@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.gremlin;
 
 import com.tinkerpop.rexster.server.RexsterApplication;
+import org.apache.log4j.Logger;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -22,6 +23,7 @@ import java.util.concurrent.BlockingQueue;
  */
 @SuppressWarnings("restriction")
 public class GremlinSession implements Runnable {
+    private static final Logger logger = Logger.getLogger(GremlinSession.class);
 
     public static final int MAX_COMMANDS_WAITING = 128;
 
@@ -143,9 +145,10 @@ public class GremlinSession implements Runnable {
             return scriptEngine.eval(job.getScript());
 
         } catch (ScriptException e) {
+            logger.error("ScriptEngine error running [%s]", e);
             return e;
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            logger.error("ScriptEngine error running [%s]", e);
             return e;
         }
     }
