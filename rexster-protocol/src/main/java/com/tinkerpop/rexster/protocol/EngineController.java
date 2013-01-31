@@ -1,5 +1,7 @@
 package com.tinkerpop.rexster.protocol;
 
+import org.apache.log4j.Logger;
+
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -17,6 +19,7 @@ import java.util.Map;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class EngineController {
+    private static final Logger logger = Logger.getLogger(EngineController.class);
 
     public static final int RESET_NEVER = -1;
 
@@ -33,6 +36,7 @@ public class EngineController {
      */
     private final List<String> gremlinEngineNames = new ArrayList<String>() {{
         add("gremlin-groovy");
+        add("gremlin-javascript");
     }};
 
     private static EngineController engineController;
@@ -44,8 +48,11 @@ public class EngineController {
         System.setProperty("org.jruby.embed.localvariable.behavior", "persistent");
         for (ScriptEngineFactory factory : this.manager.getEngineFactories()) {
 
+            logger.info(String.format("ScriptEngineManager has factory for: %s", factory.getLanguageName()));
+
             // only add engine factories for those languages that are gremlin based.
             if (gremlinEngineNames.contains(factory.getLanguageName())) {
+                logger.info(String.format("Registered ScriptEngine for: %s", factory.getLanguageName()));
                 this.engines.put(factory.getLanguageName(), new EngineHolder(
                         factory, engineResetThreshold, initializationScriptFile));
             }
