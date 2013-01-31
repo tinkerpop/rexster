@@ -118,7 +118,10 @@ public class RexsterApplicationGraph {
     public void tryCommit() {
         final TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
-            transactionalGraph.commit();
+            // will leave this as stopTransaction until we completely remove it from blueprints so as to get as
+            // much backward compatibility as we can
+            //transactionalGraph.commit();
+            transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         }
     }
 
@@ -129,7 +132,10 @@ public class RexsterApplicationGraph {
     public void tryRollback() {
         final TransactionalGraph transactionalGraph = tryGetTransactionalGraph();
         if (transactionalGraph != null) {
-            transactionalGraph.rollback();
+            // will leave this as stopTransaction until we completely remove it from blueprints so as to get as
+            // much backward compatibility as we can
+            //transactionalGraph.rollback();
+            transactionalGraph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
         }
     }
 

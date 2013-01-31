@@ -144,6 +144,8 @@ public class VertexResource extends AbstractSubResource {
 
             JSONObject error = generateErrorObject(re.getMessage(), re);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } finally {
+            rag.tryCommit();
         }
 
         return Response.ok(this.resultObject).build();
@@ -181,14 +183,15 @@ public class VertexResource extends AbstractSubResource {
     }
 
     private Response getSingleVertex(final String graphName, final String id, final boolean showTypes, final boolean showHypermedia) {
-        RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
-        Vertex vertex = rag.getGraph().getVertex(id);
-        if (null != vertex) {
-            try {
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
+        try {
 
-                JSONObject theRequestObject = this.getRequestObject();
+            final Vertex vertex = rag.getGraph().getVertex(id);
+            if (null != vertex) {
+
+                final JSONObject theRequestObject = this.getRequestObject();
                 final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
-                Set<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
+                final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
 
                 this.resultObject.put(Tokens.RESULTS, GraphSONUtility.jsonFromElement(vertex, returnKeys, mode));
                 this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
@@ -200,18 +203,21 @@ public class VertexResource extends AbstractSubResource {
                     }
                 }
 
-            } catch (JSONException ex) {
-                logger.error(ex);
+            } else {
+                final String msg = "Vertex with [" + id + "] cannot be found.";
+                logger.info(msg);
 
-                JSONObject error = generateErrorObjectJsonFail(ex);
-                throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+                final JSONObject error = generateErrorObject(msg);
+                throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
             }
-        } else {
-            String msg = "Vertex with [" + id + "] cannot be found.";
-            logger.info(msg);
 
-            JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
+        } catch (JSONException ex) {
+            logger.error(ex);
+
+            final JSONObject error = generateErrorObjectJsonFail(ex);
+            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } finally {
+            rag.tryCommit();
         }
 
         return Response.ok(this.resultObject).build();
@@ -456,16 +462,18 @@ public class VertexResource extends AbstractSubResource {
     }
 
     private Response getVertexEdges(String graphName, String vertexId, String direction, boolean showTypes) {
-        final Vertex vertex = this.getRexsterApplicationGraph(graphName).getGraph().getVertex(vertexId);
-        if (vertex == null) {
-            final String msg = "Vertex with [" + vertexId + "] cannot be found.";
-            logger.info(msg);
-
-            final JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
-        }
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 
         try {
+            final Vertex vertex = rag.getGraph().getVertex(vertexId);
+            if (vertex == null) {
+                final String msg = "Vertex with [" + vertexId + "] cannot be found.";
+                logger.info(msg);
+
+                final JSONObject error = generateErrorObject(msg);
+                throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
+            }
+
             final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
             final JSONObject theRequestObject = this.getRequestObject();
             final Long start = RequestObjectHelper.getStartOffset(theRequestObject);
@@ -554,6 +562,8 @@ public class VertexResource extends AbstractSubResource {
 
             final JSONObject error = generateErrorObject(re.getMessage(), re);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } finally {
+            rag.tryCommit();
         }
 
         return Response.ok(this.resultObject).build();

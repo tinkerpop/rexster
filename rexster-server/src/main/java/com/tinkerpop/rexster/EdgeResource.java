@@ -136,6 +136,8 @@ public class EdgeResource extends AbstractSubResource {
 
             final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } finally {
+            rag.tryCommit();
         }
 
         return Response.ok(this.resultObject).build();
@@ -175,10 +177,11 @@ public class EdgeResource extends AbstractSubResource {
 
     private Response getSingleEdge(final String graphName, final String id, final boolean showTypes, final boolean showHypermedia) {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
-        final Edge edge = rag.getGraph().getEdge(id);
 
-        if (null != edge) {
-            try {
+        try {
+            final Edge edge = rag.getGraph().getEdge(id);
+
+            if (null != edge) {
                 final JSONObject theRequestObject = this.getRequestObject();
                 final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
                 final Set<String> returnKeys = RequestObjectHelper.getReturnKeys(theRequestObject);
@@ -192,17 +195,20 @@ public class EdgeResource extends AbstractSubResource {
                         this.resultObject.put(Tokens.EXTENSIONS, extensionsList);
                     }
                 }
-            } catch (JSONException ex) {
-                logger.error(ex);
+            } else {
+                final String msg = "Edge with id [" + id + "] cannot be found.";
+                logger.info(msg);
 
-                JSONObject error = generateErrorObjectJsonFail(ex);
-                throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+                final JSONObject error = generateErrorObject(msg);
+                throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
             }
-        } else {
-            String msg = "Edge with id [" + id + "] cannot be found.";
-            logger.info(msg);
-            JSONObject error = generateErrorObject(msg);
-            throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
+        } catch (JSONException ex) {
+            logger.error(ex);
+
+            final JSONObject error = generateErrorObjectJsonFail(ex);
+            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } finally {
+            rag.tryCommit();
         }
 
         return Response.ok(this.resultObject).build();

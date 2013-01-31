@@ -107,6 +107,8 @@ public class IndexResource extends AbstractSubResource {
 
             final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } finally {
+            rag.tryCommit();
         }
 
         return Response.ok(this.resultObject).build();
@@ -143,6 +145,7 @@ public class IndexResource extends AbstractSubResource {
 
     private Response getElementsFromIndex(final String graphName, final String indexName, final boolean showTypes) {
         final Index index = this.getIndexFromGraph(graphName, indexName);
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 
         String key = null;
         Object value = null;
@@ -184,6 +187,8 @@ public class IndexResource extends AbstractSubResource {
 
                 final JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            } finally {
+                rag.tryCommit();
             }
         } else if (null == index) {
             final String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";
@@ -217,6 +222,7 @@ public class IndexResource extends AbstractSubResource {
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response getIndexCount(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
         final Index index = this.getIndexFromGraph(graphName, indexName);
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
 
         String key = null;
         Object value = null;
@@ -245,6 +251,8 @@ public class IndexResource extends AbstractSubResource {
 
                 final JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
+            } finally {
+                rag.tryCommit();
             }
         } else if (null == index) {
             final String msg = "Could not find index [" + indexName + "] on graph [" + graphName + "]";

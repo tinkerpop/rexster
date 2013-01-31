@@ -76,6 +76,8 @@ public class PrefixResource extends AbstractSubResource {
             logger.error(re);
             final JSONObject error = generateErrorObject(re.getMessage(), re);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } finally {
+            rag.tryCommit();
         }
     }
 
@@ -91,8 +93,8 @@ public class PrefixResource extends AbstractSubResource {
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     public Response getSinglePrefix(@PathParam("graphname") String graphName, @PathParam("prefix") String prefix) {
 
+        final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         try {
-            final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
             final SailGraph graph = ((SailGraph) rag.getUnwrappedGraph());
             this.resultObject.put(Tokens.RESULTS, graph.getNamespaces().get(prefix));
             this.resultObject.put(Tokens.QUERY_TIME, this.sh.stopWatch());
@@ -106,6 +108,8 @@ public class PrefixResource extends AbstractSubResource {
             logger.error(re);
             JSONObject error = generateErrorObject(re.getMessage(), re);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } finally {
+            rag.tryCommit();
         }
     }
 
