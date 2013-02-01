@@ -255,6 +255,7 @@ public class RexsterConsole {
         this.output.println("-= Console Specific =-");
         this.output.println("?<language-name>: jump to engine");
         this.output.println(Tokens.REXSTER_CONSOLE_LANGUAGES + ": list of available languages on Rexster");
+        this.output.println(Tokens.REXSTER_CONSOLE_BINDINGS + ": print available bindings in the session");
         this.output.println(Tokens.REXSTER_CONSOLE_RESET + ": reset the rexster session");
         this.output.println(Tokens.REXSTER_CONSOLE_EXECUTE + " <file-name>: execute a script file");
         this.output.println(Tokens.REXSTER_CONSOLE_QUIT + ": quit");
