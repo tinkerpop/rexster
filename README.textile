@@ -1,6 +1,6 @@
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-logo.png!
 
-Rexster is a multi-faceted graph server that exposes any "Blueprints":http://blueprints.tinkerpop.com graph through several mechanisms with a general focus on REST. Extensions support standard traversal goals such as search, score, rank, and, in concert, recommendation. Rexster makes extensive use of "Blueprints":http://blueprints.tinkerpop.com, "Pipes":http://pipes.tinkerpop.com, and "Gremlin":http://gremlin.tinkerpop.com. In this way its possible to run Rexster over various graph systems including:
+Rexster is a graph server that exposes any "Blueprints":http://blueprints.tinkerpop.com graph through HTTP/REST and a binary protocol called RexPro. Extensions support standard traversal goals such as search, score, rank, and, in concert, recommendation. Rexster makes extensive use of "Blueprints":http://blueprints.tinkerpop.com, "Pipes":http://pipes.tinkerpop.com, and "Gremlin":http://gremlin.tinkerpop.com. In this way its possible to run Rexster over various graph systems including:
 
  * "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory graph
  * "Neo4j":http://neo4j.org/ graph database
