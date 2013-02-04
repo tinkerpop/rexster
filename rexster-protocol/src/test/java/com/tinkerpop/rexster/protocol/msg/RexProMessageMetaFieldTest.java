@@ -18,42 +18,42 @@ public class RexProMessageMetaFieldTest {
 
         try{
             meta.put("floatVal", 3.14f);
-            new RexProMessageMetaField<Float>("floatVal", true, Float.class).validateMeta(meta);
+            RexProMessageMetaField.define("floatVal", true, Float.class).validateMeta(meta);
         } catch (RexProException ex) {
             Assert.fail("unexpected exception thrown: " + ex.toString());
         }
 
         try{
             meta.put("doubleVal", 3.14);
-            new RexProMessageMetaField<Double>("doubleVal", true, Double.class).validateMeta(meta);
+            RexProMessageMetaField.define("doubleVal", true, Double.class).validateMeta(meta);
         } catch (RexProException ex) {
             Assert.fail("unexpected exception thrown: " + ex.toString());
         }
 
         try{
             meta.put("intVal", 123);
-            new RexProMessageMetaField<Integer>("intVal", true, Integer.class).validateMeta(meta);
+            RexProMessageMetaField.define("intVal", true, Integer.class).validateMeta(meta);
         } catch (RexProException ex) {
             Assert.fail("unexpected exception thrown: " + ex.toString());
         }
 
         try{
             meta.put("boolVal", true);
-            new RexProMessageMetaField<Boolean>("boolVal", true, Boolean.class).validateMeta(meta);
+            RexProMessageMetaField.define("boolVal", true, Boolean.class).validateMeta(meta);
         } catch (RexProException ex) {
             Assert.fail("unexpected exception thrown: " + ex.toString());
         }
 
         try{
             meta.put("stringVal", "la la la");
-            new RexProMessageMetaField<String>("stringVal", true, String.class).validateMeta(meta);
+            RexProMessageMetaField.define("stringVal", true, String.class).validateMeta(meta);
         } catch (RexProException ex) {
             Assert.fail("unexpected exception thrown: " + ex.toString());
         }
 
         try{
             meta.put("wrongType", "should be int");
-            new RexProMessageMetaField<Integer>("wrongType", true, Integer.class).validateMeta(meta);
+            RexProMessageMetaField.define("wrongType", true, Integer.class).validateMeta(meta);
             Assert.fail("expecting RexProException to be thrown");
         } catch (RexProException ex) {
             //exception is expected
@@ -68,7 +68,7 @@ public class RexProMessageMetaFieldTest {
         RexProMessageMeta meta = new RexProMessageMeta();
 
         try{
-            new RexProMessageMetaField<Float>("floatVal", true, 1.23f, Float.class).validateMeta(meta);
+            RexProMessageMetaField.define("floatVal", true, 1.23f, Float.class).validateMeta(meta);
         } catch (RexProException ex) {
             Assert.fail("unexpected exception thrown: " + ex.toString());
         }
@@ -85,7 +85,7 @@ public class RexProMessageMetaFieldTest {
         RexProMessageMeta meta = new RexProMessageMeta();
 
         try{
-            new RexProMessageMetaField<Float>("floatVal", false, Float.class).validateMeta(meta);
+            RexProMessageMetaField.define("floatVal", false, Float.class).validateMeta(meta);
         } catch (RexProException ex) {
             Assert.fail("unexpected exception thrown: " + ex.toString());
         }
@@ -103,7 +103,7 @@ public class RexProMessageMetaFieldTest {
         RexProMessageMeta meta = new RexProMessageMeta();
 
         try{
-            new RexProMessageMetaField<Float>("floatVal", true, Float.class).validateMeta(meta);
+            RexProMessageMetaField.define("floatVal", true, Float.class).validateMeta(meta);
             Assert.fail("expecting RexProException to be thrown");
         } catch (RexProException ex) {
             //exception is expected
@@ -111,7 +111,7 @@ public class RexProMessageMetaFieldTest {
 
         //default value should override missing value
         try{
-            new RexProMessageMetaField<Integer>("intVal", true, 1, Integer.class).validateMeta(meta);
+            RexProMessageMetaField.define("intVal", true, 1, Integer.class).validateMeta(meta);
         } catch (RexProException ex) {
             Assert.fail("unexpected exception thrown: " + ex.toString());
         }

@@ -24,6 +24,14 @@ public class RexProMessageMetaField<FieldType> {
         this(key, required, null, fieldType);
     }
 
+    public static<T> RexProMessageMetaField<T> define(String key, Boolean required, Class<T> fieldType) {
+        return new RexProMessageMetaField<T>(key, required, fieldType);
+    }
+
+    public static<T> RexProMessageMetaField<T> define(String key, Boolean required, T defaultValue, Class<T> fieldType) {
+        return new RexProMessageMetaField<T>(key, required, defaultValue, fieldType);
+    }
+
     /**
      * Validates this field in the given meta object
      *
