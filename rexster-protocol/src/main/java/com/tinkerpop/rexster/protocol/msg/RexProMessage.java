@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol.msg;
 
+import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.protocol.BitWorks;
 
 import java.util.UUID;
@@ -17,6 +18,11 @@ public abstract class RexProMessage {
     protected static final int BASE_MESSAGE_SIZE = 36;
 
     /**
+     * List of meta fields accepted for this message type
+     */
+    protected static RexProMessageMetaField[] metaFields;
+
+    /**
      * The standard value for an empty session.
      */
     public static final UUID EMPTY_SESSION = new UUID(0, 0);
@@ -29,12 +35,12 @@ public abstract class RexProMessage {
      * Denotes the version of RexPro that is being used.
      */
     public byte Version = 0;
-
-    /**
-     * A value used to denote different states in different messages.  See specific message implementations
-     * for how this field is used.
-     */
-    public byte Flag;
+//
+//    /**
+//     * A value used to denote different states in different messages.  See specific message implementations
+//     * for how this field is used.
+//     */
+//    public byte Flag;
 
     /**
      * Denotes the session on which the message is sent. Reserved for 16 bytes and resolves to a UUID.
@@ -45,6 +51,11 @@ public abstract class RexProMessage {
      * A value that uniquely identifies a request. Reserved for 16 bytes and resolves to a UUID.
      */
     public byte[] Request;
+
+    /**
+     * Map of message type specific meta data, supported keys and values vary by message type
+     */
+    public RexProMessageMeta Meta;
 
     public boolean hasSession() {
         return this.Session != null && !this.sessionAsUUID().equals(EMPTY_SESSION);
@@ -70,4 +81,14 @@ public abstract class RexProMessage {
      * @return the estimated size of the message in bytes.
      */
     public abstract int estimateMessageSize();
+
+    /**
+     * Validates the instance's Meta field
+     */
+    public void validateMetaData() throws RexProException{
+        for (RexProMessageMetaField f : metaFields) {
+            f.validateMeta(Meta);
+        }
+    }
+
 }
