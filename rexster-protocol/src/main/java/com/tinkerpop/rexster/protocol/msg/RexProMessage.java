@@ -9,6 +9,7 @@ import java.util.UUID;
  * A basic RexProMessage containing the basic components of every message that Rexster can process.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public abstract class RexProMessage {
 
@@ -20,7 +21,10 @@ public abstract class RexProMessage {
     /**
      * List of meta fields accepted for this message type
      */
-    protected static RexProMessageMetaField[] metaFields;
+    protected RexProMessageMetaField[] getMetaFields() {
+        RexProMessageMetaField[] fields = {};
+        return fields;
+    }
 
     /**
      * The standard value for an empty session.
@@ -35,12 +39,6 @@ public abstract class RexProMessage {
      * Denotes the version of RexPro that is being used.
      */
     public byte Version = 0;
-//
-//    /**
-//     * A value used to denote different states in different messages.  See specific message implementations
-//     * for how this field is used.
-//     */
-//    public byte Flag;
 
     /**
      * Denotes the session on which the message is sent. Reserved for 16 bytes and resolves to a UUID.
@@ -86,7 +84,7 @@ public abstract class RexProMessage {
      * Validates the instance's Meta field
      */
     public void validateMetaData() throws RexProException{
-        for (RexProMessageMetaField f : metaFields) {
+        for (RexProMessageMetaField f : getMetaFields()) {
             f.validateMeta(Meta);
         }
     }

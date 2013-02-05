@@ -10,15 +10,19 @@ import java.nio.ByteBuffer;
  * Represents a request to process a script.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 @Message
 public class ScriptRequestMessage extends RexProMessage {
 
     protected static final String IN_SESSION_META_KEY = "inSession";
-    protected static final RexProMessageMetaField[] metaFields = {
-        //indicates this requests should be executed in the supplied session
-        RexProMessageMetaField.define(IN_SESSION_META_KEY, false, false, Boolean.class)
-    };
+    protected RexProMessageMetaField[] getMetaFields() {
+        RexProMessageMetaField[] fields = {
+            //indicates this requests should be executed in the supplied session
+            RexProMessageMetaField.define(IN_SESSION_META_KEY, false, false, Boolean.class)
+        };
+        return fields;
+    }
 
     public String LanguageName;
     public String Script;

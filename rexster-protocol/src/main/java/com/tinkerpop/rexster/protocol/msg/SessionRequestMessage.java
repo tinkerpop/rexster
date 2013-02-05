@@ -6,6 +6,7 @@ import org.msgpack.annotation.Message;
  * Represents a request to open or close a session.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 @Message
 public class SessionRequestMessage extends RexProMessage {
@@ -15,10 +16,13 @@ public class SessionRequestMessage extends RexProMessage {
     public static final byte CHANNEL_GRAPHSON = 3;
 
     protected static final String KILL_SESSION_META_KEY = "killSession";
-    protected static final RexProMessageMetaField[] metaFields = {
+    protected RexProMessageMetaField[] getMetaFields() {
+        RexProMessageMetaField[] fields = {
             //indicates this session should be destroyed
             RexProMessageMetaField.define(KILL_SESSION_META_KEY, false, false, Boolean.class)
-    };
+        };
+        return fields;
+    }
 
     public byte Channel;
     public String Username;
@@ -36,6 +40,6 @@ public class SessionRequestMessage extends RexProMessage {
     }
 
     public Boolean metaGetKillSession() {
-        Meta.get(KILL_SESSION_META_KEY);
+        return (Boolean) Meta.get(KILL_SESSION_META_KEY);
     }
 }
