@@ -1,10 +1,7 @@
 package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.protocol.msg.MessageFlag;
-import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
-import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.*;
 import org.msgpack.MessagePack;
 import org.msgpack.type.Value;
 import org.msgpack.unpacker.BufferUnpacker;
@@ -141,7 +138,8 @@ public class TryRexProSessioned {
         //scriptMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToConsoleLineByteArray(bindings);
         scriptMessage.Bindings = emptyBindings;
         scriptMessage.LanguageName = "groovy";
-        scriptMessage.Flag = MessageFlag.SCRIPT_REQUEST_IN_SESSION;
+        scriptMessage.Meta = new RexProMessageMeta();
+        scriptMessage.metaSetInSession(true);
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
         return scriptMessage;
     }

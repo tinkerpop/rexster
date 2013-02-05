@@ -17,4 +17,9 @@ public class ScriptRequestMessageTest {
 
         Assert.assertEquals(58, msg.estimateMessageSize());
     }
+
+    @Test
+    public void testMetaValidation() {
+        //TODO
+    }
 }

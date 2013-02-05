@@ -5,11 +5,7 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.RemoteRexsterSession;
 import com.tinkerpop.rexster.protocol.ResultAndBindings;
-import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.MessageFlag;
-import com.tinkerpop.rexster.protocol.msg.RexProMessage;
-import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.*;
 import jline.ConsoleReader;
 import jline.History;
 
@@ -301,7 +297,8 @@ public class RexsterConsole {
             scriptMessage.Script = script;
             scriptMessage.Bindings = emptyBindings;
             scriptMessage.LanguageName = scriptEngineName;
-            scriptMessage.Flag = MessageFlag.SCRIPT_REQUEST_IN_SESSION;
+//            scriptMessage.Flag = MessageFlag.SCRIPT_REQUEST_IN_SESSION;
+            scriptMessage.Meta = new RexProMessageMeta();
             scriptMessage.setRequestAsUUID(UUID.randomUUID());
 
             final RexProMessage resultMessage = session.sendRequest(scriptMessage, 3, 500);
