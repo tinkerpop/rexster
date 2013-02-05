@@ -92,9 +92,14 @@ public class RexProMessageFilter extends BaseFilter {
             if (message == null) {
                 logger.warn("Message did not match an expected type.");
 
-                ctx.write(MessageUtil.createErrorResponse(RexProMessage.EMPTY_REQUEST_AS_BYTES,
-                        RexProMessage.EMPTY_SESSION_AS_BYTES, MessageFlag.ERROR_MESSAGE_VALIDATION,
-                        MessageTokens.ERROR_UNEXPECTED_MESSAGE_TYPE));
+                ctx.write(
+                    MessageUtil.createErrorResponse(
+                        RexProMessage.EMPTY_REQUEST_AS_BYTES,
+                        RexProMessage.EMPTY_SESSION_AS_BYTES,
+                        ErrorResponseMessage.INVALID_MESSAGE_ERROR,
+                        MessageTokens.ERROR_UNEXPECTED_MESSAGE_TYPE
+                    )
+                );
             }
 
             ctx.setMessage(message);
