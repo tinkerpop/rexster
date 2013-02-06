@@ -18,6 +18,8 @@ import java.util.Set;
 
 /**
  * Wraps the Jersey response object with some simple response builder methods.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class ExtensionResponse {
 

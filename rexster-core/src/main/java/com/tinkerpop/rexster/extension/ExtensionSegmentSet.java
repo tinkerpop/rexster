@@ -4,6 +4,11 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
+/**
+ * Holder for the path to an extension.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
 public class ExtensionSegmentSet {
 
     private String namespace;
@@ -35,7 +40,7 @@ public class ExtensionSegmentSet {
         this.extensionMethod = extensionMethod;
     }
 
-    public ExtensionSegmentSet(UriInfo uriInfo, ExtensionPoint extensionPoint) {
+    public ExtensionSegmentSet(final UriInfo uriInfo, final ExtensionPoint extensionPoint) {
 
         int start = 2;
         if (extensionPoint != ExtensionPoint.GRAPH) {

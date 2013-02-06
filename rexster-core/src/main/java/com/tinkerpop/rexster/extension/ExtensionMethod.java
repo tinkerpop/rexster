@@ -10,6 +10,8 @@ import java.util.HashMap;
 /**
  * Holds the reflected method for the extension service call and its associated
  * extension attributes.
+ *
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class ExtensionMethod {
 
