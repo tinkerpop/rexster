@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
+import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.protocol.msg.*;
 import org.apache.log4j.Logger;
 
@@ -54,8 +55,13 @@ public class RemoteRexsterSession {
             sessionRequestMessageToSend.Password = this.password;
             sessionRequestMessageToSend.setSessionAsUUID(SessionRequestMessage.EMPTY_SESSION);
             sessionRequestMessageToSend.Channel = channel;
-            sessionRequestMessageToSend.Meta = new RexProMessageMeta();
             sessionRequestMessageToSend.setRequestAsUUID(UUID.randomUUID());
+
+            try {
+                sessionRequestMessageToSend.validateMetaData();
+            } catch (RexProException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
 
             final RexProMessage rcvMessage = sendRequest(sessionRequestMessageToSend, 3);
 
@@ -149,7 +155,6 @@ public class RemoteRexsterSession {
         try {
             if (sessionKey != RexProMessage.EMPTY_SESSION) {
                 SessionRequestMessage sessionKillMessageToSend = new SessionRequestMessage();
-                sessionKillMessageToSend.Meta = new RexProMessageMeta();
                 sessionKillMessageToSend.metaSetKillSession(true);
                 sessionKillMessageToSend.setRequestAsUUID(UUID.randomUUID());
 

@@ -98,7 +98,6 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
                     errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
                     errorMessage.Request = specificMessage.Request;
                     errorMessage.ErrorMessage = "Invalid username or password.";
-                    errorMessage.Meta = new RexProMessageMeta();
                     errorMessage.metaSetFlag(ErrorResponseMessage.AUTH_FAILURE_ERROR);
 
                     ctx.write(errorMessage);

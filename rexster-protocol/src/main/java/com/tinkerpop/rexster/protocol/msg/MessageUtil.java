@@ -15,7 +15,6 @@ public class MessageUtil {
         msg.Request = request;
         msg.Session = session;
         msg.ErrorMessage = errorMessage;
-        msg.Meta = new RexProMessageMeta();
 
         msg.metaSetFlag(flag);
         try {
@@ -32,7 +31,6 @@ public class MessageUtil {
         final SessionResponseMessage responseMessage = new SessionResponseMessage();
         responseMessage.setSessionAsUUID(sessionKey);
         responseMessage.Request = request;
-        responseMessage.Meta = new RexProMessageMeta();
         responseMessage.Languages = new String[languages.size()];
         languages.toArray(responseMessage.Languages);
 
@@ -44,7 +42,6 @@ public class MessageUtil {
         responseMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
         responseMessage.Request = request;
         responseMessage.Languages = new String[0];
-        responseMessage.Meta = new RexProMessageMeta();
 
         return responseMessage;
     }

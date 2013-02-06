@@ -138,7 +138,6 @@ public class TryRexProSessioned {
         //scriptMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToConsoleLineByteArray(bindings);
         scriptMessage.Bindings = emptyBindings;
         scriptMessage.LanguageName = "groovy";
-        scriptMessage.Meta = new RexProMessageMeta();
         scriptMessage.metaSetInSession(true);
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
         return scriptMessage;

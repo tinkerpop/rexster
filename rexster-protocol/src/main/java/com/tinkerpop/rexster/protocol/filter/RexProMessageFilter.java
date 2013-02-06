@@ -1,16 +1,6 @@
 package com.tinkerpop.rexster.protocol.filter;
 
-import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.MessageFlag;
-import com.tinkerpop.rexster.protocol.msg.MessageTokens;
-import com.tinkerpop.rexster.protocol.msg.MessageType;
-import com.tinkerpop.rexster.protocol.msg.MessageUtil;
-import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.RexProMessage;
-import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
-import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
-import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.*;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.filterchain.BaseFilter;
@@ -19,11 +9,16 @@ import org.glassfish.grizzly.filterchain.NextAction;
 import org.glassfish.grizzly.memory.MemoryManager;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
+import org.msgpack.template.Template;
+import org.msgpack.template.TemplateRegistry;
 import org.msgpack.unpacker.Unpacker;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+
+import static org.msgpack.template.Templates.*;
 
 /**
  * Handles incoming/outgoing RexProMessage instances.
@@ -33,6 +28,9 @@ import java.io.IOException;
 public class RexProMessageFilter extends BaseFilter {
     private static final Logger logger = Logger.getLogger(RexProMessageFilter.class);
     private static final MessagePack msgpack = new MessagePack();
+    static {
+        msgpack.register(RexProMessageMeta.class, RexProMessageMetaTemplate.getInstance());
+    }
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
         // Get the source buffer from the context
@@ -100,6 +98,7 @@ public class RexProMessageFilter extends BaseFilter {
                         MessageTokens.ERROR_UNEXPECTED_MESSAGE_TYPE
                     )
                 );
+                return ctx.getStopAction();
             }
 
             ctx.setMessage(message);
@@ -107,6 +106,16 @@ public class RexProMessageFilter extends BaseFilter {
             sourceBuffer.tryDispose();
 
             return ctx.getInvokeAction(remainder);
+        } catch (Exception ex) {
+            ctx.write(
+                MessageUtil.createErrorResponse(
+                    RexProMessage.EMPTY_REQUEST_AS_BYTES,
+                    RexProMessage.EMPTY_SESSION_AS_BYTES,
+                    ErrorResponseMessage.INVALID_MESSAGE_ERROR,
+                    ex.toString()
+                )
+            );
+            return ctx.getStopAction();
         } finally {
             unpacker.close();
         }
@@ -117,6 +126,7 @@ public class RexProMessageFilter extends BaseFilter {
         final RexProMessage msg = ctx.getMessage();
 
         final ByteArrayOutputStream rexProMessageStream = new ByteArrayOutputStream();
+        //TODO: create RexProMessageMeta template
         final Packer packer = msgpack.createPacker(rexProMessageStream);
         byte[] rexProMessageAsBytes;
 

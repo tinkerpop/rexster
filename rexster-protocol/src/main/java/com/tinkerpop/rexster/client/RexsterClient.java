@@ -247,7 +247,6 @@ public class RexsterClient {
         scriptMessage.Script = script;
         scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(bindings);
         scriptMessage.LanguageName = this.language;
-        scriptMessage.Meta = new RexProMessageMeta();
         scriptMessage.metaSetInSession(false);
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
 

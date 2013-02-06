@@ -131,7 +131,6 @@ public class ScriptFilter extends BaseFilter {
 
     private static GraphSONScriptResponseMessage formatForGraphSONChannel(final ScriptRequestMessage specificMessage, final Object result) throws Exception {
         final GraphSONScriptResponseMessage graphSONScriptResponseMessage = new GraphSONScriptResponseMessage();
-        graphSONScriptResponseMessage.Meta = new RexProMessageMeta();
 
         if (specificMessage.metaGetInSession()){
             graphSONScriptResponseMessage.Session = specificMessage.Session;
@@ -147,7 +146,6 @@ public class ScriptFilter extends BaseFilter {
 
     private static MsgPackScriptResponseMessage formatForMsgPackChannel(final ScriptRequestMessage specificMessage, final Object result) throws Exception {
         final MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
-        msgPackScriptResponseMessage.Meta = new RexProMessageMeta();
 
         if (specificMessage.metaGetInSession()){
             msgPackScriptResponseMessage.Session = specificMessage.Session;
@@ -164,7 +162,6 @@ public class ScriptFilter extends BaseFilter {
     private static ConsoleScriptResponseMessage formatForConsoleChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
         final ConsoleScriptResponseMessage consoleScriptResponseMessage = new ConsoleScriptResponseMessage();
         consoleScriptResponseMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToConsoleLineByteArray(session.getBindings());
-        consoleScriptResponseMessage.Meta = new RexProMessageMeta();
 
         if (specificMessage.metaGetInSession()){
             consoleScriptResponseMessage.Session = specificMessage.Session;
