@@ -3,6 +3,8 @@ package com.tinkerpop.rexster.protocol.msg;
 import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.protocol.BitWorks;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -53,7 +55,8 @@ public abstract class RexProMessage {
     /**
      * Map of message type specific meta data, supported keys and values vary by message type
      */
-    public RexProMessageMeta Meta;
+    public RexProMessageMeta Meta = new RexProMessageMeta();
+//    public HashMap Meta = new HashMap();
 
     public boolean hasSession() {
         return this.Session != null && !this.sessionAsUUID().equals(EMPTY_SESSION);
@@ -79,6 +82,13 @@ public abstract class RexProMessage {
      * @return the estimated size of the message in bytes.
      */
     public abstract int estimateMessageSize();
+
+//    /**
+//     * Initializes the Meta field
+//     */
+//    public void initMeta() {
+//        Meta = new HashMap<String, Object>();
+//    }
 
     /**
      * Validates the instance's Meta field
