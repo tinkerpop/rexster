@@ -8,14 +8,16 @@ import org.apache.log4j.Logger;
 import java.util.List;
 
 /**
+ * Configure multiple graphs in rexster via XML based Apache Configuration.  This is the standard way Rexster is
+ * configured in standalone operations.
+ *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class XmlRexsterApplication extends AbstractMapRexsterApplication {
     private static final Logger logger = Logger.getLogger(XmlRexsterApplication.class);
 
     /**
-     * Configure multiple graphs in rexster via XML based configuration.  This is the standard way Rexster is
-     * configured in standalone operations.
+     * Create new XmlRexsterApplication
      *
      * @param graphConfigs  graph configuration settings.
      */
