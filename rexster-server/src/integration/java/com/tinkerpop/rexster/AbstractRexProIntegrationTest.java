@@ -1,10 +1,10 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.client.RexsterClientFactory;
-import com.tinkerpop.rexster.server.DefaultRexsterApplication;
 import com.tinkerpop.rexster.server.RexProRexsterServer;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.server.RexsterServer;
+import com.tinkerpop.rexster.server.XmlRexsterApplication;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.junit.After;
@@ -27,7 +27,7 @@ public abstract class AbstractRexProIntegrationTest {
         rexsterServer = new RexProRexsterServer(properties);
 
         final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
-        final RexsterApplication application = new DefaultRexsterApplication(graphConfigs);
+        final RexsterApplication application = new XmlRexsterApplication(graphConfigs);
         rexsterServer.start(application);
     }
 

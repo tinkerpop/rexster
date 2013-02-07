@@ -15,22 +15,17 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Initializes and manages Graph instances.  Supplies these instances in the various
- * contexts that Rexster requires them.
+ * Configure a single existing graph into Rexster.  Useful in configuring Rexster for embedded applications.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class DefaultRexsterApplication implements RexsterApplication {
+public class DefaultRexsterApplication extends AbstractMapRexsterApplication {
 
-    protected static final Logger logger = Logger.getLogger(DefaultRexsterApplication.class);
-
-    private final long startTime = System.currentTimeMillis();
-
-    private final Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+    private static final Logger logger = Logger.getLogger(DefaultRexsterApplication.class);
 
     /**
-     * Configure a single existing graph into Rexster.  Useful in configuring Rexster for embedded applications.
+     * Constructs the DefaultRexsterApplication.
      *
      * @param graphName the name the graph will have in various Rexster contexts.
      * @param graph a graph instance.
@@ -39,69 +34,5 @@ public class DefaultRexsterApplication implements RexsterApplication {
         final RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph);
         this.graphs.put(graphName, rag);
         logger.info(String.format("Graph [%s] loaded", rag.getGraph()));
-    }
-
-    /**
-     * Configure multiple graphs in rexster via XML based configuration.  This is the standard way Rexster is
-     * configured in standalone operations.
-     *
-     * @param graphConfigs  graph configuration settings.
-     */
-    public DefaultRexsterApplication(final List<HierarchicalConfiguration> graphConfigs) {
-        try {
-            final GraphConfigurationContainer container = new GraphConfigurationContainer(graphConfigs);
-            this.graphs.putAll(container.getApplicationGraphs());
-        } catch (GraphConfigurationException gce) {
-            logger.error("Graph initialization failed. Check the graph configuration in rexster.xml.");
-        }
-    }
-
-    @Override
-    public Graph getGraph(final String graphName) {
-        final RexsterApplicationGraph g = getApplicationGraph(graphName);
-        if (g != null) {
-            return g.getGraph();
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public RexsterApplicationGraph getApplicationGraph(final String graphName) {
-        return this.graphs.get(graphName);
-    }
-
-    @Override
-    public Set<String> getGraphNames() {
-        return this.graphs.keySet();
-    }
-
-    @Override
-    public long getStartTime() {
-        return this.startTime;
-    }
-
-    @Override
-    public void stop() {
-
-        // need to shutdown all the graphs that were started with the web server
-        for (RexsterApplicationGraph rag : this.graphs.values()) {
-
-            final Graph graph = rag.getGraph();
-            logger.info(String.format("Shutting down [%s] - [%s]", rag.getGraphName(), graph));
-
-            // graph may not have been initialized properly if an exception gets tossed in
-            // on graph creation
-            if (graph != null) {
-                final Graph shutdownGraph = rag.getUnwrappedGraph();
-                shutdownGraph.shutdown();
-            }
-        }
-
-    }
-
-    @Override
-    public String toString() {
-        return String.format("RexsterServerContext {configured graphs=%s}", graphs.size());
     }
 }

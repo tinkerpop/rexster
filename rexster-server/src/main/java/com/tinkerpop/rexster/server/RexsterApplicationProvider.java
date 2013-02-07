@@ -98,7 +98,7 @@ public class RexsterApplicationProvider extends AbstractHttpContextInjectable<Re
             }
 
             final List<HierarchicalConfiguration> graphConfigs = configurationProperties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
-            rexster = new DefaultRexsterApplication(graphConfigs);
+            rexster = new XmlRexsterApplication(graphConfigs);
 
         }
     }

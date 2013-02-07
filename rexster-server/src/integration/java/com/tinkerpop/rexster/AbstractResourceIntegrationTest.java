@@ -5,7 +5,7 @@ import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.tinkerpop.rexster.server.DefaultRexsterApplication;
+import com.tinkerpop.rexster.server.XmlRexsterApplication;
 import com.tinkerpop.rexster.server.HttpRexsterServer;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.server.RexsterServer;
@@ -36,7 +36,7 @@ public abstract class AbstractResourceIntegrationTest {
         rexsterServer = new HttpRexsterServer(properties);
 
         final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
-        final RexsterApplication application = new DefaultRexsterApplication(graphConfigs);
+        final RexsterApplication application = new XmlRexsterApplication(graphConfigs);
         rexsterServer.start(application);
 
         client = Client.create(clientConfiguration);

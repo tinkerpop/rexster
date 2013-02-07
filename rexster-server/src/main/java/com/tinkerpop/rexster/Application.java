@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.protocol.EngineController;
-import com.tinkerpop.rexster.server.DefaultRexsterApplication;
 import com.tinkerpop.rexster.server.HttpRexsterServer;
 import com.tinkerpop.rexster.server.RexProRexsterServer;
 import com.tinkerpop.rexster.server.RexsterApplication;
@@ -9,6 +8,7 @@ import com.tinkerpop.rexster.server.RexsterCommandLine;
 import com.tinkerpop.rexster.server.RexsterServer;
 import com.tinkerpop.rexster.server.RexsterSettings;
 import com.tinkerpop.rexster.server.ShutdownManager;
+import com.tinkerpop.rexster.server.XmlRexsterApplication;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.IOUtils;
@@ -48,7 +48,7 @@ public class Application {
         // get the graph configurations from the XML config file
         this.properties = properties;
         final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
-        this.rexsterApplication = new DefaultRexsterApplication(graphConfigs);
+        this.rexsterApplication = new XmlRexsterApplication(graphConfigs);
 
         this.httpServer = new HttpRexsterServer(properties);
         this.rexproServer = new RexProRexsterServer(properties);
