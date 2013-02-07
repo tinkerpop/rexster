@@ -1,3 +1,3 @@
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-kibbles-logo.png!
 
-Rexster Kibbles is a collection of extensions for the "Rexster":http://rexster.tinkerpop.com graph server.
+Rexster Kibbles is a collection of "extensions":https://github.com/tinkerpop/rexster/wiki/Extensions for the "Rexster":http://rexster.tinkerpop.com graph server.
