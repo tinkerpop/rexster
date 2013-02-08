@@ -1,11 +1,7 @@
 package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.protocol.BitWorks;
-import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.MessageFlag;
-import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.RexProMessage;
-import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.*;
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Connection;
@@ -241,7 +237,7 @@ public class RexsterClient {
     }
 
     private ScriptRequestMessage createNoSessionScriptRequest(final String script,
-                                                              final Map<String, Object> scriptArguments) throws IOException {
+                                                              final Map<String, Object> scriptArguments) throws IOException, RexProException {
         final Bindings bindings = new SimpleBindings();
         if (scriptArguments != null) {
             bindings.putAll(scriptArguments);
@@ -251,8 +247,10 @@ public class RexsterClient {
         scriptMessage.Script = script;
         scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(bindings);
         scriptMessage.LanguageName = this.language;
-        scriptMessage.Flag = MessageFlag.SCRIPT_REQUEST_NO_SESSION;
+        scriptMessage.metaSetInSession(false);
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
+
+        scriptMessage.validateMetaData();
         return scriptMessage;
     }
 }

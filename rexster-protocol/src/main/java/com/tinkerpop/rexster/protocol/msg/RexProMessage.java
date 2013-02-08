@@ -1,13 +1,17 @@
 package com.tinkerpop.rexster.protocol.msg;
 
+import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.protocol.BitWorks;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
  * A basic RexProMessage containing the basic components of every message that Rexster can process.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public abstract class RexProMessage {
 
@@ -15,6 +19,14 @@ public abstract class RexProMessage {
      * Constant that represents the size of a RexProMessage.
      */
     protected static final int BASE_MESSAGE_SIZE = 36;
+
+    /**
+     * List of meta fields accepted for this message type
+     */
+    protected RexProMessageMetaField[] getMetaFields() {
+        RexProMessageMetaField[] fields = {};
+        return fields;
+    }
 
     /**
      * The standard value for an empty session.
@@ -31,12 +43,6 @@ public abstract class RexProMessage {
     public byte Version = 0;
 
     /**
-     * A value used to denote different states in different messages.  See specific message implementations
-     * for how this field is used.
-     */
-    public byte Flag;
-
-    /**
      * Denotes the session on which the message is sent. Reserved for 16 bytes and resolves to a UUID.
      */
     public byte[] Session;
@@ -45,6 +51,12 @@ public abstract class RexProMessage {
      * A value that uniquely identifies a request. Reserved for 16 bytes and resolves to a UUID.
      */
     public byte[] Request;
+
+    /**
+     * Map of message type specific meta data, supported keys and values vary by message type
+     */
+    public RexProMessageMeta Meta = new RexProMessageMeta();
+//    public HashMap Meta = new HashMap();
 
     public boolean hasSession() {
         return this.Session != null && !this.sessionAsUUID().equals(EMPTY_SESSION);
@@ -70,4 +82,21 @@ public abstract class RexProMessage {
      * @return the estimated size of the message in bytes.
      */
     public abstract int estimateMessageSize();
+
+//    /**
+//     * Initializes the Meta field
+//     */
+//    public void initMeta() {
+//        Meta = new HashMap<String, Object>();
+//    }
+
+    /**
+     * Validates the instance's Meta field
+     */
+    public void validateMetaData() throws RexProException{
+        for (RexProMessageMetaField f : getMetaFields()) {
+            f.validateMeta(Meta);
+        }
+    }
+
 }

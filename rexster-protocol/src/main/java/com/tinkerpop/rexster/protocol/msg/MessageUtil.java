@@ -1,5 +1,7 @@
 package com.tinkerpop.rexster.protocol.msg;
 
+import com.tinkerpop.rexster.client.RexProException;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -8,13 +10,18 @@ import java.util.UUID;
  */
 public class MessageUtil {
     public static ErrorResponseMessage createErrorResponse(final byte[] request, final byte[] session,
-                                                           final byte flag, final String errorMessage) {
+                                                           final Integer flag, final String errorMessage) {
         final ErrorResponseMessage msg = new ErrorResponseMessage();
         msg.Request = request;
         msg.Session = session;
         msg.ErrorMessage = errorMessage;
-        msg.Flag = flag;
 
+        msg.metaSetFlag(flag);
+        try {
+            msg.validateMetaData();
+        } catch (RexProException ex) {
+            //
+        }
         return msg;
     }
 
@@ -24,7 +31,6 @@ public class MessageUtil {
         final SessionResponseMessage responseMessage = new SessionResponseMessage();
         responseMessage.setSessionAsUUID(sessionKey);
         responseMessage.Request = request;
-        responseMessage.Flag = MessageFlag.SESSION_RESPONSE_NO_FLAG;
         responseMessage.Languages = new String[languages.size()];
         languages.toArray(responseMessage.Languages);
 
@@ -36,7 +42,6 @@ public class MessageUtil {
         responseMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
         responseMessage.Request = request;
         responseMessage.Languages = new String[0];
-        responseMessage.Flag = MessageFlag.SESSION_RESPONSE_NO_FLAG;
 
         return responseMessage;
     }

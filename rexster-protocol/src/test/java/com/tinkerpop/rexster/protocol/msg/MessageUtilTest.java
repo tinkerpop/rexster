@@ -16,13 +16,13 @@ public class MessageUtilTest {
         byte [] request = "request".getBytes();
         byte [] session = "session".getBytes();
         final ErrorResponseMessage msg = MessageUtil.createErrorResponse(request, session,
-                MessageFlag.ERROR_AUTHENTICATION_FAILURE, "error message");
+                ErrorResponseMessage.AUTH_FAILURE_ERROR, "error message");
 
         Assert.assertNotNull(msg);
         Assert.assertEquals(request, msg.Request);
         Assert.assertEquals(session, msg.Session);
         Assert.assertEquals("error message", msg.ErrorMessage);
-        Assert.assertEquals(MessageFlag.ERROR_AUTHENTICATION_FAILURE, msg.Flag);
+        Assert.assertEquals(ErrorResponseMessage.AUTH_FAILURE_ERROR, msg.metaGetFlag());
     }
 
     @Test
@@ -32,7 +32,6 @@ public class MessageUtilTest {
 
         Assert.assertNotNull(msg);
         Assert.assertEquals(request, msg.Request);
-        Assert.assertEquals(MessageFlag.SESSION_RESPONSE_NO_FLAG, msg.Flag);
         Assert.assertEquals("groovy", msg.Languages[0]);
 
         final SessionResponseMessage newMsg = MessageUtil.createNewSession(request, new ArrayList<String>() {{ add("groovy"); }});
@@ -46,7 +45,6 @@ public class MessageUtilTest {
 
         Assert.assertNotNull(msg);
         Assert.assertEquals(request, msg.Request);
-        Assert.assertEquals(MessageFlag.SESSION_RESPONSE_NO_FLAG, msg.Flag);
         Assert.assertEquals(0, msg.Languages.length);
         Assert.assertTrue(Arrays.equals(BitWorks.convertUUIDToByteArray(RexProMessage.EMPTY_SESSION), msg.Session));
     }
