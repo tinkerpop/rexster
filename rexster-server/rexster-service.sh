@@ -1,6 +1,18 @@
 #!/bin/sh
-# Init script for Rexster.
+### BEGIN REDHAT INFO
+# chkconfig: 2345 99 20
+# description: The Rexster server. See http://rexster.tinkerpop.com
+### END REDHAT INFO
+### BEGIN INIT INFO
+# Provides:          rexster
+# Required-Start:
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+### END INIT INFO
 
+# Init script for Rexster.
+#
 # You have to SET the Rexster installation directory here
 REXSTER_DIR="/usr/local/packages/rexster-server"
 REXSTER_LOG_DIR="/var/log/rexster"
