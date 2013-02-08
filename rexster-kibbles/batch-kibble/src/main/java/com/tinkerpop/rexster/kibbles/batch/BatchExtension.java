@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.kibbles.batch;
 
+import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
@@ -92,10 +93,11 @@ public class BatchExtension extends AbstractRexsterExtension {
                 Index idx = ((IndexableGraph)graph).getIndex(key, Vertex.class);
 
                 for (int ix = 0; ix < values.length(); ix++) {
-                    Iterable<Vertex> verticesFound = idx.get(key, ElementHelper.getTypedPropertyValue(values.optString(ix)));
+                    CloseableIterable<Vertex> verticesFound = idx.get(key, ElementHelper.getTypedPropertyValue(values.optString(ix)));
                     for (Vertex vertex : verticesFound) {
                         jsonArray.put(GraphSONUtility.jsonFromElement(vertex, returnKeys, mode));
                     }
+                    verticesFound.close();
                 }
             } else if (type.equals("keyindex")) {
                 for (int ix = 0; ix < values.length(); ix++) {
@@ -162,10 +164,11 @@ public class BatchExtension extends AbstractRexsterExtension {
                 Index idx = ((IndexableGraph)graph).getIndex(key, Edge.class);
 
                 for (int ix = 0; ix < values.length(); ix++) {
-                    Iterable<Edge> edgesFound = idx.get(key, ElementHelper.getTypedPropertyValue(values.optString(ix)));
+                    CloseableIterable<Edge> edgesFound = idx.get(key, ElementHelper.getTypedPropertyValue(values.optString(ix)));
                     for (Edge edge : edgesFound) {
                         jsonArray.put(GraphSONUtility.jsonFromElement(edge, returnKeys, mode));
                     }
+                    edgesFound.close();
                 }
             } else if (type.equals("keyindex")) {
                 for (int ix = 0; ix < values.length(); ix++) {
