@@ -3,6 +3,8 @@ package com.tinkerpop.rexster.kibbles.batch;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Index;
+import com.tinkerpop.blueprints.IndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
@@ -26,7 +28,6 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -87,7 +88,16 @@ public class BatchExtension extends AbstractRexsterExtension {
                         jsonArray.put(GraphSONUtility.jsonFromElement(vertexFound, returnKeys, mode));
                     }
                 }
-            } else if (type.equals("index") || type.equals("keyindex")) {
+            } else if (type.equals("index")) {
+                Index idx = ((IndexableGraph)graph).getIndex(key, Vertex.class);
+
+                for (int ix = 0; ix < values.length(); ix++) {
+                    Iterable<Vertex> verticesFound = idx.get(key, ElementHelper.getTypedPropertyValue(values.optString(ix)));
+                    for (Vertex vertex : verticesFound) {
+                        jsonArray.put(GraphSONUtility.jsonFromElement(vertex, returnKeys, mode));
+                    }
+                }
+            } else if (type.equals("keyindex")) {
                 for (int ix = 0; ix < values.length(); ix++) {
                     Iterable<Vertex> verticesFound = graph.getVertices(key, ElementHelper.getTypedPropertyValue(values.optString(ix)));
                     for (Vertex vertex : verticesFound) {
@@ -148,8 +158,16 @@ public class BatchExtension extends AbstractRexsterExtension {
                         jsonArray.put(GraphSONUtility.jsonFromElement(edgeFound, returnKeys, mode));
                     }
                 }
-            }
-            else if (type.equals("index") || type.equals("keyindex")) {
+            } else if (type.equals("index")) {
+                Index idx = ((IndexableGraph)graph).getIndex(key, Edge.class);
+
+                for (int ix = 0; ix < values.length(); ix++) {
+                    Iterable<Edge> edgesFound = idx.get(key, ElementHelper.getTypedPropertyValue(values.optString(ix)));
+                    for (Edge edge : edgesFound) {
+                        jsonArray.put(GraphSONUtility.jsonFromElement(edge, returnKeys, mode));
+                    }
+                }
+            } else if (type.equals("keyindex")) {
                 for (int ix = 0; ix < values.length(); ix++) {
                     Iterable<Edge> edgesFound = graph.getEdges(key, ElementHelper.getTypedPropertyValue(values.optString(ix)));
                     for (Edge edge : edgesFound) {

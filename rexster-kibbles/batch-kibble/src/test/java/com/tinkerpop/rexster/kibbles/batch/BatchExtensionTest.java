@@ -37,17 +37,17 @@ public class BatchExtensionTest {
 
         this.indexGraph = TinkerGraphFactory.createTinkerGraph();
 
-        Index ageIndex = this.indexGraph.createIndex("age", Vertex.class);
-        Vertex v1 = this.indexGraph.getVertex(1);
-        Vertex v2 = this.indexGraph.getVertex(2);
-        ageIndex.put("age", v1.getProperty("age"), v1);
-        ageIndex.put("age", v2.getProperty("age"), v2);
+        final Index idxAge = this.indexGraph.createIndex("age", Vertex.class);
+        final Vertex v1 = this.indexGraph.getVertex(1);
+        final Vertex v2 = this.indexGraph.getVertex(2);
+        idxAge.put("age", v1.getProperty("age"), v1);
+        idxAge.put("age", v2.getProperty("age"), v2);
 
-        Index weightIndex = this.indexGraph.createIndex("weight", Edge.class);
-        Edge e7 = this.indexGraph.getEdge(7);
-        Edge e12 = this.indexGraph.getEdge(12);
-        weightIndex.put("weight", e7.getProperty("weight"), e7);
-        weightIndex.put("weight", e12.getProperty("weight"), e12);
+        final Index idxWeight = this.indexGraph.createIndex("weight", Edge.class);
+        final Edge e7 = this.indexGraph.getEdge(7);
+        final Edge e12 = this.indexGraph.getEdge(12);
+        idxWeight.put("weight", e7.getProperty("weight"), e7);
+        idxWeight.put("weight", e12.getProperty("weight"), e12);
 
         this.keyIndexGraph = TinkerGraphFactory.createTinkerGraph();
         this.keyIndexGraph.createKeyIndex("name", Vertex.class);
