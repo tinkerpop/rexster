@@ -24,6 +24,10 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
     public String[] ConsoleLines;
     public byte[] Bindings;
 
+    public ConsoleScriptResponseMessage() {
+        super();
+    }
+
     public List<String> consoleLinesAsList() {
         final List<String> list = new ArrayList<String>();
         for (String line : ConsoleLines) {
