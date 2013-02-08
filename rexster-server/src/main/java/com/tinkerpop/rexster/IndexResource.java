@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.blueprints.Edge;
@@ -168,10 +169,11 @@ public class IndexResource extends AbstractSubResource {
         long counter = 0l;
 
         if (null != index && key != null && value != null) {
+            final CloseableIterable<Element> indexElements = (CloseableIterable<Element>) index.get(key, value);
             try {
 
                 final JSONArray elementArray = new JSONArray();
-                for (Element element : (Iterable<Element>) index.get(key, value)) {
+                for (Element element : indexElements) {
                     if (counter >= start && counter < end) {
                         elementArray.put(GraphSONUtility.jsonFromElement(element, returnKeys, mode));
                     }
@@ -188,6 +190,7 @@ public class IndexResource extends AbstractSubResource {
                 final JSONObject error = generateErrorObjectJsonFail(ex);
                 throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build());
             } finally {
+                indexElements.close();
                 rag.tryCommit();
             }
         } else if (null == index) {
