@@ -115,28 +115,22 @@ public class MsgPackResultConverter implements ResultConverter<byte[]> {
                 packer.writeMapEnd(false);
             }
         } else if (object instanceof Iterable) {
-            int size;
+            Collection contents;
             if (object instanceof Collection) {
-                size = ((Collection) object).size();
+                contents = (Collection) object;
             } else {
-                size = 0;
-                for (Object o : (Iterable) object) size++;
+                contents = iterateToList(((Iterable) object).iterator());
             }
 
-            packer.writeArrayBegin(size);
-            for (Object o : (Iterable) object) {
+            packer.writeArrayBegin(contents.size());
+            for (Object o : contents) {
                 prepareOutput(o, packer);
             }
             packer.writeArrayEnd();
 
         } else if (object instanceof Iterator) {
             //we need to know the array size before beginning serialization
-            ArrayList<Object> contents = new ArrayList<Object>();
-
-            final Iterator itty = (Iterator) object;
-            while (itty.hasNext()) {
-                contents.add(itty.next());
-            }
+            final Collection contents = iterateToList((Iterator) object);
 
             packer.writeArrayBegin(contents.size());
             for (Object o : contents) {
@@ -149,5 +143,14 @@ public class MsgPackResultConverter implements ResultConverter<byte[]> {
         } else {
             packer.write(object.toString());
         }
+    }
+
+    private static ArrayList<Object> iterateToList(final Iterator itty) {
+        final ArrayList<Object> contents = new ArrayList<Object>();
+
+        while (itty.hasNext()) {
+            contents.add(itty.next());
+        }
+        return contents;
     }
 }

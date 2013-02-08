@@ -12,6 +12,7 @@ import java.util.Random;
 
 import static org.msgpack.template.Templates.TString;
 import static org.msgpack.template.Templates.TValue;
+import static org.msgpack.template.Templates.tList;
 import static org.msgpack.template.Templates.tMap;
 
 /**
@@ -65,6 +66,7 @@ public class TryRexProSessionless implements Runnable {
 
                 try {
                     int counter = 1;
+
                     final int vRequestCount = random.nextInt(500);
                     for (int iv = 1; iv < vRequestCount; iv++) {
                         final Map<String,Object> scriptArgs = new HashMap<String, Object>();
@@ -87,7 +89,7 @@ public class TryRexProSessionless implements Runnable {
                     for (int ig = 1; ig < gRequestCount; ig++) {
                         final Map<String,Object> scriptArgs = new HashMap<String, Object>();
                         scriptArgs.put("id", random.nextInt(800));
-                        final List<Map<String, Value>> innerResults = client.execute("g=rexster.getGraph('gratefulgraph');g.v(id).out('followed_by').loop(1){it.loops<3}[0..10]", scriptArgs, tMap(TString, TValue));
+                        final List<Map<String, Value>> innerResults = client.execute("g=rexster.getGraph('gratefulgraph');g.v(id).out('followed_by').loop(1){it.loops<3}[0..10]", scriptArgs, tList(tMap(TString, TValue)));
                         System.out.println(innerResults.size() > 0 ? innerResults.get(0) : "no results");
                         counter++;
                     }

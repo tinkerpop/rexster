@@ -1,8 +1,6 @@
 package com.tinkerpop.rexster.protocol.msg;
 
-import org.msgpack.MessageTypeException;
 import org.msgpack.template.AbstractTemplate;
-import org.msgpack.template.Template;
 import org.msgpack.packer.Packer;
 import org.msgpack.template.Templates;
 import org.msgpack.type.Value;
@@ -29,7 +27,7 @@ public class RexProMessageMeta extends HashMap<String, Object> {
             write(pk, v, false);
         }
 
-        public void write(Packer pk, RexProMessageMeta v, boolean required) throws IOException {
+        public void write(final Packer pk, final RexProMessageMeta v, final boolean required) throws IOException {
             RexProMessageMeta meta = v;
             if (meta == null) {
                 meta = new RexProMessageMeta();
@@ -61,7 +59,7 @@ public class RexProMessageMeta extends HashMap<String, Object> {
             }
         }
 
-        public RexProMessageMeta read(Unpacker u, RexProMessageMeta to, boolean required) throws IOException {
+        public RexProMessageMeta read(final Unpacker u, final RexProMessageMeta to, final boolean required) throws IOException {
             if (!required && u.trySkipNil()) {
                 return null;
             }
@@ -76,8 +74,8 @@ public class RexProMessageMeta extends HashMap<String, Object> {
 
             int n = u.readMapBegin();
             for (int i=0; i<n; i++) {
-                String key = u.read(Templates.TString);
-                Object val = deserializeObject(u.read(Templates.TValue));
+                final String key = u.read(Templates.TString);
+                final Object val = deserializeObject(u.read(Templates.TValue));
                 meta.put(key, val);
             }
             u.readMapEnd();

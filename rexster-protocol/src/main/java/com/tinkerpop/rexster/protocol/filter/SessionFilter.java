@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.protocol.filter;
 
-import com.tinkerpop.rexster.protocol.msg.MessageFlag;
 import com.tinkerpop.rexster.protocol.msg.MessageTokens;
 import com.tinkerpop.rexster.protocol.msg.MessageUtil;
 import com.tinkerpop.rexster.server.RexsterApplication;
@@ -17,10 +16,7 @@ import org.glassfish.grizzly.filterchain.NextAction;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Processes session request messages or forwards through sessionless script request messages.

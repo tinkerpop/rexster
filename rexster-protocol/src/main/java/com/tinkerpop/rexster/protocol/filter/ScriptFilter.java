@@ -1,6 +1,14 @@
 package com.tinkerpop.rexster.protocol.filter;
 
-import com.tinkerpop.rexster.protocol.msg.*;
+import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.GraphSONScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MessageTokens;
+import com.tinkerpop.rexster.protocol.msg.MessageUtil;
+import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.EngineController;
@@ -59,10 +67,10 @@ public class ScriptFilter extends BaseFilter {
                     // the message is assigned a session that does not exist on the server
                     ctx.write(
                         MessageUtil.createErrorResponse(
-                            message.Request,
-                            RexProMessage.EMPTY_SESSION_AS_BYTES,
-                            ErrorResponseMessage.INVALID_SESSION_ERROR,
-                            MessageTokens.ERROR_SESSION_INVALID
+                                message.Request,
+                                RexProMessage.EMPTY_SESSION_AS_BYTES,
+                                ErrorResponseMessage.INVALID_SESSION_ERROR,
+                                MessageTokens.ERROR_SESSION_INVALID
                         )
                     );
                     return ctx.getStopAction();

@@ -13,22 +13,22 @@ public class RexProMessageMetaField<FieldType> {
     protected Object defaultValue;
     protected Class fieldType;
 
-    public RexProMessageMetaField(String key, Boolean required, FieldType defaultValue, Class<FieldType> fieldType) {
+    public RexProMessageMetaField(final String key, final Boolean required, final FieldType defaultValue, final Class<FieldType> fieldType) {
         this.key = key;
         this.required = required;
         this.defaultValue = defaultValue;
         this.fieldType = fieldType;
     }
 
-    public RexProMessageMetaField(String key, Boolean required, Class<FieldType> fieldType) {
+    public RexProMessageMetaField(final String key, final Boolean required, final Class<FieldType> fieldType) {
         this(key, required, null, fieldType);
     }
 
-    public static<T> RexProMessageMetaField<T> define(String key, Boolean required, Class<T> fieldType) {
+    public static<T> RexProMessageMetaField<T> define(final String key, final Boolean required, final Class<T> fieldType) {
         return new RexProMessageMetaField<T>(key, required, fieldType);
     }
 
-    public static<T> RexProMessageMetaField<T> define(String key, Boolean required, T defaultValue, Class<T> fieldType) {
+    public static<T> RexProMessageMetaField<T> define(final String key, final Boolean required, final T defaultValue, final Class<T> fieldType) {
         return new RexProMessageMetaField<T>(key, required, defaultValue, fieldType);
     }
 
@@ -37,7 +37,7 @@ public class RexProMessageMetaField<FieldType> {
      *
      * @param meta: the meta object to validate
      */
-    public void validateMeta(RexProMessageMeta meta) throws RexProException{
+    public void validateMeta(final RexProMessageMeta meta) throws RexProException{
         //handle missing / null values
         if (meta.get(key) == null){
             if (defaultValue != null) {
@@ -51,7 +51,7 @@ public class RexProMessageMetaField<FieldType> {
         }
 
         //handle improperly typed values
-        Object val = meta.get(key);
+        final Object val = meta.get(key);
         if (!fieldType.isInstance(val)) {
             throw new RexProException(this.fieldType.toString() + " type required for " + key + ", " + val.getClass().toString() + " found");
         }

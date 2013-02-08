@@ -1,6 +1,16 @@
 package com.tinkerpop.rexster.protocol.filter;
 
-import com.tinkerpop.rexster.protocol.msg.*;
+import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MessageTokens;
+import com.tinkerpop.rexster.protocol.msg.MessageType;
+import com.tinkerpop.rexster.protocol.msg.MessageUtil;
+import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProMessageMeta;
+import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.filterchain.BaseFilter;
@@ -9,16 +19,11 @@ import org.glassfish.grizzly.filterchain.NextAction;
 import org.glassfish.grizzly.memory.MemoryManager;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
-import org.msgpack.template.Template;
-import org.msgpack.template.TemplateRegistry;
 import org.msgpack.unpacker.Unpacker;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-
-import static org.msgpack.template.Templates.*;
 
 /**
  * Handles incoming/outgoing RexProMessage instances.
@@ -92,10 +97,10 @@ public class RexProMessageFilter extends BaseFilter {
 
                 ctx.write(
                     MessageUtil.createErrorResponse(
-                        RexProMessage.EMPTY_REQUEST_AS_BYTES,
-                        RexProMessage.EMPTY_SESSION_AS_BYTES,
-                        ErrorResponseMessage.INVALID_MESSAGE_ERROR,
-                        MessageTokens.ERROR_UNEXPECTED_MESSAGE_TYPE
+                            RexProMessage.EMPTY_REQUEST_AS_BYTES,
+                            RexProMessage.EMPTY_SESSION_AS_BYTES,
+                            ErrorResponseMessage.INVALID_MESSAGE_ERROR,
+                            MessageTokens.ERROR_UNEXPECTED_MESSAGE_TYPE
                     )
                 );
                 return ctx.getStopAction();
