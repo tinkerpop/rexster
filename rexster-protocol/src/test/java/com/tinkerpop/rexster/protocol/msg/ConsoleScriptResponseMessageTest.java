@@ -2,11 +2,18 @@ package com.tinkerpop.rexster.protocol.msg;
 
 import junit.framework.Assert;
 import org.junit.Test;
+import org.msgpack.MessagePack;
+import org.msgpack.packer.Packer;
+import org.msgpack.unpacker.Unpacker;
 
 import javax.script.Bindings;
 import javax.script.SimpleBindings;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
@@ -55,5 +62,47 @@ public class ConsoleScriptResponseMessageTest {
         msg.Bindings = ConsoleScriptResponseMessage.convertBindingsToConsoleLineByteArray(b);
 
         Assert.assertEquals(64, msg.estimateMessageSize());
+    }
+
+    @Test
+    public void testSerialization() {
+        MessagePack msgpack = new MessagePack();
+        msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
+
+        ConsoleScriptResponseMessage outMsg = new ConsoleScriptResponseMessage();
+        outMsg.Version = 0;
+        outMsg.setRequestAsUUID(UUID.randomUUID());
+        outMsg.setSessionAsUUID(UUID.randomUUID());
+        outMsg.ConsoleLines = new String[2];
+        outMsg.ConsoleLines[0] = "a";
+        outMsg.ConsoleLines[1] = "b";
+        outMsg.Bindings = new byte[1];
+        outMsg.Bindings[0] = 1;
+
+        final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        final Packer packer = msgpack.createPacker(outStream);
+        try {
+            packer.write(outMsg);
+            packer.close();
+        } catch (IOException ex) {
+            Assert.fail();
+        }
+
+        byte[] bytes = outStream.toByteArray();
+
+        final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+        final Unpacker unpacker = msgpack.createUnpacker(in);
+
+        ConsoleScriptResponseMessage inMsg;
+        try {
+            inMsg = unpacker.read(ConsoleScriptResponseMessage.class);
+            Assert.assertEquals(outMsg.Meta, inMsg.Meta);
+            Assert.assertEquals(UUID.nameUUIDFromBytes(outMsg.Request), UUID.nameUUIDFromBytes(inMsg.Request));
+            Assert.assertEquals(UUID.nameUUIDFromBytes(outMsg.Session), UUID.nameUUIDFromBytes(inMsg.Session));
+            Assert.assertTrue(Arrays.deepEquals(outMsg.ConsoleLines, inMsg.ConsoleLines));
+            Assert.assertEquals(outMsg.Bindings[0], inMsg.Bindings[0]);
+        } catch (IOException ex) {
+            Assert.fail();
+        }
     }
 }
