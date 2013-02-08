@@ -13,6 +13,7 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,8 +25,6 @@ import java.util.Map;
 public class BatchExtensionTest {
 
     private Graph graph;
-    private IndexableGraph indexGraph;
-    private KeyIndexableGraph keyIndexGraph;
     private RexsterResourceContext ctx;
 
     @Before
@@ -34,24 +33,6 @@ public class BatchExtensionTest {
         // autocommit option which relies on rexster to handle commits so even tests that used a
         // transactional graph will need to take that into account.
         this.graph = TinkerGraphFactory.createTinkerGraph();
-
-        this.indexGraph = TinkerGraphFactory.createTinkerGraph();
-
-        final Index idxAge = this.indexGraph.createIndex("age", Vertex.class);
-        final Vertex v1 = this.indexGraph.getVertex(1);
-        final Vertex v2 = this.indexGraph.getVertex(2);
-        idxAge.put("age", v1.getProperty("age"), v1);
-        idxAge.put("age", v2.getProperty("age"), v2);
-
-        final Index idxWeight = this.indexGraph.createIndex("weight", Edge.class);
-        final Edge e7 = this.indexGraph.getEdge(7);
-        final Edge e12 = this.indexGraph.getEdge(12);
-        idxWeight.put("weight", e7.getProperty("weight"), e7);
-        idxWeight.put("weight", e12.getProperty("weight"), e12);
-
-        this.keyIndexGraph = TinkerGraphFactory.createTinkerGraph();
-        this.keyIndexGraph.createKeyIndex("name", Vertex.class);
-        this.keyIndexGraph.createKeyIndex("weight", Edge.class);
     }
 
     @Test
@@ -129,17 +110,19 @@ public class BatchExtensionTest {
     public void getVerticesTypeIndexNoKeyInvalid() throws Exception {
         BatchExtension batchExtension = new BatchExtension();
 
+        createManualIndices((IndexableGraph) graph);
+
         JSONObject requestObject = new JSONObject();
         JSONArray values = new JSONArray();
         values.put("(i,27)");
         values.put("(i,29)");
-        values.put("(i,50)");
+        values.put("(i,32)");
         requestObject.put("values", values);
         requestObject.put("type", "index");
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
 
-        ExtensionResponse response = batchExtension.getVertices(this.ctx, indexGraph);
+        ExtensionResponse response = batchExtension.getVertices(this.ctx, graph);
 
         Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getJerseyResponse().getStatus());
 
@@ -149,18 +132,20 @@ public class BatchExtensionTest {
     public void getVerticesTypeIndexValid() throws Exception {
         BatchExtension batchExtension = new BatchExtension();
 
+        createManualIndices((IndexableGraph) graph);
+
         JSONObject requestObject = new JSONObject();
         JSONArray values = new JSONArray();
         values.put("(i,27)");
         values.put("(i,29)");
-        values.put("(i,50)");
+        values.put("(i,32)");
         requestObject.put("values", values);
         requestObject.put("type", "index");
         requestObject.put("key", "age");
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
 
-        ExtensionResponse response = batchExtension.getVertices(this.ctx, indexGraph);
+        ExtensionResponse response = batchExtension.getVertices(this.ctx, graph);
 
         Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getJerseyResponse().getStatus());
         JSONObject entity = (JSONObject) response.getJerseyResponse().getEntity();
@@ -172,6 +157,9 @@ public class BatchExtensionTest {
 
         Assert.assertNotNull(results);
         Assert.assertEquals(2, results.length());
+        Assert.assertTrue(contains(results, "age", 27));
+        Assert.assertTrue(contains(results, "age", 29));
+        Assert.assertFalse(contains(results, "age", 32));
 
     }
 
@@ -179,17 +167,19 @@ public class BatchExtensionTest {
     public void getVerticesTypeKeyIndexNoKeyInvalid() throws Exception {
         BatchExtension batchExtension = new BatchExtension();
 
+        createKeyIndices((KeyIndexableGraph) graph);
+
         JSONObject requestObject = new JSONObject();
         JSONArray values = new JSONArray();
-        values.put("marko");
-        values.put("peter");
-        values.put("nobody");
+        values.put("(i,27)");
+        values.put("(i,29)");
+        values.put("(i,200)");
         requestObject.put("values", values);
         requestObject.put("type", "keyindex");
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
 
-        ExtensionResponse response = batchExtension.getVertices(this.ctx, keyIndexGraph);
+        ExtensionResponse response = batchExtension.getVertices(this.ctx, graph);
 
         Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getJerseyResponse().getStatus());
 
@@ -199,18 +189,20 @@ public class BatchExtensionTest {
     public void getVerticesTypeKeyIndexValid() throws Exception {
         BatchExtension batchExtension = new BatchExtension();
 
+        createKeyIndices((KeyIndexableGraph) graph);
+
         JSONObject requestObject = new JSONObject();
         JSONArray values = new JSONArray();
-        values.put("marko");
-        values.put("peter");
-        values.put("nobody");
+        values.put("(i,27)");
+        values.put("(i,29)");
+        values.put("(i,200)");
         requestObject.put("values", values);
         requestObject.put("type", "keyindex");
-        requestObject.put("key", "name");
+        requestObject.put("key", "age");
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
 
-        ExtensionResponse response = batchExtension.getVertices(this.ctx, keyIndexGraph);
+        ExtensionResponse response = batchExtension.getVertices(this.ctx, graph);
 
         Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getJerseyResponse().getStatus());
         JSONObject entity = (JSONObject) response.getJerseyResponse().getEntity();
@@ -222,6 +214,9 @@ public class BatchExtensionTest {
 
         Assert.assertNotNull(results);
         Assert.assertEquals(2, results.length());
+        Assert.assertTrue(contains(results, "age", 27));
+        Assert.assertTrue(contains(results, "age", 29));
+        Assert.assertFalse(contains(results, "age", 200));
 
     }
 
@@ -300,17 +295,19 @@ public class BatchExtensionTest {
     public void getEdgesTypeIndexNoKeyInvalid() throws Exception {
         BatchExtension batchExtension = new BatchExtension();
 
+        createManualIndices((IndexableGraph) graph);
+
         JSONObject requestObject = new JSONObject();
         JSONArray values = new JSONArray();
         values.put("(f,0.2)");
         values.put("(f,0.5)");
-        values.put("(f,0.7)");
+        values.put("(f,0.4)");
         requestObject.put("values", values);
         requestObject.put("type", "index");
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
 
-        ExtensionResponse response = batchExtension.getEdges(this.ctx, indexGraph);
+        ExtensionResponse response = batchExtension.getEdges(this.ctx, graph);
 
         Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getJerseyResponse().getStatus());
 
@@ -320,18 +317,20 @@ public class BatchExtensionTest {
     public void getEdgesTypeIndexValid() throws Exception {
         BatchExtension batchExtension = new BatchExtension();
 
+        createManualIndices((IndexableGraph) graph);
+
         JSONObject requestObject = new JSONObject();
         JSONArray values = new JSONArray();
         values.put("(f,0.2)");
         values.put("(f,0.5)");
-        values.put("(f,0.7)");
+        values.put("(f,0.4)");
         requestObject.put("values", values);
         requestObject.put("type", "index");
         requestObject.put("key", "weight");
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
 
-        ExtensionResponse response = batchExtension.getEdges(this.ctx, indexGraph);
+        ExtensionResponse response = batchExtension.getEdges(this.ctx, graph);
 
         Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getJerseyResponse().getStatus());
         JSONObject entity = (JSONObject) response.getJerseyResponse().getEntity();
@@ -343,12 +342,17 @@ public class BatchExtensionTest {
 
         Assert.assertNotNull(results);
         Assert.assertEquals(2, results.length());
+        Assert.assertTrue(contains(results, "weight", 0.2d));
+        Assert.assertTrue(contains(results, "weight", 0.5d));
+        Assert.assertFalse(contains(results, "weight", 0.4d));
 
     }
 
     @Test
     public void getEdgesTypeKeyIndexNoKeyInvalid() throws Exception {
         BatchExtension batchExtension = new BatchExtension();
+
+        createKeyIndices((KeyIndexableGraph) graph);
 
         JSONObject requestObject = new JSONObject();
         JSONArray values = new JSONArray();
@@ -360,7 +364,7 @@ public class BatchExtensionTest {
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
 
-        ExtensionResponse response = batchExtension.getEdges(this.ctx, keyIndexGraph);
+        ExtensionResponse response = batchExtension.getEdges(this.ctx, graph);
 
         Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getJerseyResponse().getStatus());
 
@@ -370,6 +374,8 @@ public class BatchExtensionTest {
     public void getEdgesTypeKeyIndexValid() throws Exception {
         BatchExtension batchExtension = new BatchExtension();
 
+        createKeyIndices((KeyIndexableGraph) graph);
+
         JSONObject requestObject = new JSONObject();
         JSONArray values = new JSONArray();
         values.put("(f,0.2)");
@@ -381,7 +387,7 @@ public class BatchExtensionTest {
 
         this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
 
-        ExtensionResponse response = batchExtension.getEdges(this.ctx, keyIndexGraph);
+        ExtensionResponse response = batchExtension.getEdges(this.ctx, graph);
 
         Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getJerseyResponse().getStatus());
         JSONObject entity = (JSONObject) response.getJerseyResponse().getEntity();
@@ -393,6 +399,9 @@ public class BatchExtensionTest {
 
         Assert.assertNotNull(results);
         Assert.assertEquals(2, results.length());
+        Assert.assertTrue(contains(results, "weight", 0.2d));
+        Assert.assertTrue(contains(results, "weight", 0.5d));
+        Assert.assertFalse(contains(results, "weight", 0.7d));
 
     }
 
@@ -491,5 +500,46 @@ public class BatchExtensionTest {
         Vertex v3 = graph.getVertex(3);
         Assert.assertNull(v3);
 
+    }
+
+    private void createKeyIndices(final KeyIndexableGraph g) {
+        g.createKeyIndex("age", Vertex.class);
+        g.createKeyIndex("weight", Edge.class);
+    }
+
+    private void createManualIndices(final IndexableGraph g) {
+        final Index<Vertex> idxAge = g.createIndex("age", Vertex.class);
+        final Vertex v1 = g.getVertex(1);
+        final Vertex v2 = g.getVertex(2);
+        idxAge.put("age", v1.getProperty("age"), v1);
+        idxAge.put("age", v2.getProperty("age"), v2);
+
+        final Index<Edge> idxWeight = g.createIndex("weight", Edge.class);
+        final Edge e7 = g.getEdge(7);
+        final Edge e12 = g.getEdge(12);
+        idxWeight.put("weight", e7.getProperty("weight"), e7);
+        idxWeight.put("weight", e12.getProperty("weight"), e12);
+    }
+
+    private boolean contains(final JSONArray results, final String key, final Object value) {
+        try {
+            for (int ix = 0; ix < results.length(); ix++) {
+                JSONObject o = results.getJSONObject(ix);
+
+                if (value instanceof Integer) {
+                    if (o.getInt(key) == ((Integer) value).intValue()) {
+                        return true;
+                    }
+                } else if (value instanceof Double) {
+                    if (Math.abs(o.getDouble(key) - ((Double) value).doubleValue()) < 0.000001d) {
+                        return true;
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            return false;
+        }
+
+        return false;
     }
 }
