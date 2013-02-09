@@ -19,9 +19,10 @@
 # 2a) If you're running RH: chkconfig --add rexster
 # 2b) If you're running Ubuntu: update-rc.d rexster defaults
 #
-# You have to SET the Rexster installation directory here
+# You have to SET the Rexster installation directory here:
 REXSTER_DIR="/usr/local/packages/rexster-server"
 REXSTER_LOG_DIR="/var/log/rexster"
+# Specify the user to run Rexster as:
 REXSTER_USER="rexster"
 # JAVA_OPTIONS only gets used on start
 JAVA_OPTIONS="-Xms64m -Xmx512m"
