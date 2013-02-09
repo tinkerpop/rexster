@@ -98,25 +98,11 @@ public class RexsterSettings {
             // load either the rexster.xml from the command line or the default rexster.xml in the root of the
             // working directory
             properties.load(new FileReader(rexsterXmlFileLocation));
-            logger.info("Using [" + rexsterXmlFile.getAbsolutePath() + "] as configuration source.");
+            logger.info(String.format("Using [%s] as configuration source.", rexsterXmlFile.getAbsolutePath()));
         } catch (Exception e) {
-            logger.warn("Could not load configuration from [" + rexsterXmlFile.getAbsolutePath() + "]");
-
-            if (rexsterXmlConfiguredFromCommandLine) {
-                // since an explicit value for rexster.xml was supplied and could not be found then
-                // we won't continue to load rexster.
-                throw new RuntimeException("Could not load configuration from [" + rexsterXmlFile.getAbsolutePath() + "]");
-            } else {
-                // since the default value for rexster.xml was supplied and could not be found, try to
-                // revert to the rexster.xml stored as a resource.  a good fall back for users just
-                // getting started with rexster.
-                try {
-                    properties.load(Application.class.getResourceAsStream(rexsterXmlFileLocation));
-                    logger.info("Using [" + rexsterXmlFileLocation + "] resource as configuration source.");
-                } catch (Exception ex){
-                    logger.fatal("None of the default rexster.xml can be found or read.");
-                }
-            }
+            final String msg = String.format("Could not load configuration from [%s]", rexsterXmlFile.getAbsolutePath());
+            logger.warn(msg);
+            throw new RuntimeException(msg);
         }
 
         // overrides rexster-server-port from command line

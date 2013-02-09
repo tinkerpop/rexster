@@ -7,6 +7,7 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.extension.ExtensionMethod;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.gremlin.GremlinExtension;
+import com.tinkerpop.rexster.protocol.EngineController;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
@@ -47,6 +48,7 @@ public class GremlinExtensionTest {
      */
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
+        EngineController.configure(-1, null);
         graph = TinkerGraphFactory.createTinkerGraph();
     }
 
