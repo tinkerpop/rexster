@@ -16,14 +16,16 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.BindException;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 
@@ -38,7 +40,23 @@ public class Application {
     private static final Logger logger = Logger.getLogger(Application.class);
 
     static {
-        PropertyConfigurator.configure(Application.class.getResource("log4j.properties"));
+        // try to load a log4j properties file in the root of REXSTER_HOME
+        final File logConfigFile = new File("log4j.properties");
+        URL logConfigFileUrl;
+        try {
+            if (logConfigFile.exists()) {
+                // this one exists in the root of REXSTER_HOME
+                logConfigFileUrl = logConfigFile.toURI().toURL();
+            } else {
+                // a custom one from a user doesn't exist so use the default one in the jar
+                logConfigFileUrl = Application.class.getResource("log4j.properties");
+            }
+        } catch (MalformedURLException mue) {
+            // revert to the properties file in the jar
+            logConfigFileUrl = Application.class.getResource("log4j.properties");
+        }
+
+        PropertyConfigurator.configure(logConfigFileUrl);
     }
 
     private final RexsterServer httpServer;

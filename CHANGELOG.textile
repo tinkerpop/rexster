@@ -24,6 +24,7 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 * Prevent Rexster's forced Gremlin Script Engine reset as it is now handled by the Script Engine itself.
 * Configuration in @rexster.xml@ for allowing other Script Engine flavors of Gremlin to be exposed.
 * Remove @rexster.xml@ embedded as a resource as the final fallback for configuring Rexster at startup.
+* Allow override of default embedded @log4j.properties@ file with one in the root of @REXSTER_HOME@.
 
 h3. Version 2.2.0 (December 19, 2012)
 
