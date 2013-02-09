@@ -11,7 +11,13 @@
 # Default-Stop:      0 1 6
 ### END INIT INFO
 
-# Init script for Rexster.
+# Init script for Rexster so it automatically starts/stops with the machine.
+#
+# To install:
+# 1)  Add a symlink to this file in /etc/init.d/ under the name you'd like to see the service
+#     For example, to name the service "rexster": ln -s /rexster/bin/rexster-service.sh /etc/init.d/rexster
+# 2a) If you're running RH: chkconfig --add rexster
+# 2b) If you're running Ubuntu: update-rc.d rexster defaults
 #
 # You have to SET the Rexster installation directory here
 REXSTER_DIR="/usr/local/packages/rexster-server"
