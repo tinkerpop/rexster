@@ -47,8 +47,8 @@ public class RexsterResource extends BaseResource {
     public Response getRexsterRoot() {
         try {
 
-            Set<String> graphNames = this.getRexsterApplication().getGraphNames();
-            JSONArray jsonArrayNames = new JSONArray(graphNames);
+            final Set<String> graphNames = this.getRexsterApplication().getGraphNames();
+            final JSONArray jsonArrayNames = new JSONArray(graphNames);
 
             this.resultObject.put("name", "Rexster: A Graph Server");
             this.resultObject.put("graphs", jsonArrayNames);
@@ -57,7 +57,7 @@ public class RexsterResource extends BaseResource {
             return Response.ok(this.resultObject).build();
 
         } catch (JSONException ex) {
-            JSONObject error = generateErrorObject(ex.getMessage());
+            final JSONObject error = generateErrorObject(ex.getMessage());
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         }
     }

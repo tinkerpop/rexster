@@ -8,9 +8,11 @@ import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Manages the list of EngineHolder items for the current ScriptEngineManager. By default, the ScriptEngine instance
@@ -34,10 +36,7 @@ public class EngineController {
     /**
      * Add all flavors of gremlin to this list. This should be the true name of the language.
      */
-    private final List<String> gremlinEngineNames = new ArrayList<String>() {{
-        add("gremlin-groovy");
-        add("gremlin-javascript");
-    }};
+    private static Set<String> gremlinEngineNames;
 
     private static EngineController engineController;
     private static String initializationScriptFile;
@@ -60,11 +59,24 @@ public class EngineController {
     }
 
     /**
-     * Must call this before a call to getInstance() if the reset count is to be taken into account.
+     * Must call this before a call to getInstance() if the reset count is to be taken into account. Defaults
+     * to the gremlin groovy script engine.
      */
     public static void configure(final int resetCount, final String initScriptFile){
+        configure(resetCount, initScriptFile, new HashSet<String>() {{
+            add("gremlin-groovy");
+        }});
+    }
+
+    /**
+     * Must call this before a call to getInstance() if the reset count is to be taken into account.
+     *
+     * @param configuredEngineNames A list of script engine names that should be exposed.
+     */
+    public static void configure(final int resetCount, final String initScriptFile, final Set<String> configuredEngineNames){
         engineResetThreshold = resetCount;
         initializationScriptFile = initScriptFile;
+        gremlinEngineNames = configuredEngineNames;
     }
 
     public static EngineController getInstance() {

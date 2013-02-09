@@ -46,6 +46,7 @@
     <shutdown-host>127.0.0.1</shutdown-host>
     <script-engine-reset-threshold>500</script-engine-reset-threshold>
     <script-engine-init>data/init.groovy</script-engine-init>
+    <script-engines>gremlin-groovy</script-engines>
     <security>
         <authentication>
             <type>none</type>

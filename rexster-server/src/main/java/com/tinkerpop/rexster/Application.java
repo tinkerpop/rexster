@@ -23,6 +23,8 @@ import java.net.BindException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -60,7 +62,17 @@ public class Application {
         // properly construct ScriptEngine objects with the correct reset policy.
         final int scriptEngineThreshold = this.properties.getInt("script-engine-reset-threshold", EngineController.RESET_NEVER);
         final String scriptEngineInitFile = this.properties.getString("script-engine-init", "");
-        EngineController.configure(scriptEngineThreshold, scriptEngineInitFile);
+
+        // allow scriptengines to be configured so that folks can drop in different gremlin flavors.
+        final List configuredScriptEngineNames = this.properties.getList("script-engines");
+        if (configuredScriptEngineNames == null) {
+            // configure to default with gremlin-groovy
+            logger.info("No configuration for <script-engines>.  Using gremlin-groovy by default.");
+            EngineController.configure(scriptEngineThreshold, scriptEngineInitFile);
+        } else {
+            EngineController.configure(scriptEngineThreshold, scriptEngineInitFile, new HashSet<String>(configuredScriptEngineNames));
+        }
+
 
         logger.info(String.format(
                 "Gremlin ScriptEngine configured to reset every [%s] requests. Set to -1 to never reset.",

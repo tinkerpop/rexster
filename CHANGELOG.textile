@@ -22,6 +22,7 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 * More convenience methods for @ExtensionResponse@ to help simplify writing extensions.
 * Change default IO strategy to @leader-follower@.
 * Prevent Rexster's forced Gremlin Script Engine reset as it is now handled by the Script Engine itself.
+* Configuration in @rexster.xml@ for allowing other Script Engine flavors of Gremlin to be exposed.
 
 h3. Version 2.2.0 (December 19, 2012)
 
