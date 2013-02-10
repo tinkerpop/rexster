@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.Tokens;
 
@@ -36,11 +37,37 @@ public class RexProSession {
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
+    //the graph bound to this session
+    private Graph graphObj = null;
+
+    //the variable name of the graph in the interperter
+    private String graphObjName = null;
+
     public RexProSession(final String sessionKey, final RexsterApplication rexsterApplication, final byte channel) {
         this.sessionKey = sessionKey;
         this.channel = channel;
         this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, rexsterApplication);
         this.rexsterApplication = rexsterApplication;
+    }
+
+    /**
+     * Configures a graph object on the session, and sets the variable name of
+     * the graph in the interpreter
+     *
+     * @param graphName: the name of the graph (in rexster.xml)
+     * @param graphObjName: the variable name of the graph in the interpreter (usually "g")
+     */
+    public void setGraphObj(String graphName, String graphObjName) throws RexProException{
+        graphObj = rexsterApplication.getGraph(graphName);
+        if (graphObj == null) {
+            throw new RexProException("the graph '" + graphObj + "' was not found by Rexster");
+        }
+        this.graphObjName = graphObjName;
+        bindings.put(this.graphObjName, graphObj);
+    }
+
+    public Boolean hasGraphObj() {
+        return graphObj != null;
     }
 
     public String getSessionKey() {

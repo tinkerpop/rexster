@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.client.RexsterClientFactory;
+import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.server.RexProRexsterServer;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.server.RexsterServer;
@@ -28,6 +29,7 @@ public abstract class AbstractRexProIntegrationTest {
 
         final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
         final RexsterApplication application = new XmlRexsterApplication(graphConfigs);
+        EngineController.configure(-1, null);
         rexsterServer.start(application);
     }
 
