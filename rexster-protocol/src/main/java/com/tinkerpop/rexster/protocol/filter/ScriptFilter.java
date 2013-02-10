@@ -1,5 +1,7 @@
 package com.tinkerpop.rexster.protocol.filter;
 
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.GraphSONScriptResponseMessage;
@@ -76,8 +78,10 @@ public class ScriptFilter extends BaseFilter {
                     return ctx.getStopAction();
                 }
 
+                Graph graph = session.getGraphObj();
+
                 //catch any graph redefinition attempts
-                if (specificMessage.metaGetGraphName() != null && session.hasGraphObj()) {
+                if (specificMessage.metaGetGraphName() != null && graph != null) {
                     //graph config problem
                     ctx.write(
                         MessageUtil.createErrorResponse(
@@ -94,25 +98,50 @@ public class ScriptFilter extends BaseFilter {
 
                 //add the graph object to the bindings
                 if (specificMessage.metaGetGraphName() != null) {
-                    bindings.put(specificMessage.metaGetGraphObjName(), rexsterApplication.getGraph(specificMessage.metaGetGraphName()));
+                    graph = rexsterApplication.getGraph(specificMessage.metaGetGraphName());
+                    bindings.put(specificMessage.metaGetGraphObjName(), graph);
                 }
 
-                final Object result = session.evaluate(
-                    specificMessage.Script,
-                    specificMessage.LanguageName,
-                    bindings,
-                    specificMessage.metaGetIsolate(),
-                    specificMessage.metaGetTransaction()
-                );
+                //start transaction
+                if (graph != null && specificMessage.metaGetTransaction()) {
+                    if (graph instanceof TransactionalGraph) {
+                        ((TransactionalGraph) graph).rollback();
+                    }
+                }
 
-                if (session.getChannel() == SessionRequestMessage.CHANNEL_CONSOLE) {
-                    ctx.write(formatForConsoleChannel(specificMessage, session, result));
+                try {
+                    //execute script
+                    final Object result = session.evaluate(
+                        specificMessage.Script,
+                        specificMessage.LanguageName,
+                        bindings,
+                        specificMessage.metaGetIsolate()
+                    );
 
-                } else if (session.getChannel() == SessionRequestMessage.CHANNEL_MSGPACK) {
-                    ctx.write(formatForMsgPackChannel(specificMessage, result));
+                    if (session.getChannel() == SessionRequestMessage.CHANNEL_CONSOLE) {
+                        ctx.write(formatForConsoleChannel(specificMessage, session, result));
 
-                }  else if (session.getChannel() == SessionRequestMessage.CHANNEL_GRAPHSON) {
-                    ctx.write(formatForGraphSONChannel(specificMessage, result));
+                    } else if (session.getChannel() == SessionRequestMessage.CHANNEL_MSGPACK) {
+                        ctx.write(formatForMsgPackChannel(specificMessage, result));
+
+                    }  else if (session.getChannel() == SessionRequestMessage.CHANNEL_GRAPHSON) {
+                        ctx.write(formatForGraphSONChannel(specificMessage, result));
+                    }
+
+                    //commit transaction
+                    if (graph != null && specificMessage.metaGetTransaction()) {
+                        if (graph instanceof TransactionalGraph) {
+                            ((TransactionalGraph) graph).rollback();
+                        }
+                    }
+                } catch (Exception ex) {
+                    //rollback transaction
+                    if (graph != null && specificMessage.metaGetTransaction()) {
+                        if (graph instanceof TransactionalGraph) {
+                            ((TransactionalGraph) graph).rollback();
+                        }
+                    }
+                    throw ex;
                 }
 
             } else {
@@ -126,12 +155,52 @@ public class ScriptFilter extends BaseFilter {
                 }
                 bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, this.rexsterApplication);
 
+                Graph graph = null;
                 if (specificMessage.metaGetGraphName() != null) {
-                    bindings.put(specificMessage.metaGetGraphObjName(), this.rexsterApplication.getGraph(specificMessage.metaGetGraphName()));
+                    graph = this.rexsterApplication.getGraph(specificMessage.metaGetGraphName());
+                    if (graph != null) {
+                        bindings.put(specificMessage.metaGetGraphObjName(), graph);
+                    } else {
+                        //graph config problem
+                        ctx.write(
+                            MessageUtil.createErrorResponse(
+                                message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                                ErrorResponseMessage.GRAPH_CONFIG_ERROR,
+                                "the graph '" + specificMessage.metaGetGraphName() + "' was not found by Rexster"
+                            )
+                        );
+
+                        return ctx.getStopAction();
+
+                    }
                 }
 
-                final Object result = scriptEngine.eval(specificMessage.Script, bindings);
-                ctx.write(formatForMsgPackChannel(specificMessage, result));
+                //start transaction
+                if (graph != null && specificMessage.metaGetTransaction()) {
+                    if (graph instanceof TransactionalGraph) {
+                        ((TransactionalGraph) graph).rollback();
+                    }
+                }
+
+                try {
+                    final Object result = scriptEngine.eval(specificMessage.Script, bindings);
+                    ctx.write(formatForMsgPackChannel(specificMessage, result));
+
+                    //commit transaction
+                    if (graph != null && specificMessage.metaGetTransaction()) {
+                        if (graph instanceof TransactionalGraph) {
+                            ((TransactionalGraph) graph).rollback();
+                        }
+                    }
+                } catch (Exception ex) {
+                    //rollback transaction
+                    if (graph != null && specificMessage.metaGetTransaction()) {
+                        if (graph instanceof TransactionalGraph) {
+                            ((TransactionalGraph) graph).rollback();
+                        }
+                    }
+                    throw ex;
+                }
             }
 
         } catch (ScriptException se) {

@@ -298,6 +298,7 @@ public class RexsterConsole {
             scriptMessage.Bindings = emptyBindings;
             scriptMessage.LanguageName = scriptEngineName;
             scriptMessage.metaSetInSession(true);
+            scriptMessage.metaSetTransaction(false);
             scriptMessage.setRequestAsUUID(UUID.randomUUID());
 
             final RexProMessage resultMessage = session.sendRequest(scriptMessage, 3, 500);

@@ -84,12 +84,48 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
     }
 
     @Test
-    public void testGraphObjMetaOnSessionedRequest() {
+    public void testGraphObjMetaOnSessionedRequest() throws Exception {
+        final RexsterClient client = factory.createClient();
+        RexProMessage inMsg;
+
+        //create a session
+        final SessionRequestMessage outMsg = new SessionRequestMessage();
+        outMsg.Channel = SessionRequestMessage.CHANNEL_MSGPACK;
+        outMsg.setRequestAsUUID(UUID.randomUUID());
+
+        inMsg = client.execute(outMsg);
+        Assert.assertNotNull(inMsg.Session);
+        Assert.assertTrue(inMsg instanceof SessionResponseMessage);
+
+        UUID sessionKey = BitWorks.convertByteArrayToUUID(inMsg.Session);
 
         //test that it works
+        final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
+        scriptMessage.Script = "g.addVertex()";
+        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
+        scriptMessage.LanguageName = "groovy";
+        scriptMessage.metaSetInSession(true);
+        scriptMessage.metaSetGraphName("emptygraph");
+        scriptMessage.setRequestAsUUID(UUID.randomUUID());
+        scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
+
+        inMsg = client.execute(scriptMessage);
+        Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
 
         // test that it's not available on the next request
         // if the meta flag is not set
+        final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
+        scriptMessage2.Script = "g.addVertex()";
+        scriptMessage2.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
+        scriptMessage2.LanguageName = "groovy";
+        scriptMessage2.metaSetInSession(true);
+        scriptMessage2.setRequestAsUUID(UUID.randomUUID());
+        scriptMessage2.Session = BitWorks.convertUUIDToByteArray(sessionKey);
+
+        inMsg = client.execute(scriptMessage2);
+        Assert.assertTrue(inMsg instanceof ErrorResponseMessage);
+        Assert.assertEquals(((ErrorResponseMessage) inMsg).metaGetFlag(), ErrorResponseMessage.SCRIPT_FAILURE_ERROR);
 
     }
 
@@ -128,17 +164,164 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
     @Test
     public void testDefiningNonExistentGraphNameFails() throws Exception {
+        final RexsterClient client = factory.createClient();
+
+        final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
+        scriptMessage.Script = "graph.addVertex()";
+        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
+        scriptMessage.LanguageName = "groovy";
+        scriptMessage.metaSetInSession(false);
+        scriptMessage.metaSetGraphName("undefined");
+        scriptMessage.metaSetGraphObjName("graph");
+        scriptMessage.setRequestAsUUID(UUID.randomUUID());
+        scriptMessage.Session = null;
+
+        RexProMessage inMsg = client.execute(scriptMessage);
+        Assert.assertTrue(inMsg instanceof ErrorResponseMessage);
+        Assert.assertEquals(((ErrorResponseMessage) inMsg).metaGetFlag(), ErrorResponseMessage.GRAPH_CONFIG_ERROR);
+    }
+
+    /**
+     * Tests that variables introduced in one query are not available in the next
+     */
+    @Test
+    public void testQueryIsolation() throws Exception {
+        final RexsterClient client = factory.createClient();
+        RexProMessage inMsg;
+
+        //create a session
+        final SessionRequestMessage outMsg = new SessionRequestMessage();
+        outMsg.Channel = SessionRequestMessage.CHANNEL_MSGPACK;
+        outMsg.setRequestAsUUID(UUID.randomUUID());
+
+        inMsg = client.execute(outMsg);
+        Assert.assertNotNull(inMsg.Session);
+        Assert.assertTrue(inMsg instanceof SessionResponseMessage);
+
+        UUID sessionKey = BitWorks.convertByteArrayToUUID(inMsg.Session);
+
+        //test that it works
+        final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
+        scriptMessage.Script = "n = 5\nn";
+        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
+        scriptMessage.LanguageName = "groovy";
+        scriptMessage.metaSetInSession(true);
+        scriptMessage.setRequestAsUUID(UUID.randomUUID());
+        scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
+
+        inMsg = client.execute(scriptMessage);
+        Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
+
+        // test that 'n' is not available if the isolate meta flag is not set to false
+        final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
+        scriptMessage2.Script = "m = n + 1";
+        scriptMessage2.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
+        scriptMessage2.LanguageName = "groovy";
+        scriptMessage2.metaSetInSession(true);
+        scriptMessage2.setRequestAsUUID(UUID.randomUUID());
+        scriptMessage2.Session = BitWorks.convertUUIDToByteArray(sessionKey);
+
+        inMsg = client.execute(scriptMessage2);
+        Assert.assertTrue(inMsg instanceof ErrorResponseMessage);
+        Assert.assertEquals(((ErrorResponseMessage) inMsg).metaGetFlag(), ErrorResponseMessage.SCRIPT_FAILURE_ERROR);
 
     }
 
     @Test
-    public void testQueryIsolation() {
+    public void testDisabledQueryIsolation() throws Exception {
+        final RexsterClient client = factory.createClient();
+        RexProMessage inMsg;
+
+        //create a session
+        final SessionRequestMessage outMsg = new SessionRequestMessage();
+        outMsg.Channel = SessionRequestMessage.CHANNEL_MSGPACK;
+        outMsg.setRequestAsUUID(UUID.randomUUID());
+
+        inMsg = client.execute(outMsg);
+        Assert.assertNotNull(inMsg.Session);
+        Assert.assertTrue(inMsg instanceof SessionResponseMessage);
+
+        UUID sessionKey = BitWorks.convertByteArrayToUUID(inMsg.Session);
+
+        //test that it works
+        final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
+        scriptMessage.Script = "n = 5\nn";
+        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
+        scriptMessage.LanguageName = "groovy";
+        scriptMessage.metaSetInSession(true);
+        scriptMessage.metaSetIsolate(false);
+        scriptMessage.setRequestAsUUID(UUID.randomUUID());
+        scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
+
+        inMsg = client.execute(scriptMessage);
+        Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
+
+        // test that 'n' is available if the isolate meta flag is set to false
+        final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
+        scriptMessage2.Script = "m = n + 1";
+        scriptMessage2.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
+        scriptMessage2.LanguageName = "groovy";
+        scriptMessage2.metaSetInSession(true);
+        scriptMessage2.setRequestAsUUID(UUID.randomUUID());
+        scriptMessage2.Session = BitWorks.convertUUIDToByteArray(sessionKey);
+
+        inMsg = client.execute(scriptMessage2);
+        Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
+    }
+
+    @Test
+    public void testTransactionMetaFlagWithoutSession() throws Exception {
+        final RexsterClient client = factory.createClient();
+        RexProMessage inMsg;
+
+        //create a session
+        final SessionRequestMessage outMsg = new SessionRequestMessage();
+        outMsg.Channel = SessionRequestMessage.CHANNEL_MSGPACK;
+        outMsg.setRequestAsUUID(UUID.randomUUID());
+
+        inMsg = client.execute(outMsg);
+        Assert.assertNotNull(inMsg.Session);
+        Assert.assertTrue(inMsg instanceof SessionResponseMessage);
+
+        UUID sessionKey = BitWorks.convertByteArrayToUUID(inMsg.Session);
+
+        //test that it works
+        final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
+        scriptMessage.Script = "n = 5\nn";
+        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
+        scriptMessage.LanguageName = "groovy";
+        scriptMessage.metaSetInSession(true);
+        scriptMessage.metaSetTransaction(true);
+        scriptMessage.setRequestAsUUID(UUID.randomUUID());
+        scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
+
+        inMsg = client.execute(scriptMessage);
+        Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
 
     }
 
     @Test
-    public void testTransactionMetaFlag() {
+    public void testTransactionMetaFlagWithSession() throws Exception {
+        final RexsterClient client = factory.createClient();
 
+        final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
+        scriptMessage.Script = "graph.addVertex()";
+        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
+        scriptMessage.LanguageName = "groovy";
+        scriptMessage.metaSetInSession(false);
+        scriptMessage.metaSetGraphName("emptygraph");
+        scriptMessage.metaSetGraphObjName("graph");
+        scriptMessage.metaSetTransaction(true);
+        scriptMessage.setRequestAsUUID(UUID.randomUUID());
+        scriptMessage.Session = null;
+
+        RexProMessage inMsg = client.execute(scriptMessage);
+        Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
     }
 
 }

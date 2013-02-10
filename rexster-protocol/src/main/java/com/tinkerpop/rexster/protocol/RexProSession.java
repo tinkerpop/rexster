@@ -60,10 +60,14 @@ public class RexProSession {
     public void setGraphObj(String graphName, String graphObjName) throws RexProException{
         graphObj = rexsterApplication.getGraph(graphName);
         if (graphObj == null) {
-            throw new RexProException("the graph '" + graphObj + "' was not found by Rexster");
+            throw new RexProException("the graph '" + graphName + "' was not found by Rexster");
         }
         this.graphObjName = graphObjName;
         bindings.put(this.graphObjName, graphObj);
+    }
+
+    public Graph getGraphObj() {
+        return graphObj;
     }
 
     public Boolean hasGraphObj() {
@@ -91,10 +95,10 @@ public class RexProSession {
     }
 
     public Object evaluate(final String script, final String languageName, final Bindings rexsterBindings) throws ScriptException {
-        return evaluate(script, languageName, rexsterBindings, true, true);
+        return evaluate(script, languageName, rexsterBindings, true);
     }
 
-    public Object evaluate(final String script, final String languageName, final Bindings rexsterBindings, final Boolean isolate, final Boolean transaction) throws ScriptException {
+    public Object evaluate(final String script, final String languageName, final Bindings rexsterBindings, final Boolean isolate) throws ScriptException {
         Object result = null;
         try {
             final EngineHolder engine = this.controller.getEngineByLanguageName(languageName);
