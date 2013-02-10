@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.server;
 
+import com.tinkerpop.rexster.util.JuliToLog4jHandler;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -15,6 +16,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 
@@ -78,13 +80,20 @@ public class RexsterSettings {
         final XMLConfiguration properties = new XMLConfiguration();
 
         if (isDebug()) {
-            // turn on all logging for jersey
+            // turn on all logging for jersey -- this is debug mode
             for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
-                java.util.logging.Logger.getLogger(l).setLevel(Level.ALL);
+                java.util.logging.Logger logger = java.util.logging.Logger.getLogger(l);
+                logger.setLevel(Level.ALL);
 
-                final ConsoleHandler consoleHandler = new ConsoleHandler();
-                consoleHandler.setLevel(Level.ALL);
-                java.util.logging.Logger.getLogger(l).addHandler(consoleHandler);
+                // remove old handlers
+                for (Handler handler : logger.getHandlers()) {
+                    logger.removeHandler(handler);
+                }
+
+                // route all logging from java.util.Logging to log4net
+                final Handler handler = new JuliToLog4jHandler();
+                handler.setLevel(Level.ALL);
+                java.util.logging.Logger.getLogger(l).addHandler(handler);
             }
         } else {
             // turn off all logging for jersey
