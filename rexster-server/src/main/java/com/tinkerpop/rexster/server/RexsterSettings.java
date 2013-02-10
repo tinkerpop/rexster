@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.server;
 
-import com.tinkerpop.rexster.Application;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -70,11 +69,15 @@ public class RexsterSettings {
         formatter.printHelp("rexster", line.getCommandOptions());
     }
 
+    public boolean isDebug() {
+        return line.hasCommandParameters() && line.getCommandParameters().hasOption("debug");
+    }
+
     public XMLConfiguration getProperties() {
 
         final XMLConfiguration properties = new XMLConfiguration();
 
-        if (line.hasCommandParameters() && line.getCommandParameters().hasOption("debug")) {
+        if (isDebug()) {
             // turn on all logging for jersey
             for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
                 java.util.logging.Logger.getLogger(l).setLevel(Level.ALL);

@@ -64,9 +64,10 @@ public class Application {
     private final RexsterApplication rexsterApplication;
     private final XMLConfiguration properties;
 
-    public Application(final XMLConfiguration properties) throws Exception {
+    public Application(final XMLConfiguration properties, final boolean isDebug) throws Exception {
         // get the graph configurations from the XML config file
         this.properties = properties;
+        this.properties.addProperty("debug", isDebug);
         final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
         this.rexsterApplication = new XmlRexsterApplication(graphConfigs);
 
@@ -152,7 +153,7 @@ public class Application {
 
         if (settings.getPrimeCommand().equals(RexsterSettings.COMMAND_START)) {
             try {
-                new Application(settings.getProperties()).start();
+                new Application(settings.getProperties(), settings.isDebug()).start();
             } catch (BindException be) {
                 logger.fatal("Could not start Rexster Server.  A port that Rexster needs is in use.");
             } catch (Exception ex) {

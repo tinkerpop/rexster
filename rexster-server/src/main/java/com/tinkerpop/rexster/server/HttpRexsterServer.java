@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.server;
 
+import com.sun.jersey.api.container.filter.LoggingFilter;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
@@ -21,6 +22,8 @@ import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.IOStrategy;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -40,6 +43,7 @@ import java.io.File;
  */
 public class HttpRexsterServer implements RexsterServer {
     private static final Logger logger = Logger.getLogger(HttpRexsterServer.class);
+    private static final java.util.logging.Logger jdkLogger = java.util.logging.LogManager.getLogManager().getLogger(HttpRexsterServer.class.getName());
 
     private final XMLConfiguration properties;
     private final Integer rexsterServerPort;
@@ -56,9 +60,11 @@ public class HttpRexsterServer implements RexsterServer {
     private final boolean enableJmx;
     private final String ioStrategy;
     private final HttpServer httpServer;
+    private final boolean debugMode;
 
     public HttpRexsterServer(final XMLConfiguration properties) {
         this.properties = properties;
+        this.debugMode = properties.getBoolean("debug");
         rexsterServerPort = properties.getInteger("http.server-port", new Integer(RexsterSettings.DEFAULT_HTTP_PORT));
         rexsterServerHost = properties.getString("http.server-host", "0.0.0.0");
         webRootPath = properties.getString("http.web-root", RexsterSettings.DEFAULT_WEB_ROOT_PATH);
@@ -125,6 +131,11 @@ public class HttpRexsterServer implements RexsterServer {
         rc.getSingletons().add(new SingletonTypeInjectableProvider<Context, RexsterApplication>(
                 RexsterApplication.class, application){});
 
+        if (this.debugMode) {
+            rc.getContainerRequestFilters().add(new LoggingFilter());
+            rc.getContainerResponseFilters().add(new LoggingFilter());
+        }
+
         final String defaultCharacterEncoding = properties.getString("http.character-set", "ISO-8859-1");
         rc.getContainerResponseFilters().add(new HeaderResponseFilter(defaultCharacterEncoding));
 
@@ -146,6 +157,10 @@ public class HttpRexsterServer implements RexsterServer {
                 final AbstractSecurityFilter securityFilter = (AbstractSecurityFilter) clazz.newInstance();
                 rc.getContainerRequestFilters().add(securityFilter);
             }
+        }
+
+        if (LogManager.getLoggerRepository().getThreshold().isGreaterOrEqual(Level.TRACE)) {
+
         }
 
         final ServletRegistration sg = wacJersey.addServlet("jersey", new ServletContainer(rc));
