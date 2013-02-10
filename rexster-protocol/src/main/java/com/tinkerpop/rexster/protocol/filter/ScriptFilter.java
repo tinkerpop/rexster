@@ -67,16 +67,44 @@ public class ScriptFilter extends BaseFilter {
                     // the message is assigned a session that does not exist on the server
                     ctx.write(
                         MessageUtil.createErrorResponse(
-                                message.Request,
-                                RexProMessage.EMPTY_SESSION_AS_BYTES,
-                                ErrorResponseMessage.INVALID_SESSION_ERROR,
-                                MessageTokens.ERROR_SESSION_INVALID
+                            message.Request,
+                            RexProMessage.EMPTY_SESSION_AS_BYTES,
+                            ErrorResponseMessage.INVALID_SESSION_ERROR,
+                            MessageTokens.ERROR_SESSION_INVALID
                         )
                     );
                     return ctx.getStopAction();
                 }
 
-                final Object result = session.evaluate(specificMessage.Script, specificMessage.LanguageName, specificMessage.getBindings());
+                //catch any graph redefinition attempts
+                if (specificMessage.metaGetGraphName() != null && session.hasGraphObj()) {
+                    //graph config problem
+                    ctx.write(
+                        MessageUtil.createErrorResponse(
+                            message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                            ErrorResponseMessage.GRAPH_CONFIG_ERROR,
+                            MessageTokens.ERROR_GRAPH_REDEFINITION
+                        )
+                    );
+
+                    return ctx.getStopAction();
+                }
+
+                Bindings bindings = specificMessage.getBindings();
+
+                //add the graph object to the bindings
+                if (specificMessage.metaGetGraphName() != null) {
+                    bindings.put(specificMessage.metaGetGraphObjName(), rexsterApplication.getGraph(specificMessage.metaGetGraphName()));
+                }
+
+                final Object result = session.evaluate(
+                    specificMessage.Script,
+                    specificMessage.LanguageName,
+                    bindings,
+                    specificMessage.metaGetIsolate(),
+                    specificMessage.metaGetTransaction()
+                );
+
                 if (session.getChannel() == SessionRequestMessage.CHANNEL_CONSOLE) {
                     ctx.write(formatForConsoleChannel(specificMessage, session, result));
 
@@ -97,6 +125,10 @@ public class ScriptFilter extends BaseFilter {
                     bindings.put(e.getKey(), e.getValue());
                 }
                 bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, this.rexsterApplication);
+
+                if (specificMessage.metaGetGraphName() != null) {
+                    bindings.put(specificMessage.metaGetGraphObjName(), this.rexsterApplication.getGraph(specificMessage.metaGetGraphName()));
+                }
 
                 final Object result = scriptEngine.eval(specificMessage.Script, bindings);
                 ctx.write(formatForMsgPackChannel(specificMessage, result));

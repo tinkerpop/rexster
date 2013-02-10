@@ -19,6 +19,7 @@ public class ScriptRequestMessage extends RexProMessage {
     protected static final String GRAPH_NAME_META_KEY = "graphName";
     protected static final String GRAPH_OBJECT_NAME_META_KEY = "graphObjName";
     protected static final String ISOLATE_REQUEST_META_KEY = "isolate";
+    protected static final String TRANSACTION_META_KEY = "transaction";
     protected RexProMessageMetaField[] getMetaFields() {
         RexProMessageMetaField[] fields = {
             //indicates this requests should be executed in the supplied session
@@ -30,6 +31,9 @@ public class ScriptRequestMessage extends RexProMessage {
 
             //indicates variables defined in this request will not be available in the next
             RexProMessageMetaField.define(ISOLATE_REQUEST_META_KEY, false, true, Boolean.class),
+
+            //indicates this request should be wrapped in a transaction
+            RexProMessageMetaField.define(TRANSACTION_META_KEY, false, true, Boolean.class),
         };
         return fields;
     }
@@ -94,5 +98,13 @@ public class ScriptRequestMessage extends RexProMessage {
 
     public Boolean metaGetIsolate() {
         return (Boolean) Meta.get(ISOLATE_REQUEST_META_KEY);
+    }
+
+    public void metaSetTransaction(Boolean val) {
+        Meta.put(TRANSACTION_META_KEY, val);
+    }
+
+    public Boolean metaGetTransaction() {
+        return (Boolean) Meta.get(TRANSACTION_META_KEY);
     }
 }
