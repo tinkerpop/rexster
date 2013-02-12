@@ -1,5 +1,7 @@
 package com.tinkerpop.rexster.protocol.filter;
 
+import com.tinkerpop.rexster.client.RexProException;
+import com.tinkerpop.rexster.protocol.RexProSession;
 import com.tinkerpop.rexster.protocol.msg.MessageTokens;
 import com.tinkerpop.rexster.protocol.msg.MessageUtil;
 import com.tinkerpop.rexster.server.RexsterApplication;
@@ -64,6 +66,7 @@ public class SessionFilter extends BaseFilter {
                 //destroy the session
                 RexProSessions.destroySession(specificMessage.sessionAsUUID().toString());
                 ctx.write(MessageUtil.createEmptySession(specificMessage.Request));
+
             } else {
                 final EngineController engineController = EngineController.getInstance();
                 final List<String> engineLanguages = engineController.getAvailableEngineLanguages();
@@ -72,12 +75,31 @@ public class SessionFilter extends BaseFilter {
                         specificMessage.Request, engineLanguages);
 
                 // construct a session with the right channel
-                RexProSessions.ensureSessionExists(
+                if(!RexProSessions.hasSessionKey(responseMessage.sessionAsUUID().toString())) {
+                    RexProSession session = RexProSessions.createSession(
                         responseMessage.sessionAsUUID().toString(),
                         this.rexsterApplication,
                         specificMessage.Channel
-                );
+                    );
 
+                    //configure the graph object
+                    if (specificMessage.metaGetGraphName() != null) {
+                        try {
+                            session.setGraphObj(specificMessage.metaGetGraphName(), specificMessage.metaGetGraphObjName());
+                        } catch (RexProException ex) {
+                            //graph config problem
+                            ctx.write(
+                                MessageUtil.createErrorResponse(
+                                    message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                                    ErrorResponseMessage.GRAPH_CONFIG_ERROR,
+                                    ex.toString()
+                                )
+                            );
+
+                            return ctx.getStopAction();
+                        }
+                    }
+                }
                 ctx.write(responseMessage);
 
             }

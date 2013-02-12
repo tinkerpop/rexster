@@ -16,6 +16,7 @@ public class ErrorResponseMessage extends RexProMessage {
     public static final Integer INVALID_SESSION_ERROR = 1;
     public static final Integer SCRIPT_FAILURE_ERROR = 2;
     public static final Integer AUTH_FAILURE_ERROR = 3;
+    public static final Integer GRAPH_CONFIG_ERROR = 4;
 
     protected static final String FLAG_META_KEY = "flag";
     protected RexProMessageMetaField[] getMetaFields() {

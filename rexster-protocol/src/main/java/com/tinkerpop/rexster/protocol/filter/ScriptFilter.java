@@ -1,5 +1,7 @@
 package com.tinkerpop.rexster.protocol.filter;
 
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.GraphSONScriptResponseMessage;
@@ -67,24 +69,79 @@ public class ScriptFilter extends BaseFilter {
                     // the message is assigned a session that does not exist on the server
                     ctx.write(
                         MessageUtil.createErrorResponse(
-                                message.Request,
-                                RexProMessage.EMPTY_SESSION_AS_BYTES,
-                                ErrorResponseMessage.INVALID_SESSION_ERROR,
-                                MessageTokens.ERROR_SESSION_INVALID
+                            message.Request,
+                            RexProMessage.EMPTY_SESSION_AS_BYTES,
+                            ErrorResponseMessage.INVALID_SESSION_ERROR,
+                            MessageTokens.ERROR_SESSION_INVALID
                         )
                     );
                     return ctx.getStopAction();
                 }
 
-                final Object result = session.evaluate(specificMessage.Script, specificMessage.LanguageName, specificMessage.getBindings());
-                if (session.getChannel() == SessionRequestMessage.CHANNEL_CONSOLE) {
-                    ctx.write(formatForConsoleChannel(specificMessage, session, result));
+                Graph graph = session.getGraphObj();
 
-                } else if (session.getChannel() == SessionRequestMessage.CHANNEL_MSGPACK) {
-                    ctx.write(formatForMsgPackChannel(specificMessage, result));
+                //catch any graph redefinition attempts
+                if (specificMessage.metaGetGraphName() != null && graph != null) {
+                    //graph config problem
+                    ctx.write(
+                        MessageUtil.createErrorResponse(
+                            message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                            ErrorResponseMessage.GRAPH_CONFIG_ERROR,
+                            MessageTokens.ERROR_GRAPH_REDEFINITION
+                        )
+                    );
 
-                }  else if (session.getChannel() == SessionRequestMessage.CHANNEL_GRAPHSON) {
-                    ctx.write(formatForGraphSONChannel(specificMessage, result));
+                    return ctx.getStopAction();
+                }
+
+                Bindings bindings = specificMessage.getBindings();
+
+                //add the graph object to the bindings
+                if (specificMessage.metaGetGraphName() != null) {
+                    graph = rexsterApplication.getGraph(specificMessage.metaGetGraphName());
+                    bindings.put(specificMessage.metaGetGraphObjName(), graph);
+                }
+
+                //start transaction
+                if (graph != null && specificMessage.metaGetTransaction()) {
+                    if (graph instanceof TransactionalGraph) {
+                        ((TransactionalGraph) graph).rollback();
+                    }
+                }
+
+                try {
+                    //execute script
+                    final Object result = session.evaluate(
+                        specificMessage.Script,
+                        specificMessage.LanguageName,
+                        bindings,
+                        specificMessage.metaGetIsolate()
+                    );
+
+                    if (session.getChannel() == SessionRequestMessage.CHANNEL_CONSOLE) {
+                        ctx.write(formatForConsoleChannel(specificMessage, session, result));
+
+                    } else if (session.getChannel() == SessionRequestMessage.CHANNEL_MSGPACK) {
+                        ctx.write(formatForMsgPackChannel(specificMessage, result));
+
+                    }  else if (session.getChannel() == SessionRequestMessage.CHANNEL_GRAPHSON) {
+                        ctx.write(formatForGraphSONChannel(specificMessage, result));
+                    }
+
+                    //commit transaction
+                    if (graph != null && specificMessage.metaGetTransaction()) {
+                        if (graph instanceof TransactionalGraph) {
+                            ((TransactionalGraph) graph).rollback();
+                        }
+                    }
+                } catch (Exception ex) {
+                    //rollback transaction
+                    if (graph != null && specificMessage.metaGetTransaction()) {
+                        if (graph instanceof TransactionalGraph) {
+                            ((TransactionalGraph) graph).rollback();
+                        }
+                    }
+                    throw ex;
                 }
 
             } else {
@@ -98,8 +155,52 @@ public class ScriptFilter extends BaseFilter {
                 }
                 bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, this.rexsterApplication);
 
-                final Object result = scriptEngine.eval(specificMessage.Script, bindings);
-                ctx.write(formatForMsgPackChannel(specificMessage, result));
+                Graph graph = null;
+                if (specificMessage.metaGetGraphName() != null) {
+                    graph = this.rexsterApplication.getGraph(specificMessage.metaGetGraphName());
+                    if (graph != null) {
+                        bindings.put(specificMessage.metaGetGraphObjName(), graph);
+                    } else {
+                        //graph config problem
+                        ctx.write(
+                            MessageUtil.createErrorResponse(
+                                message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                                ErrorResponseMessage.GRAPH_CONFIG_ERROR,
+                                "the graph '" + specificMessage.metaGetGraphName() + "' was not found by Rexster"
+                            )
+                        );
+
+                        return ctx.getStopAction();
+
+                    }
+                }
+
+                //start transaction
+                if (graph != null && specificMessage.metaGetTransaction()) {
+                    if (graph instanceof TransactionalGraph) {
+                        ((TransactionalGraph) graph).rollback();
+                    }
+                }
+
+                try {
+                    final Object result = scriptEngine.eval(specificMessage.Script, bindings);
+                    ctx.write(formatForMsgPackChannel(specificMessage, result));
+
+                    //commit transaction
+                    if (graph != null && specificMessage.metaGetTransaction()) {
+                        if (graph instanceof TransactionalGraph) {
+                            ((TransactionalGraph) graph).rollback();
+                        }
+                    }
+                } catch (Exception ex) {
+                    //rollback transaction
+                    if (graph != null && specificMessage.metaGetTransaction()) {
+                        if (graph instanceof TransactionalGraph) {
+                            ((TransactionalGraph) graph).rollback();
+                        }
+                    }
+                    throw ex;
+                }
             }
 
         } catch (ScriptException se) {
