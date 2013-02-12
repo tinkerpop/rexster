@@ -9,4 +9,5 @@ public final class MessageTokens {
     public static final String ERROR_SESSION_INVALID = "The session on the request does not exist or has otherwise expired.";
     public static final String ERROR_IN_SCRIPT_PROCESSING = "An error occurred while processing the script for language [%s]. All transactions across all graphs in the session have been concluded with failure: %s";
     public static final String ERROR_UNEXPECTED_MESSAGE_TYPE = "Message did not match an expected type.";
+    public static final String ERROR_GRAPH_REDEFINITION = "A graph name has already been defined on this session";
 }

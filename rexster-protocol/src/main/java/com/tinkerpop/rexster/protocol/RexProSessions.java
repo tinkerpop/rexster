@@ -54,4 +54,19 @@ public class RexProSessions {
         }
     }
 
+    /**
+     * Creates and returns a new RexProSession, and adds it to the sessions table
+     *
+     * @param sessionKey
+     * @param rexsterApplication
+     * @param sessionChannel
+     * @return
+     */
+    public static RexProSession createSession(final String sessionKey, final RexsterApplication rexsterApplication, final byte sessionChannel) {
+        final RexProSession session = new RexProSession(sessionKey, rexsterApplication, sessionChannel);
+        sessions.put(sessionKey, session);
+
+        logger.info(String.format("RexPro Session created: %s", sessionKey));
+        return session;
+    }
 }

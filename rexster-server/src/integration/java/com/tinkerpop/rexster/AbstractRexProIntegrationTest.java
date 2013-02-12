@@ -33,6 +33,7 @@ public abstract class AbstractRexProIntegrationTest {
 
         final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
         final RexsterApplication application = new XmlRexsterApplication(graphConfigs);
+        EngineController.configure(-1, null);
         rexsterServer.start(application);
     }
 

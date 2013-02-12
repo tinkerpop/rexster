@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.Tokens;
 
@@ -36,11 +37,41 @@ public class RexProSession {
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
+    //the graph bound to this session
+    private Graph graphObj = null;
+
+    //the variable name of the graph in the interperter
+    private String graphObjName = null;
+
     public RexProSession(final String sessionKey, final RexsterApplication rexsterApplication, final byte channel) {
         this.sessionKey = sessionKey;
         this.channel = channel;
         this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, rexsterApplication);
         this.rexsterApplication = rexsterApplication;
+    }
+
+    /**
+     * Configures a graph object on the session, and sets the variable name of
+     * the graph in the interpreter
+     *
+     * @param graphName: the name of the graph (in rexster.xml)
+     * @param graphObjName: the variable name of the graph in the interpreter (usually "g")
+     */
+    public void setGraphObj(String graphName, String graphObjName) throws RexProException{
+        graphObj = rexsterApplication.getGraph(graphName);
+        if (graphObj == null) {
+            throw new RexProException("the graph '" + graphName + "' was not found by Rexster");
+        }
+        this.graphObjName = graphObjName;
+        bindings.put(this.graphObjName, graphObj);
+    }
+
+    public Graph getGraphObj() {
+        return graphObj;
+    }
+
+    public Boolean hasGraphObj() {
+        return graphObj != null;
     }
 
     public String getSessionKey() {
@@ -64,15 +95,33 @@ public class RexProSession {
     }
 
     public Object evaluate(final String script, final String languageName, final Bindings rexsterBindings) throws ScriptException {
+        return evaluate(script, languageName, rexsterBindings, true);
+    }
+
+    public Object evaluate(final String script, final String languageName, final Bindings rexsterBindings, final Boolean isolate) throws ScriptException {
         Object result = null;
         try {
             final EngineHolder engine = this.controller.getEngineByLanguageName(languageName);
 
-            if (rexsterBindings != null) {
-                this.bindings.putAll(rexsterBindings);
+            Future future;
+            if (isolate) {
+                //use separate bindings
+                Bindings tempBindings = new SimpleBindings();
+                tempBindings.putAll(this.bindings);
+
+                if (rexsterBindings != null) {
+                    tempBindings.putAll(rexsterBindings);
+                }
+
+                future = this.executor.submit(new Evaluator(engine.getEngine(), script, tempBindings));
+            } else {
+                if (rexsterBindings != null) {
+                    this.bindings.putAll(rexsterBindings);
+                }
+
+                future = this.executor.submit(new Evaluator(engine.getEngine(), script, this.bindings));
             }
 
-            final Future future = this.executor.submit(new Evaluator(engine.getEngine(), script, this.bindings));
             result = future.get();
         } catch (Exception e) {
             // attempt to abort the transaction across all graphs since a new thread will be created on the next request.

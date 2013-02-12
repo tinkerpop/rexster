@@ -93,6 +93,45 @@ public class RexsterClient {
         return execute(script, null, template);
     }
 
+    /**
+     * Sends a RexProMessage, and returns the received RexProMessage response
+     *
+     * @param msg
+     * @return
+     * @throws RexProException
+     * @throws IOException
+     */
+    public RexProMessage execute(RexProMessage msg) throws RexProException, IOException {
+        final ArrayBlockingQueue<Object> responseQueue = new ArrayBlockingQueue<Object>(1);
+        final UUID requestId = msg.requestAsUUID();
+        responses.put(requestId, responseQueue);
+        try {
+            this.sendRequest(msg);
+        } catch (Throwable t) {
+            throw new IOException(t);
+        }
+
+        Object resultMessage;
+        try {
+            final long beginTime = System.currentTimeMillis();
+            resultMessage = responseQueue.poll(this.timeoutRead - (System.currentTimeMillis() - beginTime), TimeUnit.MILLISECONDS);
+        } catch (Exception ex) {
+            responses.remove(requestId);
+            throw new IOException(ex);
+        }
+
+        responses.remove(requestId);
+
+        if (resultMessage == null) {
+            throw new IOException(String.format("Message received response timeoutConnection (%s s)", this.timeoutConnection));
+        } else if (!(resultMessage instanceof RexProMessage)) {
+            logger.error(String.format("Rexster returned a message of type [%s]", resultMessage.getClass().getName()));
+            throw new RexProException("RexsterClient doesn't support the message type returned.");
+        }
+
+        return (RexProMessage) resultMessage;
+    }
+
     public <T> List<T> execute(final String script, final Map<String, Object> scriptArgs,
                                final Template template) throws RexProException, IOException {
         final ArrayBlockingQueue<Object> responseQueue = new ArrayBlockingQueue<Object>(1);
