@@ -131,7 +131,7 @@ public class ScriptFilter extends BaseFilter {
                     //commit transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
                         if (graph instanceof TransactionalGraph) {
-                            ((TransactionalGraph) graph).rollback();
+                            ((TransactionalGraph) graph).commit();
                         }
                     }
                 } catch (Exception ex) {
@@ -189,7 +189,7 @@ public class ScriptFilter extends BaseFilter {
                     //commit transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
                         if (graph instanceof TransactionalGraph) {
-                            ((TransactionalGraph) graph).rollback();
+                            ((TransactionalGraph) graph).commit();
                         }
                     }
                 } catch (Exception ex) {
