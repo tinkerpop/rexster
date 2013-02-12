@@ -1,9 +1,14 @@
 package com.tinkerpop.rexster.util;
 
+import com.sun.jersey.server.impl.cdi.CDIComponentProviderFactoryInitializer;
+import com.sun.jersey.server.impl.ejb.EJBComponentProviderFactoryInitilizer;
+import com.sun.jersey.server.impl.managedbeans.ManagedBeanComponentProviderFactoryInitilizer;
 import org.apache.log4j.Priority;
 import org.apache.log4j.Logger;
 
 import java.text.MessageFormat;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -16,10 +21,22 @@ import java.util.logging.LogRecord;
  */
 public class JuliToLog4jHandler extends Handler {
 
+    /**
+     * List of loggers from Jersey/Grizzly that Rexster ignores in debug mode as they are not used in the
+     * application.
+     */
+    private Set<String> loggersRexsterSuppresses = new HashSet<String>() {{
+        add(CDIComponentProviderFactoryInitializer.class.getCanonicalName());
+        add(EJBComponentProviderFactoryInitilizer.class.getCanonicalName());
+        add(ManagedBeanComponentProviderFactoryInitilizer.class.getCanonicalName());
+    }};
+
     public void publish(LogRecord record) {
-        org.apache.log4j.Logger log4j = getTargetLogger(record.getLoggerName());
-        Priority priority = toLog4j(record.getLevel());
-        log4j.log(priority, toLog4jMessage(record), record.getThrown());
+        if (!loggersRexsterSuppresses.contains(record.getLoggerName())) {
+            org.apache.log4j.Logger log4j = getTargetLogger(record.getLoggerName());
+            Priority priority = toLog4j(record.getLevel());
+            log4j.log(priority, toLog4jMessage(record), record.getThrown());
+        }
     }
 
     static Logger getTargetLogger(String loggerName) {
