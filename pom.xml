@@ -59,6 +59,8 @@
         <pipes.version>2.3.0-SNAPSHOT</pipes.version>
         <frames.version>2.3.0-SNAPSHOT</frames.version>
         <rexster.version>2.3.0-SNAPSHOT</rexster.version>
+        <jersey.version>1.17</jersey.version>
+        <grizzly.version>2.2.16</grizzly.version>
         <junit.version>4.5</junit.version>
         <srcdir>src/test/java</srcdir>
     </properties>

@@ -5,6 +5,7 @@ import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.server.XmlRexsterApplication;
 import com.tinkerpop.rexster.server.HttpRexsterServer;
 import com.tinkerpop.rexster.server.RexsterApplication;
@@ -12,8 +13,6 @@ import com.tinkerpop.rexster.server.RexsterServer;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.codehaus.jettison.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
 
 import javax.ws.rs.core.MediaType;
 import java.io.File;
@@ -27,6 +26,10 @@ public abstract class AbstractResourceIntegrationTest {
     protected RexsterServer rexsterServer;
     protected final ClientConfig clientConfiguration = new DefaultClientConfig();
     protected Client client;
+
+    static {
+        EngineController.configure(-1, null);
+    }
 
     public void setUp() throws Exception {
         clean();

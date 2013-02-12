@@ -64,7 +64,7 @@ public class HttpRexsterServer implements RexsterServer {
 
     public HttpRexsterServer(final XMLConfiguration properties) {
         this.properties = properties;
-        this.debugMode = properties.getBoolean("debug");
+        this.debugMode = properties.getBoolean("debug", false);
         rexsterServerPort = properties.getInteger("http.server-port", new Integer(RexsterSettings.DEFAULT_HTTP_PORT));
         rexsterServerHost = properties.getString("http.server-host", "0.0.0.0");
         webRootPath = properties.getString("http.web-root", RexsterSettings.DEFAULT_WEB_ROOT_PATH);

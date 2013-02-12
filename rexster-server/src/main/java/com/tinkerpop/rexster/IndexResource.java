@@ -536,10 +536,10 @@ public class IndexResource extends AbstractSubResource {
 
         if (key != null && value != null && id != null) {
             try {
-                if (index.getIndexClass().equals(Vertex.class)) {
+                if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
                     index.put(key, value, graph.getVertex(id));
                     rag.tryCommit();
-                } else if (index.getIndexClass().equals(Edge.class)) {
+                } else if (Edge.class.isAssignableFrom(index.getIndexClass())) {
                     index.put(key, value, graph.getEdge(id));
                     rag.tryCommit();
                 } else {

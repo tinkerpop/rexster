@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.client.RexsterClientFactory;
+import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.server.RexProRexsterServer;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.server.RexsterServer;
@@ -17,6 +18,10 @@ public abstract class AbstractRexProIntegrationTest {
     protected static final RexsterClientFactory factory = RexsterClientFactory.getInstance();
 
     protected RexsterServer rexsterServer;
+
+    static {
+        EngineController.configure(-1, null);
+    }
 
     @Before
     public void setUp() throws Exception {
