@@ -7,7 +7,7 @@ import org.glassfish.grizzly.strategies.SimpleDynamicNIOStrategy;
 import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
 
 /**
- * Creates various IOStrategy implementations for Grizzly.
+ * Creates various IOStrategy implementations for Grizzly.  Defaults to leader-follower.
  *
  * http://grizzly.java.net/nonav/docs/docbkx2.0/html/iostrategies.html
  *
@@ -31,7 +31,7 @@ public class GrizzlyIoStrategyFactory {
         } else if (strategy.equals(LEADER_FOLLOWER)) {
             ioStrategy = LeaderFollowerNIOStrategy.getInstance();
         } else {
-            ioStrategy = WorkerThreadIOStrategy.getInstance();
+            ioStrategy = LeaderFollowerNIOStrategy.getInstance();
         }
 
         return ioStrategy;
