@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.protocol.msg;
 
-import org.msgpack.template.AbstractTemplate;
 import org.msgpack.packer.Packer;
+import org.msgpack.template.AbstractTemplate;
 import org.msgpack.template.Templates;
 import org.msgpack.type.Value;
 import org.msgpack.unpacker.Unpacker;

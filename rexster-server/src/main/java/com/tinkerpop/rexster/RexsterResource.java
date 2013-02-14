@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.extension.HttpMethod;
+import com.tinkerpop.rexster.server.RexsterApplication;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;

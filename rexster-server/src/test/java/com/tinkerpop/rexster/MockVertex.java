@@ -1,18 +1,18 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultQuery;
+import com.tinkerpop.blueprints.util.MultiIterable;
+import com.tinkerpop.blueprints.util.VerticesFromEdgesIterable;
 import com.tinkerpop.gremlin.pipes.filter.LabelFilterPipe;
 import com.tinkerpop.pipes.Pipe;
 import com.tinkerpop.pipes.filter.FilterPipe;
-import com.tinkerpop.blueprints.util.VerticesFromEdgesIterable;
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.util.MultiIterable;
-import java.util.Arrays;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Set;
 

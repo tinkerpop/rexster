@@ -1,9 +1,9 @@
 package com.tinkerpop.rexster.servlet;
 
-import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.gremlin.GremlinEvaluationJob;
 import com.tinkerpop.rexster.gremlin.GremlinSessions;
 import com.tinkerpop.rexster.gremlin.converter.ConsoleResultConverter;
+import com.tinkerpop.rexster.server.RexsterApplication;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

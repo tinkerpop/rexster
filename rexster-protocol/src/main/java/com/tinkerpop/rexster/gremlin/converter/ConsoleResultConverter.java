@@ -4,7 +4,6 @@ import com.tinkerpop.pipes.util.iterators.SingleIterator;
 import org.apache.commons.collections.iterators.ArrayIterator;
 
 import java.io.Writer;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

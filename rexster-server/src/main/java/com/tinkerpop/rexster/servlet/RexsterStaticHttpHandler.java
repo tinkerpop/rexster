@@ -1,22 +1,15 @@
 package com.tinkerpop.rexster.servlet;
 
-import org.glassfish.grizzly.Buffer;
-import org.glassfish.grizzly.WriteHandler;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.server.StaticHttpHandler;
-import org.glassfish.grizzly.http.server.io.NIOOutputStream;
-import org.glassfish.grizzly.http.server.io.OutputBuffer;
 import org.glassfish.grizzly.http.server.util.MimeType;
 import org.glassfish.grizzly.http.util.HttpStatus;
-import org.glassfish.grizzly.memory.MemoryManager;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 
 /**
  * This class is a near replica of the StaticHttpHandler.  The only difference is that it does not cache resources.

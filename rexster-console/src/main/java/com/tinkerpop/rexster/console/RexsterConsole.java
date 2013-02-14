@@ -5,7 +5,10 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.RemoteRexsterSession;
 import com.tinkerpop.rexster.protocol.ResultAndBindings;
-import com.tinkerpop.rexster.protocol.msg.*;
+import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import jline.ConsoleReader;
 import jline.History;
 

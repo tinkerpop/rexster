@@ -2,7 +2,12 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.protocol.BitWorks;
-import com.tinkerpop.rexster.protocol.msg.*;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import junit.framework.Assert;
 import org.junit.Test;
 

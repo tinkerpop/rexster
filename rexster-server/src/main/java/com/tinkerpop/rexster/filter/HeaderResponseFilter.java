@@ -3,7 +3,6 @@ package com.tinkerpop.rexster.filter;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.tinkerpop.rexster.Application;
 import com.tinkerpop.rexster.Tokens;
 import org.codehaus.jettison.json.JSONObject;
 

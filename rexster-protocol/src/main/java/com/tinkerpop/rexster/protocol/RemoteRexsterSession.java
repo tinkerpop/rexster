@@ -1,7 +1,9 @@
 package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.client.RexProException;
-import com.tinkerpop.rexster.protocol.msg.*;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;

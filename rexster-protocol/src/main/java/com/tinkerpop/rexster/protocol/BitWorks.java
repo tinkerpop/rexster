@@ -3,9 +3,9 @@ package com.tinkerpop.rexster.protocol;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
 import org.msgpack.template.Template;
-import org.msgpack.type.Value;
-import org.msgpack.type.MapValue;
 import org.msgpack.type.ArrayValue;
+import org.msgpack.type.MapValue;
+import org.msgpack.type.Value;
 import org.msgpack.unpacker.Unpacker;
 
 import javax.script.Bindings;
@@ -21,9 +21,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.msgpack.template.Templates.TString;
 import static org.msgpack.template.Templates.TValue;
 import static org.msgpack.template.Templates.tMap;
-import static org.msgpack.template.Templates.TString;
 
 /**
  * Helper class for for common byte operations.

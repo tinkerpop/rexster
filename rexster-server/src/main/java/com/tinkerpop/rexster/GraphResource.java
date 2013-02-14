@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
@@ -11,6 +10,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterExtension;
+import com.tinkerpop.rexster.server.RexsterApplication;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;

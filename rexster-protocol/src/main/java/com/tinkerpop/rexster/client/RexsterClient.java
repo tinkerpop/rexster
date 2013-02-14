@@ -1,7 +1,10 @@
 package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.protocol.BitWorks;
-import com.tinkerpop.rexster.protocol.msg.*;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Connection;

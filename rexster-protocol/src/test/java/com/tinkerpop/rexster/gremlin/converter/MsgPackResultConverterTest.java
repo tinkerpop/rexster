@@ -12,17 +12,15 @@ import org.msgpack.type.Value;
 import org.msgpack.type.ValueFactory;
 import org.msgpack.unpacker.BufferUnpacker;
 import org.msgpack.unpacker.Converter;
-import org.msgpack.unpacker.UnpackerIterator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static org.msgpack.template.Templates.tMap;
 import static org.msgpack.template.Templates.TString;
 import static org.msgpack.template.Templates.TValue;
-import static org.msgpack.template.Templates.tList;
+import static org.msgpack.template.Templates.tMap;
 
 
 public class MsgPackResultConverterTest {

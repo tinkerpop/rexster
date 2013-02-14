@@ -2,7 +2,6 @@ package com.tinkerpop.rexster.server;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import java.io.BufferedReader;
 import java.io.IOException;

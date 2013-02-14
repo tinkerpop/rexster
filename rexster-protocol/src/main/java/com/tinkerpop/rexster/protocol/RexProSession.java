@@ -2,9 +2,9 @@ package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.server.RexsterApplication;
-import com.tinkerpop.rexster.Tokens;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;

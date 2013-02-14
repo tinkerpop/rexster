@@ -3,8 +3,8 @@ package com.tinkerpop.rexster.util;
 import com.sun.jersey.server.impl.cdi.CDIComponentProviderFactoryInitializer;
 import com.sun.jersey.server.impl.ejb.EJBComponentProviderFactoryInitilizer;
 import com.sun.jersey.server.impl.managedbeans.ManagedBeanComponentProviderFactoryInitilizer;
-import org.apache.log4j.Priority;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 
 import java.text.MessageFormat;
 import java.util.HashSet;

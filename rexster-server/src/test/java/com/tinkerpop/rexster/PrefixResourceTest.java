@@ -1,22 +1,11 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.rexster.server.RexsterApplication;
-import com.tinkerpop.blueprints.impls.sail.SailGraph;
-import com.tinkerpop.blueprints.impls.sail.SailGraphFactory;
-import com.tinkerpop.blueprints.impls.sail.impls.MemoryStoreSailGraph;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import java.util.HashMap;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

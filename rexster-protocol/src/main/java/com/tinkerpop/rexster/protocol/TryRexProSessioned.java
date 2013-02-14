@@ -1,7 +1,9 @@
 package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.protocol.msg.*;
+import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import org.msgpack.MessagePack;
 import org.msgpack.type.Value;
 import org.msgpack.unpacker.BufferUnpacker;
@@ -13,9 +15,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.msgpack.template.Templates.tMap;
 import static org.msgpack.template.Templates.TString;
 import static org.msgpack.template.Templates.TValue;
+import static org.msgpack.template.Templates.tMap;
 
 /**
  * A bit of an experiment.

@@ -1,18 +1,8 @@
 package com.tinkerpop.rexster.server;
 
-import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
-import com.tinkerpop.rexster.RexsterApplicationGraph;
-import com.tinkerpop.rexster.Tokens;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.XMLConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)

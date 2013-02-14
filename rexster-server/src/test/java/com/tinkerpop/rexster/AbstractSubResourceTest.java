@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.rexster.extension.ExtensionConfiguration;
 import com.tinkerpop.rexster.extension.ExtensionDefinition;
@@ -8,9 +7,10 @@ import com.tinkerpop.rexster.extension.ExtensionMethod;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
-import com.tinkerpop.rexster.gremlin.GremlinExtension;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterExtension;
+import com.tinkerpop.rexster.gremlin.GremlinExtension;
+import com.tinkerpop.rexster.server.RexsterApplication;
 import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONObject;
 import org.jmock.Expectations;

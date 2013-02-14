@@ -2,17 +2,7 @@ package com.tinkerpop.rexster.server;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
-import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.config.GraphConfigurationContainer;
-import com.tinkerpop.rexster.config.GraphConfigurationException;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Configure a single existing graph into Rexster.  Useful in configuring Rexster for embedded applications.
