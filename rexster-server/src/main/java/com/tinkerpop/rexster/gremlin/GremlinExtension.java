@@ -235,7 +235,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
         }
 
         if ((script == null || script.isEmpty()) && scriptsToRun == null) {
-            return ExtensionResponse.error(
+            return ExtensionResponse.badRequest(
                     "no scripts provided",
                     generateErrorJson(extensionMethod.getExtensionApiAsJson()));
         }

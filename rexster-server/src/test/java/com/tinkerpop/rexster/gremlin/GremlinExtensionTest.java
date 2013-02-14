@@ -64,7 +64,7 @@ public class GremlinExtensionTest {
 
         JSONObject jsonResponse = assertResponseAndGetEntity(extensionResponse,
                 true,
-                Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+                Response.Status.BAD_REQUEST.getStatusCode());
 
         Assert.assertNotNull(jsonResponse);
         Assert.assertTrue(jsonResponse.has(Tokens.MESSAGE));

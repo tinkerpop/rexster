@@ -266,6 +266,14 @@ public class ExtensionResponse {
         return new ExtensionResponse(Response.ok(result).build());
     }
 
+    public static ExtensionResponse badRequest(final String message, final JSONObject appendJson) {
+        return error(message, null,  Response.Status.BAD_REQUEST.getStatusCode(), null, appendJson);
+    }
+
+    public static ExtensionResponse badRequest() {
+        return new ExtensionResponse(Response.status(Response.Status.BAD_REQUEST).build());
+    }
+
     public Response getJerseyResponse() {
         return this.jerseyResponse;
     }
