@@ -45,6 +45,11 @@ public class MockEdge implements Edge {
     }
 
     @Override
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void setProperty(String key, Object value) {
         this.properties.put(key, value);
     }

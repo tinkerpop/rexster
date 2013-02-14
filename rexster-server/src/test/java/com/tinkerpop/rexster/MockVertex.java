@@ -53,6 +53,11 @@ public class MockVertex implements Vertex {
         return this.properties.remove(key);
     }
 
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
+
     public void setProperty(String key, Object value) {
         this.properties.put(key, value);
     }
@@ -94,5 +99,10 @@ public class MockVertex implements Vertex {
 
     public Query query() {
         return new DefaultQuery(this);
+    }
+
+    @Override
+    public Edge addEdge(String label, Vertex vertex) {
+        throw new UnsupportedOperationException();
     }
 }
