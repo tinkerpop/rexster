@@ -27,7 +27,7 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
     public void executeExercise() throws Exception {
         final RexsterClient client = factory.createClient();
 
-        final List<Map<String, Value>> mapResults = client.execute("[val:1+1]");
+        final List<Map<String, Value>> mapResults = client.execute("[val:1+1]", tMap(TString, TValue));
         Assert.assertEquals(1, mapResults.size());
         final Map<String, Value> mapResult = mapResults.get(0);
         Assert.assertEquals("2", mapResult.get("val").toString());
@@ -40,7 +40,7 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         final MessagePack msgpack = new MessagePack();
         final Template<Map<String, Value>> mapTmpl = tMap(TString, TValue);
 
-        final List<Map<String, Value>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1)");
+        final List<Map<String, Value>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1)", tMap(TString, TValue));
         Assert.assertEquals(1, vertexResults.size());
         final Map<String, Value> vertexResult = vertexResults.get(0);
         Assert.assertEquals("vertex", vertexResult.get("_type").asRawValue().getString());
@@ -51,5 +51,47 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         mapTmpl.read(new Converter(msgpack, vertexPropertiesValue), vertexProperties);
         Assert.assertEquals("marko", vertexProperties.get("name").asRawValue().getString());
         Assert.assertEquals(29, vertexProperties.get("age").asIntegerValue().getInt());
+    }
+
+    @Test
+    public void executeMapValueConversion() throws Exception {
+        final RexsterClient client = factory.createClient();
+
+        // all whole numerics convert to long
+        // all float go to double
+        final List<Map<String, Object>> mapResultsObject = client.execute("[n:1+1,b:true,f:1234.56f,s:'string',a:[1,2,3],m:[one:1]]");
+        Assert.assertEquals(1, mapResultsObject.size());
+        final Map<String, Object> mapResultObject = mapResultsObject.get(0);
+        Assert.assertEquals(2l, mapResultObject.get("n"));
+        Assert.assertEquals(true, mapResultObject.get("b"));
+        Assert.assertEquals(1234.56d, (Double) mapResultObject.get("f"), 0.001d);
+        Assert.assertEquals("string", mapResultObject.get("s"));
+        Assert.assertEquals(3, ((Object []) mapResultObject.get("a")).length);
+        Assert.assertEquals(1l, ((Map) mapResultObject.get("m")).get("one"));
+    }
+
+    @Test
+    public void executeReturnGraphElementsValueConversion() throws Exception {
+        final RexsterClient client = factory.createClient();
+
+        final List<Map<String, Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1)");
+        Assert.assertEquals(1, vertexResults.size());
+        final Map<String, Object> vertexResult = vertexResults.get(0);
+        Assert.assertEquals("vertex", vertexResult.get("_type"));
+        Assert.assertEquals("1", vertexResult.get("_id"));
+        final Map vertexProperties = (Map) vertexResult.get("_properties");
+        Assert.assertEquals("marko", vertexProperties.get("name"));
+        Assert.assertEquals(29l, vertexProperties.get("age"));
+    }
+
+    @Test
+    public void executeReturnGraphElementsAsMapValueConversion() throws Exception {
+        final RexsterClient client = factory.createClient();
+
+        final List<Map<String, Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1).map");
+        Assert.assertEquals(1, vertexResults.size());
+        final Map<String, Object> vertexResult = vertexResults.get(0);
+        Assert.assertEquals("marko", vertexResult.get("name"));
+        Assert.assertEquals(29l, vertexResult.get("age"));
     }
 }

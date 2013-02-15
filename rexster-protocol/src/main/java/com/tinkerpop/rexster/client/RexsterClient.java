@@ -1,10 +1,12 @@
 package com.tinkerpop.rexster.client;
 
+import com.tinkerpop.pipes.util.iterators.SingleIterator;
 import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import org.apache.commons.collections.iterators.ArrayIterator;
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Connection;
@@ -12,6 +14,7 @@ import org.glassfish.grizzly.GrizzlyFuture;
 import org.glassfish.grizzly.nio.NIOConnection;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.msgpack.MessagePack;
+import org.msgpack.MessageTypeException;
 import org.msgpack.template.Template;
 import org.msgpack.type.Value;
 import org.msgpack.unpacker.BufferUnpacker;
@@ -22,6 +25,8 @@ import javax.script.Bindings;
 import javax.script.SimpleBindings;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -88,28 +93,48 @@ public class RexsterClient {
         this.connections = new NIOConnection[this.hosts.length];
     }
 
-    public List<Map<String,Value>> execute(final String script) throws RexProException, IOException {
-        return execute(script, tMap(TString, TValue));
-    }
-
-    public <T> List<T> execute(final String script, final Template template) throws RexProException, IOException {
-        return execute(script, null, template);
+    /**
+     * Send a script to rexster that returns a list of Maps.
+     */
+    public List<Map<String, Object>> execute(final String script) throws RexProException, IOException {
+        return execute(script, (Map<String, Object>) null);
     }
 
     /**
-     * Sends a RexProMessage, and returns the received RexProMessage response
+     * Send a script to rexster that returns a Map.
      *
-     * @param msg
-     * @return
-     * @throws RexProException
-     * @throws IOException
+     * Common usage is to retrieve graph elements (vertices and edges) which get serialized to Map by RexPro.
+     * Data conversion during deserialization takes any whole numeric numbers and treats them as longs.  Floats
+     * are treated as doubles.
      */
-    public RexProMessage execute(RexProMessage msg) throws RexProException, IOException {
+    public List<Map<String, Object>> execute(final String script, final Map<String, Object> parameters) throws RexProException, IOException {
+        final List<Map<String,Value>> packResults = execute(script, parameters, null);
+        final List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
+        try {
+            for (Map<String,Value> map : packResults) {
+                //Convert map
+                final Map<String, Object> result = new HashMap<String, Object>();
+                for (Map.Entry<String, Value> entry : map.entrySet()) {
+                    result.put(entry.getKey(), entry.getValue());
+                }
+                results.add(result);
+            }
+        } catch (MessageTypeException e) {
+            throw new IllegalArgumentException("Could not convert query result", e);
+        }
+
+        return results;
+    }
+
+    /**
+     * Sends a RexProMessage, and returns the received RexProMessage response.
+     */
+    public RexProMessage execute(final RexProMessage rawMessage) throws RexProException, IOException {
         final ArrayBlockingQueue<Object> responseQueue = new ArrayBlockingQueue<Object>(1);
-        final UUID requestId = msg.requestAsUUID();
+        final UUID requestId = rawMessage.requestAsUUID();
         responses.put(requestId, responseQueue);
         try {
-            this.sendRequest(msg);
+            this.sendRequest(rawMessage);
         } catch (Throwable t) {
             throw new IOException(t);
         }
@@ -133,6 +158,10 @@ public class RexsterClient {
         }
 
         return (RexProMessage) resultMessage;
+    }
+
+    public <T> List<T> execute(final String script, final Template template) throws RexProException, IOException {
+        return execute(script, null, template);
     }
 
     public <T> List<T> execute(final String script, final Map<String, Object> scriptArgs,
@@ -170,13 +199,39 @@ public class RexsterClient {
             unpacker.setMapSizeLimit(this.mapSizeLimit);
             unpacker.setRawSizeLimit(this.rawSizeLimit);
 
+            // when rexster returns an iterable it's read out of the unpacker as a single object much like a single
+            // vertex coming back from rexster.  basically, this is the difference between g.v(1) and g.v(1).map.
+            // the latter returns an iterable essentially putting a list inside of the results list here on the
+            // client side. the idea here is to normalize all results to a list on the client side, and therefore,
+            // iterables like those from g.v(1).map need to be unrolled into the results list.  Prefer this to
+            // doing it on the server, because the server should return what is asked of it, in case other clients
+            // want to process this differently.
             final List<T> results = new ArrayList<T>();
             final UnpackerIterator itty = unpacker.iterator();
             while (itty.hasNext()){
                 final Converter converter = new Converter(msgpack, itty.next());
-                final T t = (T) converter.read(template);
-                converter.close();
-                results.add(t);
+
+                if (template != null) {
+                    final T t = (T) converter.read(template);
+                    converter.close();
+                    results.add(t);
+                } else {
+                    final Object convertedResults = convert(converter.readValue());
+                    final Iterator convertedItty;
+                    if (convertedResults instanceof Iterable) {
+                        convertedItty = ((Iterable) convertedResults).iterator();
+                    } else if (convertedResults instanceof Iterator) {
+                        convertedItty = (Iterator) convertedResults;
+                    } else if (convertedResults instanceof Object[]) {
+                        convertedItty = new ArrayIterator((Object[]) convertedResults);
+                    } else {
+                        convertedItty = new SingleIterator<Object>(convertedResults);
+                    }
+
+                    while (convertedItty.hasNext()) {
+                        results.add((T) convertedItty.next());
+                    }
+                }
             }
 
             unpacker.close();
@@ -295,4 +350,28 @@ public class RexsterClient {
         scriptMessage.validateMetaData();
         return scriptMessage;
     }
+
+    private static Object convert(final Value v) {
+        if (v.isNilValue()) return null;
+        else if (v.isBooleanValue()) return v.asBooleanValue().getBoolean();
+        else if (v.isIntegerValue()) return v.asIntegerValue().getLong();
+        else if (v.isFloatValue()) return v.asFloatValue().getDouble();
+        else if (v.isRawValue()) return v.asRawValue().getString();
+        else if (v.isArrayValue()) {
+            final Value[] arr = v.asArrayValue().getElementArray();
+            final Object[] result = new Object[arr.length];
+            for (int i = 0; i < result.length; i++) result[i] = convert(arr[i]);
+            return result;
+        } else if (v.isMapValue()) {
+            final Map<Object, Object> result = new HashMap<Object, Object>();
+            for (Map.Entry<Value, Value> entry : v.asMapValue().entrySet()) {
+                result.put(convert(entry.getKey()), convert(entry.getValue()));
+            }
+            return result;
+        } else {
+            logger.trace(String.format("Cannot convert value:  {%s} [{%s}]", v, v.getType()));
+            return v.toString();
+        }
+    }
+
 }
