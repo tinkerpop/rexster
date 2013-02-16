@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.client.RexsterClient;
+import com.tinkerpop.rexster.client.RexsterClientFactory;
 import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
@@ -26,7 +27,7 @@ public class SessionRequestMessageTests extends AbstractRexProIntegrationTest {
      */
     @Test
     public void testSessionRequestAndResponse() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
 
         //create a session
         final SessionRequestMessage outMsg = new SessionRequestMessage();
@@ -69,7 +70,7 @@ public class SessionRequestMessageTests extends AbstractRexProIntegrationTest {
      */
     @Test
     public void testSessionGraphDefinition() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
 
         //create a session
         final SessionRequestMessage outMsg = new SessionRequestMessage();
@@ -104,7 +105,7 @@ public class SessionRequestMessageTests extends AbstractRexProIntegrationTest {
      */
     @Test
     public void testDefiningNonExistentGraphNameFails() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
 
         //create a session
         final SessionRequestMessage outMsg = new SessionRequestMessage();

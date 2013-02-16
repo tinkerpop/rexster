@@ -15,7 +15,6 @@ import java.io.File;
 import java.util.List;
 
 public abstract class AbstractRexProIntegrationTest {
-    protected static final RexsterClientFactory factory = RexsterClientFactory.getInstance();
 
     protected RexsterServer rexsterServer;
 

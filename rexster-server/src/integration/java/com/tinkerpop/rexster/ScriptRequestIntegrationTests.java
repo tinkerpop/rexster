@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.client.RexsterClient;
+import com.tinkerpop.rexster.client.RexsterClientFactory;
 import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
@@ -23,7 +24,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
     @Test
     public void testGraphObjMetaOnSessionlessRequest() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
 
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "graph.addVertex()";
@@ -45,7 +46,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
      */
     @Test
     public void testBindingsDontStickAroundAfterRequests() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
 
         //create a session
         final SessionRequestMessage outMsg = new SessionRequestMessage();
@@ -90,7 +91,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
     @Test
     public void testGraphObjMetaOnSessionedRequest() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
         RexProMessage inMsg;
 
         //create a session
@@ -136,7 +137,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
     @Test
     public void testGraphObjMetaOnSessionWithExistingGraphObjFails() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
 
         //create a session
         final SessionRequestMessage outMsg = new SessionRequestMessage();
@@ -169,7 +170,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
     @Test
     public void testDefiningNonExistentGraphNameFails() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
 
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "graph.addVertex()";
@@ -191,7 +192,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
      */
     @Test
     public void testQueryIsolation() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
         RexProMessage inMsg;
 
         //create a session
@@ -235,7 +236,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
     @Test
     public void testDisabledQueryIsolation() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
         RexProMessage inMsg;
 
         //create a session
@@ -279,7 +280,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
     @Test
     public void testTransactionMetaFlagWithoutSession() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
         RexProMessage inMsg;
 
         //create a session
@@ -311,7 +312,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
     @Test
     public void testTransactionMetaFlagWithSession() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
 
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "graph.addVertex()";

@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.client.RexsterClient;
+import com.tinkerpop.rexster.client.RexsterClientFactory;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.msgpack.MessagePack;
@@ -25,7 +26,7 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
 
     @Test
     public void executeExercise() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
 
         final List<Map<String, Value>> mapResults = client.execute("[val:1+1]", tMap(TString, TValue));
         Assert.assertEquals(1, mapResults.size());
@@ -55,7 +56,7 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
 
     @Test
     public void executeMapValueConversion() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
 
         // all whole numerics convert to long
         // all float go to double
@@ -72,7 +73,7 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
 
     @Test
     public void executeReturnGraphElementsValueConversion() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
 
         final List<Map<String, Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1)");
         Assert.assertEquals(1, vertexResults.size());
@@ -86,7 +87,7 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
 
     @Test
     public void executeReturnGraphElementsAsMapValueConversion() throws Exception {
-        final RexsterClient client = factory.createClient();
+        final RexsterClient client = RexsterClientFactory.open();
 
         final List<Map<String, Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1).map");
         Assert.assertEquals(1, vertexResults.size());
