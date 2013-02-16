@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.protocol.msg;
 
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.rexster.gremlin.converter.JSONResultConverter;
+import org.msgpack.annotation.Message;
 
 /**
  * Represents a response to a script request that formats results to GraphSON format.  This is the same format
@@ -9,6 +10,7 @@ import com.tinkerpop.rexster.gremlin.converter.JSONResultConverter;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
+@Message
 public class GraphSONScriptResponseMessage extends RexProMessage {
     private static final JSONResultConverter converter = new JSONResultConverter(
             GraphSONMode.EXTENDED, 0, Long.MAX_VALUE, null);
@@ -17,7 +19,11 @@ public class GraphSONScriptResponseMessage extends RexProMessage {
     public byte[] Bindings;
 
     public static byte[] convertResultToBytes(final Object result) throws Exception {
-        return converter.convert(result).toString().getBytes();
+        if (result == null) {
+            return new byte[0];
+        } else {
+            return converter.convert(result).toString().getBytes();
+        }
     }
 
     @Override

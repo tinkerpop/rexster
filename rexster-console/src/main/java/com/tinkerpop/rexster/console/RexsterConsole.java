@@ -7,6 +7,7 @@ import com.tinkerpop.rexster.protocol.RemoteRexsterSession;
 import com.tinkerpop.rexster.protocol.ResultAndBindings;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.GraphSONScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import jline.ConsoleReader;
@@ -320,6 +321,8 @@ public class RexsterConsole {
                     lines = new ArrayList<String>() {{
                         add(errorMessage.ErrorMessage);
                     }};
+                } else {
+                    throw new RuntimeException("Unexpected message type received from RexPro Server.");
                 }
             } catch (IllegalArgumentException iae) {
                 ErrorResponseMessage errorMessage = (ErrorResponseMessage) resultMessage;

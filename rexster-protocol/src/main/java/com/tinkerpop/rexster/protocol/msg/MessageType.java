@@ -37,4 +37,9 @@ public class MessageType {
      * Represents a response to a script request that formats results to MsgPack format.
      */
     public static final byte MSGPACK_SCRIPT_RESPONSE = 5;
+
+    /**
+     * Represents a response to a script request that formats results to GraphSON format.
+     */
+    public static final byte GRAPHSON_SCRIPT_RESPONSE = 6;
 }
