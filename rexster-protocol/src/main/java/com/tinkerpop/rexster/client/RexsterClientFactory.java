@@ -23,8 +23,6 @@ import java.util.Map;
 public class RexsterClientFactory {
     private static final Logger logger = Logger.getLogger(RexsterClientFactory.class);
 
-    private static final RexsterClientFactory factory = new RexsterClientFactory();
-
     private static final BaseConfiguration defaultConfiguration = new BaseConfiguration() {{
         addProperty(RexsterClientTokens.CONFIG_HOSTNAME, "localhost");
         addProperty(RexsterClientTokens.CONFIG_PORT, 8184);
@@ -40,38 +38,30 @@ public class RexsterClientFactory {
         addProperty(RexsterClientTokens.CONFIG_LANGUAGE, "groovy");
     }};
 
-    private RexsterClientFactory() {
-
+    public static RexsterClient open() throws Exception {
+        return open(defaultConfiguration);
     }
 
-    public static RexsterClientFactory getInstance() {
-        return factory;
-    }
-
-    public RexsterClient createClient() throws Exception {
-        return createClient(defaultConfiguration);
-    }
-
-    public RexsterClient createClient(final String host) throws Exception {
+    public static RexsterClient open(final String host) throws Exception {
         final BaseConfiguration specificConfiguration = new BaseConfiguration();
         specificConfiguration.addProperty(RexsterClientTokens.CONFIG_HOSTNAME, host);
 
-        return createClient(specificConfiguration);
+        return open(specificConfiguration);
     }
 
-    public RexsterClient createClient(final String host, final int port) throws Exception {
+    public static RexsterClient open(final String host, final int port) throws Exception {
         final BaseConfiguration specificConfiguration = new BaseConfiguration();
         specificConfiguration.addProperty(RexsterClientTokens.CONFIG_HOSTNAME, host);
         specificConfiguration.addProperty(RexsterClientTokens.CONFIG_PORT, port);
 
-        return createClient(specificConfiguration);
+        return open(specificConfiguration);
     }
 
-    public RexsterClient createClient(final Map<String,Object> configuration) throws Exception {
-        return createClient(new MapConfiguration(configuration));
+    public static RexsterClient open(final Map<String,Object> configuration) throws Exception {
+        return open(new MapConfiguration(configuration));
     }
 
-    public RexsterClient createClient(final Configuration specificConfiguration) throws Exception {
+    public static RexsterClient open(final Configuration specificConfiguration) throws Exception {
 
         final CompositeConfiguration jointConfig = new CompositeConfiguration();
         jointConfig.addConfiguration(specificConfiguration);

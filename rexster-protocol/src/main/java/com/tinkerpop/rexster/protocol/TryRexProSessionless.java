@@ -58,7 +58,7 @@ public class TryRexProSessionless implements Runnable {
 
         RexsterClient client = null;
         try {
-            client = RexsterClientFactory.getInstance().createClient(host);
+            client = RexsterClientFactory.open(host);
 
             while ((System.currentTimeMillis() - start) < exerciseTime) {
                 cycle++;
