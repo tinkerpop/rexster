@@ -66,34 +66,12 @@ public class ScriptFilter extends BaseFilter {
                 final RexProSession session = RexProSessions.getSession(specificMessage.sessionAsUUID().toString());
 
                 //validate session
-                if (session == null) {
-                    // the message is assigned a session that does not exist on the server
-                    ctx.write(
-                        MessageUtil.createErrorResponse(
-                            message.Request,
-                            RexProMessage.EMPTY_SESSION_AS_BYTES,
-                            ErrorResponseMessage.INVALID_SESSION_ERROR,
-                            MessageTokens.ERROR_SESSION_INVALID
-                        )
-                    );
-                    return ctx.getStopAction();
-                }
+                if (sessionDoesNotExist(ctx, message, session)) return ctx.getStopAction();
 
                 Graph graph = session.getGraphObj();
 
                 //catch any graph redefinition attempts
-                if (specificMessage.metaGetGraphName() != null && graph != null) {
-                    //graph config problem
-                    ctx.write(
-                        MessageUtil.createErrorResponse(
-                            message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
-                            ErrorResponseMessage.GRAPH_CONFIG_ERROR,
-                            MessageTokens.ERROR_GRAPH_REDEFINITION
-                        )
-                    );
-
-                    return ctx.getStopAction();
-                }
+                if (graphIsRedefined(ctx, message, specificMessage, graph)) return ctx.getStopAction();
 
                 Bindings bindings = specificMessage.getBindings();
 
@@ -249,6 +227,40 @@ public class ScriptFilter extends BaseFilter {
             );
         }
         return ctx.getStopAction();
+    }
+
+    private static boolean graphIsRedefined(final FilterChainContext ctx, final RexProMessage message,
+                                            final ScriptRequestMessage specificMessage, final Graph graph) {
+        if (specificMessage.metaGetGraphName() != null && graph != null) {
+            //graph config problem
+            ctx.write(
+                MessageUtil.createErrorResponse(
+                        message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                        ErrorResponseMessage.GRAPH_CONFIG_ERROR,
+                        MessageTokens.ERROR_GRAPH_REDEFINITION
+                )
+            );
+
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean sessionDoesNotExist(final FilterChainContext ctx, final RexProMessage message,
+                                               final RexProSession session) {
+        if (session == null) {
+            // the message is assigned a session that does not exist on the server
+            ctx.write(
+                MessageUtil.createErrorResponse(
+                        message.Request,
+                        RexProMessage.EMPTY_SESSION_AS_BYTES,
+                        ErrorResponseMessage.INVALID_SESSION_ERROR,
+                        MessageTokens.ERROR_SESSION_INVALID
+                )
+            );
+            return true;
+        }
+        return false;
     }
 
     private static GraphSONScriptResponseMessage formatForGraphSONChannel(final ScriptRequestMessage specificMessage, final Object result) throws Exception {
