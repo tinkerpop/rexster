@@ -50,7 +50,7 @@ public class ScriptRequestMessageTest {
 
         //these should fail
         try {
-            msg.Meta.put(ScriptRequestMessage.IN_SESSION_META_KEY, 5);
+            msg.Meta.put(ScriptRequestMessage.META_KEY_IN_SESSION, 5);
             msg.validateMetaData();
             Assert.fail();
         } catch (RexProException ex) {
@@ -59,7 +59,7 @@ public class ScriptRequestMessageTest {
 
         //these should fail
         try {
-            msg.Meta.put(ScriptRequestMessage.IN_SESSION_META_KEY, "yup");
+            msg.Meta.put(ScriptRequestMessage.META_KEY_IN_SESSION, "yup");
             msg.validateMetaData();
             Assert.fail();
         } catch (RexProException ex) {

@@ -5,6 +5,7 @@ import com.tinkerpop.rexster.client.RexsterClientFactory;
 import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProChannel;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
@@ -31,7 +32,7 @@ public class SessionRequestMessageTests extends AbstractRexProIntegrationTest {
 
         //create a session
         final SessionRequestMessage outMsg = new SessionRequestMessage();
-        outMsg.Channel = SessionRequestMessage.CHANNEL_MSGPACK;
+        outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
         outMsg.setRequestAsUUID(UUID.randomUUID());
 
         RexProMessage inMsg = client.execute(outMsg);
@@ -42,7 +43,7 @@ public class SessionRequestMessageTests extends AbstractRexProIntegrationTest {
 
         //kill said session
         final SessionRequestMessage deathMsg = new SessionRequestMessage();
-        deathMsg.Channel = SessionRequestMessage.CHANNEL_NONE;
+        deathMsg.Channel = RexProChannel.CHANNEL_NONE;
         deathMsg.Session = BitWorks.convertUUIDToByteArray(sessionKey);
         deathMsg.setRequestAsUUID(UUID.randomUUID());
         deathMsg.metaSetKillSession(true);
@@ -74,7 +75,7 @@ public class SessionRequestMessageTests extends AbstractRexProIntegrationTest {
 
         //create a session
         final SessionRequestMessage outMsg = new SessionRequestMessage();
-        outMsg.Channel = SessionRequestMessage.CHANNEL_MSGPACK;
+        outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
         outMsg.setRequestAsUUID(UUID.randomUUID());
         outMsg.metaSetGraphName("emptygraph");
         outMsg.metaSetGraphObjName("graph");
@@ -109,7 +110,7 @@ public class SessionRequestMessageTests extends AbstractRexProIntegrationTest {
 
         //create a session
         final SessionRequestMessage outMsg = new SessionRequestMessage();
-        outMsg.Channel = SessionRequestMessage.CHANNEL_MSGPACK;
+        outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
         outMsg.setRequestAsUUID(UUID.randomUUID());
         outMsg.metaSetGraphName("undefined");
 

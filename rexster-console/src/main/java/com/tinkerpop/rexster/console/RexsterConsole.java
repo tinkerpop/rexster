@@ -8,6 +8,7 @@ import com.tinkerpop.rexster.protocol.ResultAndBindings;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.GraphSONScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProChannel;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import jline.ConsoleReader;
@@ -304,6 +305,7 @@ public class RexsterConsole {
             scriptMessage.metaSetInSession(true);
             scriptMessage.metaSetTransaction(false);
             scriptMessage.metaSetIsolate(false);
+            scriptMessage.metaSetChannel(RexProChannel.CHANNEL_CONSOLE);
             scriptMessage.setRequestAsUUID(UUID.randomUUID());
 
             final RexProMessage resultMessage = session.sendRequest(scriptMessage, 3, 500);

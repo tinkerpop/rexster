@@ -5,6 +5,7 @@ import com.tinkerpop.rexster.client.RexsterClientFactory;
 import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProChannel;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
@@ -50,7 +51,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         //create a session
         final SessionRequestMessage outMsg = new SessionRequestMessage();
-        outMsg.Channel = SessionRequestMessage.CHANNEL_MSGPACK;
+        outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
         outMsg.setRequestAsUUID(UUID.randomUUID());
         outMsg.metaSetGraphName("emptygraph");
 
@@ -96,7 +97,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         //create a session
         final SessionRequestMessage outMsg = new SessionRequestMessage();
-        outMsg.Channel = SessionRequestMessage.CHANNEL_MSGPACK;
+        outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
         outMsg.setRequestAsUUID(UUID.randomUUID());
 
         inMsg = client.execute(outMsg);
@@ -141,7 +142,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         //create a session
         final SessionRequestMessage outMsg = new SessionRequestMessage();
-        outMsg.Channel = SessionRequestMessage.CHANNEL_MSGPACK;
+        outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
         outMsg.setRequestAsUUID(UUID.randomUUID());
         outMsg.metaSetGraphName("emptygraph");
 
@@ -161,10 +162,43 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
         scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
 
-        inMsg = client.execute(outMsg);
+        inMsg = client.execute(scriptMessage);
         Assert.assertNotNull(inMsg.Session);
         Assert.assertTrue(inMsg instanceof ErrorResponseMessage);
-        Assert.assertEquals(((ErrorResponseMessage) inMsg).metaGetFlag(), ErrorResponseMessage.GRAPH_CONFIG_ERROR);
+        Assert.assertEquals(ErrorResponseMessage.GRAPH_CONFIG_ERROR, ((ErrorResponseMessage) inMsg).metaGetFlag());
+
+    }
+
+    @Test
+    public void testChannelChangeFails() throws Exception {
+        final RexsterClient client = RexsterClientFactory.open();
+
+        //create a session
+        final SessionRequestMessage outMsg = new SessionRequestMessage();
+        outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
+        outMsg.setRequestAsUUID(UUID.randomUUID());
+
+        RexProMessage inMsg = client.execute(outMsg);
+        Assert.assertNotNull(inMsg.Session);
+        Assert.assertTrue(inMsg instanceof SessionResponseMessage);
+
+        UUID sessionKey = BitWorks.convertByteArrayToUUID(inMsg.Session);
+
+        //try defining a new channel different from the session
+        final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
+        scriptMessage.Script = "graph.addVertex()";
+        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
+        scriptMessage.LanguageName = "groovy";
+        scriptMessage.metaSetInSession(true);
+        scriptMessage.metaSetGraphName("emptygraph");
+        scriptMessage.metaSetChannel(RexProChannel.CHANNEL_GRAPHSON);
+        scriptMessage.setRequestAsUUID(UUID.randomUUID());
+        scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
+
+        inMsg = client.execute(scriptMessage);
+        Assert.assertNotNull(inMsg.Session);
+        Assert.assertTrue(inMsg instanceof ErrorResponseMessage);
+        Assert.assertEquals(ErrorResponseMessage.CHANNEL_CONFIG_ERROR, ((ErrorResponseMessage) inMsg).metaGetFlag());
 
     }
 
@@ -197,7 +231,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         //create a session
         final SessionRequestMessage outMsg = new SessionRequestMessage();
-        outMsg.Channel = SessionRequestMessage.CHANNEL_MSGPACK;
+        outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
         outMsg.setRequestAsUUID(UUID.randomUUID());
 
         inMsg = client.execute(outMsg);
@@ -241,7 +275,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         //create a session
         final SessionRequestMessage outMsg = new SessionRequestMessage();
-        outMsg.Channel = SessionRequestMessage.CHANNEL_MSGPACK;
+        outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
         outMsg.setRequestAsUUID(UUID.randomUUID());
 
         inMsg = client.execute(outMsg);
@@ -285,7 +319,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         //create a session
         final SessionRequestMessage outMsg = new SessionRequestMessage();
-        outMsg.Channel = SessionRequestMessage.CHANNEL_MSGPACK;
+        outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
         outMsg.setRequestAsUUID(UUID.randomUUID());
 
         inMsg = client.execute(outMsg);

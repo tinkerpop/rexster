@@ -13,6 +13,7 @@ import com.tinkerpop.rexster.protocol.msg.GraphSONScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MessageTokens;
 import com.tinkerpop.rexster.protocol.msg.MessageUtil;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProChannel;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
@@ -65,23 +66,24 @@ public class ScriptFilter extends BaseFilter {
                 //session script request
                 final RexProSession session = RexProSessions.getSession(specificMessage.sessionAsUUID().toString());
 
-                //validate session
+                // validate session and channel
                 if (sessionDoesNotExist(ctx, message, session)) return ctx.getStopAction();
+                if (channelIsRedefined(ctx, message, specificMessage, session)) return ctx.getStopAction();
 
                 Graph graph = session.getGraphObj();
 
-                //catch any graph redefinition attempts
+                // catch any graph redefinition attempts
                 if (graphIsRedefined(ctx, message, specificMessage, graph)) return ctx.getStopAction();
 
                 Bindings bindings = specificMessage.getBindings();
 
-                //add the graph object to the bindings
+                // add the graph object to the bindings
                 if (specificMessage.metaGetGraphName() != null) {
                     graph = rexsterApplication.getGraph(specificMessage.metaGetGraphName());
                     bindings.put(specificMessage.metaGetGraphObjName(), graph);
                 }
 
-                //start transaction
+                // start transaction
                 if (graph != null && specificMessage.metaGetTransaction()) {
                     if (graph instanceof TransactionalGraph) {
                         ((TransactionalGraph) graph).rollback();
@@ -89,7 +91,7 @@ public class ScriptFilter extends BaseFilter {
                 }
 
                 try {
-                    //execute script
+                    // execute script
                     final Object result = session.evaluate(
                         specificMessage.Script,
                         specificMessage.LanguageName,
@@ -98,13 +100,13 @@ public class ScriptFilter extends BaseFilter {
                     );
 
                     RexProMessage resultMessage = null;
-                    if (session.getChannel() == SessionRequestMessage.CHANNEL_CONSOLE) {
+                    if (session.getChannel() == RexProChannel.CHANNEL_CONSOLE) {
                         resultMessage = formatForConsoleChannel(specificMessage, session, result);
 
-                    } else if (session.getChannel() == SessionRequestMessage.CHANNEL_MSGPACK) {
+                    } else if (session.getChannel() == RexProChannel.CHANNEL_MSGPACK) {
                         resultMessage = formatForMsgPackChannel(specificMessage, result);
 
-                    } else if (session.getChannel() == SessionRequestMessage.CHANNEL_GRAPHSON) {
+                    } else if (session.getChannel() == RexProChannel.CHANNEL_GRAPHSON) {
                         resultMessage = formatForGraphSONChannel(specificMessage, result);
                     } else {
                         // malformed channel???!!!
@@ -122,7 +124,7 @@ public class ScriptFilter extends BaseFilter {
                     // if auto-commit was on
                     ctx.write(resultMessage);
                 } catch (Exception ex) {
-                    //rollback transaction
+                    // rollback transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
                         if (graph instanceof TransactionalGraph) {
                             ((TransactionalGraph) graph).rollback();
@@ -132,7 +134,7 @@ public class ScriptFilter extends BaseFilter {
                 }
 
             } else {
-                //non-session script request
+                // non-session script request
                 final EngineHolder engineHolder = engineController.getEngineByLanguageName(specificMessage.LanguageName);
                 final ScriptEngine scriptEngine = engineHolder.getEngine();
                 final Bindings bindings = scriptEngine.createBindings();
@@ -148,7 +150,7 @@ public class ScriptFilter extends BaseFilter {
                     if (graph != null) {
                         bindings.put(specificMessage.metaGetGraphObjName(), graph);
                     } else {
-                        //graph config problem
+                        // graph config problem
                         ctx.write(
                             MessageUtil.createErrorResponse(
                                 message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
@@ -162,7 +164,7 @@ public class ScriptFilter extends BaseFilter {
                     }
                 }
 
-                //start transaction
+                // start transaction
                 if (graph != null && specificMessage.metaGetTransaction()) {
                     if (graph instanceof TransactionalGraph) {
                         ((TransactionalGraph) graph).rollback();
@@ -173,7 +175,7 @@ public class ScriptFilter extends BaseFilter {
                     final Object result = scriptEngine.eval(specificMessage.Script, bindings);
                     final RexProMessage resultMessage = formatForMsgPackChannel(specificMessage, result);
 
-                    //commit transaction
+                    // commit transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
                         if (graph instanceof TransactionalGraph) {
                             ((TransactionalGraph) graph).commit();
@@ -184,7 +186,7 @@ public class ScriptFilter extends BaseFilter {
                     // if auto-commit was on
                     ctx.write(resultMessage);
                 } catch (Exception ex) {
-                    //rollback transaction
+                    // rollback transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
                         if (graph instanceof TransactionalGraph) {
                             ((TransactionalGraph) graph).rollback();
@@ -229,10 +231,12 @@ public class ScriptFilter extends BaseFilter {
         return ctx.getStopAction();
     }
 
+    /**
+     * The graph cannot be redefined within a session.
+     */
     private static boolean graphIsRedefined(final FilterChainContext ctx, final RexProMessage message,
                                             final ScriptRequestMessage specificMessage, final Graph graph) {
         if (specificMessage.metaGetGraphName() != null && graph != null) {
-            //graph config problem
             ctx.write(
                 MessageUtil.createErrorResponse(
                         message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
@@ -246,6 +250,29 @@ public class ScriptFilter extends BaseFilter {
         return false;
     }
 
+    /**
+     * The channel cannot be redefined within a session.
+     */
+    private static boolean channelIsRedefined(final FilterChainContext ctx, final RexProMessage message,
+                                              final ScriptRequestMessage specificMessage, final RexProSession session) {
+        // have to cast the channel to byte because meta converts to int internally via msgpack conversion
+        if (session.getChannel() != Byte.parseByte(specificMessage.metaGetChannel().toString())) {
+            ctx.write(
+                    MessageUtil.createErrorResponse(
+                            message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                            ErrorResponseMessage.CHANNEL_CONFIG_ERROR,
+                            MessageTokens.ERROR_CHANNEL_REDEFINITION
+                    )
+            );
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * The session has to be found for script to be executed.
+     */
     private static boolean sessionDoesNotExist(final FilterChainContext ctx, final RexProMessage message,
                                                final RexProSession session) {
         if (session == null) {

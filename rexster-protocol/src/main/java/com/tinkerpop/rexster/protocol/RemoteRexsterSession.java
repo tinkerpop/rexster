@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.client.RexProException;
+import com.tinkerpop.rexster.protocol.msg.RexProChannel;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
@@ -24,7 +25,7 @@ public class RemoteRexsterSession {
     private String rexProHost = "localhost";
     private String username = "";
     private String password = "";
-    private byte channel;
+    private int channel;
 
     private final RexPro rexProConnection;
 
@@ -37,10 +38,10 @@ public class RemoteRexsterSession {
     }
 
     public RemoteRexsterSession(String rexProHost, int rexProPort, int timeout, String username, String password) {
-        this(rexProHost, rexProPort, timeout, username, password, SessionRequestMessage.CHANNEL_CONSOLE);
+        this(rexProHost, rexProPort, timeout, username, password, RexProChannel.CHANNEL_CONSOLE);
     }
 
-    public RemoteRexsterSession(String rexProHost, int rexProPort, int timeout, String username, String password, byte channel) {
+    public RemoteRexsterSession(String rexProHost, int rexProPort, int timeout, String username, String password, int channel) {
         this.rexProHost = rexProHost;
         this.rexProPort = rexProPort;
         this.timeout = timeout;

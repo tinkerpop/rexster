@@ -10,4 +10,5 @@ public final class MessageTokens {
     public static final String ERROR_IN_SCRIPT_PROCESSING = "An error occurred while processing the script for language [%s]. All transactions across all graphs in the session have been concluded with failure: %s";
     public static final String ERROR_UNEXPECTED_MESSAGE_TYPE = "Message did not match an expected type.";
     public static final String ERROR_GRAPH_REDEFINITION = "A graph name has already been defined on this session";
+    public static final String ERROR_CHANNEL_REDEFINITION = "A channel has already been defined on this session";
 }

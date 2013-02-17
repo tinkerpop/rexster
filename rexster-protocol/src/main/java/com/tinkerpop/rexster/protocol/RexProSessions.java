@@ -62,7 +62,7 @@ public class RexProSessions {
      * @param sessionChannel
      * @return
      */
-    public static RexProSession createSession(final String sessionKey, final RexsterApplication rexsterApplication, final byte sessionChannel) {
+    public static RexProSession createSession(final String sessionKey, final RexsterApplication rexsterApplication, final int sessionChannel) {
         final RexProSession session = new RexProSession(sessionKey, rexsterApplication, sessionChannel);
         sessions.put(sessionKey, session);
 

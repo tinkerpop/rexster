@@ -10,10 +10,6 @@ import org.msgpack.annotation.Message;
  */
 @Message
 public class SessionRequestMessage extends RexProMessage {
-    public static final byte CHANNEL_NONE = 0;
-    public static final byte CHANNEL_CONSOLE = 1;
-    public static final byte CHANNEL_MSGPACK = 2;
-    public static final byte CHANNEL_GRAPHSON = 3;
 
     protected static final String KILL_SESSION_META_KEY = "killSession";
     protected static final String GRAPH_NAME_META_KEY = "graphName";
@@ -30,7 +26,7 @@ public class SessionRequestMessage extends RexProMessage {
         return fields;
     }
 
-    public byte Channel;
+    public int Channel;
     public String Username;
     public String Password;
 

@@ -27,7 +27,7 @@ public class RexProSession {
 
     private final String sessionKey;
 
-    private final byte channel;
+    private final int channel;
 
     private final EngineController controller = EngineController.getInstance();
 
@@ -43,7 +43,7 @@ public class RexProSession {
     //the variable name of the graph in the interperter
     private String graphObjName = null;
 
-    public RexProSession(final String sessionKey, final RexsterApplication rexsterApplication, final byte channel) {
+    public RexProSession(final String sessionKey, final RexsterApplication rexsterApplication, final int channel) {
         this.sessionKey = sessionKey;
         this.channel = channel;
         this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, rexsterApplication);
@@ -82,7 +82,7 @@ public class RexProSession {
         return this.bindings;
     }
 
-    public byte getChannel() {
+    public int getChannel() {
         return this.channel;
     }
 

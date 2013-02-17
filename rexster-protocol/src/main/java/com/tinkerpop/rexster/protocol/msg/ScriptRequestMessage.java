@@ -15,25 +15,30 @@ import java.nio.ByteBuffer;
 @Message
 public class ScriptRequestMessage extends RexProMessage {
 
-    protected static final String IN_SESSION_META_KEY = "inSession";
-    protected static final String GRAPH_NAME_META_KEY = "graphName";
-    protected static final String GRAPH_OBJECT_NAME_META_KEY = "graphObjName";
-    protected static final String ISOLATE_REQUEST_META_KEY = "isolate";
-    protected static final String TRANSACTION_META_KEY = "transaction";
+    protected static final String META_KEY_IN_SESSION = "inSession";
+    protected static final String META_KEY_GRAPH_NAME = "graphName";
+    protected static final String META_KEY_GRAPH_OBJECT_NAME = "graphObjName";
+    protected static final String META_KEY_ISOLATE_REQUEST = "isolate";
+    protected static final String META_KEY_TRANSACTION = "transaction";
+    protected static final String META_KEY_CHANNEL = "channel";
+
     protected RexProMessageMetaField[] getMetaFields() {
         RexProMessageMetaField[] fields = {
             //indicates this requests should be executed in the supplied session
-            RexProMessageMetaField.define(IN_SESSION_META_KEY, false, false, Boolean.class),
+            RexProMessageMetaField.define(META_KEY_IN_SESSION, false, false, Boolean.class),
 
             //sets the graph and graph variable name for this session, optional
-            RexProMessageMetaField.define(GRAPH_NAME_META_KEY, false, null, String.class),
-            RexProMessageMetaField.define(GRAPH_OBJECT_NAME_META_KEY, false, "g", String.class),
+            RexProMessageMetaField.define(META_KEY_GRAPH_NAME, false, null, String.class),
+            RexProMessageMetaField.define(META_KEY_GRAPH_OBJECT_NAME, false, "g", String.class),
 
             //indicates variables defined in this request will not be available in the next
-            RexProMessageMetaField.define(ISOLATE_REQUEST_META_KEY, false, true, Boolean.class),
+            RexProMessageMetaField.define(META_KEY_ISOLATE_REQUEST, false, true, Boolean.class),
 
             //indicates this request should be wrapped in a transaction
-            RexProMessageMetaField.define(TRANSACTION_META_KEY, false, true, Boolean.class),
+            RexProMessageMetaField.define(META_KEY_TRANSACTION, false, true, Boolean.class),
+
+            // used in the context of a sessionless requests to define the serialization channel
+            RexProMessageMetaField.define(META_KEY_CHANNEL, false, RexProChannel.CHANNEL_MSGPACK, Integer.class)
         };
         return fields;
     }
@@ -69,42 +74,50 @@ public class ScriptRequestMessage extends RexProMessage {
      * Gets the inSession meta val, or the default if not set
      */
     public Boolean metaGetInSession() {
-        if (!Meta.containsKey(IN_SESSION_META_KEY)) {
+        if (!Meta.containsKey(META_KEY_IN_SESSION)) {
             return false;
         } else {
-            return (Boolean) Meta.get(IN_SESSION_META_KEY);
+            return (Boolean) Meta.get(META_KEY_IN_SESSION);
         }
     }
 
-    public void metaSetGraphName(String val) {
-        Meta.put(GRAPH_NAME_META_KEY, val);
+    public void metaSetGraphName(final String val) {
+        Meta.put(META_KEY_GRAPH_NAME, val);
     }
 
     public String metaGetGraphName() {
-        return (String) Meta.get(GRAPH_NAME_META_KEY);
+        return (String) Meta.get(META_KEY_GRAPH_NAME);
     }
 
-    public void metaSetGraphObjName(String val) {
-        Meta.put(GRAPH_OBJECT_NAME_META_KEY, val);
+    public void metaSetGraphObjName(final String val) {
+        Meta.put(META_KEY_GRAPH_OBJECT_NAME, val);
     }
 
     public String metaGetGraphObjName() {
-        return (String) Meta.get(GRAPH_OBJECT_NAME_META_KEY);
+        return (String) Meta.get(META_KEY_GRAPH_OBJECT_NAME);
     }
 
-    public void metaSetIsolate(Boolean val) {
-        Meta.put(ISOLATE_REQUEST_META_KEY, val);
+    public void metaSetIsolate(final boolean val) {
+        Meta.put(META_KEY_ISOLATE_REQUEST, val);
     }
 
     public Boolean metaGetIsolate() {
-        return (Boolean) Meta.get(ISOLATE_REQUEST_META_KEY);
+        return (Boolean) Meta.get(META_KEY_ISOLATE_REQUEST);
     }
 
-    public void metaSetTransaction(Boolean val) {
-        Meta.put(TRANSACTION_META_KEY, val);
+    public void metaSetTransaction(final boolean val) {
+        Meta.put(META_KEY_TRANSACTION, val);
     }
 
     public Boolean metaGetTransaction() {
-        return (Boolean) Meta.get(TRANSACTION_META_KEY);
+        return (Boolean) Meta.get(META_KEY_TRANSACTION);
+    }
+
+    public void metaSetChannel(final int channel) {
+        Meta.put(META_KEY_CHANNEL, channel);
+    }
+
+    public Integer metaGetChannel() {
+        return (Integer) Meta.get(META_KEY_CHANNEL);
     }
 }
