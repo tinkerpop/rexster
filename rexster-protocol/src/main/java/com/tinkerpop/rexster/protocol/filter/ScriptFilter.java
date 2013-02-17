@@ -7,16 +7,7 @@ import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.EngineHolder;
 import com.tinkerpop.rexster.protocol.RexProSession;
 import com.tinkerpop.rexster.protocol.RexProSessions;
-import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.GraphSONScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.MessageTokens;
-import com.tinkerpop.rexster.protocol.msg.MessageUtil;
-import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.RexProChannel;
-import com.tinkerpop.rexster.protocol.msg.RexProMessage;
-import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
-import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.filterchain.BaseFilter;
@@ -315,7 +306,7 @@ public class ScriptFilter extends BaseFilter {
         }
 
         msgPackScriptResponseMessage.Request = specificMessage.Request;
-        msgPackScriptResponseMessage.Results = MsgPackScriptResponseMessage.convertResultToBytes(result);
+        msgPackScriptResponseMessage.Results.set(result);
         msgPackScriptResponseMessage.validateMetaData();
         return msgPackScriptResponseMessage;
     }

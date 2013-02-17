@@ -38,7 +38,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         RexProMessage inMsg = client.execute(scriptMessage);
         Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
     }
 
     /**
@@ -73,7 +73,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         inMsg = client.execute(scriptMessage);
         Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
 
         final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
         scriptMessage2.Script = "o";
@@ -115,7 +115,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         inMsg = client.execute(scriptMessage);
         Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
 
         // test that it's not available on the next request
         // if the meta flag is not set
@@ -243,7 +243,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         inMsg = client.execute(scriptMessage);
         Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
 
         // test that 'n' is not available if the isolate meta flag is not set to false
         final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
@@ -286,7 +286,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         inMsg = client.execute(scriptMessage);
         Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
 
         // test that 'n' is available if the isolate meta flag is set to false
         final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
@@ -298,7 +298,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         inMsg = client.execute(scriptMessage2);
         Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
     }
 
     @Test
@@ -328,7 +328,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         inMsg = client.execute(scriptMessage);
         Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
 
     }
 
@@ -348,7 +348,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         RexProMessage inMsg = client.execute(scriptMessage);
         Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
     }
 
 }

@@ -14,7 +14,26 @@ import java.io.IOException;
  *
  * @author Blake Eggleston (bdeggleston.github.com)
  */
-public class RexProScriptResult extends Object {
+public class RexProScriptResult {
+
+    private Object value;
+
+    public RexProScriptResult() {
+        this.value = null;
+    }
+
+    public RexProScriptResult(Object value) {
+        this.value = value;
+    }
+
+    public Object get() {
+        return value;
+    }
+
+    public void set(Object val) {
+        value = val;
+    }
+
     public static class SerializationTemplate extends AbstractTemplate<RexProScriptResult> {
 
         @Override
@@ -28,7 +47,7 @@ public class RexProScriptResult extends Object {
                 result = new RexProScriptResult();
             }
             try{
-                MsgPackConverter.serializeObject(result, pk);
+                MsgPackConverter.serializeObject(result.get(), pk);
             } catch (Exception ex) {
                 throw new IOException(ex.toString());
             }
@@ -43,8 +62,16 @@ public class RexProScriptResult extends Object {
             if (!required && u.trySkipNil()) {
                 return null;
             }
-            return (RexProScriptResult) MsgPackConverter.deserializeObject(u.read(Templates.TValue));
 
+            RexProScriptResult result;
+            if(to != null) {
+                result = to;
+            } else {
+                result = new RexProScriptResult();
+            }
+
+            result.set(MsgPackConverter.deserializeObject(u.read(Templates.TValue)));
+            return result;
         }
 
         public static SerializationTemplate instance = new SerializationTemplate();

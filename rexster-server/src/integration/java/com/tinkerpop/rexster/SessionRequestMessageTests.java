@@ -94,7 +94,7 @@ public class SessionRequestMessageTests extends AbstractRexProIntegrationTest {
 
         inMsg = client.execute(scriptMessage);
         Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
     }
 
     /**

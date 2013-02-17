@@ -11,8 +11,7 @@ public class GraphSONScriptResponseMessageTest {
     public void estimateMessageSize() {
         final GraphSONScriptResponseMessage msg = new GraphSONScriptResponseMessage();
         msg.Results = "1234567890";
-        msg.Bindings = new byte[10];
 
-        Assert.assertEquals(56, msg.estimateMessageSize());
+        Assert.assertEquals(46, msg.estimateMessageSize());
     }
 }

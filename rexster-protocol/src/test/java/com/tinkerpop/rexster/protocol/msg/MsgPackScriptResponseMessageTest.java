@@ -21,10 +21,8 @@ public class MsgPackScriptResponseMessageTest {
     @Test
     public void estimateMessageSize() {
         final MsgPackScriptResponseMessage msg = new MsgPackScriptResponseMessage();
-        msg.Results = new byte[10];
-        msg.Bindings = new byte[10];
 
-        Assert.assertEquals(56, msg.estimateMessageSize());
+        Assert.assertEquals(36, msg.estimateMessageSize());
     }
 
     final static MessagePack msgpack = new MessagePack();
@@ -108,9 +106,8 @@ public class MsgPackScriptResponseMessageTest {
         MsgPackScriptResponseMessage outMsg = new MsgPackScriptResponseMessage();
         outMsg.setRequestAsUUID(UUID.randomUUID());
         outMsg.setSessionAsUUID(UUID.randomUUID());
-        outMsg.Results = new byte[1];
-        outMsg.Bindings = new byte[1];
-        outMsg.Bindings[0] = 1;
+        outMsg.Results.set(5);
+        outMsg.Bindings.put("something", "or other");
 
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         final Packer packer = msgpack.createPacker(outStream);
@@ -132,8 +129,8 @@ public class MsgPackScriptResponseMessageTest {
             Assert.assertEquals(outMsg.Meta, inMsg.Meta);
             Assert.assertEquals(UUID.nameUUIDFromBytes(outMsg.Request), UUID.nameUUIDFromBytes(inMsg.Request));
             Assert.assertEquals(UUID.nameUUIDFromBytes(outMsg.Session), UUID.nameUUIDFromBytes(inMsg.Session));
-            Assert.assertEquals(outMsg.Results[0], inMsg.Results[0]);
-            Assert.assertEquals(outMsg.Bindings[0], inMsg.Bindings[0]);
+            Assert.assertEquals(inMsg.Results.get(), 5);
+            Assert.assertEquals(inMsg.Bindings.get("something"), "or other");
         } catch (IOException ex) {
             Assert.fail();
         }

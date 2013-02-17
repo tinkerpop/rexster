@@ -194,10 +194,6 @@ public class RexsterClient {
 
         if (resultMessage instanceof MsgPackScriptResponseMessage) {
             final MsgPackScriptResponseMessage msg = (MsgPackScriptResponseMessage) resultMessage;
-            final BufferUnpacker unpacker = msgpack.createBufferUnpacker(msg.Results);
-            unpacker.setArraySizeLimit(this.arraySizeLimit);
-            unpacker.setMapSizeLimit(this.mapSizeLimit);
-            unpacker.setRawSizeLimit(this.rawSizeLimit);
 
             // when rexster returns an iterable it's read out of the unpacker as a single object much like a single
             // vertex coming back from rexster.  basically, this is the difference between g.v(1) and g.v(1).map.
@@ -207,36 +203,17 @@ public class RexsterClient {
             // doing it on the server, because the server should return what is asked of it, in case other clients
             // want to process this differently.
             final List<T> results = new ArrayList<T>();
-            final UnpackerIterator itty = unpacker.iterator();
-            while (itty.hasNext()){
-                final Converter converter = new Converter(msgpack, itty.next());
-
-                if (template != null) {
-                    final T t = (T) converter.read(template);
-                    converter.close();
-                    results.add(t);
-                } else {
-                    final Object convertedResults = convert(converter.readValue());
-                    final Iterator convertedItty;
-                    if (convertedResults instanceof Iterable) {
-                        convertedItty = ((Iterable) convertedResults).iterator();
-                    } else if (convertedResults instanceof Iterator) {
-                        convertedItty = (Iterator) convertedResults;
-                    } else if (convertedResults instanceof Object[]) {
-                        convertedItty = new ArrayIterator((Object[]) convertedResults);
-                    } else {
-                        convertedItty = new SingleIterator<Object>(convertedResults);
-                    }
-
-                    while (convertedItty.hasNext()) {
-                        results.add((T) convertedItty.next());
-                    }
+            if (msg.Results instanceof Iterable) {
+                final Iterator<T> itty = ((Iterable) msg.Results).iterator();
+                while(itty.hasNext()) {
+                    results.add(itty.next());
                 }
+            } else {
+                results.add((T)msg.Results);
             }
 
-            unpacker.close();
-
             return results;
+
         } else if (resultMessage instanceof ErrorResponseMessage) {
             logger.warn(String.format("Rexster returned an error response for [%s] with params [%s]",
                     script, scriptArgs));

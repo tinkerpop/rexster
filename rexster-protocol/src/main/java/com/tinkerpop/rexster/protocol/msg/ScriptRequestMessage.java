@@ -1,12 +1,8 @@
 package com.tinkerpop.rexster.protocol.msg;
 
-import com.tinkerpop.rexster.protocol.BitWorks;
 import org.msgpack.annotation.Message;
 
-import javax.script.Bindings;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Map;
 
 /**
  * Represents a request to process a script.
