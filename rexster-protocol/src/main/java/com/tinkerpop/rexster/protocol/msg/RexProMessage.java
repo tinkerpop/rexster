@@ -13,6 +13,8 @@ import java.util.UUID;
  */
 public abstract class RexProMessage {
 
+    public static final int MESSAGE_HEADER_SIZE = 6;
+
     /**
      * Constant that represents the size of a RexProMessage.
      */

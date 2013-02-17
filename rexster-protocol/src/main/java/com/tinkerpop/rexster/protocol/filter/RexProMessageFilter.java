@@ -44,7 +44,7 @@ public class RexProMessageFilter extends BaseFilter {
         final int sourceBufferLength = sourceBuffer.remaining();
 
         // If source buffer doesn't contain header
-        if (sourceBufferLength < 5) {
+        if (sourceBufferLength < RexProMessage.MESSAGE_HEADER_SIZE) {
             // stop the filterchain processing and store sourceBuffer to be
             // used next time
             return ctx.getStopAction(sourceBuffer);
@@ -53,7 +53,7 @@ public class RexProMessageFilter extends BaseFilter {
         final byte messageVersion = sourceBuffer.get(0);
         final byte messageType = sourceBuffer.get(1);
         final int bodyLength = sourceBuffer.getInt(2);
-        final int completeMessageLength = 6 + bodyLength;
+        final int completeMessageLength = RexProMessage.MESSAGE_HEADER_SIZE + bodyLength;
 
         //check message version
         if (messageVersion != 0) {
@@ -74,7 +74,7 @@ public class RexProMessageFilter extends BaseFilter {
                 sourceBuffer.split(completeMessageLength) : null;
 
         byte[] messageAsBytes = new byte[bodyLength];
-        sourceBuffer.position(6);
+        sourceBuffer.position(RexProMessage.MESSAGE_HEADER_SIZE);
         sourceBuffer.get(messageAsBytes);
 
         final ByteArrayInputStream in = new ByteArrayInputStream(messageAsBytes);
@@ -155,7 +155,7 @@ public class RexProMessageFilter extends BaseFilter {
         // Retrieve the memory manager
         final MemoryManager memoryManager =
                 ctx.getConnection().getTransport().getMemoryManager();
-        final Buffer bb = memoryManager.allocate(6 + rexProMessageAsBytes.length);
+        final Buffer bb = memoryManager.allocate(RexProMessage.MESSAGE_HEADER_SIZE + rexProMessageAsBytes.length);
 
         //add version
         bb.put((byte) 0);
