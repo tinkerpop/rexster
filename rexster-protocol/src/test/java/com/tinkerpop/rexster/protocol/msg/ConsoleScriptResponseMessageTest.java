@@ -68,6 +68,8 @@ public class ConsoleScriptResponseMessageTest {
     public void testSerialization() {
         MessagePack msgpack = new MessagePack();
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
+        msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
+        msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
 
         ConsoleScriptResponseMessage outMsg = new ConsoleScriptResponseMessage();
         outMsg.setRequestAsUUID(UUID.randomUUID());

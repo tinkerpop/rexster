@@ -25,19 +25,6 @@ import static org.msgpack.template.Templates.tMap;
  */
 public class TryRexProSessioned {
 
-    private static final byte[] emptyBindings;
-
-    static {{
-        byte [] empty;
-        try {
-            empty = BitWorks.convertBindingsToByteArray(new SimpleBindings());
-        } catch (IOException ioe) {
-            empty = new byte[0];
-        }
-
-        emptyBindings = empty;
-    }};
-
     public static void main(String[] args) {
         //bigCalls();
         lotsOfCalls(false);
@@ -135,11 +122,6 @@ public class TryRexProSessioned {
         scriptMessage.setSessionAsUUID(session.getSessionKey());
         scriptMessage.Script = script;
 
-        //RexsterBindings bindings = new RexsterBindings();
-        //bindings.put("x", 5);
-        //scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(bindings);
-        //scriptMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToConsoleLineByteArray(bindings);
-        scriptMessage.Bindings = emptyBindings;
         scriptMessage.LanguageName = "groovy";
         scriptMessage.metaSetInSession(true);
         scriptMessage.setRequestAsUUID(UUID.randomUUID());

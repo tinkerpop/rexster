@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.protocol.msg;
 
-import com.tinkerpop.rexster.protocol.BitWorks;
+import com.tinkerpop.rexster.protocol.MsgPackConverter;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.msgpack.MessagePack;
@@ -33,7 +33,7 @@ public class MsgPackScriptResponseMessageTest {
     public void serializeString() throws Exception {
         byte[] bytes = MsgPackScriptResponseMessage.convertResultToBytes("xyz");
         Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(bytes));
-        Object dst = BitWorks.deserializeObject(unpacker.readValue());
+        Object dst = MsgPackConverter.deserializeObject(unpacker.readValue());
 
         Assert.assertEquals("xyz", dst);
     }
@@ -42,7 +42,7 @@ public class MsgPackScriptResponseMessageTest {
     public void serializeInt() throws Exception {
         byte[] bytes = MsgPackScriptResponseMessage.convertResultToBytes(31);
         Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(bytes));
-        Object dst = BitWorks.deserializeObject(unpacker.readValue());
+        Object dst = MsgPackConverter.deserializeObject(unpacker.readValue());
 
         Assert.assertEquals(31, dst);
     }
@@ -51,7 +51,7 @@ public class MsgPackScriptResponseMessageTest {
     public void serializeFloat() throws Exception {
         byte[] bytes = MsgPackScriptResponseMessage.convertResultToBytes(1.2);
         Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(bytes));
-        Object dst = BitWorks.deserializeObject(unpacker.readValue());
+        Object dst = MsgPackConverter.deserializeObject(unpacker.readValue());
 
         Assert.assertEquals(1.2, dst);
     }
@@ -60,7 +60,7 @@ public class MsgPackScriptResponseMessageTest {
     public void serializeBool() throws Exception {
         byte[] bytes = MsgPackScriptResponseMessage.convertResultToBytes(true);
         Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(bytes));
-        Object dst = BitWorks.deserializeObject(unpacker.readValue());
+        Object dst = MsgPackConverter.deserializeObject(unpacker.readValue());
 
         Assert.assertEquals(true, dst);
     }
@@ -74,7 +74,7 @@ public class MsgPackScriptResponseMessageTest {
 
         byte[] bytes = MsgPackScriptResponseMessage.convertResultToBytes(srcArray);
         Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(bytes));
-        Object dst = BitWorks.deserializeObject(unpacker.readValue());
+        Object dst = MsgPackConverter.deserializeObject(unpacker.readValue());
 
         Assert.assertEquals(srcArray, dst);
     }
@@ -92,7 +92,7 @@ public class MsgPackScriptResponseMessageTest {
 
         byte[] bytes = MsgPackScriptResponseMessage.convertResultToBytes(srcMap);
         Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(bytes));
-        Object dst = BitWorks.deserializeObject(unpacker.readValue());
+        Object dst = MsgPackConverter.deserializeObject(unpacker.readValue());
         for (Object key : srcMap.keySet()) {
             Assert.assertEquals(srcMap.get(key), ((HashMap<Object, Object>) dst).get(key));
         }
@@ -102,6 +102,8 @@ public class MsgPackScriptResponseMessageTest {
     public void testSerialization() {
         MessagePack msgpack = new MessagePack();
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
+        msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
+        msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
 
         MsgPackScriptResponseMessage outMsg = new MsgPackScriptResponseMessage();
         outMsg.setRequestAsUUID(UUID.randomUUID());

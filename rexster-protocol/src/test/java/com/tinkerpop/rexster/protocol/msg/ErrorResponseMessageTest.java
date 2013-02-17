@@ -76,6 +76,8 @@ public class ErrorResponseMessageTest {
     public void testSerialization() {
         MessagePack msgpack = new MessagePack();
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
+        msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
+        msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
 
         ErrorResponseMessage outMsg = new ErrorResponseMessage();
         outMsg.setRequestAsUUID(UUID.randomUUID());

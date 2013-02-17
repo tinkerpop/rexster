@@ -335,19 +335,19 @@ public class RexsterClient {
 
     private ScriptRequestMessage createNoSessionScriptRequest(final String script,
                                                               final Map<String, Object> scriptArguments) throws IOException, RexProException {
-        final Bindings bindings = new SimpleBindings();
-        if (scriptArguments != null) {
-            bindings.putAll(scriptArguments);
-        }
-
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = script;
-        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(bindings);
         scriptMessage.LanguageName = this.language;
         scriptMessage.metaSetInSession(false);
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
 
         scriptMessage.validateMetaData();
+
+        //attach bindings
+        if (scriptArguments != null) {
+            scriptMessage.Bindings.putAll(scriptArguments);
+        }
+
         return scriptMessage;
     }
 

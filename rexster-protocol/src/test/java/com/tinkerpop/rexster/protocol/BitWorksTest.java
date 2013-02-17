@@ -92,54 +92,54 @@ public class BitWorksTest {
         Assert.assertEquals(convertMe, new String(stringPart));
     }
 
-    @Test
-    public void convertByteArrayToRexsterBindings() throws Exception {
-        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        final Map<String, Object> mapOfBindings = new HashMap<String, Object>();
-        final MessagePack msgpack = new MessagePack();
-        final Packer packer = msgpack.createPacker(stream);
-
-        mapOfBindings.put("s", "xxx");
-        mapOfBindings.put("i", 1);
-        mapOfBindings.put("d", 100.987d);
-        mapOfBindings.put("f", 200.50f);
-        mapOfBindings.put("b", true);
-        mapOfBindings.put("n", null);
-
-        //test map serialization
-        HashMap<Object, Object> boundMap = new HashMap<Object, Object>();
-        boundMap.put("city", "LA");
-        boundMap.put(1, 2);
-        ArrayList<Object> arr = new ArrayList<Object>();
-        arr.add(1);
-        arr.add("str");
-        arr.add(true);
-        boundMap.put(1.2d, arr);
-        mapOfBindings.put("m", boundMap);
-
-        //test array serialization
-        ArrayList<Object> boundArr = new ArrayList<Object>();
-        boundArr.add(true);
-        boundArr.add("abc");
-        boundArr.add(1);
-        mapOfBindings.put("a", boundArr);
-
-        packer.write(mapOfBindings);
-        byte[] b = stream.toByteArray();
-
-        final Bindings bindings = BitWorks.convertBytesToBindings(b);
-
-        Assert.assertNotNull(bindings);
-        Assert.assertEquals("xxx", bindings.get("s"));
-        Assert.assertEquals(1, bindings.get("i"));
-        Assert.assertEquals(100.987d, bindings.get("d"));
-        Assert.assertEquals(null, bindings.get("n"));
-        Assert.assertEquals(boundMap, bindings.get("m"));
-        Assert.assertEquals(boundArr, bindings.get("a"));
-
-        // this converts to double <shrug>
-        Assert.assertEquals(200.50d, bindings.get("f"));
-        Assert.assertEquals(true, bindings.get("b"));
-    }
+//    @Test
+//    public void convertByteArrayToRexsterBindings() throws Exception {
+//        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//        final Map<String, Object> mapOfBindings = new HashMap<String, Object>();
+//        final MessagePack msgpack = new MessagePack();
+//        final Packer packer = msgpack.createPacker(stream);
+//
+//        mapOfBindings.put("s", "xxx");
+//        mapOfBindings.put("i", 1);
+//        mapOfBindings.put("d", 100.987d);
+//        mapOfBindings.put("f", 200.50f);
+//        mapOfBindings.put("b", true);
+//        mapOfBindings.put("n", null);
+//
+//        //test map serialization
+//        HashMap<Object, Object> boundMap = new HashMap<Object, Object>();
+//        boundMap.put("city", "LA");
+//        boundMap.put(1, 2);
+//        ArrayList<Object> arr = new ArrayList<Object>();
+//        arr.add(1);
+//        arr.add("str");
+//        arr.add(true);
+//        boundMap.put(1.2d, arr);
+//        mapOfBindings.put("m", boundMap);
+//
+//        //test array serialization
+//        ArrayList<Object> boundArr = new ArrayList<Object>();
+//        boundArr.add(true);
+//        boundArr.add("abc");
+//        boundArr.add(1);
+//        mapOfBindings.put("a", boundArr);
+//
+//        packer.write(mapOfBindings);
+//        byte[] b = stream.toByteArray();
+//
+//        final Bindings bindings = BitWorks.convertBytesToBindings(b);
+//
+//        Assert.assertNotNull(bindings);
+//        Assert.assertEquals("xxx", bindings.get("s"));
+//        Assert.assertEquals(1, bindings.get("i"));
+//        Assert.assertEquals(100.987d, bindings.get("d"));
+//        Assert.assertEquals(null, bindings.get("n"));
+//        Assert.assertEquals(boundMap, bindings.get("m"));
+//        Assert.assertEquals(boundArr, bindings.get("a"));
+//
+//        // this converts to double <shrug>
+//        Assert.assertEquals(200.50d, bindings.get("f"));
+//        Assert.assertEquals(true, bindings.get("b"));
+//    }
 
 }

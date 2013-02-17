@@ -1,29 +1,12 @@
 package com.tinkerpop.rexster.protocol;
 
 import org.msgpack.MessagePack;
-import org.msgpack.packer.Packer;
-import org.msgpack.template.Template;
-import org.msgpack.type.ArrayValue;
-import org.msgpack.type.MapValue;
-import org.msgpack.type.Value;
-import org.msgpack.unpacker.Unpacker;
-
-import javax.script.Bindings;
-import javax.script.SimpleBindings;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
-
-import static org.msgpack.template.Templates.TString;
-import static org.msgpack.template.Templates.TValue;
-import static org.msgpack.template.Templates.tMap;
 
 /**
  * Helper class for for common byte operations.
@@ -72,89 +55,6 @@ public class BitWorks {
         } finally {
             stream.close();
         }
-    }
-
-    public static byte[] convertBindingsToByteArray(final Bindings bindings) throws IOException {
-        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-
-        try {
-            final Map<String, Object> mapOfBindings = new HashMap<String, Object>();
-            final Packer packer = msgpack.createPacker(stream);
-
-            for (String key : bindings.keySet()) {
-                final Object objectToSerialize = bindings.get(key);
-                if (objectToSerialize instanceof String
-                        || objectToSerialize instanceof Integer
-                        || objectToSerialize instanceof Double
-                        || objectToSerialize instanceof Float
-                        || objectToSerialize instanceof Boolean
-                        || objectToSerialize instanceof Long) {
-                    mapOfBindings.put(key, objectToSerialize);
-                }
-            }
-
-            packer.write(mapOfBindings);
-
-            return stream.toByteArray();
-        } finally {
-            stream.close();
-        }
-    }
-
-    public static Object deserializeObject(final Value v) {
-        Object o;
-
-        //check for null first to avoid NullPointerException
-        if (v == null) {
-            o = null;
-        } else if (v.isBooleanValue()) {
-            o = v.asBooleanValue().getBoolean();
-        } else if (v.isFloatValue()) {
-            o = v.asFloatValue().getDouble();
-        } else if (v.isIntegerValue()) {
-            o = v.asIntegerValue().getInt();
-        } else if (v.isArrayValue()) {
-            final ArrayValue src = v.asArrayValue();
-            final ArrayList<Object> dst = new ArrayList<Object>(src.size());
-            for (int i = 0; i < src.size(); i++) {
-                final Object val = deserializeObject(src.get(i));
-                dst.add(i, val);
-            }
-            o = dst;
-        } else if (v.isMapValue()) {
-            final MapValue src = v.asMapValue();
-            final HashMap<Object, Object> dst = new HashMap<Object, Object>(src.size());
-            for (Map.Entry<Value, Value> entry : src.entrySet()) {
-                final Object key = deserializeObject(entry.getKey());
-                final Object val = deserializeObject(entry.getValue());
-                dst.put(key, val);
-            }
-            o = dst;
-        } else {
-            // includes raw value
-            o = v.asRawValue().getString();
-        }
-        return o;
-    }
-
-    public static Bindings convertBytesToBindings(final byte[] bytes) throws IOException {
-
-        final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        final MessagePack msgpack = new MessagePack();
-        final Unpacker unpacker = msgpack.createUnpacker(in);
-
-        final Template<Map<String, Value>> mapTmpl = tMap(TString, TValue);
-
-        final Map<String, Value> dstMap = unpacker.read(mapTmpl);
-        final Bindings bindings = new SimpleBindings();
-
-        for (Map.Entry<String,Value> entry : dstMap.entrySet()) {
-            final Value v = entry.getValue();
-            Object o = deserializeObject(v);
-            bindings.put(entry.getKey(), o);
-        }
-
-        return bindings;
     }
 
     static byte[] getBytesWithLength(final Object result) throws IOException {

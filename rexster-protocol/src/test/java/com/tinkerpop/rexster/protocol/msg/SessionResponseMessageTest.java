@@ -28,6 +28,8 @@ public class SessionResponseMessageTest {
     public void testSerialization() {
         MessagePack msgpack = new MessagePack();
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
+        msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
+        msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
 
         SessionResponseMessage outMsg = new SessionResponseMessage();
         outMsg.setRequestAsUUID(UUID.randomUUID());

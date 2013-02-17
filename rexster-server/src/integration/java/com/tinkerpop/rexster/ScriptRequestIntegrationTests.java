@@ -29,7 +29,6 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "graph.addVertex()";
-        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         scriptMessage.LanguageName = "groovy";
         scriptMessage.metaSetInSession(false);
         scriptMessage.metaSetGraphName("emptygraph");
@@ -66,7 +65,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "o";
-        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(b);
+        scriptMessage.Bindings.put("o", 5);
         scriptMessage.LanguageName = "groovy";
         scriptMessage.metaSetInSession(true);
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
@@ -78,7 +77,6 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
         scriptMessage2.Script = "o";
-        scriptMessage2.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         scriptMessage2.LanguageName = "groovy";
         scriptMessage2.metaSetInSession(true);
         scriptMessage2.setRequestAsUUID(UUID.randomUUID());
@@ -109,7 +107,6 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
         //test that it works
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "g.addVertex()";
-        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         scriptMessage.LanguageName = "groovy";
         scriptMessage.metaSetInSession(true);
         scriptMessage.metaSetGraphName("emptygraph");
@@ -124,7 +121,6 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
         // if the meta flag is not set
         final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
         scriptMessage2.Script = "g.addVertex()";
-        scriptMessage2.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         scriptMessage2.LanguageName = "groovy";
         scriptMessage2.metaSetInSession(true);
         scriptMessage2.setRequestAsUUID(UUID.randomUUID());
@@ -155,7 +151,6 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
         //try defining a new graph object
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "graph.addVertex()";
-        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         scriptMessage.LanguageName = "groovy";
         scriptMessage.metaSetInSession(true);
         scriptMessage.metaSetGraphName("emptygraph");
@@ -187,7 +182,6 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
         //try defining a new channel different from the session
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "graph.addVertex()";
-        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         scriptMessage.LanguageName = "groovy";
         scriptMessage.metaSetInSession(true);
         scriptMessage.metaSetGraphName("emptygraph");
@@ -208,7 +202,6 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "graph.addVertex()";
-        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         scriptMessage.LanguageName = "groovy";
         scriptMessage.metaSetInSession(false);
         scriptMessage.metaSetGraphName("undefined");
@@ -243,7 +236,6 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
         //test that it works
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "n = 5\nn";
-        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         scriptMessage.LanguageName = "groovy";
         scriptMessage.metaSetInSession(true);
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
@@ -256,7 +248,6 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
         // test that 'n' is not available if the isolate meta flag is not set to false
         final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
         scriptMessage2.Script = "m = n + 1";
-        scriptMessage2.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         scriptMessage2.LanguageName = "groovy";
         scriptMessage2.metaSetInSession(true);
         scriptMessage2.setRequestAsUUID(UUID.randomUUID());
@@ -287,7 +278,6 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
         //test that it works
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "n = 5\nn";
-        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         scriptMessage.LanguageName = "groovy";
         scriptMessage.metaSetInSession(true);
         scriptMessage.metaSetIsolate(false);
@@ -301,7 +291,6 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
         // test that 'n' is available if the isolate meta flag is set to false
         final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
         scriptMessage2.Script = "m = n + 1";
-        scriptMessage2.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         scriptMessage2.LanguageName = "groovy";
         scriptMessage2.metaSetInSession(true);
         scriptMessage2.setRequestAsUUID(UUID.randomUUID());
@@ -331,7 +320,6 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
         //test that it works
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "n = 5\nn";
-        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         scriptMessage.LanguageName = "groovy";
         scriptMessage.metaSetInSession(true);
         scriptMessage.metaSetTransaction(true);
@@ -350,7 +338,6 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
 
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "graph.addVertex()";
-        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         scriptMessage.LanguageName = "groovy";
         scriptMessage.metaSetInSession(false);
         scriptMessage.metaSetGraphName("emptygraph");
