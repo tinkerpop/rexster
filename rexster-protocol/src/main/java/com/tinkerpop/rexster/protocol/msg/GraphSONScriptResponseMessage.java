@@ -15,19 +15,19 @@ public class GraphSONScriptResponseMessage extends RexProMessage {
     private static final JSONResultConverter converter = new JSONResultConverter(
             GraphSONMode.EXTENDED, 0, Long.MAX_VALUE, null);
 
-    public byte[] Results;
+    public String Results;
     public byte[] Bindings;
 
-    public static byte[] convertResultToBytes(final Object result) throws Exception {
+    public static String convertResultToBytes(final Object result) throws Exception {
         if (result == null) {
-            return new byte[0];
+            return null;
         } else {
-            return converter.convert(result).toString().getBytes();
+            return converter.convert(result).toString();
         }
     }
 
     @Override
     public int estimateMessageSize() {
-        return BASE_MESSAGE_SIZE + (Results == null ? 0 : Results.length) + (Bindings == null ? 0 : Bindings.length);
+        return BASE_MESSAGE_SIZE + (Results == null ? 0 : Results.length()) + (Bindings == null ? 0 : Bindings.length);
     }
 }
