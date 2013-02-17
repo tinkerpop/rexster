@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;
+import sun.awt.windows.ThemeReader;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
@@ -118,14 +119,18 @@ public class ScriptFilter extends BaseFilter {
                         specificMessage.metaGetIsolate()
                     );
 
+                    RexProMessage resultMessage = null;
                     if (session.getChannel() == SessionRequestMessage.CHANNEL_CONSOLE) {
-                        ctx.write(formatForConsoleChannel(specificMessage, session, result));
+                        resultMessage = formatForConsoleChannel(specificMessage, session, result);
 
                     } else if (session.getChannel() == SessionRequestMessage.CHANNEL_MSGPACK) {
-                        ctx.write(formatForMsgPackChannel(specificMessage, result));
+                        resultMessage = formatForMsgPackChannel(specificMessage, result);
 
-                    }  else if (session.getChannel() == SessionRequestMessage.CHANNEL_GRAPHSON) {
-                        ctx.write(formatForGraphSONChannel(specificMessage, result));
+                    } else if (session.getChannel() == SessionRequestMessage.CHANNEL_GRAPHSON) {
+                        resultMessage = formatForGraphSONChannel(specificMessage, result);
+                    } else {
+                        // malformed channel???!!!
+                        logger.warn(String.format("Session is configured for a channel that does not exist: [%s]", session.getChannel()));
                     }
 
                     //commit transaction
@@ -134,6 +139,10 @@ public class ScriptFilter extends BaseFilter {
                             ((TransactionalGraph) graph).commit();
                         }
                     }
+
+                    // write the message after the transaction so that we can be assured that it properly committed
+                    // if auto-commit was on
+                    ctx.write(resultMessage);
                 } catch (Exception ex) {
                     //rollback transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
@@ -184,7 +193,7 @@ public class ScriptFilter extends BaseFilter {
 
                 try {
                     final Object result = scriptEngine.eval(specificMessage.Script, bindings);
-                    ctx.write(formatForMsgPackChannel(specificMessage, result));
+                    final RexProMessage resultMessage = formatForMsgPackChannel(specificMessage, result);
 
                     //commit transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
@@ -192,6 +201,10 @@ public class ScriptFilter extends BaseFilter {
                             ((TransactionalGraph) graph).commit();
                         }
                     }
+
+                    // write the message after the transaction so that we can be assured that it properly committed
+                    // if auto-commit was on
+                    ctx.write(resultMessage);
                 } catch (Exception ex) {
                     //rollback transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
