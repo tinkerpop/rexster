@@ -70,7 +70,6 @@ public class ConsoleScriptResponseMessageTest {
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
 
         ConsoleScriptResponseMessage outMsg = new ConsoleScriptResponseMessage();
-        outMsg.Version = 0;
         outMsg.setRequestAsUUID(UUID.randomUUID());
         outMsg.setSessionAsUUID(UUID.randomUUID());
         outMsg.ConsoleLines = new String[2];

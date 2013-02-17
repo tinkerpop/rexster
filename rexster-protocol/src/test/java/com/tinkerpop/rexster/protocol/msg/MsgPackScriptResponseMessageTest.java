@@ -104,7 +104,6 @@ public class MsgPackScriptResponseMessageTest {
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
 
         MsgPackScriptResponseMessage outMsg = new MsgPackScriptResponseMessage();
-        outMsg.Version = 0;
         outMsg.setRequestAsUUID(UUID.randomUUID());
         outMsg.setSessionAsUUID(UUID.randomUUID());
         outMsg.Results = new byte[1];

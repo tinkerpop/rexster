@@ -30,7 +30,6 @@ public class SessionResponseMessageTest {
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
 
         SessionResponseMessage outMsg = new SessionResponseMessage();
-        outMsg.Version = 0;
         outMsg.setRequestAsUUID(UUID.randomUUID());
         outMsg.setSessionAsUUID(UUID.randomUUID());
         outMsg.Languages = new String[3];

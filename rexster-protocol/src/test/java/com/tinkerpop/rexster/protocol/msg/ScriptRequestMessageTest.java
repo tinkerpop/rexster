@@ -30,7 +30,6 @@ public class ScriptRequestMessageTest {
     @Test
     public void testMetaValidation() {
         final ScriptRequestMessage msg = new ScriptRequestMessage();
-        msg.Version = 0;
         msg.setRequestAsUUID(UUID.randomUUID());
         msg.setSessionAsUUID(UUID.randomUUID());
         msg.Bindings = new byte[10];
@@ -73,7 +72,6 @@ public class ScriptRequestMessageTest {
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
 
         final ScriptRequestMessage outMsg = new ScriptRequestMessage();
-        outMsg.Version = 0;
         outMsg.setRequestAsUUID(UUID.randomUUID());
         outMsg.setSessionAsUUID(UUID.randomUUID());
         outMsg.Bindings = new byte[10];
