@@ -36,11 +36,6 @@ public abstract class RexProMessage {
     public static final byte[] EMPTY_REQUEST_AS_BYTES = BitWorks.convertUUIDToByteArray(EMPTY_REQUEST);
 
     /**
-     * Denotes the version of RexPro that is being used.
-     */
-    public byte Version = 0;
-
-    /**
      * Denotes the session on which the message is sent. Reserved for 16 bytes and resolves to a UUID.
      */
     public byte[] Session;

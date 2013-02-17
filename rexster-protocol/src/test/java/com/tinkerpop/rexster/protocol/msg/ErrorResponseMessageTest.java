@@ -28,7 +28,6 @@ public class ErrorResponseMessageTest {
     @Test
     public void testMetaValidation() {
         ErrorResponseMessage msg = new ErrorResponseMessage();
-        msg.Version = 0;
         msg.setRequestAsUUID(UUID.randomUUID());
         msg.setSessionAsUUID(UUID.randomUUID());
         msg.metaSetFlag(ErrorResponseMessage.INVALID_SESSION_ERROR);
@@ -79,7 +78,6 @@ public class ErrorResponseMessageTest {
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
 
         ErrorResponseMessage outMsg = new ErrorResponseMessage();
-        outMsg.Version = 0;
         outMsg.setRequestAsUUID(UUID.randomUUID());
         outMsg.setSessionAsUUID(UUID.randomUUID());
         outMsg.metaSetFlag(ErrorResponseMessage.INVALID_SESSION_ERROR);

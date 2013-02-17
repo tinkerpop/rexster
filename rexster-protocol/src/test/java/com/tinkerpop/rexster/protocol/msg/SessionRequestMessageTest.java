@@ -29,7 +29,6 @@ public class SessionRequestMessageTest {
     @Test
     public void testMetaValidation() {
         SessionRequestMessage msg = new SessionRequestMessage();
-        msg.Version = 0;
         msg.setRequestAsUUID(UUID.randomUUID());
         msg.setSessionAsUUID(UUID.randomUUID());
         msg.metaSetKillSession(true);
@@ -60,7 +59,6 @@ public class SessionRequestMessageTest {
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
 
         SessionRequestMessage outMsg = new SessionRequestMessage();
-        outMsg.Version = 0;
         outMsg.setRequestAsUUID(UUID.randomUUID());
         outMsg.setSessionAsUUID(UUID.randomUUID());
         outMsg.metaSetKillSession(true);

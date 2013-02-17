@@ -50,9 +50,16 @@ public class RexProMessageFilter extends BaseFilter {
             return ctx.getStopAction(sourceBuffer);
         }
 
-        final byte messageType = sourceBuffer.get(0);
-        final int bodyLength = sourceBuffer.getInt(1);
-        final int completeMessageLength = 5 + bodyLength;
+        final byte messageVersion = sourceBuffer.get(0);
+        final byte messageType = sourceBuffer.get(1);
+        final int bodyLength = sourceBuffer.getInt(2);
+        final int completeMessageLength = 6 + bodyLength;
+
+        //check message version
+        if (messageVersion != 0) {
+            logger.warn("unsupported rexpro version: " + messageVersion);
+            return ctx.getStopAction();
+        }
 
         // If the source message doesn't contain entire body
         if (sourceBufferLength < completeMessageLength) {
@@ -67,7 +74,7 @@ public class RexProMessageFilter extends BaseFilter {
                 sourceBuffer.split(completeMessageLength) : null;
 
         byte[] messageAsBytes = new byte[bodyLength];
-        sourceBuffer.position(5);
+        sourceBuffer.position(6);
         sourceBuffer.get(messageAsBytes);
 
         final ByteArrayInputStream in = new ByteArrayInputStream(messageAsBytes);
@@ -148,7 +155,10 @@ public class RexProMessageFilter extends BaseFilter {
         // Retrieve the memory manager
         final MemoryManager memoryManager =
                 ctx.getConnection().getTransport().getMemoryManager();
-        final Buffer bb = memoryManager.allocate(5 + rexProMessageAsBytes.length);
+        final Buffer bb = memoryManager.allocate(6 + rexProMessageAsBytes.length);
+
+        //add version
+        bb.put((byte) 0);
 
         if (msg instanceof SessionResponseMessage) {
             bb.put(MessageType.SESSION_RESPONSE);
