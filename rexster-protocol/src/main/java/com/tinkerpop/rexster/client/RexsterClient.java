@@ -1,6 +1,8 @@
 package com.tinkerpop.rexster.client;
 
+import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.GraphSONScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
@@ -11,8 +13,6 @@ import org.glassfish.grizzly.GrizzlyFuture;
 import org.glassfish.grizzly.nio.NIOConnection;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.msgpack.MessagePack;
-import org.msgpack.MessageTypeException;
-import org.msgpack.template.Template;
 import org.msgpack.type.Value;
 
 import java.io.IOException;
@@ -56,6 +56,8 @@ public class RexsterClient {
     private final String language;
     private final String graphName;
     private final String graphObjName;
+    private final int channel;
+    private final boolean transaction;
 
     private final TCPNIOTransport transport;
     private final String[] hosts;
@@ -76,6 +78,8 @@ public class RexsterClient {
         this.language = configuration.getString(RexsterClientTokens.CONFIG_LANGUAGE);
         this.graphName = configuration.getString(RexsterClientTokens.CONFIG_GRAPH_NAME);
         this.graphObjName = configuration.getString(RexsterClientTokens.CONFIG_GRAPH_OBJECT_NAME);
+        this.channel = configuration.getInt(RexsterClientTokens.CONFIG_CHANNEL);
+        this.transaction= configuration.getBoolean(RexsterClientTokens.CONFIG_TRANSACTION);
 
         this.transport = transport;
         this.port = configuration.getInt(RexsterClientTokens.CONFIG_PORT);
@@ -83,39 +87,6 @@ public class RexsterClient {
         this.hosts = hostname.split(",");
 
         this.connections = new NIOConnection[this.hosts.length];
-    }
-
-    /**
-     * Send a script to rexster that returns a list of Maps.
-     */
-    public List<Map<String, Object>> execute(final String script) throws RexProException, IOException {
-        return execute(script, null);
-    }
-
-    /**
-     * Send a script to rexster that returns a Map.
-     *
-     * Common usage is to retrieve graph elements (vertices and edges) which get serialized to Map by RexPro.
-     * Data conversion during deserialization takes any whole numeric numbers and treats them as longs.  Floats
-     * are treated as doubles.
-     */
-    public List<Map<String, Object>> execute(final String script, final Map<String, Object> parameters) throws RexProException, IOException {
-        final List<Map<String,Object>> packResults = executeList(script, parameters);
-        final List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
-        try {
-            for (Map<String,Object> map : packResults) {
-                //Convert map
-                final Map<String, Object> result = new HashMap<String, Object>();
-                for (Map.Entry<String, Object> entry : map.entrySet()) {
-                    result.put(entry.getKey(), entry.getValue());
-                }
-                results.add(result);
-            }
-        } catch (MessageTypeException e) {
-            throw new IllegalArgumentException("Could not convert query result", e);
-        }
-
-        return results;
     }
 
     /**
@@ -152,7 +123,11 @@ public class RexsterClient {
         return (RexProMessage) resultMessage;
     }
 
-    public <T> List<T> executeList(final String script, final Map<String, Object> scriptArgs) throws RexProException, IOException {
+    public <T> List<T> execute(final String script) throws RexProException, IOException {
+        return execute(script, null);
+    }
+
+    public <T> List<T> execute(final String script, final Map<String, Object> scriptArgs) throws RexProException, IOException {
         final ArrayBlockingQueue<Object> responseQueue = new ArrayBlockingQueue<Object>(1);
         final RexProMessage msgToSend = createNoSessionScriptRequest(script, scriptArgs);
         final UUID requestId = msgToSend.requestAsUUID();
@@ -201,7 +176,19 @@ public class RexsterClient {
 
             return results;
 
-        } else if (resultMessage instanceof ErrorResponseMessage) {
+        } else if (resultMessage instanceof GraphSONScriptResponseMessage) {
+            final GraphSONScriptResponseMessage msg = (GraphSONScriptResponseMessage) resultMessage;
+            final List<T> results = new ArrayList<T>();
+            results.add((T) msg.Results);
+            return results;
+        } else if (resultMessage instanceof ConsoleScriptResponseMessage) {
+            final ConsoleScriptResponseMessage msg = (ConsoleScriptResponseMessage) resultMessage;
+            final List<T> results = new ArrayList<T>();
+            for (String line : msg.ConsoleLines) {
+                results.add((T) line);
+            }
+            return results;
+        }else if (resultMessage instanceof ErrorResponseMessage) {
             logger.warn(String.format("Rexster returned an error response for [%s] with params [%s]",
                     script, scriptArgs));
             throw new RexProException(((ErrorResponseMessage) resultMessage).ErrorMessage);
@@ -305,6 +292,8 @@ public class RexsterClient {
         scriptMessage.metaSetGraphName(this.graphName);
         scriptMessage.metaSetGraphObjName(this.graphObjName);
         scriptMessage.metaSetInSession(false);
+        scriptMessage.metaSetChannel(this.channel);
+        scriptMessage.metaSetTransaction(this.transaction);
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
 
         scriptMessage.validateMetaData();
@@ -315,29 +304,6 @@ public class RexsterClient {
         }
 
         return scriptMessage;
-    }
-
-    private static Object convert(final Value v) {
-        if (v.isNilValue()) return null;
-        else if (v.isBooleanValue()) return v.asBooleanValue().getBoolean();
-        else if (v.isIntegerValue()) return v.asIntegerValue().getLong();
-        else if (v.isFloatValue()) return v.asFloatValue().getDouble();
-        else if (v.isRawValue()) return v.asRawValue().getString();
-        else if (v.isArrayValue()) {
-            final Value[] arr = v.asArrayValue().getElementArray();
-            final Object[] result = new Object[arr.length];
-            for (int i = 0; i < result.length; i++) result[i] = convert(arr[i]);
-            return result;
-        } else if (v.isMapValue()) {
-            final Map<Object, Object> result = new HashMap<Object, Object>();
-            for (Map.Entry<Value, Value> entry : v.asMapValue().entrySet()) {
-                result.put(convert(entry.getKey()), convert(entry.getValue()));
-            }
-            return result;
-        } else {
-            logger.trace(String.format("Cannot convert value:  {%s} [{%s}]", v, v.getType()));
-            return v.toString();
-        }
     }
 
 }

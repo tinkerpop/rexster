@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
+import com.tinkerpop.rexster.protocol.msg.RexProChannel;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -38,6 +39,8 @@ public class RexsterClientFactory {
         addProperty(RexsterClientTokens.CONFIG_LANGUAGE, "groovy");
         addProperty(RexsterClientTokens.CONFIG_GRAPH_OBJECT_NAME, "g");
         addProperty(RexsterClientTokens.CONFIG_GRAPH_NAME, null);
+        addProperty(RexsterClientTokens.CONFIG_TRANSACTION, true);
+        addProperty(RexsterClientTokens.CONFIG_CHANNEL, RexProChannel.CHANNEL_MSGPACK);
     }};
 
     public static RexsterClient open() throws Exception {

@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.protocol;
 import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
 import com.tinkerpop.rexster.client.RexsterClientTokens;
+import com.tinkerpop.rexster.protocol.msg.RexProChannel;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.log4j.BasicConfigurator;
 import org.msgpack.type.Value;

@@ -163,7 +163,20 @@ public class ScriptFilter extends BaseFilter {
 
                 try {
                     final Object result = scriptEngine.eval(specificMessage.Script, bindings);
-                    final RexProMessage resultMessage = formatForMsgPackChannel(specificMessage, null, result);
+
+                    RexProMessage resultMessage = null;
+                    if (specificMessage.metaGetChannel() == RexProChannel.CHANNEL_CONSOLE) {
+                        resultMessage = formatForConsoleChannel(specificMessage, null, result);
+
+                    } else if (specificMessage.metaGetChannel() == RexProChannel.CHANNEL_MSGPACK) {
+                        resultMessage = formatForMsgPackChannel(specificMessage, null, result);
+
+                    } else if (specificMessage.metaGetChannel() == RexProChannel.CHANNEL_GRAPHSON) {
+                        resultMessage = formatForGraphSONChannel(specificMessage, null, result);
+                    } else {
+                        // malformed channel???!!!
+                        logger.warn(String.format("Sessionless request is configured for a channel that does not exist: [%s]", specificMessage.metaGetChannel()));
+                    }
 
                     // commit transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {

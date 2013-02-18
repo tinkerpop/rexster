@@ -9,11 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.msgpack.template.Templates.TInteger;
-import static org.msgpack.template.Templates.TString;
-import static org.msgpack.template.Templates.TValue;
-import static org.msgpack.template.Templates.tMap;
-
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
@@ -28,12 +23,12 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         final Map<String, Object> mapResult = mapResults.get(0);
         Assert.assertEquals("2", mapResult.get("val").toString());
 
-        final List<Integer> intResults = client.executeList("1+1", null);
+        final List<Integer> intResults = client.execute("1+1", null);
         Assert.assertEquals(1, intResults.size());
         final Integer intResult = intResults.get(0);
         Assert.assertEquals("2", intResult.toString());
 
-        final List<Map<String, Object>> vertexResults = client.executeList("g=TinkerGraphFactory.createTinkerGraph();g.v(1)", null);
+        final List<Map<String, Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1)", null);
         Assert.assertEquals(1, vertexResults.size());
         final Map<String, Object> vertexResult = vertexResults.get(0);
         Assert.assertEquals("vertex", vertexResult.get("_type").toString());
