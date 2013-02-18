@@ -1,12 +1,9 @@
 package com.tinkerpop.rexster.client;
 
-import com.tinkerpop.pipes.util.iterators.SingleIterator;
-import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
-import org.apache.commons.collections.iterators.ArrayIterator;
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Connection;
@@ -17,12 +14,7 @@ import org.msgpack.MessagePack;
 import org.msgpack.MessageTypeException;
 import org.msgpack.template.Template;
 import org.msgpack.type.Value;
-import org.msgpack.unpacker.BufferUnpacker;
-import org.msgpack.unpacker.Converter;
-import org.msgpack.unpacker.UnpackerIterator;
 
-import javax.script.Bindings;
-import javax.script.SimpleBindings;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,10 +26,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
-import static org.msgpack.template.Templates.TString;
-import static org.msgpack.template.Templates.TValue;
-import static org.msgpack.template.Templates.tMap;
 
 /**
  * Basic client for sending Gremlin scripts to Rexster and receiving results as Map objects with String
@@ -66,6 +54,8 @@ public class RexsterClient {
     private final int mapSizeLimit;
     private final int rawSizeLimit;
     private final String language;
+    private final String graphName;
+    private final String graphObjName;
 
     private final TCPNIOTransport transport;
     private final String[] hosts;
@@ -84,6 +74,8 @@ public class RexsterClient {
         this.mapSizeLimit = configuration.getInt(RexsterClientTokens.CONFIG_DESERIALIZE_MAP_SIZE_LIMIT);
         this.rawSizeLimit = configuration.getInt(RexsterClientTokens.CONFIG_DESERIALIZE_RAW_SIZE_LIMIT);
         this.language = configuration.getString(RexsterClientTokens.CONFIG_LANGUAGE);
+        this.graphName = configuration.getString(RexsterClientTokens.CONFIG_GRAPH_NAME);
+        this.graphObjName = configuration.getString(RexsterClientTokens.CONFIG_GRAPH_OBJECT_NAME);
 
         this.transport = transport;
         this.port = configuration.getInt(RexsterClientTokens.CONFIG_PORT);
@@ -97,7 +89,7 @@ public class RexsterClient {
      * Send a script to rexster that returns a list of Maps.
      */
     public List<Map<String, Object>> execute(final String script) throws RexProException, IOException {
-        return execute(script, (Map<String, Object>) null);
+        return execute(script, null);
     }
 
     /**
@@ -108,7 +100,7 @@ public class RexsterClient {
      * are treated as doubles.
      */
     public List<Map<String, Object>> execute(final String script, final Map<String, Object> parameters) throws RexProException, IOException {
-        final List<Map<String,Object>> packResults = execute(script, parameters, null);
+        final List<Map<String,Object>> packResults = executeList(script, parameters);
         final List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
         try {
             for (Map<String,Object> map : packResults) {
@@ -160,12 +152,7 @@ public class RexsterClient {
         return (RexProMessage) resultMessage;
     }
 
-    public <T> List<T> execute(final String script, final Template template) throws RexProException, IOException {
-        return execute(script, null, template);
-    }
-
-    public <T> List<T> execute(final String script, final Map<String, Object> scriptArgs,
-                               final Template template) throws RexProException, IOException {
+    public <T> List<T> executeList(final String script, final Map<String, Object> scriptArgs) throws RexProException, IOException {
         final ArrayBlockingQueue<Object> responseQueue = new ArrayBlockingQueue<Object>(1);
         final RexProMessage msgToSend = createNoSessionScriptRequest(script, scriptArgs);
         final UUID requestId = msgToSend.requestAsUUID();
@@ -315,6 +302,8 @@ public class RexsterClient {
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = script;
         scriptMessage.LanguageName = this.language;
+        scriptMessage.metaSetGraphName(this.graphName);
+        scriptMessage.metaSetGraphObjName(this.graphObjName);
         scriptMessage.metaSetInSession(false);
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
 

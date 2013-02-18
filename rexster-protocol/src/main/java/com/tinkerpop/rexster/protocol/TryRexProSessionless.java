@@ -2,6 +2,8 @@ package com.tinkerpop.rexster.protocol;
 
 import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
+import com.tinkerpop.rexster.client.RexsterClientTokens;
+import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.log4j.BasicConfigurator;
 import org.msgpack.type.Value;
 
@@ -58,7 +60,12 @@ public class TryRexProSessionless implements Runnable {
 
         RexsterClient client = null;
         try {
-            client = RexsterClientFactory.open(host);
+            final BaseConfiguration defaultConfiguration = new BaseConfiguration() {{
+                addProperty(RexsterClientTokens.CONFIG_HOSTNAME, host);
+                addProperty(RexsterClientTokens.CONFIG_GRAPH_NAME, "gratefulgraph");
+            }};
+
+            client = RexsterClientFactory.open(defaultConfiguration);
 
             while ((System.currentTimeMillis() - start) < exerciseTime) {
                 cycle++;
@@ -71,7 +78,7 @@ public class TryRexProSessionless implements Runnable {
                     for (int iv = 1; iv < vRequestCount; iv++) {
                         final Map<String,Object> scriptArgs = new HashMap<String, Object>();
                         scriptArgs.put("id", random.nextInt(800));
-                        final List<Map<String, Value>> innerResults = client.execute("g=rexster.getGraph('gratefulgraph');g.v(id)", scriptArgs, tMap(TString, TValue));
+                        final List<Map<String, Object>> innerResults = client.execute("g.v(id)", scriptArgs);
                         System.out.println(innerResults.get(0));
                         counter++;
                     }
@@ -80,7 +87,7 @@ public class TryRexProSessionless implements Runnable {
                     for (int ie = 1; ie < eRequestCount; ie++) {
                         final Map<String,Object> scriptArgs = new HashMap<String, Object>();
                         scriptArgs.put("id", random.nextInt(8000));
-                        final List<Map<String, Value>> innerResults = client.execute("g=rexster.getGraph('gratefulgraph');g.e(id)", scriptArgs, tMap(TString, TValue));
+                        final List<Map<String, Object>> innerResults = client.execute("g.e(id)", scriptArgs);
                         System.out.println(innerResults.get(0));
                         counter++;
                     }
@@ -89,7 +96,7 @@ public class TryRexProSessionless implements Runnable {
                     for (int ig = 1; ig < gRequestCount; ig++) {
                         final Map<String,Object> scriptArgs = new HashMap<String, Object>();
                         scriptArgs.put("id", random.nextInt(800));
-                        final List<Map<String, Value>> innerResults = client.execute("g=rexster.getGraph('gratefulgraph');g.v(id).out('followed_by').loop(1){it.loops<3}[0..10]", scriptArgs, tList(tMap(TString, TValue)));
+                        final List<Map<String, Object>> innerResults = client.execute("g.v(id).out('followed_by').loop(1){it.loops<3}[0..10]", scriptArgs);
                         System.out.println(innerResults.size() > 0 ? innerResults.get(0) : "no results");
                         counter++;
                     }

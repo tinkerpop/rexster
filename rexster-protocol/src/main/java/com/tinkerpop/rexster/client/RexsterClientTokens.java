@@ -7,6 +7,8 @@ public class RexsterClientTokens {
 
     public static final String CONFIG_HOSTNAME = "hostname";
     public static final String CONFIG_PORT = "port";
+    public static final String CONFIG_GRAPH_NAME = "graph-name";
+    public static final String CONFIG_GRAPH_OBJECT_NAME = "graph-obj-name";
     public static final String CONFIG_TIMEOUT_CONNECTION_MS = "timeout-connection-ms";
     public static final String CONFIG_TIMEOUT_WRITE_MS = "timeout-write-ms";
     public static final String CONFIG_TIMEOUT_READ_MS = "timeout-read-ms";

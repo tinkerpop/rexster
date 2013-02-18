@@ -36,6 +36,8 @@ public class RexsterClientFactory {
         addProperty(RexsterClientTokens.CONFIG_DESERIALIZE_MAP_SIZE_LIMIT, 2097152);
         addProperty(RexsterClientTokens.CONFIG_DESERIALIZE_RAW_SIZE_LIMIT, 134217728);
         addProperty(RexsterClientTokens.CONFIG_LANGUAGE, "groovy");
+        addProperty(RexsterClientTokens.CONFIG_GRAPH_OBJECT_NAME, "g");
+        addProperty(RexsterClientTokens.CONFIG_GRAPH_NAME, null);
     }};
 
     public static RexsterClient open() throws Exception {

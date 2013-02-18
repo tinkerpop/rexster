@@ -23,17 +23,17 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
     public void executeExercise() throws Exception {
         final RexsterClient client = RexsterClientFactory.open();
 
-        final List<Map<String, Object>> mapResults = client.execute("[val:1+1]", tMap(TString, TValue));
+        final List<Map<String, Object>> mapResults = client.execute("[val:1+1]");
         Assert.assertEquals(1, mapResults.size());
         final Map<String, Object> mapResult = mapResults.get(0);
         Assert.assertEquals("2", mapResult.get("val").toString());
 
-        final List<Integer> intResults = client.execute("1+1", TInteger);
+        final List<Integer> intResults = client.executeList("1+1", null);
         Assert.assertEquals(1, intResults.size());
         final Integer intResult = intResults.get(0);
         Assert.assertEquals("2", intResult.toString());
 
-        final List<Map<String, Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1)", tMap(TString, TValue));
+        final List<Map<String, Object>> vertexResults = client.executeList("g=TinkerGraphFactory.createTinkerGraph();g.v(1)", null);
         Assert.assertEquals(1, vertexResults.size());
         final Map<String, Object> vertexResult = vertexResults.get(0);
         Assert.assertEquals("vertex", vertexResult.get("_type").toString());
