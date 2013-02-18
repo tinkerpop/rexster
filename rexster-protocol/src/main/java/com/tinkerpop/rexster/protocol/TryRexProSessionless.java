@@ -61,12 +61,7 @@ public class TryRexProSessionless implements Runnable {
 
         RexsterClient client = null;
         try {
-            final BaseConfiguration defaultConfiguration = new BaseConfiguration() {{
-                addProperty(RexsterClientTokens.CONFIG_HOSTNAME, host);
-                addProperty(RexsterClientTokens.CONFIG_GRAPH_NAME, "gratefulgraph");
-            }};
-
-            client = RexsterClientFactory.open(defaultConfiguration);
+            client = RexsterClientFactory.open(host, "gratefulgraph");
 
             while ((System.currentTimeMillis() - start) < exerciseTime) {
                 cycle++;

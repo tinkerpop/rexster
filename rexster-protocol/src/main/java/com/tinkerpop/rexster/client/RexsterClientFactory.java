@@ -62,6 +62,23 @@ public class RexsterClientFactory {
         return open(specificConfiguration);
     }
 
+    public static RexsterClient open(final String host, final String graphName) throws Exception {
+        final BaseConfiguration specificConfiguration = new BaseConfiguration();
+        specificConfiguration.addProperty(RexsterClientTokens.CONFIG_HOSTNAME, host);
+        specificConfiguration.addProperty(RexsterClientTokens.CONFIG_GRAPH_NAME, graphName);
+
+        return open(specificConfiguration);
+    }
+
+    public static RexsterClient open(final String host, final int port, final String graphName) throws Exception {
+        final BaseConfiguration specificConfiguration = new BaseConfiguration();
+        specificConfiguration.addProperty(RexsterClientTokens.CONFIG_HOSTNAME, host);
+        specificConfiguration.addProperty(RexsterClientTokens.CONFIG_PORT, port);
+        specificConfiguration.addProperty(RexsterClientTokens.CONFIG_GRAPH_NAME, graphName);
+
+        return open(specificConfiguration);
+    }
+
     public static RexsterClient open(final Map<String,Object> configuration) throws Exception {
         return open(new MapConfiguration(configuration));
     }
