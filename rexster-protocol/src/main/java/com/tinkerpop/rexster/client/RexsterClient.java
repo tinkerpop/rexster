@@ -108,13 +108,13 @@ public class RexsterClient {
      * are treated as doubles.
      */
     public List<Map<String, Object>> execute(final String script, final Map<String, Object> parameters) throws RexProException, IOException {
-        final List<Map<String,Value>> packResults = execute(script, parameters, null);
+        final List<Map<String,Object>> packResults = execute(script, parameters, null);
         final List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
         try {
-            for (Map<String,Value> map : packResults) {
+            for (Map<String,Object> map : packResults) {
                 //Convert map
                 final Map<String, Object> result = new HashMap<String, Object>();
-                for (Map.Entry<String, Value> entry : map.entrySet()) {
+                for (Map.Entry<String, Object> entry : map.entrySet()) {
                     result.put(entry.getKey(), entry.getValue());
                 }
                 results.add(result);
@@ -203,13 +203,13 @@ public class RexsterClient {
             // doing it on the server, because the server should return what is asked of it, in case other clients
             // want to process this differently.
             final List<T> results = new ArrayList<T>();
-            if (msg.Results instanceof Iterable) {
-                final Iterator<T> itty = ((Iterable) msg.Results).iterator();
+            if (msg.Results.get() instanceof Iterable) {
+                final Iterator<T> itty = ((Iterable) msg.Results.get()).iterator();
                 while(itty.hasNext()) {
                     results.add(itty.next());
                 }
             } else {
-                results.add((T)msg.Results);
+                results.add((T)msg.Results.get());
             }
 
             return results;

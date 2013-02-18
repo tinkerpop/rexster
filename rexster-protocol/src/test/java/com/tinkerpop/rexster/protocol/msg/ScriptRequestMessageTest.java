@@ -23,7 +23,7 @@ public class ScriptRequestMessageTest {
         msg.LanguageName = "groovy";
         msg.Script = "script";
 
-        Assert.assertEquals(48, msg.estimateMessageSize());
+        Assert.assertEquals(44, msg.estimateMessageSize());
     }
 
     @Test

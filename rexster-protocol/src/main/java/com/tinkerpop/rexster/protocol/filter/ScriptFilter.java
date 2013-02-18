@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;
-import sun.awt.windows.ThemeReader;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
@@ -95,10 +94,10 @@ public class ScriptFilter extends BaseFilter {
                         resultMessage = formatForConsoleChannel(specificMessage, session, result);
 
                     } else if (session.getChannel() == RexProChannel.CHANNEL_MSGPACK) {
-                        resultMessage = formatForMsgPackChannel(specificMessage, result);
+                        resultMessage = formatForMsgPackChannel(specificMessage, session, result);
 
                     } else if (session.getChannel() == RexProChannel.CHANNEL_GRAPHSON) {
-                        resultMessage = formatForGraphSONChannel(specificMessage, result);
+                        resultMessage = formatForGraphSONChannel(specificMessage, session, result);
                     } else {
                         // malformed channel???!!!
                         logger.warn(String.format("Session is configured for a channel that does not exist: [%s]", session.getChannel()));
@@ -164,7 +163,7 @@ public class ScriptFilter extends BaseFilter {
 
                 try {
                     final Object result = scriptEngine.eval(specificMessage.Script, bindings);
-                    final RexProMessage resultMessage = formatForMsgPackChannel(specificMessage, result);
+                    final RexProMessage resultMessage = formatForMsgPackChannel(specificMessage, null, result);
 
                     // commit transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
@@ -281,7 +280,7 @@ public class ScriptFilter extends BaseFilter {
         return false;
     }
 
-    private static GraphSONScriptResponseMessage formatForGraphSONChannel(final ScriptRequestMessage specificMessage, final Object result) throws Exception {
+    private static GraphSONScriptResponseMessage formatForGraphSONChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
         final GraphSONScriptResponseMessage graphSONScriptResponseMessage = new GraphSONScriptResponseMessage();
 
         if (specificMessage.metaGetInSession()){
@@ -292,11 +291,14 @@ public class ScriptFilter extends BaseFilter {
 
         graphSONScriptResponseMessage.Request = specificMessage.Request;
         graphSONScriptResponseMessage.Results = GraphSONScriptResponseMessage.convertResultToBytes(result);
+        if (session != null){
+            graphSONScriptResponseMessage.Bindings.putAll(session.getBindings());
+        }
         graphSONScriptResponseMessage.validateMetaData();
         return graphSONScriptResponseMessage;
     }
 
-    private static MsgPackScriptResponseMessage formatForMsgPackChannel(final ScriptRequestMessage specificMessage, final Object result) throws Exception {
+    private static MsgPackScriptResponseMessage formatForMsgPackChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
         final MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
 
         if (specificMessage.metaGetInSession()){
@@ -307,13 +309,15 @@ public class ScriptFilter extends BaseFilter {
 
         msgPackScriptResponseMessage.Request = specificMessage.Request;
         msgPackScriptResponseMessage.Results.set(result);
+        if (session != null){
+            msgPackScriptResponseMessage.Bindings.putAll(session.getBindings());
+        }
         msgPackScriptResponseMessage.validateMetaData();
         return msgPackScriptResponseMessage;
     }
 
     private static ConsoleScriptResponseMessage formatForConsoleChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
         final ConsoleScriptResponseMessage consoleScriptResponseMessage = new ConsoleScriptResponseMessage();
-        consoleScriptResponseMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToConsoleLineByteArray(session.getBindings());
 
         if (specificMessage.metaGetInSession()){
             consoleScriptResponseMessage.Session = specificMessage.Session;
@@ -326,6 +330,9 @@ public class ScriptFilter extends BaseFilter {
         final List<String> consoleLines = ConsoleScriptResponseMessage.convertResultToConsoleLines(result);
         consoleScriptResponseMessage.ConsoleLines = new String[consoleLines.size()];
         consoleLines.toArray(consoleScriptResponseMessage.ConsoleLines);
+        if (session != null) {
+            consoleScriptResponseMessage.Bindings.putAll(session.getBindings());
+        }
         consoleScriptResponseMessage.validateMetaData();
         return consoleScriptResponseMessage;
     }

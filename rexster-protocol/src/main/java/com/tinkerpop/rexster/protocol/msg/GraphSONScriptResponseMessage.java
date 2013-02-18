@@ -16,7 +16,7 @@ public class GraphSONScriptResponseMessage extends RexProMessage {
             GraphSONMode.EXTENDED, 0, Long.MAX_VALUE, null);
 
     public String Results;
-    public RexProBindings Bindings;
+    public RexProBindings Bindings = new RexProBindings();
 
     public static String convertResultToBytes(final Object result) throws Exception {
         if (result == null) {
@@ -28,6 +28,7 @@ public class GraphSONScriptResponseMessage extends RexProMessage {
 
     @Override
     public int estimateMessageSize() {
+        //TODO: estimate bindings size
         return BASE_MESSAGE_SIZE + (Results == null ? 0 : Results.length());
     }
 }

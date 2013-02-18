@@ -22,7 +22,7 @@ public class ErrorResponseMessageTest {
         final ErrorResponseMessage msg = new ErrorResponseMessage();
         msg.ErrorMessage = "this was an error";
 
-        Assert.assertEquals(53, msg.estimateMessageSize());
+        Assert.assertEquals(49, msg.estimateMessageSize());
     }
 
     @Test

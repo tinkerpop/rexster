@@ -21,7 +21,7 @@ public class SessionResponseMessageTest {
         final SessionResponseMessage msg = new SessionResponseMessage();
         msg.Languages = new String[]{"groovy"};
 
-        Assert.assertEquals(42, msg.estimateMessageSize());
+        Assert.assertEquals(38, msg.estimateMessageSize());
     }
 
     @Test

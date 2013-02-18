@@ -22,7 +22,7 @@ public class MsgPackScriptResponseMessageTest {
     public void estimateMessageSize() {
         final MsgPackScriptResponseMessage msg = new MsgPackScriptResponseMessage();
 
-        Assert.assertEquals(36, msg.estimateMessageSize());
+        Assert.assertEquals(32, msg.estimateMessageSize());
     }
 
     final static MessagePack msgpack = new MessagePack();

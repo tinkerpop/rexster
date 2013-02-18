@@ -23,7 +23,7 @@ public class SessionRequestMessageTest {
         msg.Username = "user";
         msg.Password = "pass";
 
-        Assert.assertEquals(45, msg.estimateMessageSize());
+        Assert.assertEquals(41, msg.estimateMessageSize());
     }
 
     @Test

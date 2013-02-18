@@ -12,6 +12,6 @@ public class GraphSONScriptResponseMessageTest {
         final GraphSONScriptResponseMessage msg = new GraphSONScriptResponseMessage();
         msg.Results = "1234567890";
 
-        Assert.assertEquals(46, msg.estimateMessageSize());
+        Assert.assertEquals(42, msg.estimateMessageSize());
     }
 }
