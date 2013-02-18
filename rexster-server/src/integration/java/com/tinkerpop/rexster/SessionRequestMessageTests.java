@@ -13,7 +13,6 @@ import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import junit.framework.Assert;
 import org.junit.Test;
 
-import javax.script.SimpleBindings;
 import java.util.UUID;
 
 /**
@@ -55,7 +54,6 @@ public class SessionRequestMessageTests extends AbstractRexProIntegrationTest {
         //try to use the killed session
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "5";
-        scriptMessage.Bindings = new byte[0];
         scriptMessage.LanguageName = "groovy";
         scriptMessage.metaSetInSession(true);
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
@@ -89,7 +87,6 @@ public class SessionRequestMessageTests extends AbstractRexProIntegrationTest {
         //try to use the graph on the session
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "graph.addVertex()";
-        scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(new SimpleBindings());
         scriptMessage.LanguageName = "groovy";
         scriptMessage.metaSetInSession(true);
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
@@ -97,7 +94,7 @@ public class SessionRequestMessageTests extends AbstractRexProIntegrationTest {
 
         inMsg = client.execute(scriptMessage);
         Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.length > 0);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
     }
 
     /**

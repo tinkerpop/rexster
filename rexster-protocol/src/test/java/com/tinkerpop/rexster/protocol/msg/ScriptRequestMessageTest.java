@@ -20,11 +20,10 @@ public class ScriptRequestMessageTest {
     @Test
     public void estimateMessageSize() {
         final ScriptRequestMessage msg = new ScriptRequestMessage();
-        msg.Bindings = new byte[10];
         msg.LanguageName = "groovy";
         msg.Script = "script";
 
-        Assert.assertEquals(58, msg.estimateMessageSize());
+        Assert.assertEquals(44, msg.estimateMessageSize());
     }
 
     @Test
@@ -32,8 +31,6 @@ public class ScriptRequestMessageTest {
         final ScriptRequestMessage msg = new ScriptRequestMessage();
         msg.setRequestAsUUID(UUID.randomUUID());
         msg.setSessionAsUUID(UUID.randomUUID());
-        msg.Bindings = new byte[10];
-        for(int i=0; i<10; i++) msg.Bindings[i] = (byte)i;
         msg.LanguageName = "groovy";
         msg.Script = "script";
 
@@ -70,12 +67,12 @@ public class ScriptRequestMessageTest {
     public void testSerialization() {
         MessagePack msgpack = new MessagePack();
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
+        msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
+        msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
 
         final ScriptRequestMessage outMsg = new ScriptRequestMessage();
         outMsg.setRequestAsUUID(UUID.randomUUID());
         outMsg.setSessionAsUUID(UUID.randomUUID());
-        outMsg.Bindings = new byte[10];
-        for(int i=0; i<10; i++) outMsg.Bindings[i] = (byte)i;
         outMsg.LanguageName = "groovy";
         outMsg.Script = "script";
 
@@ -99,7 +96,6 @@ public class ScriptRequestMessageTest {
             Assert.assertEquals(outMsg.Meta, inMsg.Meta);
             Assert.assertEquals(UUID.nameUUIDFromBytes(outMsg.Request), UUID.nameUUIDFromBytes(inMsg.Request));
             Assert.assertEquals(UUID.nameUUIDFromBytes(outMsg.Session), UUID.nameUUIDFromBytes(inMsg.Session));
-            for (int i=0; i<10; i++) Assert.assertEquals(outMsg.Bindings[i], inMsg.Bindings[i]);
             Assert.assertEquals(outMsg.LanguageName, inMsg.LanguageName);
             Assert.assertEquals(outMsg.Script, inMsg.Script);
         } catch (IOException ex) {

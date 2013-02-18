@@ -27,18 +27,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public class RexsterConsole {
-    private static final byte[] emptyBindings;
-
-    static {{
-        byte [] empty;
-        try {
-            empty = BitWorks.convertBindingsToByteArray(new SimpleBindings());
-        } catch (IOException ioe) {
-            empty = new byte[0];
-        }
-
-        emptyBindings = empty;
-    }};
 
     private RemoteRexsterSession session = null;
     private List<String> currentBindings = new ArrayList<String>();
@@ -300,7 +288,6 @@ public class RexsterConsole {
             // the session field gets set by the RemoteRexsterSession class automatically
             final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
             scriptMessage.Script = script;
-            scriptMessage.Bindings = emptyBindings;
             scriptMessage.LanguageName = scriptEngineName;
             scriptMessage.metaSetInSession(true);
             scriptMessage.metaSetTransaction(false);
