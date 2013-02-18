@@ -4,14 +4,8 @@ import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
 import junit.framework.Assert;
 import org.junit.Test;
-import org.msgpack.MessagePack;
-import org.msgpack.template.Template;
-import org.msgpack.type.MapValue;
-import org.msgpack.type.Value;
-import org.msgpack.unpacker.Converter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,18 +33,13 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         final Integer intResult = intResults.get(0);
         Assert.assertEquals("2", intResult.toString());
 
-//        final MessagePack msgpack = new MessagePack();
-//        final Template<Map<String, Value>> mapTmpl = tMap(TString, TValue);
-
         final List<Map<String, Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1)", tMap(TString, TValue));
         Assert.assertEquals(1, vertexResults.size());
         final Map<String, Object> vertexResult = vertexResults.get(0);
         Assert.assertEquals("vertex", vertexResult.get("_type").toString());
         Assert.assertEquals("1", vertexResult.get("_id").toString());
 
-//        final MapValue vertexPropertiesValue =
         final Map<String, Object> vertexProperties = (Map<String, Object>) vertexResult.get("_properties");
-//        mapTmpl.read(new Converter(msgpack, vertexPropertiesValue), vertexProperties);
         Assert.assertEquals("marko", vertexProperties.get("name"));
         Assert.assertEquals(29, vertexProperties.get("age"));
     }
