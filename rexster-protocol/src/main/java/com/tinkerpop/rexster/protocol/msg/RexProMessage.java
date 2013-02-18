@@ -18,7 +18,7 @@ public abstract class RexProMessage {
     /**
      * Constant that represents the size of a RexProMessage.
      */
-    protected static final int BASE_MESSAGE_SIZE = 36;
+    protected static final int BASE_MESSAGE_SIZE = 32;
 
     /**
      * List of meta fields accepted for this message type

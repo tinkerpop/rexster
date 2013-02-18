@@ -4,39 +4,16 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProChannel;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
-import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import org.msgpack.MessagePack;
-import org.msgpack.type.Value;
-import org.msgpack.unpacker.BufferUnpacker;
-import org.msgpack.unpacker.Converter;
-import org.msgpack.unpacker.UnpackerIterator;
 
-import javax.script.SimpleBindings;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
-
-import static org.msgpack.template.Templates.TString;
-import static org.msgpack.template.Templates.TValue;
-import static org.msgpack.template.Templates.tMap;
-
 /**
  * A bit of an experiment.
  */
 public class TryRexProSessioned {
-
-    private static final byte[] emptyBindings;
-
-    static {{
-        byte [] empty;
-        try {
-            empty = BitWorks.convertBindingsToByteArray(new SimpleBindings());
-        } catch (IOException ioe) {
-            empty = new byte[0];
-        }
-
-        emptyBindings = empty;
-    }};
 
     public static void main(String[] args) {
         //bigCalls();
@@ -84,22 +61,16 @@ public class TryRexProSessioned {
             MsgPackScriptResponseMessage resultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
                     createScriptRequestMessage(session, "g=rexster.getGraph('gratefulgraph');g.V;"), 100);
 
-            BufferUnpacker unpacker = msgpack.createBufferUnpacker(resultMessage.Results);
-            unpacker.setArraySizeLimit(Integer.MAX_VALUE);
-            unpacker.setMapSizeLimit(Integer.MAX_VALUE);
-            unpacker.setRawSizeLimit(Integer.MAX_VALUE);
-
             int counter = 1;
-            UnpackerIterator itty = unpacker.iterator();
+            Iterator itty = ((Iterable) resultMessage.Results).iterator();
             while (itty.hasNext()){
-                final Map<String,Value> map = new Converter(msgpack, itty.next()).read(tMap(TString, TValue));
-                final String vId = map.get(Tokens._ID).asRawValue().getString();
+                final Map<String,Object> map = (Map<String, Object>) itty.next();
+                final String vId = (String) map.get(Tokens._ID);
 
                 MsgPackScriptResponseMessage vertexResultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
                         createScriptRequestMessage(session, "g.v(" + vId + ")"), 100);
 
-                unpacker = msgpack.createBufferUnpacker(vertexResultMessage.Results);
-                System.out.println(unpacker.read(tMap(TString, TValue)));
+                System.out.println(vertexResultMessage.Results);
                 counter++;
             }
 
@@ -135,11 +106,6 @@ public class TryRexProSessioned {
         scriptMessage.setSessionAsUUID(session.getSessionKey());
         scriptMessage.Script = script;
 
-        //RexsterBindings bindings = new RexsterBindings();
-        //bindings.put("x", 5);
-        //scriptMessage.Bindings = BitWorks.convertBindingsToByteArray(bindings);
-        //scriptMessage.Bindings = ConsoleScriptResponseMessage.convertBindingsToConsoleLineByteArray(bindings);
-        scriptMessage.Bindings = emptyBindings;
         scriptMessage.LanguageName = "groovy";
         scriptMessage.metaSetInSession(true);
         scriptMessage.setRequestAsUUID(UUID.randomUUID());

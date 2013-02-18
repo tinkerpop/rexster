@@ -21,13 +21,15 @@ public class SessionResponseMessageTest {
         final SessionResponseMessage msg = new SessionResponseMessage();
         msg.Languages = new String[]{"groovy"};
 
-        Assert.assertEquals(42, msg.estimateMessageSize());
+        Assert.assertEquals(38, msg.estimateMessageSize());
     }
 
     @Test
     public void testSerialization() {
         MessagePack msgpack = new MessagePack();
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
+        msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
+        msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
 
         SessionResponseMessage outMsg = new SessionResponseMessage();
         outMsg.setRequestAsUUID(UUID.randomUUID());

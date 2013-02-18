@@ -22,7 +22,7 @@ public class ErrorResponseMessageTest {
         final ErrorResponseMessage msg = new ErrorResponseMessage();
         msg.ErrorMessage = "this was an error";
 
-        Assert.assertEquals(53, msg.estimateMessageSize());
+        Assert.assertEquals(49, msg.estimateMessageSize());
     }
 
     @Test
@@ -76,6 +76,8 @@ public class ErrorResponseMessageTest {
     public void testSerialization() {
         MessagePack msgpack = new MessagePack();
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
+        msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
+        msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
 
         ErrorResponseMessage outMsg = new ErrorResponseMessage();
         outMsg.setRequestAsUUID(UUID.randomUUID());

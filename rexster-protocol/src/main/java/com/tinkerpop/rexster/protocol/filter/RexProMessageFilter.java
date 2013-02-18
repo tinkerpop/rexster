@@ -1,17 +1,6 @@
 package com.tinkerpop.rexster.protocol.filter;
 
-import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.GraphSONScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.MessageTokens;
-import com.tinkerpop.rexster.protocol.msg.MessageType;
-import com.tinkerpop.rexster.protocol.msg.MessageUtil;
-import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.RexProMessage;
-import com.tinkerpop.rexster.protocol.msg.RexProMessageMeta;
-import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
-import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
-import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.*;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.filterchain.BaseFilter;
@@ -36,6 +25,8 @@ public class RexProMessageFilter extends BaseFilter {
     private static final MessagePack msgpack = new MessagePack();
     static {
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
+        msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
+        msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
     }
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {

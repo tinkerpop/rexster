@@ -11,6 +11,7 @@ import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a response to a script request for use in a console where each results is serialized to a
@@ -22,7 +23,7 @@ import java.util.List;
 public class ConsoleScriptResponseMessage extends RexProMessage {
 
     public String[] ConsoleLines;
-    public byte[] Bindings;
+    public RexProBindings Bindings = new RexProBindings();
 
     public ConsoleScriptResponseMessage() {
         super();
@@ -40,14 +41,8 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
     public List<String> bindingsAsList() {
         final List<String> bindings = new ArrayList<String>();
 
-        final ByteBuffer bb = ByteBuffer.wrap(this.Bindings);
-
-        while (bb.hasRemaining()) {
-            final int segmentLength = bb.getInt();
-            final byte[] segmentBytes = new byte[segmentLength];
-            bb.get(segmentBytes);
-
-            bindings.add(new String(segmentBytes));
+        for(Map.Entry pair: this.Bindings.entrySet()) {
+            bindings.add(pair.getKey() + "=" + pair.getValue().toString());
         }
 
         return bindings;
@@ -71,7 +66,7 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
 
     @Override
     public int estimateMessageSize() {
-        return BASE_MESSAGE_SIZE + (Bindings == null ? 0 : Bindings.length) + estimateConsoleLineSize();
+        return BASE_MESSAGE_SIZE + estimateConsoleLineSize();
     }
 
     private int estimateConsoleLineSize() {

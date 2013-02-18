@@ -12,8 +12,8 @@ import org.msgpack.annotation.Message;
 public class MsgPackScriptResponseMessage extends RexProMessage {
     private static final MsgPackResultConverter converter = new MsgPackResultConverter();
 
-    public byte[] Results;
-    public byte[] Bindings;
+    public RexProScriptResult Results = new RexProScriptResult();
+    public RexProBindings Bindings = new RexProBindings();
 
     public static byte[] convertResultToBytes(final Object result) throws Exception {
         return converter.convert(result);
@@ -21,6 +21,6 @@ public class MsgPackScriptResponseMessage extends RexProMessage {
 
     @Override
     public int estimateMessageSize() {
-        return BASE_MESSAGE_SIZE + (Results == null ? 0 : Results.length) + (Bindings == null ? 0 : Bindings.length);
+        return BASE_MESSAGE_SIZE;
     }
 }
