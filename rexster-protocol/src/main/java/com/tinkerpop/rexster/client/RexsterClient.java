@@ -12,12 +12,9 @@ import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.GrizzlyFuture;
 import org.glassfish.grizzly.nio.NIOConnection;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
-import org.msgpack.MessagePack;
-import org.msgpack.type.Value;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -43,16 +40,12 @@ public class RexsterClient {
     private final NIOConnection[] connections;
     private int currentConnection = 0;
 
-    private final MessagePack msgpack = new MessagePack();
     private final int timeoutConnection;
     private final int timeoutWrite;
     private final int timeoutRead;
     private final int retries;
     private final int waitBetweenRetries;
     private final int asyncWriteQueueMaxBytes;
-    private final int arraySizeLimit;
-    private final int mapSizeLimit;
-    private final int rawSizeLimit;
     private final String language;
     private final String graphName;
     private final String graphObjName;
@@ -72,9 +65,6 @@ public class RexsterClient {
         this.retries = configuration.getInt(RexsterClientTokens.CONFIG_MESSAGE_RETRY_COUNT);
         this.waitBetweenRetries = configuration.getInt(RexsterClientTokens.CONFIG_MESSAGE_RETRY_WAIT_MS);
         this.asyncWriteQueueMaxBytes = configuration.getInt(RexsterClientTokens.CONFIG_MAX_ASYNC_WRITE_QUEUE_BYTES);
-        this.arraySizeLimit = configuration.getInt(RexsterClientTokens.CONFIG_DESERIALIZE_ARRAY_SIZE_LIMIT);
-        this.mapSizeLimit = configuration.getInt(RexsterClientTokens.CONFIG_DESERIALIZE_MAP_SIZE_LIMIT);
-        this.rawSizeLimit = configuration.getInt(RexsterClientTokens.CONFIG_DESERIALIZE_RAW_SIZE_LIMIT);
         this.language = configuration.getString(RexsterClientTokens.CONFIG_LANGUAGE);
         this.graphName = configuration.getString(RexsterClientTokens.CONFIG_GRAPH_NAME);
         this.graphObjName = configuration.getString(RexsterClientTokens.CONFIG_GRAPH_OBJECT_NAME);

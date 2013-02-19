@@ -33,9 +33,6 @@ public class RexsterClientFactory {
         addProperty(RexsterClientTokens.CONFIG_MAX_ASYNC_WRITE_QUEUE_BYTES, 512000);
         addProperty(RexsterClientTokens.CONFIG_MESSAGE_RETRY_COUNT, 16);
         addProperty(RexsterClientTokens.CONFIG_MESSAGE_RETRY_WAIT_MS, 50);
-        addProperty(RexsterClientTokens.CONFIG_DESERIALIZE_ARRAY_SIZE_LIMIT, 4194304);
-        addProperty(RexsterClientTokens.CONFIG_DESERIALIZE_MAP_SIZE_LIMIT, 2097152);
-        addProperty(RexsterClientTokens.CONFIG_DESERIALIZE_RAW_SIZE_LIMIT, 134217728);
         addProperty(RexsterClientTokens.CONFIG_LANGUAGE, "groovy");
         addProperty(RexsterClientTokens.CONFIG_GRAPH_OBJECT_NAME, "g");
         addProperty(RexsterClientTokens.CONFIG_GRAPH_NAME, null);
