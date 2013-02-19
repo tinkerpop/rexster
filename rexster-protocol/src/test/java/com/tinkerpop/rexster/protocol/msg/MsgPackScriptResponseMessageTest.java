@@ -18,12 +18,6 @@ import java.util.UUID;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class MsgPackScriptResponseMessageTest {
-    @Test
-    public void estimateMessageSize() {
-        final MsgPackScriptResponseMessage msg = new MsgPackScriptResponseMessage();
-
-        Assert.assertEquals(32, msg.estimateMessageSize());
-    }
 
     final static MessagePack msgpack = new MessagePack();
 

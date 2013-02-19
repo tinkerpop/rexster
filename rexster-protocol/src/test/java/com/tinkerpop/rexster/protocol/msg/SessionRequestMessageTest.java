@@ -16,15 +16,6 @@ import java.util.UUID;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class SessionRequestMessageTest {
-    @Test
-    public void estimateMessageSize() {
-        final SessionRequestMessage msg = new SessionRequestMessage();
-        msg.Channel = RexProChannel.CHANNEL_CONSOLE;
-        msg.Username = "user";
-        msg.Password = "pass";
-
-        Assert.assertEquals(41, msg.estimateMessageSize());
-    }
 
     @Test
     public void testMetaValidation() {

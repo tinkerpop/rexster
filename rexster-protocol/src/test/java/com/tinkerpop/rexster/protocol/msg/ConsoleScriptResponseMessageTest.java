@@ -47,19 +47,6 @@ public class ConsoleScriptResponseMessageTest {
     }
 
     @Test
-    public void estimateMessageSize() throws IOException {
-        final ConsoleScriptResponseMessage msg = new ConsoleScriptResponseMessage();
-        msg.ConsoleLines = new String[] { "a", "b", "c" };
-
-        msg.Bindings.put("a", "aaa");
-        msg.Bindings.put("b", "bbb");
-        msg.Bindings.put("c", 3);
-
-        //TODO
-        //Assert.assertEquals(64, msg.estimateMessageSize());
-    }
-
-    @Test
     public void testSerialization() {
         MessagePack msgpack = new MessagePack();
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());

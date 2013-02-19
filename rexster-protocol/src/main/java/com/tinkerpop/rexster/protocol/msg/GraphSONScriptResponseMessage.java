@@ -25,10 +25,4 @@ public class GraphSONScriptResponseMessage extends RexProMessage {
             return converter.convert(result).toString();
         }
     }
-
-    @Override
-    public int estimateMessageSize() {
-        //TODO: estimate bindings size
-        return BASE_MESSAGE_SIZE + (Results == null ? 0 : Results.length());
-    }
 }

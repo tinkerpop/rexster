@@ -73,11 +73,6 @@ public abstract class RexProMessage {
     }
 
     /**
-     * @return the estimated size of the message in bytes.
-     */
-    public abstract int estimateMessageSize();
-
-    /**
      * Validates the instance's Meta field
      */
     public void validateMetaData() throws RexProException{

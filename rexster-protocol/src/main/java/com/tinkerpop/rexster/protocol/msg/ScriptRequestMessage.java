@@ -45,13 +45,6 @@ public class ScriptRequestMessage extends RexProMessage {
     public String Script;
     public RexProBindings Bindings = new RexProBindings();
 
-    @Override
-    public int estimateMessageSize() {
-        return BASE_MESSAGE_SIZE
-                + (LanguageName == null ? 0 : LanguageName.length())
-                + (Script == null ? 0 :Script.length());
-    }
-
     public javax.script.Bindings getBindings() throws IOException, ClassNotFoundException {
         return this.Bindings;
     }

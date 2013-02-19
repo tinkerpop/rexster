@@ -18,15 +18,6 @@ import java.util.UUID;
 public class ScriptRequestMessageTest {
 
     @Test
-    public void estimateMessageSize() {
-        final ScriptRequestMessage msg = new ScriptRequestMessage();
-        msg.LanguageName = "groovy";
-        msg.Script = "script";
-
-        Assert.assertEquals(44, msg.estimateMessageSize());
-    }
-
-    @Test
     public void testMetaValidation() {
         final ScriptRequestMessage msg = new ScriptRequestMessage();
         msg.setRequestAsUUID(UUID.randomUUID());

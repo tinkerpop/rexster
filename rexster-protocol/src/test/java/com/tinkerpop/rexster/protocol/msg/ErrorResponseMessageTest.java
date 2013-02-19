@@ -18,14 +18,6 @@ import java.util.UUID;
 public class ErrorResponseMessageTest {
 
     @Test
-    public void estimateMessageSize(){
-        final ErrorResponseMessage msg = new ErrorResponseMessage();
-        msg.ErrorMessage = "this was an error";
-
-        Assert.assertEquals(49, msg.estimateMessageSize());
-    }
-
-    @Test
     public void testMetaValidation() {
         ErrorResponseMessage msg = new ErrorResponseMessage();
         msg.setRequestAsUUID(UUID.randomUUID());

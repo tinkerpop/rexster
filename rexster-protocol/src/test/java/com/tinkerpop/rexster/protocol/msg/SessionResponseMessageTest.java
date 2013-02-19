@@ -16,13 +16,6 @@ import java.util.UUID;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class SessionResponseMessageTest {
-    @Test
-    public void estimateMessageSize() {
-        final SessionResponseMessage msg = new SessionResponseMessage();
-        msg.Languages = new String[]{"groovy"};
-
-        Assert.assertEquals(38, msg.estimateMessageSize());
-    }
 
     @Test
     public void testSerialization() {

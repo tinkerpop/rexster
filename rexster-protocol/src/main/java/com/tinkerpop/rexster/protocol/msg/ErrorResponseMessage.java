@@ -28,11 +28,6 @@ public class ErrorResponseMessage extends RexProMessage {
         return fields;
     }
 
-    @Override
-    public int estimateMessageSize() {
-        return BASE_MESSAGE_SIZE + (ErrorMessage == null ? 0 : ErrorMessage.length());
-    }
-
     public Integer metaGetFlag() {
         return (Integer) Meta.get(FLAG_META_KEY);
     }

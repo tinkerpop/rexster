@@ -251,13 +251,9 @@ public class RexsterClient {
             try {
                 final NIOConnection connection = nextConnection();
                 if (connection != null && connection.isOpen()) {
-                    if (toSend.estimateMessageSize() + connection.getAsyncWriteQueue().spaceInBytes() <= connection.getMaxAsyncWriteQueueSize()) {
-                        final GrizzlyFuture future = connection.write(toSend);
-                        future.get(this.timeoutWrite, TimeUnit.MILLISECONDS);
-                        sent = true;
-                    } else {
-                        throw new Exception("internal");
-                    }
+                    final GrizzlyFuture future = connection.write(toSend);
+                    future.get(this.timeoutWrite, TimeUnit.MILLISECONDS);
+                    sent = true;
                 }
             } catch (Exception ex) {
                 tries--;
