@@ -42,7 +42,7 @@ public class SessionRequestMessageTests extends AbstractRexProIntegrationTest {
 
         //kill said session
         final SessionRequestMessage deathMsg = new SessionRequestMessage();
-        deathMsg.Channel = RexProChannel.CHANNEL_NONE;
+        deathMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
         deathMsg.Session = BitWorks.convertUUIDToByteArray(sessionKey);
         deathMsg.setRequestAsUUID(UUID.randomUUID());
         deathMsg.metaSetKillSession(true);
