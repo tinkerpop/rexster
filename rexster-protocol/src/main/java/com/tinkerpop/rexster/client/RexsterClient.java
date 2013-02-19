@@ -73,8 +73,7 @@ public class RexsterClient {
 
         this.transport = transport;
         this.port = configuration.getInt(RexsterClientTokens.CONFIG_PORT);
-        final String hostname = configuration.getString(RexsterClientTokens.CONFIG_HOSTNAME);
-        this.hosts = hostname.split(",");
+        this.hosts = configuration.getStringArray(RexsterClientTokens.CONFIG_HOSTNAME);
 
         this.connections = new NIOConnection[this.hosts.length];
     }
