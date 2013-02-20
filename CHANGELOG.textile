@@ -25,7 +25,8 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 * Configuration in @rexster.xml@ for allowing other Script Engine flavors of Gremlin to be exposed.
 * Remove @rexster.xml@ embedded as a resource as the final fallback for configuring Rexster at startup.
 * Allow override of default embedded @log4j.properties@ file with one in the root of @REXSTER_HOME@.
-* Improve logging
+* Improve logging configurability.
+* @RexsterClient@ for Java connectivity to Rexster through RexPro.
 
 h3. Version 2.2.0 (December 19, 2012)
 
