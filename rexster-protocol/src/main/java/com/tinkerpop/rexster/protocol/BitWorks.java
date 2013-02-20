@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.protocol;
 
-import org.msgpack.MessagePack;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -14,7 +13,6 @@ import java.util.UUID;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class BitWorks {
-    private static final MessagePack msgpack = new MessagePack();
 
     /**
      * Converts a UUID to bytes.

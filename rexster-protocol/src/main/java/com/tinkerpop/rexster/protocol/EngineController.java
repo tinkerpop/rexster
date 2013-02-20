@@ -24,7 +24,6 @@ public class EngineController {
 
     public static final int RESET_NEVER = -1;
 
-    private final ScriptEngineManager manager = new ScriptEngineManager();
     private final Map<String, EngineHolder> engines = new HashMap<String, EngineHolder>();
 
     /**
@@ -44,7 +43,8 @@ public class EngineController {
     private EngineController() {
         // for ruby
         System.setProperty("org.jruby.embed.localvariable.behavior", "persistent");
-        for (ScriptEngineFactory factory : this.manager.getEngineFactories()) {
+        final ScriptEngineManager manager = new ScriptEngineManager();
+        for (ScriptEngineFactory factory : manager.getEngineFactories()) {
 
             logger.info(String.format("ScriptEngineManager has factory for: %s", factory.getLanguageName()));
 

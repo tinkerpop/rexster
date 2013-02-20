@@ -7,12 +7,20 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.pipes.util.structures.Row;
 import com.tinkerpop.pipes.util.structures.Table;
 import com.tinkerpop.rexster.Tokens;
-import org.msgpack.MessagePack;
-import org.msgpack.packer.BufferPacker;
 import org.msgpack.packer.Packer;
-import org.msgpack.type.*;
+import org.msgpack.type.ArrayValue;
+import org.msgpack.type.MapValue;
+import org.msgpack.type.NilValue;
+import org.msgpack.type.Value;
+import org.msgpack.type.ValueFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Universally useful msgpack object serialization and deserialization functions
