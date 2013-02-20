@@ -7,6 +7,7 @@
         <web-root>public</web-root>
         <character-set>UTF-8</character-set>
         <enable-jmx>false</enable-jmx>
+        <enable-doghouse>true</enable-doghouse>
         <max-post-size>2097152</max-post-size>
         <max-header-size>8192</max-header-size>
         <upload-timeout-millis>30000</upload-timeout-millis>

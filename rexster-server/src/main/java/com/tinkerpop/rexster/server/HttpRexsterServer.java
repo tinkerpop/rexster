@@ -43,7 +43,6 @@ import java.io.File;
  */
 public class HttpRexsterServer implements RexsterServer {
     private static final Logger logger = Logger.getLogger(HttpRexsterServer.class);
-    private static final java.util.logging.Logger jdkLogger = java.util.logging.LogManager.getLogManager().getLogger(HttpRexsterServer.class.getName());
 
     private final XMLConfiguration properties;
     private final Integer rexsterServerPort;
@@ -61,22 +60,24 @@ public class HttpRexsterServer implements RexsterServer {
     private final String ioStrategy;
     private final HttpServer httpServer;
     private final boolean debugMode;
+    private final boolean enableDogHouse;
 
     public HttpRexsterServer(final XMLConfiguration properties) {
         this.properties = properties;
         this.debugMode = properties.getBoolean("debug", false);
-        rexsterServerPort = properties.getInteger("http.server-port", new Integer(RexsterSettings.DEFAULT_HTTP_PORT));
-        rexsterServerHost = properties.getString("http.server-host", "0.0.0.0");
-        webRootPath = properties.getString("http.web-root", RexsterSettings.DEFAULT_WEB_ROOT_PATH);
-        baseUri = properties.getString("http.base-uri", RexsterSettings.DEFAULT_BASE_URI);
-        coreWorkerThreadPoolSize = properties.getInt("http.thread-pool.worker.core-size", 8);
-        maxWorkerThreadPoolSize = properties.getInt("http.thread-pool.worker.max-size", 8);
-        coreKernalThreadPoolSize = properties.getInt("http.thread-pool.kernal.core-size", 4);
-        maxKernalThreadPoolSize = properties.getInt("http.thread-pool.kernal.max-size", 4);
-        maxPostSize = properties.getInt("http.max-post-size", 2097152);
-        maxHeaderSize = properties.getInt("http.max-header-size", 8192);
-        uploadTimeoutMillis = properties.getInt("http.upload-timeout-millis", 300000);
-        enableJmx = properties.getBoolean("http.enable-jmx", false);
+        this.enableDogHouse = properties.getBoolean("http.enable-doghouse", true);
+        this.rexsterServerPort = properties.getInteger("http.server-port", new Integer(RexsterSettings.DEFAULT_HTTP_PORT));
+        this.rexsterServerHost = properties.getString("http.server-host", "0.0.0.0");
+        this.webRootPath = properties.getString("http.web-root", RexsterSettings.DEFAULT_WEB_ROOT_PATH);
+        this.baseUri = properties.getString("http.base-uri", RexsterSettings.DEFAULT_BASE_URI);
+        this.coreWorkerThreadPoolSize = properties.getInt("http.thread-pool.worker.core-size", 8);
+        this.maxWorkerThreadPoolSize = properties.getInt("http.thread-pool.worker.max-size", 8);
+        this.coreKernalThreadPoolSize = properties.getInt("http.thread-pool.kernal.core-size", 4);
+        this.maxKernalThreadPoolSize = properties.getInt("http.thread-pool.kernal.max-size", 4);
+        this.maxPostSize = properties.getInt("http.max-post-size", 2097152);
+        this.maxHeaderSize = properties.getInt("http.max-header-size", 8192);
+        this.uploadTimeoutMillis = properties.getInt("http.upload-timeout-millis", 300000);
+        this.enableJmx = properties.getBoolean("http.enable-jmx", false);
         this.ioStrategy = properties.getString("http.io-strategy", "leader-follower");
 
         this.httpServer = new HttpServer();
@@ -91,7 +92,10 @@ public class HttpRexsterServer implements RexsterServer {
     public void start(final RexsterApplication application) throws Exception {
 
         deployRestApi(application);
-        deployDogHouse(application);
+
+        if (enableDogHouse) {
+            deployDogHouse(application);
+        }
 
         final NetworkListener listener = configureNetworkListener();
         final IOStrategy strategy = GrizzlyIoStrategyFactory.createIoStrategy(this.ioStrategy);
