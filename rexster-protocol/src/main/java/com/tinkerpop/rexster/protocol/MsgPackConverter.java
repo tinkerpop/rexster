@@ -33,50 +33,60 @@ public class MsgPackConverter {
         } else if (object instanceof String || object instanceof Number || object instanceof Boolean) {
             packer.write(object);
         } else if (object instanceof Element) {
-            final Element element = (Element) object;
-            final Set<String> propertyKeys = element.getPropertyKeys();
-            final int propertySize = propertyKeys.size();
-            final boolean isVertex = element instanceof Vertex;
-            final int elementSize = (isVertex ? 2 : 5) + ((propertySize > 0) ? 1 : 0);
+            try {
+                final Element element = (Element) object;
+                final Set<String> propertyKeys = element.getPropertyKeys();
+                final int propertySize = propertyKeys.size();
+                final boolean isVertex = element instanceof Vertex;
+                final int elementSize = (isVertex ? 2 : 5) + ((propertySize > 0) ? 1 : 0);
 
-            packer.writeMapBegin(elementSize);
-            packer.write(Tokens._ID);
-            final Object id = element.getId();
-            if (id.getClass().isPrimitive()) {
-                packer.write(id);
-            } else {
-                packer.write(id.toString());
-            }
-
-            if (isVertex) {
-                packer.write(Tokens._TYPE);
-                packer.write(Tokens.VERTEX);
-            } else {
-                final Edge edge = (Edge) element;
-                packer.write(Tokens._TYPE);
-                packer.write(Tokens.EDGE);
-                packer.write(Tokens._IN_V);
-                packer.write(edge.getVertex(Direction.IN).getId());
-                packer.write(Tokens._OUT_V);
-                packer.write(edge.getVertex(Direction.OUT).getId());
-                packer.write(Tokens._LABEL);
-                packer.write(edge.getLabel());
-            }
-
-            if (propertyKeys.size() > 0) {
-                packer.write(Tokens._PROPERTIES);
-                packer.writeMapBegin(propertySize);
-
-                final Iterator<String> itty = propertyKeys.iterator();
-                while (itty.hasNext()) {
-                    final String propertyKey = itty.next();
-                    packer.write(propertyKey);
-                    serializeObject(element.getProperty(propertyKey), packer);
+                packer.writeMapBegin(elementSize);
+                packer.write(Tokens._ID);
+                final Object id = element.getId();
+                if (id.getClass().isPrimitive()) {
+                    packer.write(id);
+                } else {
+                    packer.write(id.toString());
                 }
 
+                if (isVertex) {
+                    packer.write(Tokens._TYPE);
+                    packer.write(Tokens.VERTEX);
+                } else {
+                    final Edge edge = (Edge) element;
+                    packer.write(Tokens._TYPE);
+                    packer.write(Tokens.EDGE);
+                    packer.write(Tokens._IN_V);
+                    packer.write(edge.getVertex(Direction.IN).getId());
+                    packer.write(Tokens._OUT_V);
+                    packer.write(edge.getVertex(Direction.OUT).getId());
+                    packer.write(Tokens._LABEL);
+                    packer.write(edge.getLabel());
+                }
+
+                if (propertyKeys.size() > 0) {
+                    packer.write(Tokens._PROPERTIES);
+                    packer.writeMapBegin(propertySize);
+
+                    final Iterator<String> itty = propertyKeys.iterator();
+                    while (itty.hasNext()) {
+                        final String propertyKey = itty.next();
+                        packer.write(propertyKey);
+                        serializeObject(element.getProperty(propertyKey), packer);
+                    }
+
+                    packer.writeMapEnd(false);
+                }
                 packer.writeMapEnd(false);
+            } catch (Exception e) {
+                // if a transaction gets closed and the element goes out of scope it may not serialize.  in these
+                // cases the vertex will just be written as null.  this can happen during binding serialization.
+                // specific case is doing this:
+                // v = g.addVertex()
+                // g.rollback()
+                // in some graphs v will go out of scope, yet it is still on the bindings as a Vertex object.
+                packer.writeNil();
             }
-            packer.writeMapEnd(false);
         } else if (object instanceof Map) {
             final Map map = (Map) object;
 
