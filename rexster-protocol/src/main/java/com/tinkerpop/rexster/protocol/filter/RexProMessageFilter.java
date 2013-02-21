@@ -144,11 +144,10 @@ public class RexProMessageFilter extends BaseFilter {
             // have executed and likely committed with success.  just means the response won't get back cleanly
             // to the client.
             final ByteArrayOutputStream rpms = new ByteArrayOutputStream();
-            //TODO: create RexProMessageMeta template
             final Packer p = msgpack.createPacker(rpms);
             ErrorResponseMessage errorMsg = MessageUtil.createErrorResponse(msg.Request, msg.Session,
                     ErrorResponseMessage.RESULT_SERIALIZATION_ERROR,
-                    "Script was successfully executed but the result of the script was not properly serialized.");
+                    MessageTokens.ERROR_RESULT_SERIALIZATION);
             p.write(errorMsg);
             rexProMessageAsBytes = rpms.toByteArray();
 

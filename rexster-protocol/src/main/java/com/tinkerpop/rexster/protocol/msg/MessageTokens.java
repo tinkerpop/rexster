@@ -11,4 +11,5 @@ public final class MessageTokens {
     public static final String ERROR_UNEXPECTED_MESSAGE_TYPE = "Message did not match an expected type.";
     public static final String ERROR_GRAPH_REDEFINITION = "A graph name has already been defined on this session";
     public static final String ERROR_CHANNEL_REDEFINITION = "A channel has already been defined on this session";
+    public static final String ERROR_RESULT_SERIALIZATION = "Script was successfully executed but the result of the script was not properly serialized.";
 }

@@ -302,7 +302,6 @@ public class RexsterConsole {
             try {
                 if (resultMessage instanceof ConsoleScriptResponseMessage) {
                     final ConsoleScriptResponseMessage responseMessage = (ConsoleScriptResponseMessage) resultMessage;
-                    this.output.println(responseMessage);
                     bindings = responseMessage.bindingsAsList();
                     lines = responseMessage.consoleLinesAsList();
                 } else if (resultMessage instanceof ErrorResponseMessage) {
