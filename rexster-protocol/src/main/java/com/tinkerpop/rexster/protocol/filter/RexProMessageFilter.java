@@ -129,16 +129,31 @@ public class RexProMessageFilter extends BaseFilter {
 
     public NextAction handleWrite(final FilterChainContext ctx) throws IOException {
         // Get the source message to be written
-        final RexProMessage msg = ctx.getMessage();
+        RexProMessage msg = ctx.getMessage();
 
         final ByteArrayOutputStream rexProMessageStream = new ByteArrayOutputStream();
         //TODO: create RexProMessageMeta template
         final Packer packer = msgpack.createPacker(rexProMessageStream);
-        byte[] rexProMessageAsBytes;
+        byte[] rexProMessageAsBytes = new byte[0];
 
         try {
             packer.write(msg);
             rexProMessageAsBytes = rexProMessageStream.toByteArray();
+        } catch (Exception ex) {
+            // if there's an error during serialization with msgpack this could tank.  the script will already
+            // have executed and likely committed with success.  just means the response won't get back cleanly
+            // to the client.
+            final ByteArrayOutputStream rpms = new ByteArrayOutputStream();
+            //TODO: create RexProMessageMeta template
+            final Packer p = msgpack.createPacker(rpms);
+            ErrorResponseMessage errorMsg = MessageUtil.createErrorResponse(msg.Request, msg.Session,
+                    ErrorResponseMessage.RESULT_SERIALIZATION_ERROR,
+                    "Script was successfully executed but the result of the script was not properly serialized.");
+            p.write(errorMsg);
+            rexProMessageAsBytes = rpms.toByteArray();
+
+            msg = errorMsg;
+
         } finally {
             packer.close();
         }

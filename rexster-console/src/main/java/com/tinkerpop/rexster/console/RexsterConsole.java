@@ -277,7 +277,7 @@ public class RexsterConsole {
         return space;
     }
 
-    private static ResultAndBindings eval(final String script, final String scriptEngineName,
+    private ResultAndBindings eval(final String script, final String scriptEngineName,
                                           final RemoteRexsterSession session) {
 
         ResultAndBindings returnValue = null;
@@ -302,7 +302,7 @@ public class RexsterConsole {
             try {
                 if (resultMessage instanceof ConsoleScriptResponseMessage) {
                     final ConsoleScriptResponseMessage responseMessage = (ConsoleScriptResponseMessage) resultMessage;
-
+                    this.output.println(responseMessage);
                     bindings = responseMessage.bindingsAsList();
                     lines = responseMessage.consoleLinesAsList();
                 } else if (resultMessage instanceof ErrorResponseMessage) {
@@ -313,9 +313,8 @@ public class RexsterConsole {
                 } else {
                     throw new RuntimeException("Unexpected message type received from RexPro Server.");
                 }
-            } catch (IllegalArgumentException iae) {
-                ErrorResponseMessage errorMessage = (ErrorResponseMessage) resultMessage;
-                lines.add(errorMessage.ErrorMessage);
+            } catch (Exception iae) {
+                lines.add(iae.getMessage());
             }
 
             Object result = lines.iterator();

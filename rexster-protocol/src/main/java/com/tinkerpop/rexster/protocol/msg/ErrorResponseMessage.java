@@ -18,6 +18,7 @@ public class ErrorResponseMessage extends RexProMessage {
     public static final Integer AUTH_FAILURE_ERROR = 3;
     public static final Integer GRAPH_CONFIG_ERROR = 4;
     public static final Integer CHANNEL_CONFIG_ERROR = 5;
+    public static final Integer RESULT_SERIALIZATION_ERROR = 6;
 
     protected static final String FLAG_META_KEY = "flag";
     protected RexProMessageMetaField[] getMetaFields() {

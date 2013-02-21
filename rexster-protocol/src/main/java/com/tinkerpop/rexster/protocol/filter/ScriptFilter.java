@@ -76,7 +76,7 @@ public class ScriptFilter extends BaseFilter {
                 // start transaction
                 if (graph != null && specificMessage.metaGetTransaction()) {
                     if (graph instanceof TransactionalGraph) {
-                        ((TransactionalGraph) graph).rollback();
+                        ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
                     }
                 }
 
@@ -106,7 +106,7 @@ public class ScriptFilter extends BaseFilter {
                     //commit transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
                         if (graph instanceof TransactionalGraph) {
-                            ((TransactionalGraph) graph).commit();
+                            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
                         }
                     }
 
@@ -117,7 +117,7 @@ public class ScriptFilter extends BaseFilter {
                     // rollback transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
                         if (graph instanceof TransactionalGraph) {
-                            ((TransactionalGraph) graph).rollback();
+                            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
                         }
                     }
                     throw ex;
@@ -157,7 +157,7 @@ public class ScriptFilter extends BaseFilter {
                 // start transaction
                 if (graph != null && specificMessage.metaGetTransaction()) {
                     if (graph instanceof TransactionalGraph) {
-                        ((TransactionalGraph) graph).rollback();
+                        ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
                     }
                 }
 
@@ -181,7 +181,7 @@ public class ScriptFilter extends BaseFilter {
                     // commit transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
                         if (graph instanceof TransactionalGraph) {
-                            ((TransactionalGraph) graph).commit();
+                            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
                         }
                     }
 
@@ -192,7 +192,7 @@ public class ScriptFilter extends BaseFilter {
                     // rollback transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
                         if (graph instanceof TransactionalGraph) {
-                            ((TransactionalGraph) graph).rollback();
+                            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
                         }
                     }
                     throw ex;

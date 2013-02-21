@@ -42,36 +42,18 @@ public class ConsoleScriptResponseMessage extends RexProMessage {
         final List<String> bindings = new ArrayList<String>();
 
         for(Map.Entry pair: this.Bindings.entrySet()) {
-            bindings.add(pair.getKey() + "=" + pair.getValue().toString());
+            if (pair.getValue() == null) {
+                bindings.add(pair.getKey() + "=null");
+            } else {
+                bindings.add(pair.getKey() + "=" + pair.getValue().toString());
+            }
         }
 
         return bindings;
     }
 
-    public static byte[] convertBindingsToConsoleLineByteArray(final Bindings bindings) throws IOException {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        for (String key : bindings.keySet()) {
-            final Object val = bindings.get(key);
-            baos.write(BitWorks.convertStringsToByteArray(key + "=" + (val == null ? "null" : val.toString())));
-        }
-
-        return baos.toByteArray();
-    }
-
     public static List<String> convertResultToConsoleLines(final Object result) throws Exception {
         final ConsoleResultConverter converter = new ConsoleResultConverter(new StringWriter());
         return converter.convert(result);
-    }
-
-    private int estimateConsoleLineSize() {
-        int size = 0;
-        if (ConsoleLines != null) {
-            for(String cl : ConsoleLines) {
-                size = size + cl.length();
-            }
-        }
-
-        return size;
     }
 }
