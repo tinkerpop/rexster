@@ -46,7 +46,7 @@ public class RexProSession {
     public RexProSession(final String sessionKey, final RexsterApplication rexsterApplication, final int channel) {
         this.sessionKey = sessionKey;
         this.channel = channel;
-        this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, rexsterApplication);
+        this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, new RexsterApplicationHolder(rexsterApplication));
         this.rexsterApplication = rexsterApplication;
     }
 
@@ -57,7 +57,7 @@ public class RexProSession {
      * @param graphName: the name of the graph (in rexster.xml)
      * @param graphObjName: the variable name of the graph in the interpreter (usually "g")
      */
-    public void setGraphObj(String graphName, String graphObjName) throws RexProException{
+    public void setGraphObj(final String graphName, final String graphObjName) throws RexProException{
         graphObj = rexsterApplication.getGraph(graphName);
         if (graphObj == null) {
             throw new RexProException("the graph '" + graphName + "' was not found by Rexster");
