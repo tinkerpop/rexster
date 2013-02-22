@@ -15,6 +15,7 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -80,6 +81,10 @@ public class RexsterClient {
 
     /**
      * Sends a RexProMessage, and returns the received RexProMessage response.
+     *
+     * This method is for low-level operations with RexPro only.
+     *
+     * @param rawMessage message to send.
      */
     public RexProMessage execute(final RexProMessage rawMessage) throws RexProException, IOException {
         final ArrayBlockingQueue<Object> responseQueue = new ArrayBlockingQueue<Object>(1);
@@ -112,10 +117,25 @@ public class RexsterClient {
         return (RexProMessage) resultMessage;
     }
 
+    /**
+     * Send a script to a RexPro Server for execution and return the result.  No bindings are specified.
+     *
+     * @param script the script to execute
+     */
     public <T> List<T> execute(final String script) throws RexProException, IOException {
         return execute(script, null);
     }
 
+    /**
+     * Send a script to a RexPro Server for execution and return the result.
+     *
+     * Be sure that arguments sent are serializable by MsgPack or the object will not be bound properly on the
+     * server.  For example a complex object like java.util.Date will simply be serialized via toString and
+     * therefore will be referenced as such when accessed via the Gremlin script.
+     *
+     * @param script the script to execute
+     * @param scriptArgs the map becomes bindings.
+     */
     public <T> List<T> execute(final String script, final Map<String, Object> scriptArgs) throws RexProException, IOException {
         final ArrayBlockingQueue<Object> responseQueue = new ArrayBlockingQueue<Object>(1);
         final RexProMessage msgToSend = createNoSessionScriptRequest(script, scriptArgs);
