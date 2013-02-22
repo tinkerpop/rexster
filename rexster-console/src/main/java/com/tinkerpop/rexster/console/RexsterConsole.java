@@ -2,31 +2,41 @@ package com.tinkerpop.rexster.console;
 
 import com.tinkerpop.pipes.util.iterators.SingleIterator;
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.RemoteRexsterSession;
 import com.tinkerpop.rexster.protocol.ResultAndBindings;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.GraphSONScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProChannel;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import jline.ConsoleReader;
 import jline.History;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
-import javax.script.SimpleBindings;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class RexsterConsole {
+
+    static {
+        // disable all logging in console.
+        final List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
+        loggers.add(LogManager.getRootLogger());
+        for ( Logger logger : loggers ) {
+            logger.setLevel(Level.OFF);
+        }
+    }
 
     private RemoteRexsterSession session = null;
     private List<String> currentBindings = new ArrayList<String>();
