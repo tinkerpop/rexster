@@ -27,7 +27,7 @@ public class RemoteRexsterSession {
     private String password = "";
     private int channel;
 
-    private final RexPro rexProConnection;
+    private RexPro rexProConnection;
 
     private UUID sessionKey = RexProMessage.EMPTY_SESSION;
 
@@ -63,7 +63,13 @@ public class RemoteRexsterSession {
             try {
                 sessionRequestMessageToSend.validateMetaData();
             } catch (RexProException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
+            }
+
+            // if close() gets called then have to recreate the the connection here.  need to factor out this
+            // RexPro class.
+            if (this.rexProConnection == null) {
+                this.rexProConnection = new RexPro(rexProHost, rexProPort);
             }
 
             final RexProMessage rcvMessage = sendRequest(sessionRequestMessageToSend, 3);
@@ -171,6 +177,7 @@ public class RemoteRexsterSession {
                 }
 
                 rexProConnection.close();
+                rexProConnection = null;
             }
         } catch (Exception ex) {
             // likely fail is a null pointer on the session
