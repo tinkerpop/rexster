@@ -40,10 +40,16 @@ public class RexsterClientFactory {
         addProperty(RexsterClientTokens.CONFIG_CHANNEL, RexProChannel.CHANNEL_MSGPACK);
     }};
 
+    /**
+     * Creates a RexsterClient instance with default settings for the factory using localhost and 8184 for the port.
+     */
     public static RexsterClient open() throws Exception {
         return open(defaultConfiguration);
     }
 
+    /**
+     * Creates a RexsterClient instance with default settings for the factory using 8184 for the port.
+     */
     public static RexsterClient open(final String host) throws Exception {
         final BaseConfiguration specificConfiguration = new BaseConfiguration();
         specificConfiguration.addProperty(RexsterClientTokens.CONFIG_HOSTNAME, host);
@@ -51,6 +57,9 @@ public class RexsterClientFactory {
         return open(specificConfiguration);
     }
 
+    /**
+     * Creates a RexsterClient instance allowing override of host and port.
+     */
     public static RexsterClient open(final String host, final int port) throws Exception {
         final BaseConfiguration specificConfiguration = new BaseConfiguration();
         specificConfiguration.addProperty(RexsterClientTokens.CONFIG_HOSTNAME, host);
@@ -59,6 +68,11 @@ public class RexsterClientFactory {
         return open(specificConfiguration);
     }
 
+    /**
+     * Creates a RexsterClient instance using 8184 for the port and allowing explicit specification of the
+     * name of the graph to connect to.  Passing a value other than null will automatically establish a binding
+     * variable called "g" for the graph name specified.
+     */
     public static RexsterClient open(final String host, final String graphName) throws Exception {
         final BaseConfiguration specificConfiguration = new BaseConfiguration();
         specificConfiguration.addProperty(RexsterClientTokens.CONFIG_HOSTNAME, host);
@@ -67,6 +81,11 @@ public class RexsterClientFactory {
         return open(specificConfiguration);
     }
 
+    /**
+     * Creates a RexsterClient instance allowing explicit specification of the name of the graph to connect to.
+     * Passing a value other than null will automatically establish a binding variable called "g" for the graph
+     * name specified.
+     */
     public static RexsterClient open(final String host, final int port, final String graphName) throws Exception {
         final BaseConfiguration specificConfiguration = new BaseConfiguration();
         specificConfiguration.addProperty(RexsterClientTokens.CONFIG_HOSTNAME, host);
@@ -76,10 +95,16 @@ public class RexsterClientFactory {
         return open(specificConfiguration);
     }
 
+    /**
+     * Create a RexsterClient instance allowing override of all settings.
+     */
     public static RexsterClient open(final Map<String,Object> configuration) throws Exception {
         return open(new MapConfiguration(configuration));
     }
 
+    /**
+     * Create a RexsterClient instance allowing override of all settings.
+     */
     public static RexsterClient open(final Configuration specificConfiguration) throws Exception {
 
         final CompositeConfiguration jointConfig = new CompositeConfiguration();

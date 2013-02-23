@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class RexsterClientHandler extends BaseFilter {
+class RexsterClientHandler extends BaseFilter {
     private RexsterClient client;
 
     public void setClient(final RexsterClient client) {
