@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.rexster.client.RexsterClientFactory;
 import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.server.RexProRexsterServer;
 import com.tinkerpop.rexster.server.RexsterApplication;

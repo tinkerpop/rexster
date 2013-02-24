@@ -2,10 +2,14 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
+import com.tinkerpop.rexster.client.RexsterClientTokens;
 import junit.framework.Assert;
+import org.apache.commons.configuration.BaseConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -80,4 +84,58 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         Assert.assertEquals("marko", vertexResult.get("name"));
         Assert.assertEquals(29, vertexResult.get("age"));
     }
+
+    @Test
+    public void executeReturnGraphElementsAsSelectValueConversion() throws Exception {
+        final RexsterClient client = RexsterClientFactory.open();
+
+        final List<List<Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1).as('a').out.as('b').select{it.name}{it.age}");
+        Assert.assertEquals(3, vertexResults.size());
+        Assert.assertEquals("marko", vertexResults.get(0).get(0));
+        Assert.assertEquals(27, vertexResults.get(0).get(1));
+        Assert.assertEquals("marko", vertexResults.get(1).get(0));
+        Assert.assertEquals(32, vertexResults.get(1).get(1));
+        Assert.assertEquals("marko", vertexResults.get(2).get(0));
+        Assert.assertNull(vertexResults.get(2).get(1));
+    }
+
+    @Test
+    public void executeTransactionWithAutoCommitInSessionlessMode() throws Exception {
+        final Configuration conf = new BaseConfiguration();
+        conf.setProperty(RexsterClientTokens.CONFIG_GRAPH_NAME, "neo4jsample");
+        final RexsterClient rexsterClientToNeo4j = RexsterClientFactory.open(conf);
+
+        final List<Object> results = rexsterClientToNeo4j.execute("g.addVertex([name:n])",
+                new HashMap<String,Object>() {{
+                    put("n","vadas");
+                }});
+        Assert.assertEquals(1, results.size());
+
+        final List<Map<String,Object>> txResults = rexsterClientToNeo4j.execute("g.V");
+        Assert.assertEquals(1, txResults.size());
+        final Map<String, Object> vertexResult = txResults.get(0);
+        Assert.assertEquals("vadas", ((Map<String,Object>)vertexResult.get("_properties")).get("name"));
+
+    }
+
+    /*
+    @Test
+    public void executeTransactionWithNoAutoCommitInSessionlessMode() throws Exception {
+        final Configuration conf = new BaseConfiguration();
+        conf.setProperty(RexsterClientTokens.CONFIG_GRAPH_NAME, "orientdbsample");
+        conf.setProperty(RexsterClientTokens.CONFIG_TRANSACTION, false);
+        final RexsterClient rexsterClientToNeo4j = RexsterClientFactory.open(conf);
+
+        final List<Object> results = rexsterClientToNeo4j.execute("g.addVertex([name:n])",
+                new HashMap<String,Object>() {{
+                    put("n","vadas");
+                }});
+        Assert.assertEquals(1, results.size());
+
+        final List<Object> txResults = rexsterClientToNeo4j.execute("g.V");
+        Assert.assertEquals(1, txResults.size());
+        Assert.assertNull(txResults.get(0));
+
+    }
+    */
 }

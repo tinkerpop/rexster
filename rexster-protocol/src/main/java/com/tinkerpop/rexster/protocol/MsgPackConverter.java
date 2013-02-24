@@ -183,6 +183,8 @@ public class MsgPackConverter {
                 dst.put(key, val);
             }
             o = dst;
+        } else if (v.isNilValue()) {
+            o = null;
         } else {
             // includes raw value
             o = v.asRawValue().getString();
