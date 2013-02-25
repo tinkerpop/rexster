@@ -52,6 +52,19 @@ public class ScriptFilter extends BaseFilter {
         try {
             specificMessage.validateMetaData();
             if (specificMessage.metaGetInSession()) {
+                if (specificMessage.Session == null) {
+                    logger.error("no session key on message");
+                    ctx.write(
+                        MessageUtil.createErrorResponse(
+                            specificMessage.Request,
+                            RexProMessage.EMPTY_SESSION_AS_BYTES,
+                            ErrorResponseMessage.INVALID_SESSION_ERROR,
+                            "There was no session key on the message, set the meta field 'inSession' to true if you want to execute sessionless requests"
+                        )
+                    );
+
+                }
+
                 //session script request
                 final RexProSession session = RexProSessions.getSession(specificMessage.sessionAsUUID().toString());
 
