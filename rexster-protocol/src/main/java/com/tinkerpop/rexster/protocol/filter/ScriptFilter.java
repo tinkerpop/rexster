@@ -18,8 +18,7 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Processes a ScriptRequestMessage against the script engine for the channel.
@@ -53,6 +52,19 @@ public class ScriptFilter extends BaseFilter {
         try {
             specificMessage.validateMetaData();
             if (specificMessage.metaGetInSession()) {
+                if (specificMessage.Session == null) {
+                    logger.error("no session key on message");
+                    ctx.write(
+                        MessageUtil.createErrorResponse(
+                            specificMessage.Request,
+                            RexProMessage.EMPTY_SESSION_AS_BYTES,
+                            ErrorResponseMessage.INVALID_SESSION_ERROR,
+                            "There was no session key on the message, set the meta field 'inSession' to true if you want to execute sessionless requests"
+                        )
+                    );
+
+                }
+
                 //session script request
                 final RexProSession session = RexProSessions.getSession(specificMessage.sessionAsUUID().toString());
 
@@ -75,9 +87,7 @@ public class ScriptFilter extends BaseFilter {
 
                 // start transaction
                 if (graph != null && specificMessage.metaGetTransaction()) {
-                    if (graph instanceof TransactionalGraph) {
-                        ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
-                    }
+                    tryRollbackTransaction(graph);
                 }
 
                 try {
@@ -103,22 +113,21 @@ public class ScriptFilter extends BaseFilter {
                         logger.warn(String.format("Session is configured for a channel that does not exist: [%s]", session.getChannel()));
                     }
 
+                    //serialize before closing the transaction and result objects go out of scope
+                    byte[] messageBytes = RexProMessage.serialize(resultMessage);
+
                     //commit transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
-                        if (graph instanceof TransactionalGraph) {
-                            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-                        }
+                        tryCommitTransaction(graph);
                     }
 
                     // write the message after the transaction so that we can be assured that it properly committed
                     // if auto-commit was on
-                    ctx.write(resultMessage);
+                    ctx.write(messageBytes);
                 } catch (Exception ex) {
                     // rollback transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
-                        if (graph instanceof TransactionalGraph) {
-                            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
-                        }
+                        tryRollbackTransaction(graph);
                     }
                     throw ex;
                 }
@@ -156,13 +165,11 @@ public class ScriptFilter extends BaseFilter {
 
                 // start transaction
                 if (graph != null && specificMessage.metaGetTransaction()) {
-                    if (graph instanceof TransactionalGraph) {
-                        ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
-                    }
+                    tryRollbackTransaction(graph);
                 }
 
                 try {
-                    final Object result = scriptEngine.eval(specificMessage.Script, bindings);
+                    Object result = scriptEngine.eval(specificMessage.Script, bindings);
 
                     RexProMessage resultMessage = null;
                     if (specificMessage.metaGetChannel() == RexProChannel.CHANNEL_CONSOLE) {
@@ -178,22 +185,21 @@ public class ScriptFilter extends BaseFilter {
                         logger.warn(String.format("Sessionless request is configured for a channel that does not exist: [%s]", specificMessage.metaGetChannel()));
                     }
 
+                    //serialize before closing the transaction and result objects go out of scope
+                    byte[] messageBytes = RexProMessage.serialize(resultMessage);
+
                     // commit transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
-                        if (graph instanceof TransactionalGraph) {
-                            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-                        }
+                        tryCommitTransaction(graph);
                     }
 
                     // write the message after the transaction so that we can be assured that it properly committed
                     // if auto-commit was on
-                    ctx.write(resultMessage);
+                    ctx.write(messageBytes);
                 } catch (Exception ex) {
                     // rollback transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
-                        if (graph instanceof TransactionalGraph) {
-                            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
-                        }
+                        tryRollbackTransaction(graph);
                     }
                     throw ex;
                 }
@@ -232,6 +238,18 @@ public class ScriptFilter extends BaseFilter {
             );
         }
         return ctx.getStopAction();
+    }
+
+    private static void tryRollbackTransaction(final Graph graph) {
+        if (graph.getFeatures().supportsTransactions && graph instanceof TransactionalGraph) {
+            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        }
+    }
+
+    private static void tryCommitTransaction(final Graph graph) {
+        if (graph.getFeatures().supportsTransactions && graph instanceof TransactionalGraph) {
+            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        }
     }
 
     /**

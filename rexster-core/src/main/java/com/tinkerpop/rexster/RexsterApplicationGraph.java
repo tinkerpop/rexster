@@ -94,7 +94,8 @@ public class RexsterApplicationGraph {
      */
     public TransactionalGraph tryGetTransactionalGraph() {
         TransactionalGraph transactionalGraph = null;
-        if (this.graph instanceof TransactionalGraph) {
+        if (this.graph.getFeatures().supportsTransactions
+                && this.graph instanceof TransactionalGraph) {
             transactionalGraph = (TransactionalGraph) graph;
         }
 
