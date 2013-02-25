@@ -13,6 +13,7 @@ import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import junit.framework.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -71,30 +72,32 @@ public class SessionRequestMessageTests extends AbstractRexProIntegrationTest {
     public void testSessionGraphDefinition() throws Exception {
         final RexsterClient client = RexsterClientFactory.open();
 
-        //create a session
-        final SessionRequestMessage outMsg = new SessionRequestMessage();
-        outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
-        outMsg.setRequestAsUUID(UUID.randomUUID());
-        outMsg.metaSetGraphName("emptygraph");
-        outMsg.metaSetGraphObjName("graph");
+        for(String graphName : getAvailableGraphs(client)) {
+            //create a session
+            final SessionRequestMessage outMsg = new SessionRequestMessage();
+            outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
+            outMsg.setRequestAsUUID(UUID.randomUUID());
+            outMsg.metaSetGraphName(graphName);
+            outMsg.metaSetGraphObjName("graph");
 
-        RexProMessage inMsg = client.execute(outMsg);
-        Assert.assertNotNull(inMsg.Session);
-        Assert.assertTrue(inMsg instanceof SessionResponseMessage);
+            RexProMessage inMsg = client.execute(outMsg);
+            Assert.assertNotNull(inMsg.Session);
+            Assert.assertTrue(inMsg instanceof SessionResponseMessage);
 
-        UUID sessionKey = BitWorks.convertByteArrayToUUID(inMsg.Session);
+            UUID sessionKey = BitWorks.convertByteArrayToUUID(inMsg.Session);
 
-        //try to use the graph on the session
-        final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
-        scriptMessage.Script = "graph.addVertex()";
-        scriptMessage.LanguageName = "groovy";
-        scriptMessage.metaSetInSession(true);
-        scriptMessage.setRequestAsUUID(UUID.randomUUID());
-        scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
+            //try to use the graph on the session
+            final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
+            scriptMessage.Script = "graph.addVertex()";
+            scriptMessage.LanguageName = "groovy";
+            scriptMessage.metaSetInSession(true);
+            scriptMessage.setRequestAsUUID(UUID.randomUUID());
+            scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
 
-        inMsg = client.execute(scriptMessage);
-        Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
+            inMsg = client.execute(scriptMessage);
+            Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
+            Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
+        }
     }
 
     /**

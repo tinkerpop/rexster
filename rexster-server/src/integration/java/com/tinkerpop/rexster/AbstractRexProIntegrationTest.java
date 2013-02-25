@@ -1,7 +1,13 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.client.RexProException;
+import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
 import com.tinkerpop.rexster.protocol.EngineController;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import com.tinkerpop.rexster.server.RexProRexsterServer;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.server.RexsterServer;
@@ -12,7 +18,10 @@ import org.junit.After;
 import org.junit.Before;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public abstract class AbstractRexProIntegrationTest {
 
@@ -73,5 +82,27 @@ public abstract class AbstractRexProIntegrationTest {
 
         return directory.delete();
     }
+
+    public static ArrayList<String> getAvailableGraphs(RexsterClient client) throws RexProException, IOException {
+        //try to use the graph on the session
+        final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
+        scriptMessage.Script = "rexster.getGraphNames()";
+        scriptMessage.LanguageName = "groovy";
+        scriptMessage.metaSetInSession(false);
+        scriptMessage.setRequestAsUUID(UUID.randomUUID());
+
+        RexProMessage inMsg = client.execute(scriptMessage);
+
+        if (inMsg instanceof ErrorResponseMessage) {
+            throw new RexProException(((ErrorResponseMessage) inMsg).ErrorMessage);
+        } else if (!(inMsg instanceof MsgPackScriptResponseMessage)) {
+            throw new RexProException("wrong response type");
+        }
+
+        MsgPackScriptResponseMessage msg = (MsgPackScriptResponseMessage) inMsg;
+
+        return (ArrayList<String>) msg.Results.get();
+    }
+
 
 }
