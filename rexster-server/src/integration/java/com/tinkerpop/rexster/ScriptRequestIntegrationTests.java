@@ -14,6 +14,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import javax.script.SimpleBindings;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -27,12 +28,12 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
     public void testGraphObjMetaOnSessionlessRequest() throws Exception {
         final RexsterClient client = RexsterClientFactory.open();
 
-        for(String graphName : getAvailableGraphs(client)) {
+        for (Map.Entry<String, Map<String,String>> entry : getAvailableGraphs(client).entrySet()) {
             final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
             scriptMessage.Script = "graph.addVertex()";
             scriptMessage.LanguageName = "groovy";
             scriptMessage.metaSetInSession(false);
-            scriptMessage.metaSetGraphName(graphName);
+            scriptMessage.metaSetGraphName(entry.getKey());
             scriptMessage.metaSetGraphObjName("graph");
             scriptMessage.setRequestAsUUID(UUID.randomUUID());
             scriptMessage.Session = null;
@@ -51,11 +52,11 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
         final RexsterClient client = RexsterClientFactory.open();
 
         //create a session
-        for(String graphName : getAvailableGraphs(client)) {
+        for (Map.Entry<String, Map<String,String>> entry : getAvailableGraphs(client).entrySet()) {
             final SessionRequestMessage outMsg = new SessionRequestMessage();
             outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
             outMsg.setRequestAsUUID(UUID.randomUUID());
-            outMsg.metaSetGraphName(graphName);
+            outMsg.metaSetGraphName(entry.getKey());
 
             RexProMessage inMsg = client.execute(outMsg);
             Assert.assertNotNull(inMsg.Session);
@@ -97,7 +98,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
         final RexsterClient client = RexsterClientFactory.open();
         RexProMessage inMsg;
 
-        for(String graphName : getAvailableGraphs(client)) {
+        for (Map.Entry<String, Map<String,String>> entry : getAvailableGraphs(client).entrySet()) {
             //create a session
             final SessionRequestMessage outMsg = new SessionRequestMessage();
             outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
@@ -114,7 +115,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
             scriptMessage.Script = "g.addVertex()";
             scriptMessage.LanguageName = "groovy";
             scriptMessage.metaSetInSession(true);
-            scriptMessage.metaSetGraphName(graphName);
+            scriptMessage.metaSetGraphName(entry.getKey());
             scriptMessage.setRequestAsUUID(UUID.randomUUID());
             scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
 
@@ -141,12 +142,12 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
     public void testGraphObjMetaOnSessionWithExistingGraphObjFails() throws Exception {
         final RexsterClient client = RexsterClientFactory.open();
 
-        for(String graphName : getAvailableGraphs(client)) {
+        for (Map.Entry<String, Map<String,String>> entry : getAvailableGraphs(client).entrySet()) {
             //create a session
             final SessionRequestMessage outMsg = new SessionRequestMessage();
             outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
             outMsg.setRequestAsUUID(UUID.randomUUID());
-            outMsg.metaSetGraphName(graphName);
+            outMsg.metaSetGraphName(entry.getKey());
 
             RexProMessage inMsg = client.execute(outMsg);
             Assert.assertNotNull(inMsg.Session);
@@ -174,7 +175,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
     public void testChannelChangeFails() throws Exception {
         final RexsterClient client = RexsterClientFactory.open();
 
-        for(String graphName : getAvailableGraphs(client)) {
+        for (Map.Entry<String, Map<String,String>> entry : getAvailableGraphs(client).entrySet()) {
             //create a session
             final SessionRequestMessage outMsg = new SessionRequestMessage();
             outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
@@ -191,7 +192,7 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
             scriptMessage.Script = "graph.addVertex()";
             scriptMessage.LanguageName = "groovy";
             scriptMessage.metaSetInSession(true);
-            scriptMessage.metaSetGraphName(graphName);
+            scriptMessage.metaSetGraphName(entry.getKey());
             scriptMessage.metaSetChannel(RexProChannel.CHANNEL_GRAPHSON);
             scriptMessage.setRequestAsUUID(UUID.randomUUID());
             scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
@@ -343,12 +344,12 @@ public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest
     public void testTransactionMetaFlagWithSession() throws Exception {
         final RexsterClient client = RexsterClientFactory.open();
 
-        for(String graphName : getAvailableGraphs(client)) {
+        for (Map.Entry<String, Map<String,String>> entry : getAvailableGraphs(client).entrySet()) {
             final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
             scriptMessage.Script = "graph.addVertex()";
             scriptMessage.LanguageName = "groovy";
             scriptMessage.metaSetInSession(false);
-            scriptMessage.metaSetGraphName(graphName);
+            scriptMessage.metaSetGraphName(entry.getKey());
             scriptMessage.metaSetGraphObjName("graph");
             scriptMessage.metaSetTransaction(true);
             scriptMessage.setRequestAsUUID(UUID.randomUUID());

@@ -14,6 +14,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -72,12 +73,12 @@ public class SessionRequestMessageTests extends AbstractRexProIntegrationTest {
     public void testSessionGraphDefinition() throws Exception {
         final RexsterClient client = RexsterClientFactory.open();
 
-        for(String graphName : getAvailableGraphs(client)) {
+        for (Map.Entry<String, Map<String,String>> entry : getAvailableGraphs(client).entrySet()) {
             //create a session
             final SessionRequestMessage outMsg = new SessionRequestMessage();
             outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
             outMsg.setRequestAsUUID(UUID.randomUUID());
-            outMsg.metaSetGraphName(graphName);
+            outMsg.metaSetGraphName(entry.getKey());
             outMsg.metaSetGraphObjName("graph");
 
             RexProMessage inMsg = client.execute(outMsg);

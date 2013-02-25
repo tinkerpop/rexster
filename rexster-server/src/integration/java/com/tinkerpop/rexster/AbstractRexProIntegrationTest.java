@@ -18,8 +18,8 @@ import org.junit.Before;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public abstract class AbstractRexProIntegrationTest {
@@ -82,10 +82,10 @@ public abstract class AbstractRexProIntegrationTest {
         return directory.delete();
     }
 
-    public static ArrayList<String> getAvailableGraphs(final RexsterClient client) throws RexProException, IOException {
+    public static Map<String, Map<String,String>> getAvailableGraphs(final RexsterClient client) throws RexProException, IOException {
         //try to use the graph on the session
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
-        scriptMessage.Script = "rexster.getGraphNames()";
+        scriptMessage.Script = "merged=[:];rexster.getGraphNames().collect{[(\"${it}\".toString()):rexster.getGraph(it).features.toMap()]}.collectMany{it.entrySet()}.each{merged[it.key] = it.value};merged";
         scriptMessage.LanguageName = "groovy";
         scriptMessage.metaSetInSession(false);
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
@@ -100,7 +100,7 @@ public abstract class AbstractRexProIntegrationTest {
 
         final MsgPackScriptResponseMessage msg = (MsgPackScriptResponseMessage) inMsg;
 
-        return (ArrayList<String>) msg.Results.get();
+        return (Map<String, Map<String,String>>) msg.Results.get();
     }
 
 }
