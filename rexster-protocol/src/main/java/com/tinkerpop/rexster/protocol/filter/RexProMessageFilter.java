@@ -128,8 +128,24 @@ public class RexProMessageFilter extends BaseFilter {
     }
 
     public NextAction handleWrite(final FilterChainContext ctx) throws IOException {
+
+        Object rawMsg = ctx.getMessage();
+        if(rawMsg instanceof byte[]) {
+            byte[] bytes = (byte[]) rawMsg;
+
+            // Retrieve the memory manager
+            final MemoryManager memoryManager = ctx.getConnection().getTransport().getMemoryManager();
+            final Buffer bb = memoryManager.allocate(bytes.length);
+            bb.put(bytes);
+
+            // Set the Buffer as a context message
+            ctx.setMessage(bb.flip());
+            // Instruct the FilterChain to call the next filter
+            return ctx.getInvokeAction();
+        }
+
         // Get the source message to be written
-        RexProMessage msg = ctx.getMessage();
+        RexProMessage msg = (RexProMessage) rawMsg;
 
         final ByteArrayOutputStream rexProMessageStream = new ByteArrayOutputStream();
         //TODO: create RexProMessageMeta template

@@ -18,8 +18,7 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Processes a ScriptRequestMessage against the script engine for the channel.
@@ -103,6 +102,9 @@ public class ScriptFilter extends BaseFilter {
                         logger.warn(String.format("Session is configured for a channel that does not exist: [%s]", session.getChannel()));
                     }
 
+                    //serialize before closing the transaction and result objects go out of scope
+                    byte[] messageBytes = RexProMessage.serialize(resultMessage);
+
                     //commit transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
                         if (graph instanceof TransactionalGraph) {
@@ -112,7 +114,7 @@ public class ScriptFilter extends BaseFilter {
 
                     // write the message after the transaction so that we can be assured that it properly committed
                     // if auto-commit was on
-                    ctx.write(resultMessage);
+                    ctx.write(messageBytes);
                 } catch (Exception ex) {
                     // rollback transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
@@ -162,7 +164,7 @@ public class ScriptFilter extends BaseFilter {
                 }
 
                 try {
-                    final Object result = scriptEngine.eval(specificMessage.Script, bindings);
+                    Object result = scriptEngine.eval(specificMessage.Script, bindings);
 
                     RexProMessage resultMessage = null;
                     if (specificMessage.metaGetChannel() == RexProChannel.CHANNEL_CONSOLE) {
@@ -178,6 +180,9 @@ public class ScriptFilter extends BaseFilter {
                         logger.warn(String.format("Sessionless request is configured for a channel that does not exist: [%s]", specificMessage.metaGetChannel()));
                     }
 
+                    //serialize before closing the transaction and result objects go out of scope
+                    byte[] messageBytes = RexProMessage.serialize(resultMessage);
+
                     // commit transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
                         if (graph instanceof TransactionalGraph) {
@@ -187,7 +192,7 @@ public class ScriptFilter extends BaseFilter {
 
                     // write the message after the transaction so that we can be assured that it properly committed
                     // if auto-commit was on
-                    ctx.write(resultMessage);
+                    ctx.write(messageBytes);
                 } catch (Exception ex) {
                     // rollback transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
