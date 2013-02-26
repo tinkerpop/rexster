@@ -46,7 +46,7 @@ public class MsgPackConverter {
                 final Element element = (Element) object;
                 final Set<String> propertyKeys = element.getPropertyKeys();
                 final int propertySize = propertyKeys.size();
-                final boolean isVertex = element instanceof Vertex;
+                final boolean isVertex = !(element instanceof Edge);
                 final int elementSize = (isVertex ? 2 : 5) + ((propertySize > 0) ? 1 : 0);
 
                 packer.writeMapBegin(elementSize);
