@@ -46,7 +46,7 @@ public class MsgPackConverter {
                 final Element element = (Element) object;
                 final Set<String> propertyKeys = element.getPropertyKeys();
                 final int propertySize = propertyKeys.size();
-                final boolean isVertex = element instanceof Vertex;
+                final boolean isVertex = !(element instanceof Edge);
                 final int elementSize = (isVertex ? 2 : 5) + ((propertySize > 0) ? 1 : 0);
 
                 packer.writeMapBegin(elementSize);
@@ -104,9 +104,11 @@ public class MsgPackConverter {
             final Table table = (Table) object;
             final Iterator<Row> rows = table.iterator();
 
+            packer.writeArrayBegin(table.size());
             while (rows.hasNext()) {
                 serializeObject(rows.next(), packer);
             }
+            packer.writeArrayEnd();
 
         } else if (object instanceof Row) {
             final Row row = (Row) object;
@@ -117,7 +119,6 @@ public class MsgPackConverter {
                 packer.write(columnName);
                 serializeObject(row.getColumn(columnName), packer);
             }
-
             packer.writeMapEnd(false);
 
         } else if (object instanceof Iterable) {
