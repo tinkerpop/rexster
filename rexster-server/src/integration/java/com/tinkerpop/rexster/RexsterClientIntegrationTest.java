@@ -89,14 +89,14 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
     public void executeReturnGraphElementsAsSelectValueConversion() throws Exception {
         final RexsterClient client = RexsterClientFactory.open();
 
-        final List<List<Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1).as('a').out.as('b').select{it.name}{it.age}");
+        final List<Map<String,Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1).as('a').out.as('b').select{it.name}{it.age}");
         Assert.assertEquals(3, vertexResults.size());
-        Assert.assertEquals("marko", vertexResults.get(0).get(0));
-        Assert.assertEquals(27, vertexResults.get(0).get(1));
-        Assert.assertEquals("marko", vertexResults.get(1).get(0));
-        Assert.assertEquals(32, vertexResults.get(1).get(1));
-        Assert.assertEquals("marko", vertexResults.get(2).get(0));
-        Assert.assertNull(vertexResults.get(2).get(1));
+        Assert.assertEquals("marko", vertexResults.get(0).get("a"));
+        Assert.assertEquals(27, vertexResults.get(0).get("b"));
+        Assert.assertEquals("marko", vertexResults.get(1).get("a"));
+        Assert.assertEquals(32, vertexResults.get(1).get("b"));
+        Assert.assertEquals("marko", vertexResults.get(2).get("a"));
+        Assert.assertNull(vertexResults.get(2).get("b"));
     }
 
     @Test

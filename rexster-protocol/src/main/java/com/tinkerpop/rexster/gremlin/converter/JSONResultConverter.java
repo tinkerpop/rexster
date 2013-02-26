@@ -19,9 +19,9 @@ import java.util.Set;
  */
 public class JSONResultConverter implements ResultConverter<JSONArray> {
 
-    private GraphSONMode mode = GraphSONMode.NORMAL;
-    private long offsetStart = 0L;
-    private long offsetEnd = Long.MAX_VALUE;
+    private final GraphSONMode mode;
+    private final long offsetStart;
+    private final long offsetEnd;
     private final Set<String> returnKeys;
 
 
@@ -33,28 +33,22 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
         this.returnKeys = returnKeys;
     }
 
-    public JSONArray convert(Object result) throws Exception {
+    public JSONArray convert(final Object result) throws Exception {
         JSONArray results = new JSONArray();
         if (result == null) {
             // for example a script like g.clear()
             results = null;
 
         } else if (result instanceof Table) {
-            Table table = (Table) result;
-            Iterator<Row> rows = table.iterator();
+            final Table table = (Table) result;
+            final Iterator<Row> rows = table.iterator();
 
-            List<String> columnNames = table.getColumnNames();
             long counter = 0;
 
             while (rows.hasNext()) {
-                Row row = rows.next();
+                final Row row = rows.next();
                 if (counter >= this.offsetStart && counter < this.offsetEnd) {
-                    Map<String, Object> map = new HashMap<String, Object>();
-                    for (String columnName : columnNames) {
-                        map.put(columnName, prepareOutput(row.getColumn(columnName)));
-                    }
-
-                    results.put(new JSONObject(map));
+                    results.put(prepareOutput(row));
                 }
 
                 if (counter >= this.offsetEnd) {
@@ -77,7 +71,7 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
                 counter++;
             }
         } else if (result instanceof Iterator) {
-            Iterator itty = (Iterator) result;
+            final Iterator itty = (Iterator) result;
 
             long counter = 0;
             while (itty.hasNext()) {
@@ -99,15 +93,24 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
         return results;
     }
 
-    private Object prepareOutput(Object object) throws Exception {
+    private Object prepareOutput(final Object object) throws Exception {
         if (object == null) {
             return null;
         }
         if (object instanceof Element) {
             return GraphSONUtility.jsonFromElement((Element) object, returnKeys, this.mode);
+        } else if (object instanceof Row) {
+            final Row row = (Row) object;
+            final List<String> columnNames = row.getColumnNames();
+            final Map<String, Object> map = new HashMap<String, Object>();
+            for (String columnName : columnNames) {
+                map.put(columnName, prepareOutput(row.getColumn(columnName)));
+            }
+
+            return new JSONObject(map);
         } else if (object instanceof Map) {
-            JSONObject jsonObject = new JSONObject();
-            Map map = (Map) object;
+            final JSONObject jsonObject = new JSONObject();
+            final Map map = (Map) object;
             for (Object key : map.keySet()) {
                 // force an error here by passing in a null key to the JSONObject.  That way a good error message
                 // gets back to the user.

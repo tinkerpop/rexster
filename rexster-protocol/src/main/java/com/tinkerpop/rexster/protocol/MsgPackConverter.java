@@ -104,19 +104,22 @@ public class MsgPackConverter {
             final Table table = (Table) object;
             final Iterator<Row> rows = table.iterator();
 
-            final List<String> columnNames = table.getColumnNames();
-
             while (rows.hasNext()) {
-                final Row row = rows.next();
-
-                packer.writeMapBegin(table.size());
-                for (String columnName : columnNames) {
-                    packer.write(columnName);
-                    serializeObject(row.getColumn(columnName), packer);
-                }
-
-                packer.writeMapEnd(false);
+                serializeObject(rows.next(), packer);
             }
+
+        } else if (object instanceof Row) {
+            final Row row = (Row) object;
+            final List<String> columnNames = row.getColumnNames();
+
+            packer.writeMapBegin(columnNames.size());
+            for (String columnName : columnNames) {
+                packer.write(columnName);
+                serializeObject(row.getColumn(columnName), packer);
+            }
+
+            packer.writeMapEnd(false);
+
         } else if (object instanceof Iterable) {
             Collection contents;
             if (object instanceof Collection) {
