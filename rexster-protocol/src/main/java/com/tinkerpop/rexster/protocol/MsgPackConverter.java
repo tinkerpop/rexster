@@ -27,6 +27,15 @@ import java.util.Set;
  */
 public class MsgPackConverter {
 
+    static Object serializeElementId(final Element element) {
+        final Object id = element.getId();
+        if (id.getClass().isPrimitive()) {
+            return id;
+        } else {
+            return id.toString();
+        }
+    }
+
     static public void serializeObject(final Object object, final Packer packer) throws Exception {
         if (object == null) {
             packer.write(ValueFactory.createNilValue());
@@ -42,12 +51,7 @@ public class MsgPackConverter {
 
                 packer.writeMapBegin(elementSize);
                 packer.write(Tokens._ID);
-                final Object id = element.getId();
-                if (id.getClass().isPrimitive()) {
-                    packer.write(id);
-                } else {
-                    packer.write(id.toString());
-                }
+                packer.write(serializeElementId(element));
 
                 if (isVertex) {
                     packer.write(Tokens._TYPE);
@@ -57,9 +61,9 @@ public class MsgPackConverter {
                     packer.write(Tokens._TYPE);
                     packer.write(Tokens.EDGE);
                     packer.write(Tokens._IN_V);
-                    packer.write(edge.getVertex(Direction.IN).getId());
+                    packer.write(serializeElementId(edge.getVertex(Direction.IN)));
                     packer.write(Tokens._OUT_V);
-                    packer.write(edge.getVertex(Direction.OUT).getId());
+                    packer.write(serializeElementId(edge.getVertex(Direction.OUT)));
                     packer.write(Tokens._LABEL);
                     packer.write(edge.getLabel());
                 }
