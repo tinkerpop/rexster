@@ -28,6 +28,7 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 * Improve logging configurability.
 * @RexsterClient@ for Java connectivity to Rexster through RexPro.
 * Enable or disable Dog House through @rexster.xml@
+* Fix JSON serialization of @Row@ results as a @Map@ from the Gremlin Extension.
 
 h3. Version 2.2.0 (December 19, 2012)
 
