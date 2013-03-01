@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.gremlin.converter;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.pipes.util.structures.Table;
+import com.tinkerpop.rexster.protocol.MsgPackConverter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.msgpack.MessagePack;
@@ -52,17 +53,18 @@ public class MsgPackResultConverterTest {
 
         Assert.assertNotNull(results);
 
-        final BufferUnpacker unpacker = msgpack.createBufferUnpacker(results);
 
-        final Template<Map<String, String>> mapTmpl = tMap(TString, TString);
+        final Object unpackedObj = MsgPackConverter.deserializeObject(this.msgpack.read(results));
+        Assert.assertTrue(unpackedObj instanceof ArrayList);
+        final ArrayList unpacked = (ArrayList) unpackedObj;
 
-        Map<String, String> mapX = unpacker.read(mapTmpl);
+        Map<String, String> mapX = (Map<String, String>) unpacked.get(0);
         Assert.assertTrue(mapX.containsKey("col1"));
         Assert.assertTrue(mapX.containsKey("col2"));
         Assert.assertEquals("x1", mapX.get("col1"));
         Assert.assertEquals("x2", mapX.get("col2"));
 
-        Map<String, String> mapY = unpacker.read(mapTmpl);
+        Map<String, String> mapY = (Map<String, String>) unpacked.get(1);
         Assert.assertTrue(mapY.containsKey("col1"));
         Assert.assertTrue(mapY.containsKey("col2"));
         Assert.assertEquals("y1", mapY.get("col1"));
