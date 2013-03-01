@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.pipes.util.structures.Row;
 import com.tinkerpop.pipes.util.structures.Table;
+import com.tinkerpop.pipes.util.structures.Tree;
 import com.tinkerpop.rexster.Tokens;
 import org.msgpack.packer.Packer;
 import org.msgpack.type.ArrayValue;
@@ -92,6 +93,8 @@ public class MsgPackConverter {
                 // in some graphs v will go out of scope, yet it is still on the bindings as a Vertex object.
                 packer.writeNil();
             }
+        } else if (object instanceof Tree) {
+            packer.write("tree");
         } else if (object instanceof Map) {
             final Map map = (Map) object;
             packer.writeMapBegin(map.size());

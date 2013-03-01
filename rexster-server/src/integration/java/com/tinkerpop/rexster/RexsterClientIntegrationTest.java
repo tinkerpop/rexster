@@ -159,6 +159,18 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
 
     }
 
+    @Test
+    public void executeAndReturnTree() throws Exception {
+        final RexsterClient client = RexsterClientFactory.open();
+
+        final List<String> treeResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.V.out.tree.cap");
+        Assert.assertEquals(1, treeResults.size());
+        Assert.assertEquals("tree", treeResults.get(0));
+
+        client.close();
+
+    }
+
     /* this test fails on neo4j given inconsistencies in its blueprints implementation.  a failing test
        was added to blueprints here:
        https://github.com/tinkerpop/blueprints/issues/363
