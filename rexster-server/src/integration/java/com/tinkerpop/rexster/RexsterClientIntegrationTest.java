@@ -139,8 +139,8 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
 
     }
 
-    /*
-    // @Test
+
+    @Test
     public void executeAndReturnMapWithNonPrimitiveKey() throws Exception {
         // non primitive keys in maps should be serialized via toString.  there really isn't much choice since
         // MsgPack, JSON, etc. don't support other options.
@@ -158,7 +158,6 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         client.close();
 
     }
-    */
 
     /* this test fails on neo4j given inconsistencies in its blueprints implementation.  a failing test
        was added to blueprints here:

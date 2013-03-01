@@ -14,6 +14,7 @@ import org.msgpack.type.NilValue;
 import org.msgpack.type.Value;
 import org.msgpack.type.ValueFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -93,10 +94,9 @@ public class MsgPackConverter {
             }
         } else if (object instanceof Map) {
             final Map map = (Map) object;
-
             packer.writeMapBegin(map.size());
             for (Object key : map.keySet()) {
-                packer.write(key);
+                writeMapKey(key, packer);
                 serializeObject(map.get(key), packer);
             }
             packer.writeMapEnd();
@@ -151,6 +151,15 @@ public class MsgPackConverter {
             packer.write(object.toString());
         }
 
+    }
+
+    private static void writeMapKey(final Object key, final Packer packer) throws IOException {
+        // map keys must be something serializable by MsgPack.  don't get too fancy
+        if (key instanceof String || key instanceof Number) {
+            packer.write(key);
+        } else {
+            packer.write(key.toString());
+        }
     }
 
     private static ArrayList<Object> iterateToList(final Iterator itty) {
