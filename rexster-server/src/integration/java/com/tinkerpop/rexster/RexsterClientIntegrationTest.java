@@ -19,6 +19,15 @@ import java.util.Map;
 public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest {
 
     @Test
+    public void shouldOpenAndCloseLotsOfClients() throws Exception {
+        final int numberOfClientsToOpen = 100;
+        for (int ix = 0; ix < numberOfClientsToOpen; ix++) {
+            final RexsterClient client = RexsterClientFactory.open();
+            client.close();
+        }
+    }
+
+    @Test
     public void executeExercise() throws Exception {
         final RexsterClient client = RexsterClientFactory.open();
 
@@ -41,6 +50,8 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         final Map<String, Object> vertexProperties = (Map<String, Object>) vertexResult.get("_properties");
         Assert.assertEquals("marko", vertexProperties.get("name"));
         Assert.assertEquals(29, vertexProperties.get("age"));
+
+        client.close();
     }
 
     @Test
@@ -58,6 +69,8 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         Assert.assertEquals("string", mapResultObject.get("s"));
         Assert.assertEquals(3, ((ArrayList) mapResultObject.get("a")).size());
         Assert.assertEquals(1, ((Map) mapResultObject.get("m")).get("one"));
+
+        client.close();
     }
 
     @Test
@@ -72,6 +85,8 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         final Map vertexProperties = (Map) vertexResult.get("_properties");
         Assert.assertEquals("marko", vertexProperties.get("name"));
         Assert.assertEquals(29, vertexProperties.get("age"));
+
+        client.close();
     }
 
     @Test
@@ -83,6 +98,8 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         final Map<String, Object> vertexResult = vertexResults.get(0);
         Assert.assertEquals("marko", vertexResult.get("name"));
         Assert.assertEquals(29, vertexResult.get("age"));
+
+        client.close();
     }
 
     @Test
@@ -97,6 +114,8 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         Assert.assertEquals(32, vertexResults.get(1).get("b"));
         Assert.assertEquals("marko", vertexResults.get(2).get("a"));
         Assert.assertNull(vertexResults.get(2).get("b"));
+
+        client.close();
     }
 
     @Test
@@ -116,10 +135,35 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         final Map<String, Object> vertexResult = txResults.get(0);
         Assert.assertEquals("vadas", ((Map<String,Object>)vertexResult.get("_properties")).get("name"));
 
+        rexsterClientToNeo4j.close();
+
     }
 
     /*
-    @Test
+    // @Test
+    public void executeAndReturnMapWithNonPrimitiveKey() throws Exception {
+        // non primitive keys in maps should be serialized via toString.  there really isn't much choice since
+        // MsgPack, JSON, etc. don't support other options.
+        final RexsterClient client = RexsterClientFactory.open();
+
+        final List<Map<String,Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.V.out.groupCount.cap");
+        Assert.assertEquals(1, vertexResults.size());
+
+        final Map<String,Object> r = vertexResults.get(0);
+        Assert.assertEquals(3, r.get("v[3]"));
+        Assert.assertEquals(1, r.get("v[2]"));
+        Assert.assertEquals(1, r.get("v[5]"));
+        Assert.assertEquals(1, r.get("v[4]"));
+
+        client.close();
+
+    }
+    */
+
+    /* this test fails on neo4j given inconsistencies in its blueprints implementation.  a failing test
+       was added to blueprints here:
+       https://github.com/tinkerpop/blueprints/issues/363
+    // @Test
     public void executeTransactionWithNoAutoCommitInSessionlessMode() throws Exception {
         final Configuration conf = new BaseConfiguration();
         conf.setProperty(RexsterClientTokens.CONFIG_GRAPH_NAME, "orientdbsample");

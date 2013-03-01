@@ -283,7 +283,11 @@ public class RexsterClient {
 
     public void close() throws IOException {
         for (NIOConnection connection : this.connections) {
-            connection.close();
+            // a connection is only initialized in the list of connections if some gremlin is passed through it
+            // so it could end up being null.  a connection may also null out as the result of an exception.
+            if (connection != null) {
+                connection.close();
+            }
         }
 
         this.transport.stop();
