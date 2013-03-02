@@ -98,14 +98,16 @@ public class MsgPackConverter {
             packer.writeMapBegin(map.size());
             for (Object key : map.keySet()) {
                 if(key instanceof Element) {
-                    //restructure element -> x maps
-                    Element element = (Element) key;
+                    // restructure element -> x maps
+                    // this is typical in Tree and Map returns where the key is an object value instead of a
+                    // primitive.  MsgPack can't process keys that way so the data needs to be restructured
+                    // so that it doesn't end up simply being toString'd
+                    final Element element = (Element) key;
                     writeMapKey(element.getId(), packer);
-                    HashMap<String, Object> m = new HashMap<String, Object>();
+                    final HashMap<String, Object> m = new HashMap<String, Object>();
                     m.put(Tokens._ELEMENT, element);
                     m.put(Tokens._CONTENTS, map.get(key));
                     serializeObject(m, packer);
-
                 } else {
                     writeMapKey(key, packer);
                     serializeObject(map.get(key), packer);

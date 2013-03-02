@@ -141,19 +141,33 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
 
 
     @Test
-    public void executeAndReturnMapWithNonPrimitiveKey() throws Exception {
-        // non primitive keys in maps should be serialized via toString.  there really isn't much choice since
-        // MsgPack, JSON, etc. don't support other options.
+    public void executeAndReturnMapWithGraphElementKey() throws Exception {
+        // maps of graph element keys get serialized to nested maps like:
+        // {elementId : { _element : 1, _contents : { standard vertex/edge serialization } }
         final RexsterClient client = RexsterClientFactory.open();
 
-        final List<Map<String,Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.V.out.groupCount.cap");
+        final List<Map<String, Map<String,Object>>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.V.out.groupCount.cap");
         Assert.assertEquals(1, vertexResults.size());
 
-        final Map<String,Object> r = vertexResults.get(0);
-        Assert.assertEquals(3, r.get("v[3]"));
-        Assert.assertEquals(1, r.get("v[2]"));
-        Assert.assertEquals(1, r.get("v[5]"));
-        Assert.assertEquals(1, r.get("v[4]"));
+        final Map<String, Map<String,Object>> r = vertexResults.get(0);
+        Assert.assertEquals(3, r.get("3").get(Tokens._CONTENTS));
+        Assert.assertEquals(1, r.get("2").get(Tokens._CONTENTS));
+        Assert.assertEquals(1, r.get("5").get(Tokens._CONTENTS));
+        Assert.assertEquals(1, r.get("4").get(Tokens._CONTENTS));
+
+        client.close();
+
+    }
+
+    @Test
+    public void executeAndReturnMapWithPrimitiveKey() throws Exception {
+        final RexsterClient client = RexsterClientFactory.open();
+
+        final List<Map<Integer, String>> vertexResults = client.execute("[1:'test']");
+        Assert.assertEquals(1, vertexResults.size());
+
+        final Map<Integer, String> r = vertexResults.get(0);
+        Assert.assertEquals("test", r.get(1));
 
         client.close();
 
@@ -183,7 +197,6 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
     /* this test fails on neo4j given inconsistencies in its blueprints implementation.  a failing test
        was added to blueprints here:
        https://github.com/tinkerpop/blueprints/issues/363
-    // @Test
     public void executeTransactionWithNoAutoCommitInSessionlessMode() throws Exception {
         final Configuration conf = new BaseConfiguration();
         conf.setProperty(RexsterClientTokens.CONFIG_GRAPH_NAME, "orientdbsample");
