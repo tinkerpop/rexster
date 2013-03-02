@@ -93,14 +93,23 @@ public class MsgPackConverter {
                 // in some graphs v will go out of scope, yet it is still on the bindings as a Vertex object.
                 packer.writeNil();
             }
-        } else if (object instanceof Tree) {
-            packer.write("tree");
         } else if (object instanceof Map) {
             final Map map = (Map) object;
             packer.writeMapBegin(map.size());
             for (Object key : map.keySet()) {
-                writeMapKey(key, packer);
-                serializeObject(map.get(key), packer);
+                if(key instanceof Element) {
+                    //restructure element -> x maps
+                    Element element = (Element) key;
+                    writeMapKey(element.getId(), packer);
+                    HashMap<String, Object> m = new HashMap<String, Object>();
+                    m.put(Tokens._ELEMENT, element);
+                    m.put(Tokens._CONTENTS, map.get(key));
+                    serializeObject(m, packer);
+
+                } else {
+                    writeMapKey(key, packer);
+                    serializeObject(map.get(key), packer);
+                }
             }
             packer.writeMapEnd();
         } else if (object instanceof Table) {
