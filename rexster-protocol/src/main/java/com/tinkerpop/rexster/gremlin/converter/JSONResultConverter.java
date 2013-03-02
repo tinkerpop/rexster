@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
 import com.tinkerpop.pipes.util.structures.Row;
 import com.tinkerpop.pipes.util.structures.Table;
+import com.tinkerpop.rexster.Tokens;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -114,7 +115,16 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
             for (Object key : map.keySet()) {
                 // force an error here by passing in a null key to the JSONObject.  That way a good error message
                 // gets back to the user.
-                jsonObject.put(key == null ? null : key.toString(), this.prepareOutput(map.get(key)));
+                if (key instanceof Element) {
+                    final Element element = (Element) key;
+                    final HashMap<String, Object> m = new HashMap<String, Object>();
+                    m.put(Tokens._ELEMENT, this.prepareOutput(element));
+                    m.put(Tokens._CONTENTS, this.prepareOutput(map.get(key)));
+
+                    jsonObject.put(element.getId().toString(), new JSONObject(m));
+                } else {
+                    jsonObject.put(key == null ? null : key.toString(), this.prepareOutput(map.get(key)));
+                }
             }
 
             return jsonObject;
