@@ -163,9 +163,18 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
     public void executeAndReturnTree() throws Exception {
         final RexsterClient client = RexsterClientFactory.open();
 
-        final List<String> treeResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.V.out.tree.cap");
+        final List<Object> treeResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.V.out.tree.cap");
         Assert.assertEquals(1, treeResults.size());
-        Assert.assertEquals("tree", treeResults.get(0));
+
+        Assert.assertTrue(treeResults.get(0) instanceof Map);
+        final HashMap<String, Object> map = (HashMap<String, Object>) treeResults.get(0);
+
+        for(Map.Entry e : map.entrySet()) {
+            Assert.assertTrue(e.getValue() instanceof Map);
+            Map m = (Map) e.getValue();
+            Assert.assertTrue(m.containsKey(Tokens._ELEMENT));
+            Assert.assertTrue(m.containsKey(Tokens._CONTENTS));
+        }
 
         client.close();
 
