@@ -1,7 +1,11 @@
 package com.tinkerpop.rexster.gremlin.converter;
 
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.pipes.util.structures.Table;
+import com.tinkerpop.rexster.Tokens;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
@@ -210,6 +214,28 @@ public class JSONResultConverterTest {
         JSONObject innerJsonObject = jsonObject.optJSONObject("z");
         Assert.assertNotNull(innerJsonObject);
         Assert.assertEquals("b", innerJsonObject.optString("a"));
+    }
+
+    @Test
+    public void convertMapWithElementForKey() throws Exception {
+        TinkerGraph g = TinkerGraphFactory.createTinkerGraph();
+        Map<Vertex, Integer> map = new HashMap<Vertex, Integer>();
+        map.put(g.getVertex(1), 1000);
+
+        JSONArray converted = this.converterNotPaged.convert(map);
+
+        Assert.assertNotNull(converted);
+        Assert.assertEquals(1, converted.length());
+
+        JSONObject jsonObject = converted.getJSONObject(0);
+        Assert.assertNotNull(jsonObject);
+
+        JSONObject mapValue = jsonObject.optJSONObject("1");
+        Assert.assertEquals(1000, mapValue.optInt(Tokens._CONTENTS));
+
+        JSONObject element = mapValue.optJSONObject(Tokens._ELEMENT);
+        Assert.assertNotNull(element);
+        Assert.assertEquals("1", element.optString(Tokens._ID));
     }
 
     private class FunObject {
