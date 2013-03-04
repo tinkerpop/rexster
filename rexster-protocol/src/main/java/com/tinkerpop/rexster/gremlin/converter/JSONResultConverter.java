@@ -119,7 +119,7 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
                     final Element element = (Element) key;
                     final HashMap<String, Object> m = new HashMap<String, Object>();
                     m.put(Tokens._KEY, this.prepareOutput(element));
-                    m.put(Tokens._VAL, this.prepareOutput(map.get(key)));
+                    m.put(Tokens._VALUE, this.prepareOutput(map.get(key)));
 
                     jsonObject.put(element.getId().toString(), new JSONObject(m));
                 } else {

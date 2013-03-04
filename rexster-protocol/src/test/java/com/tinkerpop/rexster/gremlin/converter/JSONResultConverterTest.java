@@ -231,7 +231,7 @@ public class JSONResultConverterTest {
         Assert.assertNotNull(jsonObject);
 
         JSONObject mapValue = jsonObject.optJSONObject("1");
-        Assert.assertEquals(1000, mapValue.optInt(Tokens._VAL));
+        Assert.assertEquals(1000, mapValue.optInt(Tokens._VALUE));
 
         JSONObject element = mapValue.optJSONObject(Tokens._KEY);
         Assert.assertNotNull(element);

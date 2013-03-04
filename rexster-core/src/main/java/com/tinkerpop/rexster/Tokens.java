@@ -21,7 +21,7 @@ public class Tokens {
     public static final String _RETURN = "_return";
     public static final String _LIMIT = "_limit";
     public static final String _KEY = "_key";
-    public static final String _VAL = "_val";
+    public static final String _VALUE = "_value";
     public static final String VERTEX = "vertex";
     public static final String VERTICES = "vertices";
     public static final String EDGE = "edge";

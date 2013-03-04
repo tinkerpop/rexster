@@ -104,7 +104,7 @@ public class MsgPackConverter {
                     writeMapKey(element.getId(), packer);
                     final HashMap<String, Object> m = new HashMap<String, Object>();
                     m.put(Tokens._KEY, element);
-                    m.put(Tokens._VAL, map.get(key));
+                    m.put(Tokens._VALUE, map.get(key));
                     serializeObject(m, packer);
                 } else {
                     writeMapKey(key, packer);
