@@ -3,10 +3,8 @@ package com.tinkerpop.rexster.protocol;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.pipes.util.structures.Row;
 import com.tinkerpop.pipes.util.structures.Table;
-import com.tinkerpop.pipes.util.structures.Tree;
 import com.tinkerpop.rexster.Tokens;
 import org.msgpack.packer.Packer;
 import org.msgpack.type.ArrayValue;
@@ -105,8 +103,8 @@ public class MsgPackConverter {
                     final Element element = (Element) key;
                     writeMapKey(element.getId(), packer);
                     final HashMap<String, Object> m = new HashMap<String, Object>();
-                    m.put(Tokens._ELEMENT, element);
-                    m.put(Tokens._CONTENTS, map.get(key));
+                    m.put(Tokens._KEY, element);
+                    m.put(Tokens._VAL, map.get(key));
                     serializeObject(m, packer);
                 } else {
                     writeMapKey(key, packer);

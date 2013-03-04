@@ -118,8 +118,8 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
                 if (key instanceof Element) {
                     final Element element = (Element) key;
                     final HashMap<String, Object> m = new HashMap<String, Object>();
-                    m.put(Tokens._ELEMENT, this.prepareOutput(element));
-                    m.put(Tokens._CONTENTS, this.prepareOutput(map.get(key)));
+                    m.put(Tokens._KEY, this.prepareOutput(element));
+                    m.put(Tokens._VAL, this.prepareOutput(map.get(key)));
 
                     jsonObject.put(element.getId().toString(), new JSONObject(m));
                 } else {

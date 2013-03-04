@@ -150,10 +150,10 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         Assert.assertEquals(1, vertexResults.size());
 
         final Map<String, Map<String,Object>> r = vertexResults.get(0);
-        Assert.assertEquals(3, r.get("3").get(Tokens._CONTENTS));
-        Assert.assertEquals(1, r.get("2").get(Tokens._CONTENTS));
-        Assert.assertEquals(1, r.get("5").get(Tokens._CONTENTS));
-        Assert.assertEquals(1, r.get("4").get(Tokens._CONTENTS));
+        Assert.assertEquals(3, r.get("3").get(Tokens._VAL));
+        Assert.assertEquals(1, r.get("2").get(Tokens._VAL));
+        Assert.assertEquals(1, r.get("5").get(Tokens._VAL));
+        Assert.assertEquals(1, r.get("4").get(Tokens._VAL));
 
         client.close();
 
@@ -186,8 +186,8 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         for(Map.Entry e : map.entrySet()) {
             Assert.assertTrue(e.getValue() instanceof Map);
             Map m = (Map) e.getValue();
-            Assert.assertTrue(m.containsKey(Tokens._ELEMENT));
-            Assert.assertTrue(m.containsKey(Tokens._CONTENTS));
+            Assert.assertTrue(m.containsKey(Tokens._KEY));
+            Assert.assertTrue(m.containsKey(Tokens._VAL));
         }
 
         client.close();
