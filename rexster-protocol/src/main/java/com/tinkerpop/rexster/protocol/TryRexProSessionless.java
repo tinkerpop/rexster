@@ -30,22 +30,31 @@ public class TryRexProSessionless implements Runnable {
     private int cycle = 0;
     private final String host;
     private final int exerciseTime;
+    private final String graphName;
 
     public static void main(final String[] args) throws Exception {
         int c = Integer.parseInt(args[1]);
         final int exerciseTime = Integer.parseInt(args[2]) * 60 * 1000;
 
+        final String g;
+
+
         for (int ix = 0; ix < c; ix++) {
-            new Thread(new TryRexProSessionless(args[0],  exerciseTime)).start();
+            if (args.length == 4) {
+                new Thread(new TryRexProSessionless(args[0], exerciseTime, args[3])).start();
+            } else {
+                new Thread(new TryRexProSessionless(args[0], exerciseTime, "gratefulgraph")).start();
+            }
         }
 
         Thread.currentThread().join();
         System.exit(0);
     }
 
-    public TryRexProSessionless(final String host, final int exerciseTime) {
+    public TryRexProSessionless(final String host, final int exerciseTime, final String graphName) {
         this.exerciseTime = exerciseTime;
         this.host = host;
+        this.graphName = graphName;
     }
 
     @Override
@@ -61,7 +70,7 @@ public class TryRexProSessionless implements Runnable {
 
         RexsterClient client = null;
         try {
-            client = RexsterClientFactory.open(host, "gratefulgraph");
+            client = RexsterClientFactory.open(host, this.graphName);
 
             while ((System.currentTimeMillis() - start) < exerciseTime) {
                 cycle++;
