@@ -70,6 +70,10 @@ public class MockGraphConfiguration implements GraphConfiguration {
         public void shutdown() {
             //To change body of implemented methods use File | Settings | File Templates.
         }
+
+        public GraphQuery query() {
+            return null;
+        }
     }
 }
 

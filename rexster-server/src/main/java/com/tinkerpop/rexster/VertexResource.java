@@ -96,7 +96,7 @@ public class VertexResource extends AbstractSubResource {
         final Graph graph = rag.getGraph();
 
         final GraphSONMode mode = showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL;
-        
+
         final JSONObject theRequestObject = this.getRequestObject();
         final Long start = RequestObjectHelper.getStartOffset(theRequestObject);
         final Long end = RequestObjectHelper.getEndOffset(theRequestObject);
@@ -112,14 +112,14 @@ public class VertexResource extends AbstractSubResource {
         temp = theRequestObject.opt(Tokens.VALUE);
         if (null != temp)
             value = ElementHelper.getTypedPropertyValue(temp.toString());
-        
+
         final boolean filtered = key != null && value != null;
-        
+
         try {
             long counter = 0l;
             final JSONArray vertexArray = new JSONArray();
             boolean wasInSection = false;
-            
+
             final Iterable<Vertex> vertices = filtered ? graph.getVertices(key, value) : graph.getVertices();
             for (Vertex vertex : vertices) {
                 if (counter >= start && counter < end) {
@@ -516,7 +516,7 @@ public class VertexResource extends AbstractSubResource {
                 query = query.limit(limit);
             }
 
-            if (returnType == ReturnType.VERTICES || returnType == ReturnType.VERTEX_IDS){
+            if (returnType == ReturnType.VERTICES || returnType == ReturnType.VERTEX_IDS) {
                 final Iterable<Vertex> vertexQueryResults = query.vertices();
                 for (Vertex v : vertexQueryResults) {
                     if (counter >= start && counter < end) {
@@ -919,15 +919,16 @@ public class VertexResource extends AbstractSubResource {
         return labels;
     }
 
-    private enum ReturnType { VERTICES, EDGES, COUNT, VERTEX_IDS }
+    private enum ReturnType {VERTICES, EDGES, COUNT, VERTEX_IDS}
+
     private final class VertexQueryArguments {
 
         private final Direction queryDirection;
         private final ReturnType returnType;
         private final boolean countOnly;
 
-        public VertexQueryArguments(String directionSegment){
-            if (directionSegment.equals(Tokens.OUT_E)){
+        public VertexQueryArguments(String directionSegment) {
+            if (directionSegment.equals(Tokens.OUT_E)) {
                 returnType = ReturnType.EDGES;
                 queryDirection = Direction.OUT;
                 countOnly = false;
