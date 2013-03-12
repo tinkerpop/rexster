@@ -24,6 +24,12 @@ public class ElementHelperTest {
     }
 
     @Test
+    public void getTypedPropertyValueStringNullPropertyValue() {
+        Object nullValue = ElementHelper.getTypedPropertyValue("(null,\"\")");
+        Assert.assertNull(nullValue);
+    }
+
+    @Test
     public void getTypedPropertyValueEmptyPropertyValue() {
         Object emptyString = ElementHelper.getTypedPropertyValue("");
         Assert.assertNotNull(emptyString);

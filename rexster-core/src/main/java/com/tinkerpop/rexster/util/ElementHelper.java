@@ -38,6 +38,7 @@ public class ElementHelper {
      * s or string
      * map
      * list
+     * null
      * <p/>
      * In the event that the type is not set or the parens cannot be tracked
      * as open and closed the parser will determine the value to simply be a string.
@@ -98,6 +99,8 @@ public class ElementHelper {
                         }
 
                         typedPropertyValue = properties;
+                    } else if (dataType.equals("null")) {
+                        typedPropertyValue = null;
                     }
                 }
             } else if (propertyValue == JSONObject.NULL) {
@@ -271,6 +274,8 @@ public class ElementHelper {
             dataType = "long";
         } else if (inner.equals("map")) {
             dataType = "map";
+        } else if (inner.equals("null")) {
+            dataType = "null";
         }
 
         return dataType;

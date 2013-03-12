@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.config;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.Vertex;
 import org.apache.commons.configuration.Configuration;
 
@@ -58,6 +59,11 @@ public class MockGraphConfiguration implements GraphConfiguration {
 
         @Override
         public Iterable<Edge> getEdges(String key, Object value) {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public GraphQuery query() {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
 

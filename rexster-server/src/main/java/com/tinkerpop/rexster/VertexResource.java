@@ -4,8 +4,8 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
 import com.tinkerpop.rexster.extension.ExtensionMethod;
@@ -499,7 +499,7 @@ public class VertexResource extends AbstractSubResource {
             long counter = 0l;
             final JSONArray elementArray = new JSONArray();
 
-            Query query = vertex.query().direction(queryDirection);
+            VertexQuery query = vertex.query().direction(queryDirection);
             if (labels != null) {
                 query = query.labels(labels);
             }
