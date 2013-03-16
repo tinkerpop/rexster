@@ -22,10 +22,15 @@ public class RexProSessions {
     }
 
     public static void destroySession(final String sessionKey) {
+        logger.info(String.format("Try to destroy RexPro Session: %s", sessionKey));
+
         final RexProSession session = getSession(sessionKey);
-        session.kill();
-        sessions.remove(sessionKey);
-        logger.info(String.format("RexPro Session destroyed: %s", sessionKey));
+        if (session != null) {
+            session.kill();
+            sessions.remove(sessionKey);
+        }
+
+        logger.info(String.format("RexPro Session destroyed or doesn't otherwise exist: %s", sessionKey));
     }
 
     public static void destroyAllSessions() {
