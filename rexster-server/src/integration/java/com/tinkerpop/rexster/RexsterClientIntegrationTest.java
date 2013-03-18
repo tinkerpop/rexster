@@ -118,6 +118,7 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         client.close();
     }
 
+    /*
     @Test
     public void executeTransactionWithAutoCommitInSessionlessMode() throws Exception {
         final Configuration conf = new BaseConfiguration();
@@ -138,7 +139,7 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         rexsterClientToNeo4j.close();
 
     }
-
+    */
 
     @Test
     public void executeAndReturnMapWithGraphElementKey() throws Exception {
