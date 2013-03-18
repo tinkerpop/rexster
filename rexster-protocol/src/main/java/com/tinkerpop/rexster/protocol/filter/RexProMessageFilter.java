@@ -94,7 +94,7 @@ public class RexProMessageFilter extends BaseFilter {
             }
 
             if (message == null) {
-                logger.warn("Message did not match an expected type.");
+                logger.warn(String.format("Message did not match the specified type [%s]", messageType));
 
                 ctx.write(
                     MessageUtil.createErrorResponse(
@@ -113,14 +113,25 @@ public class RexProMessageFilter extends BaseFilter {
 
             return ctx.getInvokeAction(remainder);
         } catch (Exception ex) {
-            ctx.write(
-                MessageUtil.createErrorResponse(
+            logger.error(String.format("Error during message deserialization of a message of type [%s].", messageType), ex);
+
+            final ErrorResponseMessage deserializationMessage = MessageUtil.createErrorResponse(
                     RexProMessage.EMPTY_REQUEST_AS_BYTES,
                     RexProMessage.EMPTY_SESSION_AS_BYTES,
                     ErrorResponseMessage.INVALID_MESSAGE_ERROR,
-                    ex.toString()
-                )
-            );
+                    ex.toString());
+
+            try {
+                ctx.write(deserializationMessage);
+            } catch (Exception inner) {
+                logger.error(String.format(
+                        "Could not write error message back to client for request [%s] session [%s].  Should have reported flag [%s] message [%s] to client",
+                        deserializationMessage.requestAsUUID(),
+                        deserializationMessage.sessionAsUUID(),
+                        deserializationMessage.metaGetFlag(),
+                        deserializationMessage.ErrorMessage));
+            }
+
             return ctx.getStopAction();
         } finally {
             unpacker.close();
