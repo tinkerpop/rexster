@@ -36,9 +36,9 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         final Map<String, Object> mapResult = mapResults.get(0);
         Assert.assertEquals("2", mapResult.get("val").toString());
 
-        final List<Integer> intResults = client.execute("1+1", null);
+        final List<Long> intResults = client.execute("1+1", null);
         Assert.assertEquals(1, intResults.size());
-        final Integer intResult = intResults.get(0);
+        final Long intResult = intResults.get(0);
         Assert.assertEquals("2", intResult.toString());
 
         final List<Map<String, Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1)", null);
@@ -49,7 +49,7 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
 
         final Map<String, Object> vertexProperties = (Map<String, Object>) vertexResult.get("_properties");
         Assert.assertEquals("marko", vertexProperties.get("name"));
-        Assert.assertEquals(29, vertexProperties.get("age"));
+        Assert.assertEquals(29L, vertexProperties.get("age"));
 
         client.close();
     }
@@ -63,12 +63,12 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         final List<Map<String, Object>> mapResultsObject = client.execute("[n:1+1,b:true,f:1234.56f,s:'string',a:[1,2,3],m:[one:1]]");
         Assert.assertEquals(1, mapResultsObject.size());
         final Map<String, Object> mapResultObject = mapResultsObject.get(0);
-        Assert.assertEquals(2, mapResultObject.get("n"));
+        Assert.assertEquals(2L, mapResultObject.get("n"));
         Assert.assertEquals(true, mapResultObject.get("b"));
         Assert.assertEquals(1234.56d, (Double) mapResultObject.get("f"), 0.001d);
         Assert.assertEquals("string", mapResultObject.get("s"));
-        Assert.assertEquals(3, ((ArrayList) mapResultObject.get("a")).size());
-        Assert.assertEquals(1, ((Map) mapResultObject.get("m")).get("one"));
+        Assert.assertEquals(3L, ((ArrayList) mapResultObject.get("a")).size());
+        Assert.assertEquals(1L, ((Map) mapResultObject.get("m")).get("one"));
 
         client.close();
     }
@@ -84,7 +84,7 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         Assert.assertEquals("1", vertexResult.get("_id"));
         final Map vertexProperties = (Map) vertexResult.get("_properties");
         Assert.assertEquals("marko", vertexProperties.get("name"));
-        Assert.assertEquals(29, vertexProperties.get("age"));
+        Assert.assertEquals(29L, vertexProperties.get("age"));
 
         client.close();
     }
@@ -97,7 +97,7 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         Assert.assertEquals(1, vertexResults.size());
         final Map<String, Object> vertexResult = vertexResults.get(0);
         Assert.assertEquals("marko", vertexResult.get("name"));
-        Assert.assertEquals(29, vertexResult.get("age"));
+        Assert.assertEquals(29L, vertexResult.get("age"));
 
         client.close();
     }
@@ -109,9 +109,9 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         final List<Map<String,Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1).as('a').out.as('b').select{it.name}{it.age}");
         Assert.assertEquals(3, vertexResults.size());
         Assert.assertEquals("marko", vertexResults.get(0).get("a"));
-        Assert.assertEquals(27, vertexResults.get(0).get("b"));
+        Assert.assertEquals(27L, vertexResults.get(0).get("b"));
         Assert.assertEquals("marko", vertexResults.get(1).get("a"));
-        Assert.assertEquals(32, vertexResults.get(1).get("b"));
+        Assert.assertEquals(32L, vertexResults.get(1).get("b"));
         Assert.assertEquals("marko", vertexResults.get(2).get("a"));
         Assert.assertNull(vertexResults.get(2).get("b"));
 
@@ -151,10 +151,10 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         Assert.assertEquals(1, vertexResults.size());
 
         final Map<String, Map<String,Object>> r = vertexResults.get(0);
-        Assert.assertEquals(3, r.get("3").get(Tokens._VALUE));
-        Assert.assertEquals(1, r.get("2").get(Tokens._VALUE));
-        Assert.assertEquals(1, r.get("5").get(Tokens._VALUE));
-        Assert.assertEquals(1, r.get("4").get(Tokens._VALUE));
+        Assert.assertEquals(3L, r.get("3").get(Tokens._VALUE));
+        Assert.assertEquals(1L, r.get("2").get(Tokens._VALUE));
+        Assert.assertEquals(1L, r.get("5").get(Tokens._VALUE));
+        Assert.assertEquals(1L, r.get("4").get(Tokens._VALUE));
 
         client.close();
 
@@ -168,7 +168,7 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
         Assert.assertEquals(1, vertexResults.size());
 
         final Map<Integer, String> r = vertexResults.get(0);
-        Assert.assertEquals("test", r.get(1));
+        Assert.assertEquals("test", r.get(1L));
 
         client.close();
 
