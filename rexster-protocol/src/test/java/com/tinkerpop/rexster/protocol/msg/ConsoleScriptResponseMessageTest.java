@@ -82,7 +82,7 @@ public class ConsoleScriptResponseMessageTest {
             Assert.assertEquals(UUID.nameUUIDFromBytes(outMsg.Request), UUID.nameUUIDFromBytes(inMsg.Request));
             Assert.assertEquals(UUID.nameUUIDFromBytes(outMsg.Session), UUID.nameUUIDFromBytes(inMsg.Session));
             Assert.assertTrue(Arrays.deepEquals(outMsg.ConsoleLines, inMsg.ConsoleLines));
-            Assert.assertEquals(inMsg.Bindings.get("o"), 1);
+            Assert.assertEquals(inMsg.Bindings.get("o"), 1L);
         } catch (IOException ex) {
             Assert.fail();
         }

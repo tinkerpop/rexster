@@ -36,7 +36,7 @@ public class MsgPackScriptResponseMessageTest {
         Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(bytes));
         Object dst = MsgPackConverter.deserializeObject(unpacker.readValue());
 
-        Assert.assertEquals(31, dst);
+        Assert.assertEquals(31L, dst);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class MsgPackScriptResponseMessageTest {
         ArrayList<Object> srcArray = new ArrayList<Object>();
         srcArray.add(true);
         srcArray.add("abc");
-        srcArray.add(1);
+        srcArray.add(1L);
 
         byte[] bytes = MsgPackScriptResponseMessage.convertResultToBytes(srcArray);
         Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(bytes));
@@ -75,9 +75,9 @@ public class MsgPackScriptResponseMessageTest {
     public void serializeMap() throws Exception {
         HashMap<Object, Object> srcMap = new HashMap<Object, Object>();
         srcMap.put("city", "LA");
-        srcMap.put(1, 2);
+        srcMap.put(1L, 2L);
         ArrayList<Object> arr = new ArrayList<Object>();
-        arr.add(1);
+        arr.add(1L);
         arr.add("str");
         arr.add(true);
         srcMap.put(1.2d, arr);
@@ -123,7 +123,7 @@ public class MsgPackScriptResponseMessageTest {
             Assert.assertEquals(outMsg.Meta, inMsg.Meta);
             Assert.assertEquals(UUID.nameUUIDFromBytes(outMsg.Request), UUID.nameUUIDFromBytes(inMsg.Request));
             Assert.assertEquals(UUID.nameUUIDFromBytes(outMsg.Session), UUID.nameUUIDFromBytes(inMsg.Session));
-            Assert.assertEquals(inMsg.Results.get(), 5);
+            Assert.assertEquals(inMsg.Results.get(), 5L);
             Assert.assertEquals(inMsg.Bindings.get("something"), "or other");
         } catch (IOException ex) {
             Assert.fail();

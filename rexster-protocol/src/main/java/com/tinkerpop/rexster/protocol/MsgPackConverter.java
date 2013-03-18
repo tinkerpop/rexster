@@ -7,11 +7,7 @@ import com.tinkerpop.pipes.util.structures.Row;
 import com.tinkerpop.pipes.util.structures.Table;
 import com.tinkerpop.rexster.Tokens;
 import org.msgpack.packer.Packer;
-import org.msgpack.type.ArrayValue;
-import org.msgpack.type.MapValue;
-import org.msgpack.type.NilValue;
-import org.msgpack.type.Value;
-import org.msgpack.type.ValueFactory;
+import org.msgpack.type.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -194,7 +190,7 @@ public class MsgPackConverter {
         } else if (v.isFloatValue()) {
             o = v.asFloatValue().getDouble();
         } else if (v.isIntegerValue()) {
-            o = v.asIntegerValue().getInt();
+            o = v.asIntegerValue().getLong();
         } else if (v.isArrayValue()) {
             final ArrayValue src = v.asArrayValue();
             final ArrayList<Object> dst = new ArrayList<Object>(src.size());
