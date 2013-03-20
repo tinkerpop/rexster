@@ -38,7 +38,7 @@
             <outputDirectory>lib</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>doc</directory>
+            <directory>../doc</directory>
         </fileSet>
         <fileSet>
             <directory>data</directory>
