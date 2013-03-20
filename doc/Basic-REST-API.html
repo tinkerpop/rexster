@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Basic REST API</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Basic REST API</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Basic-REST-API"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Basic-REST-API"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src=" images/dog-reading.png" alt="" /></p>
+<p>This cheat sheet provides a review of the RESTful <span class="caps">API</span> for Rexster. Note that beyond the query parameters provided in the table below, the standard Rexster parameters <code>rexster.offset.start</code>, <code>rexster.offset.end</code>, and <code>rexster.returnKeys</code> also work in cases where it makes sense. The <code>&lt;graph&gt;</code> is the unique name of a graph configured within Rexster. The base of the <span class="caps">URI</span>, when running locally, is generally <code>localhost:8182</code>.</p>
+<p>Please note that there are <a class="internal present" href="Rexster-Mime-Types.html">Rexster MIME Types</a> that affect operations within the <span class="caps">API</span>.</p>
+<h1><span class="caps">GET</span> Operations</h1>
+<table><tr><th>returns    </th>
+		<th>uri                                                         </th>
+		<th>description                                                                                                        </th>
+	</tr><tr><td> graphs       </td>
+		<td> <code>/graphs</code>                                                     </td>
+		<td> get all the graphs                                                                                                   </td>
+	</tr><tr><td> graph        </td>
+		<td> <code>/graphs/&lt;graph&gt;</code>                                             </td>
+		<td> get the graph named </td>
+	</tr><tr><td> vertices     </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices</code>                                    </td>
+		<td> get all vertices                                                                                                     </td>
+	</tr><tr><td> vertices     </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices?key=&lt;key&gt;&amp;value=&lt;value&gt;</code>                                    </td>
+		<td> get all vertices for a key index given the specified <code>&lt;key&gt;</code>/<code>&lt;value&gt;</code>                                                                                                      </td>
+	</tr><tr><td> vertex       </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;</code>                               </td>
+		<td> get vertex with id <code>&lt;id&gt;</code>                                                                                            </td>
+	</tr><tr><td> vertices     </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;/out</code>                           </td>
+		<td> get the adjacent out vertices of vertex <code>&lt;id&gt;</code> <sup>4</sup></td>
+	</tr><tr><td> vertices     </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;/in</code>                            </td>
+		<td> get the adjacent in vertices of vertex <code>&lt;id&gt;</code> <sup>4</sup></td>
+	</tr><tr><td> vertices     </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;/both</code>                          </td>
+		<td> get the both adjacent in and out vertices of vertex <code>&lt;id&gt;</code> <sup>4</sup></td>
+	</tr><tr><td> long          </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;/outCount</code> </td>
+		<td> get the number of out vertices of vertex <code>&lt;id&gt;</code> <sup>4</sup></td>
+	</tr><tr><td> long          </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;/inCount</code>  </td>
+		<td> get the number of in vertices of vertex <code>&lt;id&gt;</code> <sup>4</sup></td>
+	</tr><tr><td> long          </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;/bothCount</code> </td>
+		<td> get the number of adjacent in and out vertices of vertex <code>&lt;id&gt;</code> <sup>4</sup></td>
+	</tr><tr><td> longs          </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;/outIds</code> </td>
+		<td> get the identifiers of out vertices of vertex <code>&lt;id&gt;</code> <sup>4</sup></td>
+	</tr><tr><td> longs          </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;/inIds</code>  </td>
+		<td> get the identifiers of in vertices of vertex <code>&lt;id&gt;</code> <sup>4</sup></td>
+	</tr><tr><td> longs          </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;/bothIds</code> </td>
+		<td> get the identifiers of adjacent in and out vertices of vertex <code>&lt;id&gt;</code> <sup>4</sup></td>
+	</tr><tr><td> edges        </td>
+		<td> <code>/graphs/&lt;graph&gt;/edges</code>                                       </td>
+		<td> get all edges                                                                                                        </td>
+	</tr><tr><td> edges        </td>
+		<td> <code>/graphs/&lt;graph&gt;/edges?key=&lt;key&gt;&amp;value=&lt;value&gt;</code>                                       </td>
+		<td> get all edges for a key index given the specified <code>&lt;key&gt;</code>/<code>&lt;value&gt;</code>                                                                                                       </td>
+	</tr><tr><td> edge         </td>
+		<td> <code>/graphs/&lt;graph&gt;/edges/&lt;id&gt;</code>                                  </td>
+		<td> get edge with id <code>&lt;id&gt;</code>                                                                                              </td>
+	</tr><tr><td> edges        </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;/outE</code>                          </td>
+		<td> get the out edges of vertex <code>&lt;id&gt;</code> <sup>4</sup></td>
+	</tr><tr><td> edges        </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;/inE</code>                           </td>
+		<td> get the in edges of vertex <code>&lt;id&gt;</code> <sup>4</sup></td>
+	</tr><tr><td> edges        </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;/bothE</code>                         </td>
+		<td> get the both in and out edges of vertex <code>&lt;id&gt;</code> <sup>4</sup></td>
+	</tr><tr><td> indices      </td>
+		<td> <code>/graphs/&lt;graph&gt;/indices</code>                                     </td>
+		<td> get all the indices associated with the graph                                                                        </td>
+	</tr><tr><td> elements     </td>
+		<td> <code>/graphs/&lt;graph&gt;/indices/index?key=&lt;key&gt;&amp;value=&lt;value&gt;</code>       </td>
+		<td> get all elements with <code>&lt;key&gt;</code> property equal to <code>&lt;value&gt;</code> in <code>index</code>                                                 </td>
+	</tr><tr><td> long         </td>
+		<td> <code>/graphs/&lt;graph&gt;/indices/index/count?key=&lt;key&gt;&amp;value=&lt;value&gt;</code> </td>
+		<td> get a count of all elements with <code>&lt;key&gt;</code> property equal to <code>&lt;value&gt;</code> in <code>index</code>                                      </td>
+	</tr><tr><td> keys         </td>
+		<td> <code>/graphs/&lt;graph&gt;/keyindices/</code>                                  </td>
+		<td> get the combination of vertex and edge keys </td>
+	</tr><tr><td> keys         </td>
+		<td> <code>/graphs/&lt;graph&gt;/keyindices/vertex</code>                           </td>
+		<td> get vertex keys </td>
+	</tr><tr><td> keys         </td>
+		<td> <code>/graphs/&lt;graph&gt;/keyindices/edge</code>                           </td>
+		<td> get edge keys </td>
+	</tr><tr><td> prefixes <sup>1</sup></td>
+		<td> <code>/graphs/&lt;graph&gt;/prefixes</code>                                    </td>
+		<td> get the list of SailGraph prefixes                                                                                   </td>
+	</tr><tr><td> prefix <sup>1</sup></td>
+		<td> <code>/graphs/&lt;graph&gt;/prefixes/prefix</code>                             </td>
+		<td> get a specific prefix value                                                                                          </td>
+	</tr></table><h1><span class="caps">POST</span> Operations</h1>
+<table><tr><th>returns  </th>
+		<th>uri                                                                           </th>
+		<th>description                                                                                                                   </th>
+	</tr><tr><td> vertex     </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices</code>                                                      </td>
+		<td> create a vertex with no specified identifier                                                                                    </td>
+	</tr><tr><td> vertex     </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;</code>                                                 </td>
+		<td> create a vertex with  id <code>&lt;id&gt;</code> <sup>2</sup></td>
+	</tr><tr><td> vertex     </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;?&lt;key&gt;=&lt;value&gt;&amp;&lt;key'&gt;=&lt;value'&gt;</code>                   </td>
+		<td> create a vertex with  id <code>&lt;id&gt;</code> and the provided properties (or update vertex properties if vertex already exists). <sup>2</sup></td>
+	</tr><tr><td> edge       </td>
+		<td> <code>/graphs/&lt;graph&gt;/edges?_outV=&lt;id&gt;&amp;_label=friend&amp;_inV=2&amp;&lt;key&gt;=&lt;key'&gt;</code>            </td>
+		<td> create an out edge with no specified identifier from vertex <code>&lt;id&gt;</code> to vertex <code>2</code> labeled &#x201C;friend&#x201D; with provided properties. <sup>2</sup></td>
+	</tr><tr><td> edge       </td>
+		<td> <code>/graphs/&lt;graph&gt;/edges/3?_outV=&lt;id&gt;&amp;_label=friend&amp;_inV=2&amp;&lt;key&gt;=&lt;key'&gt;</code>          </td>
+		<td> create an out edge with id <code>3</code> from vertex <code>&lt;id&gt;</code> to vertex <code>2</code> labeled &#x201C;friend&#x201D; with provided properties. <sup>2</sup></td>
+	</tr><tr><td> edge       </td>
+		<td> <code>/graphs/&lt;graph&gt;/edges/3?&lt;key&gt;=&lt;key'&gt;</code>                                          </td>
+		<td> update the properties of the edge with id <code>3</code>                                                                                   </td>
+	</tr><tr><td> index <sup>3</sup></td>
+		<td> <code>/graphs/&lt;graph&gt;/indices/index?class=vertex</code>                        </td>
+		<td> create a new manual index named <code>index</code>                                                                                         </td>
+	</tr><tr><td> void </td>
+		<td> <code>/graphs/&lt;graph&gt;/keyindices/vertex/&lt;key&gt;</code>                           </td>
+		<td> create a new key index for a vertex </td>
+	</tr><tr><td> void        </td>
+		<td> <code>/graphs/&lt;graph&gt;/keyindices/edge/&lt;key&gt;</code>                           </td>
+		<td> create a new key index for an edge </td>
+	</tr><tr><td> void <sup>1</sup></td>
+		<td> <code>/graphs/&lt;graph&gt;/prefixes?namespace=http%3A%2F%2Fwww.ggl.com&amp;prefix=pf</code>         </td>
+		<td> add a new SailGraph prefix with <code>namespace</code> http://www.ggl.com and <code>prefix</code> pf                                                  </td>
+	</tr></table><h1><span class="caps">PUT</span> Operations</h1>
+<table><tr><th>returns  </th>
+		<th>uri                                                         </th>
+		<th>description                                                                  </th>
+	</tr><tr><td> vertex     </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;?&lt;key&gt;=&lt;value&gt;&amp;&lt;key'&gt;=&lt;value'&gt;</code> </td>
+		<td> replaces the all existing properties of the vertex <code>&lt;id&gt;</code> with those specified </td>
+	</tr><tr><td> edge       </td>
+		<td> <code>/graphs/&lt;graph&gt;/edges/&lt;id&gt;?&lt;key&gt;=&lt;value&gt;&amp;&lt;key'&gt;=&lt;value'&gt;</code>    </td>
+		<td> replaces the all existing properties of the edge <code>&lt;id&gt;</code> with those specified   </td>
+	</tr><tr><td> void       </td>
+		<td> <code>/graphs/&lt;graph&gt;/indices/index?key=&lt;key&gt;&amp;value=&lt;value&gt;&amp;id=&lt;id&gt;</code>    </td>
+		<td> put vertex with id <code>&lt;id&gt;</code> into <code>index</code> at <code>&lt;key&gt;/&lt;value&gt;</code>                                                                       </td>
+	</tr></table><h1><span class="caps">DELETE</span> Operations</h1>
+<table><tr><th>returns  </th>
+		<th>uri                                                                        </th>
+		<th>description                                             </th>
+	</tr><tr><td> void       </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;</code>                                              </td>
+		<td> remove vertex <code>&lt;id&gt;</code>                                      </td>
+	</tr><tr><td> void       </td>
+		<td> <code>/graphs/&lt;graph&gt;/vertices/&lt;id&gt;?&lt;key&gt;&amp;&lt;key'&gt;</code>                                 </td>
+		<td> remove properties <code>&lt;key&gt;</code> and <code>&lt;key'&gt;</code> from vertex <code>&lt;id&gt;</code> </td>
+	</tr><tr><td> void       </td>
+		<td> <code>/graphs/&lt;graph&gt;/edges/3</code>                                                    </td>
+		<td> remove the edge with id <code>3</code>                               </td>
+	</tr><tr><td> void       </td>
+		<td> <code>/graphs/&lt;graph&gt;/edges/3?&lt;key&gt;&amp;&lt;key'&gt;</code>                                       </td>
+		<td> remove properties <code>&lt;key&gt;</code> and <code>&lt;key'&gt;</code> from edge <code>3</code>      </td>
+	</tr><tr><td> void       </td>
+		<td> <code>/graphs/&lt;graph&gt;/indices/index</code>                                              </td>
+		<td> drop the index named <code>index</code>                              </td>
+	</tr><tr><td> void       </td>
+		<td> <code>/graphs/&lt;graph&gt;/indices/index?key=&lt;key&gt;&amp;value=&lt;value&gt;&amp;class=vertex&amp;id=&lt;id&gt;</code> </td>
+		<td> remove the vertex <code>&lt;id&gt;</code> from <code>index</code> at <code>&lt;key&gt;/&lt;value&gt;</code>  </td>
+	</tr><tr><td> void <sup>1</sup></td>
+		<td> <code>/graphs/&lt;graph&gt;/prefixes/prefix</code>                                            </td>
+		<td> remove the specified prefix                               </td>
+	</tr></table><p><sup>1</sup> Only applies to <code>SailGraph</code> configurations.<br /><sup>2</sup> Underlying graph database implementations must support the ability to assign the edge/vertex identifier.  In cases where the graph database does not support the identifier (ie. Neo4j), the identifier supplied with be ignored and the graph assigned identifier will be returned in the <span class="caps">JSON</span> after successful graph element creation.<br /><sup>3</sup> Note that when POSTing an index you may also pass a <code>params</code> query string argument.  This argument allows configuration parameters to be passed into the index itself (support of this feature is specific to the graph implementation itself).  Please read the Neo4j Blueprints implementation for an <a href="https://github.com/tinkerpop/blueprints/wiki/Neo4j-Implementation">example</a> on how to configure an index.  The <code>params</code> argument is <a class="internal present" href="Mapping-a-URI-to-JSON.html">parsed to JSON</a> so a query string that looked like <code>params.to_lower_case=true&amp;params.type=fulltext&amp;params.provider=lucene</code> would construct a map of three index parameters.<br /><sup>4</sup> Rexster utilizes <a href="../../blueprints/2.3.0/Vertex-Query.html">Vertex Query</a> capabilities of Blueprints for these noted operations.  These operations accept the following parameters: <code>_label</code>, <code>_properties</code> and <code>limit</code>.</p>
+<ul><li><code>_label</code> filters edges by label and may be either a single value or an array of values as in <code>_label=[created,knows]</code></li>
+	<li><code>_limit</code> limits the number of values returned.</li>
+	<li><code>_properties</code> is an array of edge properties to filter on in the following fashion: <code>_properties=[ [weight,&gt;,(f,0.5)], [weight,&lt;,(f,1.0)] ]</code>.  Note that property values respect <a class="internal present" href="Property-Data-Types.html">Rexster Data Typing</a> and the following comparators: <code>&lt;=, &lt;, &lt;&gt;, &gt;, &gt;=</code>.</li>
+</ul><p>Since these <span class="caps">REST</span> operations are returning lists, the standard Rexster Parameters (discussed below) apply.  Choosing to use <code>rexster.offset.end</code> to limit to the top N results, is different than using <code>_limit</code> in that <code>_limit</code> pushes this filtering operation down to the underlying graph making it more efficient than <code>rexster.offset.end</code> which does that filtering within Rexster itself.</p>
+<p>In all cases, parameters may be POSTed or PUTed on the <a class="internal present" href="Mapping-a-URI-to-JSON.html">URI</a> or as <span class="caps">JSON</span> using one of the <a class="internal present" href="Rexster-Mime-Types.html">Rexster MIME Types</a>.</p>
+<h1>Rexster Parameters</h1>
+<ul><li><code>rexster.offset.start</code> &#x2013; Expects a numeric value that represents the start point for returning a set of records and is used in conjunction with <code>rexster.offset.end</code> to allow for paging of results.  If used without a valid <code>rexster.offset.end</code> parameter specified, Rexster will return all remaining records in the set.</li>
+	<li><code>rexster.offset.end</code> &#x2013; Expects a numeric value that represents the end point for returning a set of records and is used in conjunction with <code>rexster.offset.start</code> to allow for paging of results.  If used without a valid <code>rexster.offset.start</code> parameter specified, Rexster will assume the start value to be zero.</li>
+	<li><code>rexster.returnKeys</code> &#x2013; Expects a comma separated list of property names to return in the results.  Element meta-data will always be returned even if <code>rexster.returnKeys</code> are specified.  If a valid value for this parameter is not specified, then all properties are returned.</li>
+</ul>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Deploying an Extension</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Deploying an Extension</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Deploying-an-Extension"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Deploying-an-Extension"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src="http://www.wpclipart.com/animals/dogs/cartoon_dogs/cartoon_dogs_6/cartoon_dog_T.png" width="100px" /></p>
+<p>Deploying an extension is not difficult.  To demonstrate the process involved, we will use the <a href="https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/sample-kibbles">Sample Kibbles</a>.</p>
+<p>After building Sample Kibbles with Maven (<code>mvn clean install</code>), copy the <code>sample-kibbles-*.jar</code> file (where <code>*</code> refers to the version of kibbles you are building) to the <code>REXSTER_HOME/ext</code> directory.</p>
+<p>The next step is to <a class="internal present" href="Rexster-Configuration.html">configure</a> the extensions within <code>rexster.xml</code>. For purposes of this example, we will expose the sample extensions on the <code>tinkergraph</code> sample graph.  The <code>namespace</code> for the samples is <code>tp-sample</code>.  Therefore <code>rexster.xml</code> should be modified in the following manner:</p>
+<pre><code>&lt;graph&gt;
+  &lt;graph-name&gt;tinkergraph&lt;/graph-name&gt;
+  &lt;graph-type&gt;tinkergraph&lt;/graph-type&gt;
+  &lt;graph-file&gt;data/graph-example-1.xml&lt;/graph-file&gt;
+  &lt;extensions&gt;
+    &lt;allows&gt;
+      &lt;allow&gt;tp:gremlin&lt;/allow&gt;
+      &lt;allow&gt;tp-sample:*&lt;/allow&gt;
+    &lt;/allows&gt;
+  &lt;/extensions&gt;
+&lt;/graph&gt;</code></pre>
+<p>The addition of <code>tp-sample:*</code> means that all extensions within the <code>tp-sample</code> namespace are exposed on the <code>tinkergraph</code> sample graph.</p>
+<p>We now need to consider the configuration of individual extensions.  In this case, the <code>MapConfigurationExtension</code> requires some basic configuration in <code>rexster.xml</code> for it to work properly.  Modify the configuration so that the <code>&lt;graph&gt;</code> element looks like this:</p>
+<pre><code>&lt;graph&gt;
+  &lt;graph-name&gt;tinkergraph&lt;/graph-name&gt;
+  &lt;graph-type&gt;tinkergraph&lt;/graph-type&gt;
+  &lt;graph-file&gt;data/graph-example-1.xml&lt;/graph-file&gt;
+  &lt;extensions&gt;
+    &lt;allows&gt;
+      &lt;allow&gt;tp:gremlin&lt;/allow&gt;
+      &lt;allow&gt;tp-sample:*&lt;/allow&gt;
+    &lt;/allows&gt;
+    &lt;extension&gt;
+      &lt;namespace&gt;tp-sample&lt;/namespace&gt;
+      &lt;name&gt;map-config&lt;/name&gt;
+      &lt;configuration&gt;
+        &lt;some-key&gt;some-value&lt;/some-key&gt;
+        &lt;other-key&gt;other-value&lt;/other-key&gt;
+      &lt;/configuration&gt;
+    &lt;/extension&gt;
+  &lt;/extensions&gt;
+&lt;/graph&gt;</code></pre>
+<p>At this point, Rexster is ready to start serving the Sample Kibbles.  <a class="internal present" href="Getting-Started.html">Start Rexster</a> and access <code>http://localhost:8182/graphs/tinkergraph</code> being sure to set the <code>Accept</code> header with the <code>application/vnd.rexster-v1+json</code> <a class="internal present" href="Rexster-Mime-Types.html">Rexster Mime Type</a>:</p>
+<pre><code>{
+  "version":"*.*",
+  "name":"tinkergraph",
+  "graph":"tinkergraph[vertices:6 edges:6]",
+  "read_only":false,
+  "graph": "mocktinkertransactionalgraph[vertices:6 edges:6 directory:data/graph-example-1]",
+  "features": {
+      "ignoresSuppliedIds": false,
+      "supportsTransactions": false,
+      "supportsSelfLoops": true,
+      "supportsBooleanProperty": true,
+      "supportsEdgeKeyIndex": true,
+      "supportsUniformListProperty": true,
+      "supportsThreadedTransactions": false,
+      "isPersistent": true,
+      "supportsVertexIndex": true,
+      "supportsStringProperty": true,
+      "supportsIntegerProperty": true,
+      "isWrapper": false,
+      "supportsMixedListProperty": true,
+      "supportsVertexKeyIndex": true,
+      "isRDFModel": false,
+      "supportsLongProperty": true,
+      "supportsVertexIteration": true,
+      "supportsKeyIndices": true,
+      "supportsEdgeIteration": true,
+      "supportsPrimitiveArrayProperty": true,
+      "supportsDoubleProperty": true,
+      "supportsSerializableObjectProperty": true,
+      "supportsIndices": true,
+      "supportsEdgeIndex": true,
+      "supportsMapProperty": true,
+      "supportsFloatProperty": true,
+      "supportsDuplicateEdges": true
+  },
+  "query_time":2.57055,
+  "up_time":"0[d]:00[h]:01[m]:30[s]",
+  "extensions":[
+    {"title":"evaluate an ad-hoc Gremlin script for a graph.","href":"tp\/gremlin"},
+    {"title":"returns the results of the toString() method on the graph.","href":"tp-sample\/simple-root"},
+    {"title":"returns the results of the toString() method on the graph.","href":"tp-sample\/simple-path\/some-work"},
+    {"title":"returns the results of the toString() method on the edge.","href":"tp-sample\/simple-path\/other-work"},
+    {"title":"a simple ping extension.","href":"tp-sample\/ping"},
+    {"title":"returns the configuration as JSON.","href":"tp-sample\/map-config"}
+  ]
+}</code></pre>
+<p>As you can see, the list of extensions configured and available are listed.  Note that only those extensions that are available for the <code>GRAPH</code> <a class="internal present" href="Extension-Points.html">extension point</a> are displayed here.  As some extensions only work from the <code>VERTEX</code> or <code>EDGE</code> extension points they will not be visible here &#x2014; however they are displayed on their respective endpoints such as <code>http://localhost:8182/graphs/tinkergraph/vertices/1</code>.</p>
+<h1>Service Loader</h1>
+<p>Rexster uses <code>ServiceLoader</code> to expose available extensions.  When developing an extension to Rexster, it is necessary to include a <code>com.tinkerpop.rexster.extension.RexsterExtension</code> file in <code>META-INF/services</code> of the packaged extension to include the extensions to be exposed.  In the case of the Sample Kibbles, <a href="https://github.com/tinkerpop/rexster/blob/master/rexster-kibbles/sample-kibbles/src/main/resources/META-INF/services/com.tinkerpop.rexster.extension.RexsterExtension">the file</a> lists each of the extensions to be made available through Rexster:</p>
+<pre><code>com.tinkerpop.rexster.kibbles.sample.MapConfigurationExtension
+com.tinkerpop.rexster.kibbles.sample.PingExtension
+com.tinkerpop.rexster.kibbles.sample.PingAddOnExtension
+com.tinkerpop.rexster.kibbles.sample.ProducesXmlExtension
+com.tinkerpop.rexster.kibbles.sample.SimplePathExtension
+com.tinkerpop.rexster.kibbles.sample.SimpleRootExtension</code></pre>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

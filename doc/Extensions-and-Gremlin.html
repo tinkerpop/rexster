@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Extensions and Gremlin</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Extensions and Gremlin</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Extensions-and-Gremlin"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Extensions-and-Gremlin"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src="https://github.com/tinkerpop/gremlin/raw/master/doc/images/gremlin-logo.png" alt="" /></p>
+<p>Its possible to write <a href="../../gremlin/2.3.0/Home.html">Gremlin</a> based extensions. To do so, you will need to make sure to make use of <a href="http://docs.codehaus.org/display/GMAVEN/Home">GMaven</a> in your <code>pom.xml</code>. For example:</p>
+<pre><code>&lt;plugin&gt;
+    &lt;groupId&gt;org.codehaus.gmaven&lt;/groupId&gt;
+    &lt;artifactId&gt;gmaven-plugin&lt;/artifactId&gt;
+    &lt;version&gt;1.3&lt;/version&gt;
+    &lt;executions&gt;
+        &lt;execution&gt;
+            &lt;goals&gt;
+                &lt;goal&gt;generateStubs&lt;/goal&gt;
+                &lt;goal&gt;compile&lt;/goal&gt;
+                &lt;goal&gt;generateTestStubs&lt;/goal&gt;
+                &lt;goal&gt;testCompile&lt;/goal&gt;
+            &lt;/goals&gt;
+            &lt;configuration&gt;
+                &lt;providerSelection&gt;1.7&lt;/providerSelection&gt;
+            &lt;/configuration&gt;
+        &lt;/execution&gt;
+    &lt;/executions&gt;
+&lt;/plugin&gt;</code></pre>
+<p>Next you can then create a Gremlin-based extension.</p>
+<pre><code>@ExtensionNaming(namespace = "ex", name = "gremlinExample")
+public class GremlinBasedExtension extends AbstractRexsterExtension {
+
+    static {
+        Gremlin.load();
+    }
+
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.VERTEX)
+    @ExtensionDescriptor(description = "Traversal with native Gremlin")
+    public ExtensionResponse evaluate(@RexsterContext RexsterResourceContext context,
+                                      @RexsterContext Vertex v) {
+
+        JSONObject results = new JSONObject();
+        results.put("foaf count", v.out('knows').out('knows').count())
+        return ExtensionResponse.ok(results);
+    }
+}</code></pre>
+<p><strong><span class="caps">NOTE</span></strong> Like all extensions, don&#x2019;t forget to add the extension&#x2019;s full class name to your</p>
+<pre><code>src/resources/META-INF/services/com.tinkerpop.rexster.extension.RexsterExtension</code></pre>
+<p>Please see <a class="internal present" href="Deploying-an-Extension.html">Deploying an Extension</a> for more details</p>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

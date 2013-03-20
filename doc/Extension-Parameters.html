@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Extension Parameters</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Extension Parameters</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Extension-Parameters"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Extension-Parameters"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src="http://www.wpclipart.com/animals/dogs/cartoon_dogs/cartoon_dogs_6/cartoon_dog_T.png" width="100px" /></p>
+<p>Extension methods marked with an <code>@ExtensionDefinition</code> annotation contain the logic to be executed by the Rexster.  To do anything useful an extension method must have access to the resources that Rexster has to from the context of the request, the general graph configuration and other such parameters.  Extension methods access these resources through method parameters that are marked with the <code>@RexsterContext</code> or <code>@ExtensionRequestParameter</code> annotations.  Rexster will read these marked parameters and try to inject an object based on its type.</p>
+<p>Parameters marked with one of these annotation that is not one of an expected type (described more below) will be set to null (unless a default value is specified).  Furthermore, parameters that are not marked by annotation at all will be set to null.</p>
+<h1>Rexster Context</h1>
+<p>The <code>@RexsterContext</code> annotation tells Rexster to inject resources internal to Rexster to the extension method and can be applied to parameters of the following types:</p>
+<table><tr><th>type </th>
+		<th>description </th>
+	</tr><tr><td> Graph </td>
+		<td> The requested blueprints graph. </td>
+	</tr><tr><td> RexsterApplicationGraph </td>
+		<td> The requested blueprints graph. </td>
+	</tr><tr><td> ExtensionMethod </td>
+		<td> Provides access to the reflected <code>Method</code> as well as the <code>ExtensionDefinition</code> and <code>ExtensionDescriptor</code>.  It also provides the <code>getExtensionApiAsJson</code> helper method for getting <span class="caps">API</span> information to return as <span class="caps">JSON</span>. </td>
+	</tr><tr><td> UriInfo </td>
+		<td> The requested <span class="caps">URI</span>. </td>
+	</tr><tr><td> HttpServletRequest </td>
+		<td> The actual servlet request made. </td>
+	</tr><tr><td> SecurityContext </td>
+		<td> Allows access to the name of the user who logged in (if <a class="internal present" href="Rexster-Security.html">authentication</a> services are turned on). </td>
+	</tr><tr><td> RexsterResourceContext </td>
+		<td> A container for the <code>UriInfo</code>, <code>HttpServletRequest</code>, <code>ExtensionMethod</code>, <code>RexsterApplicationGraph</code>, <code>SecurityContext</code> and two request objects: one that is <a class="internal present" href="Mapping-a-URI-to-JSON.html">mapped</a> to <span class="caps">JSON</span> and one that just contains the raw values passed to Rexster </td>
+	</tr><tr><td> Edge </td>
+		<td> The requested edge given a <code>GRAPH</code> or <code>EDGE</code> <code>@ExtensionPoint</code>. </td>
+	</tr><tr><td> Vertex </td>
+		<td> The requested edge given a <code>GRAPH</code> or <code>EDGE</code> <code>@ExtensionPoint</code>. </td>
+	</tr></table><p>Consider the following example taken from the <code>SimpleRootExtension</code> extension in the <a href="https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/sample-kibbles">Sample Kibbles</a> project:</p>
+<pre><code>public ExtensionResponse doWorkOnGraph(@RexsterContext Graph graph) {</code></pre>
+<p>In this example, Rexster will inject the <code>Graph</code> object from the request into the <code>doWorkOnGraph</code> method.</p>
+<h1>Extension Request Parameter</h1>
+<p>The <code>@ExtensionRequestParameter</code> annotation tells Rexster to inject parameters from the <a class="internal present" href="Mapping-a-URI-to-JSON.html">request object</a> into a parameter.  This annotation takes several parameters: <code>name</code>, an optional <code>description</code>, <code>defaultValue</code> and <code>parseToJson</code>.  The <code>name</code> refers to the key in the root of the request object.  Rexster will try to coerce values from the request object into the specified type of the parameter.  The following types are supported:</p>
+<ul><li>String</li>
+	<li>Integer</li>
+	<li>Float</li>
+	<li>Double</li>
+	<li>Long</li>
+	<li>Boolean</li>
+	<li>JSONObject</li>
+	<li>JSONArray</li>
+</ul><p>The <code>defaultValue</code> allows specification of a default for that parameter if the parameter is not supplied on the request.  This parameter takes a string, but the value will be coerced to the data type of the value to which the annotation is attached.  If this value cannot be coerced, then it will be defaulted to null.</p>
+<p>It is important to note that <code>defaultValue</code> parameter takes an array of strings as its value.  This is a workaround to a shortcoming of Java that prevents a <code>null</code> assignment to annotation parameters.  If no value, is specified, the <code>defaultValue</code> is actually an empty array, which Rexster will evaluate to <code>null</code>.  If there is more than one value, only the first value in the array is taken into account.</p>
+<p>The <code>parseToJson</code> parameter is defaulted to <code>true</code> and when set as such, tells Rexster to inject the value of the parameter as <a class="internal present" href="Mapping-a-URI-to-JSON.html">mapped from JSON</a>.  When set to <code>false</code>, Rexster will inject the raw value of the parameter without the mapping.  This is especially useful when dealing with parameters that contain characters that incorrectly parse to <span class="caps">JSON</span> when a string value is really what is needed.</p>
+<p>Consider this snippet from the <code>PingExtension</code> in the <a href="https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/sample-kibbles">Sample Kibbles</a> project:</p>
+<pre><code>@ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
+@ExtensionDescriptor(description = "Ping me.")
+public ExtensionResponse evaluatePing(@RexsterContext RexsterResourceContext context,
+                                      @RexsterContext Graph graph,
+                                      @ExtensionRequestParameter(name="reply", description="a value to reply with") String reply) {
+    Map&lt;String, String&gt; map = new HashMap&lt;String, String&gt;();
+    map.put("ping", reply);
+    return ExtensionResponse.ok(map);
+}</code></pre>
+<p>When accessing this <span class="caps">URI</span>:</p>
+<pre><code>http://localhost:8182/graphs/mygraph/ex/ping?reply=ping-a-ling</code></pre>
+<p>The value of the <code>reply</code> <span class="caps">URI</span> query string parameter, &#x201C;ping-a-ling&#x201D; is injected into the <code>reply</code> method parameter on the extension.</p>
+<p>The next example demonstrates usage of the <code>defaultValue</code> parameter on the <code>ExtensionRequestParameter</code>.  This example is taken from the <code>ParametersExtension</code> in the Sample Kibbles project.</p>
+<pre><code>@ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "object-default")
+@ExtensionDescriptor(description = "pass an object parameter to be used in the response.")
+public ExtensionResponse evaluateSomeObjectWithDefaults(@RexsterContext RexsterResourceContext context,
+                                                        @RexsterContext Graph graph,
+                                                        @ExtensionRequestParameter(name = "a", defaultValue = "1", description = "an integer to reply with") Integer reply,
+                                                        @ExtensionRequestParameter(name = "b", defaultValue = "{ 85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot;a85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot;:85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot;marko85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot;,85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot;b85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot;:true, 85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot;c85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot;: { 85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot;a85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot; : 85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot;peter85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot; } }", description = "an object to reply with") JSONObject replyObject,
+                                                        @ExtensionRequestParameter(name = "c", defaultValue = "[ 85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot;marko85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot;,85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot;povel85fce56a8c37ac3cacd82b1c0ac804a4755dfacdquot; ]", description = "a list to reply with") JSONArray replyList) {
+    Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();
+    map.put("a", reply);
+    map.put("b", replyObject);
+    map.put("c", replyList);
+    return ExtensionResponse.ok(map);
+}</code></pre>
+<p>Note that the <code>defaultValue</code> is specified by a string for all three parameters.  Rexster will coerce those values to their appropriate data types.  So therefore resolving:</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/tp-sample/parameters/object</code></pre>
+<p>will return:</p>
+<pre><code>{
+  "a":1,
+  "b": {
+    "a":"marko",
+    "b":true,
+    "c": { "a":"peter" }
+  },
+  "c": [ "marko", "povel" ]
+}</code></pre>
+<p>or alternatively, resolving this <span class="caps">URI</span>:</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/tp-sample/parameters/object?a=100</code></pre>
+<p>will return:</p>
+<pre><code>{
+  "a":100,
+  "b": {
+    "a":"marko",
+    "b":true,
+    "c": { "a":"peter" }
+  },
+  "c": [ "marko", "povel" ]
+}</code></pre>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

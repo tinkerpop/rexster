@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Extension Naming</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Extension Naming</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Extension-Naming"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Extension-Naming"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src="http://www.wpclipart.com/animals/dogs/cartoon_dogs/cartoon_dogs_6/cartoon_dog_T.png" width="100px" /></p>
+<p>Extension naming plays an important role in how the extension is exposed within Rexster.  Extension names are defined through the <code>ExtensionNaming</code> annotation which applies to a class.  The annotation takes two parameters: the <code>namespace</code> and <code>name</code>.  Consider the following example:</p>
+<pre><code>@ExtensionNaming(name = "myextension", namespace = "ns")</code></pre>
+<p>The <code>namespace</code> specifies the &#x201C;package&#x201D; within which the extension will serve and really behaves as a means for organizing common extensions.  If the <code>namespace</code> is not specified, it will be defaulted to the &#x201C;global&#x201D; namespace which is specified as &#x201C;g&#x201D;.  Therefore, the following annotations are equivalent:</p>
+<pre><code>@ExtensionNaming(name = "myextension", namespace = "g")
+@ExtensionNaming(name = "myextension")</code></pre>
+<p>The <code>name</code> parameter refers to the name of the extension itself.  The <code>name</code> should be unique within the <code>namespace</code>.  Rexster will not complain of naming collisions, so therefore it is important to examine both the approach to naming as well as the configuration within Rexster of individual extensions per graph.</p>
+<p>The values supplied to the <code>@ExtensionName</code> annotation directly define the the extension <span class="caps">URI</span> given a particular <a class="internal present" href="Extension-Points.html">extension point</a>.  Therefore, assuming a particular graph configured an extension with the following <code>@ExtensionNaming</code> annotation:</p>
+<pre><code>@ExtensionNaming(name = "myextension", namespace = "ns")</code></pre>
+<p>The above annotation would expose that extension on the following base URIs depending upon the extension point:</p>
+<pre><code># graph extension point
+http://{base}/{graph}/ns/myextension
+
+# vertex extension point
+http://{base}/{graph}/vertices/{id}/ns/myextension
+
+# edge extension point
+http://{base}/{graph}/edges/{id}/ns/myextension</code></pre>
+<p>It is possible to apply the same <code>@ExtensionNaming</code> annotation to multiple classes.  If this approach is taken, it is only necessary to take care in defining the extension methods to avoid naming collisions which will not be resolved in a predictable manner.  For example, the code snippets below are adapted from the Ping Extension in the <a href="https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/sample-kibbles">Sample Kibbles</a> project:</p>
+<pre><code>@ExtensionNaming(namespace = "tp", name = "ping")
+public class PingExtension extends AbstractRexsterExtension {
+
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
+    @ExtensionDescriptor(description = "a simple ping extension.")
+    public ExtensionResponse evaluatePing(@RexsterContext RexsterResourceContext context,
+                                          @RexsterContext Graph graph,
+                                          @ExtensionRequestParameter(name = "reply", description = "a value to reply with") String reply) {
+        Map&lt;String, String&gt; map = new HashMap&lt;String, String&gt;();
+        map.put("ping", reply);
+        return ExtensionResponse.ok(map);
+    }
+}
+
+@ExtensionNaming(namespace = "tp", name = "ping")
+public class PingAddOnExtension extends AbstractRexsterExtension {
+
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "pong")
+    @ExtensionDescriptor(description = "a simple ping extension.")
+    public ExtensionResponse evaluatePing(@RexsterContext RexsterResourceContext context,
+                                          @RexsterContext Graph graph,
+                                          @ExtensionRequestParameter(name = "reply", description = "a value to reply with") String reply) {
+        Map&lt;String, String&gt; map = new HashMap&lt;String, String&gt;();
+        map.put("ping-add-on", reply);
+        return ExtensionResponse.ok(map);
+    }
+}</code></pre>
+<p>Note that both classes have the same <code>@ExtensionNaming</code> annotation, where the namespace is <code>tp</code> and the name is <code>ping</code>.  The first class, <code>PingExtension</code>, will respond to requests at:</p>
+<pre><code>http://localhost:8182/graph/tp/ping</code></pre>
+<p>and the second will respond to requests at:</p>
+<pre><code>http://localhost:8182/graph/tp/ping/pong</code></pre>
+<p>It is also important to remember that both classes must be listed in the <code>com.tinkerpop.rexster.extension.RexsterExtension</code> file in <code>META-INF/services</code>.  Read more about <a class="internal present" href="Deploying-an-Extension.html">Deploying an Extension</a> in regards to this issue.</p>
+<p>Please refer to the <a class="internal present" href="Rexster-Configuration.html">Rexster Configuration</a> section for explanation as to how extensions can be configured to work with graphs given the <code>name</code> and <code>namespace</code> parameters on the <code>@ExtensionNaming</code> annotation.</p>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Extension Documentation</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Extension Documentation</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Extension-Documentation"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Extension-Documentation"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src="http://www.wpclipart.com/animals/dogs/cartoon_dogs/cartoon_dogs_6/cartoon_dog_T.png" width="100px" /></p>
+<p>Rexster helps provide <span class="caps">API</span> documentation to users of the extension in two ways.  First, Rexster will show what extensions are properly configured and available from a particular <span class="caps">URI</span> as well as how to access them.  Second, Rexster can display <span class="caps">API</span> documentation for a specific service as part of error message generation.</p>
+<h1>Hypermedia</h1>
+<p>When accessing a <span class="caps">URI</span> <a class="internal present" href="Extension-Points.html">extension point</a>, the list of properly configured extensions will be displayed.  Accessing this <span class="caps">URI</span> with the built-in <a class="internal present" href="Gremlin-Extension.html">Gremlin Extension</a> configured (remember to set the <code>Accept</code> header with the <code>application/vnd.rexster-v1+json</code> <a class="internal present" href="Rexster-Mime-Types.html">Rexster Mime Type</a>):</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/</code></pre>
+<p>will yield:</p>
+<pre><code>{
+    "version": "*.*",
+    "name": "tinkergraph",
+    "graph": "mocktinkertransactionalgraph[vertices:6 edges:6 directory:data/graph-example-1]",
+    "features": {
+        "ignoresSuppliedIds": false,
+        "supportsTransactions": false,
+        "supportsSelfLoops": true,
+        "supportsBooleanProperty": true,
+        "supportsEdgeKeyIndex": true,
+        "supportsUniformListProperty": true,
+        "supportsThreadedTransactions": false,
+        "isPersistent": true,
+        "supportsVertexIndex": true,
+        "supportsStringProperty": true,
+        "supportsIntegerProperty": true,
+        "isWrapper": false,
+        "supportsMixedListProperty": true,
+        "supportsVertexKeyIndex": true,
+        "isRDFModel": false,
+        "supportsLongProperty": true,
+        "supportsVertexIteration": true,
+        "supportsKeyIndices": true,
+        "supportsEdgeIteration": true,
+        "supportsPrimitiveArrayProperty": true,
+        "supportsDoubleProperty": true,
+        "supportsSerializableObjectProperty": true,
+        "supportsIndices": true,
+        "supportsEdgeIndex": true,
+        "supportsMapProperty": true,
+        "supportsFloatProperty": true,
+        "supportsDuplicateEdges": true
+    },
+    "readOnly": false,
+    "type": "com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph",
+    "queryTime": 0.32901,
+    "upTime": "0[d]:00[h]:07[m]:30[s]",
+    "extensions": [
+        {
+            "title": "tp:gremlin",
+            "op": "GET",
+            "description": "evaluate an ad-hoc Gremlin script for a graph.",
+            "name": "gremlin",
+            "parameters": [
+                {
+                    "description": "displays the properties of the elements with their native data type (default is false)",
+                    "name": "rexster.showTypes"
+                },
+                {
+                    "description": "an array of element property keys to return (default is to return all element properties)",
+                    "name": "rexster.returnKeys"
+                },
+                {
+                    "description": "start index for a paged set of data to be returned",
+                    "name": "rexster.offset.start"
+                },
+                {
+                    "description": "end index for a paged set of data to be returned",
+                    "name": "rexster.offset.end"
+                },
+                {
+                    "description": "the Gremlin script to be evaluated",
+                    "name": "script"
+                }
+            ],
+            "href": "http://localhost:8182/graphs/tinkergraph/tp/gremlin",
+            "namespace": "tp"
+        },
+        {
+            "title": "tp:gremlin",
+            "op": "POST",
+            "description": "evaluate an ad-hoc Gremlin script for a graph.",
+            "name": "gremlin",
+            "parameters": [
+                {
+                    "description": "displays the properties of the elements with their native data type (default is false)",
+                    "name": "rexster.showTypes"
+                },
+                {
+                    "description": "an array of element property keys to return (default is to return all element properties)",
+                    "name": "rexster.returnKeys"
+                },
+                {
+                    "description": "start index for a paged set of data to be returned",
+                    "name": "rexster.offset.start"
+                },
+                {
+                    "description": "end index for a paged set of data to be returned",
+                    "name": "rexster.offset.end"
+                },
+                {
+                    "description": "the Gremlin script to be evaluated",
+                    "name": "script"
+                }
+            ],
+            "href": "http://localhost:8182/graphs/tinkergraph/tp/gremlin",
+            "namespace": "tp"
+        }
+    ]
+}</code></pre>
+<p>In the event that the extension is not properly configured in some way, it will not appear in this list.</p>
+<h1><span class="caps">API</span> Documentation</h1>
+<p>When a failure occurs, it is nice to show to the user what the expectations are for the extension and its basic <span class="caps">API</span>.  Rexster helps with this in a few ways: parameter descriptions, explicit description and a combination of the two.</p>
+<h2>Parameter Description</h2>
+<p>A <code>description</code> parameter can be supplied to the <code>ExtensionRequestParameter</code>.  Consider this code snippet from the <code>PingExtension</code> in the <a href="https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/sample-kibbles">Sample Kibbles</a> project:</p>
+<pre><code>public ExtensionResponse evaluatePing(@RexsterContext RexsterResourceContext context,
+                                      @RexsterContext Graph graph,
+                                      @ExtensionRequestParameter(name="reply", description="a value to reply with") String reply) </code></pre>
+<p>When accessing the following <span class="caps">URI</span> (forgetting to include the <code>reply</code> <span class="caps">URI</span> query string parameter):</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/tp-sample/ping</code></pre>
+<p>Rexster will provide the following response:</p>
+<pre><code>{
+  "message":"the reply parameter cannot be empty",
+  "api":{
+    "description":"a simple ping extension.",
+    "parameters":[{"reply":"a value to reply with"}]
+  },
+  "success":false}</code></pre>
+<p>Note that the <code>reply</code> parameter is injected into the <code>api.parameters</code> along with the value from the <code>description</code> parameter.  It is possible to get the <code>api</code> <span class="caps">JSON</span> fragment from the <code>ExtensionMethod</code> using the <code>getExtensionApiAsJson</code> method.</p>
+<h2>Explicit Description</h2>
+<p>If for some reason the extension is not using <code>@ExtensionRequestParameter</code> annotations (perhaps the extension simply extracts the extension parameters from one of the context objects directly), the extension can provide its documentation directly through the <code>@ExtensionDescriptor</code> annotation.  Simply supply an array of <code>@ExtensionApi</code> annotations to the <code>api</code> parameter of the <code>@ExtensionDescriptor</code>.</p>
+<p>Given the following sample:</p>
+<pre><code>@ExtensionDescriptor(description = "some extension i wrote for gremlin",
+                     api = {
+                         @ExtensionApi(parameterName = "script", description = "the Gremlin script to be evaluated"),
+                         @ExtensionApi(parameterName = "xyz", description = "a fake parameter")
+                     })</code></pre>
+<p>the returned <span class="caps">JSON</span> with <code>api</code> attribute would look like:</p>
+<pre><code>{
+  "message":null,
+  "api":{
+    "description":"some extension i wrote for gremlin",
+    "parameters":[
+      {"script":"the Gremlin script to be evaluated"}, 
+      {"xyz":"a fake parameter"}
+    ]
+  },
+  "success":false}</code></pre>
+<h2>Combined</h2>
+<p>It is possible to use both the parameter-based description as well as the explicit description together.  By default, Rexster will try to use explicit description first and the override existing keys with values from the parameter description first.  That behavior can be controlled by setting the <code>apiBehavior</code> property on the <code>@ExtensionDescriptor</code> annotation.</p>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

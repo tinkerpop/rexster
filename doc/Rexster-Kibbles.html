@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Rexster Kibbles</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Rexster Kibbles</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Rexster-Kibbles"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Rexster-Kibbles"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src=" images/rexster-kibbles-logo.png" /></p>
+<p>Rexster Kibbles is a collection of general-purpose <a class="internal present" href="Extensions.html">extensions</a> for <a href="../../rexster/2.3.0/Home.html">Rexster</a>. Each &#x201C;kibble&#x201D; is its own self-contained project in the repository. To install a kibble:</p>
+<ol><li>Download the Kibble <code>jar</code> (or build the project)</li>
+	<li>Drop the <code>jar</code> into the <code>ext/</code> directory of Rexster</li>
+	<li>Start (or restart) the server.</li>
+</ol><p>See also <a class="internal present" href="Deploying-an-Extension.html">Deploying an Extension</a> for information on configuration of <code>rexster.xml</code>.</p>
+<h1>The Kibbles</h1>
+<ul><li><a href="https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/sample-kibbles">Sample Kibbles</a> &#x2013; a few well documented extension samples that should help those who want to get started extending Rexster</li>
+	<li><a href="https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/frames-kibble">Frames Kibble</a> &#x2013; expose graph elements through a  <em>frame</em> in the <span class="caps">REST</span> <span class="caps">API</span></li>
+	<li><a href="https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/sparql-kibble"><span class="caps">SPARQL</span> Kibble</a> &#x2013; execute <span class="caps">SPARQL</span> queries on a graph.</li>
+	<li><a href="https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/batch-kibble">Batch Kibble</a> &#x2013; execute a series of operations in a batch/transaction.</li>
+	<li>more to come!</li>
+</ul><p>Documentation on usage and configuration for individual Kibbles can be found in each Kibble&#x2019;s respective <code>README.textile</code>.</p>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

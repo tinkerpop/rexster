@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Extension Configuration</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Extension Configuration</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Extension-Configuration"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Extension-Configuration"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src="http://www.wpclipart.com/animals/dogs/cartoon_dogs/cartoon_dogs_6/cartoon_dog_T.png" width="100px" /></p>
+<p>There are several aspects of configuration that apply to extensions.  One aspect is the configuration of which extensions apply to which graphs.  That aspect of configuration is described in the <a class="internal present" href="Rexster-Configuration.html">Rexster Configuration</a> section.  The other aspect of configuration is the ability to pass static configuration parameters to an extension.  One set of configuration parameters can be supplied per extension, per graph.  It is this second aspect of configuration that is defined within this section.</p>
+<p>Configuration of an extension is supplied within the <code>&lt;configuration&gt;</code> component of a specific <code>&lt;extension&gt;</code>.  The following is the configuration for the <code>MapConfigurationExtension</code> from the <a href="https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/sample-kibbles">Sample Kibbles</a> project:</p>
+<pre><code>&lt;extension&gt;
+  &lt;namespace&gt;tp&lt;/namespace&gt;
+  &lt;name&gt;map-config&lt;/name&gt;
+  &lt;configuration&gt;
+    &lt;some-key&gt;some-value&lt;/some-key&gt;
+    &lt;other-key&gt;other-value&lt;/other-key&gt;
+  &lt;/configuration&gt;
+&lt;/extension&gt;</code></pre>
+<p>The above configuration specifies the <code>namespace</code> and extension <code>name</code> to be configured followed by a <code>&lt;configuration&gt;</code> section which is extension specific.  There are two options for what can be placed within the <code>&lt;configuration&gt;</code> element: simple name-value pairs (as shown in the example) or any valid <code>HierarchicalConfiguration</code> parseable <span class="caps">XML</span> given the specifications for the <a href="http://commons.apache.org/configuration/">Apache Commons Configuration</a> library.</p>
+<p>To gain access to the configuration settings from within the extension, simply access the <code>RexsterApplicationGraph</code> and search for the required configuration as shown in the following code snippet from the sample:</p>
+<pre><code>@ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
+public ExtensionResponse doConfiguredWork(@RexsterContext RexsterApplicationGraph rag) {
+
+    // finds the configuration settings from the configured graph
+    ExtensionConfiguration configuration = rag.findExtensionConfiguration(EXTENSION_NAMESPACE, EXTENSION_NAME);
+    Map&lt;String, String&gt; map = configuration.tryGetMapFromConfiguration();
+
+    return ExtensionResponse.ok(map);
+}</code></pre>
+<p>The <code>ExtensionConfiguration</code> is a container for the <span class="caps">XML</span> configuration.  When accessing a configuration containing simple name-value pairs, the <code>tryGetMapFromConfiguration</code> helper method converts the <span class="caps">XML</span> to a <code>Map</code>.  In this case, the extension simply returns the configuration as <span class="caps">JSON</span>.</p>
+<p>The other option is to get the more robust <code>HierarchicalConfiguration</code> object by using the <code>getConfiguration</code> method on the <code>ExtensionConfiguration</code>.  The <code>HierarchicalConfiguration</code> object provides a far more robust approach to configuration, allowing for deep hierarchies, lists and other such constructs within the <span class="caps">XML</span>.</p>
+<p>It is possible to validate the configuration of an extension.  To have an extension support validation, implement or override the <code>isConfigurationValid</code> method from the <code>RexsterExtension</code> interface (when building an extension from the <code>AbstractRexsterExtension</code>, this method is implemented to default to always be valid).  The following code snippet from the samples shows how to validate an extension configuration:</p>
+<pre><code>@Override
+public boolean isConfigurationValid(ExtensionConfiguration extensionConfiguration) {
+    boolean valid = false;
+
+    if (extensionConfiguration != null) {
+        Map&lt;String, String&gt; map = extensionConfiguration.tryGetMapFromConfiguration();
+        valid = map != null &amp;&amp; !map.isEmpty()
+                &amp;&amp; map.containsKey("some-key") &amp;&amp; map.containsKey("other-key");
+    }
+
+    return valid;
+}</code></pre>
+<p>In this case, the extension ensures that a configuration is present, it is a simple name/value pair configuration and that there are two keys supplied. In the event that the configuration is not valid, it will not appear as a configured extension.</p>
+<p>When writing unit tests around configuration, ensure that the <code>ExtensionConfiguration</code> is mocked with values that are of type String if the <code>tryGetMapFromConfiguration</code> is used.  That method will return as null (and log a message) if it fails to parse values to String from the configuration.  When not expected that null can cause confusion as to why the configuration is not returning valid to the test.</p>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

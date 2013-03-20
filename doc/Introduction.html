@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Introduction</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Introduction</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Introduction"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Introduction"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p>Rexster is a multi-faceted graph server with direct support for searching, <a href="http://en.wikipedia.org/wiki/Ranking">ranking</a>, scoring, and more specifically, <a href="http://en.wikipedia.org/wiki/Recommender_system">recommendation</a>. Rexster is generally communicated with over <a href="http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol"><span class="caps">HTTP</span></a>, but also has the beginnings of a binary protocol which currently has support through <a class="internal present" href="Rexster-Console.html">Rexster Console</a>. Rexster primarily responds to requests with results represented as <a href="http://en.wikipedia.org/wiki/JSON"><span class="caps">JSON</span></a> documents. Rexster is highly extensible through <a class="internal present" href="Extensions.html">Rexster Extensions</a> making it possible to expose new kinds of functionality within its container. The general system architecture is diagrammed below.</p>
+<p><img src=" images/rexster-system-arch.png" alt="" /></p>
+<p>Rexster makes extensive use of <a href="../../blueprints/2.3.0/Home.html">Blueprints</a>. Blueprints, which amongst other things, is a collection of graph-based interfaces (e.g. graph, vertex, edge, etc.) and their implementations (e.g. <a href="http://www.neo4j.org">Neo4j</a>, <a href="http://www.openrdf.org">OpenRDF</a>, etc.). The benefit is that Rexster can be used with various graph backends by providing &#x201C;plug and play&#x201D; support. Two useful <a href="../../www/2.3.0/Home.html">TinkerPop</a> products that make use of Blueprints are</p>
+<ul><li><a href="../../gremlin/2.3.0/Home.html">Gremlin</a> is a general-purpose, graph-based programming language</li>
+	<li><a href="../../pipes/2.3.0/Home.html">Pipes</a> is a data processing framework that has support for processing Blueprints-based graphs.</li>
+</ul><div><strong><a href="http://www.slideshare.net/slidarko/problemsolving-using-graph-traversals-searching-scoring-ranking-and-recommendation" title="Problem-Solving using Graph Traversals: Searching, Scoring, Ranking, and Recommendation">Problem-Solving using Graph Traversals: Searching, Scoring, Ranking, and Recommendation</a></strong><div>View more <a href="http://www.slideshare.net/">presentations</a> from <a href="http://www.slideshare.net/slidarko">Marko Rodriguez</a>.</div></div>
+
+<hr /><p>Rodriguez, M.A., Neubauer, P., <a href="http://arxiv.org/abs/1004.1001">The Graph Traversal Pattern</a>, AT&amp;Ti and NeoTechnology Technical Report, April 2010.</p>
+<p>Rodriguez, M.A., Allen, D.W., Shinavier, J., Ebersole, G., <a href="http://arxiv.org/abs/0905.1594">A Recommender System to Support the Scholarly Communication Process</a>, <span class="caps">KRS</span>-2009-02, April 2009.</p>
+<p>Rodriguez M.A., Shinavier, J., <a href="http://arxiv.org/abs/0806.2274">Exposing Multi-Relational Networks to Single-Relational Network Analysis Algorithms</a>, Journal of Informetrics, volume 4, number 1, pages 29-41, <span class="caps">ISSN</span>:1751-1577, Elsevier, doi:10.1016/j.joi.2009.06.004, LA-UR-08-03931, December 2009.</p>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

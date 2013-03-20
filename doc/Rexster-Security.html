@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Rexster Security</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Rexster Security</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Rexster-Security"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Rexster-Security"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p>Rexster supports a simple authentication model allowing <a class="internal present" href="Rexster-Configuration.html">configuration</a> through <code>rexster.xml</code>.  The model is extensible to allow Rexster users to plug-in their own security implementations with relative ease.  The authentication process extends across all aspects of Rexster to include <a class="internal present" href="Basic-REST-API.html">REST</a>, <a class="internal present" href="The-Dog-House.html">Dog House</a> and <a class="internal present" href="Rexster-Console.html">Rexster Console</a> access.</p>
+<p>From a <span class="caps">REST</span> and Dog House perspective, Rexster supports <a href="http://en.wikipedia.org/wiki/Basic_access_authentication">Basic Authentication</a> with the <code>default</code> configuration:</p>
+<pre><code>&lt;rexster&gt;
+  ...
+  &lt;security&gt;
+    &lt;authentication&gt;
+        &lt;type&gt;default&lt;/type&gt;
+        &lt;configuration&gt;
+          &lt;users&gt;
+            &lt;user&gt;
+              &lt;username&gt;rexster&lt;/username&gt;
+              &lt;password&gt;rexster&lt;/password&gt;
+            &lt;/user&gt;
+          &lt;/users&gt;
+        &lt;/configuration&gt;
+    &lt;/authentication&gt;
+  &lt;/security&gt;
+  ...
+&lt;/rexster&gt;</code></pre>
+To make a <span class="caps">REST</span> <span class="caps">API</span> call to Rexster with authentication turned on:
+<pre><code>curl -H "Authorization:Basic cmV4c3RlcjpyZXhzdGVy" http://localhost:8182/graphs</code></pre>
+<p>To prepare the request above, the user name is appended with a colon and concatenated with the password. The resulting string is encoded with the Base64 algorithm. For example, given the user name <code>rexster</code> and password <code>rexster</code>, the string <code>rexster:rexster</code> is Base64 encoded, resulting in <code>cmV4c3RlcjpyZXhzdGVy</code>.  In the case of <a class="internal present" href="The-Dog-House.html">Dog House</a>, the browser will produce an authentication dialog box to capture the username and password.</p>
+<h1>Custom Authentication</h1>
+<p>The default security model for Rexster that utilizes <code>rexster.xml</code> to house the usernames and passwords may not be the right choice for every environment.  It is possible to develop a plug-in to Rexster to implement your own custom approach to validating a user&#x2019;s credentials.</p>
+<p>Create a class that extends the <a href="https://github.com/tinkerpop/rexster/blob/master/rexster-server/src/main/java/com/tinkerpop/rexster/filter/AbstractSecurityFilter.java">AbstractSecurityFilter</a>.  This class will require the implementation of three methods:</p>
+<pre><code>public boolean authenticate(final String username, final String password){
+...
+}
+
+public void configure(final XMLConfiguration configuration) {
+...
+}
+
+public String getName() {
+...
+}</code></pre>
+<p>The <code>authenticate</code> method is the important one.  For each request, a call will be made to this method.  Validate the username and password combination in the appropriate manner for the implementation (ie. connect to a database via <span class="caps">JDBC</span>) and return <code>true</code> if the the username and password combination are acceptable and false otherwise.</p>
+<p>The <code>configure</code> method provides the means to access configuration information passed in from <code>rexster.xml</code>.  This would obviously be useful for a <span class="caps">JDBC</span>-based solution where database connectivity information could be set in <code>rexster.xml</code> and passed in to this method at startup of Rexster.  Rexster will pass in the contents of the <code>&lt;configuration&gt;</code> section of <code>rexster.xml</code>.</p>
+<p>The <code>getName</code> method is fairly simple.  It is just a name used for labeling of the implementation.</p>
+<p>Make this class available in the Rexster classpath by copying it to Rexster&#x2019;s <code>REXSTER_HOME/ext</code> directory (just like <a class="internal present" href="Extensions.html">Rexster Extensions</a>).</p>
+<p>The final step is to configure <code>rexster.xml</code> to use the custom security extension.  Set the value of the <code>&lt;security&gt;&lt;authentication&gt;&lt;type&gt;</code> element to the fully qualified class name of the <code>AbstractSecurityFilter</code> implementation.</p>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

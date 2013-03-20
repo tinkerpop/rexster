@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Rexster Console</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Rexster Console</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Rexster-Console"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Rexster-Console"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p>Rexster Console is a <a href="http://en.wikipedia.org/wiki/Read-eval-print_loop"><span class="caps">REPL</span></a> similar to the <span class="caps">REPL</span> available from <a href="../../gremlin/2.3.0/Getting-Started.html">Gremlin</a>.  It differs in several ways:</p>
+<ul><li>Script evaluation within Rexster Console occurs remotely on a Rexster server. It communicates with Rexster over <a class="internal present" href="RexPro.html">RexPro</a>, Rexster&#x2019;s binary protocol.</li>
+	<li>Rexster Console communicates with any <a href="../../gremlin/2.3.0/JVM-Language-Implementations.html">Gremlin-flavored</a> <a href="http://jcp.org/en/jsr/detail?id=223">JSR223</a> compliant ScriptEngine hosted within the Rexster server.  (At this time, Rexster only hosts <a href="../../gremlin/2.3.0/Using-Gremlin-through-Groovy.html">Gremlin Groovy</a>) The variable pool is shared across each engine. In this way, its possible to make use of each language&#x2019;s unique expressive qualities when manipulating variables.</li>
+	<li>Rexster Console provides access to configured graphs within Rexster server through the <code>rexster</code> variable that is injected into the variable pool on the server.</li>
+</ul><h1>Getting Started</h1>
+<p>Rexster Console is packaged separately from Rexster Server.  These instructions assume that commands are being executed from within the Rexster Console home directory.</p>
+<p>To start the console, first ensure that the Rexster server is running, then start the console from the command line (this assumes that Rexster is not <a class="internal present" href="Rexster-Security.html">configured</a> with authentication turned on):</p>
+<pre><code>./bin/rexster-console.sh</code></pre>
+<pre><code>        (l_(l
+(_______( 0 0
+(        (-Y-) &lt;woof&gt;
+l l-----l l
+l l,,   l l,,
+opening session with Rexster [localhost:8184]--&gt; ready
+?h for help
+
+rexster[groovy]&gt; </code></pre>
+<p>Note the language name in square brackets.  This represents the script engine language that the line will be evaluated with on the server.  It&#x2019;s easy to see what languages are available on the server:</p>
+<pre><code>rexster[groovy]&gt; ?l
+-= Available Languages =-
+?groovy</code></pre>
+<p>It is important to note that Rexster abbreviates the script engine language names.  For example, <code>groovy</code> is really <code>gremlin-groovy</code>.  As Rexster only deals with gremlin-flavored script engines and all script engines to be developed in the future will be prefixed with <code>gremlin-</code>, Rexster simply ignores that prefix to make things more succinct.</p>
+<p>To change languages simply type one of those languages (case sensitive) into the command-line <strong>(The following examples are for demonstration purposes only as Gremlin Scala does not yet have a script engine implementation)</strong>:</p>
+<pre><code>rexster[groovy]&gt; ?scala
+rexster[scala]&gt; </code></pre>
+<p>Variables are shared across script engines within a Rexster Console session.</p>
+<pre><code>rexster[groovy]&gt; x = 1 + 1
+==&gt;2
+rexster[groovy]&gt; ?scala
+rexster[scala]&gt; x = x + 1
+==&gt;3
+rexster[scala]&gt; y = x + 1 
+==&gt;4
+rexster[scala]&gt; ?groovy
+rexster[groovy]&gt; x + y
+==&gt;7.0</code></pre>
+<p>Getting access to graphs configured within Rexster is allowed through the <code>rexster</code> variable which is a context object on the server.</p>
+<pre><code>rexster[groovy]&gt; g = rexster.getGraph("tinkergraph")
+==&gt;tinkergraph[vertices:6 edges:6]
+rexster[groovy]&gt; g.v(1).name
+==&gt;marko</code></pre>
+<h1>Command Line</h1>
+<p>The Rexster Console accepts several parameters for its initialization.</p>
+<table><tr><th>parameter </th>
+		<th>description </th>
+	</tr><tr><td> -l </td>
+		<td> The default language to use at startup of the console.  Defaulted to <code>groovy</code>. </td>
+	</tr><tr><td> -rh </td>
+		<td> The host name or IP address of the Rexster server. Defaulted to <code>localhost</code>. </td>
+	</tr><tr><td> -rp </td>
+		<td> The port of the Rexster server that is serving RexPro. Defaulted to <code>8184</code> </td>
+	</tr><tr><td> -t </td>
+		<td> The number of seconds the console will wait for a response from the server. Defaulted to 100. </td>
+	</tr><tr><td> -e </td>
+		<td> A script file to execute remotely. </td>
+	</tr><tr><td> -u </td>
+		<td> Username (only required if default authentication is turned on) </td>
+	</tr><tr><td> -p </td>
+		<td> Password (only required if default authentication is turned on) </td>
+	</tr><tr><td> -h </td>
+		<td> Displays the help message. </td>
+	</tr></table><p>Common usage:</p>
+<pre><code>./bin/rexster-console.sh -rh localhost -rp 8184</code></pre>
+<p>To remotely execute a script in a file via the console:</p>
+<pre><code>./bin/rexster-console.sh -rh localhost -rp 8184 -e my-script.grm</code></pre>
+<p>It is important to keep in mind that Gremlin is the default language for the console, therefore if the script is a non-Gremlin script, ensure that the <code>-l</code> parameter is passed with the language specified.  It is also worth mentioning that Rexster Console commands cannot be executed from a script.  In other words, it will not allow any of the <code>?</code> prefixed features specific to Rexster Console to be executed.  For example, a script can not change scripting languages within the script itself.</p>
+<p>Port 8184 is the default RexPro port as defined in <code>rexster.xml</code>.  Please see the <a class="internal present" href="Rexster-Configuration.html">Rexster Configuration</a> section for more information on this setting.</p>
+<h1>Console Commands</h1>
+<p>From within the console, there are a number of actions that can be executed from the command line.  Each command is prefixed with a question mark:</p>
+<table><tr><th>returns </th>
+		<th>description </th>
+	</tr><tr><td> ?{language-name} </td>
+		<td> Change the language of the script engine.  The language parameter is case sensitive and must be an available script engine on the server. </td>
+	</tr><tr><td> ?b </td>
+		<td> Show the variable pool. </td>
+	</tr><tr><td> ?l </td>
+		<td> List the languages installed on Rexster. </td>
+	</tr><tr><td> ?r </td>
+		<td> Refresh the Rexster Console session.  The variable pool will be destroyed. </td>
+	</tr><tr><td> ?e {file-name} </td>
+		<td> Execute a script file on the server. </td>
+	</tr><tr><td> ?q </td>
+		<td> Close the session and exit the command line. </td>
+	</tr><tr><td> ?h </td>
+		<td> Display help. </td>
+	</tr></table><p>When using the <code>?e</code> option, it is important to recognize that the <span class="caps">REPL</span> commands do not apply.  For example, the script file cannot contain a <code>?r</code> to refresh the session.</p>
+<h1>Rexster Context</h1>
+<p>When establishing a session with Rexster, the <code>rexster</code> context variable is injected into the variable pool that is shared with all the script engines.  The <code>rexster</code> variable provides access to server-side resources such as the graphs configured within Rexster.  The following operations are available from the <code>rexster</code> within script evaluations:</p>
+<table><tr><th>function </th>
+		<th>description </th>
+	</tr><tr><td> getGraph(graphName) </td>
+		<td> Gets a configured graph instance within Rexster. The <code>graphName</code> specified is a String value that is case sensitive and matches the name of a configured graph. </td>
+	</tr><tr><td> getGraphNames() </td>
+		<td> Gets the list of configured graph instance names on the server. </td>
+	</tr><tr><td> getVersion() </td>
+		<td> Gets the version of Rexster on the server. </td>
+	</tr></table><pre><code>rexster[groovy]&gt; graphNames = rexster.graphNames.toArray()
+==&gt;tinkergraph
+==&gt;gratefulgraph
+==&gt;tinkergraph-readonly
+==&gt;emptygraph
+rexster[groovy]&gt; g = rexster.getGraph(graphNames[0])
+==&gt;tinkergraph[vertices:6 edges:6]</code></pre>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

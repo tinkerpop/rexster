@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Extensions</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Extensions</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Extensions"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Extensions"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src="http://www.wpclipart.com/animals/dogs/cartoon_dogs/cartoon_dogs_6/cartoon_dog_T.png" width="100px" /></p>
+<p>Extensions provide for a way to plug-in new functions to existing Rexster resources (specifically, graphs, vertices and edges) allowing for support of standard traversal goals such as search, score, rank, and, in concert, recommendation.</p>
+<p>Rexster is packaged with the <a class="internal present" href="Gremlin-Extension.html">Gremlin Extension</a> which allows users to execute ad-hoc computations on the graph backend.  <a class="internal present" href="Rexster-Kibbles.html">Rexster Kibbles</a> contains additional extensions that can easily plug-in to Rexster.</p>
+<p>Extensions are identified by implementing the <code>RexsterExtension</code> interface and are defined using a series of <code>Annotations</code> (see <a class="internal present" href="Extension-Annotations.html">Extension Annotations</a>) which instruct Rexster how to expose it through the <span class="caps">REST</span> <span class="caps">API</span>.  The <code>Annotations</code> are applied to to any class and method to be exposed through the <span class="caps">REST</span> <span class="caps">API</span>.  These <code>Annotations</code> allow for the definition of meta-data, such as extension description and <span class="caps">API</span> documentation, the <code>ExtensionPoint</code>, which refers to the Rexster resource the extension applies to, namespacing, and the injection of Rexster context into an extension method.</p>
+<p>Methods marked for extension must return an <code>ExtensionResponse</code> which is a wrapper for a a standard <a href="http://jersey.java.net/">Jersey</a> <code>Response</code> object.  The <code>ExtensionResponse</code> has a series of helper methods for building its own instances so that the underlying details of Jersey are hidden from view.  At the same time, the option to build-you-own Jersey <code>Response</code> object remains open for complete flexibility.</p>
+<p>Extensions are configured per graph in <a href="https://github.com/tinkerpop/rexster/blob/master/rexster-server/rexster.xml">rexster.xml</a>.  This means that different extensions can be applied to different graphs.  Furthermore, each graph extension may be given a different configuration (to the extent that the extension allows for configuration, at least).</p>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

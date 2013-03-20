@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Creating an Extension</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Creating an Extension</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Creating-an-Extension"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Creating-an-Extension"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src="http://www.wpclipart.com/animals/dogs/cartoon_dogs/cartoon_dogs_6/cartoon_dog_T.png" width="100px" /></p>
+<p>This section will demonstrate how to create an Extension for Rexster. Lets start by creating a <code>PingExtension</code> and then modify it over the course of the documentation.  The code for the <code>PingExtension</code> can be found in the Extension samples within <a href="http://rexster-kibbles.tinkerpop.com">Rexster Kibbles</a>.</p>
+<h1>Dependencies</h1>
+<p>To build an extension, the following dependencies are necessary:</p>
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop.rexster&lt;/groupId&gt;
+  &lt;artifactId&gt;rexster-core&lt;/artifactId&gt;
+  &lt;version&gt;??&lt;/version&gt;
+  &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
+  &lt;artifactId&gt;jersey-server&lt;/artifactId&gt;
+  &lt;version&gt;1.11&lt;/version&gt;
+  &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+<p>Note that both of these dependencies can be scoped as <code>provided</code>, as Rexster will have these dependencies available when th extension is deployed.  In addition to these dependencies, it would be difficult to build a meaningful extension without at least also including:</p>
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop.blueprints&lt;/groupId&gt;
+  &lt;artifactId&gt;blueprints-core&lt;/artifactId&gt;
+  &lt;version&gt;??&lt;/version&gt;
+  &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+<h2>A Simple Ping Extension</h2>
+<pre><code>@ExtensionNaming(namespace = "ex", name = "ping")
+public class PingExtension extends AbstractRexsterExtension {
+
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
+    @ExtensionDescriptor(description = "Ping me.")
+    public ExtensionResponse evaluatePing(@RexsterContext RexsterResourceContext context,
+                                          @RexsterContext Graph graph) {
+        Map&lt;String, String&gt; map = new HashMap&lt;String, String&gt;();
+        map.put("ping", "pong");
+        return ExtensionResponse.ok(map);
+    }
+}</code></pre>
+<p>The <a class="internal present" href="Extension-Naming.html">extension</a> is named using <code>@ExtensionNaming</code> annotation where a namespace and name is provided. The extension must implement the <code>RexsterExtension</code> interface (or simply extend from <code>AbstractRexsterExtension</code> which implements it itself). A method is provided called <code>evaluatePing</code>. This method is attached to the <code>ExtensionPoint.GRAPH</code>. Thus, when</p>
+<pre><code>http://localhost:8182/graphs/mygraph/ex/ping</code></pre>
+<p>is resolved, a <span class="caps">JSON</span> object is returned that has the key/value ping/pong.</p>
+<pre><code>{
+  "ping": "pong"
+  "version": "*.*"
+  "queryTime": 3.765
+}</code></pre>
+<p>Of course, you can (and probably will) interact with the <code>graph</code> and perform some calculation. In these simple examples, no graph manipulations are discussed.</p>
+<h2>Automatic Parameter Parsing and Self-Documenting Extensions</h2>
+<pre><code>@ExtensionNaming(namespace = "ex", name = "ping")
+public class PingExtension extends AbstractRexsterExtension {
+
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
+    @ExtensionDescriptor(description = "A simple ping extension.")
+    public ExtensionResponse evaluatePing(@RexsterContext RexsterResourceContext context,
+                                          @RexsterContext Graph graph,
+                                          @ExtensionRequestParameter(name="reply", description="a value to reply with") String reply) {
+        Map&lt;String, String&gt; map = new HashMap&lt;String, String&gt;();
+        map.put("ping", reply);
+        return ExtensionResponse.ok(map);
+    }
+}</code></pre>
+<p>There are two new add-ons to the <code>PingExtension</code>.</p>
+<ol><li><code>@ExtensionDescriptor</code>: An annotation to provide documentation to the user when the extension fails.</li>
+	<li><code>@ExtensionRequestParameter</code>: An annotation to parse the <span class="caps">JSON</span> request object and provide value as a parameter.</li>
+</ol><p>Note what is returned when <code>http://localhost:8182/graphs/mygraph/ex/ping</code> is resolved:</p>
+<pre><code>{
+  "message": null
+  "api": {
+    "description": "A simple ping extension."
+    "parameters": {
+      "reply": "a value to reply with"
+    }
+  }
+  "success": false
+}</code></pre>
+<p>By annotating the method and its parameters, an <span class="caps">API</span> is created. Next, resolve <code>http://localhost:8182/graphs/mygraph/ex/ping?reply=ping-a-ling</code> and what is returned is:</p>
+<pre><code>{
+  "ping": "ping-a-ling"
+  "version": "*.*"
+  "queryTime": 4.281
+}</code></pre>
+<h2>Getting the Request Object and Returning a Result Object</h2>
+<p>In Rexster, <span class="caps">JSON</span> comes in and <span class="caps">JSON</span> goes out (see <a class="internal present" href="Mapping-a-URI-to-JSON.html">Mapping a URI to JSON</a>). Its possible to get the values of the <span class="caps">JSON</span> request object using <code>@ExtensionRequestParameter</code> annotations. You can also get the <span class="caps">JSON</span> object directly with:</p>
+<pre><code>JSONObject requestObject = context.getRequestObject()</code></pre>
+<p>Next, building up the result in a <code>JSONObject</code> is as easy as using Java <code>Map</code>. When the result object has been constructed, return it with a <code>ExtensionResponse</code> method (e.g. <code>ok</code>, <code>error</code>). That is all there is to it.</p>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

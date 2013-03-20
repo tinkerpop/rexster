@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Gremlin Extension</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Gremlin Extension</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Gremlin-Extension"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Gremlin-Extension"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src="https://github.com/tinkerpop/gremlin/raw/master/doc/images/gremlin-logo.png" alt="" /></p>
+<p><a href="../../gremlin/2.3.0/Home.html">Gremlin</a> is a graph-based traversal language developed for <a href="../../gremlin/2.3.0/defining-a-property-graph.html">property graphs</a>. In combination with Rexster, Gremlin allows users to execute ad-hoc computations on the graph backend.</p>
+<p>Gremlin is exposed through Rexster as an <a class="internal present" href="Extensions.html">Extension</a> and scripts may be executed via the <span class="caps">REST</span> <span class="caps">API</span> or through the Gremlin Console in <a class="internal present" href="The-Dog-House.html">The Dog House</a>.</p>
+<h1>Gremlin Use-Cases</h1>
+<p>Through Gremlin, its possible, amongst other things, to perform the following tasks:</p>
+<ul><li>Add/delete vertices and edges from the graph.</li>
+	<li>Manipulate the graph indices.</li>
+	<li>Search for elements of a graph.</li>
+	<li>Load graph data from a file or <span class="caps">URL</span>.</li>
+	<li>Make use of <a href="http://jung.sourceforge.net/"><span class="caps">JUNG</span></a> algorithms.</li>
+	<li>Make use of <a href="http://www.w3.org/TR/rdf-sparql-query/"><span class="caps">SPARQL</span></a> queries over OpenRDF-based graphs.</li>
+	<li>and much, much more.</li>
+</ul><p>In general, using the <code>GremlinExtension</code> provided with Rexster, various graph management tasks can be accomplished.</p>
+<h1>Executing Scripts</h1>
+<p>The Gremlin Extension is exposed on the following <a class="internal present" href="Extension-Points.html">extension point</a> options: graphs, vertices and edges which means it is available on the following URIs:</p>
+<pre><code>http://localhost:8182/graphs/{graph}/tp/gremlin
+http://localhost:8182/graphs/{graph}/vertices/{id}/tp/gremlin
+http://localhost:8182/graphs/{graph}/edges/{id}/tp/gremlin</code></pre>
+<p>The difference among these URIs is the context within which the Gremlin session is initialized with graph variables.  When simply accessing Gremlin from the graph <code>ExtensionPoint</code>, the Gremlin session is given access to the requested graph.  When accessed from the vertex or edge <code>ExtensionPoint</code>, the requested vertex or edge is pushed into the session with the graph.</p>
+<p>Therefore, given the following <span class="caps">URI</span>:</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=g.v(1)</code></pre>
+<p>Rexster will take the requested <code>tinkergraph</code> and pass it to the Gremlin script engine in the context of the variable <code>g</code>.  Similarly, the vertex and edge resource will pass a <code>v</code> and <code>e</code> variable, respectively, to the script engine for the requested vertex or edge.</p>
+<p>For a vertex,</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/vertices/1/tp/gremlin?script=v.out()</code></pre>
+<p>Rexster will respond with:</p>
+<pre><code>{
+  "results":[
+    {"_id":"2","_type":"vertex","name":"vadas","age":27},
+    {"_id":"3","_type":"vertex","name":"lop","lang":"java"},
+    {"_id":"4","_type":"vertex","name":"josh","age":32}
+  ],
+  "success":true,
+  "version":"*.*",
+  "queryTime":5.963338
+}</code></pre>
+<p>For an edge,</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/edges/11/tp/gremlin?script=e.inV</code></pre>
+<p>Rexster will respond with:</p>
+<pre><code>{
+  "results":[
+    {"_id":"3","_type":"vertex","name":"lop","lang":"java"}
+  ],
+  "success":true,
+  "version":"*.*",
+  "queryTime":5.963338
+}</code></pre>
+<p>By default, Rexster uses the <code>groovy</code> flavor of Gremlin for processing scripts.  It is possible to specify other flavors of Gremlin with the <code>language</code> parameter (<strong>Note:</strong> No other Gremlin flavors are exposed at this time.  This feature is for future compatibility).</p>
+<h1>Configuration</h1>
+<p>The Gremlin Extension does not require any specific configuration beyond including it in the <code>&lt;allows&gt;</code> section of the <code>&lt;extensions&gt;</code> element of <code>rexster.xml</code>.  The Gremlin Extension is in the TinkerPop namespace called <code>tp</code> and its name is <code>gremlin</code>.  Therefore, the configuration would look something like this:</p>
+<pre><code>&lt;graph&gt;
+  &lt;graph-name&gt;tinkergraph&lt;/graph-name&gt;
+  &lt;graph-type&gt;tinkergraph&lt;/graph-type&gt;
+  &lt;graph-file&gt;data/graph-example-1.xml&lt;/graph-file&gt;
+  &lt;extensions&gt;
+    &lt;allows&gt;
+      &lt;allow&gt;tp:gremlin&lt;/allow&gt;
+    &lt;/allows&gt;
+    &lt;extension&gt;
+      &lt;namespace&gt;tp&lt;/namespace&gt;
+      &lt;name&gt;gremlin&lt;/name&gt;
+      &lt;configuration&gt;
+        &lt;scripts&gt;script-directory&lt;/scripts&gt;
+        &lt;allow-client-script&gt;true&lt;/allow-client-script&gt;
+        &lt;cache-scripts&gt;true&lt;/cache-scripts&gt;
+      &lt;/configuration&gt;
+    &lt;/extension&gt;
+  &lt;/extensions&gt;
+&lt;/graph&gt;</code></pre>
+<p>The <code>&lt;configuration&gt;</code> element is an optional element which contains several settings.  The first is the <code>&lt;scripts&gt;</code> element, which represents a directory that Rexster can access for Gremlin script files.  The script files must be suffixed with a <code>.gremlin</code> extension for Rexster to find them.  You can read more about how to utilize these script files below.</p>
+<p>The second setting is the <code>&lt;allow-client=script&gt;</code> option controls whether or not scripts passed to the <code>script</code> parameter are executed or not.  This value is <code>true</code> by default when the configuration is not present.</p>
+<p>The third setting is the <code>cache-scripts&gt;</code> element.  When set to <code>true</code> (the default if the configuration setting is not present), the Gremlin Extension will read the script file once the first time it is referenced and keep it in memory for future calls.  If the value is <code>false</code>, the Gremlin Extension will read the script each time a call is made where the script is referenced.  Scripts are cached globally across graph configuration.  In other words, if two graphs both reference the same script directory as the location for Gremlin scripts, the script will only be cached once.</p>
+<h1>Gremlin Extension <span class="caps">API</span></h1>
+<p>To see the full <span class="caps">API</span> of the <code>GremlinExtension</code> service, simply call the service without any query parameters.</p>
+<pre><code>http://localhost:8182/graphs/gratefulgraph/tp/gremlin</code></pre>
+<p>The returned <span class="caps">JSON</span> is provided below.</p>
+<pre><code>{
+  "message": "no scripts provided",
+  "api": {
+    "description": "evaluate an ad-hoc Gremlin script for a graph.",
+    "parameters": {
+      "rexster.returnKeys": "an array of element property keys to return (default is to return all element properties)",
+      "rexster.showTypes": "displays the properties of the elements with their native data type (default is false)",
+      "load": "a list of 'stored procedures' to execute prior to the 'script' (if 'script' is not specified then the last script in this argument will return the values",
+      "rexster.offset.end": "end index for a paged set of data to be returned",
+      "rexster.offset.start": "start index for a paged set of data to be returned",
+      "params": "a map of parameters to bind to the script engine",
+      "language": "the gremlin language flavor to use (default to groovy)",
+      "script": "the Gremlin script to be evaluated"
+    }
+  },
+  "success": false
+}</code></pre>
+<h2>Paging &#x2013; Offset Parameter</h2>
+<p>The <code>rexster.offset.start</code> and <code>rexster.offset.end</code> parameters allow gremlin results to paged.  The two parameters represent the respective indexes that tell the Gremlin Extension what records to return.  Without paging, the following <span class="caps">URI</span> will return all results.</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=g.v(1).outE</code></pre>
+<pre><code>{
+  "results":[
+    {"_id":"7","_type":"edge","_label":"knows","_inV":"2","_outV":"1","weight":0.5},
+    {"_id":"9","_type":"edge","_label":"created","_inV":"3","_outV":"1","weight":0.4},
+    {"_id":"8","_type":"edge","_label":"knows","_inV":"4","_outV":"1","weight":1}
+  ],
+  "success":true,
+  "version":"*.*",
+  "queryTime":6.423103
+}</code></pre>
+<p>Specifying the <code>rexster.offset.start</code> alone will return all values starting from the value of that index to the end of the result set.</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=g.v(1).outE&amp;rexster.offset.start=1</code></pre>
+<pre><code>{
+  "results":[
+    {"_id":"9","_type":"edge","_label":"created","_inV":"3","_outV":"1","weight":0.4},
+    {"_id":"8","_type":"edge","_label":"knows","_inV":"4","_outV":"1","weight":1}
+  ],
+  "success":true,
+  "version":"*.*",
+  "queryTime":6.423103
+}</code></pre>
+<p>Specifying the <code>rexster.offset.end</code> alone will return all values starting from the beginning of the list to the value of the end offset.</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=g.v(1).outE&amp;rexster.offset.end=1</code></pre>
+<pre><code>{
+  "results":[
+    {"_id":"7","_type":"edge","_label":"knows","_inV":"2","_outV":"1","weight":0.5}
+  ],
+  "success":true,
+  "version":"*.*",
+  "queryTime":6.423103
+}</code></pre>
+<p>Specifying both the <code>rexster.offset.start</code> and <code>rexster.offset.end</code> will return just those results that exist between those two indexes.</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=g.v(1).outE&amp;rexster.offset.end=2&amp;rexster.offset.start=1</code></pre>
+<pre><code>{
+  "results":[
+    {"_id":"9","_type":"edge","_label":"created","_inV":"3","_outV":"1","weight":0.4}
+  ],
+  "success":true,
+  "version":"*.*",
+  "queryTime":6.423103
+}</code></pre>
+<h2>Return Keys Parameter</h2>
+<p>The <code>rexster.returnKeys</code> parameter allows one to specify how to construct a <span class="caps">JSON</span> object representation of a returned <code>Element</code> (i.e. <code>Vertex</code> or <code>Edge</code>). All elements are returned as <span class="caps">JSON</span> objects with the properties identified by the <code>rexster.returnKeys</code> array being what is included in the <span class="caps">JSON</span> representation. The wildcard <code>*</code> denotes to return all properties of the element.</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=g.idx(%22vertices%22)[[name:%22marko%22]]&amp;rexster.returnKeys=[age]</code></pre>
+<pre><code>{
+  "results":[
+    {"_id":"1","_type":"vertex","age":29}
+  ],
+  "success":true,
+  "version":"*.*",
+  "queryTime":7.547388
+}</code></pre>
+<h2>Script Engine Bindings</h2>
+<p>Parameters can be passed to the Gremlin Extension through the <code>params</code> argument.  These key/values pairs become bindings to the script engine that can then be used in the script itself.</p>
+<pre><code>curl -v -X POST -d '{"params":{"list":[1,2,3],"text":"test"},"script":"[list[0]+list[1]+list[2], text]"}' -H "Content-Type:application/json" http://localhost:8182/graphs/tinkergraph/tp/gremlin</code></pre>
+<pre><code>{
+    "results": [
+        6,
+        "test"
+    ],
+    "success": true,
+    "version": "*.*",
+    "queryTime": 3547.145821
+}</code></pre>
+<p>To use the <a class="internal present" href="Property-Data-Types.html">Rexster type system</a> for parameters to be placed in the bindings be sure to set <code>rexster.showTypes</code> to <code>true</code>, as it will control that data type parsing operation.</p>
+<p>It is possible to get access to the <code>Bindings</code> object itself by using the <code>ScriptContext</code>:</p>
+<pre><code>curl "http://localhost:8182/graphs/tinkergraph/tp/gremlin?params.x=1&amp;script=this.context.getBindings(javax.script.ScriptContext.ENGINE_SCOPE).containsKey('x')"
+{"results":[true],"success":true,"version":"*.*","queryTime":125.693432}
+
+curl "http://localhost:8182/graphs/tinkergraph/tp/gremlin?params.x=1&amp;script=this.context.getBindings(javax.script.ScriptContext.ENGINE_SCOPE).containsKey('y')"
+{"results":[false],"success":true,"version":"*.*","queryTime":126.561443}</code></pre>
+<p>This bit of the above script submitted to Rexster:</p>
+<pre><code>this.context.getBindings(javax.script.ScriptContext.ENGINE_SCOPE)</code></pre>
+<p>returns the set of <a href="http://docs.oracle.com/javase/6/docs/api/javax/script/Bindings.html">Bindings</a>.  It is then possible to access the map of parameters sent to Rexster.  Accessing the <code>Bindings</code> is useful when it is necessary to check if a parameter was passed in the first place.</p>
+<h2>Load Parameter</h2>
+<p>It is possible to execute &#x201C;stored procedures&#x201D; by utilizing the <code>load</code> parameter.  The load parameter accepts an array of Gremlin script file names that must exist in the configured <code>scripts</code> directory of <code>rexster.xml</code> (as part of the Gremlin configuration described above).  Those script files are executed in order prior to the execution of the Gremlin script passed on the <code>script</code> argument.  In the event that no <code>script</code> parameter is supplied or if <code>&lt;allow-client-script&gt;</code> is set to false, the return value of the Gremlin Extension ends up being the output of the final script passed to <code>load</code> parameter.</p>
+<p>The benefit of storing these scripts on the server is that globally reusable functions and algorithms can be centralized and protected on the server.  In doing this, it makes it possible to keep heavy logic on the server (which may amount to many lines of Gremlin) and simply reference those functions from the <code>script</code> argument.</p>
+<p>For example, add two server-side script files to the directory configured in <code>rexster.xml</code>:</p>
+<ul><li>vertices.gremlin</li>
+	<li>filter-age.gremlin</li>
+</ul><p>The <code>vertices.gremlin</code> script simply contains a script that puts the list of vertices into a variable, called <code>vx</code>, in the script engine context:</p>
+<pre><code>vx = g.V;</code></pre>
+<p>The <code>filter-age.gremlin</code> script contains a generic function that filters a list of vertices.</p>
+<pre><code>def filterOver30(vertices) {
+  return vertices.filter{it.age &gt; 30}
+} </code></pre>
+<p>You can then make use of these functions with the following <span class="caps">REST</span> <span class="caps">API</span> call:</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=filterOver30(vx)&amp;load=[vertices,filter-age]</code></pre>
+<p>The <span class="caps">URI</span> references both scripts as an array in the <code>load</code> parameter (note that the files are referenced by name without the <code>.gremlin</code> extension).  The <code>script</code> argument calls the <code>filterOver30</code> function and passes in the list of vertices established by the <code>vertices.gremlin</code> script.  This call returns the following:</p>
+<pre><code>{
+  "results": [
+    {
+      "name": "peter",
+      "age": 35,
+      "_id": "6",
+      "_type": "vertex"
+    },
+    {
+      "name": "josh",
+      "age": 32,
+      "_id": "4",
+      "_type": "vertex"
+    }
+  ],
+  "success": true,
+  "version": "*.*",
+  "queryTime": 12.299851
+}</code></pre>
+<h1><span class="caps">JSON</span> Serialization</h1>
+<p>Rexster tries to serialize results to <span class="caps">JSON</span> in a way that is most like the structures they originate from and uses the <a href="../../blueprints/2.3.0/GraphSON-Reader-and-Writer-Library.html">GraphSON</a> for the serialization of graph elements.  This approach works well in most cases but there are scenarios where the limits of <span class="caps">JSON</span> prevent a mirror copy of results.</p>
+<p>First, complex objects outside of <code>Map</code>, <code>List</code>, and those items handled by GraphSON will be converted via <code>toString</code>.  In other words, a value that is a <code>Date</code> or <code>UUID</code> will simply be converted to a string in the <span class="caps">JSON</span>.</p>
+<p>Second, <code>Map</code> objects that contain keys that are graph elements have a different serialization structure.  <span class="caps">JSON</span> must have keys that are of type <code>String</code>.  Therefore, using a graph element for a key, which is a common pattern when using <code>groupCount</code> or <code>groupBy</code> operations in Gremlin, needs to have a bit more verbosity.</p>
+<p>Note the <code>Map</code> structure in the following example from Rexster Console:</p>
+<pre><code>rexster[groovy]&gt; g = rexster.getGraph("tinkergraph")
+==&gt;mocktinkertransactionalgraph[vertices:6 edges:6 directory:data/graph-example-1]
+rexster[groovy]&gt; g.V.out.groupCount.cap
+==&gt;{v[3]=3, v[2]=1, v[5]=1, v[4]=1}</code></pre>
+<p>The key in the <code>Map</code> is the vertex that was grouped on and the value is the &#x201C;count&#x201D; or number of times that vertex was traversed.</p>
+<p>When executing this Gremlin query through the Gremlin Extension:</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=g.V.out.groupCount.cap</code></pre>
+<p>the results look a bit different:</p>
+<pre><code>{
+    "results": [
+        {
+            "2": {
+                "_value": 1,
+                "_key": {
+                    "name": "vadas",
+                    "age": 27,
+                    "_id": "2",
+                    "_type": "vertex"
+                }
+            },
+            "3": {
+                "_value": 3,
+                "_key": {
+                    "name": "lop",
+                    "lang": "java",
+                    "_id": "3",
+                    "_type": "vertex"
+                }
+            },
+            "4": {
+                "_value": 1,
+                "_key": {
+                    "name": "josh",
+                    "age": 32,
+                    "_id": "4",
+                    "_type": "vertex"
+                }
+            },
+            "5": {
+                "_value": 1,
+                "_key": {
+                    "name": "ripple",
+                    "lang": "java",
+                    "_id": "5",
+                    "_type": "vertex"
+                }
+            }
+        }
+    ],
+    "success": true,
+    "version": "*.*",
+    "queryTime": 12.599092
+}</code></pre>
+<p>Here the key to top level <code>Map</code> is the identifier of the graph element.  The value is itself a <code>Map</code> that contains the GraphSON serialized graph element, and the value (i.e. the &#x201C;count&#x201D;).</p>
+<h1>Using Multi-Line Scripts</h1>
+<p>For multi-line constructs, its possible to use tools like <a href="http://en.wikipedia.org/wiki/CURL">cURL</a> to post <span class="caps">JSON</span> to the traversal service instead of relying on the conversion of the <span class="caps">URI</span> query parameters to be mapped to <span class="caps">JSON</span> (see <a class="internal present" href="Mapping-a-URI-to-JSON.html">Mapping a URI to JSON</a>). However, you can also use newline characters in your <span class="caps">URI</span>.</p>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

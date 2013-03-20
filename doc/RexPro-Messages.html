@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>RexPro Messages</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>RexPro Messages</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/RexPro-Messages"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/RexPro-Messages"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src=" images/rexpro-logo.png" width="500px" /></p>
+<p>Communication over <a class="internal present" href="RexPro.html">RexPro</a> is achieved by sending and receiving messages that adhere to the format specified on this page.  There are several clients that communicate via RexPro that would serve as good examples for how communication over RexPro works:</p>
+<ul><li><a class="internal present" href="Rexster-Console.html">Rexster Console</a> &#x2013; A <a href="http://en.wikipedia.org/wiki/Read-eval-print_loop"><span class="caps">REPL</span></a> for executing scripts on a remote Rexster server.</li>
+	<li><a class="internal present" href="RexPro-Java.html">RexsterClient</a> &#x2013; A Java language binding</li>
+	<li><a href="https://github.com/bdeggleston/rexpro-python">rexpro-python</a> &#x2013; A Python language binding</li>
+</ul><h1>Basic Message Structure</h1>
+<p>Every RexPro message consists of the following segments:</p>
+<pre><code>[protocol version][message type][message size][message body]</code></pre>
+<table><tr><th>segment </th>
+		<th>type(bytes) </th>
+		<th>description </th>
+	</tr><tr><td> protocol version </td>
+		<td> <code>byte(1)</code> </td>
+		<td>The version of RexPro.  Currently, this value should be set to zero. </td>
+	</tr><tr><td> message type </td>
+		<td> <code>byte(1)</code> </td>
+		<td> The type of message as described below. </td>
+	</tr><tr><td> message size </td>
+		<td> <code>int(4)</code> </td>
+		<td> The length of the message body </td>
+	</tr><tr><td> message body </td>
+		<td> <code>byte(n)</code> </td>
+		<td> The body of the message itself, containing the instructions for, or a response from, the RexPro Server. This portion of the message is an array of message fields serialized using MsgPack. The fields for each specific message are described below. </td>
+	</tr></table><h1>Message Definitions</h1>
+<p>RexPro messages are divided into those that deal with requests made from the client and those that involved a response from the server.  The following table represents an overview of the basic message set:</p>
+<table><tr><th>message </th>
+		<th>type </th>
+		<th>description </th>
+	</tr><tr><td> session </td>
+		<td> request </td>
+		<td> A request to open or close the session with the RexPro Server. </td>
+	</tr><tr><td> session </td>
+		<td> response </td>
+		<td> The response from the RexPro Server to a session request containing session information. </td>
+	</tr><tr><td> script </td>
+		<td> request </td>
+		<td> A request to process a Gremlin script on the RexPro Server. </td>
+	</tr><tr><td> script </td>
+		<td> response </td>
+		<td> A response to a script request.  Script response messages actually refer to a set of response messages that are unique to each serialization channel (i.e. MsgPack, GraphSON, and Console). </td>
+	</tr><tr><td> error </td>
+		<td> response </td>
+		<td> A response from the RexPro Server indicating a problem has occurred. </td>
+	</tr></table><p><strong><span class="caps">NOTE</span></strong> &#x2013; The following sections describe the individual RexPro Messages in greater detail.  It is important to note that the messages are defined in terms of MsgPack serialization, so data types defined must adhere to MsgPack expectations.   The order of fields in the sections below are important to adhering to the format.  They should be serialized to a MsgPack array.</p>
+<h2>Request Messages</h2>
+<p>The request class of messages are those that are sent by the client to the RexPro Server for processing.</p>
+<h3>Session</h3>
+<p>The Session Request Message is used to establish or destroy a session on the RexPro Server.  When a session is opened, future Script Request Messages can be executed within this session and variable bindings established in previous scripts can be accessed.</p>
+<table><tr><th>field </th>
+		<th>type </th>
+		<th>description </th>
+	</tr><tr><td> <code>Session</code> </td>
+		<td> <code>byte(16)</code> </td>
+		<td> The <span class="caps">UUID</span> for the Session. Set each byte to zero for an &#x201C;empty&#x201D; session. </td>
+	</tr><tr><td> <code>Request</code> </td>
+		<td> <code>byte(16)</code> </td>
+		<td> The <span class="caps">UUID</span> for the request.  Uniquely identifies the request from the client.  This value gets passed back from the RexPro Server so that the response message can be mapped to a request if necessary. </td>
+	</tr><tr><td> <code>Meta</code> </td>
+		<td> <code>Map</code> </td>
+		<td> Message specific properties described below. </td>
+	</tr><tr><td> <code>Channel</code> </td>
+		<td> <code>Integer</code> </td>
+		<td> Defines the channel of serialization for the life of the session.  The channel cannot be changed on future requests to the session. </td>
+	</tr><tr><td> <code>Username</code> </td>
+		<td> <code>String</code> </td>
+		<td> The username to access the RexPro Server assuming Rexster authentication is turned on.  The field is ignored in cases where it is not enabled. </td>
+	</tr><tr><td> <code>Password</code> </td>
+		<td> <code>String</code> </td>
+		<td> The password to access the RexPro Server assuming Rexster authentication is turned on.  The field is ignored in cases where it is not enabled. </td>
+	</tr></table><h4>Meta Attributes</h4>
+<table><tr><th>field </th>
+		<th>type </th>
+		<th>description </th>
+	</tr><tr><td> <code>graphName</code> </td>
+		<td> <code>String</code> </td>
+		<td> The name of the graph to open a session on. Optional. </td>
+	</tr><tr><td> <code>graphObjName</code> </td>
+		<td> <code>String</code> </td>
+		<td> The variable name of the graph object, defaults to <code>g</code>. Optional. </td>
+	</tr><tr><td> <code>killSession</code> </td>
+		<td> <code>Boolean</code> </td>
+		<td> If true, the given session will be destroyed, otherwise, one will be created, defaults to false. </td>
+	</tr></table><h3>Script</h3>
+<p>The Script Request Message is used to send Gremlin scripts to the RexPro Server.  Script Requests can be made either in-session or sessionless.  In-session requires that a session is already established with the RexPro Server via the Session Request Message.  Sessionless Script Request Messages can be sent without the context of the session but come with the limitation that variable bindings established by a script are lost between requests.</p>
+<table><tr><th>field </th>
+		<th>type </th>
+		<th>description </th>
+	</tr><tr><td> <code>Session</code> </td>
+		<td> <code>byte(16)</code> </td>
+		<td> The <span class="caps">UUID</span> for the Session. Set each byte to zero for an &#x201C;empty&#x201D; session. </td>
+	</tr><tr><td> <code>Request</code> </td>
+		<td> <code>byte(16)</code> </td>
+		<td> The <span class="caps">UUID</span> for the request.  Uniquely identifies the request from the client.  This value gets passed back from the RexPro Server so that the response message can be mapped to a request if necessary. </td>
+	</tr><tr><td> <code>Meta</code> </td>
+		<td> <code>Map</code> </td>
+		<td> Message specific properties described below. </td>
+	</tr><tr><td> <code>LanguageName</code> </td>
+		<td> <code>String</code> </td>
+		<td> The Gremlin flavor to request the RexPro Server to process the message with.  This value is dependent upon the configured script engine languages in <code>rexster.xml</code>.  Generally speaking, this value should be set to <code>groovy</code>. </td>
+	</tr><tr><td> <code>Script</code> </td>
+		<td> <code>String</code> </td>
+		<td> The Gremlin script to execute on the server. </td>
+	</tr><tr><td> <code>Bindings</code> </td>
+		<td> <code>Map</code> </td>
+		<td> Bindings are arguments passed with the script that become variables to the Script Engine when the script is executed.  Use bindings to parameterize scripts.  Bindings must be serializable by MsgPack. </td>
+	</tr></table><h4>Meta Attributes</h4>
+<table><tr><th>field </th>
+		<th>type </th>
+		<th>description </th>
+	</tr><tr><td> <code>channel</code> </td>
+		<td> <code>Integer</code> </td>
+		<td> Used where <code>inSession</code> is <code>false</code> and the channel of communication is established for each request.  If this value is used when <code>inSession</code> is <code>true</code> it must match the value established by the session. </td>
+	</tr><tr><td> <code>inSession</code> </td>
+		<td> <code>Boolean</code> </td>
+		<td> Indicates this requests should be executed in the supplied session. Defaults to <code>false</code>. Optional. </td>
+	</tr><tr><td> <code>isolate</code> </td>
+		<td> <code>Boolean</code> </td>
+		<td> Bindings from previous messages are not available in subsequent requests. Defaults to <code>true</code>. Optional. </td>
+	</tr><tr><td> <code>transaction</code> </td>
+		<td> <code>Boolean</code> </td>
+		<td> Executes script within a transaction, committing if successful, rolling back if not. Has no effect with non transactional graph. Defaults to <code>true</code>. Optional. </td>
+	</tr><tr><td> <code>graphName</code> </td>
+		<td> <code>String</code> </td>
+		<td> The name of the graph to open a session on. Optional. </td>
+	</tr><tr><td> <code>graphObjName</code> </td>
+		<td> <code>String</code> </td>
+		<td> The variable name of the graph object. Defaults to <code>g</code>. Optional. </td>
+	</tr></table><p><strong><span class="caps">NOTE</span></strong> &#x2013; supplying <code>graphName</code> or <code>graphObjName</code> for a session request which already has these values defined will raise an exception.</p>
+<h2>Response Messages</h2>
+<p>The response class of messages are those that are sent by the RexPro Server back to the client, in response to a request message.</p>
+<h3>Session</h3>
+<p>The Session Response Message is used to send a response to a Session Request Message and is sent when the session is successfully created.  The Session Response Message will contain information about the session created by the RexPro Server.</p>
+<table><tr><th>field </th>
+		<th>type </th>
+		<th>description </th>
+	</tr><tr><td> <code>Session</code> </td>
+		<td> <code>byte(16)</code> </td>
+		<td> The <span class="caps">UUID</span> for the Session. Used on future Script Request Messages that need to be made on the session. </td>
+	</tr><tr><td> <code>Request</code> </td>
+		<td> <code>byte(16)</code> </td>
+		<td> The <span class="caps">UUID</span> for the request.  Uniquely identifies the request from the client.  This value gets passed back from the RexPro Server so that the response message can be mapped to a request if necessary. </td>
+	</tr><tr><td> <code>Meta</code> </td>
+		<td> <code>Map</code> </td>
+		<td> Not applicable for this message </td>
+	</tr><tr><td> <code>Languages</code> </td>
+		<td> <code>String[]</code> </td>
+		<td> The list of Gremlin flavors that are <a class="internal present" href="Rexster-Configuration.html">configured</a> for Rexster.  By default the language list will just be <code>groovy</code>. </td>
+	</tr></table><h3>Console Script Response</h3>
+<p>The Console Script Response Message contains the results of a Gremlin script sent in a Script Request Message, where the results are serialized into strings that are best displayed in a console or terminal.  <a class="internal present" href="Rexster-Console.html">Rexster Console</a> uses this message for communication with the RexPro Server.</p>
+<table><tr><th>field </th>
+		<th>type </th>
+		<th>description </th>
+	</tr><tr><td> <code>Session</code> </td>
+		<td> <code>byte(16)</code> </td>
+		<td> The <span class="caps">UUID</span> for the Session. Used on future Script Request Messages that need to be made on the session. </td>
+	</tr><tr><td> <code>Request</code> </td>
+		<td> <code>byte(16)</code> </td>
+		<td> The <span class="caps">UUID</span> for the request.  Uniquely identifies the request from the client.  This value gets passed back from the RexPro Server so that the response message can be mapped to a request if necessary. </td>
+	</tr><tr><td> <code>Meta</code> </td>
+		<td> <code>Map</code> </td>
+		<td> Not applicable for this message </td>
+	</tr><tr><td> <code>ConsoleLines</code> </td>
+		<td> <code>String[]</code> </td>
+		<td> List of results serialized to strings where each string is a line that should be printed to a console output. </td>
+	</tr><tr><td> <code>Bindings</code> </td>
+		<td> <code>Map</code> </td>
+		<td> Once the script is executed any bindings on the Script Engine that can be serialized via MsgPack are returned.  Any that cannot be properly serialized are converted via <code>toString</code>. </td>
+	</tr></table><h3>GraphSON Script Response</h3>
+<p>The <a href="../../blueprints/2.3.0/GraphSON-Reader-and-Writer-Library.html">GraphSON</a> Script Response Message contains the results of a Gremlin script sent in a Script Request Message, where the results are serialized into a <span class="caps">JSON</span> string by the GraphSON converter from Blueprints.</p>
+<table><tr><th>field </th>
+		<th>type </th>
+		<th>description </th>
+	</tr><tr><td> <code>Session</code> </td>
+		<td> <code>byte(16)</code> </td>
+		<td> The <span class="caps">UUID</span> for the Session. Used on future Script Request Messages that need to be made on the session. </td>
+	</tr><tr><td> <code>Request</code> </td>
+		<td> <code>byte(16)</code> </td>
+		<td> The <span class="caps">UUID</span> for the request.  Uniquely identifies the request from the client.  This value gets passed back from the RexPro Server so that the response message can be mapped to a request if necessary. </td>
+	</tr><tr><td> <code>Meta</code> </td>
+		<td> <code>Map</code> </td>
+		<td> Not applicable for this message </td>
+	</tr><tr><td> <code>Results</code> </td>
+		<td> <code>String</code> </td>
+		<td> The result serialized to a <span class="caps">JSON</span> string. </td>
+	</tr><tr><td> <code>Bindings</code> </td>
+		<td> <code>Map</code> </td>
+		<td> Once the script is executed any bindings on the Script Engine that can be serialized via MsgPack are returned.  Any that cannot be properly serialized are converted via <code>toString</code>. </td>
+	</tr></table><h3>MsgPack Script Response</h3>
+<p>The MsgPack Script Response Message contains the results of a Gremlin script sent in a Script Request Message, where the results are serialized by <a href="http://msgpack.org">MsgPack</a>.</p>
+<table><tr><th>field </th>
+		<th>type </th>
+		<th>description </th>
+	</tr><tr><td> <code>Session</code> </td>
+		<td> <code>byte(16)</code> </td>
+		<td> The <span class="caps">UUID</span> for the Session. Used on future Script Request Messages that need to be made on the session. </td>
+	</tr><tr><td> <code>Request</code> </td>
+		<td> <code>byte(16)</code> </td>
+		<td> The <span class="caps">UUID</span> for the request.  Uniquely identifies the request from the client.  This value gets passed back from the RexPro Server so that the response message can be mapped to a request if necessary. </td>
+	</tr><tr><td> <code>Meta</code> </td>
+		<td> <code>Map</code> </td>
+		<td> Not applicable for this message </td>
+	</tr><tr><td> <code>Results</code> </td>
+		<td> <code>Object</code> </td>
+		<td> The result serialized by MsgPack. Any result not serializable by MsgPack is converted via <code>toString</code>. </td>
+	</tr><tr><td> <code>Bindings</code> </td>
+		<td> <code>Map</code> </td>
+		<td> Once the script is executed any bindings on the Script Engine that can be serialized via MsgPack are returned.  Any that cannot be properly serialized are converted via <code>toString</code>. </td>
+	</tr></table><h3>Error</h3>
+<p>An Error Response Message may be returned by the RexPro Server for any request message sent.</p>
+<table><tr><th>field </th>
+		<th>type </th>
+		<th>description </th>
+	</tr><tr><td> <code>Session</code> </td>
+		<td> <code>byte(16)</code> </td>
+		<td> The <span class="caps">UUID</span> for the Session. Used on future Script Request Messages that need to be made on the session. </td>
+	</tr><tr><td> <code>Request</code> </td>
+		<td> <code>byte(16)</code> </td>
+		<td> The <span class="caps">UUID</span> for the request.  Uniquely identifies the request from the client.  This value gets passed back from the RexPro Server so that the response message can be mapped to a request if necessary. </td>
+	</tr><tr><td> <code>Meta</code> </td>
+		<td> <code>Map</code> </td>
+		<td> Not applicable for this message </td>
+	</tr><tr><td> <code>ErrorMessage</code> </td>
+		<td> <code>String</code> </td>
+		<td> The error message from the server. </td>
+	</tr></table><h4>Meta Attributes</h4>
+<table><tr><th>field </th>
+		<th>type </th>
+		<th>description </th>
+	</tr><tr><td> <code>flag</code> </td>
+		<td> <code>Integer</code> </td>
+		<td> &#x2013; <code>0</code> : The message sent to the RexPro Server was malformed.<br />
+                       &#x2013; <code>1</code> : A session was requested that has either expired or no longer exists.<br />
+                       &#x2013; <code>2</code> : A script failed to execute (likely cause is syntax error).<br />
+                       &#x2013; <code>3</code> : Invalid username/password if authentication is turned on.<br />
+                       &#x2013; <code>4</code> : A graph requested via <code>graphName</code> meta attribute did not exist.<br />
+                       &#x2013; <code>5</code> : The channel requested did not exist or the channel was changed after being established on the session. <br />
+                       &#x2013; <code>6</code> : The result or an item in the bindings could not be serialized properly. </td>
+	</tr></table>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

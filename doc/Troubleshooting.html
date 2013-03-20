@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Troubleshooting</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Troubleshooting</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Troubleshooting"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Troubleshooting"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p>This page contains frequently identified problems with Rexster and its components.</p>
+<h3>Not using &#x201C;localhost&#x201D; to access <span class="caps">REST</span> <span class="caps">API</span>/Dog House?</h3>
+<p>If you set up Rexster with the default configuration in a server environment and try to access it by IP or <span class="caps">DNS</span> as in:</p>
+<pre><code>http://8.8.8.8:8182/graphs/tinkergraph</code></pre>
+<p>you will quickly find that Rexster will not respond to requests.  In most cases, after checking firewall settings that the appropriate ports are open, the solution is to simply check <code>rexster.xml</code> and ensure that the <code>&lt;base-uri&gt;</code> property is set properly.  Given the above example, that would mean setting the value as follows:</p>
+<pre><code>&lt;rexster&gt;
+  ...
+  &lt;base-uri&gt;http://8.8.8.8&lt;/base-uri&gt;
+  ...
+&lt;/rexster&gt;</code></pre>
+<p>When setting up a non-local Rexster environment, it is a good idea to read through the <a class="internal present" href="Rexster-Configuration.html">Rexster Configuration</a> section very carefully to ensure that all settings are as needed for your environment.</p>
+<h3>Dog House not showing configured graphs?</h3>
+<p>If you access the Dog House and find no graphs visible to select, there is a good chance that either the <code>&lt;base-uri&gt;</code> property of <code>rexster.xml</code> is not set appropriately or firewall ports are preventing access to the port configured in <code>&lt;rexster-server-port&gt;</code>.  A simple way to test connectivity is to point your browser at the configured <code>&lt;base-uri&gt;</code> and <code>&lt;rexster-server-port&gt;</code> to see if some valid <span class="caps">JSON</span> is returned.</p>
+<h3>Want to see more logging from Rexster?</h3>
+<p>By default, Rexster is configured to hide Jersey-level logging.  Sometimes, this information includes very valuable information when trying to isolate a problem or issue.  To have this log information displayed in the console, simply supply to the <code>-d</code> or <code>--debug</code> option as follows:</p>
+<pre><code>rexster.sh -s -d</code></pre>
+<p>See also the Logging Configuration section in <a class="internal present" href="Rexster-Configuration.html">Rexster Configuration</a>.</p>
+<h3>Null Key Error Returned from Gremlin Extension?</h3>
+<p>It&#x2019;s important to ensure that the Gremlin Extension returns data that can be converted to valid <span class="caps">JSON</span>. A common case where this does not happen is when a Gremlin script returns a null value as a map key (null values as map values are OK). <span class="caps">JSON</span> does not support a null value in the key and therefore the Gremlin Extension will return a &#x201C;Null key&#x201D; error.</p>
+<p>The following is an example script that presents such a situation:</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=m=[:];g.V.age.groupCount(m).iterate();m;</code></pre>
+<p>Since <code>age</code> is not an available property of all vertices (<code>V</code>), the script will produce a map that has a <code>null</code> key.</p>
+<p>One way to work around this would be to filter out nulls as in:</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=m=[:];g.V.age.filter{it!=null}.groupCount(m).iterate();m;</code></pre>
+<p>Another way to work around this would be to convert null key into a string &#x201C;null&#x201D; key as in:</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=m=[:];g.V.age.groupCount(m).iterate();m['null']=m[null];m.remove(null);m;</code></pre>
+<h3>&#x201C;Too many open files&#x201D; when running integration tests?</h3>
+<p>When running integration tests for Rexster using:</p>
+<pre><code>mvn clean install -Pintegration-test</code></pre>
+<p>An <code>IOException</code> may occur depending on the system&#x2019;s configuration.  The issue is related to Grizzly and the starting and stopping of the underlying <code>TCPNIOTransport</code> in between tests.  To allow the tests to work (at least on Linux), first check the size of the limit with:</p>
+<pre><code>ulimit -n</code></pre>
+<p>It will likely be set to 1024 by default.  Increase this limit by editing:</p>
+<pre><code>/etc/security/limits.conf</code></pre>
+<p>and setting larger values as necessary:</p>
+<pre><code>* soft nofile 8192
+* hard nofile 8192</code></pre>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

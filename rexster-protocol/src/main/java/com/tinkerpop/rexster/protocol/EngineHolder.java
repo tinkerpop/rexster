@@ -58,7 +58,7 @@ public class EngineHolder {
 
     public ScriptEngine getEngine() {
         /*
-        // commit in Gremlin in 2.3.0-SNAPSHOT removes the need for this reset.
+        // commit in Gremlin in 2.3.0 removes the need for this reset.
         if (engineResetThreshold > EngineController.RESET_NEVER) {
             // determine if a reset is necessary.
             if (numberOfScriptsEvaluated.get() >= engineResetThreshold) {

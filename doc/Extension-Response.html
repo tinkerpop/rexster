@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Extension Response</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Extension Response</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Extension-Response"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Extension-Response"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p>All methods to be exposed as extensions must return an <code>ExtensionResponse</code>.  The <code>ExtensionResponse</code> is a wrapper for a <a href="http://jersey.java.net/">Jersey</a> <code>Response</code>.  It has a number of static helper methods to simplify its construction and is largely designed to help with the construction of <span class="caps">JSON</span>-based responses.</p>
+<h1>ok</h1>
+<p>The <code>ok</code> method of the <code>ExtensionResponse</code> will build a response with a 200 status code.  The following is a simple example from the <a href="https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/sample-kibbles">Sample Kibbles</a> project:</p>
+<pre><code>Map&lt;String, String&gt; map = new HashMap&lt;String, String&gt;();
+map.put("ping", reply);
+return ExtensionResponse.ok(map);</code></pre>
+<p>The <code>ok</code> method takes a <code>Map</code> as a parameter and converts it to a <code>JSONObject</code> which will be returned as the entity within a Jersey <code>Response</code> object.  It is also possible to build the <code>JSONObject</code> manually and pass that to the <code>ok</code> method as shown here:</p>
+<h1>error</h1>
+<p>The <code>error</code> method of the <code>ExtensionResponse</code> will build a response with an error status code.  There are a number of overloads for this method that offer numerous way to construct the object with different return values and error codes.</p>
+<p>For example, the following code snippet tries to validate a parameter, called <code>reply</code>, from the <span class="caps">URI</span> query string:</p>
+<pre><code>if (reply == null || reply.isEmpty()) {
+    ExtensionMethod extMethod = context.getExtensionMethod();
+    return ExtensionResponse.error(
+        "the reply parameter cannot be empty",
+        null,
+        Response.Status.BAD_REQUEST.getStatusCode(),
+        null,
+        generateErrorJson(extMethod.getExtensionApiAsJson()));
+}</code></pre>
+<h1>noContent</h1>
+<p>The <code>noContent</code> method of the <code>ExtensionResponse</code> will construct a response with a 204 status code.</p>
+<h1>availableOptions</h1>
+<p>the <code>availableOptions</code> method of the <code>ExtensionResponse</code> will construct a response with a 204 status code and include in the header the list of <span class="caps">HTTP</span> method supplied.  These methods are added to the <code>Access-Control-Allow-Methods</code> header.  This helper method is useful in implementing the <span class="caps">OPTIONS</span> <span class="caps">HTTP</span> method within an extension.</p>
+<h1>Build Your Own With Jersey</h1>
+<p>Should the basic helper methods of <code>ExtensionResponse</code> not provide enough flexibility, it is possible to construct the Jersey <code>Response</code> manually and pass that directly to the <code>ExtensionResponse</code>.  A good reason to construct a Jersey <code>Response</code> object directly, would be if there was a situation where the extension looked to return an entity other than <span class="caps">JSON</span>.</p>
+<p>The following code snippet from the <code>ProducesXmlExtension</code> Sample Kibbles shows how this might be done:</p>
+<pre><code>String xml = "&lt;vertex&gt;&lt;id&gt;" + vertex.getId().toString() + "&lt;/id&gt;&lt;/vertex&gt;";
+return new ExtensionResponse(Response.ok(xml).build());</code></pre>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Mapping a URI to JSON</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Mapping a URI to JSON</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Mapping-a-URI-to-JSON"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Mapping-a-URI-to-JSON"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src=" images/json-logo.png" alt="" /></p>
+<p>Up to this point, it has been assumed that a parametrized <span class="caps">URI</span> is the input to a traversal. While this is true, the <span class="caps">URI</span> is actually converted into a <span class="caps">JSON</span> object and that serves as the primary object by which the traversal code can retrieve its parameters from. The mapping between a <span class="caps">URI</span> and <span class="caps">JSON</span> is described using an example (as taken from the Parameters Sample Kibble).</p>
+<pre><code>http://localhost:8182/graphs/tp-sample/parameters?a=1&amp;b.a=marko&amp;b.b=true&amp;b.c.a=peter&amp;c=[marko,povel]</code></pre>
+<pre><code>{
+  "a" : 1,
+  "b" : {
+    "a" : "marko",
+    "b" : true,
+    "c" : {
+      "a" : "peter"
+    }
+  }
+  "c" : ["marko","povel"]
+}</code></pre>
+<p>There are two <span class="caps">JSON</span> documents used during a Rexster query:</p>
+<ol><li><code>requestObject</code> (input) is generated from the query parameter component of the <span class="caps">URI</span> request.</li>
+	<li><code>responseObject</code> (output) is provided by extension the results of the evaluation.</li>
+</ol><p>Rexster provides support for parsing and constructing the <code>requestObject</code> and <code>responseObject</code>, respectively.</p>
+<p><img src=" images/json-in-out.png" alt="" /></p>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

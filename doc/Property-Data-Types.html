@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Property Data Types</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Property Data Types</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Property-Data-Types"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Property-Data-Types"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p>Rexster allows manipulation of property values on <code>Vertex</code> and <code>Edge</code> objects (i.e. <code>Element</code> objects).  By default, these values are assumed to be string data types, but the Rexster <span class="caps">API</span> allows the the following data types to be set and allows for a calling client to get any results with their associated data types for proper deserialization.</p>
+<p>Rexster supports the following data types:</p>
+<ul><li>String</li>
+	<li>Integer</li>
+	<li>Long</li>
+	<li>Float</li>
+	<li>Double</li>
+	<li>List</li>
+	<li>Map</li>
+</ul><p>Serialization of graph elements to <span class="caps">JSON</span> is handled by the <a href="../../blueprints/2.3.0/GraphSON-Reader-and-Writer-Library.html">Blueprints GraphSONUtility</a>.</p>
+<h1>Getting Results with Data Types</h1>
+<p>Getting results with data types attached is accomplished by adding the <code>application/vnd.rexster-typed+json</code> <a class="internal present" href="Rexster-Mime-Types.html">mime type</a> to the <code>accept</code> header on the request.</p>
+<pre><code>curl -v -H "Accept:application/vnd.rexster.typed+json" http://localhost:8182/graphs/gratefulgraph/vertices/337</code></pre>
+<pre><code>{
+    "version": "*.*",
+    "results": {
+        "_type": "vertex",
+        "_id": {
+            "type": "string",
+            "value": "337"
+        },
+        "keystring": {
+            "type": "string",
+            "value": "123"
+        },
+        "keymap": {
+            "type": "map",
+            "value": {
+                "propertyb": {
+                    "type": "integer",
+                    "value": 321
+                },
+                "propertya": {
+                    "type": "integer",
+                    "value": 123
+                }
+            }
+        },
+        "name": {
+            "type": "string",
+            "value": "CHINESE BONES"
+        },
+        "song_type": {
+            "type": "string",
+            "value": "cover"
+        },
+        "performances": {
+            "type": "integer",
+            "value": 1
+        },
+        "keylist": {
+            "type": "list",
+            "value": [
+                {
+                    "type": "integer",
+                    "value": 100
+                },
+                {
+                    "type": "integer",
+                    "value": 200
+                },
+                {
+                    "type": "string",
+                    "value": "(i,300"
+                }
+            ]
+        },
+        "type": {
+            "type": "string",
+            "value": "song"
+        },
+        "keytyped": {
+            "type": "integer",
+            "value": 123
+        }
+    },
+    "queryTime": 1.092324
+}</code></pre>
+<h1>Set Properties With Data Types</h1>
+<p>By default, properties set on the <span class="caps">URI</span> are stored as strings.  Even values that could be coerced to a different data type will be stored as a string.</p>
+<pre><code>http://localhost:8182/graphs/gratefulgraph/vertices/337?keyinteger=123&amp;keystring=xyz</code></pre>
+<p>Both properties, <code>keyinteger</code> and <code>keystring</code> will be stored as strings even though <code>keyinteger</code> could be coerced to an integer value.  To get Rexster to store the value using a specific data type that data type must be specified as the value in the key-value pair using the following format: <code>(type,value)</code>.</p>
+<pre><code>http://localhost:8182/graphs/gratefulgraph/vertices/337?keyinteger=(integer,123)&amp;keystring=xyz</code></pre>
+<h2>Primitive Data Types</h2>
+<p>All values set without a data type will be defaulted to strings.  If a data type is set and it does not match one of the allowable types, Rexster will assume a string value.  If a data type is set and the value itself cannot be coerced to that type, Rexster will assume a string.</p>
+<p>An integer may be specified using <code>integer</code> or <code>i</code> as the data type.</p>
+<pre><code>http://localhost:8182/graphs/gratefulgraph/vertices/337?x=(integer,123)&amp;y=(i,123)</code></pre>
+<p>A long may be specified using <code>long</code> or <code>l</code> as the data type.</p>
+<pre><code>http://localhost:8182/graphs/gratefulgraph/vertices/337?x=(long,123)&amp;y=(l,123)</code></pre>
+<p>A float may be specified using <code>float</code> or <code>f</code> as the data type.</p>
+<pre><code>http://localhost:8182/graphs/gratefulgraph/vertices/337?x=(float,123)&amp;y=(f,123)</code></pre>
+<p>A double may be specified using <code>double</code> or <code>d</code> as the data type.</p>
+<pre><code>http://localhost:8182/graphs/gratefulgraph/vertices/337?x=(double,123)&amp;y=(d,123)</code></pre>
+<h2>List Data Type</h2>
+<p>A list will store an array of objects.  The objects may be all of the same data type or a mixture of different data types.  Lists are defined on the <span class="caps">URI</span> using the <code>list</code> keyword and is followed by a parentheses enclosed, comma separated list of values.  The values are defined in the same way that primitives are defined using the <code>(type,value)</code>.</p>
+<pre><code>http://localhost:8182/graphs/gratefulgraph/vertices/337?keylist=(list,((i,100),(i,200),(i,300)))</code></pre>
+<pre><code>http://localhost:8182/graphs/gratefulgraph/vertices/337?keylist=(list,((i,100),200,(d,300.5)))</code></pre>
+<h2>Map Data Type</h2>
+<p>A map allows the storing of a key-value pair set within a property.  Maps are defined on the <span class="caps">URI</span> using the <code>map</code> keyword and is followed by a key-value pair.  The key is the name of the property on the map and the value is a <code>(type,value)</code> setting.</p>
+<pre><code>http://localhost:8182/graphs/gratefulgraph/vertices/337?keymap=(map,(propertya=(i,123),propertyb=(d,321.5)))</code></pre>
+<h2>Embedded Lists and Maps</h2>
+<p>Maps and lists can embed other maps and lists within them to virtually any depth required.</p>
+<pre><code>http://localhost:818/graphs2/gratefulgraph/vertices/337?keylist=(list,((i,100),(i,200),(i,300),(list,(x,y,z)))</code></pre>
+<pre><code>http://localhost:8182/graphs/gratefulgraph/vertices/337?keymap=(map,(propertya=(i,123),propertyb=(d,321.5),propertyc=(list,(x,y,z)),propertyd=(map,(x=xyz))))</code></pre>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

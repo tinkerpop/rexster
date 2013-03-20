@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Command Line</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Command Line</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Command-Line"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Command-Line"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p>Rexster is started and stopped through a command line interface exposed via the <code>rexster.sh</code>.  When Rexster is started, it listens on a <a class="internal present" href="Rexster-Configuration.html">configurable port</a> (port 8183 by default) for shutdown and status requests.</p>
+<h1>Starting Rexster</h1>
+<p>When starting Rexster from the command line using:</p>
+<pre><code>./bin/rexster.sh --start</code></pre>
+<p>or with:</p>
+<pre><code>./bin/rexster.sh -s</code></pre>
+<p>there are several options available:</p>
+<ul><li><code>-rp</code>, <code>--rexsterport</code> &#x2013; Overrides the <code>rexster-server-port</code> configuration value in <code>rexster.xml</code>.  This value is 8182 by default.</li>
+	<li><code>-wr</code>, <code>--webroot</code> &#x2013; Overrides the <code>web-root</code> configuration value in <code>rexster.xml</code>.</li>
+	<li><code>-c</code>, <code>--configuration</code> &#x2013; Specify the location of a specific <code>rexster.xml</code> file to use for configuration.  If this argument is not specified, Rexster will first try to read a file called <code>rexster.xml</code> from the root of the working directory.  If it can&#x2019;t find that it will use the <code>com.tinkerpop.rexster.rexster.xml</code> resource.</li>
+	<li><code>-d</code>, <code>--debug</code> &#x2013; When this flag is included on the command line, log messages from Jersey are no longer suppressed.  May be useful when developing Rexster itself or building <a class="internal present" href="Extensions.html">Extensions</a>.  Read more about the debug mode in the context of <a class="internal present" href="Rexster-Configuration.html">logging configuration</a>.</li>
+	<li><code>-h</code>, <code>--help</code> &#x2013; When this flag is supplied on the command line, Rexster outputs a description of the command line options available.  Rexster will not start when help is requested.</li>
+</ul><p>The following command will start Rexster on port 7788 with a configuration file called <code>my-rexster.xml</code>:</p>
+<pre><code>./bin/rexster.sh --start -rp 7788 -c my-rexster.xml</code></pre>
+<h1>Stopping Rexster</h1>
+<p>When stopping Rexster from the command line using:</p>
+<pre><code>./bin/rexster.sh --stop</code></pre>
+<p>or with the shorthand:</p>
+<pre><code>./bin/rexster.sh -x</code></pre>
+<p>there are several options available:</p>
+<ul><li><code>-rh</code>, <code>--rexsterhost</code> &#x2013; The host/IP address to which the shutdown command will be issued.  Shutdown will assume <code>127.0.0.1</code> if the parameter is not specified.</li>
+	<li><code>-rp</code>, <code>--rexsterport</code> &#x2013; The port of the host to which the shutdown command will be issued.  Shutdown will assume <code>8183</code> if the parameter is not specified.</li>
+	<li><code>-w</code>, <code>--wait</code> &#x2013; Wait for the server to confirm that shutdown was performed.</li>
+	<li><code>-h</code>, <code>--help</code> &#x2013; When this flag is supplied on the command line, a description of the command line options is displayed.  A command to stop Rexster will not be issued when help is requested.</li>
+</ul><p>The following command would issue a stop message to a Rexster server listening on <code>192.168.0.123</code> and port <code>7788</code>.</p>
+<pre><code>./bin/rexster.sh --stop -rh 192.168.0.123 -rp 7788</code></pre>
+<h1>Other Commands</h1>
+<p>Aside from starting and stopping Rexster, there are several other commands that can be executed against Rexster.</p>
+<ul><li><code>-u</code>, <code>--status</code> &#x2013; Gets the status of the Rexster server (running or not).  Use <code>-h</code> with it for a list of command parameters.</li>
+	<li><code>-v</code>, <code>--version</code> &#x2013; Shows the version of Rexster.</li>
+	<li><code>-h</code>, <code>--help</code> &#x2013; When this flag is supplied on the command line, a description of the command options is displayed.</li>
+</ul>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

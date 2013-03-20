@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>RexPro Java</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>RexPro Java</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/RexPro-Java"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/RexPro-Java"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src=" images/rexpro-logo.png" width="500px" /></p>
+<p><a class="internal present" href="RexPro.html">RexPro</a> is designed to be language agnostic, such that virtually any programming language, especially those languages that support <a href="http://msgpack.org">MsgPack</a>, can connect to a RexPro Server.  Rexster comes bundled with a Java client, called <code>RexsterClient</code>, that allows low-level connectivity via RexPro, sending sessionless messages.</p>
+<p>The following Maven dependency is required for accessing <code>RexsterClient</code> classes:</p>
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;com.tinkerpop.rexster&lt;/groupId&gt;
+    &lt;artifactId&gt;rexster-protocol&lt;/artifactId&gt;
+    &lt;version&gt;x.y.z&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<p>Use the <code>RexsterClientFactory</code> to create a <code>RexsterClient</code> instance:</p>
+<pre><code>RexsterClient client = RexsterClientFactory.open();
+RexsterClient client = RexsterClientFactory.open("localhost");
+RexsterClient client = RexsterClientFactory.open("localhost", 8184);</code></pre>
+<p>All three of the above initializations of <code>RexsterClient</code> are equivalent.  When no arguments are specified, the factory will initialize the <code>RexsterClient</code> to connect to <code>localhost</code> on the standard RexPro port <code>8184</code>.  There are numerous settings and configurations for initializing a <code>RexsterClient</code> instance which are described further below.  Once <code>RexsterClient</code> is initialized, it is possible to send a Gremlin script to the RexPro Server:</p>
+<pre><code>List&lt;Map&lt;String, Object&gt;&gt; results = client.execute("g=rexster.getGraph(\"tinkergraph\");g.v(1).map");
+Map&lt;String, Object&gt; map = results.get(0);
+System.out.println(map.get("name"));</code></pre>
+<p>As <code>RexsterClient</code> uses sessionless requests, <code>g</code> must be initialized on each request.  To get around this problem set the <code>graph-name</code> configuration setting when instantiating <code>RexsterClient</code> through <code>RexsterClientFactory</code> or simply use this convenience method overload:</p>
+<pre><code>RexsterClient client = RexsterClientFactory.open("localhost", "tinkergraph");
+List&lt;Map&lt;String, Object&gt;&gt; results = client.execute("g.v(1).map");
+Map&lt;String, Object&gt; map = results.get(0);
+System.out.println(map.get("name"));</code></pre>
+<p>When possible, parameterize Gremlin scripts, as this leads to better overall performance.  The above example can be done as a parameterized request as follows:</p>
+<pre><code>RexsterClient client = RexsterClientFactory.open("localhost", "tinkergraph");
+List&lt;Map&lt;String, Object&gt;&gt; results = client.execute("g.v(start).map", 
+    new HashMap&lt;String, Object&gt;(){{
+        put("start", 1);
+    }});
+Map&lt;String, Object&gt; map = results.get(0);
+System.out.println(map.get("name"));</code></pre>
+<p>Note that <code>RexsterClient</code> makes some assumptions about data types, as it is limited by MsgPack data types:</p>
+<pre><code>List&lt;Map&lt;String, Object&gt;&gt; mapResultsObject = client.execute("[n:1+1,b:true,f:1234.56f,s:'string',a:[1,2,3],m:[one:1]]");
+Assert.assertEquals(1, mapResultsObject.size());
+Map&lt;String, Object&gt; mapResultObject = mapResultsObject.get(0);
+Assert.assertEquals(2l, mapResultObject.get("n"));
+Assert.assertEquals(true, mapResultObject.get("b"));
+Assert.assertEquals(1234.56d, (Double) mapResultObject.get("f"), 0.001d);
+Assert.assertEquals("string", mapResultObject.get("s"));
+Assert.assertEquals(3, ((Object []) mapResultObject.get("a")).length);
+Assert.assertEquals(1l, ((Map) mapResultObject.get("m")).get("one"));</code></pre>
+<h3>Advanced Usage</h3>
+<p><code>RexsterClient</code> is designed with fault-tolerance in mind.  In communication with a single RexPro Server, it can be configured to retry requests in the event of failure (e.g. temporary network problem). The following shows the default configuration in a more explicit way:</p>
+<pre><code>BaseConfiguration conf = new BaseConfiguration() {{
+    addProperty(RexsterClientTokens.CONFIG_MESSAGE_RETRY_COUNT, 16);
+    addProperty(RexsterClientTokens.CONFIG_MESSAGE_RETRY_WAIT_MS, 50);
+}};
+RexsterClient client = RexsterClientFactory.open(conf);</code></pre>
+<p>The above code shows a <code>RexsterClient</code> being configured to retry sending a message <code>16</code> times with a <code>50ms</code> wait time between each failure.</p>
+<p>Not all configurations of Rexster involve a single server.  Configuring a set of RexPro Servers for better redundancy and availability is possible with certain graphs like <a href="https://github.com/thinkaurelius/titan">Titan</a> or <a href="https://github.com/tinkerpop/blueprints/wiki/Neo4jHa-Implementation">Neo4j HA</a>.  There is also the option to configure a cluster of <a href="https://github.com/thinkaurelius/titan/wiki/Titan-Server">Titan Server</a> instances which embed RexPro natively.  In these cases, <code>RexsterClient</code> can be configured to round-robin request to each of the RexPro Servers in the cluster.</p>
+<pre><code>BaseConfiguration conf = new BaseConfiguration() {{
+    addProperty(RexsterClientTokens.CONFIG_HOSTNAME, "10.20.30.40,10.20.30.41,10.20.30.42");
+    addProperty(RexsterClientTokens.CONFIG_MESSAGE_RETRY_WAIT_MS, 0);
+}};
+RexsterClient client = RexsterClientFactory.open(conf);</code></pre>
+<p>In this above example, <code>RexsterClient</code> is configured to send requests to three different RexPro Servers.  If a request fails, the client does not wait between failed requests, it simply tries to send the request to the next available RexPro Server in the list.  Note that the default setting of <code>16</code> retries is established by <code>RexsterClientFactory</code> since it was not otherwise specified.</p>
+<h3>Settings</h3>
+<p>The following settings are available when configuring a <code>RexsterClient</code> instance.  These settings can be passed to the <code>RexsterClientFactory.open()</code> method as a <code>Map&lt;String,Object&gt;</code> or <a href="http://commons.apache.org/configuration/">Apache Configuration</a> object.</p>
+<table><tr><th>name </th>
+		<th>default </th>
+		<th>description </th>
+	</tr><tr><td> <code>hostname</code> </td>
+		<td> <code>localhost</code> </td>
+		<td> The RexPro Server host to connect to. Note that this value may be set to a comma separated list of hosts. </td>
+	</tr><tr><td> <code>port</code> </td>
+		<td> <code>8184</code> </td>
+		<td> The RexPro Server port to connect to.  If multiple hosts are defined, each host must listen on the same port.  </td>
+	</tr><tr><td> <code>timeout-connection-ms</code> </td>
+		<td> <code>8000</code> </td>
+		<td> How long to wait for a connection to open to the RexPro Server. </td>
+	</tr><tr><td> <code>timeout-write-ms</code> </td>
+		<td> <code>4000</code> </td>
+		<td> How long to wait for a write of a message to the RexPro Server. </td>
+	</tr><tr><td> <code>timeout-read-ms</code> </td>
+		<td> <code>16000</code> </td>
+		<td> How long to wait for a read of a response from the RexPro Server. </td>
+	</tr><tr><td> <code>message-retry-count</code> </td>
+		<td> <code>16</code> </td>
+		<td>  The number of times to retry the request if any of the above fail. </td>
+	</tr><tr><td> <code>message-retry-wait-ms</code> </td>
+		<td> <code>50</code> </td>
+		<td>  The amount of time to wait if any of the above fail. </td>
+	</tr><tr><td> <code>max-async-write-queue-size</code> </td>
+		<td> <code>512000</code> </td>
+		<td> The size in bytes of the queue on the client for sending requests to the RexPro Server.  This queue can backup if network performance is poor or Rexster slows/stops. </td>
+	</tr><tr><td> <code>language</code> </td>
+		<td> <code>groovy</code> </td>
+		<td> The Gremlin flavor to use to execute the script. </td>
+	</tr><tr><td> <code>graph-name</code> </td>
+		<td> </td>
+		<td> The name of the graph configured in Rexster to use as the subject of the script.  Typically, the graph must be retrieved in the script via <code>rexster.getGraph()</code>.  This setting in conjunction with <code>graph-obj-name</code> help to simplify a script by putting the graph specified here in the Script Engine bindings so that it is ready for the script. </td>
+	</tr><tr><td> <code>graph-obj-name</code> </td>
+		<td> <code>g</code> </td>
+		<td> If <code>graph-name</code> is specified then the graph instance is assigned to the value of this setting in the bindings so that it can be instantly referenced in the script. </td>
+	</tr><tr><td> <code>channel</code> </td>
+		<td> <code>2</code> </td>
+		<td> The serialization channel for RexPro. By default this value is set to MsgPack. Values are defined as constants in <a href="https://github.com/tinkerpop/rexster/blob/master/rexster-protocol/src/main/java/com/tinkerpop/rexster/protocol/msg/RexProChannel.java">RexProChannel</a> </td>
+	</tr></table>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

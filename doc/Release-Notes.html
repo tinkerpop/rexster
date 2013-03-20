@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Release Notes</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Release Notes</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Release-Notes"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Release-Notes"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p>Rexster: A Graph Server<br /><a href="../../rexster/2.3.0/Home.html">http://rexster.tinkerpop.com</a></p>
+<h2>Rexster 2.y.z</h2>
+<p><img src=" images/rexster-2.png" alt="" /></p>
+<h3>Version 2.3.0 (March 20, 2013)</h3>
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop.rexster&lt;/groupId&gt;
+  &lt;artifactId&gt;rexster-core&lt;/artifactId&gt;
+  &lt;version&gt;2.3.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<ul><li>Both RexPro and <span class="caps">HTTP</span> Server can be started independently with out configuration parameters, as all now have default values.</li>
+	<li><span class="caps">OPTIONS</span> for extensions returns a default response.</li>
+	<li>Batch Kibble allows for multiple lookups within an manual or key index.</li>
+	<li>Rexster can initialize the Gremlin Script Engine with a script file referenced in <code>rexster.xml</code>.</li>
+	<li>More convenience methods for <code>ExtensionResponse</code> to help simplify writing extensions.</li>
+	<li>Change default IO strategy to <code>leader-follower</code>.</li>
+	<li>Prevent Rexster&#x2019;s forced Gremlin Script Engine reset as it is now handled by the Script Engine itself.</li>
+	<li>Configuration in <code>rexster.xml</code> for allowing other Script Engine flavors of Gremlin to be exposed.</li>
+	<li>Remove <code>rexster.xml</code> embedded as a resource as the final fallback for configuring Rexster at startup.</li>
+	<li>Allow override of default embedded <code>log4j.properties</code> file with one in the root of <code>REXSTER_HOME</code>.</li>
+	<li>Improve logging configurability.</li>
+	<li><code>RexsterClient</code> for Java connectivity to Rexster through RexPro.</li>
+	<li>Enable or disable Dog House through <code>rexster.xml</code></li>
+	<li>Fix <span class="caps">JSON</span> serialization of <code>Row</code> results as a <code>Map</code> from the Gremlin Extension.</li>
+	<li>Improved <span class="caps">JSON</span> serialization for Map that uses a graph element as the key.</li>
+</ul><hr /><h3>Version 2.2.0 (December 19, 2012)</h3>
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop.rexster&lt;/groupId&gt;
+  &lt;artifactId&gt;rexster-core&lt;/artifactId&gt;
+  &lt;version&gt;2.2.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<ul><li>Major refactoring and renaming of core &#x201C;server&#x201D; classes.</li>
+	<li><code>ExtensionRequestParameter</code> now supports a <code>defaultValue</code>.</li>
+	<li>Requests with <code>OPTIONS</code> now returns <code>OPTIONS</code> in the <code>Access-Control-Allow-Methods</code> and a response 200 instead of 204.</li>
+	<li>Upgrade to Grizzly 2.2.18 and Jersey 1.14.</li>
+	<li>Include new configuration options in <code>rexster.xml</code>
+	<ul><li><code>enable-jmx</code> element turns on or turns off <span class="caps">JMX</span> monitoring.</li>
+		<li><code>thread-pool</code> section gives control over how many threads are allocated to Rexster.</li>
+		<li><code>max-post-size</code> element controls the size of the data that can be POSTed to Rexster.</li>
+		<li><code>max-header-size</code> element controls the size of the request header that can be sent to Rexster.</li>
+		<li><code>upload-timeout-millis</code> element represents the length of the time in milliseconds that Rexster will wait for an upload to occur.</li>
+	</ul></li>
+	<li>Fixed Rexster Console where some <code>null</code> results were not being rendered back to it.</li>
+	<li>Fixed Rexster Console issues where transactions were not executing properly as requests within a session were not being bound to specific threads.</li>
+	<li>Update the Dex configuration of <code>rexster.xml</code> to accept an external configuration file.</li>
+</ul><hr /><h3>Version 2.1.0 (August 4, 2012)</h3>
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop.rexster&lt;/groupId&gt;
+  &lt;artifactId&gt;rexster-core&lt;/artifactId&gt;
+  &lt;version&gt;2.1.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<ul><li>Added Travis continuous integration support</li>
+	<li>Fixed issue with <span class="caps">POST</span> and <span class="caps">DELETE</span> of key indices via <span class="caps">REST</span> <span class="caps">API</span>.</li>
+	<li>Configuration element of <code>rexster.xml</code> to bind the rexpro hostname.</li>
+	<li>Vertex query <span class="caps">API</span>.</li>
+	<li>Fixed issue with inconsistencies of <span class="caps">PUT</span>, <span class="caps">POST</span>, and <span class="caps">DELETE</span> around manual indices.</li>
+	<li>Restructured project to introduce rexster-core, rexster-console and rexster-protocol.</li>
+	<li>Integration tests now run across TinkerGraph, Neo4j, OrientDB, Titan and Dex by default (Titan is disabled by default)</li>
+</ul><hr /><h3>Version 2.0.0 (May 23, 2012)</h3>
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop.rexster&lt;/groupId&gt;
+  &lt;artifactId&gt;rexster&lt;/artifactId&gt;
+  &lt;version&gt;2.0.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<ul><li><span class="caps">REST</span> <span class="caps">API</span> for POSTing new indices supports <code>params</code> argument which constructs a parameter map which will configure the newly created index</li>
+	<li>The <span class="caps">DELETE</span> operation for the Graph resource has been removed since Blueprints no longer supports <code>Graph.clear()</code></li>
+	<li>The Index resource no longer has a <code>keys</code> sub-resource nor the notion of &#x201C;automatic&#x201D; or &#x201C;manual&#x201D; indices due to changes in the Blueprints <span class="caps">API</span></li>
+	<li>Add metadata from graph <code>Features</code> to the Graph resource</li>
+	<li><code>KeyIndexResource</code> to access features of <code>KeyIndexableGraph</code> instances</li>
+	<li><code>VertexResource</code> and <code>EdgeResource</code> support key index filtering</li>
+	<li>Improved messaging to the server console regarding which <code>rexster.xml</code> file is being loaded</li>
+</ul><hr /><h2>Rexster 0.x</h2>
+<p><img src=" images/rexster-santas-little-helper.png" alt="" /></p>
+<h3>Version 0.8 (Santa&#x2019;s Little Helper &#x2014; February 28, 2012)</h3>
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop.rexster&lt;/groupId&gt;
+  &lt;artifactId&gt;rexster&lt;/artifactId&gt;
+  &lt;version&gt;0.8&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<ul><li>Added <code>PUT</code> to the Indices resource to place elements in an index.  This changes split this functionality away from <code>POST</code>.  <code>POST</code> is now only for creating new indices.</li>
+	<li><code>DELETE</code> of index elements now accepts parameters to be sent as an entity on the request.</li>
+	<li>Fix PermGen issues with Gremlin processing.  This is bit of a stop gap fix in that it simply resets the engine after so many script executions.</li>
+	<li>The Gremlin Extension now includes a <code>language</code> parameter so that one can specify the flavor of Gremlin that is being used.</li>
+	<li>Gremlin Extension takes a <code>params</code> extension and applies the keys and values within it to the bindings of the Gremlin script engine.</li>
+	<li>Dog House uses require.js for module loading.</li>
+	<li>Simple graph visualization through <a href="http://thejit.org"><span class="caps">JIT</span></a>.</li>
+	<li>Dog House provides a filter option when browsing vertices and edges.  Filters are backed by indices such that the user can select an index then specify a key/value to filter the paged results by.</li>
+	<li>Dropped support for support for <code>application/x-www-form-urlencoded</code>.</li>
+	<li>Basic authentication configurable through <code>rexster.xml</code> and extensible via extensions to <code>AbstractSecurityFilter</code>.</li>
+	<li>Better handling of null values being passed to Gremlin Extension as bindings.</li>
+	<li>Allow configuration of the Rexster server host in <code>rexster.xml</code>.</li>
+	<li>Launching an extension from Dog House that fails now properly removes the &#x201C;Loading&#x201D; spinner and displays the error.</li>
+	<li>Encode the <span class="caps">URI</span> for extensions launched in Dog House so that they are properly encoded for cut and paste use.</li>
+	<li>Added a mock <code>TransactionalGraph</code> implementation so that a <code>TinkerGraph</code> can be tested in a transactional mode (configured through <code>rexster.xml</code>).</li>
+	<li>Results from the Gremlin Extension that are <code>Iterator</code> implementations are now paging properly.</li>
+	<li>Added the <code>load</code> parameter to the Gremlin Extension so that it is possible to execute server-side stored Gremlin scripts.</li>
+	<li>Gremlin Extension can be configured so that it does not execute scripts sent on the <code>script</code> parameter leaving it to only process server-side scripts with the <code>load</code> parameter.</li>
+	<li>Gremlin Extension can be configured to cache server-side scripts.</li>
+	<li>Sample Kibble
+	<ul><li>Secure Sample Kibble shows how to get a <code>Principal</code> from the <code>SecurityContext</code>.</li>
+	</ul></li>
+</ul><hr /><p><img src=" images/rexster-brian.png" alt="" /></p>
+<h3>Version 0.7 (Brian &#x2014; December 7, 2011)</h3>
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop&lt;/groupId&gt;
+  &lt;artifactId&gt;rexster&lt;/artifactId&gt;
+  &lt;version&gt;0.7&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<ul><li>Improved performance for most types of requests.</li>
+	<li>Added two custom Rexster mime types: <code>application/vnd.rexster-v1+json</code> and <code>application/vnd.rexster-typed-v1+json</code>.
+	<ul><li>The <code>rexster.showTypes</code> general parameter does not exist anymore and is replaced by <code>application/vnd.rexster-typed-v1+json</code>.</li>
+		<li>Rexster respects the data types of POSTed <code>application/json</code> mime type for edges and vertices.</li>
+		<li>Extensive refactoring of content negotiation and unit tests around these changes.</li>
+	</ul></li>
+	<li>Fixed problem with the Prefix resource where SailGraph in read-only mode generated 500 (Internal Server Error) responses.</li>
+	<li>Added <span class="caps">SPARQL</span> Repository configuration.</li>
+	<li>Fixed error that appeared on multiple successive calls to <span class="caps">PUT</span> on the Vertex and Edge Resources.</li>
+	<li>The <code>extension</code> key in <span class="caps">JSON</span> responses now includes more information:
+	<ul><li>The full <span class="caps">URI</span> to the extension resource (not just the relative <span class="caps">URL</span>).</li>
+		<li>Parameters for the query string.</li>
+		<li>The name of the extension (not just the description).</li>
+	</ul></li>
+	<li>Dog House has Rexster Extension support
+	<ul><li>List all configured extensions for graphs, vertices and edges.</li>
+		<li>Launch extensions that can be accessed with a <span class="caps">GET</span> and that return <span class="caps">JSON</span>.</li>
+	</ul></li>
+	<li>Dog House is kinder to SailGraph implementations (generally cosmetic changes).</li>
+	<li>Rexster Console only hosts Gremlin-flavored script engine implementations.  Currently, that means that <code>gremlin-groovy</code> is the only exposed language.</li>
+	<li>Upgrade all Kibbles to use GraphSON.</li>
+	<li>Sample Kibble
+	<ul><li>New Parameters Sample Kibble shows how to deal with injecting different data types into the request.</li>
+	</ul></li>
+</ul><hr /><p><img src=" images/rexster-dalmatian.png" alt="" /></p>
+<h3>Version 0.6 (Dalmatian &#x2014; September 18, 2011)</h3>
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop&lt;/groupId&gt;
+  &lt;artifactId&gt;rexster&lt;/artifactId&gt;
+  &lt;version&gt;0.6&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop&lt;/groupId&gt;
+  &lt;artifactId&gt;batch-kibble&lt;/artifactId&gt;
+  &lt;version&gt;0.6&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop&lt;/groupId&gt;
+  &lt;artifactId&gt;frames-kibble&lt;/artifactId&gt;
+  &lt;version&gt;0.6&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop&lt;/groupId&gt;
+  &lt;artifactId&gt;sample-kibbles&lt;/artifactId&gt;
+  &lt;version&gt;0.6&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop&lt;/groupId&gt;
+  &lt;artifactId&gt;sparql-kibble&lt;/artifactId&gt;
+  &lt;version&gt;0.6&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<ul><li>Support for High Availability mode of Neo4j</li>
+	<li>The <code>rexster-stop.sh</code> command is now consistent with the <code>rexster-stop.sh</code> in terms of parameter naming and shorthand.</li>
+	<li>Retrieve adjacency vertices through <span class="caps">REST</span> <span class="caps">API</span> of the vertex resource.</li>
+	<li>Filter by multiple edge labels in the <span class="caps">REST</span> <span class="caps">API</span> of the vertex resource.</li>
+	<li><span class="caps">PUT</span> on vertex and edge resources in the <span class="caps">REST</span> <span class="caps">API</span> replaces all graph element properties with the specified set.</li>
+	<li>Combine rexster-start.sh and rexster-stop.sh into rexster.sh with new <code>-version</code> and <code>-status</code> commands.</li>
+	<li>If the <code>-c</code> argument is not passed at startup, Rexster first tries to read <code>rexster.xml</code> from the root of the working directory.  If it cannot be found then it tries to read from a resource.</li>
+	<li>Dog House and <span class="caps">REST</span> <span class="caps">API</span> both serve from port 8182
+	<ul><li>Dog House is at <code>http://localhost:8182/doghouse</code></li>
+		<li>The <span class="caps">REST</span> <span class="caps">URI</span> scheme has changed slightly to include a <code>graphs</code> segment, as in: <code>http://localhost:8182/graphs/tinkergraph</code></li>
+	</ul></li>
+	<li>RexPro sessions that remain idle for a configurable amount of time are destroyed.</li>
+	<li>Support <span class="caps">OPTIONS</span> <span class="caps">HTTP</span> method for all <span class="caps">REST</span> resources so that <span class="caps">HTTP</span> Access Control works properly when used (eg. jquery).</li>
+	<li>New Batch Kibble makes it possible to execute commands in a batch/transactional fashion.</li>
+	<li>Bring all Kibbles up to the latest version of <span class="caps">REST</span> <span class="caps">API</span> changes for the current version of Rexster.</li>
+</ul><hr /><p><img src=" images/rexster-dogstar.png" alt="" /></p>
+<h3>Version 0.5 (Dog Star &#x2014; August 1, 2011)</h3>
+<pre><code> &lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop&lt;/groupId&gt;
+  &lt;artifactId&gt;rexster&lt;/artifactId&gt;
+  &lt;version&gt;0.5&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<ul><li>It is now possible to mix and match root level extensions with pathed extensions in the same extension class.</li>
+	<li>Support the <code>Accept-Charset</code> request header.</li>
+	<li>The Dog House Gremlin Console now handles <span class="caps">UTF</span>-8.</li>
+	<li>The <span class="caps">HTTP</span> method is now displayed in the hypermedia for extensions.</li>
+	<li>Added the <code>parseToJson</code> parameter to the <code>@ExtensionRequestParameter</code> so that it is possible for extensions to control whether or not a specific parameter&#x2019;s value is parsed to <span class="caps">JSON</span> or not.</li>
+	<li>The <code>&lt;graph-file&gt;</code> parameter <code>rexster.xml</code> is now used to locate a graph, not to initialize it.  Affects <code>TinkerGraph</code> and <code>MemoryStoreSailGraph</code> implementations.</li>
+	<li>When requesting an index by name <code>http://localhost/graph/indices/edge</code> the index is wrapped in a <code>results</code> key in the return <span class="caps">JSON</span>.  This is more consistent with other return values.</li>
+	<li>Indices returned from <code>http://localhost/graph/indices</code> or when requested by name have their class value set to <code>edge</code> or <code>vertex</code> as opposed to the full canonical class name.</li>
+	<li>Short-hand command line options.</li>
+	<li>Extensions can be broken up across multiple classes within the same namespace and name.</li>
+	<li>Used the Blueprints <code>JSONWriter</code> to serialize to <span class="caps">JSON</span> which fixed a number of problems related to serialization of multi-layered hashes and lists.</li>
+	<li>Nulls in iterators returned through Dog House are displayed as &#x201C;null&#x201D;.</li>
+	<li>Rexster Console for evaluating scripts remotely on a Rexster server.</li>
+</ul><hr /><p><img src=" images/rexster-mcgruff.png" alt="" /></p>
+<h3>Version 0.4.1 (McGruff &#x2014; June 28, 2011)</h3>
+<pre><code> &lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop&lt;/groupId&gt;
+  &lt;artifactId&gt;rexster&lt;/artifactId&gt;
+  &lt;version&gt;0.4.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<ul><li>Fixed transactional graph error</li>
+</ul><hr /><h3>Version 0.4 (McGruff &#x2014; June 15, 2011)</h3>
+<pre><code> &lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop&lt;/groupId&gt;
+  &lt;artifactId&gt;rexster&lt;/artifactId&gt;
+  &lt;version&gt;0.4&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<ul><li>Failed vertex <span class="caps">POST</span> now returns a &#x201C;not found&#x201D; status if the identifier cannot be found in the graph</li>
+	<li>Raw <span class="caps">JSON</span> can be POSTed for vertices and edges.</li>
+	<li>Extension can now contain a hyphen in the extension name and namespace.</li>
+	<li>POSTing raw <span class="caps">JSON</span> and form data is now supported on the IndexResource.</li>
+	<li>Gremlin scripts that return a null value return a null as a result in the <span class="caps">JSON</span>.</li>
+	<li>Non-configured extensions do not appear in <span class="caps">JSON</span> for graphs, vertices, and edges.</li>
+	<li><code>@ExtensionDescriptor</code> is not required for an extension to work within Rexster.</li>
+	<li>Support for <code>RexsterGraph</code> configuration within <code>rexster.xml</code>.</li>
+	<li>The <code>returnKeys</code> parameter now works consistently across Rexster to only accept an array of keys as a value.</li>
+	<li><span class="caps">POST</span> of form data to extensions.</li>
+	<li><span class="caps">POST</span> to <code>prefixes</code> resource works consistently now supporting form data, <span class="caps">JSON</span> and query string parameters.</li>
+	<li>Ensured that all requests for a graph that does not exist throws an <span class="caps">NOT</span> <span class="caps">FOUND</span> <span class="caps">HTTP</span> status code.</li>
+	<li>Support start and stop of transactions for <span class="caps">POST</span>/<span class="caps">DELETE</span> operations</li>
+	<li>Better messaging returned as <span class="caps">JSON</span> if Rexster cannot find an extension class not found in <code>com.tinkerpop.rexster.extension.RexsterExtension</code>.</li>
+	<li>Extensions provide support for all standard <span class="caps">HTTP</span> methods allowing control through the <code>ExtensionDefinition</code>.</li>
+</ul><hr /><p><img src=" images/rexster-dogeatdog.png" alt="" /></p>
+<h3>Version 0.3 (Dog Eat Dog &#x2014; May 8, 2011)</h3>
+<pre><code> &lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop&lt;/groupId&gt;
+  &lt;artifactId&gt;rexster&lt;/artifactId&gt;
+  &lt;version&gt;0.3&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<ul><li>Minor changes to rexster.xml:
+	<ul><li>Addition of the <code>&lt;base-uri&gt;</code> element.</li>
+		<li>Renaming of <code>&lt;webserver-port&gt;</code> to <code>&lt;rexster-server-port&gt;</code>.</li>
+		<li>Renaming of <code>&lt;adminserver-port&gt;</code> to <code>&lt;doghouse-server-port&gt;</code>.</li>
+		<li>Removed some redundancy where rexster.xml had to reference itself within intialization parameters.</li>
+	</ul></li>
+	<li>The port to which the Dog House connects for <span class="caps">REST</span> services is no longer hardcoded and is configurable given the changes to rexster.xml defined above.</li>
+	<li>Supports <a href="http://www.sparsity-technologies.com/dex"><span class="caps">DEX</span></a> graph database.</li>
+	<li>Neo4jSail is no longer supported within Rexster and Blueprints.</li>
+	<li>Blueprints added a <code>count</code> method to indices.  That function is exposed via <code>http://localhost/graph/indices/myindex/count?key=name&amp;value=val</code></li>
+	<li>Introducing the new extension model.  The Gremlin traversal has been converted to the extension model.  Traversals have all been removed from Rexster.</li>
+	<li>The following <span class="caps">REST</span> <span class="caps">API</span> parameters have a new format:
+	<ul><li><code>rexster.show_types</code> is now <code>rexster.showTypes</code></li>
+		<li><code>rexster.return_keys</code> is now <code>rexster.returnKeys</code></li>
+		<li><code>rexster.allow_cached</code> is now <code>rexster.allowCached</code></li>
+	</ul></li>
+	<li>The following standard properties contained within the <span class="caps">JSON</span> response have been reformatted:
+	<ul><li><code>up_time</code> is now <code>upTime</code></li>
+		<li><code>query_time</code> is now <code>queryTime</code></li>
+		<li><code>read_only</code> is now <code>readOnly</code></li>
+	</ul></li>
+	<li>Arrays are now serialized to <span class="caps">JSON</span> in the same fashion as Lists.</li>
+	<li>Requesting an index resource without parameters will return information about that index instead of a Bad Request status code.</li>
+	<li>Removed built-in caching functions.</li>
+	<li>New command line &#x201C;debug&#x201D; option for Rexster server which will turn on all logging of the underlying Jersey/Grizzly server.</li>
+	<li>Remote shutdown.</li>
+	<li>Paging model changed in The Dog House.  There is no longer a &#x201C;Move Last&#x201D; button when paging through vertices and edges.</li>
+	<li>Prefix resource for <code>SailGraph</code> implementations.</li>
+</ul><hr /><p><img src=" images/rexster-doghouse.png" alt="" /></p>
+<h3>Version 0.2 (Dog House &#x2014; March 2, 2011)</h3>
+<pre><code> &lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop&lt;/groupId&gt;
+  &lt;artifactId&gt;rexster&lt;/artifactId&gt;
+  &lt;version&gt;0.2&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<ul><li>Fixed problem with <code>return_key</code> parameter on a Gremlin Traversal from causing an error.</li>
+	<li>The <code>return_keys</code> option will now only filter out non-metadata values.</li>
+	<li>Rexster operational when deployed within Tomcat after the conversion from Restlet to Jersey.</li>
+	<li>Fixed problem where specifying a start offset without an end offset was not returning all records from the start to the unspecified end of the list.</li>
+	<li>Fixed problem where specifying a single <code>return_key</code> was returning all properties.</li>
+	<li>Command line options for overriding configuration options in <code>rexster.xml</code>.</li>
+	<li>Graphs configured in <code>rexster.xml</code> have a <code>&lt;read-only&gt;</code> option.</li>
+	<li>Added a Gremlin console to The Dog House.</li>
+	<li>Added vertex and edge property pages to The Dog House such that it is now possible to traverse the graph textually.</li>
+	<li>Bumped to Blueprints 0.5, Pipes 0.3.1, and Gremlin 0.8.</li>
+</ul><hr /><p><img src=" images/rexster-fluffy.png" alt="" /></p>
+<h3>Version 0.1.5 (Fluffy &#x2014; January 27, 2011)</h3>
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop&lt;/groupId&gt;
+  &lt;artifactId&gt;rexster&lt;/artifactId&gt;
+  &lt;version&gt;0.1.5&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<ul><li>Support for <a href="../../gremlin/2.3.0/Home.html">Gremlin</a> 0.7</li>
+	<li>Bug fix in configuration parameters of <code>rexster.xml</code> preventing certain values from being configurable.</li>
+	<li>Early release of web tool for Rexster for browsing vertices and edges.  Will be expanded with additional features in future releases.  This feature is experimental only.</li>
+	<li>Sail support</li>
+	<li>Unit test coverage greatly expanded.</li>
+</ul><h3>Version 0.1 (Fluffy &#x2014; December 14, 2010)</h3>
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.tinkerpop&lt;/groupId&gt;
+  &lt;artifactId&gt;rexster&lt;/artifactId&gt;
+  &lt;version&gt;0.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<ul><li>Initial release of the web service shell and rank and score support</li>
+</ul>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

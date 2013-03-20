@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Home</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Home</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Home"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Home"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src=" images/rexster-logo.png" height="149px" /><a href="../../rexster/2.3.0/Downloads.html"><span class="float-right"><span><img src="https://github.com/tinkerpop/blueprints/raw/master/doc/images/tinkerpop-download.png" /></span></span></a></p>
+<p>Rexster is a graph server that exposes any <a href="../../blueprints/2.3.0/Home.html">Blueprints</a> graph through  <a href="http://en.wikipedia.org/wiki/Representational_State_Transfer"><span class="caps">REST</span></a> and a binary protocol called <a class="internal present" href="RexPro.html">RexPro</a>. The <a href="http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol"><span class="caps">HTTP</span></a> <a href="http://en.wikipedia.org/wiki/Web_service">web service</a> provides standard low-level <span class="caps">GET</span>, <span class="caps">POST</span>, <span class="caps">PUT</span>, and <span class="caps">DELETE</span> methods, a flexible <a class="internal present" href="Extensions.html">extensions</a> model which allows plug-in like development for external services (such as adhoc graph queries through <a href="../../gremlin/2.3.0/Home.html">Gremlin</a>), server-side &#x201C;stored procedures&#x201D; written in Gremlin, and a browser-based interface called <a class="internal present" href="The-Dog-House.html">The Dog House</a>. <a class="internal present" href="Rexster-Console.html">Rexster Console</a> makes it possible to do remote script evaluation against configured graphs inside of a Rexster Server.<sup class="footnote"><a href="#fn1">1</a></sup></p>
+<p><a class="internal present" href="Rexster-Kibbles.html">Rexster Kibbles</a> is a collection of various Rexster server extensions provided by TinkerPop.</p>
+<p>Please join the Gremlin users group at <a href="http://groups.google.com/group/gremlin-users">http://groups.google.com/group/gremlin-users</a> for all <a href="../../index.html">TinkerPop</a> related discussions.</p>
+<pre><code>http://localhost:8182/graphs/tinkergraph/vertices/1</code></pre>
+<pre><code>{
+  "version":"*.*",
+  "results": {
+    "_type":"vertex",
+    "_id":"1",
+    "name":"marko",
+    "age":29 
+  },
+  "queryTime":0.12351 
+}</code></pre><br />
+Rexster JavaDoc: <a href="http://tinkerpop.com/docs/javadocs/rexster/2.3.0/">2.3.0</a> &#x2013; <a href="http://tinkerpop.com/docs/javadocs/rexster/2.2.0/">2.2.0</a> &#x2013; <a href="http://tinkerpop.com/docs/javadocs/rexster/2.1.0/">2.1.0</a> &#x2013; <a href="http://tinkerpop.com/docs/javadocs/rexster/2.0.0/">2.0.0</a><br />
+Rexster WikiDoc: <a href="http://tinkerpop.com/docs/wikidocs/rexster/2.3.0/Home.html">2.3.0</a> &#x2013; <a href="http://tinkerpop.com/docs/wikidocs/rexster/2.2.0/Home.html">2.2.0</a> &#x2013; <a href="http://tinkerpop.com/docs/wikidocs/rexster/2.1.0/Home.html">2.1.0</a> &#x2013; <a href="http://tinkerpop.com/docs/wikidocs/rexster/2.0.0/Home.html">2.0.0</a>
+<hr /><ul><li><a class="internal present" href="Introduction.html">Introduction</a>
+	<ul><li><a class="internal present" href="The-Benefits-of-Rexster.html">The Benefits of Rexster</a></li>
+		<li><a class="internal present" href="Getting-Started.html">Getting Started</a></li>
+		<li><a class="internal present" href="Rexster-Configuration.html">Rexster Configuration</a>
+		<ul><li><a class="internal present" href="Specific-Graph-Configurations.html">Specific Graph Configurations</a></li>
+		</ul></li>
+		<li><a class="internal present" href="Command-Line.html">Command Line</a></li>
+		<li><a class="internal present" href="The-Dog-House.html">The Dog House</a></li>
+		<li><a class="internal present" href="Rexster-Console.html">Rexster Console</a></li>
+		<li><a class="internal present" href="Basic-REST-API.html">Basic REST API</a> (<strong>Cheat Sheet</strong>)</li>
+	</ul></li>
+	<li><span class="caps">HTTP</span> <span class="caps">REST</span>
+	<ul><li><a class="internal present" href="Mapping-a-URI-to-JSON.html">Mapping a URI to JSON</a></li>
+		<li><a class="internal present" href="Property-Data-Types.html">Property Data Types</a></li>
+		<li><a class="internal present" href="Rexster-Mime-Types.html">Rexster MIME Types</a></li>
+		<li><a class="internal present" href="Rexster-Security.html">Rexster Security</a></li>
+		<li><a href="../../blueprints/2.3.0/Rexster-Implementation.html">Using RexsterGraph</a> (distributed through <a href="../../blueprints/2.3.0/Home.html">Blueprints</a>)</li>
+		<li><a class="internal present" href="Extensions.html">Extensions</a>
+		<ul><li><a class="internal present" href="Creating-an-Extension.html">Creating an Extension</a></li>
+			<li><a class="internal present" href="Extensions-and-Gremlin.html">Extensions and Gremlin</a></li>
+			<li><a class="internal present" href="Deploying-an-Extension.html">Deploying an Extension</a></li>
+			<li><a class="internal present" href="Extension-Naming.html">Extension Naming</a></li>
+			<li><a class="internal present" href="Extension-Points.html">Extension Points</a></li>
+			<li><a class="internal present" href="Extension-Configuration.html">Extension Configuration</a></li>
+			<li><a class="internal present" href="Extension-Parameters.html">Extension Parameters</a></li>
+			<li><a class="internal present" href="Extension-Response.html">Extension Response</a></li>
+			<li><a class="internal present" href="Extension-Documentation.html">Extension Documentation</a></li>
+			<li><a class="internal present" href="Extension-Annotations.html">Extension Annotations</a> (<strong>Cheat Sheet</strong>)</li>
+		</ul></li>
+		<li>TinkerPop Extensions
+		<ul><li><a class="internal present" href="Gremlin-Extension.html">Gremlin Extension</a></li>
+			<li><a class="internal present" href="Rexster-Kibbles.html">Rexster Kibbles</a></li>
+		</ul></li>
+	</ul></li>
+	<li><a class="internal present" href="RexPro.html">RexPro</a>
+	<ul><li><a class="internal present" href="RexPro-Java.html">Connecting via RexPro</a></li>
+		<li><a class="internal present" href="RexPro-Messages.html">RexPro Messages</a></li>
+	</ul></li>
+	<li>Third-Party Rexster Clients
+	<ul><li><span class="caps">HTTP</span>/<span class="caps">REST</span>
+		<ul><li><a href="http://bulbflow.com">Bulbs</a> (python)</li>
+			<li><a href="https://github.com/StartTheShift/thunderdome">ThunderDome</a> (python)</li>
+			<li><a href="http://github.com/mavenik/rexster-ruby">rexster-ruby</a> (ruby)</li>
+			<li><a href="https://github.com/entrendipity/grex">grex</a> (javascript)</li>
+		</ul></li>
+		<li>RexPro
+		<ul><li><a href="https://github.com/bdeggleston/rexpro-python">rexpro-python</a> (python)</li>
+		</ul></li>
+	</ul></li>
+	<li>Conclusion
+	<ul><li><a class="internal present" href="Troubleshooting.html">Troubleshooting</a></li>
+		<li><a class="internal present" href="Acknowledgments.html">Acknowledgments</a></li>
+		<li><a class="internal present" href="Release-Notes.html">Release Notes</a></li>
+	</ul></li>
+</ul><hr /><pre><code>&lt;dependency&gt;
+   &lt;groupId&gt;com.tinkerpop.rexster&lt;/groupId&gt;
+   &lt;artifactId&gt;rexster-core&lt;/artifactId&gt;
+   &lt;version&gt;2.3.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<p>Non-Maven users can get the raw jars from Apache&#x2019;s <a href="http://search.maven.org/#browse%7C1398694123">Central Repository</a>.</p>
+<p class="footnote"><a href="#fnr1"><sup>1</sup></a> Rexster documentation is up to date with the current Rexster <a href="http://github.com/tinkerpop/rexster/tree/master">codebase</a>, not with the latest Rexster <a href="../../rexster/2.3.0/Downloads.html">release</a>.</p>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

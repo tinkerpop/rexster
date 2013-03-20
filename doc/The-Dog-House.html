@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>The Dog House</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>The Dog House</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/The-Dog-House"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/The-Dog-House"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p>Rexster&#x2019;s Dog House is a browser-based interface to Rexster and currently provides the following functions:</p>
+<ul><li>Vertex and Edge Browser &#x2013; View vertices and edges for a selected graph.</li>
+	<li>Filter graph elements by key index.</li>
+	<li>Basic graph visualization with <a href="http://thejit.org">JavaScript InfoVis Toolkit</a>.</li>
+	<li>Launch <a class="internal present" href="Extensions.html">Extensions</a>.</li>
+	<li>Gremlin Console &#x2013; Simulates a Gremlin console session against a selected graph.</li>
+</ul><h1>Getting Started</h1>
+<p>Start the Rexster Web Server as described on the <a class="internal present" href="Getting-Started.html">Getting Started</a> page, using:</p>
+<pre><code>./bin/rexster-start.sh</code></pre>
+<p><a class="internal present" href="Rexster-Configuration.html">Configuration</a> related to the Dog House are found in the <code>rexster.xml</code> file.  Given the default configuration, The Dog House can be accessed at:</p>
+<pre><code>http://localhost:8182/doghouse</code></pre>
+<p>It is important to remember that if you intend to host The Dog House somewhere besides <code>http://localhost</code>, you must change the <code>&lt;base-uri&gt;</code> element in <code>rexster.xml</code>.  Therefore, if you intend to host at <code>http://my.favoritegraph.com:8182/doghouse</code> then be sure to change <code>rexster.xml</code> as follows:</p>
+<pre><code>&lt;rexster&gt;
+  &lt;rexster-server-port&gt;8182&lt;/rexster-server-port&gt;
+  &lt;base-uri&gt;http://my.favoritegraph.com&lt;/base-uri&gt;
+  &lt;web-root&gt;public&lt;/web-root&gt;
+  &lt;character-set&gt;UTF-8&lt;/character-set&gt;
+  ...
+&lt;/rexster&gt;</code></pre>
+<h1>Vertex and Edge Browser</h1>
+<p>The Vertex and Edge Browser lists the graphs that are configured within Rexster.  Rexster will only shows those graphs which are marked as enabled within the configuration.  Selecting a graph yields the opportunity to browse vertices or edges.  A pager at the top and bottom of the browse panel listing vertices or edges allows one to cycle through the listing and the multi-cornered arrow button within each drills through to a detailed view of that element.  From there it is possible to see other graph elements associated with the one selected.</p>
+<p><img src=" images/rexster-dog-house-browse.png" alt="" /></p>
+<p>Note the small magnifying glass button to the right of the move next button on the pager.  The button will display a filtering dialog box which allows you to select the key index to search by and the value for the filter.</p>
+<p><img src=" images/rexster-dog-house-index.png" alt="" /></p>
+<p>When you click the Filter button the vertex/edge browser will page through the results returned by the key index.  To cancel the filtering, simply click the Remove button, which will appear to the right of the Filter button after a filter is created.</p>
+<p>The value field of the filtering dialog box allows <a class="internal present" href="Property-Data-Types.html">Rexster typing</a>, so if your index is an integer value, you can enter <code>(i,10)</code> to get your results.</p>
+<h1>Graph Visualization</h1>
+<p>You can visualize parts of a graph from a starting vertex.  Click the Visualize button attached to each vertex to display a the vertex and its connected vertices.</p>
+<p><img src=" images/rexster-dog-house-viz.png" alt="" /></p>
+<p>You can expand the visualization by right-clicking any vertex in the graph to include the connections of that vertex.  Left-clicking a vertex or edge will display the properties of that graph element in the right-hand panel.  Standard pan operations are supported by dragging and zooming is controlled with the mouse wheel.</p>
+<h1>Extensions Launcher</h1>
+<p><a class="internal present" href="Extensions.html">Rexster Extensions</a> can be triggered from within Dog House.  Extensions configured in Rexster are available from within the &#x201C;Browse&#x201D; panel as shown in the screenshot below:</p>
+<p><img src=" images/rexster-dog-house-extension-list.png" alt="" /></p>
+<p>As the screenshot above shows, there are three configured extensions:</p>
+<ul><li><code>tp:gremlin</code> &#x2013; the built-in <a class="internal present" href="Gremlin-Extension.html">Gremlin Extension</a>.</li>
+	<li><code>tp:batch-vertices</code> &#x2013; the <a href="https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/batch-kibble">Batch Kibble</a> for vertices.</li>
+	<li><code>tp:batch-edges</code> &#x2013; the <a href="https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/batch-kibble">Batch Kibble</a> for edges.</li>
+</ul><p>It is important to note that the extensions listed are sensitive to what is currently being browsed in Dog House.  In other words, if a graph is selected then extensions configured to the graph <a class="internal present" href="Extension-Points.html">extension point</a> are shown and if viewing a vertex or edge within a graph then extensions configured to the vertex or edge extension points are shown.  Extensions shown in Dog House are further limited to <code>GET</code> operations that return <span class="caps">JSON</span>.  For example, if an extension only executes via <code>POST</code> it will not be displayed.</p>
+<p>Selecting an extension will expand the accordion and display the <span class="caps">URI</span> to the extension and the expected parameters as extracted from the <a class="internal present" href="Extension-Documentation.html">extension API</a>.  Tooltips on the textboxes for parameters show descriptions from the <span class="caps">API</span>.</p>
+<p><img src=" images/rexster-dog-house-extension-expanded.png" alt="" /></p>
+<p>The following screenshot displays the results of the executed extension:</p>
+<p><img src=" images/rexster-dog-house-extension-launched.png" alt="" /></p>
+<h1>Gremlin Console</h1>
+<p>The Gremlin Console looks to simulate a Gremlin session within the browser.  First, ensure that the appropriate graph is selected so that Gremlin scripts are evaluated against the right graph.  Like the Vertex and Edge Browser, the graph listing only includes graphs that are marked as enabled within the configuration.  Once the correct graph is selected, simply use the console as one would use Gremlin in a terminal session.</p>
+<p><img src=" images/rexster-dog-house-gremlin.png" alt="" /></p>
+<p>It is important to note that the Gremlin Console in The Dog House will only accept single line statements.  For example:</p>
+<pre><code>gremlin&gt; for(int i=0; i&lt;10; i++) { 
+gremlin&gt;   println i; 
+gremlin&gt; }</code></pre>
+<p>would need to be written as:</p>
+<pre><code>gremlin&gt; for(int i=0; i&lt;10; i++) { println i; }</code></pre>
+<h1>Limitations</h1>
+<ul><li>The Dog House works best with <a href="http://www.google.com/chrome/">Google Chrome</a> 19.x or better, but has been shown to work well with <a href="http://www.mozilla.com/">Firefox</a> 13.&#xD7;.</li>
+	<li>Not all Blueprints graph implementations support all the features that Dog House needs to operate.  Therefore, some features of Dog House may not be available depending upon the graph implementation being accessed.</li>
+</ul>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

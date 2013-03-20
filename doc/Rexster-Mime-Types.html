@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Rexster Mime Types</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>Rexster Mime Types</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Rexster-Mime-Types"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Rexster-Mime-Types"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p>Mime types are used in the <span class="caps">REST</span> <span class="caps">API</span> to let consumers choose the format of the data they wish to receive  (via the <code>Accept</code> header), as well as to explain to Rexster the type of content being sent (via the <code>Content-Type</code> header).</p>
+<h1>Accept Header</h1>
+<p>There are three formats that may be set on the <code>Accept</code> header.</p>
+<ul><li><code>application/json</code></li>
+	<li><code>application/vnd.rexster-v1+json</code></li>
+	<li><code>application/vnd.rexster-typed-v1+json</code></li>
+</ul><p>If the <code>Accept</code> header is not specified, Rexster will return <code>application/json</code> in its response.  Both <code>application/vnd.rexster-v1+json</code> and <code>application/vnd.rexster-typed-v1+json</code> are considered custom types and can be generally applied to all requests with the exception of <a class="internal present" href="Extensions.html">Extension</a> requests, as they are capable of exposing their own specific content types.</p>
+<p>While all three types are <a href="http://json.org"><span class="caps">JSON</span></a> formats, <code>application/vnd.rexster-v1+json</code> and <code>application/vnd.rexster-typed-v1+json</code> provide additional information in their responses which may be important to consumers.  The <code>application/vnd.rexster-v1+json</code> type contains link information regarding configured and available extensions, specifically for the graph, vertex, and edge resource and the <code>application/vnd.rexster-typed-v1+json</code> type is the same but also includes <a class="internal present" href="Property-Data-Types.html">property data type</a> information embedded within the returned <span class="caps">JSON</span>.</p>
+<h2>Examples</h2>
+<p>This first request does not specify the <code>Accept</code> header and therefore Rexster simply returns <code>application/json</code>.</p>
+<pre><code>curl -v http://localhost:8182/graphs/tinkergraph/edges/11</code></pre>
+<pre><code>{
+    "version": "*.*",
+    "results": {
+        "weight": 0.4000000059604645,
+        "_id": "11",
+        "_type": "edge",
+        "_outV": "4",
+        "_inV": "3",
+        "_label": "created"
+    },
+    "queryTime": 1.225442
+}</code></pre>
+<p>The following request to the same resource uses <code>application/vnd.rexster-v1+json</code> and Rexster therefore responds with the same result as above, but includes the list of configured extensions.</p>
+<pre><code>curl -v -H "Accept:application/vnd.rexster-v1+json" http://localhost:8182/graphs/tinkergraph/edges/11</code></pre>
+<pre><code>{
+    "version": "*.*",
+    "results": {
+        "weight": 0.4000000059604645,
+        "_id": "11",
+        "_type": "edge",
+        "_outV": "4",
+        "_inV": "3",
+        "_label": "created"
+    },
+    "queryTime": 0.363026,
+    "extensions": [
+        {
+            "title": "tp:gremlin",
+            "op": "GET",
+            "description": "evaluate an ad-hoc Gremlin script for an edge.",
+            "name": "gremlin",
+            "parameters": [
+                {
+                    "description": "displays the properties of the elements with their native data type (default is false)",
+                    "name": "rexster.showTypes"
+                },
+                {
+                    "description": "an array of element property keys to return (default is to return all element properties)",
+                    "name": "rexster.returnKeys"
+                },
+                {
+                    "description": "start index for a paged set of data to be returned",
+                    "name": "rexster.offset.start"
+                },
+                {
+                    "description": "end index for a paged set of data to be returned",
+                    "name": "rexster.offset.end"
+                },
+                {
+                    "description": "the Gremlin script to be evaluated",
+                    "name": "script"
+                }
+            ],
+            "href": "http://localhost:8182/graphs/tinkergraph/edges/11/tp/gremlin",
+            "namespace": "tp"
+        },
+        {
+            "title": "tp:gremlin",
+            "op": "POST",
+            "description": "evaluate an ad-hoc Gremlin script for an edge.",
+            "name": "gremlin",
+            "parameters": [
+                {
+                    "description": "displays the properties of the elements with their native data type (default is false)",
+                    "name": "rexster.showTypes"
+                },
+                {
+                    "description": "an array of element property keys to return (default is to return all element properties)",
+                    "name": "rexster.returnKeys"
+                },
+                {
+                    "description": "start index for a paged set of data to be returned",
+                    "name": "rexster.offset.start"
+                },
+                {
+                    "description": "end index for a paged set of data to be returned",
+                    "name": "rexster.offset.end"
+                },
+                {
+                    "description": "the Gremlin script to be evaluated",
+                    "name": "script"
+                }
+            ],
+            "href": "http://localhost:8182/graphs/tinkergraph/edges/11/tp/gremlin",
+            "namespace": "tp"
+        }
+    ]
+}</code></pre>
+<p>This final request in the example set uses <code>application/vnd.rexster-typed-v1+json</code> and Rexster therefore responds with the same result as above, but includes embedded data types within the <span class="caps">JSON</span> itself.</p>
+<pre><code>curl -v -H "Accept:application/vnd.rexster-typed-v1+json" http://localhost:8182/graphs/tinkergraph/edges/11</code></pre>
+<pre><code>{
+    "version": "*.*",
+    "results": {
+        "weight": {
+            "type": "float",
+            "value": 0.4000000059604645
+        },
+        "_id": "11",
+        "_type": "edge",
+        "_outV": "4",
+        "_inV": "3",
+        "_label": "created"
+    },
+    "queryTime": 0.981574,
+    "extensions": [
+        {
+            "title": "tp:gremlin",
+            "op": "GET",
+            "description": "evaluate an ad-hoc Gremlin script for an edge.",
+            "name": "gremlin",
+            "parameters": [
+                {
+                    "description": "displays the properties of the elements with their native data type (default is false)",
+                    "name": "rexster.showTypes"
+                },
+                {
+                    "description": "an array of element property keys to return (default is to return all element properties)",
+                    "name": "rexster.returnKeys"
+                },
+                {
+                    "description": "start index for a paged set of data to be returned",
+                    "name": "rexster.offset.start"
+                },
+                {
+                    "description": "end index for a paged set of data to be returned",
+                    "name": "rexster.offset.end"
+                },
+                {
+                    "description": "the Gremlin script to be evaluated",
+                    "name": "script"
+                }
+            ],
+            "href": "http://localhost:8182/graphs/tinkergraph/edges/11/tp/gremlin",
+            "namespace": "tp"
+        },
+        {
+            "title": "tp:gremlin",
+            "op": "POST",
+            "description": "evaluate an ad-hoc Gremlin script for an edge.",
+            "name": "gremlin",
+            "parameters": [
+                {
+                    "description": "displays the properties of the elements with their native data type (default is false)",
+                    "name": "rexster.showTypes"
+                },
+                {
+                    "description": "an array of element property keys to return (default is to return all element properties)",
+                    "name": "rexster.returnKeys"
+                },
+                {
+                    "description": "start index for a paged set of data to be returned",
+                    "name": "rexster.offset.start"
+                },
+                {
+                    "description": "end index for a paged set of data to be returned",
+                    "name": "rexster.offset.end"
+                },
+                {
+                    "description": "the Gremlin script to be evaluated",
+                    "name": "script"
+                }
+            ],
+            "href": "http://localhost:8182/graphs/tinkergraph/edges/11/tp/gremlin",
+            "namespace": "tp"
+        }
+    ]
+}</code></pre>
+<h1>Content-Type Header</h1>
+<p>There are several formats that may be set on the <code>Content-Type</code> header when doing a <span class="caps">POST</span>, <span class="caps">PUT</span>, or <span class="caps">DELETE</span> operation.</p>
+<ul><li><code>application/x-www-form-urlencoded</code></li>
+	<li><code>application/json</code></li>
+	<li><code>application/vnd.rexster-v1+json</code></li>
+	<li><code>application/vnd.rexster-typed-v1+json</code></li>
+</ul><p>Rexster also offers the flexibility of performing those operations directly on the <a class="internal present" href="Mapping-a-URI-to-JSON.html">URI</a>.</p>
+<p>Rexster&#x2019;s will use <a class="internal present" href="Property-Data-Types.html">embedded typing</a> when the <code>Content-Type</code> is set to <code>application/x-www-form-urlencoded</code>, <code>application/vnd.rexster-typed-v1+json</code>, or is a <span class="caps">URI</span> mapping.  If the <code>Content-Type</code> is set to <code>application/json</code> or <code>application/vnd.rexster-v1+json</code> it will use native <span class="caps">JSON</span> data types.</p>
+<h2>Examples</h2>
+<p>The following curl command POSTs a new vertex to a <span class="caps">URI</span>:</p>
+<pre><code>curl -v -X POST "http://localhost:8182/graphs/emptygraph/vertices?x=(integer,123)&amp;y=(s,123)"</code></pre>
+<p>and Rexster associates each property with the correct data type:</p>
+<pre><code>{
+    "version": "*.*",
+    "results": {
+        "y": "123",
+        "x": 123,
+        "_id": "0",
+        "_type": "vertex"
+    },
+    "queryTime": 1.871345
+}</code></pre>
+<p>The following is the same <span class="caps">POST</span> without the data type formatting:</p>
+<pre><code>curl -v -X POST "http://localhost:8182/graphs/emptygraph/vertices?x=123&amp;y=123"</code></pre>
+<p>and Rexster just assumes that the property values are both strings:</p>
+<pre><code>{
+    "version": "*.*",
+    "results": {
+        "y": "123",
+        "x": "123",
+        "_id": "0",
+        "_type": "vertex"
+    },
+    "queryTime": 1.871345
+}</code></pre>
+<p>Now consider the <span class="caps">POST</span> of <code>application/json</code> using the same parameters:</p>
+<pre><code>curl -v -X POST -H "Content-Type:application/json" -d '{"y":"123","x":123}' "http://localhost:8182/graphs/emptygraph/vertices"</code></pre>
+<p>In this case, Rexster uses the native <span class="caps">JSON</span> data types.</p>
+<pre><code>{
+    "version": "*.*",
+    "results": {
+        "y": "123",
+        "x": 123,
+        "_id": "0",
+        "_type": "vertex"
+    },
+    "queryTime": 0.5959555
+}</code></pre>
+<p>The next examples demonstrates what happens an embedded-type request with a <code>Content-Type</code> of <code>application/json</code> is POSTed:</p>
+<pre><code>curl -v -X POST -H "Content-Type:application/json" -d '{"y":"(s,123)","x":"(i,123)"}' "http://localhost:8182/graphs/emptygraph/vertices"</code></pre>
+<p>Note below how the embedded-types are not parsed and the data is just stored literally:</p>
+<pre><code>{
+    "version": "*.*",
+    "results": {
+        "y": "(s,123)",
+        "x": "(i,123)",
+        "_id": "3",
+        "_type": "vertex"
+    },
+    "queryTime": 0.949773
+}</code></pre>
+<p>To get Rexster to parse those types the <code>Content-Type</code> must be set to <code>application/vnd.rexster-typed-v1+json</code> as in:</p>
+<pre><code>curl -v -X POST -H "Content-Type:application/vnd.rexster-typed-v1+json" -d '{"y":"(s,123)","x":"(i,123)"}' "http://localhost:8182/graphs/emptygraph/vertices"</code></pre>
+<pre><code>{
+    "version": "*.*",
+    "results": {
+        "y": "123",
+        "x": 123,
+        "_id": "4",
+        "_type": "vertex"
+    },
+    "queryTime": 1.082941
+}</code></pre>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

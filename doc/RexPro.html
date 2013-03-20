@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>RexPro</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Rexster</a></h3>
+  <h1>RexPro</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/RexPro"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/RexPro"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src=" images/rexpro-logo.png" width="500px" /></p>
+<p>RexPro is a binary protocol for Rexster that can be used to send Gremlin scripts to a remote Rexster instance.   The script is processed on the server and the results serialized and returned back to the calling client.  For those familiar with the <a class="internal present" href="Gremlin-Extension.html">Gremlin Extension</a> in the RESTful side of Rexster, RexPro is not so different in what it does. However, RexPro will perform better than <span class="caps">REST</span> as it does not bring with it the overhead that comes with the <span class="caps">REST</span> <span class="caps">HTTP</span> infrastructure.</p>
+<ul><li><a class="internal present" href="RexPro-Messages.html">RexPro Messages</a> &#x2013; Discusses the format of messages used to communicate with Rexster.</li>
+	<li><a class="internal present" href="RexPro-Java.html">Connecting via RexPro</a> &#x2013; Discusses how to connect to a RexPro Server with Java.</li>
+</ul><h1>Architecture</h1>
+<p>The RexPro Server is embedded in Rexster and starts when Rexster itself is started.  It utilizes <a href="http://grizzly.java.net">Grizzly</a> at its core, much like it&#x2019;s <span class="caps">HTTP</span> Server counterpart.  It <a class="internal present" href="Rexster-Configuration.html">configures</a> a set of messages filters over a lightweight <span class="caps">TCP</span> <span class="caps">NIO</span> Transport and begins listening on a port when the server starts.  Clients send binary <a class="internal present" href="RexPro-Messages.html">messages</a> to the RexPro server, which open sessions, execute graph traversals, modify the graph or perform any other operations possible by Gremlin.</p>
+<p>RexPro uses <a href="http://msgpack.org/">MsgPack</a> for much of its message serialization.  For those building different language bindings to RexPro, MsgPack can help greatly in that endeavor.</p>
+<h2>Modes of Operations</h2>
+<p>A RexPro message can be sent in one of two modes: in the context of a session or sessionless.</p>
+<h3>RexPro Sessions</h3>
+<p>When using a session, the first request made to the RexPro Server must be one that asks that a session be created.  That request will return a session identifier which must be sent on future requests so that the message can be handled by the proper session on the server.  When using a session, the Gremlin Script Engine bindings are maintained for the life of the session, which simply means that a variable or transaction established in one requests is available in the next.</p>
+<h3>RexPro Sessionless</h3>
+<p>Sessionless RexPro messages avoid the overhead of a session.  When sending a message in a sessionless fashion, the RexPro Server assumes that the script within the message is self-contained.  It does not maintain variable bindings from one request to the next.  Transactions should be closed with each request as future requests will not know anything about previous ones.  By default, the RexPro Server will automatically close transactions, unless otherwise specified in the message itself.</p>
+<h2>Channels of Serialization</h2>
+<p>RexPro does not rely on a single method for result serialization from Gremlin script requests.  Unlike the Gremlin Extension in the <span class="caps">REST</span> side of Rexster, which only returns results as <a href="../../blueprints/2.3.0/GraphSON-Reader-and-Writer-Library.html">GraphSON</a> (which is basically just <a href="http://json.org"><span class="caps">JSON</span></a>), RexPro maintains different channels that return different result serialization types.  There are currently three channels:</p>
+<ul><li><strong>MsgPack</strong> &#x2013; Default channel and suitable for most requirements</li>
+	<li><strong>GraphSON</strong> &#x2013; Same serialization format as <span class="caps">REST</span></li>
+	<li><strong>Console</strong> &#x2013; String based serialization (used by <a class="internal present" href="Rexster-Console.html">Rexster Console</a>)</li>
+</ul><p>Channels help ensure that RexPro stays extensible, as new channels can be added without breaking compatibility of the RexPro message formats.</p>
+<p>It is important to remember that channels only affect serialization within the result body of a message.  In other words, a RexPro script result message is like an envelope for the serialized result.  The result is impacted by the channel choice, but the envelope is not.  The envelope, which contains control data for the message, is always serialized by MsgPack.  For example, sending a script request message using the GraphSON channel will return a MsgPack encoded envelope with a <span class="caps">JSON</span> string inside.  The envelope will tell the client how to decode that GraphSON out of the envelope (i.e. how many bytes long the GraphSON string is).</p>
+<h2>Gotchas and Limitations</h2>
+<h3>Auto-commit</h3>
+<p>When using auto-commit operations it important to note that there are some limitations to be considered depending on the underlying database being used.  The commit occurs after the script has executed in the Script Engine.  This approach has a down-side for Blueprints implementations that assigned identifiers after the commit, such as <a href="http://code.google.com/p/orient/wiki/Transactions">OrientDB</a>.  The down-side is that scripts that insert a new graph element and then try to return it in the same script will return an element with a temporary identifier and not the one assigned after the commit.</p>
+<p>This is not a problem unique to RexPro.  The <a class="internal present" href="Gremlin-Extension.html">Gremlin Extension</a> on the <span class="caps">REST</span> side has the same limitation.  The most straightforward solution to this problem is to simply handle transactions manually.</p>
+<h3>Sessionless Requests and Bindings</h3>
+<p>Sessionless requests are meant to be fast performing.  To reduce serialization time, bindings from the Script Engine are not serialized and sent back with the result message.</p>
+<h3>Parameterize Gremlin</h3>
+<p>When possible, it is better to parameterize Gremlin sending variables as Script Engine Bindings that can be injected to the Gremlin script at evaluation time.  In other words, rather than issue a script as follows:</p>
+<pre><code>g.v(1).out.has('name','vadas')</code></pre>
+<p>choose to send the script as:</p>
+<pre><code>g.v(start).out.has('name',personName)</code></pre>
+<p>with a map of bindings as such as:</p>
+<pre><code>[start:1,personName:'vadas']</code></pre>
+<p>By taking the parameterized approach, the frequency at which the Script Engine resets itself (to clear the script cache) will be diminished and scripts will be compiled less often leading to better overall performance.</p>
+<h3>Binding Integer and Float values</h3>
+<p>Internally, RexPro deserializes Integer and Float bindings as Long and Double values. This is due to a limitation of the msgpack format.</p>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>okram</b>, 2013-03-20 03:17:30</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>
