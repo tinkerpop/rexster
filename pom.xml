@@ -30,6 +30,11 @@
             <email>marko@markorodriguez.com</email>
             <url>http://markorodriguez.com</url>
         </developer>
+        <developer>
+            <name>Blake Eggleston</name>
+            <email>bdeggleston@gmail.com</email>
+            <url>https://github.com/bdeggleston</url>
+        </developer>
     </developers>
     <inceptionYear>2009</inceptionYear>
     <licenses>
