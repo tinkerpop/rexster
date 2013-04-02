@@ -94,6 +94,8 @@ public class HttpRexsterServer implements RexsterServer {
         deployRestApi(application);
 
         if (enableDogHouse) {
+            // serves images
+            deployStaticResourceServer();
             deployDogHouse(application);
         }
 
@@ -112,22 +114,11 @@ public class HttpRexsterServer implements RexsterServer {
     }
 
     private void deployRestApi(final RexsterApplication application) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        final String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
-        final ServerConfiguration config = this.httpServer.getServerConfiguration();
-        config.addHttpHandler(new RexsterStaticHttpHandler(absoluteWebRootPath), "/static");
 
         final WebappContext wacJersey = new WebappContext("jersey", "");
 
         // explicitly load resources so that the "RexsterApplicationProvider" class is not loaded
-        final ResourceConfig rc = new ClassNamesResourceConfig(
-                EdgeResource.class,
-                GraphResource.class,
-                IndexResource.class,
-                KeyIndexResource.class,
-                PrefixResource.class,
-                RexsterResource.class,
-                RootResource.class,
-                VertexResource.class);
+        final ResourceConfig rc = constructResourceConfig();
 
         // constructs an injectable for the RexsterApplication instance.  This get constructed externally
         // and is passed into the HttpRexsterServer.  The SingletonTypeInjectableProvider is responsible for
@@ -172,7 +163,39 @@ public class HttpRexsterServer implements RexsterServer {
         wacJersey.deploy(this.httpServer);
     }
 
-    private void deployDogHouse(RexsterApplication application) {
+    private ResourceConfig constructResourceConfig() {
+        ResourceConfig rc;
+        if (enableDogHouse) {
+            rc = new ClassNamesResourceConfig(
+                EdgeResource.class,
+                GraphResource.class,
+                IndexResource.class,
+                KeyIndexResource.class,
+                PrefixResource.class,
+                RexsterResource.class,
+                RootResource.class,
+                VertexResource.class);
+        } else {
+            // need to disable the root resource which shows the splash page. not needed when dog house is disabled
+            rc = new ClassNamesResourceConfig(
+                EdgeResource.class,
+                GraphResource.class,
+                IndexResource.class,
+                KeyIndexResource.class,
+                PrefixResource.class,
+                RexsterResource.class,
+                VertexResource.class);
+        }
+        return rc;
+    }
+
+    private void deployStaticResourceServer() {
+        final String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
+        final ServerConfiguration config = this.httpServer.getServerConfiguration();
+        config.addHttpHandler(new RexsterStaticHttpHandler(absoluteWebRootPath), "/static");
+    }
+
+    private void deployDogHouse(final RexsterApplication application) {
         // servlet that services all url from "main" by simply sending
         // main.html back to the calling client.  main.html handles its own
         // state given the uri
