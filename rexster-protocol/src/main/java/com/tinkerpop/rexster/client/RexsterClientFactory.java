@@ -12,9 +12,14 @@ import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
-import org.glassfish.grizzly.strategies.SameThreadIOStrategy;
+import org.glassfish.grizzly.strategies.LeaderFollowerNIOStrategy;
+import org.glassfish.grizzly.threadpool.GrizzlyExecutorService;
+import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Creates RexsterClient instances.
@@ -39,6 +44,16 @@ public class RexsterClientFactory {
         addProperty(RexsterClientTokens.CONFIG_TRANSACTION, true);
         addProperty(RexsterClientTokens.CONFIG_CHANNEL, RexProChannel.CHANNEL_MSGPACK);
     }};
+
+    /**
+     * The transport used by all instantiated RexsterClient objects.
+     */
+    private static TCPNIOTransport transport;
+
+    /**
+     * A list of all clients that were opened by the factory.
+     */
+    private static Set<RexsterClient> registeredClients = new HashSet<RexsterClient>();
 
     /**
      * Creates a RexsterClient instance with default settings for the factory using localhost and 8184 for the port.
@@ -105,28 +120,58 @@ public class RexsterClientFactory {
     /**
      * Create a RexsterClient instance allowing override of all settings.
      */
-    public static RexsterClient open(final Configuration specificConfiguration) throws Exception {
+    public static synchronized RexsterClient open(final Configuration specificConfiguration) throws Exception {
 
         final CompositeConfiguration jointConfig = new CompositeConfiguration();
         jointConfig.addConfiguration(specificConfiguration);
         jointConfig.addConfiguration(defaultConfiguration);
 
-        final RexsterClientHandler handler = new RexsterClientHandler();
-        final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
-        filterChainBuilder.add(new TransportFilter());
-        filterChainBuilder.add(new RexProMessageFilter());
-        filterChainBuilder.add(handler);
-
-        final TCPNIOTransport transport = TCPNIOTransportBuilder.newInstance().build();
-        transport.setIOStrategy(SameThreadIOStrategy.getInstance());
-        transport.setProcessor(filterChainBuilder.build());
-        transport.start();
-
-        final RexsterClient client = new RexsterClient(jointConfig, transport);
-        handler.setClient(client);
+        final RexsterClient client = new RexsterClient(jointConfig, getTransport());
+        registeredClients.add(client);
 
         logger.info(String.format("Create RexsterClient instance: [%s]", ConfigurationUtils.toString(jointConfig)));
 
         return client;
+    }
+
+    /**
+     * Calling this method will release resources for all clients.
+     */
+    public synchronized static void releaseClients()  throws Exception {
+        registeredClients.clear();
+
+        if (transport != null) {
+            transport.stop();
+            transport = null;
+        }
+    }
+
+    static synchronized void removeClient(final RexsterClient client) {
+        registeredClients.remove(client);
+    }
+
+    private synchronized static TCPNIOTransport getTransport() throws Exception {
+        if (transport == null) {
+            final RexsterClientHandler handler = new RexsterClientHandler();
+            final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
+            filterChainBuilder.add(new TransportFilter());
+            filterChainBuilder.add(new RexProMessageFilter());
+            filterChainBuilder.add(handler);
+
+            transport = TCPNIOTransportBuilder.newInstance().build();
+            transport.setIOStrategy(LeaderFollowerNIOStrategy.getInstance());
+            final ThreadPoolConfig workerThreadPoolConfig = ThreadPoolConfig.defaultConfig()
+                    .setCorePoolSize(4)
+                    .setMaxPoolSize(12);
+            transport.setWorkerThreadPoolConfig(workerThreadPoolConfig);
+            final ThreadPoolConfig kernalThreadPoolConfig = ThreadPoolConfig.defaultConfig()
+                    .setCorePoolSize(4)
+                    .setMaxPoolSize(12);
+            transport.setKernelThreadPoolConfig(kernalThreadPoolConfig);
+            transport.setProcessor(filterChainBuilder.build());
+            transport.start();
+        }
+
+        return transport;
     }
 }
