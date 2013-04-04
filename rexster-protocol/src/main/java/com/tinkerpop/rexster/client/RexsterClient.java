@@ -15,13 +15,13 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -207,10 +207,11 @@ public class RexsterClient {
         }
     }
 
-    void putResponse(final RexProMessage response) throws Exception {
+    static void putResponse(final RexProMessage response) throws Exception {
         final UUID requestId = response.requestAsUUID();
         if (!responses.containsKey(requestId)) {
             // probably a timeout if we get here... ???
+            logger.warn(String.format("No queue found in the response map: %s", requestId));
             return;
         }
 
@@ -221,10 +222,12 @@ public class RexsterClient {
             }
             else {
                 // no queue for some reason....why ???
+                logger.error(String.format("No queue found in the response map: %s", requestId));
             }
         }
         catch (InterruptedException e) {
             // just trap this one ???
+            logger.error("Error reading the queue in the response map.", e);
         }
     }
 
@@ -282,15 +285,7 @@ public class RexsterClient {
     }
 
     public void close() throws IOException {
-        for (NIOConnection connection : this.connections) {
-            // a connection is only initialized in the list of connections if some gremlin is passed through it
-            // so it could end up being null.  a connection may also null out as the result of an exception.
-            if (connection != null) {
-                connection.close();
-            }
-        }
-
-        this.transport.stop();
+        RexsterClientFactory.removeClient(this);
     }
 
     private ScriptRequestMessage createNoSessionScriptRequest(final String script,
