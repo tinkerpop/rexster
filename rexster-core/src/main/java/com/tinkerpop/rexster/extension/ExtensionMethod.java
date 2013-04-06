@@ -82,7 +82,7 @@ public class ExtensionMethod {
                 for (int ix = 0; ix < parametersAnnotations.length; ix++) {
                     final Annotation[] annotation = parametersAnnotations[ix];
 
-                    if (annotation != null && annotation[0] instanceof ExtensionRequestParameter) {
+                    if (annotation != null && annotation.length > 0 && annotation[0] instanceof ExtensionRequestParameter) {
                         final ExtensionRequestParameter extensionRequestParameter = (ExtensionRequestParameter) annotation[0];
                         innerMap.put(extensionRequestParameter.name(), extensionRequestParameter.description());
                     }
