@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.util;
 
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONTokens;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -36,6 +37,7 @@ public class ElementHelper {
      * l or long
      * d or double
      * s or string
+     * b or boolean
      * map
      * list
      * null
@@ -72,17 +74,19 @@ public class ElementHelper {
                     String dataType = getDataTypeSegment(stringPropertyValue);
                     String theValue = getValueSegment(stringPropertyValue);
 
-                    if (dataType.equals("string")) {
+                    if (dataType.equals(GraphSONTokens.TYPE_STRING)) {
                         typedPropertyValue = theValue;
-                    } else if (dataType.equals("integer")) {
+                    } else if (dataType.equals(GraphSONTokens.TYPE_INTEGER)) {
                         typedPropertyValue = tryParseInteger(theValue);
-                    } else if (dataType.equals("long")) {
+                    } else if (dataType.equals(GraphSONTokens.TYPE_BOOLEAN)) {
+                        typedPropertyValue = tryParseBoolean(theValue);
+                    } else if (dataType.equals(GraphSONTokens.TYPE_LONG)) {
                         typedPropertyValue = tryParseLong(theValue);
-                    } else if (dataType.equals("double")) {
+                    } else if (dataType.equals(GraphSONTokens.TYPE_DOUBLE)) {
                         typedPropertyValue = tryParseDouble(theValue);
-                    } else if (dataType.equals("float")) {
+                    } else if (dataType.equals(GraphSONTokens.TYPE_FLOAT)) {
                         typedPropertyValue = tryParseFloat(theValue);
-                    } else if (dataType.equals("list")) {
+                    } else if (dataType.equals(GraphSONTokens.TYPE_LIST)) {
                         ArrayList<String> items = tryParseList(theValue);
                         ArrayList typedItems = new ArrayList();
                         for (String item : items) {
@@ -90,7 +94,7 @@ public class ElementHelper {
                         }
 
                         typedPropertyValue = typedItems;
-                    } else if (dataType.equals("map")) {
+                    } else if (dataType.equals(GraphSONTokens.TYPE_MAP)) {
                         HashMap<String, String> stringProperties = tryParseMap(theValue);
                         HashMap<String, Object> properties = new HashMap<String, Object>();
 
@@ -254,26 +258,28 @@ public class ElementHelper {
 
     private static String getDataTypeSegment(String propertyValue) {
         // assumes that the propertyValue has open and closed parens
-        String dataType = "string";
+        String dataType = GraphSONTokens.TYPE_STRING;
 
         // strip the initial parens and read up to the command.
         // no need to check for string as that is the default
         int place = propertyValue.indexOf(',');
         String inner = propertyValue.substring(1, place).trim();
-        if (inner.equals("s") || inner.equals("string")) {
-            dataType = "string";
-        } else if (inner.equals("i") || inner.equals("integer")) {
-            dataType = "integer";
-        } else if (inner.equals("d") || inner.equals("double")) {
-            dataType = "double";
-        } else if (inner.equals("f") || inner.equals("float")) {
-            dataType = "float";
-        } else if (inner.equals("list")) {
-            dataType = "list";
-        } else if (inner.equals("l") || inner.equals("long")) {
-            dataType = "long";
-        } else if (inner.equals("map")) {
-            dataType = "map";
+        if (inner.equals("s") || inner.equals(GraphSONTokens.TYPE_STRING)) {
+            dataType = GraphSONTokens.TYPE_STRING;
+        } else if (inner.equals("b") || inner.equals(GraphSONTokens.TYPE_BOOLEAN)) {
+            dataType = GraphSONTokens.TYPE_BOOLEAN;
+        } else if (inner.equals("i") || inner.equals(GraphSONTokens.TYPE_INTEGER)) {
+            dataType = GraphSONTokens.TYPE_INTEGER;
+        } else if (inner.equals("d") || inner.equals(GraphSONTokens.TYPE_DOUBLE)) {
+            dataType = GraphSONTokens.TYPE_DOUBLE;
+        } else if (inner.equals("f") || inner.equals(GraphSONTokens.TYPE_FLOAT)) {
+            dataType = GraphSONTokens.TYPE_FLOAT;
+        } else if (inner.equals(GraphSONTokens.TYPE_LIST)) {
+            dataType = GraphSONTokens.TYPE_LIST;
+        } else if (inner.equals("l") || inner.equals(GraphSONTokens.TYPE_LONG)) {
+            dataType = GraphSONTokens.TYPE_LONG;
+        } else if (inner.equals(GraphSONTokens.TYPE_MAP)) {
+            dataType = GraphSONTokens.TYPE_MAP;
         } else if (inner.equals("null")) {
             dataType = "null";
         }
@@ -281,7 +287,7 @@ public class ElementHelper {
         return dataType;
     }
 
-    private static Object tryParseInteger(String intValue) {
+    private static Object tryParseInteger(final String intValue) {
         Object parsedValue;
         try {
             parsedValue = Integer.parseInt(intValue);
@@ -292,7 +298,7 @@ public class ElementHelper {
         return parsedValue;
     }
 
-    private static Object tryParseFloat(String floatValue) {
+    private static Object tryParseFloat(final String floatValue) {
         Object parsedValue;
         try {
             parsedValue = Float.parseFloat(floatValue);
@@ -303,7 +309,18 @@ public class ElementHelper {
         return parsedValue;
     }
 
-    private static Object tryParseLong(String longValue) {
+    private static Object tryParseBoolean(final String booleanValue) {
+        Object parsedValue;
+        try {
+            parsedValue = Boolean.parseBoolean(booleanValue);
+        } catch (NumberFormatException nfe) {
+            parsedValue = booleanValue;
+        }
+
+        return parsedValue;
+    }
+
+    private static Object tryParseLong(final String longValue) {
         Object parsedValue;
         try {
             parsedValue = Long.parseLong(longValue);
@@ -314,7 +331,7 @@ public class ElementHelper {
         return parsedValue;
     }
 
-    private static Object tryParseDouble(String doubleValue) {
+    private static Object tryParseDouble(final String doubleValue) {
         Object parsedValue;
         try {
             parsedValue = Double.parseDouble(doubleValue);

@@ -5,6 +5,20 @@ h2. Rexster 2.y.z
 
 !https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-2.png!
 
+h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop.rexster</groupId>
+  <artifactId>rexster-core</artifactId>
+  <version>2.3.2-SNAPSHOT</version>
+</dependency>
+```
+
+* Property data types in REST now properly support @boolean@ values.
+
+==<hr/>==
+
 h3. Version 2.3.0 (March 20, 2013)
 
 ```xml
