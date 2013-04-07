@@ -188,6 +188,21 @@ public class ElementHelperTest {
     }
 
     @Test
+    public void getTypedPropertyValueBooleanTyped() {
+        Object typedPropertyValue = ElementHelper.getTypedPropertyValue("(b,true)");
+        Assert.assertNotNull(typedPropertyValue);
+        Assert.assertEquals(Boolean.TRUE, typedPropertyValue);
+
+        typedPropertyValue = ElementHelper.getTypedPropertyValue("(boolean,true)");
+        Assert.assertNotNull(typedPropertyValue);
+        Assert.assertEquals(Boolean.TRUE, typedPropertyValue);
+
+        typedPropertyValue = ElementHelper.getTypedPropertyValue("(boolean,123bad)");
+        Assert.assertNotNull(typedPropertyValue);
+        Assert.assertEquals(false, typedPropertyValue);
+    }
+
+    @Test
     public void getTypedPropertyValueListNonTyped() {
         Object typedPropertyValue = ElementHelper.getTypedPropertyValue("(list,(123,321,456,678))");
         Assert.assertNotNull(typedPropertyValue);
