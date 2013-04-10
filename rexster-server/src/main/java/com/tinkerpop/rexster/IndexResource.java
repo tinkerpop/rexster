@@ -14,6 +14,7 @@ import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.util.ElementHelper;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
+import com.yammer.metrics.annotation.Timed;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -72,6 +73,7 @@ public class IndexResource extends AbstractSubResource {
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.indices.collection.get", absolute = true)
     public Response getAllIndices(@PathParam("graphname") final String graphName) {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         final Graph graph = rag.getGraph();
@@ -133,6 +135,7 @@ public class IndexResource extends AbstractSubResource {
     @GET
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Timed(name = "http.rest.indices.object.get", absolute = true)
     public Response getElementsFromIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
         return this.getElementsFromIndex(graphName, indexName, false);
     }
@@ -140,6 +143,7 @@ public class IndexResource extends AbstractSubResource {
     @GET
     @Path("/{indexName}")
     @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.indices.object.get", absolute = true)
     public Response getElementsFromIndexRexsterTypedJson(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
         return this.getElementsFromIndex(graphName, indexName, true);
     }
@@ -213,6 +217,7 @@ public class IndexResource extends AbstractSubResource {
 
     @OPTIONS
     @Path("/{indexName}/count")
+    @Timed(name = "http.rest.indices.count.get", absolute = true)
     public Response optionsIndexCount() {
         return buildOptionsResponse(HttpMethod.GET.toString());
     }
@@ -223,6 +228,7 @@ public class IndexResource extends AbstractSubResource {
     @GET
     @Path("/{indexName}/count")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.indices.count.get", absolute = true)
     public Response getIndexCount(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
         final Index index = this.getIndexFromGraph(graphName, indexName);
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
@@ -278,6 +284,7 @@ public class IndexResource extends AbstractSubResource {
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.indices.object.delete", absolute = true)
     public Response deleteIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName, final JSONObject json) {
         // initializes the request object with the data DELETEed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
@@ -297,6 +304,7 @@ public class IndexResource extends AbstractSubResource {
     @DELETE
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.indices.object.delete", absolute = true)
     public Response deleteIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
         String key = null;
         Object value = null;
@@ -372,6 +380,7 @@ public class IndexResource extends AbstractSubResource {
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.indices.object.post", absolute = true)
     public Response postIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName, final JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
@@ -383,6 +392,7 @@ public class IndexResource extends AbstractSubResource {
     @POST
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.indices.object.post", absolute = true)
     public Response postIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
         String clazz = null;
         Set<String> keys = null;
@@ -494,6 +504,7 @@ public class IndexResource extends AbstractSubResource {
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.indices.object.put", absolute = true)
     public Response putElementInIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName, final JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
@@ -508,6 +519,7 @@ public class IndexResource extends AbstractSubResource {
     @PUT
     @Path("/{indexName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.indices.object.put", absolute = true)
     public Response putElementInIndex(@PathParam("graphname") final String graphName, @PathParam("indexName") final String indexName) {
         final Index index = this.getIndexFromGraph(graphName, indexName);
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);

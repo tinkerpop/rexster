@@ -9,6 +9,8 @@ import com.tinkerpop.rexster.server.RexsterServer;
 import com.tinkerpop.rexster.server.RexsterSettings;
 import com.tinkerpop.rexster.server.ShutdownManager;
 import com.tinkerpop.rexster.server.XmlRexsterApplication;
+import com.tinkerpop.rexster.server.metrics.AbstractReporterConfig;
+import com.tinkerpop.rexster.server.metrics.ReporterConfig;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.IOUtils;
@@ -71,6 +73,10 @@ public class Application {
         final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
         this.rexsterApplication = new XmlRexsterApplication(graphConfigs);
 
+        final ReporterConfig reporterConfig = ReporterConfig.load(properties.configurationsAt(Tokens.REXSTER_REPORTER_PATH), this.rexsterApplication.getMetricRegistry());
+        this.properties.addProperty("enable-http-reporter", reporterConfig.isHttpReporterEnabled());
+        reporterConfig.enable();
+
         this.httpServer = new HttpRexsterServer(properties);
         this.rexproServer = new RexProRexsterServer(properties);
     }
@@ -91,7 +97,6 @@ public class Application {
         } else {
             EngineController.configure(scriptEngineThreshold, scriptEngineInitFile, new HashSet<String>(configuredScriptEngineNames));
         }
-
 
         logger.info(String.format(
                 "Gremlin ScriptEngine configured to reset every [%s] requests. Set to -1 to never reset.",

@@ -7,6 +7,9 @@ import com.tinkerpop.rexster.protocol.RexProSessionMonitor;
 import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
 import com.tinkerpop.rexster.protocol.filter.ScriptFilter;
 import com.tinkerpop.rexster.protocol.filter.SessionFilter;
+import com.yammer.metrics.JmxAttributeGauge;
+import com.yammer.metrics.JmxReporter;
+import com.yammer.metrics.MetricRegistry;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
@@ -20,6 +23,8 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 import org.glassfish.grizzly.utils.IdleTimeoutFilter;
 
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -118,9 +123,14 @@ public class RexProRexsterServer implements RexsterServer {
         this.tcpTransport.setProcessor(filterChainBuilder.build());
         this.tcpTransport.bind(rexproServerHost, rexproServerPort);
 
+        final MetricRegistry metricRegistry = application.getMetricRegistry();
+
         if (this.enableJmx) {
             final JmxObject jmx = this.tcpTransport.getMonitoringConfig().createManagementObject();
             GrizzlyJmxManager.instance().registerAtRoot(jmx, "RexPro");
+
+            // the JMX settings below pipe in metrics from Grizzly.
+            registerMetricsFromJmx(metricRegistry);
         }
 
         this.tcpTransport.start();
@@ -134,6 +144,46 @@ public class RexProRexsterServer implements RexsterServer {
 
         logger.info("RexPro serving on port: [" + rexproServerPort + "]");
     }
+
+    private static void registerMetricsFromJmx(final MetricRegistry metricRegistry) throws MalformedObjectNameException {
+        final String jmxObjectMemoryManager = "org.glassfish.grizzly:pp=/gmbal-root/TCPNIOTransport[RexPro],type=HeapMemoryManager,name=MemoryManager";
+        final String metricGroupMemoryManager = "heap-memory-manager";
+        registerJmxKeyAsMetric(metricRegistry, metricGroupMemoryManager, jmxObjectMemoryManager, "pool-allocated-bytes");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupMemoryManager, jmxObjectMemoryManager, "pool-released-bytes");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupMemoryManager, jmxObjectMemoryManager, "real-allocated-bytes");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupMemoryManager, jmxObjectMemoryManager, "total-allocated-bytes");
+
+        final String jmxObjectTcpNioTransport = "org.glassfish.grizzly:pp=/gmbal-root,type=TCPNIOTransport,name=RexPro";
+        final String metricGroupTcpNioTransport = "tcp-nio-transport";
+        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "bound-addresses");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "bytes-read");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "bytes-written");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "client-connect-timeout-millis");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "io-strategy");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "open-connections-count");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "read-buffer-size");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "selector-threads-count");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "server-socket-so-timeout");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "total-connections-count");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "write-buffer-size");
+
+        final String jmxObjectThreadPool = "org.glassfish.grizzly:pp=/gmbal-root/TCPNIOTransport[RexPro],type=ThreadPool,name=ThreadPool";
+        final String metricGroupThreadPool = "thread-pool";
+        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-allocated-thread-count");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-core-pool-size");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-max-num-threads");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-queued-task-count");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-task-queue-overflow-count");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-total-allocated-thread-count");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-total-completed-tasks-count");
+        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-type");
+    }
+
+    private static void registerJmxKeyAsMetric(final MetricRegistry metricRegistry, final String metricGroup, final String jmxObjectName, final String jmxAttributeName) throws MalformedObjectNameException  {
+        metricRegistry.register(MetricRegistry.name("rexpro", "core", metricGroup, jmxAttributeName),
+                new JmxAttributeGauge(new ObjectName(jmxObjectName), jmxAttributeName));
+    }
+
 
     private TCPNIOTransport configureTransport() {
         final TCPNIOTransport tcpTransport = TCPNIOTransportBuilder.newInstance().build();

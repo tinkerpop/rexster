@@ -18,6 +18,7 @@ import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.util.ElementHelper;
 import com.tinkerpop.rexster.util.QueryProperties;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
+import com.yammer.metrics.annotation.Timed;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -81,12 +82,14 @@ public class VertexResource extends AbstractSubResource {
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Timed(name = "http.rest.vertices.collection.get", absolute = true)
     public Response getVertices(@PathParam("graphname") final String graphName) {
         return getVertices(graphName, false);
     }
 
     @GET
     @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.vertices.collection.get", absolute = true)
     public Response getVerticesRexsterJson(@PathParam("graphname") final String graphName) {
         return getVertices(graphName, true);
     }
@@ -164,6 +167,7 @@ public class VertexResource extends AbstractSubResource {
     @GET
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON})
+    @Timed(name = "http.rest.vertices.object.get", absolute = true)
     public Response getSingleVertex(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return getSingleVertex(graphName, id, false, false);
     }
@@ -171,6 +175,7 @@ public class VertexResource extends AbstractSubResource {
     @GET
     @Path("/{id}")
     @Produces({RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Timed(name = "http.rest.vertices.object.get", absolute = true)
     public Response getSingleVertexRexsterJson(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return getSingleVertex(graphName, id, false, true);
     }
@@ -178,6 +183,7 @@ public class VertexResource extends AbstractSubResource {
     @GET
     @Path("/{id}")
     @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.vertices.object.get", absolute = true)
     public Response getSingleVertexRexsterTypedJson(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return getSingleVertex(graphName, id, true, true);
     }
@@ -240,6 +246,7 @@ public class VertexResource extends AbstractSubResource {
     @PUT
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Timed(name = "http.rest.vertices.extension.put", absolute = true)
     public Response putVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeVertexExtension(graphName, id, HttpMethod.PUT);
@@ -248,6 +255,7 @@ public class VertexResource extends AbstractSubResource {
     @PUT
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Timed(name = "http.rest.vertices.extension.put", absolute = true)
     public Response putVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final MultivaluedMap<String, String> formParams) {
         this.setRequestObject(formParams);
         return this.executeVertexExtension(graphName, id, HttpMethod.PUT);
@@ -255,6 +263,7 @@ public class VertexResource extends AbstractSubResource {
 
     @PUT
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
+    @Timed(name = "http.rest.vertices.extension.put", absolute = true)
     public Response putVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.PUT);
     }
@@ -276,6 +285,7 @@ public class VertexResource extends AbstractSubResource {
     @DELETE
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Timed(name = "http.rest.vertices.extension.delete", absolute = true)
     public Response deleteVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeVertexExtension(graphName, id, HttpMethod.DELETE);
@@ -283,6 +293,7 @@ public class VertexResource extends AbstractSubResource {
 
     @DELETE
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
+    @Timed(name = "http.rest.vertices.extension.delete", absolute = true)
     public Response deleteVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.DELETE);
     }
@@ -290,6 +301,7 @@ public class VertexResource extends AbstractSubResource {
     @POST
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Timed(name = "http.rest.vertices.extension.post", absolute = true)
     public Response postVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeVertexExtension(graphName, id, HttpMethod.POST);
@@ -298,6 +310,7 @@ public class VertexResource extends AbstractSubResource {
     @POST
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Timed(name = "http.rest.vertices.extension.post", absolute = true)
     public Response postVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final MultivaluedMap<String, String> formParams) {
         this.setRequestObject(formParams);
         return this.executeVertexExtension(graphName, id, HttpMethod.POST);
@@ -305,12 +318,14 @@ public class VertexResource extends AbstractSubResource {
 
     @POST
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
+    @Timed(name = "http.rest.vertices.extension.post", absolute = true)
     public Response postVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.POST);
     }
 
     @GET
     @Path("/{id}/{extension: (?!outE)(?!bothE)(?!inE)(?!out)(?!both)(?!in)(?!query).+}")
+    @Timed(name = "http.rest.vertices.extension.get", absolute = true)
     public Response getVertexExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeVertexExtension(graphName, id, HttpMethod.GET);
     }
@@ -450,6 +465,7 @@ public class VertexResource extends AbstractSubResource {
     @GET
     @Path("/{id}/{direction}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Timed(name = "http.rest.vertices.object.edges.collection.get", absolute = true)
     public Response getVertexEdges(@PathParam("graphname") String graphName, @PathParam("id") String vertexId, @PathParam("direction") String direction) {
         return this.getVertexEdges(graphName, vertexId, direction, false);
     }
@@ -457,6 +473,7 @@ public class VertexResource extends AbstractSubResource {
     @GET
     @Path("/{id}/{direction}")
     @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.vertices.object.edges.collection.get", absolute = true)
     public Response getVertexEdgesRexsterTypedJson(@PathParam("graphname") String graphName, @PathParam("id") String vertexId, @PathParam("direction") String direction) {
         return this.getVertexEdges(graphName, vertexId, direction, true);
     }
@@ -572,6 +589,7 @@ public class VertexResource extends AbstractSubResource {
     @POST
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Timed(name = "http.rest.vertices.object.post", absolute = true)
     public Response postNullVertexRexsterConsumesJson(@Context final Request request, @PathParam("graphname") final String graphName, final JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
@@ -584,6 +602,7 @@ public class VertexResource extends AbstractSubResource {
     @POST
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.vertices.object.post", absolute = true)
     public Response postNullVertexRexsterConsumesTypedJson(@Context final Request request, @PathParam("graphname") final String graphName, final JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
@@ -599,6 +618,7 @@ public class VertexResource extends AbstractSubResource {
      */
     @POST
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.vertices.object.post", absolute = true)
     public Response postNullVertexOnUri(@Context final Request request, @PathParam("graphname") final String graphName) {
         final Variant v = request.selectVariant(producesVariantList);
         return this.postVertex(graphName, null, true, v);
@@ -613,6 +633,7 @@ public class VertexResource extends AbstractSubResource {
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Timed(name = "http.rest.vertices.object.post", absolute = true)
     public Response postVertexConsumesJson(@Context final Request request, @PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
@@ -626,6 +647,7 @@ public class VertexResource extends AbstractSubResource {
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.vertices.object.post", absolute = true)
     public Response postVertexRexsterConsumesTypedJson(@Context final Request request, @PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
@@ -643,6 +665,7 @@ public class VertexResource extends AbstractSubResource {
     @POST
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.vertices.object.post", absolute = true)
     public Response postVertexOnUri(@Context final Request request, @PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         final Variant v = request.selectVariant(producesVariantList);
         return postVertex(graphName, id, true, v);
@@ -732,6 +755,7 @@ public class VertexResource extends AbstractSubResource {
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Timed(name = "http.rest.vertices.object.put", absolute = true)
     public Response putVertexConsumesJson(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         // initializes the request object with the data PUTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
@@ -745,6 +769,7 @@ public class VertexResource extends AbstractSubResource {
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes(RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON)
+    @Timed(name = "http.rest.vertices.object.put", absolute = true)
     public Response putVertexConsumesTypedJson(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         // initializes the request object with the data PUTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
@@ -762,6 +787,7 @@ public class VertexResource extends AbstractSubResource {
     @PUT
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.vertices.object.put", absolute = true)
     public Response putVertexConsumesUri(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id) {
         Variant v = request.selectVariant(producesVariantList);
         return putVertex(graphName, id, true, v);
@@ -850,6 +876,7 @@ public class VertexResource extends AbstractSubResource {
     @DELETE
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.vertices.object.delete", absolute = true)
     public Response deleteVertex(@PathParam("graphname") String graphName, @PathParam("id") String id) {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         final Graph graph = rag.getGraph();

@@ -3,6 +3,7 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.blueprints.impls.sail.SailGraph;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.server.RexsterApplication;
+import com.yammer.metrics.annotation.Timed;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -51,6 +52,7 @@ public class PrefixResource extends AbstractSubResource {
 
     @GET
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.prefixes.collection.get", absolute = true)
     public Response getPrefixes(@PathParam("graphname") String graphName) {
 
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
@@ -91,6 +93,7 @@ public class PrefixResource extends AbstractSubResource {
     @GET
     @Path("/{prefix}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.prefixes.object.get", absolute = true)
     public Response getSinglePrefix(@PathParam("graphname") String graphName, @PathParam("prefix") String prefix) {
 
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
@@ -116,6 +119,7 @@ public class PrefixResource extends AbstractSubResource {
     @DELETE
     @Path("/{prefix}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.prefixes.object.delete", absolute = true)
     public Response deleteSinglePrefix(@PathParam("graphname") String graphName, @PathParam("prefix") String prefix) {
 
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
@@ -144,6 +148,7 @@ public class PrefixResource extends AbstractSubResource {
     @POST
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.prefixes.object.post", absolute = true)
     public Response postSinglePrefix(@PathParam("graphname") String graphName, JSONObject json) {
         this.setRequestObject(json);
         return this.postSinglePrefix(graphName);
@@ -151,6 +156,7 @@ public class PrefixResource extends AbstractSubResource {
 
     @POST
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.prefixes.object.post", absolute = true)
     public Response postSinglePrefix(@PathParam("graphname") String graphName) {
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
         final JSONObject reqObject = this.getRequestObject();

@@ -32,6 +32,7 @@ public class Tokens {
     public static final String EXTENSIONS = "extensions";
 
     public static final String REXSTER_GRAPH_PATH = "graphs.graph";
+    public static final String REXSTER_REPORTER_PATH = "metrics.reporter";
     public static final String REXSTER_GRAPH_EXTENSIONS_ALLOWS_PATH = "extensions.allows.allow";
     public static final String REXSTER_GRAPH_EXTENSIONS_PATH = "extensions.extension";
     public static final String REXSTER_GRAPH_NAME = "graph-name";

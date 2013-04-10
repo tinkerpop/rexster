@@ -15,6 +15,7 @@ import com.tinkerpop.rexster.extension.RexsterExtension;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.util.ElementHelper;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
+import com.yammer.metrics.annotation.Timed;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -78,12 +79,14 @@ public class EdgeResource extends AbstractSubResource {
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Timed(name = "http.rest.edges.collection.get", absolute = true)
     public Response getAllEdges(@PathParam("graphname") final String graphName) {
         return this.getAllEdges(graphName, false);
     }
 
     @GET
     @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.edges.collection.get", absolute = true)
     public Response getAllEdgesRexsterTypedJson(@PathParam("graphname") final String graphName) {
         return this.getAllEdges(graphName, true);
     }
@@ -157,6 +160,7 @@ public class EdgeResource extends AbstractSubResource {
     @GET
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON})
+    @Timed(name = "http.rest.edges.object.get", absolute = true)
     public Response getSingleEdge(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return getSingleEdge(graphName, id, false, false);
     }
@@ -164,6 +168,7 @@ public class EdgeResource extends AbstractSubResource {
     @GET
     @Path("/{id}")
     @Produces({RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Timed(name = "http.rest.edges.object.get", absolute = true)
     public Response getSingleEdgeRexsterJson(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return getSingleEdge(graphName, id, false, true);
     }
@@ -171,6 +176,7 @@ public class EdgeResource extends AbstractSubResource {
     @GET
     @Path("/{id}")
     @Produces({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.edges.object.get", absolute = true)
     public Response getSingleEdgeRexsterTypedJson(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return getSingleEdge(graphName, id, true, true);
     }
@@ -231,6 +237,7 @@ public class EdgeResource extends AbstractSubResource {
     @PUT
     @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Timed(name = "http.rest.edges.object.put", absolute = true)
     public Response putEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeEdgeExtension(graphName, id, HttpMethod.PUT);
@@ -239,6 +246,7 @@ public class EdgeResource extends AbstractSubResource {
     @PUT
     @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Timed(name = "http.rest.edges.object.put", absolute = true)
     public Response putEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final MultivaluedMap<String, String> formParams) {
         this.setRequestObject(formParams);
         return this.executeEdgeExtension(graphName, id, HttpMethod.PUT);
@@ -246,6 +254,7 @@ public class EdgeResource extends AbstractSubResource {
 
     @PUT
     @Path("/{id}/{extension: .+}")
+    @Timed(name = "http.rest.edges.object.put", absolute = true)
     public Response putEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeEdgeExtension(graphName, id, HttpMethod.PUT);
     }
@@ -267,6 +276,7 @@ public class EdgeResource extends AbstractSubResource {
     @DELETE
     @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Timed(name = "http.rest.edges.object.delete", absolute = true)
     public Response deleteEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeEdgeExtension(graphName, id, HttpMethod.DELETE);
@@ -274,6 +284,7 @@ public class EdgeResource extends AbstractSubResource {
 
     @DELETE
     @Path("/{id}/{extension: .+}")
+    @Timed(name = "http.rest.edges.object.delete", absolute = true)
     public Response deleteEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeEdgeExtension(graphName, id, HttpMethod.DELETE);
     }
@@ -281,6 +292,7 @@ public class EdgeResource extends AbstractSubResource {
     @POST
     @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Timed(name = "http.rest.edges.object.post", absolute = true)
     public Response postEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeEdgeExtension(graphName, id, HttpMethod.POST);
@@ -289,6 +301,7 @@ public class EdgeResource extends AbstractSubResource {
     @POST
     @Path("/{id}/{extension: .+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Timed(name = "http.rest.edges.object.post", absolute = true)
     public Response postEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id, final MultivaluedMap<String, String> formParams) {
         this.setRequestObject(formParams);
         return this.executeEdgeExtension(graphName, id, HttpMethod.POST);
@@ -296,12 +309,14 @@ public class EdgeResource extends AbstractSubResource {
 
     @POST
     @Path("/{id}/{extension: .+}")
+    @Timed(name = "http.rest.edges.object.post", absolute = true)
     public Response postEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeEdgeExtension(graphName, id, HttpMethod.POST);
     }
 
     @GET
     @Path("/{id}/{extension: .+}")
+    @Timed(name = "http.rest.edges.object.get", absolute = true)
     public Response getEdgeExtension(@PathParam("graphname") final String graphName, @PathParam("id") final String id) {
         return this.executeEdgeExtension(graphName, id, HttpMethod.GET);
     }
@@ -432,6 +447,7 @@ public class EdgeResource extends AbstractSubResource {
     @POST
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Timed(name = "http.rest.edges.object.post", absolute = true)
     public Response postNullEdgeConsumesJson(@Context final Request request,
                                              @PathParam("graphname") final String graphName, final JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
@@ -449,6 +465,7 @@ public class EdgeResource extends AbstractSubResource {
     @POST
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.edges.object.post", absolute = true)
     public Response postNullEdgeConsumesTypedJson(@Context final Request request,
                                                   @PathParam("graphname") final String graphName, final JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
@@ -466,6 +483,7 @@ public class EdgeResource extends AbstractSubResource {
      */
     @POST
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.edges.object.post", absolute = true)
     public Response postNullEdgeConsumesUri(@Context final Request request, @PathParam("graphname") final String graphName) {
         Variant v = request.selectVariant(producesVariantList);
         return this.postEdge(graphName, null, true, v);
@@ -480,6 +498,7 @@ public class EdgeResource extends AbstractSubResource {
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Timed(name = "http.rest.edges.object.post", absolute = true)
     public Response postEdgeConsumesJson(@Context final Request request,
                                          @PathParam("graphname") final String graphName,
                                          @PathParam("id") final String id, final JSONObject json) {
@@ -500,6 +519,7 @@ public class EdgeResource extends AbstractSubResource {
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.edges.object.post", absolute = true)
     public Response postEdgeConsumesTypedJson(@Context final Request request,
                                               @PathParam("graphname") final String graphName,
                                               @PathParam("id") final String id, final JSONObject json) {
@@ -516,6 +536,7 @@ public class EdgeResource extends AbstractSubResource {
     @POST
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.edges.object.post", absolute = true)
     public Response postEdgeConsumesUri(@Context final Request request,
                                         @PathParam("graphname") final String graphName,
                                         @PathParam("id") final String id) {
@@ -641,6 +662,7 @@ public class EdgeResource extends AbstractSubResource {
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON})
+    @Timed(name = "http.rest.edges.object.put", absolute = true)
     public Response putEdgeConsumesJson(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         // initializes the request object with the data POSTed to the resource.  URI parameters
         // will then be ignored when the getRequestObject is called as the request object will
@@ -659,6 +681,7 @@ public class EdgeResource extends AbstractSubResource {
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
     @Consumes({RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.edges.object.put", absolute = true)
     public Response putEdgeConsumesTypedJson(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id, JSONObject json) {
         this.setRequestObject(json);
         Variant v = request.selectVariant(producesVariantList);
@@ -673,6 +696,7 @@ public class EdgeResource extends AbstractSubResource {
     @PUT
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.edges.object.put", absolute = true)
     public Response putEdgeOnUri(@Context Request request, @PathParam("graphname") String graphName, @PathParam("id") String id) {
         Variant v = request.selectVariant(producesVariantList);
         return this.putEdge(graphName, id, true, v);
@@ -762,6 +786,7 @@ public class EdgeResource extends AbstractSubResource {
     @DELETE
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.edges.object.delete", absolute = true)
     public Response deleteEdge(@PathParam("graphname") String graphName, @PathParam("id") String id) {
 
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);

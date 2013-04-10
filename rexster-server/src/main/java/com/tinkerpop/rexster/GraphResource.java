@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterExtension;
 import com.tinkerpop.rexster.server.RexsterApplication;
+import com.yammer.metrics.annotation.Timed;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -64,6 +65,7 @@ public class GraphResource extends AbstractSubResource {
 
     @GET
     @Produces({MediaType.APPLICATION_JSON})
+    @Timed(name = "http.rest.graphs.object.get", absolute = true)
     public Response getGraphProducesJson(@PathParam("graphname") final  String graphName) {
         return getGraph(graphName, false);
     }
@@ -74,6 +76,7 @@ public class GraphResource extends AbstractSubResource {
      */
     @GET
     @Produces({RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.graphs.object.get", absolute = true)
     public Response getGraphProducesRexsterJson(@PathParam("graphname") final String graphName) {
         return getGraph(graphName, true);
     }
@@ -137,6 +140,7 @@ public class GraphResource extends AbstractSubResource {
     @PUT
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Timed(name = "http.rest.graphs.extension.put", absolute = true)
     public Response putGraphExtension(@PathParam("graphname") final String graphName, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeGraphExtension(graphName, HttpMethod.PUT);
@@ -145,6 +149,7 @@ public class GraphResource extends AbstractSubResource {
     @PUT
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Timed(name = "http.rest.graphs.extension.put", absolute = true)
     public Response putGraphExtension(@PathParam("graphname") final String graphName, final MultivaluedMap<String, String> formParams) {
         this.setRequestObject(formParams);
         return this.executeGraphExtension(graphName, HttpMethod.PUT);
@@ -152,6 +157,7 @@ public class GraphResource extends AbstractSubResource {
 
     @PUT
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
+    @Timed(name = "http.rest.graphs.extension.put", absolute = true)
     public Response putGraphExtension(@PathParam("graphname") final String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.PUT);
     }
@@ -173,6 +179,7 @@ public class GraphResource extends AbstractSubResource {
     @DELETE
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Timed(name = "http.rest.graphs.extension.delete", absolute = true)
     public Response deleteGraphExtension(@PathParam("graphname") final String graphName, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeGraphExtension(graphName, HttpMethod.DELETE);
@@ -180,6 +187,7 @@ public class GraphResource extends AbstractSubResource {
 
     @DELETE
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
+    @Timed(name = "http.rest.graphs.extension.delete", absolute = true)
     public Response deleteGraphExtension(@PathParam("graphname") final String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.DELETE);
     }
@@ -187,6 +195,7 @@ public class GraphResource extends AbstractSubResource {
     @POST
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Timed(name = "http.rest.graphs.extension.post", absolute = true)
     public Response postGraphExtension(@PathParam("graphname") final String graphName, final JSONObject json) {
         this.setRequestObject(json);
         return this.executeGraphExtension(graphName, HttpMethod.POST);
@@ -195,6 +204,7 @@ public class GraphResource extends AbstractSubResource {
     @POST
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Timed(name = "http.rest.graphs.extension.post", absolute = true)
     public Response postGraphExtension(@PathParam("graphname") String graphName, final MultivaluedMap<String, String> formParams) {
         this.setRequestObject(formParams);
         return this.executeGraphExtension(graphName, HttpMethod.POST);
@@ -202,12 +212,14 @@ public class GraphResource extends AbstractSubResource {
 
     @POST
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
+    @Timed(name = "http.rest.graphs.extension.post", absolute = true)
     public Response postGraphExtension(@PathParam("graphname") final String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.POST);
     }
 
     @GET
     @Path("{extension: (?!vertices)(?!edges)(?!indices)(?!keyindices)(?!prefixes).+}")
+    @Timed(name = "http.rest.graphs.extension.post", absolute = true)
     public Response getGraphExtension(@PathParam("graphname") final String graphName) {
         return this.executeGraphExtension(graphName, HttpMethod.GET);
     }

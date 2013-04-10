@@ -2,6 +2,7 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.server.RexsterApplication;
+import com.yammer.metrics.annotation.Timed;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -44,6 +45,7 @@ public class RexsterResource extends BaseResource {
     }
 
     @GET
+    @Timed(name = "http.rest.graphs.collection.get", absolute = true)
     public Response getRexsterRoot() {
         try {
 

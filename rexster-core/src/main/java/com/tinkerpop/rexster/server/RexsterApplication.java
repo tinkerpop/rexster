@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.server;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
+import com.yammer.metrics.MetricRegistry;
 
 import java.util.Set;
 
@@ -39,6 +40,17 @@ public interface RexsterApplication {
      * @return a set of the names of all graphs that we are serving
      */
     Set<String> getGraphNames();
+
+    /**
+     * Rexster uses Metrics (http://metrics.codahale.com/) for gathering and reporting stats.
+     *
+     * Implementations should return a singleton of this object.  It can be instantiated very easily with something
+     * like: new MetricRegistry("rexster") where the argument to the constructor is the name to give the object
+     * collecting the metrics.
+     *
+     * @return a MetricsRegistry singleton.
+     */
+    MetricRegistry getMetricRegistry();
 
     /**
      * Retrieve the time at which we started serving graphs

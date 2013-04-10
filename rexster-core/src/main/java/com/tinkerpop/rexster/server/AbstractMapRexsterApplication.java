@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.server;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
+import com.yammer.metrics.MetricRegistry;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -16,6 +17,8 @@ import java.util.Set;
 public abstract class AbstractMapRexsterApplication implements RexsterApplication {
 
     private static final Logger logger = Logger.getLogger(AbstractMapRexsterApplication.class);
+
+    private static MetricRegistry metricRegistry;
 
     protected final long startTime = System.currentTimeMillis();
 
@@ -63,6 +66,15 @@ public abstract class AbstractMapRexsterApplication implements RexsterApplicatio
             }
         }
 
+    }
+
+    @Override
+    public MetricRegistry getMetricRegistry() {
+        if (metricRegistry == null) {
+            metricRegistry = new MetricRegistry("rexster");
+        }
+
+        return metricRegistry;
     }
 
     @Override

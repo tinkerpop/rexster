@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.server.RexsterApplication;
+import com.yammer.metrics.annotation.Timed;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -52,6 +53,7 @@ public class KeyIndexResource extends AbstractSubResource {
 
     @GET
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.key-indices.collection.get", absolute = true)
     public Response getKeyIndices(@PathParam("graphname") final String graphName) {
         final KeyIndexableGraph graph = this.getKeyIndexableGraph(graphName);
         final RexsterApplicationGraph rag = this.getRexsterApplicationGraph(graphName);
@@ -95,6 +97,7 @@ public class KeyIndexResource extends AbstractSubResource {
     @GET
     @Path("/{clazz}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.key-indices.class.collection.get", absolute = true)
     public Response getIndexKeys(@PathParam("graphname") final String graphName, @PathParam("clazz") final String clazz) {
         final Class<? extends Element> keyClass;
         if (clazz.equals(Tokens.VERTEX)) {
@@ -140,6 +143,7 @@ public class KeyIndexResource extends AbstractSubResource {
     @DELETE
     @Path("{clazz}/{keyName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.key-indices.object.delete", absolute = true)
     public Response deleteIndexKey(@PathParam("graphname") final String graphName, @PathParam("clazz") final String clazz, 
                                    @PathParam("keyName") final String keyName) {
         final Class keyClass;
@@ -180,6 +184,7 @@ public class KeyIndexResource extends AbstractSubResource {
     @POST
     @Path("/{clazz}/{keyName}")
     @Produces({MediaType.APPLICATION_JSON, RexsterMediaType.APPLICATION_REXSTER_JSON, RexsterMediaType.APPLICATION_REXSTER_TYPED_JSON})
+    @Timed(name = "http.rest.key-indices.class.object.post", absolute = true)
     public Response postIndexKey(@PathParam("graphname") final String graphName, @PathParam("clazz") final String clazz,
                                  @PathParam("keyName") final String keyName) {
 
