@@ -6,7 +6,7 @@
         <base-uri>http://localhost</base-uri>
         <web-root>public</web-root>
         <character-set>UTF-8</character-set>
-        <enable-jmx>true</enable-jmx>
+        <enable-jmx>false</enable-jmx>
         <enable-doghouse>true</enable-doghouse>
         <max-post-size>2097152</max-post-size>
         <max-header-size>8192</max-header-size>
@@ -30,7 +30,7 @@
         <session-check-interval>3000000</session-check-interval>
         <connection-max-idle>180000</connection-max-idle>
         <connection-check-interval>3000000</connection-check-interval>
-        <enable-jmx>true</enable-jmx>
+        <enable-jmx>false</enable-jmx>
         <thread-pool>
             <worker>
                 <core-size>8</core-size>
@@ -71,17 +71,7 @@
                 <rates-time-unit>SECONDS</rates-time-unit>
                 <duration-time-unit>SECONDS</duration-time-unit>
                 <report-period>10</report-period>
-                <report-time-unit>SECONDS</report-time-unit>
-            </properties>
-        </reporter>
-        <reporter>
-            <type>ganglia</type>
-            <properties>
-                <host></host>
-                <rates-time-unit>SECONDS</rates-time-unit>
-                <duration-time-unit>SECONDS</duration-time-unit>
-                <report-period>10</report-period>
-                <report-time-unit>SECONDS</report-time-unit>
+                <report-time-unit>MINUTES</report-time-unit>
             </properties>
         </reporter>
     </metrics>
