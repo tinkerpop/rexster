@@ -16,6 +16,11 @@ import java.util.List;
  * This class is responsible for configuring the metric reporting options in Rexster.  This class takes the contents
  * of the <i>metrics</i> section of rexster.xml to enable different reporting outs such as ganglia, jmx, graphite, etc.
  *
+ * Typical usage involves calling the load method to construct an instance of the class and then calling enable on
+ * that instance to start configured reporters.  The <i>http</i> reporter is a bit different only in the sense that
+ * it does not initialize via a configuration class.  It is initialized through a servlet configured into the
+ * HTTP server in Rexster.  If Rexster's HTTP is disabled then this reporter will not be accessible.
+ *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class ReporterConfig {
@@ -33,6 +38,11 @@ public class ReporterConfig {
         this.metricRegistry = metricRegistry;
     }
 
+    /**
+     * Create a configuration class from items at the metrics.reporter element of rexster.xml.  It reads the
+     * <i>type</i> element from each <i>reporter</i> element and constructs the appropriate config class for
+     * that particular type.
+     */
     public static ReporterConfig load(final List<HierarchicalConfiguration> configurations, final MetricRegistry metricRegistry) {
         final ReporterConfig rc = new ReporterConfig(metricRegistry);
 
@@ -43,7 +53,8 @@ public class ReporterConfig {
 
             if (reporterType != null) {
                 if (reporterType.equals("jmx") || reporterType.equals(JmxReporter.class.getCanonicalName())) {
-                    // only initializes this once
+                    // only initializes this once...this shouldn't be generated multiple times.  other reports
+                    // have more flexibility that way.
                     if (rc.jmxReporter == null) {
                         rc.jmxReporter = JmxReporter.forRegistry(metricRegistry).build();
                     }
