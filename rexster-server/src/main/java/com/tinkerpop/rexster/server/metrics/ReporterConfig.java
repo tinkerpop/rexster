@@ -13,6 +13,9 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * This class is responsible for configuring the metric reporting options in Rexster.  This class takes the contents
+ * of the <i>metrics</i> section of rexster.xml to enable different reporting outs such as ganglia, jmx, graphite, etc.
+ *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class ReporterConfig {
