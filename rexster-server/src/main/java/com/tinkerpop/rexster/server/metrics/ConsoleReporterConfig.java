@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Configures a reporter that writes to the console.
+ *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class ConsoleReporterConfig extends AbstractReporterConfig {
@@ -22,10 +24,10 @@ public class ConsoleReporterConfig extends AbstractReporterConfig {
 
         this.metricRegistry = metricRegistry;
 
-        this.setTimeunit(c.getString("report-time-unit", TimeUnit.SECONDS.toString()));
-        this.setPeriod(c.getInt("report-period", 60));
-        this.setConvertRateTo(c.getString("rates-time-unit", TimeUnit.SECONDS.toString()));
-        this.setConvertDurationTo(c.getString("duration-time-unit", TimeUnit.SECONDS.toString()));
+        this.timeUnit = c.getString(Tokens.REXSTER_REPORTER_TIME_UNIT, DEFAULT_TIME_UNIT);
+        this.period = c.getLong(Tokens.REXSTER_REPORTER_PERIOD, DEFAULT_PERIOD);
+        this.convertRateTo = c.getString(Tokens.REXSTER_REPORTER_RATES_TIME_UNIT, DEFAULT_TIME_UNIT);
+        this.convertDurationTo = c.getString(Tokens.REXSTER_REPORTER_DURATION_TIME_UNIT, DEFAULT_TIME_UNIT);
     }
 
     @Override
@@ -36,7 +38,7 @@ public class ConsoleReporterConfig extends AbstractReporterConfig {
             ConsoleReporter.forRegistry(this.metricRegistry)
                     .convertDurationsTo(this.getRealConvertDurationTo())
                     .convertRatesTo(this.getRealConvertRateTo())
-                    .build().start(this.getPeriod(), this.getRealTimeunit());
+                    .build().start(this.getPeriod(), this.getRealTimeUnit());
         }
         catch (Exception e)
         {

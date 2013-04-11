@@ -9,9 +9,10 @@ import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.log4j.Logger;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
+ * Configures Ganglia as a reporter.
+ *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class GangliaReporterConfig extends AbstractHostPortReporterConfig {
@@ -24,11 +25,11 @@ public class GangliaReporterConfig extends AbstractHostPortReporterConfig {
 
         this.metricRegistry = metricRegistry;
 
-        this.setTimeunit(c.getString("report-time-unit", TimeUnit.SECONDS.toString()));
-        this.setPeriod(c.getInt("report-period", 60));
-        this.setConvertRateTo(c.getString("rates-time-unit", TimeUnit.SECONDS.toString()));
-        this.setConvertDurationTo(c.getString("duration-time-unit", TimeUnit.SECONDS.toString()));
-        this.setHostsString(c.getString("hosts", "localhost:8649"));
+        this.timeUnit = c.getString(Tokens.REXSTER_REPORTER_TIME_UNIT, DEFAULT_TIME_UNIT);
+        this.period = c.getLong(Tokens.REXSTER_REPORTER_PERIOD, DEFAULT_PERIOD);
+        this.convertRateTo = c.getString(Tokens.REXSTER_REPORTER_RATES_TIME_UNIT, DEFAULT_TIME_UNIT);
+        this.convertDurationTo = c.getString(Tokens.REXSTER_REPORTER_DURATION_TIME_UNIT, DEFAULT_TIME_UNIT);
+        this.hostsString = c.getString(Tokens.REXSTER_REPORTER_HOSTS, "localhost:8649");
     }
 
     @Override
@@ -53,7 +54,7 @@ public class GangliaReporterConfig extends AbstractHostPortReporterConfig {
                 GangliaReporter.forRegistry(this.metricRegistry)
                         .convertDurationsTo(this.getRealConvertDurationTo())
                         .convertRatesTo(this.getRealConvertRateTo())
-                        .build(ganglia).start(this.getPeriod(), this.getRealTimeunit());
+                        .build(ganglia).start(this.getPeriod(), this.getRealTimeUnit());
             }
         }
         catch (Exception e)

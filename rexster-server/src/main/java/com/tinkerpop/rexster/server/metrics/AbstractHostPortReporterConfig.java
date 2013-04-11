@@ -6,42 +6,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A base configuration that accepts host and port combinations for configuration.
+ *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public abstract class AbstractHostPortReporterConfig extends AbstractReporterConfig {
     private static final Logger logger = Logger.getLogger(AbstractHostPortReporterConfig.class);
 
     private List<HostPort> hosts;
-    private String hostsString;
+    protected String hostsString;
 
     public List<HostPort> getHosts()
     {
         return hosts;
     }
 
-    public void setHosts(List<HostPort> hosts)
-    {
-        this.hosts = hosts;
-    }
-
-
-    public String getHostsString()
-    {
-        return hostsString;
-    }
-
-    public void setHostsString(String hostsString)
-    {
-        this.hostsString = hostsString;
-    }
-
     public List<HostPort> parseHostString()
     {
-        List<HostPort> hosts = new ArrayList<HostPort>();
-        String[] hostPairs = getHostsString().split(",");
+        final List<HostPort> hosts = new ArrayList<HostPort>();
+        final String[] hostPairs = this.hostsString.split(",");
         for (int i = 0; i < hostPairs.length; i++)
         {
-            String[] pair = hostPairs[i].split(":");
+            final String[] pair = hostPairs[i].split(":");
             hosts.add(new HostPort(pair[0], Integer.valueOf(pair[1])));
         }
         return hosts;
@@ -51,23 +37,23 @@ public abstract class AbstractHostPortReporterConfig extends AbstractReporterCon
     {
         // some simple log valadatin' sinc we can't || the @NotNulls
         // make mini protected functions sans logging for Ganglia
-        if (getHosts() == null && getHostsString() == null)
+        if (getHosts() == null && this.hostsString == null)
         {
             logger.warn("No hosts specified as a list or delimited string");
             return null;
         }
 
-        if (getHosts() != null && getHostsString() != null)
+        if (getHosts() != null && this.hostsString != null)
         {
-            logger.warn("Did you really mean to have hosts as a list and delimited string?");
+            logger.warn("There are reporter hosts configured as a list and delimited string?");
         }
 
-        ArrayList<HostPort> combinedHosts = new ArrayList<HostPort>();
+        final ArrayList<HostPort> combinedHosts = new ArrayList<HostPort>();
         if (getHosts() != null)
         {
             combinedHosts.addAll(getHosts());
         }
-        if (getHostsString() != null)
+        if (this.hostsString != null)
         {
             combinedHosts.addAll(parseHostString());
         }

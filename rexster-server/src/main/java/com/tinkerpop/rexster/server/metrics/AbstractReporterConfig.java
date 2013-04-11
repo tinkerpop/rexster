@@ -3,45 +3,31 @@ package com.tinkerpop.rexster.server.metrics;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Base class for reporter configurations.
+ *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public abstract class AbstractReporterConfig
 {
-    private long period;
+    protected static final long DEFAULT_PERIOD = 60l;
+    protected static final String DEFAULT_TIME_UNIT = TimeUnit.SECONDS.toString();
 
-    private String timeunit;
+    protected long period;
 
-    private String convertRateTo;
+    protected String timeUnit;
 
-    private String convertDurationTo;
+    protected String convertRateTo;
+
+    protected String convertDurationTo;
 
     public long getPeriod()
     {
         return period;
     }
 
-    public void setPeriod(long period)
+    public TimeUnit getRealTimeUnit()
     {
-        this.period = period;
-    }
-
-    public String getTimeunit()
-    {
-        return timeunit;
-    }
-
-    public void setTimeunit(String timeunit)
-    {
-        this.timeunit = timeunit;
-    }
-
-    public TimeUnit getRealTimeunit()
-    {
-        return TimeUnit.valueOf(timeunit);
-    }
-
-    public void setConvertRateTo(String convertRateTo) {
-        this.convertRateTo = convertRateTo;
+        return TimeUnit.valueOf(timeUnit);
     }
 
     public TimeUnit getRealConvertRateTo()
@@ -49,27 +35,14 @@ public abstract class AbstractReporterConfig
         return TimeUnit.valueOf(convertRateTo);
     }
 
-    public void setConvertDurationTo(String convertDurationTo) {
-        this.convertDurationTo = convertDurationTo;
-    }
-
     public TimeUnit getRealConvertDurationTo()
     {
         return TimeUnit.valueOf(convertDurationTo);
     }
 
-    protected boolean isClassAvailable(String className)
-    {
-        try
-        {
-            Class.forName(className);
-            return true;
-        }
-        catch (ClassNotFoundException e)
-        {
-            return false;
-        }
-    }
-
+    /**
+     * Enable (start) a reporter configuration.
+     * @return
+     */
     public abstract boolean enable();
 }

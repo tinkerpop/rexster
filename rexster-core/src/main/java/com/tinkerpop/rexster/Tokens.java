@@ -43,6 +43,12 @@ public class Tokens {
     public static final String REXSTER_GRAPH_PROPERTIES = "properties";
     public static final String REXSTER_GRAPH_BUFFER_SIZE = "graph-buffer-size";
     public static final String REXSTER_GRAPH_HA = "graph-high-availability";
+    public static final String REXSTER_REPORTER_TIME_UNIT = "report-time-unit";
+    public static final String REXSTER_REPORTER_PERIOD = "report-period";
+    public static final String REXSTER_REPORTER_RATES_TIME_UNIT = "rates-time-unit";
+    public static final String REXSTER_REPORTER_DURATION_TIME_UNIT = "duration-time-unit";
+    public static final String REXSTER_REPORTER_HOSTS = "hosts";
+    public static final String REXSTER_REPORTER_PREFIX = "prefix";
 
     public static final String REXSTER_SECURITY_NONE = "none";
     public static final String REXSTER_SECURITY_DEFAULT = "default";
