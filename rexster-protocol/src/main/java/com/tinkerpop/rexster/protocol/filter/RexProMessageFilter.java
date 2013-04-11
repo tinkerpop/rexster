@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.protocol.filter;
 
 import com.tinkerpop.rexster.protocol.msg.*;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.filterchain.BaseFilter;
@@ -56,6 +57,13 @@ public class RexProMessageFilter extends BaseFilter {
         if (sourceBufferLength < completeMessageLength) {
             // stop the filterchain processing and store sourceBuffer to be
             // used next time
+            logger.warn(String.format("Message envelope is incomplete. Message length set to %s but the buffer only contains %s", completeMessageLength, sourceBufferLength));
+            return ctx.getStopAction(sourceBuffer);
+        }
+
+        if (completeMessageLength < 0) {
+            // the message length can never be negative
+            logger.warn(String.format("Message body length in the envelope is negative: %s.", completeMessageLength));
             return ctx.getStopAction(sourceBuffer);
         }
 
@@ -67,6 +75,17 @@ public class RexProMessageFilter extends BaseFilter {
         byte[] messageAsBytes = new byte[bodyLength];
         sourceBuffer.position(RexProMessage.MESSAGE_HEADER_SIZE);
         sourceBuffer.get(messageAsBytes);
+
+        if (logger.isDebugEnabled()) {
+            final StringBuilder sb = new StringBuilder();
+            for (byte b : messageAsBytes) {
+                sb.append(StringUtils.rightPad(Byte.toString(b), 4));
+                sb.append(" ");
+            }
+
+            logger.debug(String.format("Received message [version:%s][message type:%s][body length:%s][body:%s]",
+                    messageVersion, messageType, bodyLength, sb.toString().trim()));
+        }
 
         final ByteArrayInputStream in = new ByteArrayInputStream(messageAsBytes);
         final Unpacker unpacker = msgpack.createUnpacker(in);
