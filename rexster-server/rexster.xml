@@ -66,6 +66,9 @@
             <type>jmx</type>
         </reporter>
         <reporter>
+            <type>http</type>
+        </reporter>
+        <reporter>
             <type>console</type>
             <properties>
                 <rates-time-unit>SECONDS</rates-time-unit>

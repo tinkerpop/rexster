@@ -60,6 +60,23 @@
             </configuration>
         </authentication>
     </security>
+    <metrics>
+        <reporter>
+            <type>jmx</type>
+        </reporter>
+        <reporter>
+            <type>http</type>
+        </reporter>
+        <reporter>
+            <type>console</type>
+            <properties>
+                <rates-time-unit>SECONDS</rates-time-unit>
+                <duration-time-unit>SECONDS</duration-time-unit>
+                <report-period>10</report-period>
+                <report-time-unit>MINUTES</report-time-unit>
+            </properties>
+        </reporter>
+    </metrics>
     <graphs>
         <graph>
             <graph-name>emptygraph</graph-name>
