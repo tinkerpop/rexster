@@ -1,17 +1,17 @@
 package com.tinkerpop.rexster.server.metrics;
 
 /**
+ * Represents a host and port combination.
+ *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class HostPort {
+class HostPort {
 
     private String host;
 
     private int port;
 
-    public HostPort() {}
-
-    public HostPort(String host, int port)
+    public HostPort(final String host, final int port)
     {
         this.host = host;
         this.port = port;
@@ -22,18 +22,8 @@ public class HostPort {
         return host;
     }
 
-    public void setHost(String host)
-    {
-        this.host = host;
-    }
-
     public int getPort()
     {
         return port;
-    }
-
-    public void setPort(int port)
-    {
-        this.port = port;
     }
 }
