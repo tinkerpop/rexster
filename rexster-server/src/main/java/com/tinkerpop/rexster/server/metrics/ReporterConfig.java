@@ -27,7 +27,7 @@ public class ReporterConfig {
 
     private final MetricRegistry metricRegistry;
 
-    private List<AbstractReporterConfig> reporters = new ArrayList<AbstractReporterConfig>();
+    private final List<AbstractReporterConfig> reporters = new ArrayList<AbstractReporterConfig>();
 
     private ReporterConfig(final MetricRegistry metricRegistry) {
         this.metricRegistry = metricRegistry;

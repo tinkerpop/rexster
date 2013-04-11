@@ -7,9 +7,9 @@ package com.tinkerpop.rexster.server.metrics;
  */
 class HostPort {
 
-    private String host;
+    private final String host;
 
-    private int port;
+    private final int port;
 
     public HostPort(final String host, final int port)
     {
