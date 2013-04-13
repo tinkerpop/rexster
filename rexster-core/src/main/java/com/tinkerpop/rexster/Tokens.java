@@ -49,6 +49,8 @@ public class Tokens {
     public static final String REXSTER_REPORTER_DURATION_TIME_UNIT = "duration-time-unit";
     public static final String REXSTER_REPORTER_HOSTS = "hosts";
     public static final String REXSTER_REPORTER_PREFIX = "prefix";
+    public static final String REXSTER_REPORTER_EXCLUDES = "excludes";
+    public static final String REXSTER_REPORTER_INCLUDES = "includes";
 
     public static final String REXSTER_SECURITY_NONE = "none";
     public static final String REXSTER_SECURITY_DEFAULT = "default";

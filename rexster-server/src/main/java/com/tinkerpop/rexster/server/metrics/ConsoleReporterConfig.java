@@ -24,10 +24,7 @@ public class ConsoleReporterConfig extends AbstractReporterConfig {
 
         this.metricRegistry = metricRegistry;
 
-        this.timeUnit = c.getString(Tokens.REXSTER_REPORTER_TIME_UNIT, DEFAULT_TIME_UNIT);
-        this.period = c.getLong(Tokens.REXSTER_REPORTER_PERIOD, DEFAULT_PERIOD);
-        this.convertRateTo = c.getString(Tokens.REXSTER_REPORTER_RATES_TIME_UNIT, DEFAULT_TIME_UNIT);
-        this.convertDurationTo = c.getString(Tokens.REXSTER_REPORTER_DURATION_TIME_UNIT, DEFAULT_TIME_UNIT);
+        readCommonConfiguration(c);
     }
 
     @Override
@@ -38,7 +35,8 @@ public class ConsoleReporterConfig extends AbstractReporterConfig {
             ConsoleReporter.forRegistry(this.metricRegistry)
                     .convertDurationsTo(this.getRealConvertDurationTo())
                     .convertRatesTo(this.getRealConvertRateTo())
-                    .build().start(this.getPeriod(), this.getRealTimeUnit());
+                    .filter(new RegexMetricFilter(this.inclusion, this.exclusion))
+                    .build().start(this.period, this.getRealTimeUnit());
         }
         catch (Exception e)
         {

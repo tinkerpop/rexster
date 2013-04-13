@@ -75,6 +75,8 @@
                 <duration-time-unit>SECONDS</duration-time-unit>
                 <report-period>10</report-period>
                 <report-time-unit>MINUTES</report-time-unit>
+                <includes>http.rest.*</includes>
+                <excludes>http.rest.*.delete</excludes>
             </properties>
         </reporter>
     </metrics>

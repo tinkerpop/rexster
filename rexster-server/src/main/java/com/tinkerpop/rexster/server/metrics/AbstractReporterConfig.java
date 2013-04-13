@@ -1,5 +1,8 @@
 package com.tinkerpop.rexster.server.metrics;
 
+import com.tinkerpop.rexster.Tokens;
+import org.apache.commons.configuration.SubnodeConfiguration;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -20,10 +23,9 @@ public abstract class AbstractReporterConfig
 
     protected String convertDurationTo;
 
-    public long getPeriod()
-    {
-        return period;
-    }
+    protected String inclusion;
+
+    protected String exclusion;
 
     public TimeUnit getRealTimeUnit()
     {
@@ -45,4 +47,13 @@ public abstract class AbstractReporterConfig
      * @return
      */
     public abstract boolean enable();
+
+    protected void readCommonConfiguration(SubnodeConfiguration c) {
+        this.timeUnit = c.getString(Tokens.REXSTER_REPORTER_TIME_UNIT, DEFAULT_TIME_UNIT);
+        this.period = c.getLong(Tokens.REXSTER_REPORTER_PERIOD, DEFAULT_PERIOD);
+        this.convertRateTo = c.getString(Tokens.REXSTER_REPORTER_RATES_TIME_UNIT, DEFAULT_TIME_UNIT);
+        this.convertDurationTo = c.getString(Tokens.REXSTER_REPORTER_DURATION_TIME_UNIT, DEFAULT_TIME_UNIT);
+        this.inclusion = c.getString(Tokens.REXSTER_REPORTER_INCLUDES, null);
+        this.exclusion = c.getString(Tokens.REXSTER_REPORTER_EXCLUDES, null);
+    }
 }

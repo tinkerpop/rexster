@@ -25,10 +25,7 @@ public class GangliaReporterConfig extends AbstractHostPortReporterConfig {
 
         this.metricRegistry = metricRegistry;
 
-        this.timeUnit = c.getString(Tokens.REXSTER_REPORTER_TIME_UNIT, DEFAULT_TIME_UNIT);
-        this.period = c.getLong(Tokens.REXSTER_REPORTER_PERIOD, DEFAULT_PERIOD);
-        this.convertRateTo = c.getString(Tokens.REXSTER_REPORTER_RATES_TIME_UNIT, DEFAULT_TIME_UNIT);
-        this.convertDurationTo = c.getString(Tokens.REXSTER_REPORTER_DURATION_TIME_UNIT, DEFAULT_TIME_UNIT);
+        readCommonConfiguration(c);
         this.hostsString = c.getString(Tokens.REXSTER_REPORTER_HOSTS, "localhost:8649");
     }
 
@@ -54,7 +51,8 @@ public class GangliaReporterConfig extends AbstractHostPortReporterConfig {
                 GangliaReporter.forRegistry(this.metricRegistry)
                         .convertDurationsTo(this.getRealConvertDurationTo())
                         .convertRatesTo(this.getRealConvertRateTo())
-                        .build(ganglia).start(this.getPeriod(), this.getRealTimeUnit());
+                        .filter(new RegexMetricFilter(this.inclusion, this.exclusion))
+                        .build(ganglia).start(this.period, this.getRealTimeUnit());
             }
         }
         catch (Exception e)
