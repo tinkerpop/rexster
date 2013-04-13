@@ -27,8 +27,7 @@ public class ReporterConfig {
     private static final Logger logger = Logger.getLogger(ReporterConfig.class);
 
     private JmxReporter jmxReporter = null;
-
-    private boolean httpReporterEnabled = false;
+    private HttpReporterConfig httpReporterConfig = null;
 
     private final MetricRegistry metricRegistry;
 
@@ -53,13 +52,15 @@ public class ReporterConfig {
 
             if (reporterType != null) {
                 if (reporterType.equals("jmx") || reporterType.equals(JmxReporter.class.getCanonicalName())) {
-                    // only initializes this once...this shouldn't be generated multiple times.  other reports
-                    // have more flexibility that way.
+                    // only initializes this once...this shouldn't be generated multiple times.
                     if (rc.jmxReporter == null) {
                         rc.jmxReporter = JmxReporter.forRegistry(metricRegistry).build();
                     }
                 } else if (reporterType.equals("http")) {
-                    rc.httpReporterEnabled = true;
+                    // only initializes this once...this shouldn't be generated multiple times.
+                    if (rc.httpReporterConfig == null) {
+                        rc.httpReporterConfig = new HttpReporterConfig(reporterConfig);
+                    }
                 } else if (reporterType.equals("console") || reporterType.equals(ConsoleReporter.class.getCanonicalName())) {
                     rc.reporters.add(new ConsoleReporterConfig(reporterConfig, metricRegistry));
                 } else if (reporterType.equals("ganglia") || reporterType.equals(GangliaReporter.class.getCanonicalName())) {
@@ -78,7 +79,15 @@ public class ReporterConfig {
     }
 
     public boolean isHttpReporterEnabled() {
-        return httpReporterEnabled;
+        return httpReporterConfig != null;
+    }
+
+    public String getRateTimeUnitConversion() {
+        return httpReporterConfig.getRealRateTimeUnitConversion().toString();
+    }
+
+    public String getDurationTimeUnitConversion() {
+        return httpReporterConfig.getRealDurationTimeUnitConversion().toString();
     }
 
     public void enable() {

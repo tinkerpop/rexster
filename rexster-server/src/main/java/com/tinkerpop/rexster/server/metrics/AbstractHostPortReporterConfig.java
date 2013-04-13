@@ -1,5 +1,7 @@
 package com.tinkerpop.rexster.server.metrics;
 
+import com.yammer.metrics.MetricRegistry;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -16,13 +18,15 @@ public abstract class AbstractHostPortReporterConfig extends AbstractReporterCon
     private List<HostPort> hosts;
     protected String hostsString;
 
-    public List<HostPort> getHosts()
-    {
+    public AbstractHostPortReporterConfig(final HierarchicalConfiguration config, final MetricRegistry metricRegistry) {
+        super(config, metricRegistry);
+    }
+
+    public List<HostPort> getHosts(){
         return hosts;
     }
 
-    public List<HostPort> parseHostString()
-    {
+    public List<HostPort> parseHostString(){
         final List<HostPort> hosts = new ArrayList<HostPort>();
         final String[] hostPairs = this.hostsString.split(",");
         for (int i = 0; i < hostPairs.length; i++)
@@ -33,8 +37,7 @@ public abstract class AbstractHostPortReporterConfig extends AbstractReporterCon
         return hosts;
     }
 
-    public List<HostPort> getHostListAndStringList()
-    {
+    public List<HostPort> getHostListAndStringList(){
         // some simple log valadatin' sinc we can't || the @NotNulls
         // make mini protected functions sans logging for Ganglia
         if (getHosts() == null && this.hostsString == null)

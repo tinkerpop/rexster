@@ -17,6 +17,7 @@ import com.tinkerpop.rexster.VertexResource;
 import com.tinkerpop.rexster.filter.AbstractSecurityFilter;
 import com.tinkerpop.rexster.filter.DefaultSecurityFilter;
 import com.tinkerpop.rexster.filter.HeaderResponseFilter;
+import com.tinkerpop.rexster.server.metrics.AbstractReporterConfig;
 import com.tinkerpop.rexster.servlet.DogHouseServlet;
 import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
@@ -70,12 +71,16 @@ public class HttpRexsterServer implements RexsterServer {
     private final boolean debugMode;
     private final boolean enableHttpReporter;
     private final boolean enableDogHouse;
+    private final String convertRateTo;
+    private final String convertDurationTo;
 
     public HttpRexsterServer(final XMLConfiguration properties) {
         this.properties = properties;
         this.debugMode = properties.getBoolean("debug", false);
         this.enableDogHouse = properties.getBoolean("http.enable-doghouse", true);
-        this.enableHttpReporter = properties.getBoolean("enable-http-reporter", false);
+        this.enableHttpReporter = properties.getBoolean("http-reporter-enabled", false);
+        this.convertRateTo = properties.getString("http-reporter-convert", AbstractReporterConfig.DEFAULT_TIME_UNIT.toString());
+        this.convertDurationTo = properties.getString("http-reporter-duration", AbstractReporterConfig.DEFAULT_TIME_UNIT.toString());
         this.rexsterServerPort = properties.getInteger("http.server-port", new Integer(RexsterSettings.DEFAULT_HTTP_PORT));
         this.rexsterServerHost = properties.getString("http.server-host", "0.0.0.0");
         this.webRootPath = properties.getString("http.web-root", RexsterSettings.DEFAULT_WEB_ROOT_PATH);
@@ -212,7 +217,8 @@ public class HttpRexsterServer implements RexsterServer {
         // and is passed into the HttpRexsterServer.  The SingletonTypeInjectableProvider is responsible for
         // pushing that instance into the context.
         rc.getSingletons().add(new SingletonTypeInjectableProvider<Context, RexsterApplication>(
-                RexsterApplication.class, application){});
+                RexsterApplication.class, application) {
+        });
         rc.getSingletons().add(new InstrumentedResourceMethodDispatchAdapter(application.getMetricRegistry()));
 
         if (this.debugMode) {
@@ -301,13 +307,15 @@ public class HttpRexsterServer implements RexsterServer {
 
     private void deployMetricsAdmin(final RexsterApplication application) {
         // deploys the metrics servlet into rexster
-        final WebappContext wacDogHouse = new WebappContext("metrics", "");
-        wacDogHouse.setAttribute("com.yammer.metrics.servlets.MetricsServlet.registry", application.getMetricRegistry());
+        final WebappContext wacMetrics = new WebappContext("metrics", "");
+        wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.registry", application.getMetricRegistry());
+        wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.rateUnit", this.convertRateTo);
+        wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.durationUnit", this.convertDurationTo);
 
-        final ServletRegistration sgDogHouse = wacDogHouse.addServlet("metrics", new MetricsServlet());
-        sgDogHouse.addMapping("/metrics/*");
+        final ServletRegistration sgMetrics = wacMetrics.addServlet("metrics", new MetricsServlet());
+        sgMetrics.addMapping("/metrics/*");
 
-        wacDogHouse.deploy(this.httpServer);
+        wacMetrics.deploy(this.httpServer);
     }
 
     private NetworkListener configureNetworkListener() {

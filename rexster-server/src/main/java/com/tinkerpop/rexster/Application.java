@@ -9,7 +9,6 @@ import com.tinkerpop.rexster.server.RexsterServer;
 import com.tinkerpop.rexster.server.RexsterSettings;
 import com.tinkerpop.rexster.server.ShutdownManager;
 import com.tinkerpop.rexster.server.XmlRexsterApplication;
-import com.tinkerpop.rexster.server.metrics.AbstractReporterConfig;
 import com.tinkerpop.rexster.server.metrics.ReporterConfig;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -74,7 +73,11 @@ public class Application {
         this.rexsterApplication = new XmlRexsterApplication(graphConfigs);
 
         final ReporterConfig reporterConfig = ReporterConfig.load(properties.configurationsAt(Tokens.REXSTER_REPORTER_PATH), this.rexsterApplication.getMetricRegistry());
-        this.properties.addProperty("enable-http-reporter", reporterConfig.isHttpReporterEnabled());
+        this.properties.addProperty("http-reporter-enabled", reporterConfig.isHttpReporterEnabled());
+        this.properties.addProperty("http-reporter-duration", reporterConfig.getDurationTimeUnitConversion());
+        this.properties.addProperty("http-reporter-convert", reporterConfig.getRateTimeUnitConversion());
+
+        // start the metric reporters if any
         reporterConfig.enable();
 
         this.httpServer = new HttpRexsterServer(properties);

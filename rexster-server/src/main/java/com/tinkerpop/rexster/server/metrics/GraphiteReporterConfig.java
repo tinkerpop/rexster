@@ -5,7 +5,6 @@ import com.yammer.metrics.MetricRegistry;
 import com.yammer.metrics.graphite.Graphite;
 import com.yammer.metrics.graphite.GraphiteReporter;
 import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.log4j.Logger;
 
 import java.net.InetSocketAddress;
@@ -16,21 +15,17 @@ import java.util.List;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class GraphiteReporterConfig extends AbstractHostPortReporterConfig {
+class GraphiteReporterConfig extends AbstractHostPortReporterConfig {
     private static final Logger logger = Logger.getLogger(GraphiteReporterConfig.class);
 
     private final String prefix;
 
-    private final MetricRegistry metricRegistry;
-
     public GraphiteReporterConfig(final HierarchicalConfiguration config, final MetricRegistry metricRegistry) {
-        final SubnodeConfiguration c = config.configurationAt(Tokens.REXSTER_GRAPH_PROPERTIES);
+        super(config, metricRegistry);
+        this.hostsString = this.registryConfiguration.getString(Tokens.REXSTER_REPORTER_HOSTS, "localhost:2003");
+        this.prefix = this.registryConfiguration.getString(Tokens.REXSTER_REPORTER_PREFIX, "");
 
-        this.metricRegistry = metricRegistry;
-
-        readCommonConfiguration(c);
-        this.hostsString = c.getString(Tokens.REXSTER_REPORTER_HOSTS, "localhost:2003");
-        this.prefix = c.getString(Tokens.REXSTER_REPORTER_PREFIX, "");
+        logger.info(String.format("Configured Graphite Metric Reporter [%s].", this.hostsString));
     }
 
     @Override
@@ -56,8 +51,8 @@ public class GraphiteReporterConfig extends AbstractHostPortReporterConfig {
 
                 final Graphite graphite = new Graphite(new InetSocketAddress(hostPort.getHost(), hostPort.getPort()));
                 GraphiteReporter.forRegistry(this.metricRegistry)
-                        .convertDurationsTo(this.getRealConvertDurationTo())
-                        .convertRatesTo(this.getRealConvertRateTo())
+                        .convertDurationsTo(this.getRealDurationTimeUnitConversion())
+                        .convertRatesTo(this.getRealRateTimeUnitConversion())
                         .prefixedWith(this.prefix)
                         .filter(new RegexMetricFilter(this.inclusion, this.exclusion))
                         .build(graphite).start(this.period, this.getRealTimeUnit());

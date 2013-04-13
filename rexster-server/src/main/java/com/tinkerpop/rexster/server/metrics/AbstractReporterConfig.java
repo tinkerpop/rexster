@@ -1,6 +1,8 @@
 package com.tinkerpop.rexster.server.metrics;
 
 import com.tinkerpop.rexster.Tokens;
+import com.yammer.metrics.MetricRegistry;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 
 import java.util.concurrent.TimeUnit;
@@ -12,34 +14,45 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractReporterConfig
 {
-    protected static final long DEFAULT_PERIOD = 60l;
-    protected static final String DEFAULT_TIME_UNIT = TimeUnit.SECONDS.toString();
+    public static final long DEFAULT_PERIOD = 60l;
+    public static final String DEFAULT_TIME_UNIT = TimeUnit.SECONDS.toString();
+    protected final MetricRegistry metricRegistry;
+
+    protected SubnodeConfiguration registryConfiguration;
 
     protected long period;
 
     protected String timeUnit;
 
-    protected String convertRateTo;
+    protected String rateTimeUnitConversion;
 
-    protected String convertDurationTo;
+    protected String durationTimeUnitConversion;
 
     protected String inclusion;
 
     protected String exclusion;
 
-    public TimeUnit getRealTimeUnit()
-    {
+    public AbstractReporterConfig(final HierarchicalConfiguration config, final MetricRegistry metricRegistry) {
+        this.metricRegistry = metricRegistry;
+        try {
+            this.registryConfiguration = config.configurationAt(Tokens.REXSTER_GRAPH_PROPERTIES);
+        } catch (IllegalArgumentException iae) {
+            this.registryConfiguration = null;
+        }
+
+        readCommonConfiguration();
+    }
+
+    public TimeUnit getRealTimeUnit() {
         return TimeUnit.valueOf(timeUnit);
     }
 
-    public TimeUnit getRealConvertRateTo()
-    {
-        return TimeUnit.valueOf(convertRateTo);
+    public TimeUnit getRealRateTimeUnitConversion() {
+        return TimeUnit.valueOf(rateTimeUnitConversion);
     }
 
-    public TimeUnit getRealConvertDurationTo()
-    {
-        return TimeUnit.valueOf(convertDurationTo);
+    public TimeUnit getRealDurationTimeUnitConversion() {
+        return TimeUnit.valueOf(durationTimeUnitConversion);
     }
 
     /**
@@ -48,12 +61,12 @@ public abstract class AbstractReporterConfig
      */
     public abstract boolean enable();
 
-    protected void readCommonConfiguration(SubnodeConfiguration c) {
-        this.timeUnit = c.getString(Tokens.REXSTER_REPORTER_TIME_UNIT, DEFAULT_TIME_UNIT);
-        this.period = c.getLong(Tokens.REXSTER_REPORTER_PERIOD, DEFAULT_PERIOD);
-        this.convertRateTo = c.getString(Tokens.REXSTER_REPORTER_RATES_TIME_UNIT, DEFAULT_TIME_UNIT);
-        this.convertDurationTo = c.getString(Tokens.REXSTER_REPORTER_DURATION_TIME_UNIT, DEFAULT_TIME_UNIT);
-        this.inclusion = c.getString(Tokens.REXSTER_REPORTER_INCLUDES, null);
-        this.exclusion = c.getString(Tokens.REXSTER_REPORTER_EXCLUDES, null);
+    private void readCommonConfiguration() {
+        this.timeUnit = this.registryConfiguration == null ? DEFAULT_TIME_UNIT : this.registryConfiguration.getString(Tokens.REXSTER_REPORTER_TIME_UNIT, DEFAULT_TIME_UNIT);
+        this.period = this.registryConfiguration == null ? DEFAULT_PERIOD : this.registryConfiguration.getLong(Tokens.REXSTER_REPORTER_PERIOD, DEFAULT_PERIOD);
+        this.rateTimeUnitConversion = this.registryConfiguration == null ? DEFAULT_TIME_UNIT : this.registryConfiguration.getString(Tokens.REXSTER_REPORTER_RATES_TIME_UNIT, DEFAULT_TIME_UNIT);
+        this.durationTimeUnitConversion = this.registryConfiguration == null ? DEFAULT_TIME_UNIT : this.registryConfiguration.getString(Tokens.REXSTER_REPORTER_DURATION_TIME_UNIT, DEFAULT_TIME_UNIT);
+        this.inclusion = this.registryConfiguration == null ? null : this.registryConfiguration.getString(Tokens.REXSTER_REPORTER_INCLUDES, null);
+        this.exclusion = this.registryConfiguration == null ? null : this.registryConfiguration.getString(Tokens.REXSTER_REPORTER_EXCLUDES, null);
     }
 }
