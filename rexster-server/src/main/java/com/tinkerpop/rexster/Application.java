@@ -123,9 +123,9 @@ public class Application {
     }
 
     private void startShutdownManager(final XMLConfiguration properties) throws Exception {
-        final Integer shutdownServerPort = properties.getInteger("rexster-shutdown-port",
+        final Integer shutdownServerPort = properties.getInteger("shutdown-port",
                 new Integer(RexsterSettings.DEFAULT_SHUTDOWN_PORT));
-        final String shutdownServerHost = properties.getString("rexster-shutdown-host", RexsterSettings.DEFAULT_HOST);
+        final String shutdownServerHost = properties.getString("shutdown-host", RexsterSettings.DEFAULT_HOST);
         final ShutdownManager shutdownManager = new ShutdownManager(shutdownServerHost, shutdownServerPort);
 
         //Register a shutdown hook
