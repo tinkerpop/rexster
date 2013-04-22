@@ -91,10 +91,12 @@ public class EngineHolder {
                     logger.info("ScriptEngine initializing with a custom script");
                     engine.eval(reader);
                 } catch (FileNotFoundException fnfe) {
-                    logger.warn("Could not read ScriptEngine initialization file.  Check script-engine-init.groovy on classpath.");
+                    logger.warn(String.format("Could not read ScriptEngine initialization file.  Check [%s] on classpath.", scriptEngineInitFile.getAbsolutePath()));
                 } catch (ScriptException ex) {
-                    logger.warn("ScriptEngine initialization failure. Custom scripts and imports will not be initialized.", ex);
+                    logger.warn(String.format("ScriptEngine initialization failure. Custom scripts and imports will not be initialized by [%s].", scriptEngineInitFile.getAbsolutePath()), ex);
                 }
+            } else {
+                logger.warn(String.format("ScriptEngine initialization file does not exist.  Check [%s] on classpath.", scriptEngineInitFile.getAbsolutePath()));
             }
         }
 
