@@ -33,7 +33,7 @@ public class SparqlExtensionTest {
     public void evaluateSparqlNoReturnKeysNoShowTypes() {
         String sparqlQuery = "SELECT ?x ?y WHERE { ?x <http://tinkerpop.com#knows> ?y }";
 
-        this.ctx = new RexsterResourceContext(null, null, null, new JSONObject(), null, null, null);
+        this.ctx = new RexsterResourceContext(null, null, null, new JSONObject(), null, null, null, null);
 
         SparqlExtension extension = new SparqlExtension();
         ExtensionResponse extensionResponse = extension.evaluateSparql(this.ctx, this.graph, sparqlQuery);

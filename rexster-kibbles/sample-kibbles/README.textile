@@ -9,6 +9,7 @@ The following examples are included:
 
 |_. extension |_. description |_. uri |
 | @MapConfigurationExtension@ | Demonstrates how graph specific configuration in rexster.xml can be exposed to the extension. | @http://base/graphs/graph/tp-sample/map-config@ |
+| @MetricExtension@ | Demonstrates how to register custom metrics to be reported statistics through the "Metrics":http://metrics.codahale.com/. | @http://base/graphs/graph/tp-sample/metric@ |
 | @ParametersExtension@ | Demonstrates echoing of different kinds of request parameters. | @http://base/graphs/graph/tp-sample/parameters@ |
 | @PingExtension@ | Performs a simple echo of the value of a URI query string parameter. | @http://base/graphs/graph/tp-sample/ping@ |
 | @PingAddOnExtension@ | Performs a simple echo of the value of a URI query string parameter demonstrating that Extensions can be spread across multiple classes within a namespace and extension name. | @http://basegraphs//graph/tp-sample/ping/pong@ |

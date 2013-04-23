@@ -1,4 +1,5 @@
 com.tinkerpop.rexster.kibbles.sample.MapConfigurationExtension
+com.tinkerpop.rexster.kibbles.sample.MetricExtension
 com.tinkerpop.rexster.kibbles.sample.ParametersExtension
 com.tinkerpop.rexster.kibbles.sample.PingExtension
 com.tinkerpop.rexster.kibbles.sample.PingAddOnExtension

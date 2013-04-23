@@ -179,9 +179,9 @@ public class GremlinExtension extends AbstractRexsterExtension {
         return tryExecuteGremlinScript(rexsterResourceContext, graph, null, null, script);
     }
 
-    private ExtensionResponse tryExecuteGremlinScript(RexsterResourceContext rexsterResourceContext,
-                                                      Graph graph, Vertex vertex, Edge edge,
-                                                      String script) {
+    private ExtensionResponse tryExecuteGremlinScript(final RexsterResourceContext rexsterResourceContext,
+                                                      final Graph graph, final Vertex vertex, final Edge edge,
+                                                      final String script) {
         ExtensionResponse extensionResponse;
 
         final JSONObject requestObject = rexsterResourceContext.getRequestObject();

@@ -41,7 +41,7 @@ public class BatchExtensionTest {
 
         JSONObject requestObject = new JSONObject();
 
-        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null, null);
 
         ExtensionResponse response = batchExtension.getVertices(this.ctx, graph);
 
@@ -60,7 +60,7 @@ public class BatchExtensionTest {
         values.put(100000);
         requestObject.put("values", values);
 
-        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null, null);
 
         ExtensionResponse response = batchExtension.getVertices(this.ctx, graph);
 
@@ -89,7 +89,7 @@ public class BatchExtensionTest {
         requestObject.put("values", values);
         requestObject.put("type", "id");
 
-        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null, null);
 
         ExtensionResponse response = batchExtension.getVertices(this.ctx, graph);
 
@@ -120,7 +120,7 @@ public class BatchExtensionTest {
         requestObject.put("values", values);
         requestObject.put("type", "index");
 
-        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null, null);
 
         ExtensionResponse response = batchExtension.getVertices(this.ctx, graph);
 
@@ -143,7 +143,7 @@ public class BatchExtensionTest {
         requestObject.put("type", "index");
         requestObject.put("key", "age");
 
-        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null, null);
 
         ExtensionResponse response = batchExtension.getVertices(this.ctx, graph);
 
@@ -177,7 +177,7 @@ public class BatchExtensionTest {
         requestObject.put("values", values);
         requestObject.put("type", "keyindex");
 
-        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null, null);
 
         ExtensionResponse response = batchExtension.getVertices(this.ctx, graph);
 
@@ -200,7 +200,7 @@ public class BatchExtensionTest {
         requestObject.put("type", "keyindex");
         requestObject.put("key", "age");
 
-        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null, null);
 
         ExtensionResponse response = batchExtension.getVertices(this.ctx, graph);
 
@@ -226,7 +226,7 @@ public class BatchExtensionTest {
 
         JSONObject requestObject = new JSONObject();
 
-        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null, null);
 
         ExtensionResponse response = batchExtension.getEdges(this.ctx, graph);
 
@@ -245,7 +245,7 @@ public class BatchExtensionTest {
         values.put(100000);
         requestObject.put("values", values);
 
-        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null, null);
 
         ExtensionResponse response = batchExtension.getEdges(this.ctx, graph);
 
@@ -274,7 +274,7 @@ public class BatchExtensionTest {
         requestObject.put("values", values);
         requestObject.put("type", "id");
 
-        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null, null);
 
         ExtensionResponse response = batchExtension.getEdges(this.ctx, graph);
 
@@ -305,7 +305,7 @@ public class BatchExtensionTest {
         requestObject.put("values", values);
         requestObject.put("type", "index");
 
-        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null, null);
 
         ExtensionResponse response = batchExtension.getEdges(this.ctx, graph);
 
@@ -328,7 +328,7 @@ public class BatchExtensionTest {
         requestObject.put("type", "index");
         requestObject.put("key", "weight");
 
-        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null, null);
 
         ExtensionResponse response = batchExtension.getEdges(this.ctx, graph);
 
@@ -362,7 +362,7 @@ public class BatchExtensionTest {
         requestObject.put("values", values);
         requestObject.put("type", "keyindex");
 
-        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null, null);
 
         ExtensionResponse response = batchExtension.getEdges(this.ctx, graph);
 
@@ -385,7 +385,7 @@ public class BatchExtensionTest {
         requestObject.put("type", "keyindex");
         requestObject.put("key", "weight");
 
-        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null);
+        this.ctx = new RexsterResourceContext(null, null, null, requestObject, null, null, null, null);
 
         ExtensionResponse response = batchExtension.getEdges(this.ctx, graph);
 
@@ -463,7 +463,7 @@ public class BatchExtensionTest {
 
         RexsterApplicationGraph rag = new RexsterApplicationGraph("graph", this.graph);
 
-        this.ctx = new RexsterResourceContext(rag, null, null, requestObject, null, null, null);
+        this.ctx = new RexsterResourceContext(rag, null, null, requestObject, null, null, null, null);
 
         ExtensionResponse response = batchExtension.postTx(this.ctx, this.graph, rag);
 

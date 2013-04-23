@@ -254,7 +254,8 @@ public abstract class AbstractSubResource extends BaseResource {
                 this.getRequestObject(),
                 this.getRequestObjectFlat(),
                 methodToCall,
-                this.securityContext);
+                this.securityContext,
+                this.getRexsterApplication().getMetricRegistry());
 
         final Annotation[][] parametersAnnotations = method.getParameterAnnotations();
         final ArrayList<Object> methodToCallParams = new ArrayList<Object>();

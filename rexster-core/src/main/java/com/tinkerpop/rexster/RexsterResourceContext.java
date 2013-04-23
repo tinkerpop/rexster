@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.extension.ExtensionMethod;
+import com.yammer.metrics.MetricRegistry;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,10 +22,11 @@ public class RexsterResourceContext {
     private final JSONObject requestObjectFlat;
     private final ExtensionMethod extensionMethod;
     private final SecurityContext securityContext;
+    private final MetricRegistry metricRegistry;
 
     public RexsterResourceContext(final RexsterApplicationGraph rag, final UriInfo uriInfo, final HttpServletRequest request,
                                   final JSONObject requestObject, final JSONObject requestObjectFlat, final ExtensionMethod extensionMethod,
-                                  final SecurityContext securityContext) {
+                                  final SecurityContext securityContext, final MetricRegistry metricRegistry) {
         this.rag = rag;
         this.uriInfo = uriInfo;
         this.request = request;
@@ -32,6 +34,11 @@ public class RexsterResourceContext {
         this.extensionMethod = extensionMethod;
         this.requestObjectFlat = requestObjectFlat;
         this.securityContext = securityContext;
+        this.metricRegistry = metricRegistry;
+    }
+
+    public MetricRegistry getMetricRegistry() {
+        return this.metricRegistry;
     }
 
     public SecurityContext getSecurityContext() {
