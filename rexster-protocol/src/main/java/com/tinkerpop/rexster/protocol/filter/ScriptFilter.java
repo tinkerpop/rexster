@@ -9,6 +9,9 @@ import com.tinkerpop.rexster.protocol.RexProSession;
 import com.tinkerpop.rexster.protocol.RexProSessions;
 import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.server.RexsterApplication;
+import com.yammer.metrics.Counter;
+import com.yammer.metrics.MetricRegistry;
+import com.yammer.metrics.Timer;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
@@ -18,7 +21,8 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Processes a ScriptRequestMessage against the script engine for the channel.
@@ -33,8 +37,25 @@ public class ScriptFilter extends BaseFilter {
 
     private final RexsterApplication rexsterApplication;
 
+    private final Timer scriptTimer;
+
+    /**
+     * A count of successful execution of scripts.  Counts even if a write back to the stream fails.
+     */
+    private final Counter successfulExecutions;
+
+    /**
+     * A count of failed script executions. Not the same as a failed request.
+     */
+    private final Counter failedExecutions;
+
     public ScriptFilter(final RexsterApplication rexsterApplication) {
         this.rexsterApplication = rexsterApplication;
+
+        final MetricRegistry metricRegistry = this.rexsterApplication.getMetricRegistry();
+        this.scriptTimer = metricRegistry.timer(MetricRegistry.name("rexpro", "script-engine"));
+        this.successfulExecutions = metricRegistry.counter(MetricRegistry.name("rexpro", "script-engine", "success"));
+        this.failedExecutions = metricRegistry.counter(MetricRegistry.name("rexpro", "script-engine", "fail"));
     }
 
     /**
@@ -90,6 +111,7 @@ public class ScriptFilter extends BaseFilter {
                     tryRollbackTransaction(graph);
                 }
 
+                final Timer.Context context = scriptTimer.time();
                 try {
                     // execute script
                     final Object result = session.evaluate(
@@ -121,6 +143,8 @@ public class ScriptFilter extends BaseFilter {
                         tryCommitTransaction(graph);
                     }
 
+                    successfulExecutions.inc();
+
                     // write the message after the transaction so that we can be assured that it properly committed
                     // if auto-commit was on
                     ctx.write(messageBytes);
@@ -129,7 +153,12 @@ public class ScriptFilter extends BaseFilter {
                     if (graph != null && specificMessage.metaGetTransaction()) {
                         tryRollbackTransaction(graph);
                     }
+
+                    failedExecutions.inc();
+
                     throw ex;
+                } finally {
+                    context.stop();
                 }
 
             } else {
@@ -168,6 +197,7 @@ public class ScriptFilter extends BaseFilter {
                     tryRollbackTransaction(graph);
                 }
 
+                final Timer.Context context = scriptTimer.time();
                 try {
                     Object result = scriptEngine.eval(specificMessage.Script, bindings);
 
@@ -193,6 +223,8 @@ public class ScriptFilter extends BaseFilter {
                         tryCommitTransaction(graph);
                     }
 
+                    successfulExecutions.inc();
+
                     // write the message after the transaction so that we can be assured that it properly committed
                     // if auto-commit was on
                     ctx.write(messageBytes);
@@ -201,7 +233,12 @@ public class ScriptFilter extends BaseFilter {
                     if (graph != null && specificMessage.metaGetTransaction()) {
                         tryRollbackTransaction(graph);
                     }
+
+                    failedExecutions.dec();
+
                     throw ex;
+                } finally {
+                    context.stop();
                 }
             }
 

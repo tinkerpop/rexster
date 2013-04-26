@@ -24,6 +24,9 @@ import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.EngineHolder;
 import com.tinkerpop.rexster.util.ElementHelper;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
+import com.yammer.metrics.Counter;
+import com.yammer.metrics.MetricRegistry;
+import com.yammer.metrics.Timer;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -182,6 +185,12 @@ public class GremlinExtension extends AbstractRexsterExtension {
     private ExtensionResponse tryExecuteGremlinScript(final RexsterResourceContext rexsterResourceContext,
                                                       final Graph graph, final Vertex vertex, final Edge edge,
                                                       final String script) {
+
+        final MetricRegistry metricRegistry = rexsterResourceContext.getMetricRegistry();
+        final Timer scriptTimer = metricRegistry.timer(MetricRegistry.name("http", "script-engine"));
+        final Counter successfulExecutions = metricRegistry.counter(MetricRegistry.name("http", "script-engine", "success"));
+        final Counter failedExecutions = metricRegistry.counter(MetricRegistry.name("http", "script-engine", "fail"));
+
         ExtensionResponse extensionResponse;
 
         final JSONObject requestObject = rexsterResourceContext.getRequestObject();
@@ -240,6 +249,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
                     generateErrorJson(extensionMethod.getExtensionApiAsJson()));
         }
 
+        final Timer.Context context = scriptTimer.time();
         try {
             // result is either the ad-hoc script on the query string or the last "stored procedure"
             Object result = null;
@@ -262,10 +272,16 @@ public class GremlinExtension extends AbstractRexsterExtension {
             final JSONObject resultObject = new JSONObject(resultMap);
             extensionResponse = ExtensionResponse.ok(resultObject);
 
+            successfulExecutions.inc();
+
         } catch (Exception e) {
             logger.error(String.format("Gremlin Extension: %s", e.getMessage()), e);
             extensionResponse = ExtensionResponse.error(e,
                     generateErrorJson(extensionMethod.getExtensionApiAsJson()));
+
+            failedExecutions.inc();
+        } finally {
+            context.stop();
         }
 
         return extensionResponse;
