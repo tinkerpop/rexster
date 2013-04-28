@@ -12,6 +12,8 @@ import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import com.tinkerpop.rexster.server.RexsterApplication;
+import com.yammer.metrics.Gauge;
+import com.yammer.metrics.MetricRegistry;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
@@ -34,6 +36,13 @@ public class SessionFilter extends BaseFilter {
 
     public SessionFilter(final RexsterApplication rexsterApplication) {
         this.rexsterApplication = rexsterApplication;
+
+        this.rexsterApplication.getMetricRegistry().register(MetricRegistry.name("rexpro", "sessions"), new Gauge<Integer>() {
+            @Override
+            public Integer getValue() {
+                return RexProSessions.getSessionKeys().size();
+            }
+        });
     }
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
