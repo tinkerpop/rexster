@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class is responsible for configuring the metric reporting options in Rexster.  This class takes the contents
@@ -83,11 +84,11 @@ public class ReporterConfig {
     }
 
     public String getRateTimeUnitConversion() {
-        return httpReporterConfig.getRealRateTimeUnitConversion().toString();
+        return isHttpReporterEnabled() ? httpReporterConfig.getRealRateTimeUnitConversion().toString() : TimeUnit.SECONDS.toString();
     }
 
     public String getDurationTimeUnitConversion() {
-        return httpReporterConfig.getRealDurationTimeUnitConversion().toString();
+        return isHttpReporterEnabled() ? httpReporterConfig.getRealDurationTimeUnitConversion().toString() : TimeUnit.SECONDS.toString();
     }
 
     public void enable() {
