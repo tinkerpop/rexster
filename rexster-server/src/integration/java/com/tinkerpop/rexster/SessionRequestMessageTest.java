@@ -13,7 +13,6 @@ import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import junit.framework.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
@@ -22,7 +21,7 @@ import java.util.UUID;
  *
  * @author Blake Eggleston (bdeggleston.github.com)
  */
-public class SessionRequestMessageTests extends AbstractRexProIntegrationTest {
+public class SessionRequestMessageTest extends AbstractRexProIntegrationTest {
 
     /**
      * Tests that requests to create and destroy sessions work as expected

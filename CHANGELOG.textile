@@ -16,6 +16,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 ```
 
 * Support server monitoring features via "Metrics":http://metrics.codahale.com/
+* Add performance testing.
 
 h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 

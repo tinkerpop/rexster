@@ -37,12 +37,15 @@ public class SessionFilter extends BaseFilter {
     public SessionFilter(final RexsterApplication rexsterApplication) {
         this.rexsterApplication = rexsterApplication;
 
-        this.rexsterApplication.getMetricRegistry().register(MetricRegistry.name("rexpro", "sessions"), new Gauge<Integer>() {
-            @Override
-            public Integer getValue() {
-                return RexProSessions.getSessionKeys().size();
-            }
-        });
+        final String metricName = MetricRegistry.name("rexpro", "sessions");
+        if (!this.rexsterApplication.getMetricRegistry().getGauges().containsKey(metricName)) {
+            this.rexsterApplication.getMetricRegistry().register(metricName, new Gauge<Integer>() {
+                @Override
+                public Integer getValue() {
+                    return RexProSessions.getSessionKeys().size();
+                }
+            });
+        }
     }
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {

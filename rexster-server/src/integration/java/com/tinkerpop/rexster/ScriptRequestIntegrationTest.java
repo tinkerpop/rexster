@@ -22,7 +22,7 @@ import java.util.UUID;
  *
  * @author Blake Eggleston (bdeggleston.github.com)
  */
-public class ScriptRequestIntegrationTests extends AbstractRexProIntegrationTest {
+public class ScriptRequestIntegrationTest extends AbstractRexProIntegrationTest {
 
     @Test
     public void testGraphObjMetaOnSessionlessRequest() throws Exception {

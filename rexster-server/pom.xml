@@ -205,6 +205,18 @@
             <version>2.5.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.carrotsearch</groupId>
+            <artifactId>junit-benchmarks</artifactId>
+            <version>0.6.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.3.171</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
@@ -242,6 +254,10 @@
                 <directory>${basedir}/src/integration/resources
                 </directory>
             </testResource>
+            <testResource>
+                <directory>${basedir}/src/performance/resources
+                </directory>
+            </testResource>
         </testResources>
         <plugins>
             <plugin>
@@ -272,6 +288,14 @@
                     </archive>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-Dhost=localhost -DhttpPort=8182 -DrexproPort=8184 -Djub.consumers=CONSOLE,H2 -Djub.db.file=target/performance/h2/benchmarks -Djub.charts.dir=target/performance/charts -Djub.customkey=${rexster.version}
+                    </argLine>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -284,6 +308,16 @@
             </activation>
             <properties>
                 <srcdir>src/integration/java</srcdir>
+            </properties>
+        </profile>
+        <profile>
+            <id>performance-test</id>
+            <activation>
+                <!-- keep this setting false for commit purposes -->
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <srcdir>src/performance/java</srcdir>
             </properties>
         </profile>
     </profiles>
