@@ -21,14 +21,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Read 800 vertices from gratefulgraph.
+ * Read 800 edges from gratefulgraph.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 @AxisRange(min = 0, max = 1)
-@BenchmarkMethodChart(filePrefix = "read-all-vertices")
-@BenchmarkHistoryChart(labelWith = LabelType.CUSTOM_KEY, maxRuns = 20, filePrefix = "hx-read-all-vertices")
-public class ScenarioReadAllVerticesTest extends AbstractRexsterPerformanceTest {
+@BenchmarkMethodChart(filePrefix = "read-many-edges")
+@BenchmarkHistoryChart(labelWith = LabelType.CUSTOM_KEY, maxRuns = 20, filePrefix = "hx-read-many-edges")
+public class ScenarioReadManyEdgesTest extends AbstractRexsterPerformanceTest {
 
     public final static int DEFAULT_BENCHMARK_ROUNDS = 10;
     public final static int DEFAULT_WARMUP_ROUNDS = 1;
@@ -76,18 +76,18 @@ public class ScenarioReadAllVerticesTest extends AbstractRexsterPerformanceTest 
     }
 
     private void tryRexproSessionless() throws Exception {
-        for (int ix = 1; ix < 801; ix++) {
+        for (int ix = 101; ix < 901; ix++) {
             final Map<String, Object> m = new HashMap<String, Object>();
             m.put("x", ix);
 
-            final List<Map<String, Object>> results = rexproClientGrateful.execute("g.v(x)", m);
+            final List<Map<String, Object>> results = rexproClientGrateful.execute("g.e(x)", m);
             Assert.assertEquals(String.valueOf(ix), results.get(0).get("_id"));
         }
     }
 
     private void tryRestGremlin() throws Exception {
-        final String url = getHttpBaseUri() + "graphs/gratefulgraph/tp/gremlin?script=" + URLEncoder.encode("g.v(x)") + "&params.x=";
-        for (int ix = 1; ix < 801; ix++) {
+        final String url = getHttpBaseUri() + "graphs/gratefulgraph/tp/gremlin?script=" + URLEncoder.encode("g.e(x)") + "&params.x=";
+        for (int ix = 101; ix < 901; ix++) {
             final ClientRequest request = ClientRequest.create().build(URI.create(url + String.valueOf(ix)), "GET");
             final ClientResponse response = httpClient.handle(request);
             final JSONObject json = response.getEntity(JSONObject.class);
@@ -96,8 +96,8 @@ public class ScenarioReadAllVerticesTest extends AbstractRexsterPerformanceTest 
     }
 
     private void tryRestApi() throws Exception {
-        final String url = getHttpBaseUri() + "graphs/gratefulgraph/vertices/";
-        for (int ix = 1; ix < 801; ix++) {
+        final String url = getHttpBaseUri() + "graphs/gratefulgraph/edges/";
+        for (int ix = 101; ix < 901; ix++) {
             final ClientRequest request = ClientRequest.create().build(URI.create(url + String.valueOf(ix)), "GET");
             final ClientResponse response = httpClient.handle(request);
             final JSONObject json = response.getEntity(JSONObject.class);
