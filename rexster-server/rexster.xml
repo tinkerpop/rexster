@@ -107,6 +107,9 @@
             <graph-read-only>true</graph-read-only>
             <graph-type>tinkergraph</graph-type>
             <graph-location>data/graph-example-1</graph-location>
+            <properties>
+                <file-type>graphson</file-type>
+            </properties>
             <extensions>
                 <allows>
                     <allow>tp:gremlin</allow>
@@ -117,6 +120,9 @@
             <graph-name>gratefulgraph</graph-name>
             <graph-type>com.tinkerpop.rexster.config.TinkerGraphGraphConfiguration</graph-type>
             <graph-location>data/graph-example-2</graph-location>
+            <properties>
+                <file-type>graphson</file-type>
+            </properties>
             <extensions>
                 <allows>
                     <allow>tp:gremlin</allow>
