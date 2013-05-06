@@ -75,9 +75,7 @@
             <graph-name>gratefulgraph</graph-name>
             <graph-type>com.tinkerpop.rexster.config.TinkerGraphGraphConfiguration</graph-type>
             <graph-location>data/graph-example-2</graph-location>
-            <properties>
-                <file-type>graphson</file-type>
-            </properties>
+            <graph-storage>graphson</graph-storage>
             <extensions>
                 <allows>
                     <allow>tp:gremlin</allow>
