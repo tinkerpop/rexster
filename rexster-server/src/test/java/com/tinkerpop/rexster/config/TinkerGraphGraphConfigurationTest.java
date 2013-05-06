@@ -14,11 +14,4 @@ public class TinkerGraphGraphConfigurationTest {
         Configuration graphConfig = new HierarchicalConfiguration();
         configuration.configureGraphInstance(graphConfig);
     }
-
-    @Test
-    public void configureGraphInstanceNoFileTypeConfig() throws GraphConfigurationException {
-        Configuration graphConfig = new HierarchicalConfiguration();
-        graphConfig.addProperty(Tokens.REXSTER_GRAPH_LOCATION, "some-file");
-        configuration.configureGraphInstance(graphConfig);
-    }
 }

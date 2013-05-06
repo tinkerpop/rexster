@@ -12,8 +12,8 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
  */
 public class MockTinkerTransactionalGraph extends TinkerGraph implements TransactionalGraph {
 
-    public MockTinkerTransactionalGraph(final String directory) {
-        super(directory);
+    public MockTinkerTransactionalGraph(final String directory, final FileType fileType) {
+        super(directory, fileType);
     }
 
     public MockTinkerTransactionalGraph() {

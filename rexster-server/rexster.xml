@@ -95,7 +95,9 @@
             <graph-name>tinkergraph</graph-name>
             <graph-type>tinkergraph</graph-type>
             <graph-location>data/graph-example-1</graph-location>
-            <graph-mock-tx>true</graph-mock-tx>
+            <properties>
+                <file-type>graphson</file-type>
+            </properties>
             <extensions>
                 <allows>
                     <allow>tp:gremlin</allow>

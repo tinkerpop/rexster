@@ -44,7 +44,7 @@ public class TinkerGraphGraphConfiguration implements GraphConfiguration {
                 } catch (IllegalArgumentException iae) {
                 }
 
-                return mockTx ? new MockTinkerTransactionalGraph(graphFile) : new TinkerGraph(graphFile, getFileType(fileType));
+                return mockTx ? new MockTinkerTransactionalGraph(graphFile, getFileType(fileType)) : new TinkerGraph(graphFile, getFileType(fileType));
             }
         } catch (Exception ex) {
             throw new GraphConfigurationException(ex);
