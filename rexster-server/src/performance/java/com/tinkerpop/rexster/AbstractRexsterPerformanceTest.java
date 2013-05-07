@@ -35,8 +35,8 @@ public abstract class AbstractRexsterPerformanceTest {
 
     protected static Client httpClient;
     protected static final ClientConfig clientConfiguration = new DefaultClientConfig();
-    protected static  RexsterClient rexproClientEmpty;
-    protected static  RexsterClient rexproClientGrateful;
+    protected static final ThreadLocal<RexsterClient> rexproClientEmpty = new ThreadLocal<RexsterClient>();
+    protected static final ThreadLocal<RexsterClient> rexproClientGrateful = new ThreadLocal<RexsterClient>();
 
     static {
         // kill all but the worst logging
@@ -67,14 +67,32 @@ public abstract class AbstractRexsterPerformanceTest {
         httpPort = System.getProperty("httpPort", "8182");
 
         httpClient = Client.create(clientConfiguration);
-        rexproClientEmpty = RexsterClientFactory.open(host, Integer.parseInt(rexproPort), "emptygraph");
-        rexproClientGrateful = RexsterClientFactory.open(host, Integer.parseInt(rexproPort), "gratefulgraph");
     }
 
     @AfterClass
     public static void tearDown() throws Exception {
         rexProServer.stop();
         httpServer.stop();
+    }
+
+    public RexsterClient getRexsterClientEmptyGraph() throws Exception {
+        RexsterClient rexsterClient = rexproClientEmpty.get();
+        if (rexsterClient == null) {
+            rexsterClient = RexsterClientFactory.open(host, Integer.parseInt(rexproPort), "emptygraph");
+            rexproClientEmpty.set(rexsterClient);
+        }
+
+        return rexsterClient;
+    }
+
+    public RexsterClient getRexsterClientGratefulGraph() throws Exception {
+        RexsterClient rexsterClient = rexproClientGrateful.get();
+        if (rexsterClient == null) {
+            rexsterClient = RexsterClientFactory.open(host, Integer.parseInt(rexproPort), "gratefulgraph");
+            rexproClientGrateful.set(rexsterClient);
+        }
+
+        return rexsterClient;
     }
 
     protected static String getRexProHost() {

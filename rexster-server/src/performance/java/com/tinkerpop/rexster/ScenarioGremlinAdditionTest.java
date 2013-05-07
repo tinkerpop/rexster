@@ -62,7 +62,7 @@ public class ScenarioGremlinAdditionTest extends AbstractRexsterPerformanceTest 
     }
 
     private void tryRexproSessionless() throws Exception {
-        final List<Long> results = rexproClientEmpty.execute("1+1");
+        final List<Long> results = getRexsterClientEmptyGraph().execute("1+1");
         Assert.assertEquals(2, results.get(0).intValue());
     }
 

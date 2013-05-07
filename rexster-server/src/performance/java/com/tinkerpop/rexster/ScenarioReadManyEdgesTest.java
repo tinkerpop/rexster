@@ -80,7 +80,7 @@ public class ScenarioReadManyEdgesTest extends AbstractRexsterPerformanceTest {
             final Map<String, Object> m = new HashMap<String, Object>();
             m.put("x", ix);
 
-            final List<Map<String, Object>> results = rexproClientGrateful.execute("g.e(x)", m);
+            final List<Map<String, Object>> results = getRexsterClientGratefulGraph().execute("g.e(x)", m);
             Assert.assertEquals(String.valueOf(ix), results.get(0).get("_id"));
         }
     }

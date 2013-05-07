@@ -76,7 +76,7 @@ public class ScenarioGremlinTraverseTest extends AbstractRexsterPerformanceTest 
             final Map<String, Object> m = new HashMap<String, Object>();
             m.put("x", iy * 8);
 
-            final List<Map<String, Object>> results = rexproClientGrateful.execute(traversal, m);
+            final List<Map<String, Object>> results = getRexsterClientGratefulGraph().execute(traversal, m);
             Assert.assertNotNull(results);
         }
 
@@ -85,7 +85,7 @@ public class ScenarioGremlinTraverseTest extends AbstractRexsterPerformanceTest 
             final Map<String, Object> m = new HashMap<String, Object>();
             m.put("x", artists[ix]);
 
-            final List<Map<String, Object>> results = rexproClientGrateful.execute(traversal, m);
+            final List<Map<String, Object>> results = getRexsterClientGratefulGraph().execute(traversal, m);
             Assert.assertNotNull(results);
         }
 
@@ -94,7 +94,7 @@ public class ScenarioGremlinTraverseTest extends AbstractRexsterPerformanceTest 
             final Map<String, Object> m = new HashMap<String, Object>();
             m.put("x", songs[ix]);
 
-            final List<Map<String, Object>> results = rexproClientGrateful.execute(traversal, m);
+            final List<Map<String, Object>> results = getRexsterClientGratefulGraph().execute(traversal, m);
             Assert.assertNotNull(results);
         }
     }
@@ -103,7 +103,7 @@ public class ScenarioGremlinTraverseTest extends AbstractRexsterPerformanceTest 
     private void tryRestGremlin() throws Exception {
         String traversal = traversals[0];
         for (int iy = 1; iy < 26; iy++) {
-            final String url = getHttpBaseUri() + "graphs/gratefulgraph/tp/gremlin?script=" + URLEncoder.encode(traversal) + "&params.x=";
+            final String url = getHttpBaseUri() + "graphs/gratefulgraph/tp/gremlin?script=" + URLEncoder.encode(traversal) + "&rexster.offset.end=" + Long.MAX_VALUE + "&params.x=";
             final ClientRequest request = ClientRequest.create().build(URI.create(url + String.valueOf(iy * 8)), "GET");
             final ClientResponse response = httpClient.handle(request);
             final JSONObject json = response.getEntity(JSONObject.class);
@@ -112,7 +112,7 @@ public class ScenarioGremlinTraverseTest extends AbstractRexsterPerformanceTest 
 
         traversal = traversals[1];
         for (int ix = 0; ix < 25; ix++) {
-            final String url = getHttpBaseUri() + "graphs/gratefulgraph/tp/gremlin?script=" + URLEncoder.encode(traversal) + "&params.x=";
+            final String url = getHttpBaseUri() + "graphs/gratefulgraph/tp/gremlin?script=" + URLEncoder.encode(traversal) + "&rexster.offset.end=" + Long.MAX_VALUE + "&params.x=";
             final ClientRequest request = ClientRequest.create().build(URI.create(url + String.valueOf(artists[ix])), "GET");
             final ClientResponse response = httpClient.handle(request);
             final JSONObject json = response.getEntity(JSONObject.class);
@@ -121,7 +121,7 @@ public class ScenarioGremlinTraverseTest extends AbstractRexsterPerformanceTest 
 
         traversal = traversals[2];
         for (int ix = 100; ix < 125; ix++) {
-            final String url = getHttpBaseUri() + "graphs/gratefulgraph/tp/gremlin?script=" + URLEncoder.encode(traversal) + "&params.x=";
+            final String url = getHttpBaseUri() + "graphs/gratefulgraph/tp/gremlin?script=" + URLEncoder.encode(traversal) + "&rexster.offset.end=" + Long.MAX_VALUE + "&params.x=";
             final ClientRequest request = ClientRequest.create().build(URI.create(url + String.valueOf(songs[ix])), "GET");
             final ClientResponse response = httpClient.handle(request);
             final JSONObject json = response.getEntity(JSONObject.class);
