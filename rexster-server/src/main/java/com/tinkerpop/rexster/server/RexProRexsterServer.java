@@ -8,12 +8,12 @@ import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
 import com.tinkerpop.rexster.protocol.filter.ScriptFilter;
 import com.tinkerpop.rexster.protocol.filter.SessionFilter;
 import com.yammer.metrics.JmxAttributeGauge;
-import com.yammer.metrics.JmxReporter;
 import com.yammer.metrics.MetricRegistry;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.IOStrategy;
+import org.glassfish.grizzly.filterchain.FilterChain;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
 import org.glassfish.grizzly.monitoring.jmx.GrizzlyJmxManager;
@@ -35,39 +35,62 @@ import java.util.concurrent.TimeUnit;
 public class RexProRexsterServer implements RexsterServer {
 
     private static final Logger logger = Logger.getLogger(RexProRexsterServer.class);
-    private final XMLConfiguration properties;
-    private final Integer rexproServerPort;
-    private final String rexproServerHost;
-    private final TCPNIOTransport tcpTransport;
-    private final boolean allowSessions;
-    private final int maxWorkerThreadPoolSize;
-    private final int coreWorkerThreadPoolSize;
-    private final int maxKernalThreadPoolSize;
-    private final int coreKernalThreadPoolSize;
-    private final int connectionIdleMax;
-    private final int connectionIdleInterval;
-    private final boolean enableJmx;
-    private final String ioStrategy;
 
-    public RexProRexsterServer(final XMLConfiguration properties) {
-        this(properties, true);
+    private RexsterApplication app;
+    private RexsterProperties properties;
+    private Integer rexproServerPort;
+    private String rexproServerHost;
+    private final TCPNIOTransport tcpTransport;
+    private boolean allowSessions;
+    private int maxWorkerThreadPoolSize;
+    private int coreWorkerThreadPoolSize;
+    private int maxKernalThreadPoolSize;
+    private int coreKernalThreadPoolSize;
+    private int connectionIdleMax;
+    private int connectionIdleInterval;
+    private boolean enableJmx;
+    private String ioStrategy;
+
+    public RexProRexsterServer(final XMLConfiguration configuration) {
+        this(configuration, true);
     }
 
-    public RexProRexsterServer(final XMLConfiguration properties, final boolean allowSessions) {
+    public RexProRexsterServer(final XMLConfiguration configuration, final boolean allowSessions) {
+        this(new RexsterProperties(configuration), allowSessions);
+    }
+
+    public RexProRexsterServer(final RexsterProperties properties, final boolean allowSessions) {
         this.allowSessions = allowSessions;
         this.properties = properties;
-        this.rexproServerPort = properties.getInteger("rexpro.server-port", new Integer(RexsterSettings.DEFAULT_REXPRO_PORT));
-        this.rexproServerHost = properties.getString("rexpro.server-host", "0.0.0.0");
-        this.coreWorkerThreadPoolSize = properties.getInt("rexpro.thread-pool.worker.core-size", 8);
-        this.maxWorkerThreadPoolSize = properties.getInt("rexpro.thread-pool.worker.max-size", 8);
-        this.coreKernalThreadPoolSize = properties.getInt("rexpro.thread-pool.kernal.core-size", 4);
-        this.maxKernalThreadPoolSize = properties.getInt("rexpro.thread-pool.kernal.max-size", 4);
-        this.connectionIdleMax = properties.getInt("rexpro.connection-max-idle", 180000);
-        this.connectionIdleInterval = properties.getInt("rexpro.connection-check-interval", 3000000);
-        this.enableJmx = properties.getBoolean("rexpro.enable-jmx", false);
-        this.ioStrategy = properties.getString("rexpro.io-strategy", "leader-follower");
+        updateSettings(properties.getConfiguration());
 
         this.tcpTransport = configureTransport();
+
+        properties.assignListener(new RexsterProperties.RexsterPropertiesListener() {
+            @Override
+            public void propertiesChanged(final XMLConfiguration configuration) {
+                updateSettings(configuration);
+
+                try {
+                    restart(app, true);
+                } catch (Exception ex) {
+                    logger.error("Could not modify Rexster configuration.  Please restart Rexster to allow changes to be applied.", ex);
+                }
+            }
+        });
+    }
+
+    private void updateSettings(final XMLConfiguration configuration) {
+        this.rexproServerPort = configuration.getInteger("rexpro.server-port", new Integer(RexsterSettings.DEFAULT_REXPRO_PORT));
+        this.rexproServerHost = configuration.getString("rexpro.server-host", "0.0.0.0");
+        this.coreWorkerThreadPoolSize = configuration.getInt("rexpro.thread-pool.worker.core-size", 8);
+        this.maxWorkerThreadPoolSize = configuration.getInt("rexpro.thread-pool.worker.max-size", 8);
+        this.coreKernalThreadPoolSize = configuration.getInt("rexpro.thread-pool.kernal.core-size", 4);
+        this.maxKernalThreadPoolSize = configuration.getInt("rexpro.thread-pool.kernal.max-size", 4);
+        this.connectionIdleMax = configuration.getInt("rexpro.connection-max-idle", 180000);
+        this.connectionIdleInterval = configuration.getInt("rexpro.connection-check-interval", 3000000);
+        this.enableJmx = configuration.getBoolean("rexpro.enable-jmx", false);
+        this.ioStrategy = configuration.getString("rexpro.io-strategy", "leader-follower");
     }
 
     @Override
@@ -77,6 +100,61 @@ public class RexProRexsterServer implements RexsterServer {
 
     @Override
     public void start(final RexsterApplication application) throws Exception {
+        this.app = application;
+        restart(application, false);
+    }
+
+    public void restart(final RexsterApplication application, final boolean restart) throws Exception {
+        final IOStrategy strategy = GrizzlyIoStrategyFactory.createIoStrategy(this.ioStrategy);
+
+        logger.info(String.format("Using %s IOStrategy for RexPro.", strategy.getClass().getName()));
+
+        this.tcpTransport.setIOStrategy(strategy);
+        this.tcpTransport.setProcessor(constructFilterChain(application));
+
+        // unbind everything first then bind back if changed.
+        // TODO: maybe it should only unbind if there is a change
+        this.tcpTransport.unbindAll();
+        this.tcpTransport.bind(rexproServerHost, rexproServerPort);
+
+        if (this.enableJmx) {
+            final JmxObject jmx = this.tcpTransport.getMonitoringConfig().createManagementObject();
+            GrizzlyJmxManager.instance().registerAtRoot(jmx, "RexPro");
+
+            // the JMX settings below pipe in metrics from Grizzly.  don't register twice.
+            if (!restart) {
+                final MetricRegistry metricRegistry = application.getMetricRegistry();
+                registerMetricsFromJmx(metricRegistry);
+            }
+        } else {
+            // only need to deregister if this is a restart.  on initial run, no jmx is enabled.
+            if (restart) {
+                final JmxObject jmx = this.tcpTransport.getMonitoringConfig().createManagementObject();
+                try {
+                    GrizzlyJmxManager.instance().deregister(jmx);
+                } catch (IllegalArgumentException iae) {
+                    logger.debug("Could not deregister JMX object on restart.  Perhaps it was never initially registered.");
+                }
+            }
+        }
+
+        // no need to restart the transport if already running
+        if (!restart) {
+            this.tcpTransport.start();
+        }
+
+        // TODO: let's just not try to reconfigure this right now....................
+        if (!restart) {
+            // initialize the session monitor for rexpro to clean up dead sessions.
+            final Long rexProSessionMaxIdle = properties.getRexProSessionMaxIdle();
+            final Long rexProSessionCheckInterval = properties.getRexProSessionCheckInterval();
+            new RexProSessionMonitor(rexProSessionMaxIdle, rexProSessionCheckInterval);
+        }
+
+        logger.info("RexPro serving on port: [" + rexproServerPort + "]");
+    }
+
+    private FilterChain constructFilterChain(final RexsterApplication application) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
         filterChainBuilder.add(new TransportFilter());
         filterChainBuilder.add(new IdleTimeoutFilter(
@@ -84,13 +162,7 @@ public class RexProRexsterServer implements RexsterServer {
                 this.connectionIdleMax, TimeUnit.MILLISECONDS));
         filterChainBuilder.add(new RexProMessageFilter());
 
-        HierarchicalConfiguration securityConfiguration = null;
-        try {
-            securityConfiguration = properties.configurationAt(Tokens.REXSTER_SECURITY_AUTH);
-        } catch (IllegalArgumentException iae) {
-            // do nothing...null is cool
-        }
-
+        HierarchicalConfiguration securityConfiguration = properties.getSecuritySettings();
         final String securityFilterType = securityConfiguration != null ? securityConfiguration.getString("type") : Tokens.REXSTER_SECURITY_NONE;
         if (securityFilterType.equals(Tokens.REXSTER_SECURITY_NONE)) {
             logger.info("Rexster configured with no security.");
@@ -104,7 +176,7 @@ public class RexProRexsterServer implements RexsterServer {
                 filterChainBuilder.add(filter);
             }
 
-            filter.configure(properties);
+            filter.configure(properties.getConfiguration());
 
             logger.info("Rexster configured with [" + filter.getName() + "].");
         }
@@ -114,35 +186,7 @@ public class RexProRexsterServer implements RexsterServer {
         }
 
         filterChainBuilder.add(new ScriptFilter(application));
-
-        final IOStrategy strategy = GrizzlyIoStrategyFactory.createIoStrategy(this.ioStrategy);
-
-        logger.info(String.format("Using %s IOStrategy for RexPro.", strategy.getClass().getName()));
-
-        this.tcpTransport.setIOStrategy(strategy);
-        this.tcpTransport.setProcessor(filterChainBuilder.build());
-        this.tcpTransport.bind(rexproServerHost, rexproServerPort);
-
-        final MetricRegistry metricRegistry = application.getMetricRegistry();
-
-        if (this.enableJmx) {
-            final JmxObject jmx = this.tcpTransport.getMonitoringConfig().createManagementObject();
-            GrizzlyJmxManager.instance().registerAtRoot(jmx, "RexPro");
-
-            // the JMX settings below pipe in metrics from Grizzly.
-            registerMetricsFromJmx(metricRegistry);
-        }
-
-        this.tcpTransport.start();
-
-        // initialize the session monitor for rexpro to clean up dead sessions.
-        final Long rexProSessionMaxIdle = properties.getLong("rexpro.session-max-idle",
-                new Long(RexsterSettings.DEFAULT_REXPRO_SESSION_MAX_IDLE));
-        final Long rexProSessionCheckInterval = properties.getLong("rexpro.session-check-interval",
-                new Long(RexsterSettings.DEFAULT_REXPRO_SESSION_CHECK_INTERVAL));
-        new RexProSessionMonitor(rexProSessionMaxIdle, rexProSessionCheckInterval);
-
-        logger.info("RexPro serving on port: [" + rexproServerPort + "]");
+        return filterChainBuilder.build();
     }
 
     private static void registerMetricsFromJmx(final MetricRegistry metricRegistry) throws MalformedObjectNameException {

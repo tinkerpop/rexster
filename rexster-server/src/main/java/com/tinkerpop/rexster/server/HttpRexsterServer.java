@@ -98,6 +98,10 @@ public class HttpRexsterServer implements RexsterServer {
         this.httpServer = new HttpServer();
     }
 
+    public HttpRexsterServer(final RexsterProperties properties) {
+        this(properties.getConfiguration());
+    }
+
     @Override
     public void stop() throws Exception {
         this.httpServer.stop();
