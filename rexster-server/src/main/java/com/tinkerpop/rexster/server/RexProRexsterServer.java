@@ -51,6 +51,13 @@ public class RexProRexsterServer implements RexsterServer {
     private boolean enableJmx;
     private String ioStrategy;
 
+    private boolean metricsLoaded = false;
+    private JmxObject jmx;
+
+    private Integer lastRexproServerPort;
+    private String lastRexproServerHost;
+    private boolean lastEnableJmx;
+
     public RexProRexsterServer(final XMLConfiguration configuration) {
         this(configuration, true);
     }
@@ -69,6 +76,11 @@ public class RexProRexsterServer implements RexsterServer {
         properties.assignListener(new RexsterProperties.RexsterPropertiesListener() {
             @Override
             public void propertiesChanged(final XMLConfiguration configuration) {
+                // maintain history of previous settings
+                lastRexproServerHost = rexproServerHost;
+                lastRexproServerPort = rexproServerPort;
+                lastEnableJmx = enableJmx;
+
                 updateSettings(configuration);
 
                 try {
@@ -78,19 +90,6 @@ public class RexProRexsterServer implements RexsterServer {
                 }
             }
         });
-    }
-
-    private void updateSettings(final XMLConfiguration configuration) {
-        this.rexproServerPort = configuration.getInteger("rexpro.server-port", new Integer(RexsterSettings.DEFAULT_REXPRO_PORT));
-        this.rexproServerHost = configuration.getString("rexpro.server-host", "0.0.0.0");
-        this.coreWorkerThreadPoolSize = configuration.getInt("rexpro.thread-pool.worker.core-size", 8);
-        this.maxWorkerThreadPoolSize = configuration.getInt("rexpro.thread-pool.worker.max-size", 8);
-        this.coreKernalThreadPoolSize = configuration.getInt("rexpro.thread-pool.kernal.core-size", 4);
-        this.maxKernalThreadPoolSize = configuration.getInt("rexpro.thread-pool.kernal.max-size", 4);
-        this.connectionIdleMax = configuration.getInt("rexpro.connection-max-idle", 180000);
-        this.connectionIdleInterval = configuration.getInt("rexpro.connection-check-interval", 3000000);
-        this.enableJmx = configuration.getBoolean("rexpro.enable-jmx", false);
-        this.ioStrategy = configuration.getString("rexpro.io-strategy", "leader-follower");
     }
 
     @Override
@@ -113,27 +112,32 @@ public class RexProRexsterServer implements RexsterServer {
         this.tcpTransport.setProcessor(constructFilterChain(application));
 
         // unbind everything first then bind back if changed.
-        // TODO: maybe it should only unbind if there is a change
-        this.tcpTransport.unbindAll();
-        this.tcpTransport.bind(rexproServerHost, rexproServerPort);
+        if (this.hasPortHostChanged()) {
+            this.tcpTransport.unbindAll();
+            this.tcpTransport.bind(rexproServerHost, rexproServerPort);
 
-        if (this.enableJmx) {
-            final JmxObject jmx = this.tcpTransport.getMonitoringConfig().createManagementObject();
-            GrizzlyJmxManager.instance().registerAtRoot(jmx, "RexPro");
+            logger.info(String.format("RexPro Server bound to [%s:%s]", rexproServerHost, rexproServerPort));
+        }
 
-            // the JMX settings below pipe in metrics from Grizzly.  don't register twice.
-            if (!restart) {
-                final MetricRegistry metricRegistry = application.getMetricRegistry();
-                registerMetricsFromJmx(metricRegistry);
-            }
-        } else {
-            // only need to deregister if this is a restart.  on initial run, no jmx is enabled.
-            if (restart) {
-                final JmxObject jmx = this.tcpTransport.getMonitoringConfig().createManagementObject();
-                try {
-                    GrizzlyJmxManager.instance().deregister(jmx);
-                } catch (IllegalArgumentException iae) {
-                    logger.debug("Could not deregister JMX object on restart.  Perhaps it was never initially registered.");
+        if (hasEnableJmxChanged()) {
+            if (this.enableJmx) {
+                jmx = this.tcpTransport.getMonitoringConfig().createManagementObject();
+                GrizzlyJmxManager.instance().registerAtRoot(jmx, "RexPro");
+                manageJmxMetrics(application, true);
+                logger.info("JMX enabled on RexPro.");
+            } else {
+                // only need to deregister if this is a restart.  on initial run, no jmx is enabled.
+                if (restart) {
+                    try {
+                        GrizzlyJmxManager.instance().deregister(jmx);
+                        manageJmxMetrics(application, false);
+                    } catch (IllegalArgumentException iae) {
+                        logger.debug("Could not deregister JMX object on restart.  Perhaps it was never initially registered.");
+                    } finally {
+                        jmx = null;
+                    }
+
+                    logger.info("JMX disabled on RexPro.");
                 }
             }
         }
@@ -150,8 +154,34 @@ public class RexProRexsterServer implements RexsterServer {
             final Long rexProSessionCheckInterval = properties.getRexProSessionCheckInterval();
             new RexProSessionMonitor(rexProSessionMaxIdle, rexProSessionCheckInterval);
         }
+    }
 
-        logger.info("RexPro serving on port: [" + rexproServerPort + "]");
+    private void manageJmxMetrics(final RexsterApplication application, final boolean register) throws MalformedObjectNameException {
+        // the JMX settings below pipe in metrics from Grizzly.
+        final MetricRegistry metricRegistry = application.getMetricRegistry();
+            manageMetricsFromJmx(metricRegistry, register);
+            logger.info(register ? "Registered JMX Metrics." : "Removed JMX Metrics.");
+    }
+
+    private boolean hasPortHostChanged() {
+        return !this.rexproServerPort.equals(this.lastRexproServerPort) || !this.lastRexproServerHost.equals(this.rexproServerHost);
+    }
+
+    private boolean hasEnableJmxChanged() {
+        return this.enableJmx != this.lastEnableJmx;
+    }
+
+    private void updateSettings(final XMLConfiguration configuration) {
+        this.rexproServerPort = configuration.getInteger("rexpro.server-port", new Integer(RexsterSettings.DEFAULT_REXPRO_PORT));
+        this.rexproServerHost = configuration.getString("rexpro.server-host", "0.0.0.0");
+        this.coreWorkerThreadPoolSize = configuration.getInt("rexpro.thread-pool.worker.core-size", 8);
+        this.maxWorkerThreadPoolSize = configuration.getInt("rexpro.thread-pool.worker.max-size", 8);
+        this.coreKernalThreadPoolSize = configuration.getInt("rexpro.thread-pool.kernal.core-size", 4);
+        this.maxKernalThreadPoolSize = configuration.getInt("rexpro.thread-pool.kernal.max-size", 4);
+        this.connectionIdleMax = configuration.getInt("rexpro.connection-max-idle", 180000);
+        this.connectionIdleInterval = configuration.getInt("rexpro.connection-check-interval", 3000000);
+        this.enableJmx = configuration.getBoolean("rexpro.enable-jmx", false);
+        this.ioStrategy = configuration.getString("rexpro.io-strategy", "leader-follower");
     }
 
     private FilterChain constructFilterChain(final RexsterApplication application) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
@@ -189,45 +219,58 @@ public class RexProRexsterServer implements RexsterServer {
         return filterChainBuilder.build();
     }
 
-    private static void registerMetricsFromJmx(final MetricRegistry metricRegistry) throws MalformedObjectNameException {
+    private static void manageMetricsFromJmx(final MetricRegistry metricRegistry, final boolean register) throws MalformedObjectNameException {
         final String jmxObjectMemoryManager = "org.glassfish.grizzly:pp=/gmbal-root/TCPNIOTransport[RexPro],type=HeapMemoryManager,name=MemoryManager";
         final String metricGroupMemoryManager = "heap-memory-manager";
-        registerJmxKeyAsMetric(metricRegistry, metricGroupMemoryManager, jmxObjectMemoryManager, "pool-allocated-bytes");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupMemoryManager, jmxObjectMemoryManager, "pool-released-bytes");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupMemoryManager, jmxObjectMemoryManager, "real-allocated-bytes");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupMemoryManager, jmxObjectMemoryManager, "total-allocated-bytes");
+        final String[] heapMemoryManagerMetrics = new String[] {
+                "pool-allocated-bytes", "pool-released-bytes", "real-allocated-bytes", "total-allocated-bytes"
+        };
+
+        managerJmxKeysAsMetric(metricRegistry, jmxObjectMemoryManager, metricGroupMemoryManager, heapMemoryManagerMetrics, register);
 
         final String jmxObjectTcpNioTransport = "org.glassfish.grizzly:pp=/gmbal-root,type=TCPNIOTransport,name=RexPro";
         final String metricGroupTcpNioTransport = "tcp-nio-transport";
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "bound-addresses");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "bytes-read");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "bytes-written");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "client-connect-timeout-millis");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "io-strategy");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "open-connections-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "read-buffer-size");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "selector-threads-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "server-socket-so-timeout");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "total-connections-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "write-buffer-size");
+        final String[] tcpNioTransportMetrics = new String[] {
+                "bound-addresses", "bytes-read" , "bytes-written", "client-connect-timeout-millis", "io-strategy",
+                "open-connections-count", "read-buffer-size", "selector-threads-count", "server-socket-so-timeout",
+                "total-connections-count", "write-buffer-size"
+        };
+
+        managerJmxKeysAsMetric(metricRegistry, jmxObjectTcpNioTransport, metricGroupTcpNioTransport, tcpNioTransportMetrics, register);
 
         final String jmxObjectThreadPool = "org.glassfish.grizzly:pp=/gmbal-root/TCPNIOTransport[RexPro],type=ThreadPool,name=ThreadPool";
         final String metricGroupThreadPool = "thread-pool";
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-allocated-thread-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-core-pool-size");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-max-num-threads");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-queued-task-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-task-queue-overflow-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-total-allocated-thread-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-total-completed-tasks-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-type");
+        final String[] threadPoolMetrics = new String [] {
+                "thread-pool-allocated-thread-count", "thread-pool-core-pool-size", "thread-pool-max-num-threads",
+                "thread-pool-queued-task-count", "thread-pool-task-queue-overflow-count",
+                "thread-pool-total-allocated-thread-count", "thread-pool-total-completed-tasks-count",
+                "thread-pool-type"
+        };
+
+        managerJmxKeysAsMetric(metricRegistry, jmxObjectThreadPool, metricGroupThreadPool, threadPoolMetrics, register);
     }
 
-    private static void registerJmxKeyAsMetric(final MetricRegistry metricRegistry, final String metricGroup, final String jmxObjectName, final String jmxAttributeName) throws MalformedObjectNameException  {
+    private static void managerJmxKeysAsMetric(final MetricRegistry metricRegistry, final String jmxObjectName,
+                                               final String metricGroup, final String[] metricKeys,
+                                               final boolean register) throws MalformedObjectNameException {
+        for (String metricKey : metricKeys) {
+            if (register)
+                registerJmxKeyAsMetric(metricRegistry, metricGroup, jmxObjectName, metricKey);
+            else
+                deregisterJmxKeyAsMetric(metricRegistry, metricGroup, jmxObjectName, metricKey);
+        }
+    }
+
+    private static void registerJmxKeyAsMetric(final MetricRegistry metricRegistry, final String metricGroup,
+                                               final String jmxObjectName, final String jmxAttributeName) throws MalformedObjectNameException  {
         metricRegistry.register(MetricRegistry.name("rexpro", "core", metricGroup, jmxAttributeName),
                 new JmxAttributeGauge(new ObjectName(jmxObjectName), jmxAttributeName));
     }
 
+    private static void deregisterJmxKeyAsMetric(final MetricRegistry metricRegistry, final String metricGroup,
+                                                 final String jmxObjectName, final String jmxAttributeName) throws MalformedObjectNameException  {
+        metricRegistry.remove(MetricRegistry.name("rexpro", "core", metricGroup, jmxAttributeName));
+    }
 
     private TCPNIOTransport configureTransport() {
         final TCPNIOTransport tcpTransport = TCPNIOTransportBuilder.newInstance().build();
