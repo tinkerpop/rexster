@@ -20,6 +20,7 @@ import org.glassfish.grizzly.monitoring.jmx.GrizzlyJmxManager;
 import org.glassfish.grizzly.monitoring.jmx.JmxObject;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
+import org.glassfish.grizzly.threadpool.GrizzlyExecutorService;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 import org.glassfish.grizzly.utils.IdleTimeoutFilter;
 
@@ -56,7 +57,12 @@ public class RexProRexsterServer implements RexsterServer {
 
     private Integer lastRexproServerPort;
     private String lastRexproServerHost;
+    private String lastIoStrategy;
     private boolean lastEnableJmx;
+    private int lastMaxWorkerThreadPoolSize;
+    private int lastCoreWorkerThreadPoolSize;
+    private int lastMaxKernalThreadPoolSize;
+    private int lastCoreKernalThreadPoolSize;
 
     public RexProRexsterServer(final XMLConfiguration configuration) {
         this(configuration, true);
@@ -71,7 +77,8 @@ public class RexProRexsterServer implements RexsterServer {
         this.properties = properties;
         updateSettings(properties.getConfiguration());
 
-        this.tcpTransport = configureTransport();
+        // initialize the transport
+        this.tcpTransport = TCPNIOTransportBuilder.newInstance().build();
 
         properties.assignListener(new RexsterProperties.RexsterPropertiesListener() {
             @Override
@@ -80,6 +87,11 @@ public class RexProRexsterServer implements RexsterServer {
                 lastRexproServerHost = rexproServerHost;
                 lastRexproServerPort = rexproServerPort;
                 lastEnableJmx = enableJmx;
+                lastIoStrategy = ioStrategy;
+                lastMaxWorkerThreadPoolSize = maxWorkerThreadPoolSize;
+                lastCoreWorkerThreadPoolSize = coreWorkerThreadPoolSize;
+                lastMaxKernalThreadPoolSize = maxKernalThreadPoolSize;
+                lastCoreKernalThreadPoolSize = coreKernalThreadPoolSize;
 
                 updateSettings(configuration);
 
@@ -104,20 +116,9 @@ public class RexProRexsterServer implements RexsterServer {
     }
 
     public void restart(final RexsterApplication application, final boolean restart) throws Exception {
-        final IOStrategy strategy = GrizzlyIoStrategyFactory.createIoStrategy(this.ioStrategy);
 
-        logger.info(String.format("Using %s IOStrategy for RexPro.", strategy.getClass().getName()));
-
-        this.tcpTransport.setIOStrategy(strategy);
-        this.tcpTransport.setProcessor(constructFilterChain(application));
-
-        // unbind everything first then bind back if changed.
-        if (this.hasPortHostChanged()) {
-            this.tcpTransport.unbindAll();
-            this.tcpTransport.bind(rexproServerHost, rexproServerPort);
-
-            logger.info(String.format("RexPro Server bound to [%s:%s]", rexproServerHost, rexproServerPort));
-        }
+        // configure the tcp/nio transport
+        this.configureTransport();
 
         if (hasEnableJmxChanged()) {
             if (this.enableJmx) {
@@ -142,8 +143,8 @@ public class RexProRexsterServer implements RexsterServer {
             }
         }
 
-        // no need to restart the transport if already running
-        if (!restart) {
+        // start the transport if not already running.
+        if (this.tcpTransport.isStopped()) {
             this.tcpTransport.start();
         }
 
@@ -169,6 +170,15 @@ public class RexProRexsterServer implements RexsterServer {
 
     private boolean hasEnableJmxChanged() {
         return this.enableJmx != this.lastEnableJmx;
+    }
+
+    private boolean hasIoStrategyChanged() {
+        return !this.ioStrategy.equals(this.lastIoStrategy);
+    }
+
+    private boolean hasThreadPoolSizeChanged() {
+        return this.maxKernalThreadPoolSize != lastMaxKernalThreadPoolSize || this.maxWorkerThreadPoolSize != lastMaxWorkerThreadPoolSize
+                || this.coreKernalThreadPoolSize != lastCoreKernalThreadPoolSize || this.coreWorkerThreadPoolSize != this.lastCoreWorkerThreadPoolSize;
     }
 
     private void updateSettings(final XMLConfiguration configuration) {
@@ -257,7 +267,7 @@ public class RexProRexsterServer implements RexsterServer {
             if (register)
                 registerJmxKeyAsMetric(metricRegistry, metricGroup, jmxObjectName, metricKey);
             else
-                deregisterJmxKeyAsMetric(metricRegistry, metricGroup, jmxObjectName, metricKey);
+                deregisterJmxKeyAsMetric(metricRegistry, metricGroup, metricKey);
         }
     }
 
@@ -268,21 +278,51 @@ public class RexProRexsterServer implements RexsterServer {
     }
 
     private static void deregisterJmxKeyAsMetric(final MetricRegistry metricRegistry, final String metricGroup,
-                                                 final String jmxObjectName, final String jmxAttributeName) throws MalformedObjectNameException  {
+                                                 final String jmxAttributeName) throws MalformedObjectNameException  {
         metricRegistry.remove(MetricRegistry.name("rexpro", "core", metricGroup, jmxAttributeName));
     }
 
-    private TCPNIOTransport configureTransport() {
-        final TCPNIOTransport tcpTransport = TCPNIOTransportBuilder.newInstance().build();
-        final ThreadPoolConfig workerThreadPoolConfig = ThreadPoolConfig.defaultConfig()
-                .setCorePoolSize(coreWorkerThreadPoolSize)
-                .setMaxPoolSize(maxWorkerThreadPoolSize);
-        tcpTransport.setWorkerThreadPoolConfig(workerThreadPoolConfig);
-        final ThreadPoolConfig kernalThreadPoolConfig = ThreadPoolConfig.defaultConfig()
-                .setCorePoolSize(coreKernalThreadPoolSize)
-                .setMaxPoolSize(maxKernalThreadPoolSize);
-        tcpTransport.setKernelThreadPoolConfig(kernalThreadPoolConfig);
+    private void configureTransport() throws Exception {
+        if (this.hasIoStrategyChanged()) {
+            final IOStrategy strategy = GrizzlyIoStrategyFactory.createIoStrategy(this.ioStrategy);
+            this.tcpTransport.setIOStrategy(strategy);
 
-        return tcpTransport;
+            logger.info(String.format("Using %s IOStrategy for RexPro.", strategy.getClass().getName()));
+        }
+
+        if (hasThreadPoolSizeChanged()) {
+            final ThreadPoolConfig workerThreadPoolConfig = ThreadPoolConfig.defaultConfig()
+                    .setCorePoolSize(coreWorkerThreadPoolSize)
+                    .setMaxPoolSize(maxWorkerThreadPoolSize);
+            tcpTransport.setWorkerThreadPoolConfig(workerThreadPoolConfig);
+            final ThreadPoolConfig kernalThreadPoolConfig = ThreadPoolConfig.defaultConfig()
+                    .setCorePoolSize(coreKernalThreadPoolSize)
+                    .setMaxPoolSize(maxKernalThreadPoolSize);
+            tcpTransport.setKernelThreadPoolConfig(kernalThreadPoolConfig);
+
+            // if the threadpool is initialized then call reconfigure to reset the threadpool
+            if (tcpTransport.getKernelThreadPool() != null) {
+                ((GrizzlyExecutorService) tcpTransport.getKernelThreadPool()).reconfigure(kernalThreadPoolConfig);
+            }
+
+            if (tcpTransport.getWorkerThreadPool() != null) {
+                ((GrizzlyExecutorService) tcpTransport.getWorkerThreadPool()).reconfigure(workerThreadPoolConfig);
+            }
+
+            logger.info(String.format("RexPro thread pool configuration: kernal[%s / %s] worker[%s / %s] ",
+                    coreKernalThreadPoolSize, maxKernalThreadPoolSize,
+                    coreWorkerThreadPoolSize, maxWorkerThreadPoolSize));
+
+        }
+
+        this.tcpTransport.setProcessor(constructFilterChain(app));
+
+        // unbind everything first then bind back if changed.
+        if (this.hasPortHostChanged()) {
+            this.tcpTransport.unbindAll();
+            this.tcpTransport.bind(rexproServerHost, rexproServerPort);
+
+            logger.info(String.format("RexPro Server bound to [%s:%s]", rexproServerHost, rexproServerPort));
+        }
     }
 }
