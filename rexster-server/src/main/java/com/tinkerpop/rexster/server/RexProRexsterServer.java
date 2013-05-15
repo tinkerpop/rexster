@@ -52,7 +52,6 @@ public class RexProRexsterServer implements RexsterServer {
     private boolean enableJmx;
     private String ioStrategy;
 
-    private boolean metricsLoaded = false;
     private JmxObject jmx;
     private RexProSessionMonitor rexProSessionMonitor = new RexProSessionMonitor();
 
@@ -83,7 +82,7 @@ public class RexProRexsterServer implements RexsterServer {
         // initialize the transport
         this.tcpTransport = TCPNIOTransportBuilder.newInstance().build();
 
-        properties.assignListener(new RexsterProperties.RexsterPropertiesListener() {
+        properties.addListener(new RexsterProperties.RexsterPropertiesListener() {
             @Override
             public void propertiesChanged(final XMLConfiguration configuration) {
                 // maintain history of previous settings

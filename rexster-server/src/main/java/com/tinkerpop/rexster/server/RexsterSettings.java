@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.server;
 
-import com.tinkerpop.rexster.util.JuliToLog4jHandler;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -8,16 +7,9 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
 
 /**
  * RexsterSettings is the combination of the Rexster configuration options and command line overrides.
@@ -25,8 +17,6 @@ import java.util.logging.LogManager;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RexsterSettings {
-
-    private static final Logger logger = Logger.getLogger(RexsterSettings.class);
 
     public static final int DEFAULT_HTTP_PORT = 8182;
     public static final int DEFAULT_SHUTDOWN_PORT = 8183;

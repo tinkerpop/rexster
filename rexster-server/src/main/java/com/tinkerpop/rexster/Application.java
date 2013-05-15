@@ -93,7 +93,7 @@ public class Application {
 
         // get the graph configurations from the XML config file
         this.properties = properties;
-        this.rexsterApplication = new XmlRexsterApplication(this.properties.getGraphConfigurations());
+        this.rexsterApplication = new XmlRexsterApplication(this.properties);
 
         final ReporterConfig reporterConfig = ReporterConfig.load(properties.getReporterConfigurations(), this.rexsterApplication.getMetricRegistry());
         this.properties.addOverride("http-reporter-enabled", reporterConfig.isHttpReporterEnabled());

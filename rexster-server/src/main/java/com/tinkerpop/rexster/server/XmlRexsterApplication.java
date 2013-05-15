@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.server;
 import com.tinkerpop.rexster.config.GraphConfigurationContainer;
 import com.tinkerpop.rexster.config.GraphConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -22,8 +23,26 @@ public class XmlRexsterApplication extends AbstractMapRexsterApplication {
      * @param graphConfigs  graph configuration settings.
      */
     public XmlRexsterApplication(final List<HierarchicalConfiguration> graphConfigs) {
+        this.reconfigure(graphConfigs);
+    }
+
+    /**
+     * Create new XmlRexsterApplication
+     */
+    public XmlRexsterApplication(final RexsterProperties properties) {
+        properties.addListener(new RexsterProperties.RexsterPropertiesListener() {
+            @Override
+            public void propertiesChanged(XMLConfiguration configuration) {
+                reconfigure(properties.getGraphConfigurations());
+            }
+        });
+        this.reconfigure(properties.getGraphConfigurations());
+    }
+
+    public synchronized void reconfigure(final List<HierarchicalConfiguration> graphConfigs) {
         try {
             final GraphConfigurationContainer container = new GraphConfigurationContainer(graphConfigs);
+            this.graphs.clear();
             this.graphs.putAll(container.getApplicationGraphs());
         } catch (GraphConfigurationException gce) {
             logger.error("Graph initialization failed. Check the graph configuration in rexster.xml.");

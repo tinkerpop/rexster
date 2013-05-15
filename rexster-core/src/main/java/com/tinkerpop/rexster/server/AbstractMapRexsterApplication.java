@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Base class for implementations that need to use a Map to hold graphs served by Rexster.
@@ -22,7 +23,7 @@ public abstract class AbstractMapRexsterApplication implements RexsterApplicatio
 
     protected final long startTime = System.currentTimeMillis();
 
-    protected final Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+    protected final Map<String, RexsterApplicationGraph> graphs = new ConcurrentHashMap<String, RexsterApplicationGraph>();
 
     @Override
     public Graph getGraph(final String graphName) {

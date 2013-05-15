@@ -22,7 +22,7 @@ public class RexsterProperties extends FileAlterationListenerAdaptor {
     private static final Logger logger = Logger.getLogger(RexsterProperties.class);
 
     private XMLConfiguration configuration;
-    private RexsterPropertiesListener listener;
+    private final List<RexsterPropertiesListener> listeners = new ArrayList<RexsterPropertiesListener>();
     private final List<RexsterPropertyOverride> overrides = new ArrayList<RexsterPropertyOverride>();
 
     public RexsterProperties(final XMLConfiguration configuration) {
@@ -99,8 +99,8 @@ public class RexsterProperties extends FileAlterationListenerAdaptor {
         }
     }
 
-    public void assignListener(final RexsterPropertiesListener listener) {
-        this.listener = listener;
+    public void addListener(final RexsterPropertiesListener listener) {
+        this.listeners.add(listener);
     }
 
     public void addOverride(final String overrideKey, final Object overrideValue) {
@@ -117,7 +117,9 @@ public class RexsterProperties extends FileAlterationListenerAdaptor {
             configuration.setProperty(override.getKeyToOverride(), override.getOverrideValue());
         }
 
-        listener.propertiesChanged(configuration);
+        for (RexsterPropertiesListener listener : listeners) {
+            listener.propertiesChanged(configuration);
+        }
     }
 
     interface RexsterPropertiesListener {
