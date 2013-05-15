@@ -47,13 +47,14 @@ public class RexProRexsterServer implements RexsterServer {
     private int coreWorkerThreadPoolSize;
     private int maxKernalThreadPoolSize;
     private int coreKernalThreadPoolSize;
-    private int connectionIdleMax;
-    private int connectionIdleInterval;
+    private long connectionIdleMax;
+    private long connectionIdleInterval;
     private boolean enableJmx;
     private String ioStrategy;
 
     private boolean metricsLoaded = false;
     private JmxObject jmx;
+    private RexProSessionMonitor rexProSessionMonitor = new RexProSessionMonitor();
 
     private Integer lastRexproServerPort;
     private String lastRexproServerHost;
@@ -63,6 +64,8 @@ public class RexProRexsterServer implements RexsterServer {
     private int lastCoreWorkerThreadPoolSize;
     private int lastMaxKernalThreadPoolSize;
     private int lastCoreKernalThreadPoolSize;
+    private long lastConnectionIdleMax;
+    private long lastConnectionIdleInterval;
 
     public RexProRexsterServer(final XMLConfiguration configuration) {
         this(configuration, true);
@@ -92,11 +95,13 @@ public class RexProRexsterServer implements RexsterServer {
                 lastCoreWorkerThreadPoolSize = coreWorkerThreadPoolSize;
                 lastMaxKernalThreadPoolSize = maxKernalThreadPoolSize;
                 lastCoreKernalThreadPoolSize = coreKernalThreadPoolSize;
+                lastConnectionIdleInterval = connectionIdleInterval;
+                lastConnectionIdleMax = connectionIdleMax;
 
                 updateSettings(configuration);
 
                 try {
-                    restart(app, true);
+                    reconfigure(app);
                 } catch (Exception ex) {
                     logger.error("Could not modify Rexster configuration.  Please restart Rexster to allow changes to be applied.", ex);
                 }
@@ -112,10 +117,13 @@ public class RexProRexsterServer implements RexsterServer {
     @Override
     public void start(final RexsterApplication application) throws Exception {
         this.app = application;
-        restart(application, false);
+        reconfigure(application);
     }
 
-    public void restart(final RexsterApplication application, final boolean restart) throws Exception {
+    /**
+     * Reconfigures and starts the server if not already started.
+     */
+    public void reconfigure(final RexsterApplication application) throws Exception {
 
         // configure the tcp/nio transport
         this.configureTransport();
@@ -128,7 +136,7 @@ public class RexProRexsterServer implements RexsterServer {
                 logger.info("JMX enabled on RexPro.");
             } else {
                 // only need to deregister if this is a restart.  on initial run, no jmx is enabled.
-                if (restart) {
+                if (jmx != null) {
                     try {
                         GrizzlyJmxManager.instance().deregister(jmx);
                         manageJmxMetrics(application, false);
@@ -148,12 +156,9 @@ public class RexProRexsterServer implements RexsterServer {
             this.tcpTransport.start();
         }
 
-        // TODO: let's just not try to reconfigure this right now....................
-        if (!restart) {
+        if (hasSessionIdleChanged()) {
             // initialize the session monitor for rexpro to clean up dead sessions.
-            final Long rexProSessionMaxIdle = properties.getRexProSessionMaxIdle();
-            final Long rexProSessionCheckInterval = properties.getRexProSessionCheckInterval();
-            new RexProSessionMonitor(rexProSessionMaxIdle, rexProSessionCheckInterval);
+            this.rexProSessionMonitor.reconfigure(this.connectionIdleInterval, this.connectionIdleMax);
         }
     }
 
@@ -181,6 +186,10 @@ public class RexProRexsterServer implements RexsterServer {
                 || this.coreKernalThreadPoolSize != lastCoreKernalThreadPoolSize || this.coreWorkerThreadPoolSize != this.lastCoreWorkerThreadPoolSize;
     }
 
+    private boolean hasSessionIdleChanged() {
+        return this.connectionIdleInterval != this.lastConnectionIdleInterval || this.connectionIdleMax != this.lastConnectionIdleMax;
+    }
+
     private void updateSettings(final XMLConfiguration configuration) {
         this.rexproServerPort = configuration.getInteger("rexpro.server-port", new Integer(RexsterSettings.DEFAULT_REXPRO_PORT));
         this.rexproServerHost = configuration.getString("rexpro.server-host", "0.0.0.0");
@@ -188,8 +197,8 @@ public class RexProRexsterServer implements RexsterServer {
         this.maxWorkerThreadPoolSize = configuration.getInt("rexpro.thread-pool.worker.max-size", 8);
         this.coreKernalThreadPoolSize = configuration.getInt("rexpro.thread-pool.kernal.core-size", 4);
         this.maxKernalThreadPoolSize = configuration.getInt("rexpro.thread-pool.kernal.max-size", 4);
-        this.connectionIdleMax = configuration.getInt("rexpro.connection-max-idle", 180000);
-        this.connectionIdleInterval = configuration.getInt("rexpro.connection-check-interval", 3000000);
+        this.connectionIdleMax = configuration.getLong("rexpro.connection-max-idle", new Long(RexsterSettings.DEFAULT_REXPRO_SESSION_MAX_IDLE));
+        this.connectionIdleInterval = configuration.getLong("rexpro.connection-check-interval", new Long(RexsterSettings.DEFAULT_REXPRO_SESSION_CHECK_INTERVAL));
         this.enableJmx = configuration.getBoolean("rexpro.enable-jmx", false);
         this.ioStrategy = configuration.getString("rexpro.io-strategy", "leader-follower");
     }
