@@ -81,6 +81,7 @@
     </metrics>
     <graphs>
         <graph>
+            <graph-enabled>true</graph-enabled>
             <graph-name>emptygraph</graph-name>
             <graph-type>tinkergraph</graph-type>
             <graph-mock-tx>true</graph-mock-tx>
@@ -90,12 +91,11 @@
                 </allows>
             </extensions>
         </graph>
-        <!--
         <graph>
-            <graph-enabled>true</graph-enabled>
+            <graph-enabled>false</graph-enabled>
             <graph-name>orientdbsample</graph-name>
             <graph-type>orientgraph</graph-type>
-            <graph-location>memory:/tmp/orientdb-graph</graph-location>
+            <graph-location>memory:orientdb-graph</graph-location>
             <properties>
                 <username>admin</username>
                 <password>admin</password>
@@ -106,7 +106,6 @@
                 </allows>
             </extensions>
         </graph>
-        -->
         <graph>
             <graph-enabled>true</graph-enabled>
             <graph-name>neo4jsample</graph-name>
