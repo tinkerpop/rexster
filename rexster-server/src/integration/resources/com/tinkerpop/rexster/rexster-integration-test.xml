@@ -90,6 +90,7 @@
                 </allows>
             </extensions>
         </graph>
+        <!--
         <graph>
             <graph-enabled>true</graph-enabled>
             <graph-name>orientdbsample</graph-name>
@@ -105,6 +106,7 @@
                 </allows>
             </extensions>
         </graph>
+        -->
         <graph>
             <graph-enabled>true</graph-enabled>
             <graph-name>neo4jsample</graph-name>
