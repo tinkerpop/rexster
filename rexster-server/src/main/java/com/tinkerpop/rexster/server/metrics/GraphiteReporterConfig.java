@@ -1,9 +1,9 @@
 package com.tinkerpop.rexster.server.metrics;
 
 import com.tinkerpop.rexster.Tokens;
-import com.yammer.metrics.MetricRegistry;
-import com.yammer.metrics.graphite.Graphite;
-import com.yammer.metrics.graphite.GraphiteReporter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.graphite.Graphite;
+import com.codahale.metrics.graphite.GraphiteReporter;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 

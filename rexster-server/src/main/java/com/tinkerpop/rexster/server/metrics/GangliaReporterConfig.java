@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster.server.metrics;
 
 import com.tinkerpop.rexster.Tokens;
-import com.yammer.metrics.MetricRegistry;
-import com.yammer.metrics.ganglia.GangliaReporter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.ganglia.GangliaReporter;
 import info.ganglia.gmetric4j.gmetric.GMetric;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;

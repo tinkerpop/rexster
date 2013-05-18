@@ -7,8 +7,8 @@ import com.tinkerpop.rexster.extension.ExtensionNaming;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
-import com.yammer.metrics.Counter;
-import com.yammer.metrics.MetricRegistry;
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
 
 /**
  * An extension that shows how to register custom metrics to extensions to expose via reporters.

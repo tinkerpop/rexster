@@ -21,12 +21,12 @@ import com.tinkerpop.rexster.server.metrics.AbstractReporterConfig;
 import com.tinkerpop.rexster.servlet.DogHouseServlet;
 import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
-import com.yammer.metrics.JmxAttributeGauge;
-import com.yammer.metrics.JmxReporter;
-import com.yammer.metrics.MetricRegistry;
-import com.yammer.metrics.jersey.InstrumentedResourceMethodDispatchAdapter;
-import com.yammer.metrics.servlets.AdminServlet;
-import com.yammer.metrics.servlets.MetricsServlet;
+import com.codahale.metrics.JmxAttributeGauge;
+import com.codahale.metrics.JmxReporter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.jersey.InstrumentedResourceMethodDispatchAdapter;
+import com.codahale.metrics.servlets.AdminServlet;
+import com.codahale.metrics.servlets.MetricsServlet;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Level;
@@ -308,9 +308,9 @@ public class HttpRexsterServer implements RexsterServer {
     private void deployMetricsAdmin(final RexsterApplication application) {
         // deploys the metrics servlet into rexster
         final WebappContext wacMetrics = new WebappContext("metrics", "");
-        wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.registry", application.getMetricRegistry());
-        wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.rateUnit", this.convertRateTo);
-        wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.durationUnit", this.convertDurationTo);
+        wacMetrics.setAttribute("com.codahale.metrics.servlets.MetricsServlet.registry", application.getMetricRegistry());
+        wacMetrics.setAttribute("com.codahale.metrics.servlets.MetricsServlet.rateUnit", this.convertRateTo);
+        wacMetrics.setAttribute("com.codahale.metrics.servlets.MetricsServlet.durationUnit", this.convertDurationTo);
 
         final ServletRegistration sgMetrics = wacMetrics.addServlet("metrics", new MetricsServlet());
         sgMetrics.addMapping("/metrics/*");

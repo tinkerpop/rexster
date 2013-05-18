@@ -2,7 +2,7 @@ package com.tinkerpop.rexster.server;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
-import com.yammer.metrics.MetricRegistry;
+import com.codahale.metrics.MetricRegistry;
 
 import java.util.Set;
 
