@@ -78,6 +78,7 @@ public class Application {
     private final RexsterServer rexproServer;
     private final RexsterApplication rexsterApplication;
     private final RexsterProperties properties;
+    private final ReporterConfig reporterConfig;
 
     /**
      * Check for configuration file changes every 10 seconds.
@@ -95,14 +96,7 @@ public class Application {
         this.properties = properties;
         this.rexsterApplication = new XmlRexsterApplication(this.properties);
 
-        final ReporterConfig reporterConfig = ReporterConfig.load(properties.getReporterConfigurations(), this.rexsterApplication.getMetricRegistry());
-        this.properties.addOverride("http-reporter-enabled", reporterConfig.isHttpReporterEnabled());
-        this.properties.addOverride("http-reporter-duration", reporterConfig.getDurationTimeUnitConversion());
-        this.properties.addOverride("http-reporter-convert", reporterConfig.getRateTimeUnitConversion());
-
-        // start the metric reporters if any
-        reporterConfig.enable();
-
+        this.reporterConfig = new ReporterConfig(properties, this.rexsterApplication.getMetricRegistry());
         this.httpServer = new HttpRexsterServer(properties);
         this.rexproServer = new RexProRexsterServer(properties, true);
     }

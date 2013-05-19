@@ -85,25 +85,25 @@ public class RexProRexsterServer implements RexsterServer {
         properties.addListener(new RexsterProperties.RexsterPropertiesListener() {
             @Override
             public void propertiesChanged(final XMLConfiguration configuration) {
-                // maintain history of previous settings
-                lastRexproServerHost = rexproServerHost;
-                lastRexproServerPort = rexproServerPort;
-                lastEnableJmx = enableJmx;
-                lastIoStrategy = ioStrategy;
-                lastMaxWorkerThreadPoolSize = maxWorkerThreadPoolSize;
-                lastCoreWorkerThreadPoolSize = coreWorkerThreadPoolSize;
-                lastMaxKernalThreadPoolSize = maxKernalThreadPoolSize;
-                lastCoreKernalThreadPoolSize = coreKernalThreadPoolSize;
-                lastConnectionIdleInterval = connectionIdleInterval;
-                lastConnectionIdleMax = connectionIdleMax;
+            // maintain history of previous settings
+            lastRexproServerHost = rexproServerHost;
+            lastRexproServerPort = rexproServerPort;
+            lastEnableJmx = enableJmx;
+            lastIoStrategy = ioStrategy;
+            lastMaxWorkerThreadPoolSize = maxWorkerThreadPoolSize;
+            lastCoreWorkerThreadPoolSize = coreWorkerThreadPoolSize;
+            lastMaxKernalThreadPoolSize = maxKernalThreadPoolSize;
+            lastCoreKernalThreadPoolSize = coreKernalThreadPoolSize;
+            lastConnectionIdleInterval = connectionIdleInterval;
+            lastConnectionIdleMax = connectionIdleMax;
 
-                updateSettings(configuration);
+            updateSettings(configuration);
 
-                try {
-                    reconfigure(app);
-                } catch (Exception ex) {
-                    logger.error("Could not modify Rexster configuration.  Please restart Rexster to allow changes to be applied.", ex);
-                }
+            try {
+                reconfigure(app);
+            } catch (Exception ex) {
+                logger.error("Could not modify Rexster configuration.  Please restart Rexster to allow changes to be applied.", ex);
+            }
             }
         });
     }
@@ -244,7 +244,7 @@ public class RexProRexsterServer implements RexsterServer {
                 "pool-allocated-bytes", "pool-released-bytes", "real-allocated-bytes", "total-allocated-bytes"
         };
 
-        managerJmxKeysAsMetric(metricRegistry, jmxObjectMemoryManager, metricGroupMemoryManager, heapMemoryManagerMetrics, register);
+        manageJmxKeysAsMetric(metricRegistry, jmxObjectMemoryManager, metricGroupMemoryManager, heapMemoryManagerMetrics, register);
 
         final String jmxObjectTcpNioTransport = "org.glassfish.grizzly:pp=/gmbal-root,type=TCPNIOTransport,name=RexPro";
         final String metricGroupTcpNioTransport = "tcp-nio-transport";
@@ -254,7 +254,7 @@ public class RexProRexsterServer implements RexsterServer {
                 "total-connections-count", "write-buffer-size"
         };
 
-        managerJmxKeysAsMetric(metricRegistry, jmxObjectTcpNioTransport, metricGroupTcpNioTransport, tcpNioTransportMetrics, register);
+        manageJmxKeysAsMetric(metricRegistry, jmxObjectTcpNioTransport, metricGroupTcpNioTransport, tcpNioTransportMetrics, register);
 
         final String jmxObjectThreadPool = "org.glassfish.grizzly:pp=/gmbal-root/TCPNIOTransport[RexPro],type=ThreadPool,name=ThreadPool";
         final String metricGroupThreadPool = "thread-pool";
@@ -265,12 +265,12 @@ public class RexProRexsterServer implements RexsterServer {
                 "thread-pool-type"
         };
 
-        managerJmxKeysAsMetric(metricRegistry, jmxObjectThreadPool, metricGroupThreadPool, threadPoolMetrics, register);
+        manageJmxKeysAsMetric(metricRegistry, jmxObjectThreadPool, metricGroupThreadPool, threadPoolMetrics, register);
     }
 
-    private static void managerJmxKeysAsMetric(final MetricRegistry metricRegistry, final String jmxObjectName,
-                                               final String metricGroup, final String[] metricKeys,
-                                               final boolean register) throws MalformedObjectNameException {
+    private static void manageJmxKeysAsMetric(final MetricRegistry metricRegistry, final String jmxObjectName,
+                                              final String metricGroup, final String[] metricKeys,
+                                              final boolean register) throws MalformedObjectNameException {
         for (String metricKey : metricKeys) {
             if (register)
                 registerJmxKeyAsMetric(metricRegistry, metricGroup, jmxObjectName, metricKey);

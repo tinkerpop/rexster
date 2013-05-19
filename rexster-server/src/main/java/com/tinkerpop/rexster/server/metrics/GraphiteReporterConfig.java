@@ -8,6 +8,7 @@ import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +20,8 @@ class GraphiteReporterConfig extends AbstractHostPortReporterConfig {
     private static final Logger logger = Logger.getLogger(GraphiteReporterConfig.class);
 
     private final String prefix;
+
+    private final List<GraphiteReporter> reporters = new ArrayList<GraphiteReporter>();
 
     public GraphiteReporterConfig(final HierarchicalConfiguration config, final MetricRegistry metricRegistry) {
         super(config, metricRegistry);
@@ -50,12 +53,15 @@ class GraphiteReporterConfig extends AbstractHostPortReporterConfig {
                 logger.info(String.format("Enabling GraphiteReporter to %s:%s", hostPort.getHost(), hostPort.getPort()));
 
                 final Graphite graphite = new Graphite(new InetSocketAddress(hostPort.getHost(), hostPort.getPort()));
-                GraphiteReporter.forRegistry(this.metricRegistry)
+                final GraphiteReporter reporter = GraphiteReporter.forRegistry(this.metricRegistry)
                         .convertDurationsTo(this.getRealDurationTimeUnitConversion())
                         .convertRatesTo(this.getRealRateTimeUnitConversion())
                         .prefixedWith(this.prefix)
                         .filter(new RegexMetricFilter(this.inclusion, this.exclusion))
-                        .build(graphite).start(this.period, this.getRealTimeUnit());
+                        .build(graphite);
+                reporter.start(this.period, this.getRealTimeUnit());
+
+                reporters.add(reporter);
 
             }
             catch (Exception e)
@@ -65,5 +71,14 @@ class GraphiteReporterConfig extends AbstractHostPortReporterConfig {
             }
         }
         return true;
+    }
+
+    @Override
+    public void disable() {
+        for (GraphiteReporter reporter : reporters) {
+            reporter.stop();
+        }
+
+        reporters.clear();
     }
 }

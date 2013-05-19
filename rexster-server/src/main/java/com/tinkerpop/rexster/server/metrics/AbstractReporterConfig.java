@@ -61,6 +61,8 @@ public abstract class AbstractReporterConfig
      */
     public abstract boolean enable();
 
+    public abstract void disable();
+
     private void readCommonConfiguration() {
         this.timeUnit = this.registryConfiguration == null ? DEFAULT_TIME_UNIT : this.registryConfiguration.getString(Tokens.REXSTER_REPORTER_TIME_UNIT, DEFAULT_TIME_UNIT);
         this.period = this.registryConfiguration == null ? DEFAULT_PERIOD : this.registryConfiguration.getLong(Tokens.REXSTER_REPORTER_PERIOD, DEFAULT_PERIOD);

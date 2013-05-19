@@ -27,4 +27,7 @@ class HttpReporterConfig extends AbstractReporterConfig {
     {
         return true;
     }
+
+    @Override
+    public void disable() { }
 }

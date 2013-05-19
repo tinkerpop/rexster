@@ -10,7 +10,9 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * RexsterProperties are settings that come from the rexster.xml configuration file appended with other in server
@@ -23,7 +25,7 @@ public class RexsterProperties extends FileAlterationListenerAdaptor {
 
     private XMLConfiguration configuration;
     private final List<RexsterPropertiesListener> listeners = new ArrayList<RexsterPropertiesListener>();
-    private final List<RexsterPropertyOverride> overrides = new ArrayList<RexsterPropertyOverride>();
+    private final Map<String, RexsterPropertyOverride> overrides = new HashMap<String,RexsterPropertyOverride>();
 
     public RexsterProperties(final XMLConfiguration configuration) {
         this.configuration = configuration;
@@ -105,7 +107,11 @@ public class RexsterProperties extends FileAlterationListenerAdaptor {
 
     public void addOverride(final String overrideKey, final Object overrideValue) {
         this.configuration.setProperty(overrideKey, overrideValue);
-        this.overrides.add(new RexsterPropertyOverride(overrideKey, overrideValue));
+        this.overrides.put(overrideKey, new RexsterPropertyOverride(overrideKey, overrideValue));
+    }
+
+    public void removeOverride(final String overrideKey) {
+        this.overrides.remove(overrideKey);
     }
 
     @Override
@@ -113,7 +119,7 @@ public class RexsterProperties extends FileAlterationListenerAdaptor {
         logger.info(String.format("File settings have changed.  Rexster is reloading [%s]", file.getAbsolutePath()));
         readConfigurationFromFile(file.getAbsolutePath());
 
-        for (RexsterPropertyOverride override : overrides) {
+        for (RexsterPropertyOverride override : overrides.values()) {
             configuration.setProperty(override.getKeyToOverride(), override.getOverrideValue());
         }
 
@@ -122,7 +128,7 @@ public class RexsterProperties extends FileAlterationListenerAdaptor {
         }
     }
 
-    interface RexsterPropertiesListener {
+    public interface RexsterPropertiesListener {
         void propertiesChanged(final XMLConfiguration configuration);
     }
 

@@ -22,10 +22,8 @@ import com.tinkerpop.rexster.servlet.DogHouseServlet;
 import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
 import com.yammer.metrics.JmxAttributeGauge;
-import com.yammer.metrics.JmxReporter;
 import com.yammer.metrics.MetricRegistry;
 import com.yammer.metrics.jersey.InstrumentedResourceMethodDispatchAdapter;
-import com.yammer.metrics.servlets.AdminServlet;
 import com.yammer.metrics.servlets.MetricsServlet;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -33,11 +31,13 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.IOStrategy;
+import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
 import org.glassfish.grizzly.servlet.ServletRegistration;
 import org.glassfish.grizzly.servlet.WebappContext;
+import org.glassfish.grizzly.threadpool.GrizzlyExecutorService;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 
 import javax.management.MalformedObjectNameException;
@@ -53,53 +53,87 @@ import java.io.File;
 public class HttpRexsterServer implements RexsterServer {
     private static final Logger logger = Logger.getLogger(HttpRexsterServer.class);
 
-    private final XMLConfiguration properties;
-    private final Integer rexsterServerPort;
-    private final String rexsterServerHost;
-    private final String webRootPath;
-    private final String baseUri;
-    private final int maxWorkerThreadPoolSize;
-    private final int coreWorkerThreadPoolSize;
-    private final int maxKernalThreadPoolSize;
-    private final int coreKernalThreadPoolSize;
-    private final int maxPostSize;
-    private final int maxHeaderSize;
-    private final int uploadTimeoutMillis;
-    private final boolean enableJmx;
-    private final String ioStrategy;
+    private RexsterApplication app;
+    private final RexsterProperties properties;
+    private Integer rexsterServerPort;
+    private String rexsterServerHost;
+    private String webRootPath;
+    private String baseUri;
+    private int maxWorkerThreadPoolSize;
+    private int coreWorkerThreadPoolSize;
+    private int maxKernalThreadPoolSize;
+    private int coreKernalThreadPoolSize;
+    private int maxPostSize;
+    private int maxHeaderSize;
+    private int uploadTimeoutMillis;
+    private boolean enableJmx;
+    private String ioStrategy;
     private final HttpServer httpServer;
-    private final boolean debugMode;
-    private final boolean enableHttpReporter;
-    private final boolean enableDogHouse;
-    private final String convertRateTo;
-    private final String convertDurationTo;
+    private boolean debugMode;
+    private boolean enableHttpReporter;
+    private boolean enableDogHouse;
+    private String convertRateTo;
+    private String convertDurationTo;
+    private String securityFilterType;
+    private String defaultCharacterEncoding;
 
-    public HttpRexsterServer(final XMLConfiguration properties) {
-        this.properties = properties;
-        this.debugMode = properties.getBoolean("debug", false);
-        this.enableDogHouse = properties.getBoolean("http.enable-doghouse", true);
-        this.enableHttpReporter = properties.getBoolean("http-reporter-enabled", false);
-        this.convertRateTo = properties.getString("http-reporter-convert", AbstractReporterConfig.DEFAULT_TIME_UNIT.toString());
-        this.convertDurationTo = properties.getString("http-reporter-duration", AbstractReporterConfig.DEFAULT_TIME_UNIT.toString());
-        this.rexsterServerPort = properties.getInteger("http.server-port", new Integer(RexsterSettings.DEFAULT_HTTP_PORT));
-        this.rexsterServerHost = properties.getString("http.server-host", "0.0.0.0");
-        this.webRootPath = properties.getString("http.web-root", RexsterSettings.DEFAULT_WEB_ROOT_PATH);
-        this.baseUri = properties.getString("http.base-uri", RexsterSettings.DEFAULT_BASE_URI);
-        this.coreWorkerThreadPoolSize = properties.getInt("http.thread-pool.worker.core-size", 8);
-        this.maxWorkerThreadPoolSize = properties.getInt("http.thread-pool.worker.max-size", 8);
-        this.coreKernalThreadPoolSize = properties.getInt("http.thread-pool.kernal.core-size", 4);
-        this.maxKernalThreadPoolSize = properties.getInt("http.thread-pool.kernal.max-size", 4);
-        this.maxPostSize = properties.getInt("http.max-post-size", 2097152);
-        this.maxHeaderSize = properties.getInt("http.max-header-size", 8192);
-        this.uploadTimeoutMillis = properties.getInt("http.upload-timeout-millis", 300000);
-        this.enableJmx = properties.getBoolean("http.enable-jmx", false);
-        this.ioStrategy = properties.getString("http.io-strategy", "leader-follower");
+    private HttpHandler staticHttpHandler = null;
+    private WebappContext wacDogHouse;
+    private WebappContext wacJersey;
+    private WebappContext wacMetrics;
 
-        this.httpServer = new HttpServer();
+    private String lastDefaultCharacterEncoding;
+    private String lastSecurityFilterType;
+    private Integer lastRexsterServerPort;
+    private String lastRexsterServerHost;
+    private String lastIoStrategy;
+    private boolean lastEnableJmx;
+    private int lastMaxWorkerThreadPoolSize;
+    private int lastCoreWorkerThreadPoolSize;
+    private int lastMaxKernalThreadPoolSize;
+    private int lastCoreKernalThreadPoolSize;
+    private boolean lastEnableDogHouse;
+    private String lastWebRootPath;
+    private String lastBaseUri;
+    private boolean lastDebugMode;
+
+    public HttpRexsterServer(final XMLConfiguration configuration) {
+        this(new RexsterProperties(configuration));
     }
 
     public HttpRexsterServer(final RexsterProperties properties) {
-        this(properties.getConfiguration());
+        this.properties = properties;
+        this.httpServer = new HttpServer();
+        updateSettings(properties.getConfiguration());
+
+        properties.addListener(new RexsterProperties.RexsterPropertiesListener() {
+            @Override
+            public void propertiesChanged(final XMLConfiguration configuration) {
+            // maintain history of previous settings
+            lastRexsterServerHost = rexsterServerHost;
+            lastRexsterServerPort = rexsterServerPort;
+            lastEnableJmx = enableJmx;
+            lastIoStrategy = ioStrategy;
+            lastMaxWorkerThreadPoolSize = maxWorkerThreadPoolSize;
+            lastCoreWorkerThreadPoolSize = coreWorkerThreadPoolSize;
+            lastMaxKernalThreadPoolSize = maxKernalThreadPoolSize;
+            lastCoreKernalThreadPoolSize = coreKernalThreadPoolSize;
+            lastEnableDogHouse = enableDogHouse;
+            lastWebRootPath = webRootPath;
+            lastBaseUri = baseUri;
+            lastSecurityFilterType = securityFilterType;
+            lastDefaultCharacterEncoding = defaultCharacterEncoding;
+            lastDebugMode = debugMode;
+
+            updateSettings(configuration);
+
+            try {
+                reconfigure(app);
+            } catch (Exception ex) {
+                logger.error("Could not modify Rexster configuration.  Please restart Rexster to allow changes to be applied.", ex);
+            }
+            }
+        });
     }
 
     @Override
@@ -109,157 +143,235 @@ public class HttpRexsterServer implements RexsterServer {
 
     @Override
     public void start(final RexsterApplication application) throws Exception {
+        this.app = application;
+        reconfigure(application);
+    }
 
+    /**
+     * Reconfigures and starts the server if not already started.
+     */
+    public void reconfigure(final RexsterApplication application) throws Exception {
         deployRestApi(application);
 
-        if (enableDogHouse) {
-            // serves images
-            deployStaticResourceServer();
-            deployDogHouse(application);
-        }
+        // serves images
+        deployStaticResourceServer();
+        deployDogHouse(application);
 
-        if (enableHttpReporter) {
-            deployMetricsAdmin(application);
-        }
+        deployMetricsAdmin(application);
 
-        final NetworkListener listener = configureNetworkListener();
-        final IOStrategy strategy = GrizzlyIoStrategyFactory.createIoStrategy(this.ioStrategy);
-
-        logger.info(String.format("Using %s IOStrategy for HTTP/REST.", strategy.getClass().getName()));
-
-        listener.getTransport().setIOStrategy(strategy);
-        this.httpServer.addListener(listener);
-
-        // the commented out line below enables raw JMX settings from grizzly
-        this.httpServer.getServerConfiguration().setJmxEnabled(enableJmx);
-
-        final MetricRegistry metricRegistry = application.getMetricRegistry();
+        this.configureNetworkListener();
 
         // the JMX settings below pipe in metrics from Grizzly.
-        if (enableJmx) {
-            registerMetricsFromJmx(metricRegistry);
+        if (hasEnableJmxChanged()) {
+            this.httpServer.getServerConfiguration().setJmxEnabled(enableJmx);
+            manageJmxMetrics(application, enableJmx);
+
+            logger.info(this.enableJmx ? "JMX enabled on HTTP/REST." : "JMX disabled on HTTP/REST.");
         }
 
-        this.httpServer.start();
+        if (!this.httpServer.isStarted()) {
+            this.httpServer.start();
+        }
 
         logger.info("Rexster Server running on: [" + baseUri + ":" + rexsterServerPort + "]");
     }
 
-    private static void registerMetricsFromJmx(final MetricRegistry metricRegistry) throws MalformedObjectNameException {
-        final String jmxObjectMemoryManager = "org.glassfish.grizzly:pp=/gmbal-root/TCPNIOTransport[RexPro],type=HeapMemoryManager,name=MemoryManager";
-        final String metricGroupMemoryManager = "heap-memory-manager";
-        registerJmxKeyAsMetric(metricRegistry, metricGroupMemoryManager, jmxObjectMemoryManager, "pool-allocated-bytes");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupMemoryManager, jmxObjectMemoryManager, "pool-released-bytes");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupMemoryManager, jmxObjectMemoryManager, "real-allocated-bytes");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupMemoryManager, jmxObjectMemoryManager, "total-allocated-bytes");
-
-        final String jmxObjectHttpServerFilter = "org.glassfish.grizzly:pp=/gmbal-root/HttpServer[HttpServer]/NetworkListener[NetworkListener[grizzly]],type=HttpServerFilter,name=HttpServerFilter";
-        final String metricGroupHttpServerFilter = "http-server";
-        registerJmxKeyAsMetric(metricRegistry, metricGroupHttpServerFilter, jmxObjectHttpServerFilter, "current-suspended-request-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupHttpServerFilter, jmxObjectHttpServerFilter, "requests-cancelled-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupHttpServerFilter, jmxObjectHttpServerFilter, "requests-completed-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupHttpServerFilter, jmxObjectHttpServerFilter, "requests-received-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupHttpServerFilter, jmxObjectHttpServerFilter, "requests-timed-out-count");
-
-        final String jmxObjectHttpKeepAlive = "org.glassfish.grizzly:pp=/gmbal-root/HttpServer[HttpServer]/NetworkListener[NetworkListener[grizzly]],type=KeepAlive,name=Keep-Alive";
-        final String metricGroupHttpKeepAlive = "http-keep-alive";
-        registerJmxKeyAsMetric(metricRegistry, metricGroupHttpKeepAlive, jmxObjectHttpKeepAlive, "hits-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupHttpKeepAlive, jmxObjectHttpKeepAlive, "idle-timeout-seconds");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupHttpKeepAlive, jmxObjectHttpKeepAlive, "live-connections-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupHttpKeepAlive, jmxObjectHttpKeepAlive, "max-requests-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupHttpKeepAlive, jmxObjectHttpKeepAlive, "refuses-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupHttpKeepAlive, jmxObjectHttpKeepAlive, "timeouts-count");
-
-        final String jmxObjectNetworkListener = "org.glassfish.grizzly:pp=/gmbal-root/HttpServer[HttpServer],type=NetworkListener,name=NetworkListener[grizzly]";
-        final String metricGroupNetworkListener = "network-listener";
-        registerJmxKeyAsMetric(metricRegistry, metricGroupNetworkListener, jmxObjectNetworkListener, "chunking-enabled");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupNetworkListener, jmxObjectNetworkListener, "host");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupNetworkListener, jmxObjectNetworkListener, "idle-timeout-seconds");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupNetworkListener, jmxObjectNetworkListener, "max-http-header-size");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupNetworkListener, jmxObjectNetworkListener, "max-pending-bytes");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupNetworkListener, jmxObjectNetworkListener, "port");
-
-        final String jmxObjectTcpNioTransport = "org.glassfish.grizzly:pp=/gmbal-root/HttpServer[HttpServer]/NetworkListener[NetworkListener[grizzly]],type=TCPNIOTransport,name=Transport";
-        final String metricGroupTcpNioTransport = "tcp-nio-transport";
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "bound-addresses");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "bytes-read");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "bytes-written");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "client-connect-timeout-millis");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "io-strategy");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "open-connections-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "read-buffer-size");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "selector-threads-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "server-socket-so-timeout");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "total-connections-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupTcpNioTransport, jmxObjectTcpNioTransport, "write-buffer-size");
-
-        final String jmxObjectThreadPool = "org.glassfish.grizzly:pp=/gmbal-root/HttpServer[HttpServer]/NetworkListener[NetworkListener[grizzly]]/TCPNIOTransport[Transport],type=ThreadPool,name=ThreadPool";
-        final String metricGroupThreadPool = "thread-pool";
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-allocated-thread-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-core-pool-size");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-max-num-threads");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-queued-task-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-task-queue-overflow-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-total-allocated-thread-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-total-completed-tasks-count");
-        registerJmxKeyAsMetric(metricRegistry, metricGroupThreadPool, jmxObjectThreadPool, "thread-pool-type");
+    private void manageJmxMetrics(final RexsterApplication application, final boolean register) throws MalformedObjectNameException {
+        // the JMX settings below pipe in metrics from Grizzly.
+        final MetricRegistry metricRegistry = application.getMetricRegistry();
+        manageMetricsFromJmx(metricRegistry, register);
+        logger.info(register ? "Registered JMX Metrics." : "Removed JMX Metrics.");
     }
 
-    private static void registerJmxKeyAsMetric(final MetricRegistry metricRegistry, final String metricGroup, final String jmxObjectName, final String jmxAttributeName) throws MalformedObjectNameException  {
-        metricRegistry.register(MetricRegistry.name("http", "core", metricGroup, jmxAttributeName),
-                new JmxAttributeGauge(new ObjectName(jmxObjectName), jmxAttributeName));
+    private boolean hasWebRootChanged() {
+        return !this.webRootPath.equals(this.lastWebRootPath);
     }
 
-    private void deployRestApi(final RexsterApplication application) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    private boolean hasPortHostChanged() {
+        return !this.rexsterServerPort.equals(this.lastRexsterServerPort) || !this.lastRexsterServerHost.equals(this.rexsterServerHost);
+    }
 
-        final WebappContext wacJersey = new WebappContext("jersey", "");
+    private boolean hasEnableJmxChanged() {
+        return this.enableJmx != this.lastEnableJmx;
+    }
 
-        // explicitly load resources so that the "RexsterApplicationProvider" class is not loaded
-        final ResourceConfig rc = constructResourceConfig();
+    private boolean hasEnableDogHouseChanged() {
+        return this.enableDogHouse != this.lastEnableDogHouse;
+    }
 
-        // constructs an injectable for the RexsterApplication instance.  This get constructed externally
-        // and is passed into the HttpRexsterServer.  The SingletonTypeInjectableProvider is responsible for
-        // pushing that instance into the context.
-        rc.getSingletons().add(new SingletonTypeInjectableProvider<Context, RexsterApplication>(
-                RexsterApplication.class, application) {
-        });
-        rc.getSingletons().add(new InstrumentedResourceMethodDispatchAdapter(application.getMetricRegistry()));
+    private boolean hasBaseUriChanged() {
+        return !this.baseUri.equals(this.lastBaseUri);
+    }
 
-        if (this.debugMode) {
-            rc.getContainerRequestFilters().add(new LoggingFilter());
-            rc.getContainerResponseFilters().add(new LoggingFilter());
-        }
+    private boolean hasIoStrategyChanged() {
+        return !this.ioStrategy.equals(this.lastIoStrategy);
+    }
 
-        final String defaultCharacterEncoding = properties.getString("http.character-set", "ISO-8859-1");
-        rc.getContainerResponseFilters().add(new HeaderResponseFilter(defaultCharacterEncoding));
+    private boolean hasThreadPoolSizeChanged() {
+        return this.maxKernalThreadPoolSize != lastMaxKernalThreadPoolSize || this.maxWorkerThreadPoolSize != lastMaxWorkerThreadPoolSize
+                || this.coreKernalThreadPoolSize != lastCoreKernalThreadPoolSize || this.coreWorkerThreadPoolSize != this.lastCoreWorkerThreadPoolSize;
+    }
+
+    private boolean hasRestConfigurationsChanged() {
+        return !this.securityFilterType.equals(this.lastSecurityFilterType) || !this.defaultCharacterEncoding.equals(this.lastDefaultCharacterEncoding)
+                || this.debugMode != lastDebugMode;
+    }
+
+    private void updateSettings(final XMLConfiguration configuration) {
+        this.debugMode = configuration.getBoolean("debug", false);
+        this.enableDogHouse = configuration.getBoolean("http.enable-doghouse", true);
+        this.enableHttpReporter = configuration.getBoolean("http-reporter-enabled", false);
+        this.convertRateTo = configuration.getString("http-reporter-convert", AbstractReporterConfig.DEFAULT_TIME_UNIT.toString());
+        this.convertDurationTo = configuration.getString("http-reporter-duration", AbstractReporterConfig.DEFAULT_TIME_UNIT.toString());
+        this.rexsterServerPort = configuration.getInteger("http.server-port", new Integer(RexsterSettings.DEFAULT_HTTP_PORT));
+        this.rexsterServerHost = configuration.getString("http.server-host", "0.0.0.0");
+        this.webRootPath = configuration.getString("http.web-root", RexsterSettings.DEFAULT_WEB_ROOT_PATH);
+        this.baseUri = configuration.getString("http.base-uri", RexsterSettings.DEFAULT_BASE_URI);
+        this.coreWorkerThreadPoolSize = configuration.getInt("http.thread-pool.worker.core-size", 8);
+        this.maxWorkerThreadPoolSize = configuration.getInt("http.thread-pool.worker.max-size", 8);
+        this.coreKernalThreadPoolSize = configuration.getInt("http.thread-pool.kernal.core-size", 4);
+        this.maxKernalThreadPoolSize = configuration.getInt("http.thread-pool.kernal.max-size", 4);
+        this.maxPostSize = configuration.getInt("http.max-post-size", 2097152);
+        this.maxHeaderSize = configuration.getInt("http.max-header-size", 8192);
+        this.uploadTimeoutMillis = configuration.getInt("http.upload-timeout-millis", 300000);
+        this.enableJmx = configuration.getBoolean("http.enable-jmx", false);
+        this.ioStrategy = configuration.getString("http.io-strategy", "leader-follower");
+        this.defaultCharacterEncoding = configuration.getString("http.character-set", "ISO-8859-1");
 
         HierarchicalConfiguration securityConfiguration = null;
         try {
-            securityConfiguration = properties.configurationAt(Tokens.REXSTER_SECURITY_AUTH);
+            securityConfiguration = configuration.configurationAt(Tokens.REXSTER_SECURITY_AUTH);
         } catch (IllegalArgumentException iae) {
             // do nothing...null is cool
         }
 
-        final String securityFilterType = securityConfiguration != null ? securityConfiguration.getString("type") : Tokens.REXSTER_SECURITY_NONE;
-        if (!securityFilterType.equals(Tokens.REXSTER_SECURITY_NONE)) {
-            if (securityFilterType.equals(Tokens.REXSTER_SECURITY_DEFAULT)) {
-                wacJersey.addContextInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, DefaultSecurityFilter.class.getName());
-                rc.getContainerRequestFilters().add(new DefaultSecurityFilter());
-            } else {
-                wacJersey.addContextInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, securityFilterType);
-                final Class clazz = Class.forName(securityFilterType, true, Thread.currentThread().getContextClassLoader());
-                final AbstractSecurityFilter securityFilter = (AbstractSecurityFilter) clazz.newInstance();
-                rc.getContainerRequestFilters().add(securityFilter);
+        securityFilterType = securityConfiguration != null ? securityConfiguration.getString("type") : Tokens.REXSTER_SECURITY_NONE;
+
+    }
+
+    private static void manageMetricsFromJmx(final MetricRegistry metricRegistry, final boolean register) throws MalformedObjectNameException {
+        final String jmxObjectMemoryManager = "org.glassfish.grizzly:pp=/gmbal-root/TCPNIOTransport[RexPro],type=HeapMemoryManager,name=MemoryManager";
+        final String metricGroupMemoryManager = "heap-memory-manager";
+        final String[] heapMemoryManagerMetrics = new String[] {
+            "pool-allocated-bytes", "pool-released-bytes", "real-allocated-bytes", "total-allocated-bytes"
+        };
+
+        manageJmxKeysAsMetric(metricRegistry, jmxObjectMemoryManager, metricGroupMemoryManager, heapMemoryManagerMetrics, register);
+
+        final String jmxObjectHttpServerFilter = "org.glassfish.grizzly:pp=/gmbal-root/HttpServer[HttpServer]/NetworkListener[NetworkListener[grizzly]],type=HttpServerFilter,name=HttpServerFilter";
+        final String metricGroupHttpServerFilter = "http-server";
+        final String[] httpServerManagerMetrics = new String [] {
+            "current-suspended-request-count", "requests-cancelled-count", "requests-completed-count", "requests-received-count", "requests-timed-out-count"
+        };
+
+        manageJmxKeysAsMetric(metricRegistry, jmxObjectHttpServerFilter, metricGroupHttpServerFilter, httpServerManagerMetrics, register);
+
+        final String jmxObjectHttpKeepAlive = "org.glassfish.grizzly:pp=/gmbal-root/HttpServer[HttpServer]/NetworkListener[NetworkListener[grizzly]],type=KeepAlive,name=Keep-Alive";
+        final String metricGroupHttpKeepAlive = "http-keep-alive";
+        final String[] httpKeepAliveMetrics = new String [] {
+            "hits-count", "idle-timeout-seconds", "live-connections-count", "max-requests-count", "refuses-count", "timeouts-count"
+        };
+
+        manageJmxKeysAsMetric(metricRegistry, jmxObjectHttpKeepAlive, metricGroupHttpKeepAlive, httpKeepAliveMetrics, register);
+
+        final String jmxObjectNetworkListener = "org.glassfish.grizzly:pp=/gmbal-root/HttpServer[HttpServer],type=NetworkListener,name=NetworkListener[grizzly]";
+        final String metricGroupNetworkListener = "network-listener";
+        final String [] networkListenerMetrics = new String[] {
+            "chunking-enabled", "host", "idle-timeout-seconds", "max-http-header-size", "max-pending-bytes", "port"
+        };
+
+        manageJmxKeysAsMetric(metricRegistry, jmxObjectNetworkListener, metricGroupNetworkListener, networkListenerMetrics, register);
+
+        final String jmxObjectTcpNioTransport = "org.glassfish.grizzly:pp=/gmbal-root/HttpServer[HttpServer]/NetworkListener[NetworkListener[grizzly]],type=TCPNIOTransport,name=Transport";
+        final String metricGroupTcpNioTransport = "tcp-nio-transport";
+        final String [] tcpNioTransportMetrics = new String[] {
+            "bound-addresses", "bytes-read", "bytes-written", "client-connect-timeout-millis", "io-strategy",
+            "open-connections-count", "read-buffer-size", "selector-threads-count", "server-socket-so-timeout",
+            "total-connections-count", "write-buffer-size"
+        };
+
+        manageJmxKeysAsMetric(metricRegistry, jmxObjectTcpNioTransport, metricGroupTcpNioTransport, tcpNioTransportMetrics, register);
+
+        final String jmxObjectThreadPool = "org.glassfish.grizzly:pp=/gmbal-root/HttpServer[HttpServer]/NetworkListener[NetworkListener[grizzly]]/TCPNIOTransport[Transport],type=ThreadPool,name=ThreadPool";
+        final String metricGroupThreadPool = "thread-pool";
+        final String [] threadPoolMetrics = new String[] {
+            "thread-pool-allocated-thread-count", "thread-pool-core-pool-size", "thread-pool-max-num-threads",
+            "thread-pool-queued-task-count", "thread-pool-task-queue-overflow-count",
+            "thread-pool-total-allocated-thread-count", "thread-pool-total-completed-tasks-count", "thread-pool-type"
+        };
+
+        manageJmxKeysAsMetric(metricRegistry, jmxObjectThreadPool, metricGroupThreadPool, threadPoolMetrics, register);
+    }
+
+    private static void manageJmxKeysAsMetric(final MetricRegistry metricRegistry, final String jmxObjectName,
+                                                     final String metricGroup, final String[] metricKeys,
+                                                     final boolean register) throws MalformedObjectNameException {
+        for (String metricKey : metricKeys) {
+            if (register)
+                registerJmxKeyAsMetric(metricRegistry, metricGroup, jmxObjectName, metricKey);
+            else
+                deregisterJmxKeyAsMetric(metricRegistry, metricGroup, metricKey);
+        }
+    }
+
+    private static void registerJmxKeyAsMetric(final MetricRegistry metricRegistry, final String metricGroup,
+                                               final String jmxObjectName, final String jmxAttributeName) throws MalformedObjectNameException  {
+        metricRegistry.register(MetricRegistry.name("http", "core", metricGroup, jmxAttributeName),
+                new JmxAttributeGauge(new ObjectName(jmxObjectName), jmxAttributeName));
+    }
+
+    private static void deregisterJmxKeyAsMetric(final MetricRegistry metricRegistry, final String metricGroup,
+                                                 final String jmxAttributeName) throws MalformedObjectNameException  {
+        metricRegistry.remove(MetricRegistry.name("http", "core", metricGroup, jmxAttributeName));
+    }
+
+    private void deployRestApi(final RexsterApplication application) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        if (this.hasRestConfigurationsChanged()) {
+            if (this.wacJersey != null) {
+                this.wacJersey.undeploy();
+                this.wacJersey = null;
             }
+
+            wacJersey = new WebappContext("jersey", "");
+
+            // explicitly load resources so that the "RexsterApplicationProvider" class is not loaded
+            final ResourceConfig rc = constructResourceConfig();
+
+            // constructs an injectable for the RexsterApplication instance.  This get constructed externally
+            // and is passed into the HttpRexsterServer.  The SingletonTypeInjectableProvider is responsible for
+            // pushing that instance into the context.
+            rc.getSingletons().add(new SingletonTypeInjectableProvider<Context, RexsterApplication>(
+                    RexsterApplication.class, application) {
+            });
+            rc.getSingletons().add(new InstrumentedResourceMethodDispatchAdapter(application.getMetricRegistry()));
+
+            if (this.debugMode) {
+                rc.getContainerRequestFilters().add(new LoggingFilter());
+                rc.getContainerResponseFilters().add(new LoggingFilter());
+            }
+
+            rc.getContainerResponseFilters().add(new HeaderResponseFilter(defaultCharacterEncoding));
+
+            if (!securityFilterType.equals(Tokens.REXSTER_SECURITY_NONE)) {
+                if (securityFilterType.equals(Tokens.REXSTER_SECURITY_DEFAULT)) {
+                    wacJersey.addContextInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, DefaultSecurityFilter.class.getName());
+                    rc.getContainerRequestFilters().add(new DefaultSecurityFilter());
+                } else {
+                    wacJersey.addContextInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, securityFilterType);
+                    final Class clazz = Class.forName(securityFilterType, true, Thread.currentThread().getContextClassLoader());
+                    final AbstractSecurityFilter securityFilter = (AbstractSecurityFilter) clazz.newInstance();
+                    rc.getContainerRequestFilters().add(securityFilter);
+                }
+            }
+
+            if (LogManager.getLoggerRepository().getThreshold().isGreaterOrEqual(Level.TRACE)) {
+
+            }
+
+            final ServletRegistration sg = wacJersey.addServlet("jersey", new ServletContainer(rc));
+            sg.addMapping("/*");
+            wacJersey.deploy(this.httpServer);
         }
-
-        if (LogManager.getLoggerRepository().getThreshold().isGreaterOrEqual(Level.TRACE)) {
-
-        }
-
-        final ServletRegistration sg = wacJersey.addServlet("jersey", new ServletContainer(rc));
-        sg.addMapping("/*");
-        wacJersey.deploy(this.httpServer);
     }
 
     private ResourceConfig constructResourceConfig() {
@@ -289,55 +401,114 @@ public class HttpRexsterServer implements RexsterServer {
     }
 
     private void deployStaticResourceServer() {
-        final String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
-        final ServerConfiguration config = this.httpServer.getServerConfiguration();
-        config.addHttpHandler(new RexsterStaticHttpHandler(absoluteWebRootPath), "/static");
+        if (hasEnableDogHouseChanged() || hasWebRootChanged()) {
+            final ServerConfiguration config = this.httpServer.getServerConfiguration();
+            final String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
+
+            if (staticHttpHandler != null) {
+                config.removeHttpHandler(staticHttpHandler);
+            }
+
+            if (enableDogHouse) {
+                staticHttpHandler = new RexsterStaticHttpHandler(absoluteWebRootPath);
+                config.addHttpHandler(staticHttpHandler, "/static");
+            }
+        }
     }
 
     private void deployDogHouse(final RexsterApplication application) {
         // servlet that services all url from "main" by simply sending
         // main.html back to the calling client.  main.html handles its own
         // state given the uri
-        final WebappContext wacDogHouse = new WebappContext("doghouse", "");
-        final ServletRegistration sgDogHouse = wacDogHouse.addServlet("doghouse", new DogHouseServlet());
-        sgDogHouse.addMapping("/doghouse/*");
-        sgDogHouse.setInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri", baseUri + ":" + rexsterServerPort.toString());
+        if (hasEnableDogHouseChanged() || hasBaseUriChanged()) {
+            if (this.wacDogHouse != null) {
+                this.wacDogHouse.undeploy();
+                this.wacDogHouse = null;
+            }
 
-        final ServletRegistration sgDogHouseEval = wacDogHouse.addServlet("doghouse-evaluator", new EvaluatorServlet(application));
-        sgDogHouseEval.addMapping("/doghouse/exec");
+            if (enableDogHouse) {
+                this.wacDogHouse = new WebappContext("doghouse", "");
+                final ServletRegistration sgDogHouse = wacDogHouse.addServlet("doghouse", new DogHouseServlet());
+                sgDogHouse.addMapping("/doghouse/*");
+                sgDogHouse.setInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri", baseUri + ":" + rexsterServerPort.toString());
 
-        wacDogHouse.deploy(this.httpServer);
+                final ServletRegistration sgDogHouseEval = wacDogHouse.addServlet("doghouse-evaluator", new EvaluatorServlet(application));
+                sgDogHouseEval.addMapping("/doghouse/exec");
+
+                wacDogHouse.deploy(this.httpServer);
+            }
+        }
     }
 
     private void deployMetricsAdmin(final RexsterApplication application) {
-        // deploys the metrics servlet into rexster
-        final WebappContext wacMetrics = new WebappContext("metrics", "");
-        wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.registry", application.getMetricRegistry());
-        wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.rateUnit", this.convertRateTo);
-        wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.durationUnit", this.convertDurationTo);
+        if (this.wacMetrics != null) {
+            this.wacMetrics.undeploy();
+            this.wacMetrics = null;
+        }
 
-        final ServletRegistration sgMetrics = wacMetrics.addServlet("metrics", new MetricsServlet());
-        sgMetrics.addMapping("/metrics/*");
+        if (this.enableHttpReporter) {
+            // deploys the metrics servlet into rexster
+            wacMetrics = new WebappContext("metrics", "");
+            wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.registry", application.getMetricRegistry());
+            wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.rateUnit", this.convertRateTo);
+            wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.durationUnit", this.convertDurationTo);
 
-        wacMetrics.deploy(this.httpServer);
+            final ServletRegistration sgMetrics = wacMetrics.addServlet("metrics", new MetricsServlet());
+            sgMetrics.addMapping("/metrics/*");
+
+            wacMetrics.deploy(this.httpServer);
+        }
     }
 
-    private NetworkListener configureNetworkListener() {
-        final NetworkListener listener = new NetworkListener("grizzly", rexsterServerHost, rexsterServerPort);
-        final ThreadPoolConfig workerThreadPoolConfig = ThreadPoolConfig.defaultConfig()
-                .setCorePoolSize(coreWorkerThreadPoolSize)
-                .setMaxPoolSize(maxWorkerThreadPoolSize);
-        listener.getTransport().setWorkerThreadPoolConfig(workerThreadPoolConfig);
-        final ThreadPoolConfig kernalThreadPoolConfig = ThreadPoolConfig.defaultConfig()
-                .setCorePoolSize(coreKernalThreadPoolSize)
-                .setMaxPoolSize(maxKernalThreadPoolSize);
-        listener.getTransport().setKernelThreadPoolConfig(kernalThreadPoolConfig);
+    private void configureNetworkListener() throws Exception {
+        boolean allowPortChange = true;
+        NetworkListener listener = this.httpServer.getListener("grizzly");
+        if (listener == null) {
+            listener = new NetworkListener("grizzly", rexsterServerHost, rexsterServerPort);
+            this.httpServer.addListener(listener);
+            allowPortChange = false;
+        }
+
+        if (allowPortChange && hasPortHostChanged()) {
+            listener.getTransport().unbindAll();
+            listener.getTransport().bind(rexsterServerHost, rexsterServerPort);
+
+            logger.info(String.format("RexPro Server bound to [%s:%s]", rexsterServerHost, rexsterServerPort));
+        }
+
+        if (hasThreadPoolSizeChanged()) {
+            final ThreadPoolConfig workerThreadPoolConfig = ThreadPoolConfig.defaultConfig()
+                    .setCorePoolSize(coreWorkerThreadPoolSize)
+                    .setMaxPoolSize(maxWorkerThreadPoolSize);
+            listener.getTransport().setWorkerThreadPoolConfig(workerThreadPoolConfig);
+            final ThreadPoolConfig kernalThreadPoolConfig = ThreadPoolConfig.defaultConfig()
+                    .setCorePoolSize(coreKernalThreadPoolSize)
+                    .setMaxPoolSize(maxKernalThreadPoolSize);
+            listener.getTransport().setKernelThreadPoolConfig(kernalThreadPoolConfig);
+
+            if (listener.getTransport().getKernelThreadPool() != null) {
+                ((GrizzlyExecutorService) listener.getTransport().getKernelThreadPool()).reconfigure(kernalThreadPoolConfig);
+            }
+
+            if (listener.getTransport().getWorkerThreadPool() != null) {
+                ((GrizzlyExecutorService) listener.getTransport().getWorkerThreadPool()).reconfigure(workerThreadPoolConfig);
+            }
+
+            logger.info(String.format("HTTP/REST thread pool configuration: kernal[%s / %s] worker[%s / %s] ",
+                    coreKernalThreadPoolSize, maxKernalThreadPoolSize,
+                    coreWorkerThreadPoolSize, maxWorkerThreadPoolSize));
+        }
 
         listener.setMaxPostSize(maxPostSize);
         listener.setMaxHttpHeaderSize(maxHeaderSize);
         listener.setUploadTimeout(uploadTimeoutMillis);
         listener.setDisableUploadTimeout(false);
 
-        return listener;
+        if (this.hasIoStrategyChanged()) {
+            final IOStrategy strategy = GrizzlyIoStrategyFactory.createIoStrategy(this.ioStrategy);
+            listener.getTransport().setIOStrategy(strategy);
+
+            logger.info(String.format("Using %s IOStrategy for HTTP/REST.", strategy.getClass().getName()));
+        }
     }
 }
