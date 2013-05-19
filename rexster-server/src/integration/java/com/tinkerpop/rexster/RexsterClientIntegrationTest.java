@@ -173,9 +173,7 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
 
     }
 
-    // TODO: temporarily ignore until it's explained why Tree now puts the graph in the root of the tree.
     @Test
-    @Ignore
     public void executeAndReturnTree() throws Exception {
         final RexsterClient client = RexsterClientFactory.open();
 
