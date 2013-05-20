@@ -44,6 +44,9 @@ public class ShutdownManager {
     private final int port;
     private final String host;
 
+    private int lastPort;
+    private String lastHost;
+
     private ShutdownSocketListener shutdownSocketListener;
 
     public ShutdownManager(final String host, final int port) {
@@ -62,7 +65,12 @@ public class ShutdownManager {
     }
 
     public void updateSettings(final String host, final int port) {
-        this.shutdownSocketListener.updateSettings(host, port);
+        if (!host.equals(lastHost) || port != lastPort) {
+            this.shutdownSocketListener.updateSettings(host, port);
+        }
+
+        lastHost = host;
+        lastPort = port;
     }
 
     public void registerShutdownListener(final ShutdownListener shutdownListener) {

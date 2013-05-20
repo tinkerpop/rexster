@@ -102,7 +102,22 @@ public class Application {
     }
 
     public void start() throws Exception {
+        configureScriptEngine();
+        properties.addListener(new RexsterProperties.RexsterPropertiesListener() {
+            @Override
+            public void propertiesChanged(final XMLConfiguration configuration) {
+                configureScriptEngine();
+            }
+        });
 
+        this.httpServer.start(this.rexsterApplication);
+        this.rexproServer.start(this.rexsterApplication);
+        this.configurationMonitor.start();
+
+        startShutdownManager(this.properties);
+    }
+
+    private void configureScriptEngine() {
         // the EngineController needs to be configured statically before requests start serving so that it can
         // properly construct ScriptEngine objects with the correct reset policy.
         final int scriptEngineThreshold = this.properties.getScriptEngineResetThreshold();
@@ -121,12 +136,6 @@ public class Application {
         logger.info(String.format(
                 "Gremlin ScriptEngine configured to reset every [%s] requests. Set to -1 to never reset.",
                 scriptEngineThreshold));
-
-        this.httpServer.start(this.rexsterApplication);
-        this.rexproServer.start(this.rexsterApplication);
-        this.configurationMonitor.start();
-
-        startShutdownManager(this.properties);
     }
 
     public void stop() {

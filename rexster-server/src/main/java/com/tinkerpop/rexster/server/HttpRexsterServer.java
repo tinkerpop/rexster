@@ -96,6 +96,7 @@ public class HttpRexsterServer implements RexsterServer {
     private String lastWebRootPath;
     private String lastBaseUri;
     private boolean lastDebugMode;
+    private boolean lastEnableHttpReporter;
 
     public HttpRexsterServer(final XMLConfiguration configuration) {
         this(new RexsterProperties(configuration));
@@ -109,29 +110,30 @@ public class HttpRexsterServer implements RexsterServer {
         properties.addListener(new RexsterProperties.RexsterPropertiesListener() {
             @Override
             public void propertiesChanged(final XMLConfiguration configuration) {
-            // maintain history of previous settings
-            lastRexsterServerHost = rexsterServerHost;
-            lastRexsterServerPort = rexsterServerPort;
-            lastEnableJmx = enableJmx;
-            lastIoStrategy = ioStrategy;
-            lastMaxWorkerThreadPoolSize = maxWorkerThreadPoolSize;
-            lastCoreWorkerThreadPoolSize = coreWorkerThreadPoolSize;
-            lastMaxKernalThreadPoolSize = maxKernalThreadPoolSize;
-            lastCoreKernalThreadPoolSize = coreKernalThreadPoolSize;
-            lastEnableDogHouse = enableDogHouse;
-            lastWebRootPath = webRootPath;
-            lastBaseUri = baseUri;
-            lastSecurityFilterType = securityFilterType;
-            lastDefaultCharacterEncoding = defaultCharacterEncoding;
-            lastDebugMode = debugMode;
+                // maintain history of previous settings
+                lastRexsterServerHost = rexsterServerHost;
+                lastRexsterServerPort = rexsterServerPort;
+                lastEnableJmx = enableJmx;
+                lastIoStrategy = ioStrategy;
+                lastMaxWorkerThreadPoolSize = maxWorkerThreadPoolSize;
+                lastCoreWorkerThreadPoolSize = coreWorkerThreadPoolSize;
+                lastMaxKernalThreadPoolSize = maxKernalThreadPoolSize;
+                lastCoreKernalThreadPoolSize = coreKernalThreadPoolSize;
+                lastEnableDogHouse = enableDogHouse;
+                lastWebRootPath = webRootPath;
+                lastBaseUri = baseUri;
+                lastSecurityFilterType = securityFilterType;
+                lastDefaultCharacterEncoding = defaultCharacterEncoding;
+                lastDebugMode = debugMode;
+                lastEnableHttpReporter = enableHttpReporter;
 
-            updateSettings(configuration);
+                updateSettings(configuration);
 
-            try {
-                reconfigure(app);
-            } catch (Exception ex) {
-                logger.error("Could not modify Rexster configuration.  Please restart Rexster to allow changes to be applied.", ex);
-            }
+                try {
+                    reconfigure(app);
+                } catch (Exception ex) {
+                    logger.error("Could not modify Rexster configuration.  Please restart Rexster to allow changes to be applied.", ex);
+                }
             }
         });
     }
@@ -151,12 +153,32 @@ public class HttpRexsterServer implements RexsterServer {
      * Reconfigures and starts the server if not already started.
      */
     public void reconfigure(final RexsterApplication application) throws Exception {
-        deployRestApi(application);
+        // Seems to be a bug in WebappContext.undeploy() of grizzly that not only undeploy's the context,but
+        // all the servlet registrations from other contexts as well.  hence....it is not possible to undeploy
+        // just a single context with tearing everything down and building it back. unfortunately this means that
+        // a full undeploy and redeploy of all apps installed to the web server need to be removed and put back
+        // on any change.  ....either that, or I don't get the undeploy() method and what it's supposed to do
+        if (hasAnythingChanged()) {
 
-        // serves images
+            if (this.wacJersey != null) {
+                this.wacJersey.undeploy();
+                this.wacJersey = null;
+            }
+
+            if (this.wacDogHouse != null) {
+                this.wacDogHouse.undeploy();
+                this.wacDogHouse = null;
+            }
+
+            if (this.wacMetrics != null) {
+                this.wacMetrics.undeploy();
+                this.wacMetrics = null;
+            }
+        }
+
+        deployRestApi(application);
         deployStaticResourceServer();
         deployDogHouse(application);
-
         deployMetricsAdmin(application);
 
         this.configureNetworkListener();
@@ -181,6 +203,11 @@ public class HttpRexsterServer implements RexsterServer {
         final MetricRegistry metricRegistry = application.getMetricRegistry();
         manageMetricsFromJmx(metricRegistry, register);
         logger.info(register ? "Registered JMX Metrics." : "Removed JMX Metrics.");
+    }
+
+    private boolean hasAnythingChanged() {
+        return hasRestConfigurationsChanged() || hasWebRootChanged() || hasEnableDogHouseChanged()
+                || hasBaseUriChanged() || hasEnableHttpReporterChanged();
     }
 
     private boolean hasWebRootChanged() {
@@ -215,6 +242,10 @@ public class HttpRexsterServer implements RexsterServer {
     private boolean hasRestConfigurationsChanged() {
         return !this.securityFilterType.equals(this.lastSecurityFilterType) || !this.defaultCharacterEncoding.equals(this.lastDefaultCharacterEncoding)
                 || this.debugMode != lastDebugMode;
+    }
+
+    private boolean hasEnableHttpReporterChanged() {
+        return this.enableHttpReporter != this.lastEnableHttpReporter;
     }
 
     private void updateSettings(final XMLConfiguration configuration) {
@@ -326,12 +357,7 @@ public class HttpRexsterServer implements RexsterServer {
     }
 
     private void deployRestApi(final RexsterApplication application) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        if (this.hasRestConfigurationsChanged()) {
-            if (this.wacJersey != null) {
-                this.wacJersey.undeploy();
-                this.wacJersey = null;
-            }
-
+        if (hasAnythingChanged()) {
             wacJersey = new WebappContext("jersey", "");
 
             // explicitly load resources so that the "RexsterApplicationProvider" class is not loaded
@@ -401,7 +427,7 @@ public class HttpRexsterServer implements RexsterServer {
     }
 
     private void deployStaticResourceServer() {
-        if (hasEnableDogHouseChanged() || hasWebRootChanged()) {
+        if (hasAnythingChanged()) {
             final ServerConfiguration config = this.httpServer.getServerConfiguration();
             final String absoluteWebRootPath = (new File(webRootPath)).getAbsolutePath();
 
@@ -420,12 +446,7 @@ public class HttpRexsterServer implements RexsterServer {
         // servlet that services all url from "main" by simply sending
         // main.html back to the calling client.  main.html handles its own
         // state given the uri
-        if (hasEnableDogHouseChanged() || hasBaseUriChanged()) {
-            if (this.wacDogHouse != null) {
-                this.wacDogHouse.undeploy();
-                this.wacDogHouse = null;
-            }
-
+        if (hasAnythingChanged()) {
             if (enableDogHouse) {
                 this.wacDogHouse = new WebappContext("doghouse", "");
                 final ServletRegistration sgDogHouse = wacDogHouse.addServlet("doghouse", new DogHouseServlet());
@@ -441,22 +462,19 @@ public class HttpRexsterServer implements RexsterServer {
     }
 
     private void deployMetricsAdmin(final RexsterApplication application) {
-        if (this.wacMetrics != null) {
-            this.wacMetrics.undeploy();
-            this.wacMetrics = null;
-        }
+        if (hasAnythingChanged()) {
+            if (this.enableHttpReporter) {
+                // deploys the metrics servlet into rexster
+                wacMetrics = new WebappContext("metrics", "");
+                wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.registry", application.getMetricRegistry());
+                wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.rateUnit", this.convertRateTo);
+                wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.durationUnit", this.convertDurationTo);
 
-        if (this.enableHttpReporter) {
-            // deploys the metrics servlet into rexster
-            wacMetrics = new WebappContext("metrics", "");
-            wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.registry", application.getMetricRegistry());
-            wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.rateUnit", this.convertRateTo);
-            wacMetrics.setAttribute("com.yammer.metrics.servlets.MetricsServlet.durationUnit", this.convertDurationTo);
+                final ServletRegistration sgMetrics = wacMetrics.addServlet("metrics", new MetricsServlet());
+                sgMetrics.addMapping("/metrics/*");
 
-            final ServletRegistration sgMetrics = wacMetrics.addServlet("metrics", new MetricsServlet());
-            sgMetrics.addMapping("/metrics/*");
-
-            wacMetrics.deploy(this.httpServer);
+                wacMetrics.deploy(this.httpServer);
+            }
         }
     }
 
