@@ -51,12 +51,14 @@ public class RexProRexsterServer implements RexsterServer {
     private long connectionIdleInterval;
     private boolean enableJmx;
     private String ioStrategy;
+    private String securityFilterType;
 
     private JmxObject jmx;
     private RexProSessionMonitor rexProSessionMonitor = new RexProSessionMonitor();
 
     private Integer lastRexproServerPort;
     private String lastRexproServerHost;
+    private String lastSecurityFilterType;
     private String lastIoStrategy;
     private boolean lastEnableJmx;
     private int lastMaxWorkerThreadPoolSize;
@@ -96,6 +98,7 @@ public class RexProRexsterServer implements RexsterServer {
             lastCoreKernalThreadPoolSize = coreKernalThreadPoolSize;
             lastConnectionIdleInterval = connectionIdleInterval;
             lastConnectionIdleMax = connectionIdleMax;
+            lastSecurityFilterType = securityFilterType;
 
             updateSettings(configuration);
 
@@ -189,6 +192,10 @@ public class RexProRexsterServer implements RexsterServer {
         return this.connectionIdleInterval != this.lastConnectionIdleInterval || this.connectionIdleMax != this.lastConnectionIdleMax;
     }
 
+    private boolean hasSecurityFilterChanged() {
+        return !this.securityFilterType.equals(this.lastSecurityFilterType);
+    }
+
     private void updateSettings(final XMLConfiguration configuration) {
         this.rexproServerPort = configuration.getInteger("rexpro.server-port", new Integer(RexsterSettings.DEFAULT_REXPRO_PORT));
         this.rexproServerHost = configuration.getString("rexpro.server-host", "0.0.0.0");
@@ -200,6 +207,15 @@ public class RexProRexsterServer implements RexsterServer {
         this.connectionIdleInterval = configuration.getLong("rexpro.connection-check-interval", new Long(RexsterSettings.DEFAULT_REXPRO_SESSION_CHECK_INTERVAL));
         this.enableJmx = configuration.getBoolean("rexpro.enable-jmx", false);
         this.ioStrategy = configuration.getString("rexpro.io-strategy", "leader-follower");
+
+        HierarchicalConfiguration securityConfiguration = null;
+        try {
+            securityConfiguration = configuration.configurationAt(Tokens.REXSTER_SECURITY_AUTH);
+        } catch (IllegalArgumentException iae) {
+            // do nothing...null is cool
+        }
+
+        securityFilterType = securityConfiguration != null ? securityConfiguration.getString("type") : Tokens.REXSTER_SECURITY_NONE;
     }
 
     private FilterChain constructFilterChain(final RexsterApplication application) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
@@ -323,14 +339,11 @@ public class RexProRexsterServer implements RexsterServer {
 
         }
 
+        // when the processor is reset, the port/host have to be rebound.
         this.tcpTransport.setProcessor(constructFilterChain(app));
+        this.tcpTransport.unbindAll();
+        this.tcpTransport.bind(rexproServerHost, rexproServerPort);
 
-        // unbind everything first then bind back if changed.
-        if (this.hasPortHostChanged()) {
-            this.tcpTransport.unbindAll();
-            this.tcpTransport.bind(rexproServerHost, rexproServerPort);
-
-            logger.info(String.format("RexPro Server bound to [%s:%s]", rexproServerHost, rexproServerPort));
-        }
+        logger.info(String.format("RexPro Server bound to [%s:%s]", rexproServerHost, rexproServerPort));
     }
 }
