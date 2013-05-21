@@ -18,7 +18,8 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Processes a ScriptRequestMessage against the script engine for the channel.
@@ -55,12 +56,12 @@ public class ScriptFilter extends BaseFilter {
                 if (specificMessage.Session == null) {
                     logger.error("no session key on message");
                     ctx.write(
-                        MessageUtil.createErrorResponse(
-                            specificMessage.Request,
-                            RexProMessage.EMPTY_SESSION_AS_BYTES,
-                            ErrorResponseMessage.INVALID_SESSION_ERROR,
-                            "There was no session key on the message, set the meta field 'inSession' to true if you want to execute sessionless requests"
-                        )
+                            MessageUtil.createErrorResponse(
+                                    specificMessage.Request,
+                                    RexProMessage.EMPTY_SESSION_AS_BYTES,
+                                    ErrorResponseMessage.INVALID_SESSION_ERROR,
+                                    "There was no session key on the message, set the meta field 'inSession' to true if you want to execute sessionless requests"
+                            )
                     );
 
                 }
@@ -85,50 +86,19 @@ public class ScriptFilter extends BaseFilter {
                     bindings.put(specificMessage.metaGetGraphObjName(), graph);
                 }
 
-                // start transaction
-                if (graph != null && specificMessage.metaGetTransaction()) {
-                    tryRollbackTransaction(graph);
-                }
-
                 try {
-                    // execute script
-                    final Object result = session.evaluate(
-                        specificMessage.Script,
-                        specificMessage.LanguageName,
-                        bindings,
-                        specificMessage.metaGetIsolate()
-                    );
-
-                    RexProMessage resultMessage = null;
-                    if (session.getChannel() == RexProChannel.CHANNEL_CONSOLE) {
-                        resultMessage = formatForConsoleChannel(specificMessage, session, result);
-
-                    } else if (session.getChannel() == RexProChannel.CHANNEL_MSGPACK) {
-                        resultMessage = formatForMsgPackChannel(specificMessage, session, result);
-
-                    } else if (session.getChannel() == RexProChannel.CHANNEL_GRAPHSON) {
-                        resultMessage = formatForGraphSONChannel(specificMessage, session, result);
-                    } else {
-                        // malformed channel???!!!
-                        logger.warn(String.format("Session is configured for a channel that does not exist: [%s]", session.getChannel()));
-                    }
-
-                    //serialize before closing the transaction and result objects go out of scope
-                    byte[] messageBytes = RexProMessage.serialize(resultMessage);
-
-                    //commit transaction
-                    if (graph != null && specificMessage.metaGetTransaction()) {
-                        tryCommitTransaction(graph);
-                    }
-
-                    // write the message after the transaction so that we can be assured that it properly committed
-                    // if auto-commit was on
+                    //message serialization and transaction commit are handled
+                    //inside the session evaluator so the script execution,
+                    //serialization and transaction commit are all handled
+                    //in the same thread
+                    byte[] messageBytes = session.evaluate(specificMessage, bindings);
                     ctx.write(messageBytes);
                 } catch (Exception ex) {
                     // rollback transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {
                         tryRollbackTransaction(graph);
                     }
+
                     throw ex;
                 }
 
@@ -151,13 +121,12 @@ public class ScriptFilter extends BaseFilter {
                     } else {
                         // graph config problem
                         ctx.write(
-                            MessageUtil.createErrorResponse(
-                                message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
-                                ErrorResponseMessage.GRAPH_CONFIG_ERROR,
-                                "the graph '" + specificMessage.metaGetGraphName() + "' was not found by Rexster"
-                            )
+                                MessageUtil.createErrorResponse(
+                                        message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                                        ErrorResponseMessage.GRAPH_CONFIG_ERROR,
+                                        "the graph '" + specificMessage.metaGetGraphName() + "' was not found by Rexster"
+                                )
                         );
-
                         return ctx.getStopAction();
 
                     }
@@ -201,6 +170,7 @@ public class ScriptFilter extends BaseFilter {
                     if (graph != null && specificMessage.metaGetTransaction()) {
                         tryRollbackTransaction(graph);
                     }
+
                     throw ex;
                 }
             }
@@ -211,30 +181,30 @@ public class ScriptFilter extends BaseFilter {
                     + "] and request [" + specificMessage.Request + "]");
 
             ctx.write(
-                MessageUtil.createErrorResponse(
-                    specificMessage.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
-                    ErrorResponseMessage.SCRIPT_FAILURE_ERROR,
-                    String.format(
-                        MessageTokens.ERROR_IN_SCRIPT_PROCESSING,
-                        specificMessage.LanguageName,
-                        se.getMessage()
+                    MessageUtil.createErrorResponse(
+                            specificMessage.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                            ErrorResponseMessage.SCRIPT_FAILURE_ERROR,
+                            String.format(
+                                    MessageTokens.ERROR_IN_SCRIPT_PROCESSING,
+                                    specificMessage.LanguageName,
+                                    se.getMessage()
+                            )
                     )
-                )
             );
 
         } catch (Exception e) {
             logger.error(e);
             ctx.write(
-                MessageUtil.createErrorResponse(
-                    specificMessage.Request,
-                    RexProMessage.EMPTY_SESSION_AS_BYTES,
-                    ErrorResponseMessage.SCRIPT_FAILURE_ERROR,
-                    String.format(
-                        MessageTokens.ERROR_IN_SCRIPT_PROCESSING,
-                        specificMessage.LanguageName,
-                        e.toString()
+                    MessageUtil.createErrorResponse(
+                            specificMessage.Request,
+                            RexProMessage.EMPTY_SESSION_AS_BYTES,
+                            ErrorResponseMessage.SCRIPT_FAILURE_ERROR,
+                            String.format(
+                                    MessageTokens.ERROR_IN_SCRIPT_PROCESSING,
+                                    specificMessage.LanguageName,
+                                    e.toString()
+                            )
                     )
-                )
             );
         }
         return ctx.getStopAction();
@@ -259,11 +229,11 @@ public class ScriptFilter extends BaseFilter {
                                             final ScriptRequestMessage specificMessage, final Graph graph) {
         if (specificMessage.metaGetGraphName() != null && graph != null) {
             ctx.write(
-                MessageUtil.createErrorResponse(
-                        message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
-                        ErrorResponseMessage.GRAPH_CONFIG_ERROR,
-                        MessageTokens.ERROR_GRAPH_REDEFINITION
-                )
+                    MessageUtil.createErrorResponse(
+                            message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                            ErrorResponseMessage.GRAPH_CONFIG_ERROR,
+                            MessageTokens.ERROR_GRAPH_REDEFINITION
+                    )
             );
 
             return true;
@@ -299,19 +269,19 @@ public class ScriptFilter extends BaseFilter {
         if (session == null) {
             // the message is assigned a session that does not exist on the server
             ctx.write(
-                MessageUtil.createErrorResponse(
-                        message.Request,
-                        RexProMessage.EMPTY_SESSION_AS_BYTES,
-                        ErrorResponseMessage.INVALID_SESSION_ERROR,
-                        MessageTokens.ERROR_SESSION_INVALID
-                )
+                    MessageUtil.createErrorResponse(
+                            message.Request,
+                            RexProMessage.EMPTY_SESSION_AS_BYTES,
+                            ErrorResponseMessage.INVALID_SESSION_ERROR,
+                            MessageTokens.ERROR_SESSION_INVALID
+                    )
             );
             return true;
         }
         return false;
     }
 
-    private static GraphSONScriptResponseMessage formatForGraphSONChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
+    public static GraphSONScriptResponseMessage formatForGraphSONChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
         final GraphSONScriptResponseMessage graphSONScriptResponseMessage = new GraphSONScriptResponseMessage();
 
         if (specificMessage.metaGetInSession()){
@@ -329,7 +299,7 @@ public class ScriptFilter extends BaseFilter {
         return graphSONScriptResponseMessage;
     }
 
-    private static MsgPackScriptResponseMessage formatForMsgPackChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
+    public static MsgPackScriptResponseMessage formatForMsgPackChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
         final MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
 
         if (specificMessage.metaGetInSession()){
@@ -347,7 +317,7 @@ public class ScriptFilter extends BaseFilter {
         return msgPackScriptResponseMessage;
     }
 
-    private static ConsoleScriptResponseMessage formatForConsoleChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
+    public static ConsoleScriptResponseMessage formatForConsoleChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
         final ConsoleScriptResponseMessage consoleScriptResponseMessage = new ConsoleScriptResponseMessage();
 
         if (specificMessage.metaGetInSession()){
