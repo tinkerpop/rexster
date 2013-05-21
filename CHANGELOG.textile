@@ -30,6 +30,11 @@ h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 ```
 
 * Property data types in REST now properly support @boolean@ values.
+* Serialize RexPro in the same thread that mutates the graph to prevent partial serialization of property values with Neo4j.
+* Improve logging for
+** Graph configuration errors
+** Bad/missing Gremlin intiializations scripts.
+** Incoming RexPro messages
 
 ==<hr/>==
 
