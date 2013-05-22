@@ -112,9 +112,9 @@ public class ScriptFilter extends BaseFilter {
                     //inside the session evaluator so the script execution,
                     //serialization and transaction commit are all handled
                     //in the same thread
-                    byte[] messageBytes = session.evaluate(specificMessage, bindings);
-                    successfulExecutions.inc();
-                    ctx.write(messageBytes);
+//                    byte[] messageBytes = session.evaluate(specificMessage, bindings);
+//                    successfulExecutions.inc();
+//                    ctx.write(messageBytes);
                 } catch (Exception ex) {
                     // rollback transaction
                     if (graph != null && specificMessage.metaGetTransaction()) {

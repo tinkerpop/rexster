@@ -4,9 +4,7 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.filter.AbstractSecurityFilter;
 import com.tinkerpop.rexster.filter.DefaultSecurityFilter;
 import com.tinkerpop.rexster.protocol.RexProSessionMonitor;
-import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
-import com.tinkerpop.rexster.protocol.filter.ScriptFilter;
-import com.tinkerpop.rexster.protocol.filter.SessionFilter;
+import com.tinkerpop.rexster.protocol.filter.*;
 import com.yammer.metrics.JmxAttributeGauge;
 import com.yammer.metrics.JmxReporter;
 import com.yammer.metrics.MetricRegistry;
@@ -82,7 +80,7 @@ public class RexProRexsterServer implements RexsterServer {
         filterChainBuilder.add(new IdleTimeoutFilter(
                 IdleTimeoutFilter.createDefaultIdleDelayedExecutor(this.connectionIdleInterval, TimeUnit.MILLISECONDS),
                 this.connectionIdleMax, TimeUnit.MILLISECONDS));
-        filterChainBuilder.add(new RexProMessageFilter());
+        filterChainBuilder.add(new RexProServerFilter(application));
 
         HierarchicalConfiguration securityConfiguration = null;
         try {
@@ -109,11 +107,7 @@ public class RexProRexsterServer implements RexsterServer {
             logger.info("Rexster configured with [" + filter.getName() + "].");
         }
 
-        if (this.allowSessions) {
-            filterChainBuilder.add(new SessionFilter(application));
-        }
-
-        filterChainBuilder.add(new ScriptFilter(application));
+        filterChainBuilder.add(new RexProProcessorFilter());
 
         final IOStrategy strategy = GrizzlyIoStrategyFactory.createIoStrategy(this.ioStrategy);
 

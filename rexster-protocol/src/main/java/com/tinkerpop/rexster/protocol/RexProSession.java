@@ -4,10 +4,8 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.client.RexProException;
-import com.tinkerpop.rexster.protocol.filter.ScriptFilter;
-import com.tinkerpop.rexster.protocol.msg.RexProChannel;
-import com.tinkerpop.rexster.protocol.msg.RexProMessage;
-import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.server.RexProRequest;
+import com.tinkerpop.rexster.protocol.server.ScriptServer;
 import com.tinkerpop.rexster.server.RexsterApplication;
 
 import javax.script.Bindings;
@@ -98,13 +96,14 @@ public class RexProSession {
         this.executor.shutdown();
     }
 
-    public byte[] evaluate(final ScriptRequestMessage msg, final Bindings bindings) throws ScriptException {
+    public void evaluate(final String script, final String languageName, final Bindings rexsterBindings, final Boolean isolate,
+                           final Boolean inTransaction, final Graph graph, final RexProRequest request) throws ScriptException {
 
         try {
-            final EngineHolder engine = this.controller.getEngineByLanguageName(msg.LanguageName);
+            final EngineHolder engine = this.controller.getEngineByLanguageName(languageName);
 
-            Future<byte[]> future;
-            if (msg.metaGetIsolate()) {
+            Future future;
+            if (isolate) {
                 //use separate bindings
                 Bindings tempBindings = new SimpleBindings();
                 tempBindings.putAll(this.bindings);
@@ -113,15 +112,26 @@ public class RexProSession {
                     tempBindings.putAll(bindings);
                 }
 
-                future = this.executor.submit(new Evaluator(engine.getEngine(), this, msg, tempBindings, getGraphObj()));
+                future = this.executor.submit(
+                        new Evaluator(
+                                engine.getEngine(), script, tempBindings,
+                                inTransaction, graph, request
+                        )
+                );
             } else {
                 if (bindings != null) {
                     this.bindings.putAll(bindings);
                 }
-                future = this.executor.submit(new Evaluator(engine.getEngine(), this, msg, this.bindings, getGraphObj()));
+
+                future = this.executor.submit(
+                        new Evaluator(
+                                engine.getEngine(), script, this.bindings,
+                                inTransaction, graph, request
+                        )
+                );
             }
 
-            return future.get();
+            future.get();
         } catch (Exception e) {
             // attempt to abort the transaction across all graphs since a new thread will be created on the next request.
             // don't want transactions lingering about, though this seems like a brute force way to deal with it.
@@ -140,58 +150,29 @@ public class RexProSession {
         }
     }
 
-    private class Evaluator implements Callable<byte[]> {
+    private class Evaluator implements Callable {
         private ScriptEngine engine;
-        private RexProSession session;
-        private final ScriptRequestMessage msg;
         private final Bindings bindings;
-        private final Graph graph;
+        private final String script;
+        private Boolean inTransaction;
+        private Graph graph;
+        private RexProRequest request;
 
-        public Evaluator(final ScriptEngine engine, RexProSession session, final ScriptRequestMessage msg, final Bindings bindings, final Graph graph) {
+        public Evaluator(final ScriptEngine engine, final String script, final Bindings bindings,
+                         final Boolean inTransaction, final Graph graph, final RexProRequest request) {
+            this.script = script;
             this.engine = engine;
-            this.session = session;
-            this.msg = msg;
             this.bindings = bindings;
             this.graph = graph;
         }
 
         @Override
-        public byte[] call() throws Exception {
-            //open a transaction if applicable
-            if ((graph instanceof TransactionalGraph) && msg.metaGetTransaction()) {
-                ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            }
-
-            try {
-                //execute the script
-                final Object result = this.engine.eval(msg.Script, bindings);
-
-                //create and serialize the rexpro message
-                RexProMessage resultMessage = null;
-                if (session.getChannel() == RexProChannel.CHANNEL_CONSOLE) {
-                    resultMessage = ScriptFilter.formatForConsoleChannel(msg, session, result);
-
-                } else if (session.getChannel() == RexProChannel.CHANNEL_MSGPACK) {
-                    resultMessage = ScriptFilter.formatForMsgPackChannel(msg, session, result);
-
-                } else if (session.getChannel() == RexProChannel.CHANNEL_GRAPHSON) {
-                    resultMessage = ScriptFilter.formatForGraphSONChannel(msg, session, result);
-                }
-                //serialize before closing the transaction and result objects go out of scope
-                byte[] bytes = RexProMessage.serialize(resultMessage);
-
-                //close the transaction if applicable
-                if ((graph instanceof TransactionalGraph) && msg.metaGetTransaction()) {
-                    ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-                }
-
-                return bytes;
-            } catch (Exception ex) {
-                if ((graph instanceof TransactionalGraph) && msg.metaGetTransaction()) {
-                    ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
-                }
-                throw new ScriptException(ex);
-            }
+        public Object call() throws Exception {
+            if (inTransaction) ScriptServer.tryRollbackTransaction(graph);
+            Object result = this.engine.eval(this.script, this.bindings);
+            request.writeScriptResults(result);
+            if (inTransaction) ScriptServer.tryCommitTransaction(graph);
+            return null;
         }
     }
 }
