@@ -17,6 +17,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 
 * Support server monitoring features via "Metrics":http://metrics.codahale.com/
 * Add performance testing.
+* Moved rexster-*.sh and rexster-*.bat to bin/ (noticeable to developers of source only)
 
 h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 
