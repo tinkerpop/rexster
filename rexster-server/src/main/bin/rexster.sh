@@ -2,7 +2,8 @@
 
 CP=$( echo `dirname $0`/../lib/*.jar . | sed 's/ /:/g')
 CP=$CP:$(find -L `dirname $0`/../ext/ -name "*.jar" | tr '\n' ':')
-#echo $CP
+
+REXSTER_EXT=../ext
 
 PUBLIC=`dirname $0`/../public/
 

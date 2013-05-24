@@ -2,14 +2,14 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.util.DefaultVertexQuery;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.VerticesFromEdgesIterable;
-import com.tinkerpop.gremlin.pipes.filter.LabelFilterPipe;
 import com.tinkerpop.pipes.Pipe;
-import com.tinkerpop.pipes.filter.FilterPipe;
+import com.tinkerpop.pipes.filter.LabelFilterPipe;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +66,7 @@ public class MockVertex implements Vertex {
         if (labels.length == 0) {
             return this.outEdges;
         } else {
-            Pipe pipe = new LabelFilterPipe(labels[0], FilterPipe.Filter.EQUAL);
+            Pipe pipe = new LabelFilterPipe(Query.Compare.EQUAL, labels);
             pipe.setStarts(this.outEdges);
             return pipe;
         }
@@ -76,7 +76,7 @@ public class MockVertex implements Vertex {
         if (labels.length == 0) {
             return this.inEdges;
         } else {
-            Pipe pipe = new LabelFilterPipe(labels[0], FilterPipe.Filter.EQUAL);
+            Pipe pipe = new LabelFilterPipe(Query.Compare.EQUAL, labels);
             pipe.setStarts(this.inEdges);
             return pipe;
         }
