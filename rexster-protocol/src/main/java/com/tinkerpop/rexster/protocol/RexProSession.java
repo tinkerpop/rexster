@@ -163,7 +163,9 @@ public class RexProSession {
             this.script = script;
             this.engine = engine;
             this.bindings = bindings;
+            this.inTransaction = inTransaction;
             this.graph = graph;
+            this.request = request;
         }
 
         @Override
