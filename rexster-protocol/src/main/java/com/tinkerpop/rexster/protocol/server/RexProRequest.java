@@ -206,19 +206,18 @@ public class RexProRequest {
             channel = message.metaGetChannel();
         }
 
-        if (session.getChannel() == RexProChannel.CHANNEL_CONSOLE) {
-            responseMessage = formatForConsoleChannel(message, session, result);
+        if (channel == RexProChannel.CHANNEL_CONSOLE) {
+            writeResponseMessage(formatForConsoleChannel(message, session, result));
 
-        } else if (session.getChannel() == RexProChannel.CHANNEL_MSGPACK) {
-            responseMessage = formatForMsgPackChannel(message, session, result);
+        } else if (channel == RexProChannel.CHANNEL_MSGPACK) {
+            writeResponseMessage(formatForMsgPackChannel(message, session, result));
 
-        } else if (session.getChannel() == RexProChannel.CHANNEL_GRAPHSON) {
-            responseMessage = formatForGraphSONChannel(message, session, result);
+        } else if (channel == RexProChannel.CHANNEL_GRAPHSON) {
+            writeResponseMessage(formatForGraphSONChannel(message, session, result));
         } else {
             // malformed channel???!!!
             logger.warn(String.format("Session is configured for a channel that does not exist: [%s]", session.getChannel()));
         }
-
     }
 
     /**
