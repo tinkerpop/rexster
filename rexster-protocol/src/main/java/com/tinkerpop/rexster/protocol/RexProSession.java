@@ -109,7 +109,7 @@ public class RexProSession {
                 tempBindings.putAll(this.bindings);
 
                 if (bindings != null) {
-                    tempBindings.putAll(bindings);
+                    tempBindings.putAll(rexsterBindings);
                 }
 
                 future = this.executor.submit(
@@ -119,8 +119,8 @@ public class RexProSession {
                         )
                 );
             } else {
-                if (bindings != null) {
-                    this.bindings.putAll(bindings);
+                if (rexsterBindings != null) {
+                    bindings.putAll(rexsterBindings);
                 }
 
                 future = this.executor.submit(
