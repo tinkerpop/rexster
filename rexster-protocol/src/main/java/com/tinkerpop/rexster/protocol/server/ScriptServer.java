@@ -119,12 +119,10 @@ public class ScriptServer {
                 // non-session script request
                 final EngineHolder engineHolder = engineController.getEngineByLanguageName(message.LanguageName);
                 final ScriptEngine scriptEngine = engineHolder.getEngine();
+
                 final Bindings bindings = scriptEngine.createBindings();
-                final Bindings rexsterBindings = message.getBindings();
-                for (Map.Entry<String,Object> e : rexsterBindings.entrySet()) {
-                    bindings.put(e.getKey(), e.getValue());
-                }
                 bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, this.rexsterApplication);
+                bindings.putAll(message.getBindings());
 
                 Graph graph = null;
                 if (message.metaGetGraphName() != null) {
