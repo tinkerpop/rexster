@@ -2,7 +2,7 @@ package com.tinkerpop.rexster.console;
 
 import com.tinkerpop.pipes.util.iterators.SingleIterator;
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.protocol.RemoteRexsterSession;
+import com.tinkerpop.rexster.client.RemoteRexsterSession;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProChannel;

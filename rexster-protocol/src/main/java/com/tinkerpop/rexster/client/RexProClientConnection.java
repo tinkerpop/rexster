@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster.protocol;
+package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.client.RexProClientFilter;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;

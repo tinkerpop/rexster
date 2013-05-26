@@ -1,22 +1,11 @@
-package com.tinkerpop.rexster.protocol;
+package com.tinkerpop.rexster.client;
 
-import com.tinkerpop.rexster.client.RexsterClient;
-import com.tinkerpop.rexster.client.RexsterClientFactory;
-import com.tinkerpop.rexster.client.RexsterClientTokens;
-import com.tinkerpop.rexster.protocol.msg.RexProChannel;
-import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.log4j.BasicConfigurator;
-import org.msgpack.type.Value;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import static org.msgpack.template.Templates.TString;
-import static org.msgpack.template.Templates.TValue;
-import static org.msgpack.template.Templates.tList;
-import static org.msgpack.template.Templates.tMap;
 
 /**
  * A bit of an experiment.

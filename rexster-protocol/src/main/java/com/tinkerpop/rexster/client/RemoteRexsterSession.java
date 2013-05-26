@@ -1,6 +1,5 @@
-package com.tinkerpop.rexster.protocol;
+package com.tinkerpop.rexster.client;
 
-import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.protocol.msg.RexProChannel;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
