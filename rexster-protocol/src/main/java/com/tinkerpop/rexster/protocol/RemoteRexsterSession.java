@@ -27,14 +27,14 @@ public class RemoteRexsterSession {
     private String password = "";
     private int channel;
 
-    private RexPro rexProConnection;
+    private RexProClientConnection rexProConnection;
 
     private UUID sessionKey = RexProMessage.EMPTY_SESSION;
 
     private List<String> availableLanguages;
 
     public RemoteRexsterSession(String rexProHost, int rexProPort, String username, String password) {
-        this(rexProHost, rexProPort, RexPro.DEFAULT_TIMEOUT_SECONDS, username, password);
+        this(rexProHost, rexProPort, RexProClientConnection.DEFAULT_TIMEOUT_SECONDS, username, password);
     }
 
     public RemoteRexsterSession(String rexProHost, int rexProPort, int timeout, String username, String password) {
@@ -48,7 +48,7 @@ public class RemoteRexsterSession {
         this.username = username;
         this.password = password;
         this.channel = channel;
-        this.rexProConnection = new RexPro(rexProHost, rexProPort);
+        this.rexProConnection = new RexProClientConnection(rexProHost, rexProPort);
     }
 
     public void open() {
@@ -69,7 +69,7 @@ public class RemoteRexsterSession {
             // if close() gets called then have to recreate the the connection here.  need to factor out this
             // RexPro class.
             if (this.rexProConnection == null) {
-                this.rexProConnection = new RexPro(rexProHost, rexProPort);
+                this.rexProConnection = new RexProClientConnection(rexProHost, rexProPort);
             }
 
             final RexProMessage rcvMessage = sendRequest(sessionRequestMessageToSend, 3);

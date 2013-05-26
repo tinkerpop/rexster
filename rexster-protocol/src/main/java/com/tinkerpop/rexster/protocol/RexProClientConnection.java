@@ -21,13 +21,13 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public final class RexPro {
+public final class RexProClientConnection {
     public static final int DEFAULT_TIMEOUT_SECONDS = 100;
 
     private final Connection connection;
     private final BlockingQueue<RexProMessage> responseQueue = new SynchronousQueue<RexProMessage>(true);
 
-    public RexPro(String rexProHost, int rexProPort) {
+    public RexProClientConnection(String rexProHost, int rexProPort) {
         TCPNIOTransport transport = getTransport(responseQueue);
 
         try {
