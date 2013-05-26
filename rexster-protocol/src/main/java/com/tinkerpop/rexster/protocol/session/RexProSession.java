@@ -24,97 +24,33 @@ import java.util.concurrent.Executors;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class RexProSession {
-
-    private final Bindings bindings = new SimpleBindings();
+public class RexProSession extends AbstractRexProSession{
 
     private final String sessionKey;
 
-    private final int channel;
-
-    private final EngineController controller = EngineController.getInstance();
-
     private Date lastTimeUsed = new Date();
-
-    private final RexsterApplication rexsterApplication;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    //the graph bound to this session
-    private Graph graphObj = null;
-
-    //the variable name of the graph in the interperter
-    private String graphObjName = null;
-
     public RexProSession(final String sessionKey, final RexsterApplication rexsterApplication, final int channel) {
+        super(rexsterApplication, channel);
         this.sessionKey = sessionKey;
-        this.channel = channel;
-        this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, new RexsterApplicationHolder(rexsterApplication));
-        this.rexsterApplication = rexsterApplication;
-    }
-
-    /**
-     * Configures a graph object on the session, and sets the variable name of
-     * the graph in the interpreter
-     *
-     * @param graphName: the name of the graph (in rexster.xml)
-     * @param graphObjName: the variable name of the graph in the interpreter (usually "g")
-     */
-    public void setGraphObj(final String graphName, final String graphObjName) throws RexProException{
-        graphObj = rexsterApplication.getGraph(graphName);
-        if (graphObj == null) {
-            throw new RexProException("the graph '" + graphName + "' was not found by Rexster");
-        }
-        this.graphObjName = graphObjName;
-        bindings.put(this.graphObjName, graphObj);
-    }
-
-    public Graph getGraphObj() {
-        return graphObj;
-    }
-
-    public Boolean hasGraphObj() {
-        return graphObj != null;
-    }
-
-    public String getSessionKey() {
-        return this.sessionKey;
-    }
-
-    public Bindings getBindings() {
-        return this.bindings;
-    }
-
-    public int getChannel() {
-        return this.channel;
-    }
-
-    public long getIdleTime() {
-        return (new Date()).getTime() - this.lastTimeUsed.getTime();
     }
 
     public void kill() {
         this.executor.shutdown();
     }
 
-    public void evaluate(final String script, final String languageName, final Bindings requestBindings, final Boolean isolate,
-                           final Boolean inTransaction, final Graph graph, final RexProRequest request) throws ScriptException {
+    public long getIdleTime() {
+        return (new Date()).getTime() - this.lastTimeUsed.getTime();
+    }
+
+    @Override
+    protected void execute(Evaluator evaluator) throws ScriptException {
 
         try {
-            final ScriptEngine engine = this.controller.getEngineByLanguageName(languageName).getEngine();
-
-            //setup the bindings for the request
-            Bindings executorBindings;
-            if (isolate) {
-                executorBindings = new SimpleBindings();
-                executorBindings.putAll(this.bindings);
-            } else {
-                executorBindings = this.bindings;
-            }
-            if (requestBindings != null) executorBindings.putAll(requestBindings);
-
             //execute request in the same thread the session was created on
-            this.executor.submit(new Evaluator(engine, script, executorBindings, inTransaction, graph, request)).get();
+            this.executor.submit(evaluator).get();
 
         } catch (Exception e) {
             // attempt to abort the transaction across all graphs since a new thread will be created on the next request.
@@ -134,31 +70,4 @@ public class RexProSession {
         }
     }
 
-    private class Evaluator implements Callable {
-        private ScriptEngine engine;
-        private final Bindings bindings;
-        private final String script;
-        private Boolean inTransaction;
-        private Graph graph;
-        private RexProRequest request;
-
-        public Evaluator(final ScriptEngine engine, final String script, final Bindings bindings,
-                         final Boolean inTransaction, final Graph graph, final RexProRequest request) {
-            this.script = script;
-            this.engine = engine;
-            this.bindings = bindings;
-            this.inTransaction = inTransaction;
-            this.graph = graph;
-            this.request = request;
-        }
-
-        @Override
-        public Object call() throws Exception {
-            if (inTransaction) ScriptServer.tryRollbackTransaction(graph);
-            Object result = this.engine.eval(this.script, this.bindings);
-            request.writeScriptResults(result);
-            if (inTransaction) ScriptServer.tryCommitTransaction(graph);
-            return null;
-        }
-    }
 }
