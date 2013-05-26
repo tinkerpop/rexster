@@ -96,42 +96,25 @@ public class RexProSession {
         this.executor.shutdown();
     }
 
-    public void evaluate(final String script, final String languageName, final Bindings rexsterBindings, final Boolean isolate,
+    public void evaluate(final String script, final String languageName, final Bindings requestBindings, final Boolean isolate,
                            final Boolean inTransaction, final Graph graph, final RexProRequest request) throws ScriptException {
 
         try {
-            final EngineHolder engine = this.controller.getEngineByLanguageName(languageName);
+            final ScriptEngine engine = this.controller.getEngineByLanguageName(languageName).getEngine();
 
-            Future future;
+            //setup the bindings for the request
+            Bindings executorBindings;
             if (isolate) {
-                //use separate bindings
-                Bindings tempBindings = new SimpleBindings();
-                tempBindings.putAll(this.bindings);
-
-                if (bindings != null) {
-                    tempBindings.putAll(rexsterBindings);
-                }
-
-                future = this.executor.submit(
-                        new Evaluator(
-                                engine.getEngine(), script, tempBindings,
-                                inTransaction, graph, request
-                        )
-                );
+                executorBindings = new SimpleBindings();
+                executorBindings.putAll(this.bindings);
             } else {
-                if (rexsterBindings != null) {
-                    bindings.putAll(rexsterBindings);
-                }
-
-                future = this.executor.submit(
-                        new Evaluator(
-                                engine.getEngine(), script, this.bindings,
-                                inTransaction, graph, request
-                        )
-                );
+                executorBindings = this.bindings;
             }
+            if (requestBindings != null) executorBindings.putAll(requestBindings);
 
-            future.get();
+            //execute request in the same thread the session was created on
+            this.executor.submit(new Evaluator(engine, script, executorBindings, inTransaction, graph, request)).get();
+
         } catch (Exception e) {
             // attempt to abort the transaction across all graphs since a new thread will be created on the next request.
             // don't want transactions lingering about, though this seems like a brute force way to deal with it.
