@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.protocol.server;
 
-import com.tinkerpop.rexster.protocol.RexProSession;
+import com.tinkerpop.rexster.protocol.session.RexProSession;
 import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import org.apache.log4j.Logger;

@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster.protocol;
+package com.tinkerpop.rexster.protocol.session;
 
 import java.util.Collection;
 

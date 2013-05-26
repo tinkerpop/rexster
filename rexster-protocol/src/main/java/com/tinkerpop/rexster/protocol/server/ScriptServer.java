@@ -5,8 +5,8 @@ import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.EngineHolder;
-import com.tinkerpop.rexster.protocol.RexProSession;
-import com.tinkerpop.rexster.protocol.RexProSessions;
+import com.tinkerpop.rexster.protocol.session.RexProSession;
+import com.tinkerpop.rexster.protocol.session.RexProSessions;
 import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import org.apache.log4j.Logger;
@@ -18,7 +18,6 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  */
@@ -61,7 +60,7 @@ public class ScriptServer {
                             message.Request,
                             RexProMessage.EMPTY_SESSION_AS_BYTES,
                             ErrorResponseMessage.INVALID_SESSION_ERROR,
-                            "There was no session key on the message, set the meta field 'inSession' to true if you want to execute sessionless requests"
+                            "There was no session key on the message, set the meta field 'inSession' to false if you want to execute sessionless requests"
                         )
                     );
                 }

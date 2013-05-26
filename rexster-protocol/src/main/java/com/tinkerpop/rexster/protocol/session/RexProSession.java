@@ -1,9 +1,11 @@
-package com.tinkerpop.rexster.protocol;
+package com.tinkerpop.rexster.protocol.session;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.client.RexProException;
+import com.tinkerpop.rexster.protocol.EngineController;
+import com.tinkerpop.rexster.protocol.RexsterApplicationHolder;
 import com.tinkerpop.rexster.protocol.server.RexProRequest;
 import com.tinkerpop.rexster.protocol.server.ScriptServer;
 import com.tinkerpop.rexster.server.RexsterApplication;

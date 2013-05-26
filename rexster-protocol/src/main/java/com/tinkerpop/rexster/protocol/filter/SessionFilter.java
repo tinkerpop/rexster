@@ -2,8 +2,8 @@ package com.tinkerpop.rexster.protocol.filter;
 
 import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.protocol.EngineController;
-import com.tinkerpop.rexster.protocol.RexProSession;
-import com.tinkerpop.rexster.protocol.RexProSessions;
+import com.tinkerpop.rexster.protocol.session.RexProSession;
+import com.tinkerpop.rexster.protocol.session.RexProSessions;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MessageTokens;
 import com.tinkerpop.rexster.protocol.msg.MessageUtil;

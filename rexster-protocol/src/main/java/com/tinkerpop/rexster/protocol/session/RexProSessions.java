@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster.protocol;
+package com.tinkerpop.rexster.protocol.session;
 
 import com.tinkerpop.rexster.server.RexsterApplication;
 import org.apache.log4j.Logger;

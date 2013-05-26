@@ -2,8 +2,8 @@ package com.tinkerpop.rexster.protocol.server;
 
 import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.protocol.EngineController;
-import com.tinkerpop.rexster.protocol.RexProSession;
-import com.tinkerpop.rexster.protocol.RexProSessions;
+import com.tinkerpop.rexster.protocol.session.RexProSession;
+import com.tinkerpop.rexster.protocol.session.RexProSessions;
 import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.yammer.metrics.Gauge;
