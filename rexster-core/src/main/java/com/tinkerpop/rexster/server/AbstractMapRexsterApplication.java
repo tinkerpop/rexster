@@ -2,7 +2,7 @@ package com.tinkerpop.rexster.server;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
-import com.yammer.metrics.MetricRegistry;
+import com.codahale.metrics.MetricRegistry;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -71,7 +71,7 @@ public abstract class AbstractMapRexsterApplication implements RexsterApplicatio
     @Override
     public MetricRegistry getMetricRegistry() {
         if (metricRegistry == null) {
-            metricRegistry = new MetricRegistry("rexster");
+            metricRegistry = new MetricRegistry();
         }
 
         return metricRegistry;

@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.server.metrics;
 
-import com.yammer.metrics.Metric;
-import com.yammer.metrics.MetricFilter;
+import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricFilter;
 
 import java.util.regex.Pattern;
 

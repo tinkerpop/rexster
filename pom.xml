@@ -66,7 +66,7 @@
         <rexster.version>2.4.0-SNAPSHOT</rexster.version>
         <jersey.version>1.17</jersey.version>
         <grizzly.version>2.2.16</grizzly.version>
-        <metrics.version>3.0.0-BETA1</metrics.version>
+        <metrics.version>3.0.0-BETA3</metrics.version>
         <junit.version>4.11</junit.version>
         <srcdir>src/test/java</srcdir>
     </properties>

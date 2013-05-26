@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.server.metrics;
 
 import com.tinkerpop.rexster.Tokens;
-import com.yammer.metrics.MetricRegistry;
+import com.codahale.metrics.MetricRegistry;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 
