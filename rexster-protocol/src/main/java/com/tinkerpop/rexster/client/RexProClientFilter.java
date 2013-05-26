@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster.protocol.filter;
+package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.protocol.msg.*;
 import org.apache.commons.lang.StringUtils;
@@ -21,8 +21,8 @@ import java.io.IOException;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class RexProMessageFilter extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(RexProMessageFilter.class);
+public class RexProClientFilter extends BaseFilter {
+    private static final Logger logger = Logger.getLogger(RexProClientFilter.class);
     private static final MessagePack msgpack = new MessagePack();
     static {
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());

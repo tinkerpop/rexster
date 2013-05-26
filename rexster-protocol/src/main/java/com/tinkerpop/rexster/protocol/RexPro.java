@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
-import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
+import com.tinkerpop.rexster.client.RexProClientFilter;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.filterchain.BaseFilter;
@@ -64,7 +64,7 @@ public final class RexPro {
         // Add TransportFilter, which is responsible
         // for reading and writing data to the connection
         filterChainBuilder.add(new TransportFilter());
-        filterChainBuilder.add(new RexProMessageFilter());
+        filterChainBuilder.add(new RexProClientFilter());
         filterChainBuilder.add(new BaseFilter() {
             @Override
             public NextAction handleRead(FilterChainContext ctx) throws IOException {
