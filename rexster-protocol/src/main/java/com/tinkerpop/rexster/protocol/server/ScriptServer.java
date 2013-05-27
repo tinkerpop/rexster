@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.EngineHolder;
+import com.tinkerpop.rexster.protocol.session.AbstractRexProSession;
 import com.tinkerpop.rexster.protocol.session.RexProSession;
 import com.tinkerpop.rexster.protocol.session.RexProSessions;
 import com.tinkerpop.rexster.protocol.msg.*;
@@ -51,6 +52,9 @@ public class ScriptServer {
     public void handleRequest(ScriptRequestMessage message, RexProRequest request) throws IOException {
 
         try {
+            final AbstractRexProSession session;
+            Graph graph = null;
+
             message.validateMetaData();
             if (message.metaGetInSession()) {
                 if (message.Session == null) {
@@ -66,30 +70,45 @@ public class ScriptServer {
                 }
 
                 //session script request
-                final RexProSession session = RexProSessions.getSession(message.sessionAsUUID().toString());
+                session = RexProSessions.getSession(message.sessionAsUUID().toString());
 
                 // validate session and channel
                 if (sessionDoesNotExist(request, message, session)) return;
                 if (channelIsRedefined(request, message, message, session)) return;
 
-                Graph graph = session.getGraphObj();
+                graph = session.getGraphObj();
 
                 // catch any graph redefinition attempts
                 if (graphIsRedefined(request, message, message, graph)) return;
 
-                Bindings bindings = message.getBindings();
+            } else {
+                session = new EmptySession(rexsterApplication, 0);
+            }
 
-                // add the graph object to the bindings
-                if (message.metaGetGraphName() != null) {
-                    graph = rexsterApplication.getGraph(message.metaGetGraphName());
-                    bindings.put(message.metaGetGraphObjName(), graph);
+            Bindings bindings = message.getBindings();
+
+            // add the graph object to the bindings
+            if (message.metaGetGraphName() != null) {
+                graph = rexsterApplication.getGraph(message.metaGetGraphName());
+                bindings.put(message.metaGetGraphObjName(), graph);
+                if (graph == null) {
+                    // graph config problem
+                    request.writeResponseMessage(
+                            MessageUtil.createErrorResponse(
+                                    message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
+                                    ErrorResponseMessage.GRAPH_CONFIG_ERROR,
+                                    "the graph '" + message.metaGetGraphName() + "' was not found by Rexster"
+                            )
+                    );
+                    return;
                 }
+            }
 
-                final Timer.Context context = scriptTimer.time();
-                try {
+            final Timer.Context timer = scriptTimer.time();
+            try {
 
-                    // execute script
-                    session.evaluate(
+                // execute script
+                session.evaluate(
                         message.Script,
                         message.LanguageName,
                         bindings,
@@ -97,80 +116,21 @@ public class ScriptServer {
                         message.metaGetTransaction(),
                         graph,
                         request
-                    );
+                );
 
-                    successfulExecutions.inc();
+                successfulExecutions.inc();
 
-                } catch (Exception ex) {
-                    // rollback transaction
-                    if (message.metaGetTransaction()) {
-                        tryRollbackTransaction(graph);
-                    }
-
-                    failedExecutions.inc();
-
-                    throw ex;
-                } finally {
-                    context.stop();
-                }
-
-            } else {
-                // non-session script request
-                final EngineHolder engineHolder = engineController.getEngineByLanguageName(message.LanguageName);
-                final ScriptEngine scriptEngine = engineHolder.getEngine();
-
-                final Bindings bindings = scriptEngine.createBindings();
-                bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, this.rexsterApplication);
-                bindings.putAll(message.getBindings());
-
-                Graph graph = null;
-                if (message.metaGetGraphName() != null) {
-                    graph = this.rexsterApplication.getGraph(message.metaGetGraphName());
-                    if (graph != null) {
-                        bindings.put(message.metaGetGraphObjName(), graph);
-                    } else {
-                        // graph config problem
-                        request.writeResponseMessage(
-                            MessageUtil.createErrorResponse(
-                                message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
-                                ErrorResponseMessage.GRAPH_CONFIG_ERROR,
-                                "the graph '" + message.metaGetGraphName() + "' was not found by Rexster"
-                            )
-                        );
-                        return;
-
-                    }
-                }
-
-                // start transaction
+            } catch (Exception ex) {
+                // rollback transaction
                 if (message.metaGetTransaction()) {
                     tryRollbackTransaction(graph);
                 }
 
-                final Timer.Context context = scriptTimer.time();
-                try {
-                    Object result = scriptEngine.eval(message.Script, bindings);
-                    request.writeScriptResults(result);
+                failedExecutions.inc();
 
-                    // commit transaction
-                    if (message.metaGetTransaction()) {
-                        tryCommitTransaction(graph);
-                    }
-
-                    successfulExecutions.inc();
-
-                } catch (Exception ex) {
-                    // rollback transaction
-                    if (message.metaGetTransaction()) {
-                        tryRollbackTransaction(graph);
-                    }
-
-                    failedExecutions.dec();
-
-                    throw ex;
-                } finally {
-                    context.stop();
-                }
+                throw ex;
+            } finally {
+                timer.stop();
             }
 
         } catch (ScriptException se) {
@@ -244,7 +204,7 @@ public class ScriptServer {
      * The channel cannot be redefined within a session.
      */
     private static boolean channelIsRedefined(final RexProRequest request, final RexProMessage message,
-                                              final ScriptRequestMessage specificMessage, final RexProSession session) throws IOException {
+                                              final ScriptRequestMessage specificMessage, final AbstractRexProSession session) throws IOException {
         // have to cast the channel to byte because meta converts to int internally via msgpack conversion
         if (session.getChannel() != Byte.parseByte(specificMessage.metaGetChannel().toString())) {
             request.writeResponseMessage(
@@ -263,7 +223,7 @@ public class ScriptServer {
     /**
      * The session has to be found for script to be executed.
      */
-    private static boolean sessionDoesNotExist(final RexProRequest request, final RexProMessage message, final RexProSession session) throws IOException {
+    private static boolean sessionDoesNotExist(final RexProRequest request, final RexProMessage message, final AbstractRexProSession session) throws IOException {
         if (session == null) {
             // the message is assigned a session that does not exist on the server
             request.writeResponseMessage(
@@ -277,5 +237,23 @@ public class ScriptServer {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Simplified session class that executes scripts immediately
+     */
+    private class EmptySession extends AbstractRexProSession {
+
+        private EmptySession(RexsterApplication rexsterApplication, int channel) {
+            super(rexsterApplication, channel);
+        }
+
+        protected void execute(Evaluator evaluator) throws ScriptException {
+            try {
+                evaluator.call();
+            } catch (Exception e) {
+                throw new ScriptException(e);
+            }
+        }
     }
 }
