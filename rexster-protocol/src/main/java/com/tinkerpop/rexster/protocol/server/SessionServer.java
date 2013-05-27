@@ -93,19 +93,5 @@ public class SessionServer {
             }
             request.writeResponseMessage(responseMessage);
         }
-
-        //todo: move this to the script filter?
-//        if (!RexProSessions.hasSessionKey(message.sessionAsUUID().toString())) {
-//            // the message is assigned a session that does not exist on the server
-//            request.writeResponseMessage(
-//                    MessageUtil.createErrorResponse(
-//                            message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
-//                            ErrorResponseMessage.INVALID_SESSION_ERROR,
-//                            MessageTokens.ERROR_SESSION_INVALID
-//                    )
-//            );
-//            return;
-//        }
-
     }
 }
