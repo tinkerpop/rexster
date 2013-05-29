@@ -23,6 +23,7 @@ public class RexProBindings extends SimpleBindings {
     public RexProBindings() {
     }
 
+    //TODO: delete
     public static class SerializationTemplate extends AbstractTemplate<RexProBindings> {
 
         @Override

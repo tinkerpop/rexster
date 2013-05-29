@@ -22,6 +22,7 @@ public class RexProMessageMeta extends HashMap<String, Object> {
     public RexProMessageMeta(int i, float v) { super(i, v); }
     public RexProMessageMeta(Map<? extends String, ?> map) { super(map); }
 
+    //TODO: delete
     public static class SerializationTemplate extends AbstractTemplate<RexProMessageMeta>{
 
         @Override

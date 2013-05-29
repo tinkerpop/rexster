@@ -4,7 +4,6 @@ import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.protocol.BitWorks;
 import org.msgpack.MessagePack;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.UUID;
@@ -21,6 +20,7 @@ public abstract class RexProMessage {
 
     private static final MessagePack msgpack = new MessagePack();
     static {
+        //todo: replace with msgpack.templates.* template instances
         msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
         msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
         msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
