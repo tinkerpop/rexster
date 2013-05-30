@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.util;
 
 import com.tinkerpop.blueprints.Query;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
@@ -9,9 +10,11 @@ import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -168,17 +171,11 @@ public class RequestObjectHelper {
     }
 
     /**
-     * Gets a set of QueryProperties that can be translated into a Vertex Query.
+     * Add has operations to the VertexQuery.
      */
-    public static Set<QueryProperties> getQueryProperties(final JSONObject requestObject) {
-        final Set<QueryProperties> properties = new HashSet<QueryProperties>();
+    public static void buildQueryProperties(final JSONObject requestObject, final VertexQuery query) {
         final JSONArray propertyArray = requestObject.optJSONArray(Tokens._PROPERTIES);
         if (propertyArray != null) {
-            // read the contents of the property array which will be a string array value because
-            // of limitations in the URI to JSON process.  this is a bit of a hack to get
-            // the array out
-            final JSONArray jsonPropertyArray;
-
             try {
                 final StringBuffer sb = new StringBuffer();
                 for (int ix = 0; ix < propertyArray.length(); ix++) {
@@ -201,29 +198,34 @@ public class RequestObjectHelper {
                     tripleSplit[0] = separated[0].trim();
                     tripleSplit[1] = separated[1].trim();
 
-                    String[] tripleValue =  Arrays.copyOfRange(separated, 2, separated.length);
+                    final String[] tripleValue =  Arrays.copyOfRange(separated, 2, separated.length);
                     tripleSplit[2] = StringUtils.join(tripleValue, ',');
+
+                    final String[] splitTripleValue = tripleSplit[2].split(" ");
+
 
                     final Query.Compare c;
                     final String compareString = tripleSplit[1];
-                    if (compareString.equals("=")) {
-                        c = Query.Compare.EQUAL;
-                    } else if (compareString.equals("<>")) {
-                        c = Query.Compare.NOT_EQUAL;
-                    } else if (compareString.equals(">")) {
-                        c = Query.Compare.GREATER_THAN;
-                    } else if (compareString.equals(">=")) {
-                        c = Query.Compare.GREATER_THAN_EQUAL;
-                    } else if (compareString.equals("<")) {
-                        c = Query.Compare.LESS_THAN;
-                    } else if (compareString.equals("<=")) {
-                        c = Query.Compare.LESS_THAN_EQUAL;
-                    } else {
+                    try {
+                        c = Query.Compare.fromString(compareString);
+                    } catch (IllegalArgumentException iae) {
                         throw new WebApplicationException(Response.Status.BAD_REQUEST);
                     }
 
-                    properties.add(new QueryProperties(tripleSplit[0], c,
-                            (Comparable) ElementHelper.getTypedPropertyValue(tripleSplit[2], true)));
+                    if (splitTripleValue.length == 1) {
+                        query.has(tripleSplit[0], c, (Comparable) ElementHelper.getTypedPropertyValue(splitTripleValue[0], true));
+                    } else {
+                        final List l = new ArrayList(splitTripleValue.length);
+                        for (String stv : splitTripleValue) {
+                            l.add(ElementHelper.getTypedPropertyValue(stv, true));
+                        }
+
+                        if (c == Query.Compare.EQUAL) {
+                            query.has(tripleSplit[0], l.toArray(new Object[l.size()]));
+                        } else {
+                            query.hasNot(tripleSplit[0], l.toArray(new Object[l.size()]));
+                        }
+                    }
 
                     startBracePlace = propertyArgument.indexOf('[', endBracePlace);
                     endBracePlace = propertyArgument.indexOf(']', endBracePlace + 1);
@@ -236,8 +238,6 @@ public class RequestObjectHelper {
                 throw new WebApplicationException(Response.Status.BAD_REQUEST);
             }
         }
-
-        return properties;
     }
 
     private static Long getOffset(final JSONObject requestObject, final String offsetToken) {
