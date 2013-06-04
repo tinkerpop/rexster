@@ -57,12 +57,12 @@ public class RexProRequest {
     private byte[] responseBytes = null;
 
 
-    public RexProRequest(ByteBuffer buffer, int bufferSize, RexsterApplication application) throws IncompleteRexProRequest {
+    public RexProRequest(ByteBuffer buffer, int bufferSize, RexsterApplication application) throws IncompleteRexProRequestException {
         requestBuffer = buffer;
         rexsterApplication = application;
 
         if (bufferSize < ENVELOPE_LENGTH) {
-            throw new IncompleteRexProRequest();
+            throw new IncompleteRexProRequestException();
         }
 
         messageType = requestBuffer.get(1);
@@ -71,11 +71,11 @@ public class RexProRequest {
 
         // If the source message doesn't contain entire body
         if (bufferSize < completeMessageLength) {
-            throw new IncompleteRexProRequest(String.format("Message envelope is incomplete. Message length set to %s but the buffer only contains %s", completeMessageLength, bufferSize));
+            throw new IncompleteRexProRequestException(String.format("Message envelope is incomplete. Message length set to %s but the buffer only contains %s", completeMessageLength, bufferSize));
         }
 
         if (bodyLength < 0) {
-            throw new IncompleteRexProRequest(String.format("Message body length in the envelope is negative: %s.", completeMessageLength));
+            throw new IncompleteRexProRequestException(String.format("Message body length in the envelope is negative: %s.", completeMessageLength));
         }
 
         //get the actual message requestBytes
