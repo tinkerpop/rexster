@@ -2,6 +2,8 @@ package com.tinkerpop.rexster.protocol.msg;
 
 import com.tinkerpop.rexster.client.RexProException;
 
+import java.util.Map;
+
 /**
  * Defines the key, type, default, and whether or not a field is required
  *
@@ -37,7 +39,7 @@ public class RexProMessageMetaField<FieldType> {
      *
      * @param meta: the meta object to validate
      */
-    public void validateMeta(final RexProMessageMeta meta) throws RexProException{
+    public void validateMeta(final Map<String, Object> meta) throws RexProException{
         //handle missing / null values
         if (meta.get(key) == null){
             if (defaultValue != null) {
