@@ -2,9 +2,10 @@ package com.tinkerpop.rexster.protocol.msg;
 
 import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.protocol.BitWorks;
+import org.msgpack.MessagePack;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.UUID;
 
 /**
@@ -16,6 +17,14 @@ import java.util.UUID;
 public abstract class RexProMessage {
 
     public static final int MESSAGE_HEADER_SIZE = 6;
+
+    private static final MessagePack msgpack = new MessagePack();
+    static {
+        //todo: replace with msgpack.templates.* template instances
+        msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
+        msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
+        msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
+    }
 
     /**
      * List of meta fields accepted for this message type
@@ -47,7 +56,7 @@ public abstract class RexProMessage {
     /**
      * Map of message type specific meta data, supported keys and values vary by message type
      */
-    public Map<String, Object> Meta = new HashMap<String, Object>();
+    public RexProMessageMeta Meta = new RexProMessageMeta();
 
     public boolean hasSession() {
         return this.Session != null && !this.sessionAsUUID().equals(EMPTY_SESSION);
@@ -78,35 +87,35 @@ public abstract class RexProMessage {
         }
     }
 
-//    /**
-//     * Serializes the message into a byte array
-//     * @return
-//     */
-//    public static byte[] serialize(RexProMessage msg) throws IOException {
-//        byte[] message = msgpack.write(msg);
-//        ByteBuffer bb = ByteBuffer.allocate(MESSAGE_HEADER_SIZE + message.length);
-//
-//        //version
-//        bb.put((byte)0);
-//
-//        if (msg instanceof SessionResponseMessage) {
-//            bb.put(MessageType.SESSION_RESPONSE);
-//        } else if (msg instanceof ConsoleScriptResponseMessage) {
-//            bb.put(MessageType.CONSOLE_SCRIPT_RESPONSE);
-//        } else if (msg instanceof ErrorResponseMessage) {
-//            bb.put(MessageType.ERROR);
-//        } else if (msg instanceof ScriptRequestMessage) {
-//            bb.put(MessageType.SCRIPT_REQUEST);
-//        } else if (msg instanceof SessionRequestMessage) {
-//            bb.put(MessageType.SESSION_REQUEST);
-//        } else if (msg instanceof MsgPackScriptResponseMessage) {
-//            bb.put(MessageType.MSGPACK_SCRIPT_RESPONSE);
-//        }  else if (msg instanceof GraphSONScriptResponseMessage) {
-//            bb.put(MessageType.GRAPHSON_SCRIPT_RESPONSE);
-//        }
-//
-//        bb.putInt(message.length);
-//        bb.put(message);
-//        return bb.array();
-//    }
+    /**
+     * Serializes the message into a byte array
+     * @return
+     */
+    public static byte[] serialize(RexProMessage msg) throws IOException {
+        byte[] message = msgpack.write(msg);
+        ByteBuffer bb = ByteBuffer.allocate(MESSAGE_HEADER_SIZE + message.length);
+
+        //version
+        bb.put((byte)0);
+
+        if (msg instanceof SessionResponseMessage) {
+            bb.put(MessageType.SESSION_RESPONSE);
+        } else if (msg instanceof ConsoleScriptResponseMessage) {
+            bb.put(MessageType.CONSOLE_SCRIPT_RESPONSE);
+        } else if (msg instanceof ErrorResponseMessage) {
+            bb.put(MessageType.ERROR);
+        } else if (msg instanceof ScriptRequestMessage) {
+            bb.put(MessageType.SCRIPT_REQUEST);
+        } else if (msg instanceof SessionRequestMessage) {
+            bb.put(MessageType.SESSION_REQUEST);
+        } else if (msg instanceof MsgPackScriptResponseMessage) {
+            bb.put(MessageType.MSGPACK_SCRIPT_RESPONSE);
+        }  else if (msg instanceof GraphSONScriptResponseMessage) {
+            bb.put(MessageType.GRAPHSON_SCRIPT_RESPONSE);
+        }
+
+        bb.putInt(message.length);
+        bb.put(message);
+        return bb.array();
+    }
 }
