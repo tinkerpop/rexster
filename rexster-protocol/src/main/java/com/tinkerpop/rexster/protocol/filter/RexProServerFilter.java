@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.protocol.filter;
 
-import com.tinkerpop.rexster.protocol.server.IncompleteRexProRequest;
+import com.tinkerpop.rexster.protocol.server.IncompleteRexProRequestException;
 import com.tinkerpop.rexster.protocol.server.RexProRequest;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import org.apache.commons.lang.StringUtils;
@@ -52,7 +52,7 @@ public class RexProServerFilter extends BaseFilter {
                     logger.warn("unsupported rexpro version: " + messageVersion);
                     return ctx.getStopAction();
             }
-        } catch (IncompleteRexProRequest ex) {
+        } catch (IncompleteRexProRequestException ex) {
             // If the source message doesn't contain entire body
             // stop the filterchain processing and store sourceBuffer to be
             // used next time
