@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.protocol.msg;
 
 import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.protocol.BitWorks;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
 import org.msgpack.MessagePack;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ public abstract class RexProMessage {
     private static final MessagePack msgpack = new MessagePack();
     static {
         //todo: replace with msgpack.templates.* template instances
-        msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
+        msgpack.register(RexProMessageMeta.class, MetaTemplate.getInstance());
         msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
         msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
     }

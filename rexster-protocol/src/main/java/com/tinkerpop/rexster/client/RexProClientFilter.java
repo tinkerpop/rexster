@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.protocol.msg.*;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Buffer;
@@ -25,7 +26,7 @@ public class RexProClientFilter extends BaseFilter {
     private static final Logger logger = Logger.getLogger(RexProClientFilter.class);
     private static final MessagePack msgpack = new MessagePack();
     static {
-        msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
+        msgpack.register(RexProMessageMeta.class, MetaTemplate.getInstance());
         msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
         msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
     }

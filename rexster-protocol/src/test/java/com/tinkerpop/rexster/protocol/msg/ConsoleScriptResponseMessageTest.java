@@ -1,13 +1,12 @@
 package com.tinkerpop.rexster.protocol.msg;
 
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
 import org.msgpack.unpacker.Unpacker;
 
-import javax.script.Bindings;
-import javax.script.SimpleBindings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -49,7 +48,7 @@ public class ConsoleScriptResponseMessageTest {
     @Test
     public void testSerialization() {
         MessagePack msgpack = new MessagePack();
-        msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
+        msgpack.register(RexProMessageMeta.class, MetaTemplate.getInstance());
         msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
         msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
 

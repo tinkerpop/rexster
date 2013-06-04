@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol.server;
 
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
 import com.tinkerpop.rexster.protocol.session.RexProSession;
 import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.server.RexsterApplication;
@@ -26,7 +27,7 @@ public class RexProRequest {
     private static final Logger logger = Logger.getLogger(RexProRequest.class);
     private static final MessagePack msgpack = new MessagePack();
     static {
-        msgpack.register(RexProMessageMeta.class, RexProMessageMeta.SerializationTemplate.getInstance());
+        msgpack.register(RexProMessageMeta.class, MetaTemplate.getInstance());
         msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
         msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
     }
