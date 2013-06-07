@@ -11,7 +11,7 @@ import com.tinkerpop.rexster.extension.ExtensionSegmentSet;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterExtension;
 import com.tinkerpop.rexster.server.RexsterApplication;
-import com.yammer.metrics.annotation.Timed;
+import com.codahale.metrics.annotation.Timed;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
