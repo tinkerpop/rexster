@@ -53,8 +53,21 @@ public class RexsterApplicationGraph {
     private final Map<ExtensionSegmentSet, Boolean> extensionAllowedCache = new HashMap<ExtensionSegmentSet, Boolean>();
 
     public RexsterApplicationGraph(final String graphName, final Graph graph) {
+        this(graphName, graph, null);
+    }
+
+    public RexsterApplicationGraph(final String graphName, final Graph graph,
+                                   final HierarchicalConfiguration graphConfig) {
+        this(graphName, graph, graphConfig == null ? null : graphConfig.getList(Tokens.REXSTER_GRAPH_EXTENSIONS_ALLOWS_PATH),
+                graphConfig == null ? null : graphConfig.configurationsAt(Tokens.REXSTER_GRAPH_EXTENSIONS_PATH));
+    }
+
+    public RexsterApplicationGraph(final String graphName, final Graph graph, final List<String> allowableNamespaces,
+                                   final List<HierarchicalConfiguration> extensionConfigurations) {
         this.graphName = graphName;
         this.graph = graph;
+        this.loadAllowableExtensions(allowableNamespaces);
+        this.loadExtensionsConfigurations(extensionConfigurations);
     }
 
     /**
@@ -184,7 +197,7 @@ public class RexsterApplicationGraph {
     /**
      * Generally speaking this method should not be called directly.
      */
-    public void loadExtensionsConfigurations(final List<HierarchicalConfiguration> extensionConfigurations) {
+    void loadExtensionsConfigurations(final List<HierarchicalConfiguration> extensionConfigurations) {
         this.extensionConfigurations = new HashSet<ExtensionConfiguration>();
 
         if (extensionConfigurations != null) {
@@ -209,7 +222,7 @@ public class RexsterApplicationGraph {
      * Loads a list of namespaces extension patterns that are allowed for this graph.  Generally speaking this
      * method should not be called directly.
      */
-    public void loadAllowableExtensions(final List allowableNamespaces) {
+    void loadAllowableExtensions(final List allowableNamespaces) {
         this.extensionAllowables = new HashSet<ExtensionAllowed>();
 
         if (allowableNamespaces != null) {

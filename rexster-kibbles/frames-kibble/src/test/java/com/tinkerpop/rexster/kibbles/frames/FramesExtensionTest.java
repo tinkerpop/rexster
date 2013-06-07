@@ -63,17 +63,15 @@ public class FramesExtensionTest {
         } catch (ConfigurationException ex) {
         }
 
-        this.rag = new RexsterApplicationGraph("tinkergraph", this.graph);
-
         // allow all namespaces for purpose of testing
         List<String> allowedNamespaces = new ArrayList<String>();
         allowedNamespaces.add("*:*");
-        this.rag.loadAllowableExtensions(allowedNamespaces);
 
         // configure the frames extension
         List<HierarchicalConfiguration> configs = new ArrayList<HierarchicalConfiguration>();
         configs.add(xmlConfig);
-        this.rag.loadExtensionsConfigurations(configs);
+
+        this.rag = new RexsterApplicationGraph("tinkergraph", this.graph, allowedNamespaces, configs);
     }
 
     @Test
