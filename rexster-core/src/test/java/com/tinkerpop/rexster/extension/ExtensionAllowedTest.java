@@ -51,6 +51,20 @@ public class ExtensionAllowedTest {
         Assert.assertFalse(configuration.isExtensionAllowed(extensionSegmentSet));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void isExtensionAllowedNullExtensionName() {
+        ExtensionAllowed configuration = new ExtensionAllowed(null);
+        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "extension", ""), ExtensionPoint.GRAPH);
+        configuration.isExtensionAllowed(extensionSegmentSet);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void isExtensionAllowedInvalidExtensionName() {
+        ExtensionAllowed configuration = new ExtensionAllowed("this doesn't work as an extension name");
+        ExtensionSegmentSet extensionSegmentSet = new ExtensionSegmentSet(this.mockTheUri("ns", "extension", ""), ExtensionPoint.GRAPH);
+        configuration.isExtensionAllowed(extensionSegmentSet);
+    }
+
     private UriInfo mockTheUri(final String namespace, final String extension, final String method) {
         this.mockery = new JUnit4Mockery();
 

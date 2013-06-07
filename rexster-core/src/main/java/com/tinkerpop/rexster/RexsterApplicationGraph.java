@@ -245,8 +245,51 @@ public class RexsterApplicationGraph {
         return this.extensionAllowables;
     }
 
+    public Set<ExtensionConfiguration> getExtensionConfigurations() {
+        return extensionConfigurations;
+    }
+
     static Graph unwrapGraph(final Graph g) {
         return g instanceof WrapperGraph ? unwrapGraph(((WrapperGraph) g).getBaseGraph()) : g;
+    }
+
+    @Override
+    public String toString() {
+        return this.graphName + "-" + this.graph.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final RexsterApplicationGraph that = (RexsterApplicationGraph) o;
+
+        if (!graphName.equals(that.graphName)) return false;
+        if (!graph.getClass().equals(that.graph.getClass())) return false;
+
+        for (ExtensionAllowed extensionAllowed : extensionAllowables) {
+            if (!that.getExtensionAllowables().contains(extensionAllowed)) {
+                return false;
+            }
+        }
+
+        for (ExtensionConfiguration configuration : extensionConfigurations) {
+            if (!that.getExtensionConfigurations().contains(configuration)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = graph.hashCode();
+        result = 31 * result + graphName.hashCode();
+        result = 31 * result + extensionAllowables.hashCode();
+        result = 31 * result + extensionConfigurations.hashCode();
+        return result;
     }
 
     protected JSONArray getExtensionHypermedia(final ExtensionPoint extensionPoint, final String baseUri) {

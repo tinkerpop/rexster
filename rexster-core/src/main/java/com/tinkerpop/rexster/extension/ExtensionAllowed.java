@@ -14,8 +14,8 @@ public class ExtensionAllowed {
      */
     public ExtensionAllowed(final String namespace) {
         // must match this format *:*, namespace:*, namespace:extension
-        if (!(namespace.matches("([\\w-]+|\\*):([\\w-]+|\\*)")
-                && !(namespace.startsWith("*") && namespace.equals("*.*")))) {
+        if (namespace == null || (!(namespace.matches("([\\w-]+|\\*):([\\w-]+|\\*)")
+                && !(namespace.startsWith("*") && namespace.equals("*.*"))))) {
             throw new IllegalArgumentException("The namespace must match the format of *:*, namespace:*, namespace:extension");
         }
 
@@ -37,5 +37,22 @@ public class ExtensionAllowed {
         }
 
         return allowed;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final ExtensionAllowed that = (ExtensionAllowed) o;
+
+        if (!namespace.equals(that.namespace)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return namespace.hashCode();
     }
 }
