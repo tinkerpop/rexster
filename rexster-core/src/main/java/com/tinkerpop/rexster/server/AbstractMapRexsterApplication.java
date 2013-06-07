@@ -62,6 +62,7 @@ public abstract class AbstractMapRexsterApplication implements RexsterApplicatio
             // graph may not have been initialized properly if an exception gets tossed in
             // on graph creation
             if (graph != null) {
+                // call shutdown on the unwrapped graph as some wrappers don't allow shutdown() to be called.
                 final Graph shutdownGraph = rag.getUnwrappedGraph();
                 shutdownGraph.shutdown();
             }

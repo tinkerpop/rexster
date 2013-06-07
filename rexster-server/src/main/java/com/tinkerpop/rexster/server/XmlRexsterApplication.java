@@ -85,7 +85,8 @@ public class XmlRexsterApplication extends AbstractMapRexsterApplication {
             // shutdown the graphs that need to be killed and remove them
             for (RexsterApplicationGraph graphToKill : graphsToKill) {
                 try {
-                    graphToKill.getGraph().shutdown();
+                    // call shutdown on the unwrapped graph as some wrappers don't allow shutdown() to be called.
+                    graphToKill.getUnwrappedGraph().shutdown();
                 } catch (Exception ex) {
                     logger.error(String.format("Error while shutting down graph [%s] after finding it no longer configured.", graphToKill), ex);
                 } finally {
