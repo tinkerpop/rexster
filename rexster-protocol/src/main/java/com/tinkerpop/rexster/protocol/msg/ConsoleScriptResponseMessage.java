@@ -1,14 +1,9 @@
 package com.tinkerpop.rexster.protocol.msg;
 
 import com.tinkerpop.rexster.gremlin.converter.ConsoleResultConverter;
-import com.tinkerpop.rexster.protocol.BitWorks;
 import org.msgpack.annotation.Message;
 
-import javax.script.Bindings;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

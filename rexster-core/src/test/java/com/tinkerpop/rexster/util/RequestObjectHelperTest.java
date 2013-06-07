@@ -1,13 +1,11 @@
 package com.tinkerpop.rexster.util;
 
-import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.rexster.Tokens;
 import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
 import org.junit.Test;
 
-import javax.ws.rs.WebApplicationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.server;
 
-import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.config.GraphConfigurationContainer;

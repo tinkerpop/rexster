@@ -1,8 +1,6 @@
 package com.tinkerpop.rexster.extension;
 
 import com.tinkerpop.rexster.util.HierarchicalConfigurationComparator;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationComparator;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 

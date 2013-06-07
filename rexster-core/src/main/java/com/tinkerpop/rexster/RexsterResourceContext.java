@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster;
 
-import com.tinkerpop.rexster.extension.ExtensionMethod;
 import com.codahale.metrics.MetricRegistry;
+import com.tinkerpop.rexster.extension.ExtensionMethod;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;

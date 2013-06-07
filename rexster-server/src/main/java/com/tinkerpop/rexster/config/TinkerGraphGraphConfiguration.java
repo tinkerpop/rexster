@@ -6,8 +6,6 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.util.MockTinkerTransactionalGraph;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConversionException;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.SubnodeConfiguration;
 
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)

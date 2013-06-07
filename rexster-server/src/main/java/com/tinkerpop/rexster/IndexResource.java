@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.codahale.metrics.annotation.Timed;
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
@@ -14,7 +15,6 @@ import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.util.ElementHelper;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
-import com.codahale.metrics.annotation.Timed;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;

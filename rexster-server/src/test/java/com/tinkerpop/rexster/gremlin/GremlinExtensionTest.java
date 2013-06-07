@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.gremlin;
 
+import com.codahale.metrics.MetricRegistry;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.rexster.RexsterResourceContext;
@@ -7,7 +8,6 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.extension.ExtensionMethod;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.protocol.EngineController;
-import com.codahale.metrics.MetricRegistry;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;

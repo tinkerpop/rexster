@@ -1,16 +1,11 @@
 package com.tinkerpop.rexster.server.metrics;
 
+import com.codahale.metrics.ConsoleReporter;
+import com.codahale.metrics.JmxReporter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.ganglia.GangliaReporter;
+import com.codahale.metrics.graphite.GraphiteReporter;
 import com.tinkerpop.rexster.server.RexsterProperties;
-import com.codahale.metrics.ConsoleReporter;
-import com.codahale.metrics.JmxReporter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.ganglia.GangliaReporter;
-import com.codahale.metrics.graphite.GraphiteReporter;
-import com.codahale.metrics.ConsoleReporter;
-import com.codahale.metrics.JmxReporter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.ganglia.GangliaReporter;
-import com.codahale.metrics.graphite.GraphiteReporter;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;

@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster.server;
 
+import com.codahale.metrics.MetricRegistry;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
-import com.codahale.metrics.MetricRegistry;
 
 import java.util.Set;
 

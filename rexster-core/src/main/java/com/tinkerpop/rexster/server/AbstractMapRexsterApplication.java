@@ -1,11 +1,10 @@
 package com.tinkerpop.rexster.server;
 
+import com.codahale.metrics.MetricRegistry;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
-import com.codahale.metrics.MetricRegistry;
 import org.apache.log4j.Logger;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

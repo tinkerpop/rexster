@@ -1,5 +1,9 @@
 package com.tinkerpop.rexster.server;
 
+import com.codahale.metrics.JmxAttributeGauge;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.jersey.InstrumentedResourceMethodDispatchAdapter;
+import com.codahale.metrics.servlets.MetricsServlet;
 import com.sun.jersey.api.container.filter.LoggingFilter;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -21,16 +25,6 @@ import com.tinkerpop.rexster.server.metrics.AbstractReporterConfig;
 import com.tinkerpop.rexster.servlet.DogHouseServlet;
 import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
-import com.codahale.metrics.JmxAttributeGauge;
-import com.codahale.metrics.JmxReporter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.jersey.InstrumentedResourceMethodDispatchAdapter;
-import com.codahale.metrics.servlets.AdminServlet;
-import com.codahale.metrics.servlets.MetricsServlet;
-import com.codahale.metrics.JmxAttributeGauge;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.jersey.InstrumentedResourceMethodDispatchAdapter;
-import com.codahale.metrics.servlets.MetricsServlet;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Level;

@@ -1,5 +1,7 @@
 package com.tinkerpop.rexster.protocol.filter;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.RexProSession;
@@ -12,8 +14,6 @@ import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import com.tinkerpop.rexster.server.RexsterApplication;
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.MetricRegistry;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;

@@ -1,5 +1,7 @@
 package com.tinkerpop.rexster.server;
 
+import com.codahale.metrics.JmxAttributeGauge;
+import com.codahale.metrics.MetricRegistry;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.filter.AbstractSecurityFilter;
 import com.tinkerpop.rexster.filter.DefaultSecurityFilter;
@@ -7,11 +9,6 @@ import com.tinkerpop.rexster.protocol.RexProSessionMonitor;
 import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
 import com.tinkerpop.rexster.protocol.filter.ScriptFilter;
 import com.tinkerpop.rexster.protocol.filter.SessionFilter;
-import com.codahale.metrics.JmxAttributeGauge;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.JmxAttributeGauge;
-import com.codahale.metrics.JmxReporter;
-import com.codahale.metrics.MetricRegistry;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
