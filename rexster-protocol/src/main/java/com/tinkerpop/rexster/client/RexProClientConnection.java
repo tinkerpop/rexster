@@ -1,6 +1,6 @@
-package com.tinkerpop.rexster.protocol;
+package com.tinkerpop.rexster.client;
 
-import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
+import com.tinkerpop.rexster.client.RexProClientFilter;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.filterchain.BaseFilter;
@@ -21,13 +21,13 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public final class RexPro {
+public final class RexProClientConnection {
     public static final int DEFAULT_TIMEOUT_SECONDS = 100;
 
     private final Connection connection;
     private final BlockingQueue<RexProMessage> responseQueue = new SynchronousQueue<RexProMessage>(true);
 
-    public RexPro(String rexProHost, int rexProPort) {
+    public RexProClientConnection(String rexProHost, int rexProPort) {
         TCPNIOTransport transport = getTransport(responseQueue);
 
         try {
@@ -64,7 +64,7 @@ public final class RexPro {
         // Add TransportFilter, which is responsible
         // for reading and writing data to the connection
         filterChainBuilder.add(new TransportFilter());
-        filterChainBuilder.add(new RexProMessageFilter());
+        filterChainBuilder.add(new RexProClientFilter());
         filterChainBuilder.add(new BaseFilter() {
             @Override
             public NextAction handleRead(FilterChainContext ctx) throws IOException {
