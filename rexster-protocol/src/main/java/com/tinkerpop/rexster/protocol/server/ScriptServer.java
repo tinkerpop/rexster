@@ -11,9 +11,9 @@ import com.tinkerpop.rexster.protocol.session.RexProSessions;
 import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import org.apache.log4j.Logger;
-import com.yammer.metrics.Counter;
-import com.yammer.metrics.MetricRegistry;
-import com.yammer.metrics.Timer;
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
