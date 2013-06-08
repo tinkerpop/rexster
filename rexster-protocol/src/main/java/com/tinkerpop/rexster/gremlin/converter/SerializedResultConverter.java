@@ -34,7 +34,6 @@ public class SerializedResultConverter {
                 final Set<String> propertyKeys = element.getPropertyKeys();
                 final int propertySize = propertyKeys.size();
                 final boolean isVertex = !(element instanceof Edge);
-                final int elementSize = (isVertex ? 2 : 5) + ((propertySize > 0) ? 1 : 0);
 
                 HashMap<Object, Object> outMap = new HashMap<Object, Object>();
                 outMap.put(Tokens._ID, serializeElementId(element));
