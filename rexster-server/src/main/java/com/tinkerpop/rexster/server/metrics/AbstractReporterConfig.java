@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.server.metrics;
 
+import com.codahale.metrics.MetricRegistry;
 import com.tinkerpop.rexster.Tokens;
-import com.yammer.metrics.MetricRegistry;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 
@@ -60,6 +60,8 @@ public abstract class AbstractReporterConfig
      * @return
      */
     public abstract boolean enable();
+
+    public abstract void disable();
 
     private void readCommonConfiguration() {
         this.timeUnit = this.registryConfiguration == null ? DEFAULT_TIME_UNIT : this.registryConfiguration.getString(Tokens.REXSTER_REPORTER_TIME_UNIT, DEFAULT_TIME_UNIT);

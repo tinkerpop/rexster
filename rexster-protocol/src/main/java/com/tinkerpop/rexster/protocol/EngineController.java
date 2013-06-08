@@ -7,11 +7,11 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages the list of EngineHolder items for the current ScriptEngineManager.
@@ -24,7 +24,7 @@ public class EngineController {
 
     public static final int RESET_NEVER = -1;
 
-    private final Map<String, EngineHolder> engines = new HashMap<String, EngineHolder>();
+    private final Map<String, EngineHolder> engines = new ConcurrentHashMap<String, EngineHolder>();
 
     /**
      * All gremlin engines are prefixed with this value.
@@ -43,6 +43,12 @@ public class EngineController {
     private EngineController() {
         // for ruby
         System.setProperty("org.jruby.embed.localvariable.behavior", "persistent");
+        loadEngines();
+    }
+
+    private void loadEngines() {
+        engines.clear();
+
         final ScriptEngineManager manager = new ScriptEngineManager();
         for (ScriptEngineFactory factory : manager.getEngineFactories()) {
 
@@ -76,6 +82,7 @@ public class EngineController {
         engineResetThreshold = resetCount;
         initializationScriptFile = initScriptFile;
         gremlinEngineNames = configuredEngineNames;
+        getInstance().loadEngines();
     }
 
     public static EngineController getInstance() {

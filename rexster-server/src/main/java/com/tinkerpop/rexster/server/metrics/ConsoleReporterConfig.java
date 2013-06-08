@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.server.metrics;
 
-import com.yammer.metrics.ConsoleReporter;
-import com.yammer.metrics.MetricRegistry;
+import com.codahale.metrics.ConsoleReporter;
+import com.codahale.metrics.MetricRegistry;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 
@@ -13,6 +13,8 @@ import org.apache.log4j.Logger;
 class ConsoleReporterConfig extends AbstractReporterConfig {
     private static final Logger logger = Logger.getLogger(ConsoleReporterConfig.class);
 
+    private ConsoleReporter consoleReporter;
+
     public ConsoleReporterConfig(final HierarchicalConfiguration config, final MetricRegistry metricRegistry) {
         super(config, metricRegistry);
 
@@ -20,15 +22,15 @@ class ConsoleReporterConfig extends AbstractReporterConfig {
     }
 
     @Override
-    public boolean enable()
-    {
+    public boolean enable() {
         try
         {
-            ConsoleReporter.forRegistry(this.metricRegistry)
+            consoleReporter = ConsoleReporter.forRegistry(this.metricRegistry)
                     .convertDurationsTo(this.getRealDurationTimeUnitConversion())
                     .convertRatesTo(this.getRealRateTimeUnitConversion())
                     .filter(new RegexMetricFilter(this.inclusion, this.exclusion))
-                    .build().start(this.period, this.getRealTimeUnit());
+                    .build();
+            consoleReporter.start(this.period, this.getRealTimeUnit());
         }
         catch (Exception e)
         {
@@ -36,5 +38,10 @@ class ConsoleReporterConfig extends AbstractReporterConfig {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void disable() {
+        consoleReporter.stop();
     }
 }

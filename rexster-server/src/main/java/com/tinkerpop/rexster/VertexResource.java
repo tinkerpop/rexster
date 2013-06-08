@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.codahale.metrics.annotation.Timed;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
@@ -16,9 +17,7 @@ import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterExtension;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.util.ElementHelper;
-import com.tinkerpop.rexster.util.QueryProperties;
 import com.tinkerpop.rexster.util.RequestObjectHelper;
-import com.yammer.metrics.annotation.Timed;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -521,16 +520,18 @@ public class VertexResource extends AbstractSubResource {
                 query = query.labels(labels);
             }
 
-            final Set<QueryProperties> queryProperties = RequestObjectHelper.getQueryProperties(theRequestObject);
-            if (queryProperties.size() > 0) {
-                for (QueryProperties queryProperty : queryProperties) {
-                    query = query.has(queryProperty.getName(), queryProperty.getValue(), queryProperty.getCompare());
-                }
-            }
+            // add .has() elements to query
+            RequestObjectHelper.buildQueryProperties(theRequestObject, query);
 
-            final long limit = theRequestObject.has(Tokens._LIMIT) ? theRequestObject.getLong(Tokens._LIMIT) : Long.MIN_VALUE;
-            if (limit >= 0) {
-                query = query.limit(limit);
+            // need to include limits in addition to standard rexster paging as there is buffering going on via
+            // rexstergraph that requires both ... meaning, i might do a vertex query with limit that exceeds my
+            // buffer size for rexstergraph.
+            final long limitTake = theRequestObject.has(Tokens._TAKE) ? theRequestObject.getLong(Tokens._TAKE) : Long.MIN_VALUE;
+            final long limitSkip = theRequestObject.has(Tokens._SKIP) ? theRequestObject.getLong(Tokens._SKIP) : Long.MIN_VALUE;
+            if (limitTake >= 0 && limitSkip >= 0) {
+                query = query.limit(limitSkip, limitTake);
+            } else if (limitTake >= 0) {
+                query = query.limit(limitTake);
             }
 
             if (returnType == ReturnType.VERTICES || returnType == ReturnType.VERTEX_IDS) {

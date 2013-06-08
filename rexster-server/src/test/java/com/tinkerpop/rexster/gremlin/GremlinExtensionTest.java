@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.gremlin;
 
+import com.codahale.metrics.MetricRegistry;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.rexster.RexsterResourceContext;
@@ -7,7 +8,6 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.extension.ExtensionMethod;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.protocol.EngineController;
-import com.yammer.metrics.MetricRegistry;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
@@ -40,7 +40,7 @@ public class GremlinExtensionTest {
     private ExtensionMethod extensionMethodNoApi = new ExtensionMethod(null, null, null, null);
 
     private RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(null, uriInfo,
-            httpServletRequest, null, null, extensionMethodNoApi, null, new MetricRegistry("test"));
+            httpServletRequest, null, null, extensionMethodNoApi, null, new MetricRegistry());
 
     /**
      * Choosing not to mock Graph instance for these tests as GremlinGroovyScriptEngine is
@@ -96,7 +96,7 @@ public class GremlinExtensionTest {
     public void evaluateGetOnGraphWithBindings() throws Exception {
         String json = "{\"params\":{\"x\":1, \"y\":2, \"z\":\"test\", \"list\":[3,2,1,0], \"map\":{\"mapx\":[300,200,100]}}}";
         RexsterResourceContext rexsterResourceContext = new RexsterResourceContext(null, uriInfo,
-                httpServletRequest, new JSONObject(new JSONTokener(json)), null, extensionMethodNoApi, null, new MetricRegistry("test"));
+                httpServletRequest, new JSONObject(new JSONTokener(json)), null, extensionMethodNoApi, null, new MetricRegistry());
 
         ExtensionResponse extensionResponse = this.gremlinExtension.evaluateGetOnGraph(
                 rexsterResourceContext, graph, "[x+y, z, list.size, map.mapx.size]");

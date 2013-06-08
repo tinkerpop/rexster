@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster.gremlin.converter;
 
 import com.tinkerpop.rexster.protocol.MsgPackConverter;
-
 import org.msgpack.MessagePack;
 import org.msgpack.packer.BufferPacker;
 

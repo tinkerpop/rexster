@@ -2,8 +2,7 @@ package com.tinkerpop.rexster;
 
 import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
-import junit.framework.Assert;
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;

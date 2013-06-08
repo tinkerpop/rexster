@@ -13,7 +13,6 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
-import org.neo4j.cypher.internal.symbols.IntegerType;
 
 import java.net.URI;
 import java.net.URLEncoder;

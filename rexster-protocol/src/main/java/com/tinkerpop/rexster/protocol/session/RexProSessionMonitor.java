@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.protocol.session;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Monitors RexPro sessions and cleans up ones that have been idle.
@@ -11,30 +12,34 @@ public class RexProSessionMonitor extends Thread {
     private static final long MIN_UPDATE_INTERVAL = 1000;
     private static final long MIN_IDLE_TIME = 60000;
 
-    private final long updateInterval;
-    private final long maxIdleTime;
+    private final AtomicLong updateInterval = new AtomicLong();
+    private final AtomicLong maxIdleTime = new AtomicLong();
+    private final AtomicLong lastCheck = new AtomicLong(System.currentTimeMillis());
 
     /**
      * Create a new monitor.
-     *
-     * @param updateInterval time in milliseconds between checking the idle time of sessions.
-     * @param maxIdleTime time in milliseconds that a session can stay idle before being closed.
      */
-    public RexProSessionMonitor(final long updateInterval, final long maxIdleTime) {
+    public RexProSessionMonitor() {
+        setDaemon(true);
+        reconfigure(MIN_UPDATE_INTERVAL, MIN_IDLE_TIME);
+        start();
+    }
+
+    /**
+     * Reconfigure the session monitor with new settings.
+     */
+    public void reconfigure(final long updateInterval, final long maxIdleTime) {
         if (updateInterval < MIN_UPDATE_INTERVAL) {
-            this.updateInterval = MIN_UPDATE_INTERVAL;
+            this.updateInterval.set(MIN_UPDATE_INTERVAL);
         } else {
-            this.updateInterval = updateInterval;
+            this.updateInterval.set(updateInterval);
         }
 
         if (maxIdleTime < MIN_IDLE_TIME) {
-            this.maxIdleTime = MIN_IDLE_TIME;
+            this.maxIdleTime.set(MIN_IDLE_TIME);
         } else {
-            this.maxIdleTime = maxIdleTime;
+            this.maxIdleTime.set(maxIdleTime);
         }
-
-        setDaemon(true);
-        start();
     }
 
     @Override
@@ -42,20 +47,23 @@ public class RexProSessionMonitor extends Thread {
 
         while (true) {
             try {
-                Thread.sleep(updateInterval);
+                Thread.sleep(MIN_UPDATE_INTERVAL);
             } catch (InterruptedException e) {
             }
 
-            final Collection<String> sessionKeys = RexProSessions.getSessionKeys();
-
-            for (String sessionKey : sessionKeys) {
-                if (RexProSessions.hasSessionKey(sessionKey)) {
-                    // check if the idle time of the session is past the threshold
-                    if (RexProSessions.getSession(sessionKey).getIdleTime() > maxIdleTime) {
-                        // Throw the GremlinSession instance to the wolves
-                        RexProSessions.destroySession(sessionKey);
+            if (updateInterval.get() > (System.currentTimeMillis() - lastCheck.get())) {
+                final Collection<String> sessionKeys = RexProSessions.getSessionKeys();
+                for (String sessionKey : sessionKeys) {
+                    if (RexProSessions.hasSessionKey(sessionKey)) {
+                        // check if the idle time of the session is past the threshold
+                        if (RexProSessions.getSession(sessionKey).getIdleTime() > maxIdleTime.get()) {
+                            // Throw the GremlinSession instance to the wolves
+                            RexProSessions.destroySession(sessionKey);
+                        }
                     }
                 }
+
+                lastCheck.set(System.currentTimeMillis());
             }
         }
     }

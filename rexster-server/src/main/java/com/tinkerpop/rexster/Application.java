@@ -5,14 +5,19 @@ import com.tinkerpop.rexster.server.HttpRexsterServer;
 import com.tinkerpop.rexster.server.RexProRexsterServer;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import com.tinkerpop.rexster.server.RexsterCommandLine;
+import com.tinkerpop.rexster.server.RexsterProperties;
 import com.tinkerpop.rexster.server.RexsterServer;
 import com.tinkerpop.rexster.server.RexsterSettings;
 import com.tinkerpop.rexster.server.ShutdownManager;
 import com.tinkerpop.rexster.server.XmlRexsterApplication;
 import com.tinkerpop.rexster.server.metrics.ReporterConfig;
-import org.apache.commons.configuration.HierarchicalConfiguration;
+import com.tinkerpop.rexster.util.JuliToLog4jHandler;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.FileFileFilter;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.monitor.FileAlterationMonitor;
+import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -27,8 +32,12 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 
 /**
  * Main class for initializing, starting and stopping Rexster.
@@ -63,36 +72,54 @@ public class Application {
     private final RexsterServer httpServer;
     private final RexsterServer rexproServer;
     private final RexsterApplication rexsterApplication;
-    private final XMLConfiguration properties;
+    private final RexsterProperties properties;
+    private final ReporterConfig reporterConfig;
 
-    public Application(final XMLConfiguration properties, final boolean isDebug) throws Exception {
+    /**
+     * Check for configuration file changes every 10 seconds.
+     */
+    private final FileAlterationMonitor configurationMonitor = new FileAlterationMonitor(10000);
+
+    public Application(final RexsterProperties properties,
+                       final FileAlterationObserver rexsterConfigurationObserver) throws Exception {
+
+        // watch rexster.xml for changes
+        rexsterConfigurationObserver.addListener(properties);
+        configurationMonitor.addObserver(rexsterConfigurationObserver);
+
         // get the graph configurations from the XML config file
         this.properties = properties;
-        this.properties.addProperty("debug", isDebug);
-        final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
-        this.rexsterApplication = new XmlRexsterApplication(graphConfigs);
+        this.rexsterApplication = new XmlRexsterApplication(this.properties);
 
-        final ReporterConfig reporterConfig = ReporterConfig.load(properties.configurationsAt(Tokens.REXSTER_REPORTER_PATH), this.rexsterApplication.getMetricRegistry());
-        this.properties.addProperty("http-reporter-enabled", reporterConfig.isHttpReporterEnabled());
-        this.properties.addProperty("http-reporter-duration", reporterConfig.getDurationTimeUnitConversion());
-        this.properties.addProperty("http-reporter-convert", reporterConfig.getRateTimeUnitConversion());
-
-        // start the metric reporters if any
-        reporterConfig.enable();
-
+        this.reporterConfig = new ReporterConfig(properties, this.rexsterApplication.getMetricRegistry());
         this.httpServer = new HttpRexsterServer(properties);
-        this.rexproServer = new RexProRexsterServer(properties);
+        this.rexproServer = new RexProRexsterServer(properties, true);
     }
 
     public void start() throws Exception {
+        configureScriptEngine();
+        properties.addListener(new RexsterProperties.RexsterPropertiesListener() {
+            @Override
+            public void propertiesChanged(final XMLConfiguration configuration) {
+                configureScriptEngine();
+            }
+        });
 
+        this.httpServer.start(this.rexsterApplication);
+        this.rexproServer.start(this.rexsterApplication);
+        this.configurationMonitor.start();
+
+        startShutdownManager(this.properties);
+    }
+
+    private void configureScriptEngine() {
         // the EngineController needs to be configured statically before requests start serving so that it can
         // properly construct ScriptEngine objects with the correct reset policy.
-        final int scriptEngineThreshold = this.properties.getInt("script-engine-reset-threshold", EngineController.RESET_NEVER);
-        final String scriptEngineInitFile = this.properties.getString("script-engine-init", "");
+        final int scriptEngineThreshold = this.properties.getScriptEngineResetThreshold();
+        final String scriptEngineInitFile = this.properties.getScriptEngineInitFile();
 
         // allow scriptengines to be configured so that folks can drop in different gremlin flavors.
-        final List configuredScriptEngineNames = this.properties.getList("script-engines");
+        final List configuredScriptEngineNames = this.properties.getConfiguredScriptEngines();
         if (configuredScriptEngineNames == null) {
             // configure to default with gremlin-groovy
             logger.info("No configuration for <script-engines>.  Using gremlin-groovy by default.");
@@ -104,13 +131,16 @@ public class Application {
         logger.info(String.format(
                 "Gremlin ScriptEngine configured to reset every [%s] requests. Set to -1 to never reset.",
                 scriptEngineThreshold));
-
-        this.httpServer.start(this.rexsterApplication);
-        this.rexproServer.start(this.rexsterApplication);
-        startShutdownManager(this.properties);
     }
 
     public void stop() {
+
+        try {
+            this.configurationMonitor.stop();
+        } catch (Exception ex) {
+            logger.debug("Error shutting down the configuration monitor");
+        }
+
         try {
             this.httpServer.stop();
         } catch (Exception ex) {
@@ -130,17 +160,14 @@ public class Application {
         }
     }
 
-    private void startShutdownManager(final XMLConfiguration properties) throws Exception {
-        final Integer shutdownServerPort = properties.getInteger("shutdown-port",
-                new Integer(RexsterSettings.DEFAULT_SHUTDOWN_PORT));
-        final String shutdownServerHost = properties.getString("shutdown-host", RexsterSettings.DEFAULT_HOST);
-        final ShutdownManager shutdownManager = new ShutdownManager(shutdownServerHost, shutdownServerPort);
+    private void startShutdownManager(final RexsterProperties properties) throws Exception {
+        final ShutdownManager shutdownManager = new ShutdownManager(properties);
 
         //Register a shutdown hook
         shutdownManager.registerShutdownListener(new ShutdownManager.ShutdownListener() {
             public void shutdown() {
-                // shutdown grizzly/graphs
-                stop();
+            // shutdown grizzly/graphs
+            stop();
             }
         });
 
@@ -157,11 +184,12 @@ public class Application {
 
         // properties from XML can be overriden by entries issued from the command line
         final RexsterSettings settings = new RexsterSettings(args);
+        initializeDebugLogging(settings);
         final RexsterCommandLine line = settings.getCommand();
 
         if (settings.getPrimeCommand().equals(RexsterSettings.COMMAND_START)) {
             try {
-                new Application(settings.getProperties(), settings.isDebug()).start();
+                new Application(settings.getProperties(), createRexsterConfigurationObserver(settings)).start();
             } catch (BindException be) {
                 logger.fatal("Could not start Rexster Server.  A port that Rexster needs is in use.");
             } catch (Exception ex) {
@@ -180,6 +208,49 @@ public class Application {
         } else {
             settings.printHelp();
         }
+    }
+
+    /**
+     * Initialize debug level logging for rexster if the setting is turned on from the command line.
+     */
+    private static void initializeDebugLogging(final RexsterSettings settings) {
+        if (settings.isDebug()) {
+            // turn on all logging for jersey -- this is debug mode
+            for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
+                java.util.logging.Logger logger = java.util.logging.Logger.getLogger(l);
+                logger.setLevel(Level.ALL);
+
+                // remove old handlers
+                for (Handler handler : logger.getHandlers()) {
+                    logger.removeHandler(handler);
+                }
+
+                // route all logging from java.util.Logging to log4net
+                final Handler handler = new JuliToLog4jHandler();
+                handler.setLevel(Level.ALL);
+                java.util.logging.Logger.getLogger(l).addHandler(handler);
+            }
+        } else {
+            // turn off all logging for jersey
+            for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
+                java.util.logging.Logger.getLogger(l).setLevel(Level.OFF);
+            }
+        }
+    }
+
+    /**
+     * Construct an observer for watching the rexster configuration file.
+     */
+    private static FileAlterationObserver createRexsterConfigurationObserver(final RexsterSettings settings) {
+        final File rexsterConfigurationFile = settings.getRexsterXmlFile();
+        final File absolute = new File(rexsterConfigurationFile.getAbsolutePath());
+        final File rexsterConfigurationDirectory = absolute.getParentFile();
+
+        logger.info(String.format("Rexster is watching [%s] for change.", rexsterConfigurationFile.getAbsolutePath()));
+
+        // follow the rexster configuration file directory and only the rexster.xml equivalent within that directory.
+        return new FileAlterationObserver(rexsterConfigurationDirectory,
+                FileFilterUtils.and(FileFileFilter.FILE, FileFilterUtils.nameFileFilter(rexsterConfigurationFile.getName())));
     }
 
     private static int parseInt(final String intString, final int intDefault) {

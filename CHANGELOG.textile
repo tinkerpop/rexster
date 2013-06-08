@@ -17,7 +17,10 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 
 * Support server monitoring features via "Metrics":http://metrics.codahale.com/
 * Add performance testing.
+* The port rexster serves HTTP/REST on can no longer be overriden from @rexster.sh@.
 * Moved rexster-*.sh and rexster-*.bat to bin/ (noticeable to developers of source only)
+* The @_limit@ query string argument for vertex queries is split into @_skip@ and @_take@ to better match the new limit API in Blueprints.
+* Changes to @rexster.xml@ no longer require a restart of Rexster to become available.
 
 h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 

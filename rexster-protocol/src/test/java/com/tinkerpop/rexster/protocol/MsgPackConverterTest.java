@@ -7,7 +7,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.BufferPacker;
-import org.msgpack.type.Value;
 
 import java.util.ArrayList;
 import java.util.HashMap;

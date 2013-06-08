@@ -1,12 +1,13 @@
 package com.tinkerpop.rexster.server.metrics;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.ganglia.GangliaReporter;
 import com.tinkerpop.rexster.Tokens;
-import com.yammer.metrics.MetricRegistry;
-import com.yammer.metrics.ganglia.GangliaReporter;
 import info.ganglia.gmetric4j.gmetric.GMetric;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,6 +17,8 @@ import java.util.List;
  */
 class GangliaReporterConfig extends AbstractHostPortReporterConfig {
     private static final Logger logger = Logger.getLogger(GangliaReporterConfig.class);
+
+    private List<GangliaReporter> reporters = new ArrayList<GangliaReporter>();
 
     public GangliaReporterConfig(final HierarchicalConfiguration config, final MetricRegistry metricRegistry) {
         super(config, metricRegistry);
@@ -30,8 +33,7 @@ class GangliaReporterConfig extends AbstractHostPortReporterConfig {
     }
 
     @Override
-    public boolean enable()
-    {
+    public boolean enable() {
         final List<HostPort> hosts = getFullHostList();
         if (hosts == null || hosts.isEmpty())
         {
@@ -43,11 +45,13 @@ class GangliaReporterConfig extends AbstractHostPortReporterConfig {
         {
             for (HostPort hostPort : hosts) {
                 final GMetric ganglia = new GMetric(hostPort.getHost(), hostPort.getPort(), GMetric.UDPAddressingMode.MULTICAST, 1);
-                GangliaReporter.forRegistry(this.metricRegistry)
-                        .convertDurationsTo(this.getRealDurationTimeUnitConversion())
-                        .convertRatesTo(this.getRealRateTimeUnitConversion())
-                        .filter(new RegexMetricFilter(this.inclusion, this.exclusion))
-                        .build(ganglia).start(this.period, this.getRealTimeUnit());
+                final GangliaReporter reporter = GangliaReporter.forRegistry(this.metricRegistry)
+                            .convertDurationsTo(this.getRealDurationTimeUnitConversion())
+                            .convertRatesTo(this.getRealRateTimeUnitConversion())
+                            .filter(new RegexMetricFilter(this.inclusion, this.exclusion))
+                            .build(ganglia);
+                reporter.start(this.period, this.getRealTimeUnit());
+                reporters.add(reporter);
             }
         }
         catch (Exception e)
@@ -56,5 +60,14 @@ class GangliaReporterConfig extends AbstractHostPortReporterConfig {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void disable() {
+        for (GangliaReporter reporter : reporters) {
+            reporter.stop();
+        }
+
+        reporters.clear();
     }
 }

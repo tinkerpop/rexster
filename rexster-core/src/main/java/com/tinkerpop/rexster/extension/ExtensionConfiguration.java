@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.extension;
 
+import com.tinkerpop.rexster.util.HierarchicalConfigurationComparator;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 
@@ -88,4 +89,28 @@ public class ExtensionConfiguration {
 
         return map;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final ExtensionConfiguration that = (ExtensionConfiguration) o;
+
+        if (!extensionName.equals(that.extensionName)) return false;
+        if (!namespace.equals(that.namespace)) return false;
+        if (!new HierarchicalConfigurationComparator().compare(this.getConfiguration(), that.getConfiguration())) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = namespace.hashCode();
+        result = 31 * result + extensionName.hashCode();
+        result = 31 * result + configuration.hashCode();
+        return result;
+    }
+
+
 }

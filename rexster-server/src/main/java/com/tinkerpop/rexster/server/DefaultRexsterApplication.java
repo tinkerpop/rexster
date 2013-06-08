@@ -39,18 +39,8 @@ public class DefaultRexsterApplication extends AbstractMapRexsterApplication {
      */
     public DefaultRexsterApplication(final String graphName, final Graph graph, final List<String> allowableNamespaces,
                                      final List<HierarchicalConfiguration> extensionConfigurations) {
-        final RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph);
-        rag.loadAllowableExtensions(allowableNamespaces);
-        configureExtensions(extensionConfigurations, rag);
-
+        final RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph, allowableNamespaces, extensionConfigurations);
         this.graphs.put(graphName, rag);
         logger.info(String.format("Graph [%s] loaded", rag.getGraph()));
-
-    }
-
-    private static void configureExtensions(final List<HierarchicalConfiguration> extensionConfigurations, final RexsterApplicationGraph rag) {
-        if (extensionConfigurations != null) {
-            rag.loadExtensionsConfigurations(extensionConfigurations);
-        }
     }
 }

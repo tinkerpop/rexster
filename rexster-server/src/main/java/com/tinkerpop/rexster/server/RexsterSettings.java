@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.server;
 
-import com.tinkerpop.rexster.util.JuliToLog4jHandler;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -8,23 +7,16 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
 
 /**
+ * RexsterSettings is the combination of the Rexster configuration options and command line overrides.
+ *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RexsterSettings {
-
-    private static final Logger logger = Logger.getLogger(RexsterSettings.class);
 
     public static final int DEFAULT_HTTP_PORT = 8182;
     public static final int DEFAULT_SHUTDOWN_PORT = 8183;
@@ -74,59 +66,28 @@ public class RexsterSettings {
         return line.hasCommandParameters() && line.getCommandParameters().hasOption("debug");
     }
 
-    public XMLConfiguration getProperties() {
+    public File getRexsterXmlFile() {
+        final String rexsterXmlFileLocation = getRexsterXmlFileString();
+        return new File(rexsterXmlFileLocation);
+    }
 
-        final XMLConfiguration properties = new XMLConfiguration();
-
-        if (isDebug()) {
-            // turn on all logging for jersey -- this is debug mode
-            for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
-                java.util.logging.Logger logger = java.util.logging.Logger.getLogger(l);
-                logger.setLevel(Level.ALL);
-
-                // remove old handlers
-                for (Handler handler : logger.getHandlers()) {
-                    logger.removeHandler(handler);
-                }
-
-                // route all logging from java.util.Logging to log4net
-                final Handler handler = new JuliToLog4jHandler();
-                handler.setLevel(Level.ALL);
-                java.util.logging.Logger.getLogger(l).addHandler(handler);
-            }
-        } else {
-            // turn off all logging for jersey
-            for (String l : Collections.list(LogManager.getLogManager().getLoggerNames())) {
-                java.util.logging.Logger.getLogger(l).setLevel(Level.OFF);
-            }
-        }
-
-        final boolean rexsterXmlConfiguredFromCommandLine = line.hasCommandParameters() && line.getCommandParameters().hasOption("configuration");
-        final String rexsterXmlFileLocation = rexsterXmlConfiguredFromCommandLine ? line.getCommandParameters().getOptionValue("configuration") : "rexster.xml";
-        final File rexsterXmlFile = new File(rexsterXmlFileLocation);
-
-        try {
-            // load either the rexster.xml from the command line or the default rexster.xml in the root of the
-            // working directory
-            properties.load(new FileReader(rexsterXmlFileLocation));
-            logger.info(String.format("Using [%s] as configuration source.", rexsterXmlFile.getAbsolutePath()));
-        } catch (Exception e) {
-            final String msg = String.format("Could not load configuration from [%s]", rexsterXmlFile.getAbsolutePath());
-            logger.warn(msg);
-            throw new RuntimeException(msg);
-        }
-
-        // overrides rexster-server-port from command line
-        if (line.hasCommandParameters() && line.getCommandParameters().hasOption("rexsterport")) {
-            properties.setProperty("http.server-port", line.getCommandParameters().getOptionValue("rexsterport"));
-        }
+    public RexsterProperties getProperties() {
+        final String rexsterXmlFileLocation = getRexsterXmlFileString();
+        final RexsterProperties properties = new RexsterProperties(rexsterXmlFileLocation);
 
         // overrides web-root from command line
         if (line.hasCommandParameters() && line.getCommandParameters().hasOption("webroot")) {
-            properties.setProperty("http.web-root", line.getCommandParameters().getOptionValue("webroot"));
+            properties.addOverride("http.web-root", line.getCommandParameters().getOptionValue("webroot"));
         }
 
+        properties.addOverride("debug", isDebug());
+
         return properties;
+    }
+
+    private String getRexsterXmlFileString() {
+        final boolean rexsterXmlConfiguredFromCommandLine = line.hasCommandParameters() && line.getCommandParameters().hasOption("configuration");
+        return rexsterXmlConfiguredFromCommandLine ? line.getCommandParameters().getOptionValue("configuration") : "rexster.xml";
     }
 
     @SuppressWarnings("static-access")

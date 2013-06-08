@@ -80,4 +80,119 @@ public class ExtensionConfigurationTest {
         Assert.assertTrue(map.containsKey("key2"));
         Assert.assertEquals("value2", map.get("key2"));
     }
+
+    @Test
+    public void shouldEqual() {
+        HierarchicalConfiguration hc1 = new HierarchicalConfiguration();
+        hc1.addProperty("key1", "value1");
+        hc1.addProperty("key2", "value2");
+        ExtensionConfiguration config1 = new ExtensionConfiguration("ns", "name", hc1);
+
+        HierarchicalConfiguration hc2 = new HierarchicalConfiguration();
+        hc2.addProperty("key1", "value1");
+        hc2.addProperty("key2", "value2");
+        ExtensionConfiguration config2 = new ExtensionConfiguration("ns", "name", hc2);
+
+        Assert.assertTrue(config1.equals(config2));
+    }
+
+    @Test
+    public void shouldNotEqualWhenValuesInConfigAreDifferent() {
+        HierarchicalConfiguration hc1 = new HierarchicalConfiguration();
+        hc1.addProperty("key1", "value1");
+        hc1.addProperty("key2", "value2");
+        ExtensionConfiguration config1 = new ExtensionConfiguration("ns", "name", hc1);
+
+        HierarchicalConfiguration hc2 = new HierarchicalConfiguration();
+        hc2.addProperty("key1", "value1");
+        hc2.addProperty("key2", "value-not the same");
+        ExtensionConfiguration config2 = new ExtensionConfiguration("ns", "name", hc2);
+
+        Assert.assertFalse(config1.equals(config2));
+    }
+
+    @Test
+    public void shouldNotEqualWhenMissingKeyInConfig() {
+        HierarchicalConfiguration hc1 = new HierarchicalConfiguration();
+        hc1.addProperty("key1", "value1");
+        hc1.addProperty("key2", "value2");
+        ExtensionConfiguration config1 = new ExtensionConfiguration("ns", "name", hc1);
+
+        HierarchicalConfiguration hc2 = new HierarchicalConfiguration();
+        hc2.addProperty("key1", "value1");
+        ExtensionConfiguration config2 = new ExtensionConfiguration("ns", "name", hc2);
+
+        Assert.assertFalse(config1.equals(config2));
+    }
+
+    @Test
+    public void shouldNotEqualWhenConfig1HasKeyConfig2DoesNot() {
+        HierarchicalConfiguration hc1 = new HierarchicalConfiguration();
+        hc1.addProperty("key1", "value1");
+        hc1.addProperty("key2", "value2");
+        ExtensionConfiguration config1 = new ExtensionConfiguration("ns", "name", hc1);
+
+        HierarchicalConfiguration hc2 = new HierarchicalConfiguration();
+        hc2.addProperty("key1", "value1");
+        hc2.addProperty("new-key", "value1");
+        ExtensionConfiguration config2 = new ExtensionConfiguration("ns", "name", hc2);
+
+        Assert.assertFalse(config1.equals(config2));
+    }
+
+    @Test
+    public void shouldNotEqualWhenConfig2HasAllKeysFromConfig1ButAlsoANewOne() {
+        HierarchicalConfiguration hc1 = new HierarchicalConfiguration();
+        hc1.addProperty("key1", "value1");
+        ExtensionConfiguration config1 = new ExtensionConfiguration("ns", "name", hc1);
+
+        HierarchicalConfiguration hc2 = new HierarchicalConfiguration();
+        hc2.addProperty("key1", "value1");
+        hc2.addProperty("new-key", "value1");
+        ExtensionConfiguration config2 = new ExtensionConfiguration("ns", "name", hc2);
+
+        Assert.assertFalse(config1.equals(config2));
+    }
+
+    @Test
+    public void shouldNotEqualWhenValuesInConfigAreDifferentDeeperInHierarchy() {
+        HierarchicalConfiguration hc1 = new HierarchicalConfiguration();
+        hc1.addProperty("key1", "value1");
+        HierarchicalConfiguration hc1i = new HierarchicalConfiguration();
+        hc1i.addProperty("key2i", "value2i");
+        hc1.addProperty("key2", hc1i);
+
+        ExtensionConfiguration config1 = new ExtensionConfiguration("ns", "name", hc1);
+
+        HierarchicalConfiguration hc2 = new HierarchicalConfiguration();
+        hc2.addProperty("key1", "value1");
+
+        HierarchicalConfiguration hc2i = new HierarchicalConfiguration();
+        hc2i.addProperty("key2i", "value-not the same");
+        hc2.addProperty("key2", hc2i);
+        ExtensionConfiguration config2 = new ExtensionConfiguration("ns", "name", hc2);
+
+        Assert.assertFalse(config1.equals(config2));
+    }
+
+    @Test
+    public void shouldEqualWhenValuesInConfigAreSameDeeperInHierarchy() {
+        HierarchicalConfiguration hc1 = new HierarchicalConfiguration();
+        hc1.addProperty("key1", "value1");
+        HierarchicalConfiguration hc1i = new HierarchicalConfiguration();
+        hc1i.addProperty("key2i", "value2i");
+        hc1.addProperty("key2", hc1i);
+
+        ExtensionConfiguration config1 = new ExtensionConfiguration("ns", "name", hc1);
+
+        HierarchicalConfiguration hc2 = new HierarchicalConfiguration();
+        hc2.addProperty("key1", "value1");
+
+        HierarchicalConfiguration hc2i = new HierarchicalConfiguration();
+        hc2i.addProperty("key2i", "value2i");
+        hc2.addProperty("key2", hc2i);
+        ExtensionConfiguration config2 = new ExtensionConfiguration("ns", "name", hc2);
+
+        Assert.assertTrue(config1.equals(config2));
+    }
 }

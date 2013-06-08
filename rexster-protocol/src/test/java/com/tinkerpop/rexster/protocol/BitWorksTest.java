@@ -2,18 +2,11 @@ package com.tinkerpop.rexster.protocol;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.msgpack.MessagePack;
-import org.msgpack.packer.Packer;
 
-import javax.script.Bindings;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class BitWorksTest {

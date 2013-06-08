@@ -6,8 +6,8 @@ import com.tinkerpop.rexster.protocol.session.RexProSession;
 import com.tinkerpop.rexster.protocol.session.RexProSessions;
 import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.server.RexsterApplication;
-import com.yammer.metrics.Gauge;
-import com.yammer.metrics.MetricRegistry;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;

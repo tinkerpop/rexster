@@ -1,11 +1,10 @@
 package com.tinkerpop.rexster.protocol.msg;
 
 import com.tinkerpop.rexster.protocol.MsgPackConverter;
-
 import org.msgpack.packer.Packer;
 import org.msgpack.template.AbstractTemplate;
-import org.msgpack.unpacker.Unpacker;
 import org.msgpack.template.Templates;
+import org.msgpack.unpacker.Unpacker;
 
 import java.io.IOException;
 

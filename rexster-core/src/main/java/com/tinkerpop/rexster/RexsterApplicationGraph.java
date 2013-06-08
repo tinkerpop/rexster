@@ -53,8 +53,21 @@ public class RexsterApplicationGraph {
     private final Map<ExtensionSegmentSet, Boolean> extensionAllowedCache = new HashMap<ExtensionSegmentSet, Boolean>();
 
     public RexsterApplicationGraph(final String graphName, final Graph graph) {
+        this(graphName, graph, null);
+    }
+
+    public RexsterApplicationGraph(final String graphName, final Graph graph,
+                                   final HierarchicalConfiguration graphConfig) {
+        this(graphName, graph, graphConfig == null ? null : graphConfig.getList(Tokens.REXSTER_GRAPH_EXTENSIONS_ALLOWS_PATH),
+                graphConfig == null ? null : graphConfig.configurationsAt(Tokens.REXSTER_GRAPH_EXTENSIONS_PATH));
+    }
+
+    public RexsterApplicationGraph(final String graphName, final Graph graph, final List<String> allowableNamespaces,
+                                   final List<HierarchicalConfiguration> extensionConfigurations) {
         this.graphName = graphName;
         this.graph = graph;
+        this.loadAllowableExtensions(allowableNamespaces);
+        this.loadExtensionsConfigurations(extensionConfigurations);
     }
 
     /**
@@ -184,7 +197,7 @@ public class RexsterApplicationGraph {
     /**
      * Generally speaking this method should not be called directly.
      */
-    public void loadExtensionsConfigurations(final List<HierarchicalConfiguration> extensionConfigurations) {
+    void loadExtensionsConfigurations(final List<HierarchicalConfiguration> extensionConfigurations) {
         this.extensionConfigurations = new HashSet<ExtensionConfiguration>();
 
         if (extensionConfigurations != null) {
@@ -209,7 +222,7 @@ public class RexsterApplicationGraph {
      * Loads a list of namespaces extension patterns that are allowed for this graph.  Generally speaking this
      * method should not be called directly.
      */
-    public void loadAllowableExtensions(final List allowableNamespaces) {
+    void loadAllowableExtensions(final List allowableNamespaces) {
         this.extensionAllowables = new HashSet<ExtensionAllowed>();
 
         if (allowableNamespaces != null) {
@@ -232,8 +245,51 @@ public class RexsterApplicationGraph {
         return this.extensionAllowables;
     }
 
+    public Set<ExtensionConfiguration> getExtensionConfigurations() {
+        return extensionConfigurations;
+    }
+
     static Graph unwrapGraph(final Graph g) {
         return g instanceof WrapperGraph ? unwrapGraph(((WrapperGraph) g).getBaseGraph()) : g;
+    }
+
+    @Override
+    public String toString() {
+        return this.graphName + "-" + this.graph.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final RexsterApplicationGraph that = (RexsterApplicationGraph) o;
+
+        if (!graphName.equals(that.graphName)) return false;
+        if (!graph.getClass().equals(that.graph.getClass())) return false;
+
+        for (ExtensionAllowed extensionAllowed : extensionAllowables) {
+            if (!that.getExtensionAllowables().contains(extensionAllowed)) {
+                return false;
+            }
+        }
+
+        for (ExtensionConfiguration configuration : extensionConfigurations) {
+            if (!that.getExtensionConfigurations().contains(configuration)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = graph.hashCode();
+        result = 31 * result + graphName.hashCode();
+        result = 31 * result + extensionAllowables.hashCode();
+        result = 31 * result + extensionConfigurations.hashCode();
+        return result;
     }
 
     protected JSONArray getExtensionHypermedia(final ExtensionPoint extensionPoint, final String baseUri) {

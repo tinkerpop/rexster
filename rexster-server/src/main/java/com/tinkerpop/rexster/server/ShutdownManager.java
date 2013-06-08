@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.server;
 
+import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
@@ -43,12 +44,36 @@ public class ShutdownManager {
     private final int port;
     private final String host;
 
+    private int lastPort;
+    private String lastHost;
+
+    private ShutdownSocketListener shutdownSocketListener;
+
     public ShutdownManager(final String host, final int port) {
         this.port = port;
         this.host = host;
     }
 
-    public void registerShutdownListener(ShutdownListener shutdownListener) {
+    public ShutdownManager(final RexsterProperties properties) {
+        this(properties.getRexsterShutdownHost(), properties.getRexsterShutdownPort());
+        properties.addListener(new RexsterProperties.RexsterPropertiesListener() {
+            @Override
+            public void propertiesChanged(final XMLConfiguration configuration) {
+                updateSettings(properties.getRexsterShutdownHost(), properties.getRexsterShutdownPort());
+            }
+        });
+    }
+
+    public void updateSettings(final String host, final int port) {
+        if (!host.equals(lastHost) || port != lastPort) {
+            this.shutdownSocketListener.updateSettings(host, port);
+        }
+
+        lastHost = host;
+        lastPort = port;
+    }
+
+    public void registerShutdownListener(final ShutdownListener shutdownListener) {
         if (this.shutdownListeners == null) {
             this.shutdownListeners = new ArrayList<ShutdownListener>();
         }
@@ -56,17 +81,12 @@ public class ShutdownManager {
     }
 
     public final void start() throws Exception {
+        shutdownSocketListener = new ShutdownSocketListener(this.host, this.port);
 
-        final ShutdownSocketListener shutdownSocketListener = new ShutdownSocketListener(this.host, this.port);
-
-        final Thread shutdownSocketThread = new Thread(shutdownSocketListener, "ShutdownListener-" + this.host + ":" + this.port);
-        shutdownSocketThread.setDaemon(true);
-        shutdownSocketThread.start();
-
-        //Add the listener to the shutdown list
+        // Add the listener to the shutdown list
         this.internalShutdownListeners.add(shutdownSocketListener);
 
-        //Register a shutdown handler
+        // Register a shutdown handler
         final Thread shutdownHook = new Thread(new ShutdownHookHandler(), "JVM Shutdown Hook");
         Runtime.getRuntime().addShutdownHook(shutdownHook);
         this.logger.debug("Registered JVM shutdown hook");
@@ -165,11 +185,25 @@ public class ShutdownManager {
      * Runnable for waiting on connections to the shutdown socket and handling them
      */
     private class ShutdownSocketListener implements Runnable, ShutdownListener {
-        private final ServerSocket shutdownSocket;
-        private final InetAddress bindHost;
-        private final int port;
+        private ServerSocket shutdownSocket;
+        private InetAddress bindHost;
+        private int port;
 
-        private ShutdownSocketListener(String host, int port) {
+        private ShutdownSocketListener(final String host, final int port) {
+            this.updateSettings(host, port);
+        }
+
+        public synchronized void updateSettings(final String host, final int port) {
+            if (this.shutdownSocket != null) {
+                try {
+                    this.shutdownSocket.close();
+                } catch (IOException ioe) {
+                    logger.warn(String.format("Failure closing shutdown socket on %s:%s", host, port));
+                } finally {
+                    this.shutdownSocket = null;
+                }
+            }
+
             this.port = port;
             try {
                 this.bindHost = InetAddress.getByName(host);
@@ -184,11 +218,12 @@ public class ShutdownManager {
             }
 
             logger.info("Bound shutdown socket to " + this.bindHost + ":" + this.port + ". Starting listener thread for shutdown requests.");
+
+            final Thread shutdownSocketThread = new Thread(shutdownSocketListener, "ShutdownListener-" + host + ":" + port);
+            shutdownSocketThread.setDaemon(true);
+            shutdownSocketThread.start();
         }
 
-        /* (non-Javadoc)
-         * @see java.lang.Runnable#run()
-         */
         public void run() {
             try {
                 while (!shutdownSocket.isClosed()) {

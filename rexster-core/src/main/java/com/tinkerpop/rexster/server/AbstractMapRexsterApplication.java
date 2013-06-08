@@ -1,13 +1,13 @@
 package com.tinkerpop.rexster.server;
 
+import com.codahale.metrics.MetricRegistry;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
-import com.yammer.metrics.MetricRegistry;
 import org.apache.log4j.Logger;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Base class for implementations that need to use a Map to hold graphs served by Rexster.
@@ -22,7 +22,7 @@ public abstract class AbstractMapRexsterApplication implements RexsterApplicatio
 
     protected final long startTime = System.currentTimeMillis();
 
-    protected final Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+    protected final Map<String, RexsterApplicationGraph> graphs = new ConcurrentHashMap<String, RexsterApplicationGraph>();
 
     @Override
     public Graph getGraph(final String graphName) {
@@ -61,6 +61,7 @@ public abstract class AbstractMapRexsterApplication implements RexsterApplicatio
             // graph may not have been initialized properly if an exception gets tossed in
             // on graph creation
             if (graph != null) {
+                // call shutdown on the unwrapped graph as some wrappers don't allow shutdown() to be called.
                 final Graph shutdownGraph = rag.getUnwrappedGraph();
                 shutdownGraph.shutdown();
             }
@@ -71,7 +72,7 @@ public abstract class AbstractMapRexsterApplication implements RexsterApplicatio
     @Override
     public MetricRegistry getMetricRegistry() {
         if (metricRegistry == null) {
-            metricRegistry = new MetricRegistry("rexster");
+            metricRegistry = new MetricRegistry();
         }
 
         return metricRegistry;

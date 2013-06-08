@@ -52,16 +52,7 @@ public class GraphConfigurationContainer {
                         // their attempt to be created
                         try {
                             final Graph graph = getGraphFromConfiguration(graphConfig);
-                            final RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph);
-
-                            // loads extensions that are allowed to be served for this graph
-                            final List extensionConfigs = graphConfig.getList(Tokens.REXSTER_GRAPH_EXTENSIONS_ALLOWS_PATH);
-                            rag.loadAllowableExtensions(extensionConfigs);
-
-                            // loads extension configuration for this graph
-                            final List<HierarchicalConfiguration> extensionConfigurations = graphConfig.configurationsAt(Tokens.REXSTER_GRAPH_EXTENSIONS_PATH);
-                            rag.loadExtensionsConfigurations(extensionConfigurations);
-
+                            final RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph, graphConfig);
                             this.graphs.put(rag.getGraphName(), rag);
 
                             logger.info("Graph " + graphName + " - " + graph + " loaded");

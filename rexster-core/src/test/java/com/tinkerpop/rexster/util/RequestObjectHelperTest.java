@@ -1,13 +1,11 @@
 package com.tinkerpop.rexster.util;
 
-import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.rexster.Tokens;
 import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
 import org.junit.Test;
 
-import javax.ws.rs.WebApplicationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -173,125 +171,5 @@ public class RequestObjectHelperTest {
     @Test
     public void hasElementPropertiesNullRequestFalse() {
         Assert.assertFalse(RequestObjectHelper.hasElementProperties(null));
-    }
-
-    @Test
-    public void getQueryPropertiesNoParameter(){
-        JSONObject requestObject = buildJSONObjectFromString("{\"nope-not-here\":13213}");
-        Assert.assertEquals(0, RequestObjectHelper.getQueryProperties(requestObject).size());
-    }
-
-    @Test(expected = WebApplicationException.class)
-    public void getQueryPropertiesBadParameter(){
-        // can't have a non valid "compare" parameter
-        JSONObject requestObject = buildJSONObjectFromString("{\"_properties\":[\"[d\",\"f\",\"df]\"]}");
-        RequestObjectHelper.getQueryProperties(requestObject);
-    }
-
-    @Test
-    public void getQueryPropertiesCompareEqual(){
-        assertQueryPropertyOperatorValid("=", Query.Compare.EQUAL);
-    }
-
-    @Test
-    public void getQueryPropertiesCompareGreaterThan(){
-        assertQueryPropertyOperatorValid(">", Query.Compare.GREATER_THAN);
-    }
-
-    @Test
-    public void getQueryPropertiesCompareGreaterThanEqual(){
-        assertQueryPropertyOperatorValid(">=", Query.Compare.GREATER_THAN_EQUAL);
-    }
-
-    @Test
-    public void getQueryPropertiesCompareLessThan(){
-        assertQueryPropertyOperatorValid("<", Query.Compare.LESS_THAN);
-    }
-
-    @Test
-    public void getQueryPropertiesCompareLessThanEqual(){
-        assertQueryPropertyOperatorValid("<=", Query.Compare.LESS_THAN_EQUAL);
-    }
-
-    @Test
-    public void getQueryPropertiesCompareNotEqual(){
-        assertQueryPropertyOperatorValid("<>", Query.Compare.NOT_EQUAL);
-    }
-
-    @Test
-    public void getQueryPropertiesMultiple(){
-        JSONObject requestObject = buildJSONObjectFromString("{\"_properties\":[\"[key1\",\"=\",\"val1]\",\"[key2\",\"=\",\"val2]\"]}");
-
-        Set<QueryProperties> queryProperties = RequestObjectHelper.getQueryProperties(requestObject);
-
-        Assert.assertEquals(2, queryProperties.size());
-    }
-
-    @Test
-    public void getQueryPropertiesCoerceTypeFloat() {
-        JSONObject requestObject = buildJSONObjectFromString("{\"_properties\":[\"[key\",\"=\",\"(f,2.34)]\"]}");
-        Set<QueryProperties> queryProperties = RequestObjectHelper.getQueryProperties(requestObject);
-
-        Assert.assertEquals(1, queryProperties.size());
-        QueryProperties queryProperty = queryProperties.iterator().next();
-        Assert.assertEquals(2.34f, queryProperty.getValue());
-    }
-
-    @Test
-    public void getQueryPropertiesCoerceTypeDouble() {
-        JSONObject requestObject = buildJSONObjectFromString("{\"_properties\":[\"[key\",\"=\",\"(d,2.34)]\"]}");
-        Set<QueryProperties> queryProperties = RequestObjectHelper.getQueryProperties(requestObject);
-
-        Assert.assertEquals(1, queryProperties.size());
-        QueryProperties queryProperty = queryProperties.iterator().next();
-        Assert.assertEquals(2.34d, queryProperty.getValue());
-    }
-
-    @Test
-    public void getQueryPropertiesCoerceTypeLong() {
-        JSONObject requestObject = buildJSONObjectFromString("{\"_properties\":[\"[key\",\"=\",\"(l,2000)]\"]}");
-        Set<QueryProperties> queryProperties = RequestObjectHelper.getQueryProperties(requestObject);
-
-        Assert.assertEquals(1, queryProperties.size());
-        QueryProperties queryProperty = queryProperties.iterator().next();
-        Assert.assertEquals(2000l, queryProperty.getValue());
-    }
-
-    @Test
-    public void getQueryPropertiesCoerceTypeInteger() {
-        JSONObject requestObject = buildJSONObjectFromString("{\"_properties\":[\"[key\",\"=\",\"(i,2000)]\"]}");
-        Set<QueryProperties> queryProperties = RequestObjectHelper.getQueryProperties(requestObject);
-
-        Assert.assertEquals(1, queryProperties.size());
-        QueryProperties queryProperty = queryProperties.iterator().next();
-        Assert.assertEquals(2000, queryProperty.getValue());
-    }
-
-    @Test
-    public void getQueryPropertiesCoerceTypeString() {
-        JSONObject requestObject = buildJSONObjectFromString("{\"_properties\":[\"[key\",\"=\",\"(s,xxx)]\"]}");
-        Set<QueryProperties> queryProperties = RequestObjectHelper.getQueryProperties(requestObject);
-
-        Assert.assertEquals(1, queryProperties.size());
-        QueryProperties queryProperty = queryProperties.iterator().next();
-        Assert.assertEquals("xxx", queryProperty.getValue());
-    }
-
-    private void assertQueryPropertyOperatorValid(String compareString, Query.Compare compare) {
-        // can't have a non valid "compare" parameter...
-        JSONObject requestObject = createQueryPropertyRequestObject(compareString);
-        Set<QueryProperties> queryProperties = RequestObjectHelper.getQueryProperties(requestObject);
-
-        Assert.assertEquals(1, queryProperties.size());
-        QueryProperties queryProperty = queryProperties.iterator().next();
-        Assert.assertEquals("key", queryProperty.getName());
-        Assert.assertEquals("val", queryProperty.getValue());
-        Assert.assertEquals(compare, queryProperty.getCompare());
-
-    }
-
-    private JSONObject createQueryPropertyRequestObject(String compare) {
-        // purposely building JSON this way.  current URI to JSON processing mangles the JSON into this format.
-        return buildJSONObjectFromString("{\"_properties\":[\"[key\",\"" + compare + "\",\"val]\"]}");
     }
 }
