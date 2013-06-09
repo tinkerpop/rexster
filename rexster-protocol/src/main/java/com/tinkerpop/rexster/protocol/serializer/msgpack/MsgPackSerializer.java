@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.protocol.serializer.msgpack;
 import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.protocol.serializer.RexProSerializer;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsTemplate;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages.ErrorResponseMessageTemplate;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages.ScriptRequestMessageTemplate;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages.SessionRequestMessageTemplate;
@@ -20,7 +21,7 @@ public class MsgPackSerializer implements RexProSerializer {
         //todo: get rid of the special classes and implement their serialization in the message templates
         msgpack.register(RexProMessageMeta.class, new MetaTemplate());
         msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
-        msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
+        msgpack.register(RexProScriptResult.class, ResultsTemplate.getInstance());
 
         //todo: write a bit about why this is required
         msgpack.register(ErrorResponseMessage.class, new ErrorResponseMessageTemplate());

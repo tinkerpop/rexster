@@ -15,6 +15,7 @@ import com.tinkerpop.rexster.protocol.msg.RexProScriptResult;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsTemplate;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Buffer;
@@ -41,7 +42,7 @@ public class RexProClientFilter extends BaseFilter {
     static {
         msgpack.register(RexProMessageMeta.class, MetaTemplate.getInstance());
         msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
-        msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
+        msgpack.register(RexProScriptResult.class, ResultsTemplate.getInstance());
     }
 
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {

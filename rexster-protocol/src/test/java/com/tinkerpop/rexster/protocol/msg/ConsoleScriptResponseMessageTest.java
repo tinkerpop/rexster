@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.protocol.msg;
 
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsTemplate;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.msgpack.MessagePack;
@@ -50,7 +51,7 @@ public class ConsoleScriptResponseMessageTest {
         MessagePack msgpack = new MessagePack();
         msgpack.register(RexProMessageMeta.class, MetaTemplate.getInstance());
         msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
-        msgpack.register(RexProScriptResult.class, RexProScriptResult.SerializationTemplate.getInstance());
+        msgpack.register(RexProScriptResult.class, ResultsTemplate.getInstance());
 
         ConsoleScriptResponseMessage outMsg = new ConsoleScriptResponseMessage();
         outMsg.setRequestAsUUID(UUID.randomUUID());
