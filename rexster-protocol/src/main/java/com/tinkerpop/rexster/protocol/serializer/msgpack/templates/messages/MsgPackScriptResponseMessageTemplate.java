@@ -1,6 +1,11 @@
 package com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages;
 
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.BindingsTemplate;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsTemplate;
+import org.msgpack.unpacker.Unpacker;
+
+import java.io.IOException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,5 +19,14 @@ public class MsgPackScriptResponseMessageTemplate extends RexProMessageTemplate<
     @Override
     protected MsgPackScriptResponseMessage instantiateMessage() {
         return new MsgPackScriptResponseMessage();
+    }
+
+    @Override
+    protected MsgPackScriptResponseMessage readMessageArray(final Unpacker un, final MsgPackScriptResponseMessage msg) throws IOException {
+        MsgPackScriptResponseMessage message = super.readMessageArray(un, msg);
+
+        message.Results = ResultsTemplate.getInstance().read(un, null);
+        message.Bindings = BindingsTemplate.getInstance().read(un, null);
+        return message;
     }
 }
