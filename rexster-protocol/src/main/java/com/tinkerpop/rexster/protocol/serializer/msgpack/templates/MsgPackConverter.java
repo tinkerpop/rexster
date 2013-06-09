@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster.protocol;
+package com.tinkerpop.rexster.protocol.serializer.msgpack.templates;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;

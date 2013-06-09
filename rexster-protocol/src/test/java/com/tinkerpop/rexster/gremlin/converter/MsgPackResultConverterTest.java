@@ -3,7 +3,7 @@ package com.tinkerpop.rexster.gremlin.converter;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.pipes.util.structures.Table;
-import com.tinkerpop.rexster.protocol.MsgPackConverter;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MsgPackConverter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.msgpack.MessagePack;

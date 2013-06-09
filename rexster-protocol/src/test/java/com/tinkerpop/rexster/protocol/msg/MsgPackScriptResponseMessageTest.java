@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.protocol.msg;
 
-import com.tinkerpop.rexster.protocol.MsgPackConverter;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MsgPackConverter;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsTemplate;
 import junit.framework.Assert;
