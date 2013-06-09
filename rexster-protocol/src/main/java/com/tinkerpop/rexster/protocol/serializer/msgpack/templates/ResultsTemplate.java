@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.protocol.serializer.msgpack.templates;
 
-import com.tinkerpop.rexster.protocol.MsgPackConverter;
 import com.tinkerpop.rexster.protocol.msg.RexProScriptResult;
 import org.msgpack.packer.Packer;
 import org.msgpack.template.AbstractTemplate;
@@ -24,7 +23,7 @@ public class ResultsTemplate extends AbstractTemplate<RexProScriptResult> {
             result = new RexProScriptResult();
         }
         try{
-            MsgPackConverter.serializeObject(result.get(), pk);
+            ResultsConverter.serializeObject(result.get(), pk);
         } catch (Exception ex) {
             throw new IOException(ex.toString());
         }
@@ -47,7 +46,7 @@ public class ResultsTemplate extends AbstractTemplate<RexProScriptResult> {
             result = new RexProScriptResult();
         }
 
-        result.set(MsgPackConverter.deserializeObject(u.read(Templates.TValue)));
+        result.set(ResultsConverter.deserializeObject(u.read(Templates.TValue)));
         return result;
     }
 
