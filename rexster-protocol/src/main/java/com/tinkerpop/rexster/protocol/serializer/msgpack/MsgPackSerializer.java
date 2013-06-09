@@ -4,10 +4,7 @@ import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.protocol.serializer.RexProSerializer;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsTemplate;
-import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages.ErrorResponseMessageTemplate;
-import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages.ScriptRequestMessageTemplate;
-import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages.SessionRequestMessageTemplate;
-import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages.SessionResponseMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages.*;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.BufferPacker;
 import org.msgpack.unpacker.Unpacker;
@@ -28,6 +25,9 @@ public class MsgPackSerializer implements RexProSerializer {
         msgpack.register(SessionRequestMessage.class, new SessionRequestMessageTemplate());
         msgpack.register(SessionResponseMessage.class, new SessionResponseMessageTemplate());
         msgpack.register(ScriptRequestMessage.class, new ScriptRequestMessageTemplate());
+        msgpack.register(MsgPackScriptResponseMessage.class, new MsgPackScriptResponseMessageTemplate());
+        msgpack.register(GraphSONScriptResponseMessage.class, new GraphSONScriptResponseMessageTemplate());
+        msgpack.register(ConsoleScriptResponseMessage.class, new ConsoleScriptResponseMessageTemplate());
     }
 
     public <Message extends RexProMessage> Message deserialize(byte[] bytes, Class<Message> messageClass) throws IOException {

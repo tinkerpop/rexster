@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages;
 
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
+import org.msgpack.MessageTypeException;
 import org.msgpack.packer.Packer;
 import org.msgpack.template.AbstractTemplate;
 import org.msgpack.unpacker.Unpacker;
@@ -51,15 +52,15 @@ public abstract class RexProMessageTemplate<Message extends RexProMessage> exten
     }
 
     protected Message readMessageArray(final Unpacker un, final Message msg) throws IOException {
-        msg.Session = un.readByteArray();
-        msg.Request = un.readByteArray();
+        msg.Session = un.trySkipNil()?null:un.readByteArray();
+        msg.Request = un.trySkipNil()?null:un.readByteArray();
         msg.Meta = MetaTemplate.getInstance().read(un, null);
         return msg;
     }
 
     public Message read(final Unpacker u, final Message to, final boolean required) throws IOException {
         u.readArrayBegin();
-        Message msg = readMessageArray(u, to);
+        Message msg = readMessageArray(u, to==null?instantiateMessage():to);
         u.readArrayEnd();
         return msg;
     }

@@ -30,7 +30,7 @@ public class ErrorResponseMessageTemplate extends RexProMessageTemplate<ErrorRes
 
     protected ErrorResponseMessage readMessageArray(final Unpacker un, final ErrorResponseMessage msg) throws IOException {
         ErrorResponseMessage message = super.readMessageArray(un, msg);
-        message.ErrorMessage = un.readString();
+        message.ErrorMessage = un.trySkipNil()?null:un.readString();
         return message;
     }
 }

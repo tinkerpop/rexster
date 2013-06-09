@@ -25,8 +25,8 @@ public class ScriptRequestMessageTemplate extends RexProMessageTemplate<ScriptRe
 
     protected ScriptRequestMessage readMessageArray(final Unpacker un, final ScriptRequestMessage msg) throws IOException {
         ScriptRequestMessage message = super.readMessageArray(un, msg);
-        message.LanguageName = un.readString();
-        message.Script = un.readString();
+        message.LanguageName = un.trySkipNil()?null:un.readString();
+        message.Script = un.trySkipNil()?null:un.readString();
         message.Bindings = BindingsTemplate.getInstance().read(un, null);
         return message;
     }

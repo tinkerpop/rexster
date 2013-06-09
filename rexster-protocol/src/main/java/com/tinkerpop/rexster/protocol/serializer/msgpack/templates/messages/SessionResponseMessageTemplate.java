@@ -27,11 +27,13 @@ public class SessionResponseMessageTemplate extends RexProMessageTemplate<Sessio
 
     protected SessionResponseMessage readMessageArray(final Unpacker un, final SessionResponseMessage msg) throws IOException {
         SessionResponseMessage message = super.readMessageArray(un, msg);
-        message.Languages = new String[un.readArrayBegin()];
-        for (int i=0; i<message.Languages.length; i++) {
-            message.Languages[i] = un.readString();
+        if (!un.trySkipNil()){
+            message.Languages = new String[un.readArrayBegin()];
+            for (int i=0; i<message.Languages.length; i++) {
+                message.Languages[i] = un.readString();
+            }
+            un.readArrayEnd();
         }
-        un.readArrayEnd();
         return message;
     }
 }

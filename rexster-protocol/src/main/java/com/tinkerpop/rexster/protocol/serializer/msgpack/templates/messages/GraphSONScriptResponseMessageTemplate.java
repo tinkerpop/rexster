@@ -26,7 +26,7 @@ public class GraphSONScriptResponseMessageTemplate extends RexProMessageTemplate
     @Override
     protected GraphSONScriptResponseMessage readMessageArray(final Unpacker un, final GraphSONScriptResponseMessage msg) throws IOException {
         GraphSONScriptResponseMessage message = super.readMessageArray(un, msg);
-        message.Results = un.readString();
+        message.Results = un.trySkipNil()?null:un.readString();
         message.Bindings = BindingsTemplate.getInstance().read(un, null);
         return message;
     }

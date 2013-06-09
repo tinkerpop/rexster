@@ -25,9 +25,9 @@ public class SessionRequestMessageTemplate extends RexProMessageTemplate<Session
 
     protected SessionRequestMessage readMessageArray(final Unpacker un, final SessionRequestMessage msg) throws IOException {
         SessionRequestMessage message = super.readMessageArray(un, msg);
-        message.Channel = un.readInt();
-        message.Username = un.readString();
-        message.Password = un.readString();
+        message.Channel = un.trySkipNil()?null:un.readInt();
+        message.Username = un.trySkipNil()?null:un.readString();
+        message.Password = un.trySkipNil()?null:un.readString();
         return message;
     }
 

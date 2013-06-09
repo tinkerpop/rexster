@@ -30,12 +30,14 @@ public class ConsoleScriptResponseMessageTemplate extends RexProMessageTemplate<
     @Override
     protected ConsoleScriptResponseMessage readMessageArray(final Unpacker un, final ConsoleScriptResponseMessage msg) throws IOException {
         ConsoleScriptResponseMessage message = super.readMessageArray(un, msg);
-        int numLines = un.readArrayBegin();
-        message.ConsoleLines = new String[numLines];
-        for (int i=0; i<numLines; i++) {
-            message.ConsoleLines[i] = un.readString();
+        if (un.trySkipNil()) {
+            int numLines = un.readArrayBegin();
+            message.ConsoleLines = new String[numLines];
+            for (int i=0; i<numLines; i++) {
+                message.ConsoleLines[i] = un.readString();
+            }
+            un.readArrayEnd();
         }
-        un.readArrayEnd();
         message.Bindings = BindingsTemplate.getInstance().read(un, null);
         return message;
     }
