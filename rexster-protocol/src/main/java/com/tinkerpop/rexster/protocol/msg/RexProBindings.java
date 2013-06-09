@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.protocol.msg;
 
-import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MsgPackConverter;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsConverter;
 import org.msgpack.packer.Packer;
 import org.msgpack.template.AbstractTemplate;
 import org.msgpack.template.Templates;
@@ -40,7 +40,7 @@ public class RexProBindings extends SimpleBindings {
             for (Map.Entry pair : bindings.entrySet()) {
                 pk.write(pair.getKey());
                 try {
-                    MsgPackConverter.serializeObject(pair.getValue(), pk);
+                    ResultsConverter.serializeObject(pair.getValue(), pk);
                 } catch (Exception ex) {
                     throw new IOException(ex.toString());
                 }
@@ -69,7 +69,7 @@ public class RexProBindings extends SimpleBindings {
             int n = u.readMapBegin();
             for (int i=0; i<n; i++) {
                 final String key = u.read(Templates.TString);
-                final Object val = MsgPackConverter.deserializeObject(u.read(Templates.TValue));
+                final Object val = ResultsConverter.deserializeObject(u.read(Templates.TValue));
                 bindings.put(key, val);
             }
             u.readMapEnd();

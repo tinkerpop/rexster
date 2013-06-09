@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.gremlin.converter;
 
-import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MsgPackConverter;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsConverter;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.BufferPacker;
 
@@ -13,7 +13,7 @@ public class MsgPackResultConverter implements ResultConverter<byte[]> {
     public byte[] convert(final Object result) throws Exception {
         final BufferPacker packer = msgpack.createBufferPacker(1024);
         try {
-            MsgPackConverter.serializeObject(result, packer);
+            ResultsConverter.serializeObject(result, packer);
             return packer.toByteArray();
         } catch (Exception e) {
             throw e;

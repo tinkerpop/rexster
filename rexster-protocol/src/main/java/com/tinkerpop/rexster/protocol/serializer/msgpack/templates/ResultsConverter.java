@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * Universally useful msgpack object serialization and deserialization functions
  */
-public class MsgPackConverter {
+public class ResultsConverter {
 
     static Object serializeElementId(final Element element) {
         final Object id = element.getId();

@@ -3,7 +3,7 @@ package com.tinkerpop.rexster.protocol;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.pipes.util.structures.Table;
-import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MsgPackConverter;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsConverter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.msgpack.MessagePack;
@@ -21,12 +21,12 @@ public class MsgPackConverterTest {
     @Test
     public void testNull() throws Exception {
         BufferPacker packer = msgpack.createBufferPacker(1024);
-        MsgPackConverter.serializeObject(null, packer);
+        ResultsConverter.serializeObject(null, packer);
         byte[] results = packer.toByteArray();
         Assert.assertNotNull(results);
 
 
-        Object obj = MsgPackConverter.deserializeObject(msgpack.read(results));
+        Object obj = ResultsConverter.deserializeObject(msgpack.read(results));
         Assert.assertEquals(obj, null);
     }
 
@@ -34,11 +34,11 @@ public class MsgPackConverterTest {
     public void testShort() throws Exception {
         BufferPacker packer = msgpack.createBufferPacker(1024);
 
-        MsgPackConverter.serializeObject(Short.MAX_VALUE, packer);
+        ResultsConverter.serializeObject(Short.MAX_VALUE, packer);
         byte[] results = packer.toByteArray();
 
         Assert.assertNotNull(results);
-        Object obj = MsgPackConverter.deserializeObject(msgpack.read(results));
+        Object obj = ResultsConverter.deserializeObject(msgpack.read(results));
 
         Assert.assertTrue(obj instanceof Long);
         Long value = (Long) obj;
@@ -50,12 +50,12 @@ public class MsgPackConverterTest {
     public void testInt() throws Exception {
         BufferPacker packer = msgpack.createBufferPacker(1024);
 
-        MsgPackConverter.serializeObject(Integer.MAX_VALUE, packer);
+        ResultsConverter.serializeObject(Integer.MAX_VALUE, packer);
         byte[] results = packer.toByteArray();
 
         Assert.assertNotNull(results);
 
-        Object obj = MsgPackConverter.deserializeObject(msgpack.read(results));
+        Object obj = ResultsConverter.deserializeObject(msgpack.read(results));
 
         Assert.assertTrue(obj instanceof Long);
         Long value = (Long) obj;
@@ -67,12 +67,12 @@ public class MsgPackConverterTest {
     public void testLong() throws Exception {
         BufferPacker packer = msgpack.createBufferPacker(1024);
 
-        MsgPackConverter.serializeObject(Long.MAX_VALUE, packer);
+        ResultsConverter.serializeObject(Long.MAX_VALUE, packer);
         byte[] results = packer.toByteArray();
 
         Assert.assertNotNull(results);
 
-        Object obj = MsgPackConverter.deserializeObject(msgpack.read(results));
+        Object obj = ResultsConverter.deserializeObject(msgpack.read(results));
 
         Assert.assertTrue(obj instanceof Long);
         Long value = (Long) obj;
@@ -84,12 +84,12 @@ public class MsgPackConverterTest {
     public void testFloat() throws Exception {
         BufferPacker packer = msgpack.createBufferPacker(1024);
 
-        MsgPackConverter.serializeObject(Float.MAX_VALUE, packer);
+        ResultsConverter.serializeObject(Float.MAX_VALUE, packer);
         byte[] results = packer.toByteArray();
 
         Assert.assertNotNull(results);
 
-        Object obj = MsgPackConverter.deserializeObject(msgpack.read(results));
+        Object obj = ResultsConverter.deserializeObject(msgpack.read(results));
 
         Assert.assertTrue(obj instanceof Double);
         Double value = (Double) obj;
@@ -101,12 +101,12 @@ public class MsgPackConverterTest {
     public void testDouble() throws Exception {
         BufferPacker packer = msgpack.createBufferPacker(1024);
 
-        MsgPackConverter.serializeObject(Double.MAX_VALUE, packer);
+        ResultsConverter.serializeObject(Double.MAX_VALUE, packer);
         byte[] results = packer.toByteArray();
 
         Assert.assertNotNull(results);
 
-        Object obj = MsgPackConverter.deserializeObject(msgpack.read(results));
+        Object obj = ResultsConverter.deserializeObject(msgpack.read(results));
 
         Assert.assertTrue(obj instanceof Double);
         Double value = (Double) obj;
@@ -121,11 +121,11 @@ public class MsgPackConverterTest {
         table.addRow("y1", "y2");
 
         BufferPacker packer = msgpack.createBufferPacker(1024);
-        MsgPackConverter.serializeObject(table, packer);
+        ResultsConverter.serializeObject(table, packer);
         byte[] results = packer.toByteArray();
 
         Assert.assertNotNull(results);
-        final Object unpackedObj = MsgPackConverter.deserializeObject(msgpack.read(results));
+        final Object unpackedObj = ResultsConverter.deserializeObject(msgpack.read(results));
 
         Assert.assertTrue(unpackedObj instanceof ArrayList);
         final ArrayList unpacked = (ArrayList) unpackedObj;
@@ -148,10 +148,10 @@ public class MsgPackConverterTest {
         TinkerGraph g = TinkerGraphFactory.createTinkerGraph();
 
         BufferPacker packer = msgpack.createBufferPacker(1024);
-        MsgPackConverter.serializeObject(g.getVertices(), packer);
+        ResultsConverter.serializeObject(g.getVertices(), packer);
         byte[] results = packer.toByteArray();
 
-        final Object unpacked = MsgPackConverter.deserializeObject(msgpack.read(results));
+        final Object unpacked = ResultsConverter.deserializeObject(msgpack.read(results));
 
         Assert.assertTrue(unpacked instanceof Iterable);
 
@@ -175,11 +175,11 @@ public class MsgPackConverterTest {
         Iterable<String> iterable = stringList;
 
         BufferPacker packer = msgpack.createBufferPacker(1024);
-        MsgPackConverter.serializeObject(iterable, packer);
+        ResultsConverter.serializeObject(iterable, packer);
         byte[] results = packer.toByteArray();
 
         Assert.assertNotNull(results);
-        final Object unpacked = MsgPackConverter.deserializeObject(msgpack.read(results));
+        final Object unpacked = ResultsConverter.deserializeObject(msgpack.read(results));
 
         Assert.assertTrue(unpacked instanceof Iterable);
 
@@ -209,12 +209,12 @@ public class MsgPackConverterTest {
         Iterable<String> iterable = stringList;
 
         BufferPacker packer = msgpack.createBufferPacker(1024);
-        MsgPackConverter.serializeObject(iterable, packer);
+        ResultsConverter.serializeObject(iterable, packer);
         byte[] results = packer.toByteArray();
 
         Assert.assertNotNull(results);
 
-        final Object unpacked = MsgPackConverter.deserializeObject(msgpack.read(results));
+        final Object unpacked = ResultsConverter.deserializeObject(msgpack.read(results));
 
         Assert.assertTrue(unpacked instanceof Iterable);
 
@@ -245,12 +245,12 @@ public class MsgPackConverterTest {
         Iterable<String> iterable = stringList;
 
         BufferPacker packer = msgpack.createBufferPacker(1024);
-        MsgPackConverter.serializeObject(iterable, packer);
+        ResultsConverter.serializeObject(iterable, packer);
         byte[] results = packer.toByteArray();
 
         Assert.assertNotNull(results);
 
-        final Object unpacked = MsgPackConverter.deserializeObject(msgpack.read(results));
+        final Object unpacked = ResultsConverter.deserializeObject(msgpack.read(results));
         Assert.assertTrue(unpacked instanceof  Iterable);
         final Iterator unpackerItty = ((Iterable) unpacked).iterator();
 
@@ -282,12 +282,12 @@ public class MsgPackConverterTest {
         map.put("z", innerMap);
 
         BufferPacker packer = msgpack.createBufferPacker(1024);
-        MsgPackConverter.serializeObject(map, packer);
+        ResultsConverter.serializeObject(map, packer);
         byte[] results = packer.toByteArray();
 
         Assert.assertNotNull(results);
 
-        final Object unpacked = MsgPackConverter.deserializeObject(msgpack.read(results));
+        final Object unpacked = ResultsConverter.deserializeObject(msgpack.read(results));
 
         Map<String, Object> unpackedMap = (Map) unpacked;
         Assert.assertTrue(unpackedMap.containsKey("x"));

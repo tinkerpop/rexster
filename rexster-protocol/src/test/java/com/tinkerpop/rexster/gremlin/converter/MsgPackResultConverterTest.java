@@ -3,7 +3,7 @@ package com.tinkerpop.rexster.gremlin.converter;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.pipes.util.structures.Table;
-import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MsgPackConverter;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsConverter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.msgpack.MessagePack;
@@ -54,7 +54,7 @@ public class MsgPackResultConverterTest {
         Assert.assertNotNull(results);
 
 
-        final Object unpackedObj = MsgPackConverter.deserializeObject(this.msgpack.read(results));
+        final Object unpackedObj = ResultsConverter.deserializeObject(this.msgpack.read(results));
         Assert.assertTrue(unpackedObj instanceof ArrayList);
         final ArrayList unpacked = (ArrayList) unpackedObj;
 
