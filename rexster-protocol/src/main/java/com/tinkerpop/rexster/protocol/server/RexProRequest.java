@@ -1,5 +1,7 @@
 package com.tinkerpop.rexster.protocol.server;
 
+import com.tinkerpop.rexster.protocol.serializer.RexProSerializer;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsTemplate;
 import com.tinkerpop.rexster.protocol.session.RexProSession;
@@ -106,19 +108,17 @@ public class RexProRequest {
         this.session = session;
     }
 
+    private static MsgPackSerializer _serializer = new MsgPackSerializer();
+    protected RexProSerializer getSerializer() {
+        return _serializer;
+    }
+
     private void deserializeMessage() throws IOException{
-        final ByteArrayInputStream in = new ByteArrayInputStream(requestBytes);
-        final Unpacker unpacker = msgpack.createUnpacker(in);
-
         try {
-            unpacker.setArraySizeLimit(Integer.MAX_VALUE);
-            unpacker.setMapSizeLimit(Integer.MAX_VALUE);
-            unpacker.setRawSizeLimit(Integer.MAX_VALUE);
-
             if (messageType == MessageType.SCRIPT_REQUEST) {
-                requestMessage = unpacker.read(ScriptRequestMessage.class);
+                requestMessage = getSerializer().deserialize(requestBytes, ScriptRequestMessage.class);
             } else if (messageType == MessageType.SESSION_REQUEST) {
-                requestMessage = unpacker.read(SessionRequestMessage.class);
+                requestMessage = getSerializer().deserialize(requestBytes, SessionRequestMessage.class);
             }
 
             if (requestMessage == null) {
@@ -144,8 +144,6 @@ public class RexProRequest {
                 )
             );
 
-        } finally {
-            unpacker.close();
         }
     }
 
