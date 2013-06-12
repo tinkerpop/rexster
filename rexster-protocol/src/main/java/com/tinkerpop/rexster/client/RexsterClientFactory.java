@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.client;
 
-import com.tinkerpop.rexster.protocol.filter.RexProMessageFilter;
 import com.tinkerpop.rexster.protocol.msg.RexProChannel;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -153,7 +152,7 @@ public class RexsterClientFactory {
             final RexsterClientHandler handler = new RexsterClientHandler();
             final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
             filterChainBuilder.add(new TransportFilter());
-            filterChainBuilder.add(new RexProMessageFilter());
+            filterChainBuilder.add(new RexProClientFilter());
             filterChainBuilder.add(handler);
 
             transport = TCPNIOTransportBuilder.newInstance().build();

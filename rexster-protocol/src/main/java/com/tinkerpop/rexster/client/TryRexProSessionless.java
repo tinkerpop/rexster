@@ -1,7 +1,5 @@
-package com.tinkerpop.rexster.protocol;
+package com.tinkerpop.rexster.client;
 
-import com.tinkerpop.rexster.client.RexsterClient;
-import com.tinkerpop.rexster.client.RexsterClientFactory;
 import org.apache.log4j.BasicConfigurator;
 
 import java.util.HashMap;

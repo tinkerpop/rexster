@@ -296,10 +296,52 @@ public class ScriptRequestIntegrationTest extends AbstractRexProIntegrationTest 
         Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
         Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
 
-        // test that 'n' is available if the isolate meta flag is set to false
         final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
         scriptMessage2.Script = "m = n + 1";
         scriptMessage2.LanguageName = "groovy";
+        scriptMessage2.metaSetInSession(true);
+        scriptMessage2.setRequestAsUUID(UUID.randomUUID());
+        scriptMessage2.Session = BitWorks.convertUUIDToByteArray(sessionKey);
+
+        inMsg = client.execute(scriptMessage2);
+        Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
+    }
+
+    @Test
+    public void testDisabledQueryIsolationInSession() throws Exception {
+        final RexsterClient client = RexsterClientFactory.open();
+        RexProMessage inMsg;
+
+        //create a session
+        final SessionRequestMessage outMsg = new SessionRequestMessage();
+        outMsg.Channel = RexProChannel.CHANNEL_MSGPACK;
+        outMsg.setRequestAsUUID(UUID.randomUUID());
+
+        inMsg = client.execute(outMsg);
+        Assert.assertNotNull(inMsg.Session);
+        Assert.assertTrue(inMsg instanceof SessionResponseMessage);
+
+        UUID sessionKey = BitWorks.convertByteArrayToUUID(inMsg.Session);
+
+        //test that it works
+        final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
+        scriptMessage.Script = "n = 5\nn";
+        scriptMessage.LanguageName = "groovy";
+        scriptMessage.metaSetInSession(true);
+        scriptMessage.metaSetIsolate(false);
+        scriptMessage.setRequestAsUUID(UUID.randomUUID());
+        scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
+
+        inMsg = client.execute(scriptMessage);
+        Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
+        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
+
+        // test that 'n' is available if the isolate meta flag is set to false
+        final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
+        scriptMessage2.Script = "m = n + o";
+        scriptMessage2.LanguageName = "groovy";
+        scriptMessage2.Bindings.put("o", 5);
         scriptMessage2.metaSetInSession(true);
         scriptMessage2.setRequestAsUUID(UUID.randomUUID());
         scriptMessage2.Session = BitWorks.convertUUIDToByteArray(sessionKey);
