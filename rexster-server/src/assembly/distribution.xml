@@ -44,15 +44,14 @@
             <directory>data</directory>
         </fileSet>
         <fileSet>
+            <directory>config</directory>
+        </fileSet>
+        <fileSet>
             <directory>target/${project.artifactId}-${project.version}-standalone/ext</directory>
             <outputDirectory>ext</outputDirectory>
         </fileSet>
     </fileSets>
     <files>
-        <file>
-            <source>rexster.xml</source>
-            <outputDirectory>/</outputDirectory>
-        </file>
         <file>
             <source>pom.xml</source>
             <outputDirectory>src</outputDirectory>
