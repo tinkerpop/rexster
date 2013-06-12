@@ -36,6 +36,10 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>config</directory>
+            <outputDirectory>/config</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>data</directory>
             <outputDirectory>/data</outputDirectory>
         </fileSet>
