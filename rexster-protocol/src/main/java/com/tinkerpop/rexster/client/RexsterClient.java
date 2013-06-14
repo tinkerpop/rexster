@@ -287,6 +287,14 @@ public class RexsterClient {
         RexsterClientFactory.removeClient(this);
     }
 
+    public void closeClientAndConnections() throws IOException {
+    	close();
+    	
+        for ( NIOConnection c : this.connections ) {
+            c.closeSilently();
+        }
+    } 
+
     private ScriptRequestMessage createNoSessionScriptRequest(final String script,
                                                               final Map<String, Object> scriptArguments) throws IOException, RexProException {
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
