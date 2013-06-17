@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol;
 
+import com.tinkerpop.gremlin.groovy.jsr223.DefaultImportCustomizerProvider;
 import org.apache.log4j.Logger;
 
 import javax.script.ScriptEngine;
@@ -32,15 +33,22 @@ public class EngineHolder {
     private ScriptEngine engine;
     private AtomicInteger numberOfScriptsEvaluated = new AtomicInteger(1);
 
-    public EngineHolder(final ScriptEngineFactory factory, final int engineResetThreshold,
-                        final String initializationScriptFile) {
+    public EngineHolder(final ScriptEngineFactory factory, final EngineConfiguration configuration) {
         this.languageName = factory.getLanguageName();
         this.languageVersion = factory.getLanguageVersion();
         this.engineName = factory.getEngineName();
         this.engineVersion = factory.getEngineVersion();
-        this.engineResetThreshold = engineResetThreshold;
-        this.initializationScriptFile = initializationScriptFile;
+        this.engineResetThreshold = configuration.getResetCount();
+        this.initializationScriptFile = configuration.getInitScriptFile();
         this.factory = factory;
+
+        // gremlin-groovy allows imports to be customized.  need to figure out how to implement this generically
+        // across scriptengines.
+        if (this.languageName.equals("gremlin-groovy")) {
+            logger.info("Initializing gremlin-groovy engine with additional imports.");
+            DefaultImportCustomizerProvider.initializeStatically(configuration.getImports(), configuration.getStaticImports());
+        }
+
         this.engine = initEngine(this.factory, this.initializationScriptFile);
     }
 
@@ -58,7 +66,8 @@ public class EngineHolder {
 
     public ScriptEngine getEngine() {
         /*
-        // commit in Gremlin in 2.3.0 removes the need for this reset.
+        // commit in Gremlin in 2.3.0 removes the need for this reset. unsure if this should be removed completely
+        // though as other scriptengine implementations might need it???
         if (engineResetThreshold > EngineController.RESET_NEVER) {
             // determine if a reset is necessary.
             if (numberOfScriptsEvaluated.get() >= engineResetThreshold) {

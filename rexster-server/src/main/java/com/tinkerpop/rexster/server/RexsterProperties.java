@@ -81,16 +81,8 @@ public class RexsterProperties extends FileAlterationListenerAdaptor {
         return configuration.getString("shutdown-host", RexsterSettings.DEFAULT_HOST);
     }
 
-    public Integer getScriptEngineResetThreshold() {
-        return this.configuration.getInt("script-engine-reset-threshold", EngineController.RESET_NEVER);
-    }
-
-    public String getScriptEngineInitFile() {
-        return this.configuration.getString("script-engine-init", "");
-    }
-
-    public List getConfiguredScriptEngines() {
-        return this.configuration.getList("script-engines");
+    public List<HierarchicalConfiguration> getScriptEngines() {
+        return this.configuration.configurationsAt(Tokens.REXSTER_SCRIPT_ENGINE_PATH);
     }
 
     public HierarchicalConfiguration getSecuritySettings() {

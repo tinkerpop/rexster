@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.rexster.protocol.EngineConfiguration;
 import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.server.HttpRexsterServer;
 import com.tinkerpop.rexster.server.RexProRexsterServer;
@@ -12,6 +13,7 @@ import com.tinkerpop.rexster.server.ShutdownManager;
 import com.tinkerpop.rexster.server.XmlRexsterApplication;
 import com.tinkerpop.rexster.server.metrics.ReporterConfig;
 import com.tinkerpop.rexster.util.JuliToLog4jHandler;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FileFileFilter;
@@ -32,6 +34,7 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -114,23 +117,15 @@ public class Application {
 
     private void configureScriptEngine() {
         // the EngineController needs to be configured statically before requests start serving so that it can
-        // properly construct ScriptEngine objects with the correct reset policy.
-        final int scriptEngineThreshold = this.properties.getScriptEngineResetThreshold();
-        final String scriptEngineInitFile = this.properties.getScriptEngineInitFile();
-
-        // allow scriptengines to be configured so that folks can drop in different gremlin flavors.
-        final List configuredScriptEngineNames = this.properties.getConfiguredScriptEngines();
-        if (configuredScriptEngineNames == null) {
-            // configure to default with gremlin-groovy
-            logger.info("No configuration for <script-engines>.  Using gremlin-groovy by default.");
-            EngineController.configure(scriptEngineThreshold, scriptEngineInitFile);
-        } else {
-            EngineController.configure(scriptEngineThreshold, scriptEngineInitFile, new HashSet<String>(configuredScriptEngineNames));
+        // properly construct ScriptEngine objects with the correct reset policy. allow scriptengines to be
+        // configured so that folks can drop in different gremlin flavors.
+        final List<EngineConfiguration> configuredScriptEngines = new ArrayList<EngineConfiguration>();
+        final List<HierarchicalConfiguration> configs = this.properties.getScriptEngines();
+        for(HierarchicalConfiguration config : configs) {
+            configuredScriptEngines.add(new EngineConfiguration(config));
         }
 
-        logger.info(String.format(
-                "Gremlin ScriptEngine configured to reset every [%s] requests. Set to -1 to never reset.",
-                scriptEngineThreshold));
+        EngineController.configure(configuredScriptEngines);
     }
 
     public void stop() {
