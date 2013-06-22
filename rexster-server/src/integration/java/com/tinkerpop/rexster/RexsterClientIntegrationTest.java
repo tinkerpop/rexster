@@ -214,6 +214,19 @@ public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest 
 
     }
 
+    @Test
+    public void executeForTextWithBreaks() throws Exception {
+        final RexsterClient client = RexsterClientFactory.open();
+
+        // note that you have to escape the \r\n for it to be understood as a property value else the script engine
+        // assumes it is line breaks in the script itself.
+        final List<String> text = client.execute("g=new TinkerGraph();g.addVertex(['text':'''test1\\r\\ntest2\\r\\ntest3''']);g.v(0).text");
+
+        Assert.assertEquals(1, text.size());
+        Assert.assertEquals("test1\r\ntest2\r\ntest3", text.get(0));
+
+    }
+
     /* this test fails on neo4j given inconsistencies in its blueprints implementation.  a failing test
        was added to blueprints here:
        https://github.com/tinkerpop/blueprints/issues/363
