@@ -231,20 +231,26 @@ public class RexProRequest {
     }
 
     private void serializeMessage() throws IOException {
-        final ByteArrayOutputStream rexProMessageStream = new ByteArrayOutputStream();
-        //TODO: create RexProMessageMeta template
-        final Packer packer = msgpack.createPacker(rexProMessageStream);
-
         try {
-            packer.write(responseMessage);
-            responseBytes = rexProMessageStream.toByteArray();
+            RexProSerializer serializer = getSerializer();
+            if (responseMessage instanceof SessionResponseMessage) {
+                responseBytes = serializer.serialize((SessionResponseMessage) responseMessage, SessionResponseMessage.class);
+            } else if (responseMessage instanceof ConsoleScriptResponseMessage) {
+                responseBytes = serializer.serialize((ConsoleScriptResponseMessage) responseMessage, ConsoleScriptResponseMessage.class);
+            } else if (responseMessage instanceof ErrorResponseMessage) {
+                responseBytes = serializer.serialize((ErrorResponseMessage) responseMessage, ErrorResponseMessage.class);
+            } else if (responseMessage instanceof MsgPackScriptResponseMessage) {
+                responseBytes = serializer.serialize((MsgPackScriptResponseMessage) responseMessage, MsgPackScriptResponseMessage.class);
+            }  else if (responseMessage instanceof GraphSONScriptResponseMessage) {
+                responseBytes = serializer.serialize((GraphSONScriptResponseMessage) responseMessage, GraphSONScriptResponseMessage.class);
+            } else {
+                throw new Exception();
+            }
+
         } catch (Exception ex) {
             // if there's an error during serialization with msgpack this could tank.  the script will already
             // have executed and likely committed with success.  just means the response won't get back cleanly
             // to the client.
-            final ByteArrayOutputStream rpms = new ByteArrayOutputStream();
-            final Packer p = msgpack.createPacker(rpms);
-
             ErrorResponseMessage errorMsg = MessageUtil.createErrorResponse(
                 responseMessage.Request,
                 responseMessage.Session,
@@ -253,7 +259,8 @@ public class RexProRequest {
             );
 
             try {
-                p.write(errorMsg);
+                responseBytes = getSerializer().serialize(errorMsg, ErrorResponseMessage.class);
+                responseMessage = errorMsg;
             } catch (IOException ex2) {
                 logger.error(String.format(
                     "Could not serialize error message for request [%s] session [%s].  Should have reported flag [%s] message [%s] to client",
@@ -263,11 +270,9 @@ public class RexProRequest {
                     errorMsg.ErrorMessage
                 ));
             }
-            responseBytes = rpms.toByteArray();
-            responseMessage = errorMsg;
 
         } finally {
-            packer.close();
+//            packer.close();
         }
 
     }
