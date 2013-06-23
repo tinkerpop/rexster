@@ -390,10 +390,6 @@ public class HttpRexsterServer implements RexsterServer {
                 }
             }
 
-            if (LogManager.getLoggerRepository().getThreshold().isGreaterOrEqual(Level.TRACE)) {
-
-            }
-
             final ServletRegistration sg = wacJersey.addServlet("jersey", new ServletContainer(rc));
             sg.addMapping("/*");
             wacJersey.deploy(this.httpServer);
