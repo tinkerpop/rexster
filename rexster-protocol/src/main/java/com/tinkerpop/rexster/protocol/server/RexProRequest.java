@@ -271,10 +271,7 @@ public class RexProRequest {
                 ));
             }
 
-        } finally {
-//            packer.close();
         }
-
     }
 
     public int getResponseSize() {
