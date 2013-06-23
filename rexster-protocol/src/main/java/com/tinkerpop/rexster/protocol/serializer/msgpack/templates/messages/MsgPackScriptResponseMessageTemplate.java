@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.BindingsTemplate;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsTemplate;
+import org.msgpack.packer.Packer;
 import org.msgpack.unpacker.Unpacker;
 
 import java.io.IOException;
@@ -16,6 +17,10 @@ import java.io.IOException;
  */
 public class MsgPackScriptResponseMessageTemplate extends RexProMessageTemplate<MsgPackScriptResponseMessage> {
 
+    protected int messageArraySize() {
+        return super.messageArraySize() + 2;
+    }
+
     @Override
     protected MsgPackScriptResponseMessage instantiateMessage() {
         return new MsgPackScriptResponseMessage();
@@ -28,5 +33,12 @@ public class MsgPackScriptResponseMessageTemplate extends RexProMessageTemplate<
         message.Results = ResultsTemplate.getInstance().read(un, null);
         message.Bindings = BindingsTemplate.getInstance().read(un, null);
         return message;
+    }
+
+    @Override
+    protected void writeMessageArray(final Packer pk, final MsgPackScriptResponseMessage msg) throws IOException {
+        super.writeMessageArray(pk, msg);
+        ResultsTemplate.getInstance().write(pk, msg.Results);
+        BindingsTemplate.getInstance().write(pk, msg.Bindings);
     }
 }
