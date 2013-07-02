@@ -69,7 +69,7 @@ public class KeyIndexResource extends AbstractSubResource {
                 keyEdgeArray.put(key);
             }
 
-            this.resultObject.put(Tokens.KEYS, new JSONObject(new HashMap() {{
+            this.resultObject.put(Tokens.RESULTS, new JSONObject(new HashMap() {{
                 put(Tokens.VERTEX, keyVertexArray);
                 put(Tokens.EDGE, keyEdgeArray);
             }}));

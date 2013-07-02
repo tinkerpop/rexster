@@ -28,6 +28,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 ** Graph configuration errors
 ** Bad/missing Gremlin intiializations scripts.
 ** Incoming RexPro messages
+* Changed `keys` for root of results in key indices REST API to `results` to be more consistent with the rest of the API.
 
 ==<hr/>==
 
