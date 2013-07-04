@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster;
 
+import com.tinkerpop.blueprints.Compare;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
@@ -66,7 +67,7 @@ public class MockVertex implements Vertex {
         if (labels.length == 0) {
             return this.outEdges;
         } else {
-            Pipe pipe = new LabelFilterPipe(Query.Compare.EQUAL, labels);
+            Pipe pipe = new LabelFilterPipe(Compare.EQUAL, labels);
             pipe.setStarts(this.outEdges);
             return pipe;
         }
@@ -76,7 +77,7 @@ public class MockVertex implements Vertex {
         if (labels.length == 0) {
             return this.inEdges;
         } else {
-            Pipe pipe = new LabelFilterPipe(Query.Compare.EQUAL, labels);
+            Pipe pipe = new LabelFilterPipe(Compare.EQUAL, labels);
             pipe.setStarts(this.inEdges);
             return pipe;
         }

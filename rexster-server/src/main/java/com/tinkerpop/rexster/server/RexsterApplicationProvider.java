@@ -7,6 +7,7 @@ import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.tinkerpop.rexster.Tokens;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 
@@ -93,8 +94,9 @@ public class RexsterApplicationProvider extends AbstractHttpContextInjectable<Re
 
             try {
                 configurationProperties.load(servletContext.getResourceAsStream(rexsterXmlFile));
-            } catch (Exception e) {
-                throw new RuntimeException("Could not locate " + rexsterXmlFile + " properties file.", e);
+            } catch (ConfigurationException e) {
+                throw new RuntimeException(String.format(
+                        "Could not load %s properties file. Message: %s", rexsterXmlFile, e.getMessage()), e);
             }
 
             final List<HierarchicalConfiguration> graphConfigs = configurationProperties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);

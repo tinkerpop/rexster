@@ -1,7 +1,7 @@
 :: Windows launcher script for Rexster Console
 @echo off
 
-cd %CD%\target\
+cd %CD%\..\target\
 
 set TARGET=
 

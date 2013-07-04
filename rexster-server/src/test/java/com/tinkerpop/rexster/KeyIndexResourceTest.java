@@ -40,9 +40,9 @@ public class KeyIndexResourceTest extends BaseTest {
 
         final JSONObject json = (JSONObject) response.getEntity();
         Assert.assertTrue(json.has(Tokens.QUERY_TIME));
-        Assert.assertTrue(json.has(Tokens.KEYS));
+        Assert.assertTrue(json.has(Tokens.RESULTS));
 
-        final JSONObject jsonKeys = json.optJSONObject(Tokens.KEYS);
+        final JSONObject jsonKeys = json.optJSONObject(Tokens.RESULTS);
         Assert.assertTrue(jsonKeys.has(Tokens.VERTEX));
         Assert.assertTrue(jsonKeys.has(Tokens.EDGE));
 

@@ -526,11 +526,9 @@ public class VertexResource extends AbstractSubResource {
             // need to include limits in addition to standard rexster paging as there is buffering going on via
             // rexstergraph that requires both ... meaning, i might do a vertex query with limit that exceeds my
             // buffer size for rexstergraph.
-            final long limitTake = theRequestObject.has(Tokens._TAKE) ? theRequestObject.getLong(Tokens._TAKE) : Long.MIN_VALUE;
-            final long limitSkip = theRequestObject.has(Tokens._SKIP) ? theRequestObject.getLong(Tokens._SKIP) : Long.MIN_VALUE;
-            if (limitTake >= 0 && limitSkip >= 0) {
-                query = query.limit(limitSkip, limitTake);
-            } else if (limitTake >= 0) {
+            final int limitTake = theRequestObject.has(Tokens._TAKE) ? theRequestObject.getInt(Tokens._TAKE) : Integer.MIN_VALUE;
+            //final long limitSkip = theRequestObject.has(Tokens._SKIP) ? theRequestObject.getLong(Tokens._SKIP) : Long.MIN_VALUE;
+            if (limitTake >= 0) {
                 query = query.limit(limitTake);
             }
 

@@ -87,7 +87,7 @@ public class RexsterSettings {
 
     private String getRexsterXmlFileString() {
         final boolean rexsterXmlConfiguredFromCommandLine = line.hasCommandParameters() && line.getCommandParameters().hasOption("configuration");
-        return rexsterXmlConfiguredFromCommandLine ? line.getCommandParameters().getOptionValue("configuration") : "rexster.xml";
+        return rexsterXmlConfiguredFromCommandLine ? line.getCommandParameters().getOptionValue("configuration") : "config" + File.separator + "rexster.xml";
     }
 
     @SuppressWarnings("static-access")

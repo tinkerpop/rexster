@@ -21,23 +21,14 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Moved rexster-*.sh and rexster-*.bat to bin/ (noticeable to developers of source only)
 * The @_limit@ query string argument for vertex queries is split into @_skip@ and @_take@ to better match the new limit API in Blueprints.
 * Changes to @rexster.xml@ no longer require a restart of Rexster to become available.
-
-h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
-
-```xml
-<dependency>
-  <groupId>com.tinkerpop.rexster</groupId>
-  <artifactId>rexster-core</artifactId>
-  <version>2.3.2-SNAPSHOT</version>
-</dependency>
-```
-
+* Allow multiple and separate Script Engine configurations with the addition of the @<script-engines>@ element in @rexster.xml@
 * Property data types in REST now properly support @boolean@ values.
 * Serialize RexPro in the same thread that mutates the graph to prevent partial serialization of property values with Neo4j.
 * Improve logging for
 ** Graph configuration errors
 ** Bad/missing Gremlin intiializations scripts.
 ** Incoming RexPro messages
+* Changed `keys` for root of results in key indices REST API to `results` to be more consistent with the rest of the API.
 
 ==<hr/>==
 

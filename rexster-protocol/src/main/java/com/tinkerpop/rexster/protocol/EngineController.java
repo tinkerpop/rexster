@@ -25,20 +25,14 @@ public class EngineController {
     public static final int RESET_NEVER = -1;
 
     private final Map<String, EngineHolder> engines = new ConcurrentHashMap<String, EngineHolder>();
+    private static final List<EngineConfiguration> engineConfigurations = new ArrayList<EngineConfiguration>();
 
     /**
      * All gremlin engines are prefixed with this value.
      */
     private static final String ENGINE_NAME_PREFIX = "gremlin-";
 
-    /**
-     * Add all flavors of gremlin to this list. This should be the true name of the language.
-     */
-    private static Set<String> gremlinEngineNames;
-
     private static EngineController engineController;
-    private static String initializationScriptFile;
-    private static int engineResetThreshold = RESET_NEVER;
 
     private EngineController() {
         // for ruby
@@ -55,10 +49,10 @@ public class EngineController {
             logger.info(String.format("ScriptEngineManager has factory for: %s", factory.getLanguageName()));
 
             // only add engine factories for those languages that are gremlin based.
-            if (gremlinEngineNames.contains(factory.getLanguageName())) {
+            final EngineConfiguration engineConfiguration = findEngineConfiguration(factory.getLanguageName());
+            if (engineConfiguration != null) {
                 logger.info(String.format("Registered ScriptEngine for: %s", factory.getLanguageName()));
-                this.engines.put(factory.getLanguageName(), new EngineHolder(
-                        factory, engineResetThreshold, initializationScriptFile));
+                this.engines.put(factory.getLanguageName(), new EngineHolder(factory, engineConfiguration));
             }
         }
     }
@@ -79,10 +73,30 @@ public class EngineController {
      * @param configuredEngineNames A list of script engine names that should be exposed.
      */
     public static void configure(final int resetCount, final String initScriptFile, final Set<String> configuredEngineNames){
-        engineResetThreshold = resetCount;
-        initializationScriptFile = initScriptFile;
-        gremlinEngineNames = configuredEngineNames;
-        getInstance().loadEngines();
+        configure(resetCount, initScriptFile, configuredEngineNames, null, null);
+    }
+
+    /**
+     * Must call this before a call to getInstance() if the reset count is to be taken into account.  ScriptEngine
+     * imports can be defined that are included in addition to the standard imports provided by Gremlin.  These
+     * imports only get included for the GremlinGroovyScriptEngine at this time.
+     *
+     * @param configuredEngineNames A list of script engine names that should be exposed.
+     * @param imports A list of imports for the script engine.
+     * @param staticImports A list of static imports for the script engine.
+     */
+    public static void configure(final int resetCount, final String initScriptFile, final Set<String> configuredEngineNames,
+                                 final Set<String> imports, final Set<String> staticImports){
+        final List<EngineConfiguration> confs = new ArrayList<EngineConfiguration>();
+        for (String configuredEngineName : configuredEngineNames) {
+            confs.add(new EngineConfiguration(configuredEngineName, resetCount, initScriptFile, imports, staticImports));
+        }
+
+        configure(confs);
+    }
+
+    public static void configure(final List<EngineConfiguration> configurations) {
+        engineConfigurations.addAll(configurations);
     }
 
     public static EngineController getInstance() {
@@ -122,5 +136,15 @@ public class EngineController {
         }
 
         return engine;
+    }
+
+    private static EngineConfiguration findEngineConfiguration(final String engineName) {
+        for (EngineConfiguration conf : engineConfigurations) {
+            if (conf.getScriptEngineName().equals(engineName)) {
+                return conf;
+            }
+        }
+
+        return null;
     }
 }

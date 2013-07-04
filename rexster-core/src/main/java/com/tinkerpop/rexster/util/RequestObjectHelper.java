@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.util;
 
-import com.tinkerpop.blueprints.Query;
+import com.tinkerpop.blueprints.Compare;
 import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.lang.StringUtils;
@@ -193,21 +193,21 @@ public class RequestObjectHelper {
 
                     // extract the elements of the array within the braces
                     final String triple = propertyArgument.substring(startBracePlace + 1, endBracePlace);
-                    final String [] separated = triple.split(",");
-                    final String [] tripleSplit = new String[3];
+                    final String[] separated = triple.split(",");
+                    final String[] tripleSplit = new String[3];
                     tripleSplit[0] = separated[0].trim();
                     tripleSplit[1] = separated[1].trim();
 
-                    final String[] tripleValue =  Arrays.copyOfRange(separated, 2, separated.length);
+                    final String[] tripleValue = Arrays.copyOfRange(separated, 2, separated.length);
                     tripleSplit[2] = StringUtils.join(tripleValue, ',');
 
                     final String[] splitTripleValue = tripleSplit[2].split(" ");
 
 
-                    final Query.Compare c;
+                    final Compare c;
                     final String compareString = tripleSplit[1];
                     try {
-                        c = Query.Compare.fromString(compareString);
+                        c = Compare.fromString(compareString);
                     } catch (IllegalArgumentException iae) {
                         throw new WebApplicationException(Response.Status.BAD_REQUEST);
                     }
@@ -220,7 +220,7 @@ public class RequestObjectHelper {
                             l.add(ElementHelper.getTypedPropertyValue(stv, true));
                         }
 
-                        if (c == Query.Compare.EQUAL) {
+                        if (c == Compare.EQUAL) {
                             query.has(tripleSplit[0], l.toArray(new Object[l.size()]));
                         } else {
                             query.hasNot(tripleSplit[0], l.toArray(new Object[l.size()]));
