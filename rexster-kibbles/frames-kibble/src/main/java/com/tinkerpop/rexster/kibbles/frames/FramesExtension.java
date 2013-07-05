@@ -6,7 +6,9 @@ import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.frames.FramedGraph;
+import com.tinkerpop.frames.FramedGraphFactory;
 import com.tinkerpop.frames.Property;
+import com.tinkerpop.frames.modules.gremlingroovy.GremlinGroovyModule;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
 import com.tinkerpop.rexster.extension.ExtensionConfiguration;
@@ -18,11 +20,13 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
+
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +50,8 @@ public class FramesExtension extends AbstractRexsterExtension {
     public static final String TOKEN_BOTH = "both";
     public static final String TOKEN_IN = "in";
     public static final String TOKEN_OUT = "out";
+    
+    private FramedGraphFactory factory = new FramedGraphFactory(new GremlinGroovyModule());
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.EDGE)
     @ExtensionDescriptor(description = "Frames extension for an edge.")
@@ -99,7 +105,7 @@ public class FramesExtension extends AbstractRexsterExtension {
         }
 
         ExtensionResponse extensionResponse;
-        FramedGraph framedGraph = new FramedGraph(graph);
+        FramedGraph framedGraph = factory.create(graph);
 
         ExtensionConfiguration extensionConfig = rexsterResourceContext.getRexsterApplicationGraph()
                 .findExtensionConfiguration(EXTENSION_NAMESPACE, EXTENSION_NAME);
