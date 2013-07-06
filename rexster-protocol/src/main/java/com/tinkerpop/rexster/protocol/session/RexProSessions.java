@@ -49,10 +49,9 @@ public class RexProSessions {
         return sessions.keySet();
     }
 
-    public static void ensureSessionExists(final String sessionKey, final RexsterApplication rexsterApplication,
-                                           final byte sessionChannel) {
+    public static void ensureSessionExists(final String sessionKey, final RexsterApplication rexsterApplication) {
         if (!sessions.containsKey(sessionKey)) {
-            final RexProSession session = new RexProSession(sessionKey, rexsterApplication, sessionChannel);
+            final RexProSession session = new RexProSession(sessionKey, rexsterApplication);
             sessions.put(sessionKey, session);
 
             logger.info(String.format("RexPro Session created: %s", sessionKey));
@@ -64,11 +63,10 @@ public class RexProSessions {
      *
      * @param sessionKey
      * @param rexsterApplication
-     * @param sessionChannel
      * @return
      */
-    public static RexProSession createSession(final String sessionKey, final RexsterApplication rexsterApplication, final int sessionChannel) {
-        final RexProSession session = new RexProSession(sessionKey, rexsterApplication, sessionChannel);
+    public static RexProSession createSession(final String sessionKey, final RexsterApplication rexsterApplication) {
+        final RexProSession session = new RexProSession(sessionKey, rexsterApplication);
         sessions.put(sessionKey, session);
 
         logger.info(String.format("RexPro Session created: %s", sessionKey));

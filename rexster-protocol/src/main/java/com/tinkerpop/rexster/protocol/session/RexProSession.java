@@ -2,20 +2,10 @@ package com.tinkerpop.rexster.protocol.session;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.client.RexProException;
-import com.tinkerpop.rexster.protocol.EngineController;
-import com.tinkerpop.rexster.protocol.RexsterApplicationHolder;
-import com.tinkerpop.rexster.protocol.server.RexProRequest;
-import com.tinkerpop.rexster.protocol.server.ScriptServer;
 import com.tinkerpop.rexster.server.RexsterApplication;
 
-import javax.script.Bindings;
-import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 import java.util.Date;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -32,8 +22,8 @@ public class RexProSession extends AbstractRexProSession{
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public RexProSession(final String sessionKey, final RexsterApplication rexsterApplication, final int channel) {
-        super(rexsterApplication, channel);
+    public RexProSession(final String sessionKey, final RexsterApplication rexsterApplication) {
+        super(rexsterApplication);
         this.sessionKey = sessionKey;
     }
 

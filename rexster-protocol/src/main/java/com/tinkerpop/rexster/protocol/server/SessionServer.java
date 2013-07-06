@@ -67,8 +67,7 @@ public class SessionServer {
             if(!RexProSessions.hasSessionKey(responseMessage.sessionAsUUID().toString())) {
                 RexProSession session = RexProSessions.createSession(
                         responseMessage.sessionAsUUID().toString(),
-                        this.rexsterApplication,
-                        message.Channel
+                        this.rexsterApplication
                 );
 
                 //set on the request object

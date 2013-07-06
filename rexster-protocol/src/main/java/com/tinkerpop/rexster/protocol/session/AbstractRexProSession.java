@@ -13,7 +13,6 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import java.util.Date;
 import java.util.concurrent.Callable;
 
 /**
@@ -22,8 +21,6 @@ import java.util.concurrent.Callable;
  */
 public abstract class AbstractRexProSession {
     protected final Bindings bindings = new SimpleBindings();
-
-    protected final int channel;
 
     protected final EngineController controller = EngineController.getInstance();
 
@@ -35,8 +32,7 @@ public abstract class AbstractRexProSession {
     //the variable name of the graph in the interperter
     protected String graphObjName = null;
 
-    public AbstractRexProSession(final RexsterApplication rexsterApplication, final int channel) {
-        this.channel = channel;
+    public AbstractRexProSession(final RexsterApplication rexsterApplication) {
         this.bindings.put(Tokens.REXPRO_REXSTER_CONTEXT, new RexsterApplicationHolder(rexsterApplication));
         this.rexsterApplication = rexsterApplication;
     }
@@ -67,10 +63,6 @@ public abstract class AbstractRexProSession {
 
     public Bindings getBindings() {
         return this.bindings;
-    }
-
-    public int getChannel() {
-        return this.channel;
     }
 
     public void evaluate(final String script, final String languageName, final Bindings requestBindings, final Boolean isolate,

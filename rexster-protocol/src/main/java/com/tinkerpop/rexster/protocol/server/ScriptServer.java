@@ -2,11 +2,8 @@ package com.tinkerpop.rexster.protocol.server;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.EngineController;
-import com.tinkerpop.rexster.protocol.EngineHolder;
 import com.tinkerpop.rexster.protocol.session.AbstractRexProSession;
-import com.tinkerpop.rexster.protocol.session.RexProSession;
 import com.tinkerpop.rexster.protocol.session.RexProSessions;
 import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.server.RexsterApplication;
@@ -16,7 +13,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 
 import javax.script.Bindings;
-import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import java.io.IOException;
 
@@ -74,7 +70,6 @@ public class ScriptServer {
 
                 // validate session and channel
                 if (sessionDoesNotExist(request, message, session)) return;
-                if (channelIsRedefined(request, message, message, session)) return;
 
                 graph = session.getGraphObj();
 
@@ -82,7 +77,7 @@ public class ScriptServer {
                 if (graphIsRedefined(request, message, message, graph)) return;
 
             } else {
-                session = new EmptySession(rexsterApplication, 0);
+                session = new EmptySession(rexsterApplication);
             }
 
             Bindings bindings = message.getBindings();
@@ -201,26 +196,6 @@ public class ScriptServer {
     }
 
     /**
-     * The channel cannot be redefined within a session.
-     */
-    private static boolean channelIsRedefined(final RexProRequest request, final RexProMessage message,
-                                              final ScriptRequestMessage specificMessage, final AbstractRexProSession session) throws IOException {
-        // have to cast the channel to byte because meta converts to int internally via msgpack conversion
-        if (session.getChannel() != Byte.parseByte(specificMessage.metaGetChannel().toString())) {
-            request.writeResponseMessage(
-                    MessageUtil.createErrorResponse(
-                            message.Request, RexProMessage.EMPTY_SESSION_AS_BYTES,
-                            ErrorResponseMessage.CHANNEL_CONFIG_ERROR,
-                            MessageTokens.ERROR_CHANNEL_REDEFINITION
-                    )
-            );
-
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * The session has to be found for script to be executed.
      */
     private static boolean sessionDoesNotExist(final RexProRequest request, final RexProMessage message, final AbstractRexProSession session) throws IOException {
@@ -244,8 +219,8 @@ public class ScriptServer {
      */
     private class EmptySession extends AbstractRexProSession {
 
-        private EmptySession(RexsterApplication rexsterApplication, int channel) {
-            super(rexsterApplication, channel);
+        private EmptySession(RexsterApplication rexsterApplication) {
+            super(rexsterApplication);
         }
 
         protected void execute(Evaluator evaluator) throws ScriptException {

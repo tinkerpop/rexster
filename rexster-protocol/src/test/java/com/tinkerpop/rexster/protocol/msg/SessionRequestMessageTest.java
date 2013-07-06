@@ -25,7 +25,6 @@ public class SessionRequestMessageTest {
         msg.setRequestAsUUID(UUID.randomUUID());
         msg.setSessionAsUUID(UUID.randomUUID());
         msg.metaSetKillSession(true);
-        msg.Channel = 0;
         msg.Username = "mr test";
         msg.Password = "password";
 
@@ -57,7 +56,6 @@ public class SessionRequestMessageTest {
         outMsg.setRequestAsUUID(UUID.randomUUID());
         outMsg.setSessionAsUUID(UUID.randomUUID());
         outMsg.metaSetKillSession(true);
-        outMsg.Channel = 0;
         outMsg.Username = "mr test";
         outMsg.Password = "password";
 
@@ -81,7 +79,6 @@ public class SessionRequestMessageTest {
             Assert.assertEquals(outMsg.Meta, inMsg.Meta);
             Assert.assertEquals(UUID.nameUUIDFromBytes(outMsg.Request), UUID.nameUUIDFromBytes(inMsg.Request));
             Assert.assertEquals(UUID.nameUUIDFromBytes(outMsg.Session), UUID.nameUUIDFromBytes(inMsg.Session));
-            Assert.assertEquals(outMsg.Channel, inMsg.Channel);
             Assert.assertEquals(outMsg.Username, inMsg.Username);
             Assert.assertEquals(outMsg.Password, inMsg.Password);
         } catch (IOException ex) {

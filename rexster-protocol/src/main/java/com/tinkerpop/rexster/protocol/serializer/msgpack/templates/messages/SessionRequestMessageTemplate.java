@@ -18,14 +18,12 @@ public class SessionRequestMessageTemplate extends RexProMessageTemplate<Session
 
     protected void writeMessageArray(final Packer pk, final SessionRequestMessage msg) throws IOException {
         super.writeMessageArray(pk, msg);
-        pk.write(msg.Channel);
         pk.write(msg.Username);
         pk.write(msg.Password);
     }
 
     protected SessionRequestMessage readMessageArray(final Unpacker un, final SessionRequestMessage msg) throws IOException {
         SessionRequestMessage message = super.readMessageArray(un, msg);
-        message.Channel = un.trySkipNil()?null:un.readInt();
         message.Username = un.trySkipNil()?null:un.readString();
         message.Password = un.trySkipNil()?null:un.readString();
         return message;
