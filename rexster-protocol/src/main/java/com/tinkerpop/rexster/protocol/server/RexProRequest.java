@@ -201,22 +201,12 @@ public class RexProRequest {
      */
     public void writeScriptResults(Object result) throws Exception {
 
-        int channel;
         ScriptRequestMessage message = ((ScriptRequestMessage) requestMessage);
-        if (session != null) {
-            channel = session.getChannel();
-        } else {
-            channel = message.metaGetChannel();
-        }
 
-        if (channel == RexProChannel.CHANNEL_CONSOLE) {
+        if (message.metaGetConsole()) {
             writeResponseMessage(formatForConsoleChannel(message, session, result));
-
-        } else if (channel == RexProChannel.CHANNEL_MSGPACK) {
-            writeResponseMessage(formatForMsgPackChannel(message, session, result));
         } else {
-            // malformed channel???!!!
-            logger.warn(String.format("Session is configured for a channel that does not exist: [%s]", session.getChannel()));
+            writeResponseMessage(formatForMsgPackChannel(message, session, result));
         }
     }
 
@@ -321,8 +311,8 @@ public class RexProRequest {
         return msgPackScriptResponseMessage;
     }
 
-    private static ConsoleScriptResponseMessage formatForConsoleChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
-        final ConsoleScriptResponseMessage consoleScriptResponseMessage = new ConsoleScriptResponseMessage();
+    private static MsgPackScriptResponseMessage formatForConsoleChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
+        final MsgPackScriptResponseMessage consoleScriptResponseMessage = new MsgPackScriptResponseMessage();
 
         if (specificMessage.metaGetInSession()){
             consoleScriptResponseMessage.Session = specificMessage.Session;
@@ -333,8 +323,7 @@ public class RexProRequest {
         consoleScriptResponseMessage.Request = specificMessage.Request;
 
         final List<String> consoleLines = ConsoleScriptResponseMessage.convertResultToConsoleLines(result);
-        consoleScriptResponseMessage.ConsoleLines = new String[consoleLines.size()];
-        consoleLines.toArray(consoleScriptResponseMessage.ConsoleLines);
+        consoleScriptResponseMessage.Results.set(consoleLines);
         if (session != null) {
             consoleScriptResponseMessage.Bindings.putAll(session.getBindings());
         }

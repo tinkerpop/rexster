@@ -2,7 +2,6 @@ package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.RexProChannel;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import org.msgpack.MessagePack;
 
@@ -22,8 +21,7 @@ public class TryRexProSessioned {
 
     private static void bigCalls() {
 
-        RemoteRexsterSession session = new RemoteRexsterSession("localhost", 8184, 100, "", "",
-                RexProChannel.CHANNEL_MSGPACK);
+        RemoteRexsterSession session = new RemoteRexsterSession("localhost", 8184, 100, "", "");
         session.open();
 
         long start = System.currentTimeMillis();
@@ -46,7 +44,7 @@ public class TryRexProSessioned {
 
     private static void lotsOfCalls(boolean doJson){
 
-        RemoteRexsterSession session = new RemoteRexsterSession("localhost", 8184, 100, "", "", RexProChannel.CHANNEL_MSGPACK);
+        RemoteRexsterSession session = new RemoteRexsterSession("localhost", 8184, 100, "", "");
         session.open();
 
         MessagePack msgpack = new MessagePack();

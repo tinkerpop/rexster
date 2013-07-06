@@ -26,7 +26,6 @@ public class SessionRequestMessage extends RexProMessage {
         return fields;
     }
 
-    public int Channel;
     public String Username;
     public String Password;
 

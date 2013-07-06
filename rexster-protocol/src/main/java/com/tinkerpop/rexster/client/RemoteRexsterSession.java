@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.client;
 
-import com.tinkerpop.rexster.protocol.msg.RexProChannel;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
@@ -24,7 +23,6 @@ public class RemoteRexsterSession {
     private String rexProHost = "localhost";
     private String username = "";
     private String password = "";
-    private int channel;
 
     private RexProClientConnection rexProConnection;
 
@@ -37,16 +35,11 @@ public class RemoteRexsterSession {
     }
 
     public RemoteRexsterSession(String rexProHost, int rexProPort, int timeout, String username, String password) {
-        this(rexProHost, rexProPort, timeout, username, password, RexProChannel.CHANNEL_CONSOLE);
-    }
-
-    public RemoteRexsterSession(String rexProHost, int rexProPort, int timeout, String username, String password, int channel) {
         this.rexProHost = rexProHost;
         this.rexProPort = rexProPort;
         this.timeout = timeout;
         this.username = username;
         this.password = password;
-        this.channel = channel;
         this.rexProConnection = new RexProClientConnection(rexProHost, rexProPort);
     }
 
@@ -56,7 +49,6 @@ public class RemoteRexsterSession {
             sessionRequestMessageToSend.Username = this.username;
             sessionRequestMessageToSend.Password = this.password;
             sessionRequestMessageToSend.setSessionAsUUID(SessionRequestMessage.EMPTY_SESSION);
-            sessionRequestMessageToSend.Channel = channel;
             sessionRequestMessageToSend.setRequestAsUUID(UUID.randomUUID());
 
             try {
