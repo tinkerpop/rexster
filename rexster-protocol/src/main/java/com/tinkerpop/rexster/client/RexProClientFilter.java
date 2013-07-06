@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
-import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MessageTokens;
 import com.tinkerpop.rexster.protocol.msg.MessageType;
@@ -123,8 +122,6 @@ public class RexProClientFilter extends BaseFilter {
                 message = unpacker.read(ScriptRequestMessage.class);
             } else if (messageType == MessageType.SESSION_REQUEST) {
                 message = unpacker.read(SessionRequestMessage.class);
-            } else if (messageType == MessageType.CONSOLE_SCRIPT_RESPONSE) {
-                message = unpacker.read(ConsoleScriptResponseMessage.class);
             } else if (messageType == MessageType.SESSION_RESPONSE) {
                 message = unpacker.read(SessionResponseMessage.class);
             } else if (messageType == MessageType.ERROR) {
@@ -243,8 +240,6 @@ public class RexProClientFilter extends BaseFilter {
 
         if (msg instanceof SessionResponseMessage) {
             bb.put(MessageType.SESSION_RESPONSE);
-        } else if (msg instanceof ConsoleScriptResponseMessage) {
-            bb.put(MessageType.CONSOLE_SCRIPT_RESPONSE);
         } else if (msg instanceof ErrorResponseMessage) {
             bb.put(MessageType.ERROR);
         } else if (msg instanceof ScriptRequestMessage) {

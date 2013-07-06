@@ -102,8 +102,6 @@ public abstract class RexProMessage {
 
         if (msg instanceof SessionResponseMessage) {
             bb.put(MessageType.SESSION_RESPONSE);
-        } else if (msg instanceof ConsoleScriptResponseMessage) {
-            bb.put(MessageType.CONSOLE_SCRIPT_RESPONSE);
         } else if (msg instanceof ErrorResponseMessage) {
             bb.put(MessageType.ERROR);
         } else if (msg instanceof ScriptRequestMessage) {

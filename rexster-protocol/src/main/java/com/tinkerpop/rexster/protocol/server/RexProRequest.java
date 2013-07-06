@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol.server;
 
+import com.tinkerpop.rexster.gremlin.converter.ConsoleResultConverter;
 import com.tinkerpop.rexster.protocol.serializer.RexProSerializer;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
@@ -13,6 +14,7 @@ import org.glassfish.grizzly.Buffer;
 import org.msgpack.MessagePack;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -225,8 +227,6 @@ public class RexProRequest {
             RexProSerializer serializer = getSerializer();
             if (responseMessage instanceof SessionResponseMessage) {
                 responseBytes = serializer.serialize((SessionResponseMessage) responseMessage, SessionResponseMessage.class);
-            } else if (responseMessage instanceof ConsoleScriptResponseMessage) {
-                responseBytes = serializer.serialize((ConsoleScriptResponseMessage) responseMessage, ConsoleScriptResponseMessage.class);
             } else if (responseMessage instanceof ErrorResponseMessage) {
                 responseBytes = serializer.serialize((ErrorResponseMessage) responseMessage, ErrorResponseMessage.class);
             } else if (responseMessage instanceof MsgPackScriptResponseMessage) {
@@ -281,8 +281,6 @@ public class RexProRequest {
 
         if (responseMessage instanceof SessionResponseMessage) {
             bb.put(MessageType.SESSION_RESPONSE);
-        } else if (responseMessage instanceof ConsoleScriptResponseMessage) {
-            bb.put(MessageType.CONSOLE_SCRIPT_RESPONSE);
         } else if (responseMessage instanceof ErrorResponseMessage) {
             bb.put(MessageType.ERROR);
         } else if (responseMessage instanceof MsgPackScriptResponseMessage) {
@@ -311,6 +309,11 @@ public class RexProRequest {
         return msgPackScriptResponseMessage;
     }
 
+    public static List<String> convertResultToConsoleLines(final Object result) throws Exception {
+        final ConsoleResultConverter converter = new ConsoleResultConverter(new StringWriter());
+        return converter.convert(result);
+    }
+
     private static MsgPackScriptResponseMessage formatForConsoleChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
         final MsgPackScriptResponseMessage consoleScriptResponseMessage = new MsgPackScriptResponseMessage();
 
@@ -322,7 +325,7 @@ public class RexProRequest {
 
         consoleScriptResponseMessage.Request = specificMessage.Request;
 
-        final List<String> consoleLines = ConsoleScriptResponseMessage.convertResultToConsoleLines(result);
+        final List<String> consoleLines = convertResultToConsoleLines(result);
         consoleScriptResponseMessage.Results.set(consoleLines);
         if (session != null) {
             consoleScriptResponseMessage.Bindings.putAll(session.getBindings());

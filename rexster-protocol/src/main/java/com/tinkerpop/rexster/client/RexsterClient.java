@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.client;
 
-import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
@@ -48,7 +47,6 @@ public class RexsterClient {
     private final String language;
     private final String graphName;
     private final String graphObjName;
-    private final int channel;
     private final boolean transaction;
 
     private final TCPNIOTransport transport;
@@ -67,7 +65,6 @@ public class RexsterClient {
         this.language = configuration.getString(RexsterClientTokens.CONFIG_LANGUAGE);
         this.graphName = configuration.getString(RexsterClientTokens.CONFIG_GRAPH_NAME);
         this.graphObjName = configuration.getString(RexsterClientTokens.CONFIG_GRAPH_OBJECT_NAME);
-        this.channel = configuration.getInt(RexsterClientTokens.CONFIG_CHANNEL);
         this.transaction= configuration.getBoolean(RexsterClientTokens.CONFIG_TRANSACTION);
 
         this.transport = transport;
@@ -183,10 +180,10 @@ public class RexsterClient {
 
             return results;
 
-        } else if (resultMessage instanceof ConsoleScriptResponseMessage) {
-            final ConsoleScriptResponseMessage msg = (ConsoleScriptResponseMessage) resultMessage;
+        } else if (resultMessage instanceof MsgPackScriptResponseMessage) {
+            final MsgPackScriptResponseMessage msg = (MsgPackScriptResponseMessage) resultMessage;
             final List<T> results = new ArrayList<T>();
-            for (String line : msg.ConsoleLines) {
+            for (String line : (String[]) msg.Results.get()) {
                 results.add((T) line);
             }
             return results;
@@ -289,7 +286,6 @@ public class RexsterClient {
         scriptMessage.metaSetGraphName(this.graphName);
         scriptMessage.metaSetGraphObjName(this.graphObjName);
         scriptMessage.metaSetInSession(false);
-        scriptMessage.metaSetChannel(this.channel);
         scriptMessage.metaSetTransaction(this.transaction);
         scriptMessage.setRequestAsUUID(UUID.randomUUID());
 

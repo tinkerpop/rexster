@@ -3,10 +3,8 @@ package com.tinkerpop.rexster.console;
 import com.tinkerpop.pipes.util.iterators.SingleIterator;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.client.RemoteRexsterSession;
-import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.RexProMessage;
-import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.gremlin.converter.ConsoleResultConverter;
+import com.tinkerpop.rexster.protocol.msg.*;
 import jline.ConsoleReader;
 import jline.History;
 import org.apache.log4j.Level;
@@ -285,6 +283,30 @@ public class RexsterConsole {
         return space;
     }
 
+    public List<String> bindingsAsList(MsgPackScriptResponseMessage msg) {
+        final List<String> bindings = new ArrayList<String>();
+
+        for(Map.Entry pair: msg.Bindings.entrySet()) {
+            if (pair.getValue() == null) {
+                bindings.add(pair.getKey() + "=null");
+            } else {
+                bindings.add(pair.getKey() + "=" + pair.getValue().toString());
+            }
+        }
+
+        return bindings;
+    }
+
+    public List<String> consoleLinesAsList(MsgPackScriptResponseMessage msg) {
+        final List<String> list = new ArrayList<String>();
+        String[] lines = (String[]) msg.Results.get();
+        for (String line : lines) {
+            list.add(line);
+        }
+
+        return list;
+    }
+
     private ResultAndBindings eval(final String script, final String scriptEngineName,
                                           final RemoteRexsterSession session) {
 
@@ -308,10 +330,10 @@ public class RexsterConsole {
             List<String> lines = new ArrayList<String>();
             List<String> bindings = new ArrayList<String>();
             try {
-                if (resultMessage instanceof ConsoleScriptResponseMessage) {
-                    final ConsoleScriptResponseMessage responseMessage = (ConsoleScriptResponseMessage) resultMessage;
-                    bindings = responseMessage.bindingsAsList();
-                    lines = responseMessage.consoleLinesAsList();
+                if (resultMessage instanceof MsgPackScriptResponseMessage) {
+                    final MsgPackScriptResponseMessage responseMessage = (MsgPackScriptResponseMessage) resultMessage;
+                    bindings = bindingsAsList(responseMessage);
+                    lines = consoleLinesAsList(responseMessage);
                 } else if (resultMessage instanceof ErrorResponseMessage) {
                     final ErrorResponseMessage errorMessage = (ErrorResponseMessage) resultMessage;
                     lines = new ArrayList<String>() {{
