@@ -214,9 +214,6 @@ public class RexProRequest {
 
         } else if (channel == RexProChannel.CHANNEL_MSGPACK) {
             writeResponseMessage(formatForMsgPackChannel(message, session, result));
-
-        } else if (channel == RexProChannel.CHANNEL_GRAPHSON) {
-            writeResponseMessage(formatForGraphSONChannel(message, session, result));
         } else {
             // malformed channel???!!!
             logger.warn(String.format("Session is configured for a channel that does not exist: [%s]", session.getChannel()));
@@ -244,8 +241,6 @@ public class RexProRequest {
                 responseBytes = serializer.serialize((ErrorResponseMessage) responseMessage, ErrorResponseMessage.class);
             } else if (responseMessage instanceof MsgPackScriptResponseMessage) {
                 responseBytes = serializer.serialize((MsgPackScriptResponseMessage) responseMessage, MsgPackScriptResponseMessage.class);
-            }  else if (responseMessage instanceof GraphSONScriptResponseMessage) {
-                responseBytes = serializer.serialize((GraphSONScriptResponseMessage) responseMessage, GraphSONScriptResponseMessage.class);
             } else {
                 throw new Exception();
             }
@@ -302,30 +297,10 @@ public class RexProRequest {
             bb.put(MessageType.ERROR);
         } else if (responseMessage instanceof MsgPackScriptResponseMessage) {
             bb.put(MessageType.MSGPACK_SCRIPT_RESPONSE);
-        }  else if (responseMessage instanceof GraphSONScriptResponseMessage) {
-            bb.put(MessageType.GRAPHSON_SCRIPT_RESPONSE);
         }
 
         bb.putInt(responseBytes.length);
         bb.put(responseBytes);
-    }
-
-    private static GraphSONScriptResponseMessage formatForGraphSONChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
-        final GraphSONScriptResponseMessage graphSONScriptResponseMessage = new GraphSONScriptResponseMessage();
-
-        if (specificMessage.metaGetInSession()){
-            graphSONScriptResponseMessage.Session = specificMessage.Session;
-        } else {
-            graphSONScriptResponseMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
-        }
-
-        graphSONScriptResponseMessage.Request = specificMessage.Request;
-        graphSONScriptResponseMessage.Results = GraphSONScriptResponseMessage.convertResultToBytes(result);
-        if (session != null){
-            graphSONScriptResponseMessage.Bindings.putAll(session.getBindings());
-        }
-        graphSONScriptResponseMessage.validateMetaData();
-        return graphSONScriptResponseMessage;
     }
 
     private static MsgPackScriptResponseMessage formatForMsgPackChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {

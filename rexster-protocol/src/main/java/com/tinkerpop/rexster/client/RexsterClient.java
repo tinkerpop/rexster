@@ -2,7 +2,6 @@ package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.GraphSONScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
@@ -184,11 +183,6 @@ public class RexsterClient {
 
             return results;
 
-        } else if (resultMessage instanceof GraphSONScriptResponseMessage) {
-            final GraphSONScriptResponseMessage msg = (GraphSONScriptResponseMessage) resultMessage;
-            final List<T> results = new ArrayList<T>();
-            results.add((T) msg.Results);
-            return results;
         } else if (resultMessage instanceof ConsoleScriptResponseMessage) {
             final ConsoleScriptResponseMessage msg = (ConsoleScriptResponseMessage) resultMessage;
             final List<T> results = new ArrayList<T>();

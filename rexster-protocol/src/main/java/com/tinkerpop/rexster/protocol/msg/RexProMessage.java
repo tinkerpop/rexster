@@ -112,8 +112,6 @@ public abstract class RexProMessage {
             bb.put(MessageType.SESSION_REQUEST);
         } else if (msg instanceof MsgPackScriptResponseMessage) {
             bb.put(MessageType.MSGPACK_SCRIPT_RESPONSE);
-        }  else if (msg instanceof GraphSONScriptResponseMessage) {
-            bb.put(MessageType.GRAPHSON_SCRIPT_RESPONSE);
         }
 
         bb.putInt(message.length);

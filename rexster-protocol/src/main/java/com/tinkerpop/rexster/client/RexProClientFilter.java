@@ -3,7 +3,6 @@ package com.tinkerpop.rexster.client;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
 import com.tinkerpop.rexster.protocol.msg.ConsoleScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.GraphSONScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.MessageTokens;
 import com.tinkerpop.rexster.protocol.msg.MessageType;
 import com.tinkerpop.rexster.protocol.msg.MessageUtil;
@@ -132,8 +131,6 @@ public class RexProClientFilter extends BaseFilter {
                 message = unpacker.read(ErrorResponseMessage.class);
             } else if (messageType == MessageType.MSGPACK_SCRIPT_RESPONSE) {
                 message = unpacker.read(MsgPackScriptResponseMessage.class);
-            } else if (messageType == MessageType.GRAPHSON_SCRIPT_RESPONSE) {
-                message = unpacker.read(GraphSONScriptResponseMessage.class);
             }
 
             if (message == null) {
@@ -256,8 +253,6 @@ public class RexProClientFilter extends BaseFilter {
             bb.put(MessageType.SESSION_REQUEST);
         } else if (msg instanceof MsgPackScriptResponseMessage) {
             bb.put(MessageType.MSGPACK_SCRIPT_RESPONSE);
-        }  else if (msg instanceof GraphSONScriptResponseMessage) {
-            bb.put(MessageType.GRAPHSON_SCRIPT_RESPONSE);
         }
 
         bb.putInt(rexProMessageAsBytes.length);

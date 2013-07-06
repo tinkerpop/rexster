@@ -26,7 +26,6 @@ public class MsgPackSerializer implements RexProSerializer {
         msgpack.register(SessionResponseMessage.class, new SessionResponseMessageTemplate());
         msgpack.register(ScriptRequestMessage.class, new ScriptRequestMessageTemplate());
         msgpack.register(MsgPackScriptResponseMessage.class, new MsgPackScriptResponseMessageTemplate());
-        msgpack.register(GraphSONScriptResponseMessage.class, new GraphSONScriptResponseMessageTemplate());
         msgpack.register(ConsoleScriptResponseMessage.class, new ConsoleScriptResponseMessageTemplate());
     }
 
