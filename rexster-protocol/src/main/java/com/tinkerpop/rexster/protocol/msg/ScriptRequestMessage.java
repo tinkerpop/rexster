@@ -19,6 +19,7 @@ public class ScriptRequestMessage extends RexProMessage {
     protected static final String META_KEY_ISOLATE_REQUEST = "isolate";
     protected static final String META_KEY_TRANSACTION = "transaction";
     protected static final String META_KEY_CHANNEL = "channel";
+    protected static final String META_KEY_CONSOLE = "console";
 
     protected RexProMessageMetaField[] getMetaFields() {
         RexProMessageMetaField[] fields = {
@@ -36,7 +37,10 @@ public class ScriptRequestMessage extends RexProMessage {
             RexProMessageMetaField.define(META_KEY_TRANSACTION, false, true, Boolean.class),
 
             // used in the context of a sessionless requests to define the serialization channel
-            RexProMessageMetaField.define(META_KEY_CHANNEL, false, RexProChannel.CHANNEL_MSGPACK, Integer.class)
+            RexProMessageMetaField.define(META_KEY_CHANNEL, false, RexProChannel.CHANNEL_MSGPACK, Integer.class),
+
+            // indicates the response should be toString'd
+            RexProMessageMetaField.define(META_KEY_CONSOLE, false, false, Boolean.class)
         };
         return fields;
     }
