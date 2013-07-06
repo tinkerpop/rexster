@@ -298,8 +298,7 @@ public class RexsterConsole {
 
     public List<String> consoleLinesAsList(ScriptResponseMessage msg) {
         final List<String> list = new ArrayList<String>();
-        String[] lines = (String[]) msg.Results.get();
-        for (String line : lines) {
+        for (String line : (ArrayList<String>) msg.Results.get()) {
             list.add(line);
         }
 
