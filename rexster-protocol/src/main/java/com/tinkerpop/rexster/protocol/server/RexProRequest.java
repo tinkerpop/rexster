@@ -11,11 +11,7 @@ import org.apache.log4j.Logger;
 
 import org.glassfish.grizzly.Buffer;
 import org.msgpack.MessagePack;
-import org.msgpack.packer.Packer;
-import org.msgpack.unpacker.Unpacker;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -38,6 +34,7 @@ public class RexProRequest {
     private ByteBuffer requestBuffer;
     private RexsterApplication rexsterApplication;
 
+    private final byte serializerType;
     private final byte messageType;
     private final int bodyLength;
     private final int completeMessageLength;
@@ -48,9 +45,11 @@ public class RexProRequest {
     private RexProMessage requestMessage = null;
 
     //version byte
+    //serializer byte
+    //reserved byte (4x)
     //message type byte
     //body length int
-    private static int ENVELOPE_LENGTH = 1 + 1 + 4;
+    private static int ENVELOPE_LENGTH = 1 + 1 + 4 + 1 + 4;
 
     private RexProSession session = null;
 
@@ -69,8 +68,12 @@ public class RexProRequest {
             throw new IncompleteRexProRequestException();
         }
 
-        messageType = requestBuffer.get(1);
-        bodyLength = requestBuffer.getInt(2);
+        serializerType = requestBuffer.get(1);
+
+        //bytes 2,3,4,5 are reserved for future use
+
+        messageType = requestBuffer.get(6);
+        bodyLength = requestBuffer.getInt(7);
         completeMessageLength = ENVELOPE_LENGTH + bodyLength;
 
         // If the source message doesn't contain entire body
@@ -280,6 +283,15 @@ public class RexProRequest {
 
     public void writeToBuffer(Buffer bb) {
         //add version
+        bb.put((byte) 1);
+
+        //add serializer
+        bb.put(serializerType);
+
+        //add reserved bytes
+        bb.put((byte) 0);
+        bb.put((byte) 0);
+        bb.put((byte) 0);
         bb.put((byte) 0);
 
         if (responseMessage instanceof SessionResponseMessage) {

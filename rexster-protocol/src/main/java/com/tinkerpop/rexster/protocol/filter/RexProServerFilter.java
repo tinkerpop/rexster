@@ -44,7 +44,7 @@ public class RexProServerFilter extends BaseFilter {
         final byte messageVersion = sourceBuffer.get(0);
         try {
             switch (messageVersion) {
-                case 0:
+                case 1:
                     request = new RexProRequest(sourceBuffer.toByteBuffer(), sourceBufferLength, rexsterApplication);
                     break;
                 default:
