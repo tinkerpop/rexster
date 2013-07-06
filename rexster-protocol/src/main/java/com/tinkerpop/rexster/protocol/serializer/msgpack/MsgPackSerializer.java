@@ -25,7 +25,7 @@ public class MsgPackSerializer implements RexProSerializer {
         msgpack.register(SessionRequestMessage.class, new SessionRequestMessageTemplate());
         msgpack.register(SessionResponseMessage.class, new SessionResponseMessageTemplate());
         msgpack.register(ScriptRequestMessage.class, new ScriptRequestMessageTemplate());
-        msgpack.register(MsgPackScriptResponseMessage.class, new MsgPackScriptResponseMessageTemplate());
+        msgpack.register(ScriptResponseMessage.class, new MsgPackScriptResponseMessageTemplate());
     }
 
     public <Message extends RexProMessage> Message deserialize(byte[] bytes, Class<Message> messageClass) throws IOException {

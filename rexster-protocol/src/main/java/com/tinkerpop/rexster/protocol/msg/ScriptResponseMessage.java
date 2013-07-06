@@ -9,7 +9,7 @@ import org.msgpack.annotation.Message;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 @Message
-public class MsgPackScriptResponseMessage extends RexProMessage {
+public class ScriptResponseMessage extends RexProMessage {
     private static final MsgPackResultConverter converter = new MsgPackResultConverter();
 
     public RexProScriptResult Results = new RexProScriptResult();

@@ -28,18 +28,7 @@ public class MessageType {
     public static final byte SCRIPT_REQUEST = 3;
 
     /**
-     * Represents a response to a script request for use in a console where each results is serialized to a
-     * string value in an array of strings.
-     */
-    public static final byte CONSOLE_SCRIPT_RESPONSE = 4;
-
-    /**
      * Represents a response to a script request that formats results to MsgPack format.
      */
-    public static final byte MSGPACK_SCRIPT_RESPONSE = 5;
-
-    /**
-     * Represents a response to a script request that formats results to GraphSON format.
-     */
-    public static final byte GRAPHSON_SCRIPT_RESPONSE = 6;
+    public static final byte SCRIPT_RESPONSE = 5;
 }

@@ -4,7 +4,7 @@ import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import com.tinkerpop.rexster.server.RexProRexsterServer;
@@ -94,11 +94,11 @@ public abstract class AbstractRexProIntegrationTest {
 
         if (inMsg instanceof ErrorResponseMessage) {
             throw new RexProException(((ErrorResponseMessage) inMsg).ErrorMessage);
-        } else if (!(inMsg instanceof MsgPackScriptResponseMessage)) {
+        } else if (!(inMsg instanceof ScriptResponseMessage)) {
             throw new RexProException("wrong response type");
         }
 
-        final MsgPackScriptResponseMessage msg = (MsgPackScriptResponseMessage) inMsg;
+        final ScriptResponseMessage msg = (ScriptResponseMessage) inMsg;
 
         return (Map<String, Map<String,String>>) msg.Results.get();
     }

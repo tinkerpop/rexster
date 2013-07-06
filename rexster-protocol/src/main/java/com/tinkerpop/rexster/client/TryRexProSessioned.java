@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import org.msgpack.MessagePack;
 
@@ -29,9 +29,9 @@ public class TryRexProSessioned {
         long checkpoint = System.currentTimeMillis();
 
         try {
-            MsgPackScriptResponseMessage resultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
+            ScriptResponseMessage resultMessage = (ScriptResponseMessage) session.sendRequest(
                     createScriptRequestMessage(session, "g=rexster.getGraph('gratefulgraph');g.V;"), 100);
-            resultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
+            resultMessage = (ScriptResponseMessage) session.sendRequest(
                     createScriptRequestMessage(session, "g.E;"), 100);
             System.out.println((checkpoint - start) + ":" + (System.currentTimeMillis() - checkpoint));
 
@@ -56,7 +56,7 @@ public class TryRexProSessioned {
 
         try {
 
-            MsgPackScriptResponseMessage resultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
+            ScriptResponseMessage resultMessage = (ScriptResponseMessage) session.sendRequest(
                     createScriptRequestMessage(session, "g=rexster.getGraph('gratefulgraph');g.V;"), 100);
 
             int counter = 1;
@@ -65,7 +65,7 @@ public class TryRexProSessioned {
                 final Map<String,Object> map = (Map<String, Object>) itty.next();
                 final String vId = (String) map.get(Tokens._ID);
 
-                MsgPackScriptResponseMessage vertexResultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
+                ScriptResponseMessage vertexResultMessage = (ScriptResponseMessage) session.sendRequest(
                         createScriptRequestMessage(session, "g.v(" + vId + ")"), 100);
 
                 System.out.println(vertexResultMessage.Results);
@@ -73,7 +73,7 @@ public class TryRexProSessioned {
             }
 
             /*
-            resultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
+            resultMessage = (ScriptResponseMessage) session.sendRequest(
                     createScriptRequestMessage(session, "g.E;"), 100);
 
             unpacker = msgpack.createBufferUnpacker(resultMessage.Results);
@@ -83,7 +83,7 @@ public class TryRexProSessioned {
                 final Map<String,Value> map = new Converter(msgpack, itty.next()).read(tMap(TString, TValue));
                 final String eId = map.get(Tokens._ID).asRawValue().getString();
 
-                MsgPackScriptResponseMessage edgeResultMessage = (MsgPackScriptResponseMessage) session.sendRequest(
+                ScriptResponseMessage edgeResultMessage = (ScriptResponseMessage) session.sendRequest(
                         createScriptRequestMessage(session, "g.e(" + eId + ")"), 100);
 
                 unpacker = msgpack.createBufferUnpacker(edgeResultMessage.Results);

@@ -3,7 +3,7 @@ package com.tinkerpop.rexster.protocol.serializer;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.pipes.util.structures.Table;
-import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,12 +30,12 @@ public abstract class AbstractResultSerializerTest {
      * @return
      */
     private Object serializeAndDeserialize(Object value) throws Exception {
-        MsgPackScriptResponseMessage msg = new MsgPackScriptResponseMessage();
+        ScriptResponseMessage msg = new ScriptResponseMessage();
         msg.Results.set(value);
         RexProSerializer serializer = getSerializer();
 
-        byte[] bytes = serializer.serialize(msg, MsgPackScriptResponseMessage.class);
-        return serializer.deserialize(bytes, MsgPackScriptResponseMessage.class);
+        byte[] bytes = serializer.serialize(msg, ScriptResponseMessage.class);
+        return serializer.deserialize(bytes, ScriptResponseMessage.class);
     }
 
 

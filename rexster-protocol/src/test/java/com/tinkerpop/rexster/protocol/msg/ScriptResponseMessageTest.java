@@ -19,13 +19,13 @@ import java.util.UUID;
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class MsgPackScriptResponseMessageTest {
+public class ScriptResponseMessageTest {
 
     final static MessagePack msgpack = new MessagePack();
 
     @Test
     public void serializeString() throws Exception {
-        byte[] bytes = MsgPackScriptResponseMessage.convertResultToBytes("xyz");
+        byte[] bytes = ScriptResponseMessage.convertResultToBytes("xyz");
         Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(bytes));
         Object dst = ResultsConverter.deserializeObject(unpacker.readValue());
 
@@ -34,7 +34,7 @@ public class MsgPackScriptResponseMessageTest {
 
     @Test
     public void serializeInt() throws Exception {
-        byte[] bytes = MsgPackScriptResponseMessage.convertResultToBytes(31);
+        byte[] bytes = ScriptResponseMessage.convertResultToBytes(31);
         Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(bytes));
         Object dst = ResultsConverter.deserializeObject(unpacker.readValue());
 
@@ -43,7 +43,7 @@ public class MsgPackScriptResponseMessageTest {
 
     @Test
     public void serializeFloat() throws Exception {
-        byte[] bytes = MsgPackScriptResponseMessage.convertResultToBytes(1.2);
+        byte[] bytes = ScriptResponseMessage.convertResultToBytes(1.2);
         Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(bytes));
         Object dst = ResultsConverter.deserializeObject(unpacker.readValue());
 
@@ -52,7 +52,7 @@ public class MsgPackScriptResponseMessageTest {
 
     @Test
     public void serializeBool() throws Exception {
-        byte[] bytes = MsgPackScriptResponseMessage.convertResultToBytes(true);
+        byte[] bytes = ScriptResponseMessage.convertResultToBytes(true);
         Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(bytes));
         Object dst = ResultsConverter.deserializeObject(unpacker.readValue());
 
@@ -66,7 +66,7 @@ public class MsgPackScriptResponseMessageTest {
         srcArray.add("abc");
         srcArray.add(1L);
 
-        byte[] bytes = MsgPackScriptResponseMessage.convertResultToBytes(srcArray);
+        byte[] bytes = ScriptResponseMessage.convertResultToBytes(srcArray);
         Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(bytes));
         Object dst = ResultsConverter.deserializeObject(unpacker.readValue());
 
@@ -84,7 +84,7 @@ public class MsgPackScriptResponseMessageTest {
         arr.add(true);
         srcMap.put(1.2d, arr);
 
-        byte[] bytes = MsgPackScriptResponseMessage.convertResultToBytes(srcMap);
+        byte[] bytes = ScriptResponseMessage.convertResultToBytes(srcMap);
         Unpacker unpacker = msgpack.createUnpacker(new ByteArrayInputStream(bytes));
         Object dst = ResultsConverter.deserializeObject(unpacker.readValue());
         for (Object key : srcMap.keySet()) {
@@ -99,7 +99,7 @@ public class MsgPackScriptResponseMessageTest {
         msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
         msgpack.register(RexProScriptResult.class, ResultsTemplate.getInstance());
 
-        MsgPackScriptResponseMessage outMsg = new MsgPackScriptResponseMessage();
+        ScriptResponseMessage outMsg = new ScriptResponseMessage();
         outMsg.setRequestAsUUID(UUID.randomUUID());
         outMsg.setSessionAsUUID(UUID.randomUUID());
         outMsg.Results.set(5);
@@ -119,9 +119,9 @@ public class MsgPackScriptResponseMessageTest {
         final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         final Unpacker unpacker = msgpack.createUnpacker(in);
 
-        MsgPackScriptResponseMessage inMsg;
+        ScriptResponseMessage inMsg;
         try {
-            inMsg = unpacker.read(MsgPackScriptResponseMessage.class);
+            inMsg = unpacker.read(ScriptResponseMessage.class);
             Assert.assertEquals(outMsg.Meta, inMsg.Meta);
             Assert.assertEquals(UUID.nameUUIDFromBytes(outMsg.Request), UUID.nameUUIDFromBytes(inMsg.Request));
             Assert.assertEquals(UUID.nameUUIDFromBytes(outMsg.Session), UUID.nameUUIDFromBytes(inMsg.Session));

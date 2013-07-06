@@ -3,7 +3,6 @@ package com.tinkerpop.rexster.console;
 import com.tinkerpop.pipes.util.iterators.SingleIterator;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.client.RemoteRexsterSession;
-import com.tinkerpop.rexster.gremlin.converter.ConsoleResultConverter;
 import com.tinkerpop.rexster.protocol.msg.*;
 import jline.ConsoleReader;
 import jline.History;
@@ -283,7 +282,7 @@ public class RexsterConsole {
         return space;
     }
 
-    public List<String> bindingsAsList(MsgPackScriptResponseMessage msg) {
+    public List<String> bindingsAsList(ScriptResponseMessage msg) {
         final List<String> bindings = new ArrayList<String>();
 
         for(Map.Entry pair: msg.Bindings.entrySet()) {
@@ -297,7 +296,7 @@ public class RexsterConsole {
         return bindings;
     }
 
-    public List<String> consoleLinesAsList(MsgPackScriptResponseMessage msg) {
+    public List<String> consoleLinesAsList(ScriptResponseMessage msg) {
         final List<String> list = new ArrayList<String>();
         String[] lines = (String[]) msg.Results.get();
         for (String line : lines) {
@@ -330,8 +329,8 @@ public class RexsterConsole {
             List<String> lines = new ArrayList<String>();
             List<String> bindings = new ArrayList<String>();
             try {
-                if (resultMessage instanceof MsgPackScriptResponseMessage) {
-                    final MsgPackScriptResponseMessage responseMessage = (MsgPackScriptResponseMessage) resultMessage;
+                if (resultMessage instanceof ScriptResponseMessage) {
+                    final ScriptResponseMessage responseMessage = (ScriptResponseMessage) resultMessage;
                     bindings = bindingsAsList(responseMessage);
                     lines = consoleLinesAsList(responseMessage);
                 } else if (resultMessage instanceof ErrorResponseMessage) {

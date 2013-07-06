@@ -3,12 +3,8 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
 import com.tinkerpop.rexster.protocol.BitWorks;
-import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.RexProMessage;
-import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
-import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
-import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.*;
+import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -38,8 +34,8 @@ public class ScriptRequestIntegrationTest extends AbstractRexProIntegrationTest 
             scriptMessage.Session = null;
 
             RexProMessage inMsg = client.execute(scriptMessage);
-            Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-            Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
+            Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
+            Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
         }
     }
 
@@ -74,8 +70,8 @@ public class ScriptRequestIntegrationTest extends AbstractRexProIntegrationTest 
             scriptMessage.setSessionAsUUID(sessionKey);
 
             inMsg = client.execute(scriptMessage);
-            Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-            Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
+            Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
+            Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
 
             final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
             scriptMessage2.Script = "o";
@@ -117,8 +113,8 @@ public class ScriptRequestIntegrationTest extends AbstractRexProIntegrationTest 
             scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
 
             inMsg = client.execute(scriptMessage);
-            Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-            Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
+            Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
+            Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
 
             // test that it's not available on the next request
             // if the meta flag is not set
@@ -212,8 +208,8 @@ public class ScriptRequestIntegrationTest extends AbstractRexProIntegrationTest 
         scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
 
         inMsg = client.execute(scriptMessage);
-        Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
+        Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
+        Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
 
         // test that 'n' is not available if the isolate meta flag is not set to false
         final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
@@ -254,8 +250,8 @@ public class ScriptRequestIntegrationTest extends AbstractRexProIntegrationTest 
         scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
 
         inMsg = client.execute(scriptMessage);
-        Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
+        Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
+        Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
 
         final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
         scriptMessage2.Script = "m = n + 1";
@@ -265,8 +261,8 @@ public class ScriptRequestIntegrationTest extends AbstractRexProIntegrationTest 
         scriptMessage2.Session = BitWorks.convertUUIDToByteArray(sessionKey);
 
         inMsg = client.execute(scriptMessage2);
-        Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
+        Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
+        Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
     }
 
     @Test
@@ -294,8 +290,8 @@ public class ScriptRequestIntegrationTest extends AbstractRexProIntegrationTest 
         scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
 
         inMsg = client.execute(scriptMessage);
-        Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
+        Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
+        Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
 
         // test that 'n' is available if the isolate meta flag is set to false
         final ScriptRequestMessage scriptMessage2 = new ScriptRequestMessage();
@@ -307,8 +303,8 @@ public class ScriptRequestIntegrationTest extends AbstractRexProIntegrationTest 
         scriptMessage2.Session = BitWorks.convertUUIDToByteArray(sessionKey);
 
         inMsg = client.execute(scriptMessage2);
-        Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
+        Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
+        Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
     }
 
     @Test
@@ -336,8 +332,8 @@ public class ScriptRequestIntegrationTest extends AbstractRexProIntegrationTest 
         scriptMessage.Session = BitWorks.convertUUIDToByteArray(sessionKey);
 
         inMsg = client.execute(scriptMessage);
-        Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-        Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
+        Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
+        Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
 
     }
 
@@ -357,8 +353,8 @@ public class ScriptRequestIntegrationTest extends AbstractRexProIntegrationTest 
             scriptMessage.Session = null;
 
             RexProMessage inMsg = client.execute(scriptMessage);
-            Assert.assertTrue(inMsg instanceof MsgPackScriptResponseMessage);
-            Assert.assertTrue(((MsgPackScriptResponseMessage) inMsg).Results.get() != null);
+            Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
+            Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
         }
     }
 

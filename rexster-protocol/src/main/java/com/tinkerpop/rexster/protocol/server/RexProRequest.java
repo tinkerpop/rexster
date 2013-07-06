@@ -229,8 +229,8 @@ public class RexProRequest {
                 responseBytes = serializer.serialize((SessionResponseMessage) responseMessage, SessionResponseMessage.class);
             } else if (responseMessage instanceof ErrorResponseMessage) {
                 responseBytes = serializer.serialize((ErrorResponseMessage) responseMessage, ErrorResponseMessage.class);
-            } else if (responseMessage instanceof MsgPackScriptResponseMessage) {
-                responseBytes = serializer.serialize((MsgPackScriptResponseMessage) responseMessage, MsgPackScriptResponseMessage.class);
+            } else if (responseMessage instanceof ScriptResponseMessage) {
+                responseBytes = serializer.serialize((ScriptResponseMessage) responseMessage, ScriptResponseMessage.class);
             } else {
                 throw new Exception();
             }
@@ -283,16 +283,16 @@ public class RexProRequest {
             bb.put(MessageType.SESSION_RESPONSE);
         } else if (responseMessage instanceof ErrorResponseMessage) {
             bb.put(MessageType.ERROR);
-        } else if (responseMessage instanceof MsgPackScriptResponseMessage) {
-            bb.put(MessageType.MSGPACK_SCRIPT_RESPONSE);
+        } else if (responseMessage instanceof ScriptResponseMessage) {
+            bb.put(MessageType.SCRIPT_RESPONSE);
         }
 
         bb.putInt(responseBytes.length);
         bb.put(responseBytes);
     }
 
-    private static MsgPackScriptResponseMessage formatForMsgPackChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
-        final MsgPackScriptResponseMessage msgPackScriptResponseMessage = new MsgPackScriptResponseMessage();
+    private static ScriptResponseMessage formatForMsgPackChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
+        final ScriptResponseMessage msgPackScriptResponseMessage = new ScriptResponseMessage();
 
         if (specificMessage.metaGetInSession()){
             msgPackScriptResponseMessage.Session = specificMessage.Session;
@@ -314,8 +314,8 @@ public class RexProRequest {
         return converter.convert(result);
     }
 
-    private static MsgPackScriptResponseMessage formatForConsoleChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
-        final MsgPackScriptResponseMessage consoleScriptResponseMessage = new MsgPackScriptResponseMessage();
+    private static ScriptResponseMessage formatForConsoleChannel(final ScriptRequestMessage specificMessage, final RexProSession session, final Object result) throws Exception {
+        final ScriptResponseMessage consoleScriptResponseMessage = new ScriptResponseMessage();
 
         if (specificMessage.metaGetInSession()){
             consoleScriptResponseMessage.Session = specificMessage.Session;

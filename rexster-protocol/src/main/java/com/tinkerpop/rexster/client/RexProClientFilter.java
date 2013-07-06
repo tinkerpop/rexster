@@ -1,18 +1,8 @@
 package com.tinkerpop.rexster.client;
 
+import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
-import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.MessageTokens;
-import com.tinkerpop.rexster.protocol.msg.MessageType;
-import com.tinkerpop.rexster.protocol.msg.MessageUtil;
-import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.RexProBindings;
-import com.tinkerpop.rexster.protocol.msg.RexProMessage;
-import com.tinkerpop.rexster.protocol.msg.RexProMessageMeta;
-import com.tinkerpop.rexster.protocol.msg.RexProScriptResult;
-import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
-import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
-import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsTemplate;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -126,8 +116,8 @@ public class RexProClientFilter extends BaseFilter {
                 message = unpacker.read(SessionResponseMessage.class);
             } else if (messageType == MessageType.ERROR) {
                 message = unpacker.read(ErrorResponseMessage.class);
-            } else if (messageType == MessageType.MSGPACK_SCRIPT_RESPONSE) {
-                message = unpacker.read(MsgPackScriptResponseMessage.class);
+            } else if (messageType == MessageType.SCRIPT_RESPONSE) {
+                message = unpacker.read(ScriptResponseMessage.class);
             }
 
             if (message == null) {
@@ -246,8 +236,8 @@ public class RexProClientFilter extends BaseFilter {
             bb.put(MessageType.SCRIPT_REQUEST);
         } else if (msg instanceof SessionRequestMessage) {
             bb.put(MessageType.SESSION_REQUEST);
-        } else if (msg instanceof MsgPackScriptResponseMessage) {
-            bb.put(MessageType.MSGPACK_SCRIPT_RESPONSE);
+        } else if (msg instanceof ScriptResponseMessage) {
+            bb.put(MessageType.SCRIPT_RESPONSE);
         }
 
         bb.putInt(rexProMessageAsBytes.length);

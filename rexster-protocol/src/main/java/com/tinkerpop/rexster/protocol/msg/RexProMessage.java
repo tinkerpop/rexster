@@ -108,8 +108,8 @@ public abstract class RexProMessage {
             bb.put(MessageType.SCRIPT_REQUEST);
         } else if (msg instanceof SessionRequestMessage) {
             bb.put(MessageType.SESSION_REQUEST);
-        } else if (msg instanceof MsgPackScriptResponseMessage) {
-            bb.put(MessageType.MSGPACK_SCRIPT_RESPONSE);
+        } else if (msg instanceof ScriptResponseMessage) {
+            bb.put(MessageType.SCRIPT_RESPONSE);
         }
 
         bb.putInt(message.length);

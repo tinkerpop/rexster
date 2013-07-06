@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.MsgPackScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import org.apache.commons.configuration.Configuration;
@@ -158,8 +158,8 @@ public class RexsterClient {
             throw new IOException(String.format("Message received response timeoutConnection (%s s)", this.timeoutConnection));
         }
 
-        if (resultMessage instanceof MsgPackScriptResponseMessage) {
-            final MsgPackScriptResponseMessage msg = (MsgPackScriptResponseMessage) resultMessage;
+        if (resultMessage instanceof ScriptResponseMessage) {
+            final ScriptResponseMessage msg = (ScriptResponseMessage) resultMessage;
 
             // when rexster returns an iterable it's read out of the unpacker as a single object much like a single
             // vertex coming back from rexster.  basically, this is the difference between g.v(1) and g.v(1).map.
@@ -180,8 +180,8 @@ public class RexsterClient {
 
             return results;
 
-        } else if (resultMessage instanceof MsgPackScriptResponseMessage) {
-            final MsgPackScriptResponseMessage msg = (MsgPackScriptResponseMessage) resultMessage;
+        } else if (resultMessage instanceof ScriptResponseMessage) {
+            final ScriptResponseMessage msg = (ScriptResponseMessage) resultMessage;
             final List<T> results = new ArrayList<T>();
             for (String line : (String[]) msg.Results.get()) {
                 results.add((T) line);
