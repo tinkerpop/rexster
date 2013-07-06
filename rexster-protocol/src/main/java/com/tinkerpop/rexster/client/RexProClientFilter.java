@@ -45,25 +45,34 @@ public class RexProClientFilter extends BaseFilter {
         msgpack.register(RexProScriptResult.class, ResultsTemplate.getInstance());
     }
 
+    //version byte
+    //serializer byte
+    //reserved byte (4x)
+    //message type byte
+    //body length int
+    private static int ENVELOPE_LENGTH = 1 + 1 + 4 + 1 + 4;
+
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
         // Get the source buffer from the context
         final Buffer sourceBuffer = ctx.getMessage();
         final int sourceBufferLength = sourceBuffer.remaining();
 
         // If source buffer doesn't contain header
-        if (sourceBufferLength < RexProMessage.MESSAGE_HEADER_SIZE) {
+        if (sourceBufferLength < ENVELOPE_LENGTH) {
             // stop the filterchain processing and store sourceBuffer to be
             // used next time
             return ctx.getStopAction(sourceBuffer);
         }
 
         final byte messageVersion = sourceBuffer.get(0);
-        final byte messageType = sourceBuffer.get(1);
-        final int bodyLength = sourceBuffer.getInt(2);
-        final int completeMessageLength = RexProMessage.MESSAGE_HEADER_SIZE + bodyLength;
+        final byte serializerType = sourceBuffer.get(1);
+        //bytes 2,3,4,5 are reserved for future use
+        final byte messageType = sourceBuffer.get(6);
+        final int bodyLength = sourceBuffer.getInt(7);
+        final int completeMessageLength = ENVELOPE_LENGTH + bodyLength;
 
         //check message version
-        if (messageVersion != 0) {
+        if (messageVersion != 1) {
             logger.warn("unsupported rexpro version: " + messageVersion);
             return ctx.getStopAction();
         }
@@ -88,7 +97,7 @@ public class RexProClientFilter extends BaseFilter {
                 sourceBuffer.split(completeMessageLength) : null;
 
         byte[] messageAsBytes = new byte[bodyLength];
-        sourceBuffer.position(RexProMessage.MESSAGE_HEADER_SIZE);
+        sourceBuffer.position(ENVELOPE_LENGTH);
         sourceBuffer.get(messageAsBytes);
 
         if (logger.isDebugEnabled()) {
@@ -221,9 +230,18 @@ public class RexProClientFilter extends BaseFilter {
         // Retrieve the memory manager
         final MemoryManager memoryManager =
                 ctx.getConnection().getTransport().getMemoryManager();
-        final Buffer bb = memoryManager.allocate(RexProMessage.MESSAGE_HEADER_SIZE + rexProMessageAsBytes.length);
+        final Buffer bb = memoryManager.allocate(ENVELOPE_LENGTH + rexProMessageAsBytes.length);
 
         //add version
+        bb.put((byte) 1);
+
+        //add serializer
+        bb.put((byte) 0);
+
+        //add reserved bytes
+        bb.put((byte) 0);
+        bb.put((byte) 0);
+        bb.put((byte) 0);
         bb.put((byte) 0);
 
         if (msg instanceof SessionResponseMessage) {
