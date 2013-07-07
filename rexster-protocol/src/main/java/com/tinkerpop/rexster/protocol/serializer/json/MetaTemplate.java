@@ -1,52 +1,47 @@
 package com.tinkerpop.rexster.protocol.serializer.json;
 
-import com.google.gson.*;
 import com.tinkerpop.rexster.protocol.msg.RexProMessageMeta;
 
-import java.lang.reflect.Type;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.node.*;
+
+import java.util.Iterator;
 import java.util.Map;
 
-public class MetaTemplate implements JsonSerializer<RexProMessageMeta>, JsonDeserializer<RexProMessageMeta> {
+public class MetaTemplate {
 
-    @Override
-    public RexProMessageMeta deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public RexProMessageMeta deserialize(JsonNode json) {
         RexProMessageMeta meta = new RexProMessageMeta();
-        if (!(json instanceof JsonObject)) {
-            return meta;
-        }
-        JsonObject obj = (JsonObject) json;
-        for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
-            JsonPrimitive p = (JsonPrimitive) entry.getValue();
-            if (p == null) {
-                meta.put(entry.getKey(), null);
-            } else if (p.isBoolean()) {
-                meta.put(entry.getKey(), p.getAsBoolean());
-            } else if (p.isNumber()) {
-                Number n = p.getAsNumber();
-                if (n instanceof Float || n instanceof Double) {
-                    meta.put(entry.getKey(), p.getAsDouble());
-                } else {
-                    meta.put(entry.getKey(), p.getAsLong());
-                }
-            } else if (p.isString()) {
-                meta.put(entry.getKey(), p.getAsString());
+        Iterator<String> itr = json.getFieldNames();
+        while (itr.hasNext()) {
+            String key = itr.next();
+            JsonNode val = json.get(key);
+            if (val == null) {
+                meta.put(key, null);
+            } else if (val.isBoolean()) {
+                meta.put(key, val.asBoolean());
+            } else if (val.isFloatingPointNumber()) {
+                meta.put(key, val.asDouble());
+            } else if (val.isIntegralNumber()) {
+                meta.put(key, val.asLong());
+            } else if (val.isTextual()) {
+                meta.put(key, val.asText());
             }
         }
         return meta;
     }
 
-    @Override
-    public JsonElement serialize(RexProMessageMeta src, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject map = new JsonObject();
+    public JsonNode serialize(RexProMessageMeta src) {
+        ObjectNode map = new ObjectNode(JsonNodeFactory.instance);
         for (Map.Entry<String, Object> entry: src.entrySet()) {
             if (entry.getValue() instanceof String) {
-                map.add(entry.getKey(), new JsonPrimitive((String)entry.getValue()));
-            } else if (entry.getValue() instanceof Number) {
-                map.add(entry.getKey(), new JsonPrimitive((Number)entry.getValue()));
-            } else if (entry.getValue() instanceof Character) {
-                map.add(entry.getKey(), new JsonPrimitive((Character)entry.getValue()));
+                map.put(entry.getKey(), new TextNode((String) entry.getValue()));
+            } else if (entry.getValue() instanceof Integer || entry.getValue() instanceof Long) {
+                map.put(entry.getKey(), new LongNode((Long) entry.getValue()));
+            } else if (entry.getValue() instanceof Float || entry.getValue() instanceof Double) {
+                map.put(entry.getKey(), new DoubleNode((Double) entry.getValue()));
             } else if (entry.getValue() instanceof Boolean) {
-                map.add(entry.getKey(), new JsonPrimitive((Boolean)entry.getValue()));
+                map.put(entry.getKey(), BooleanNode.valueOf((Boolean) entry.getValue()));
             }
         }
         return map;
