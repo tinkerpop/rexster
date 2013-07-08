@@ -3,7 +3,6 @@ package com.tinkerpop.rexster.rexpro;
 import com.tinkerpop.rexster.AbstractRexProIntegrationTest;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.client.RexsterClient;
-import com.tinkerpop.rexster.client.RexsterClientFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -22,14 +21,14 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
     public void shouldOpenAndCloseLotsOfClients() throws Exception {
         final int numberOfClientsToOpen = 100;
         for (int ix = 0; ix < numberOfClientsToOpen; ix++) {
-            final RexsterClient client = RexsterClientFactory.open();
+            final RexsterClient client = getClient();
             client.close();
         }
     }
 
     @Test
     public void executeExercise() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
 
         final List<Map<String, Object>> mapResults = client.execute("[val:1+1]");
         Assert.assertEquals(1, mapResults.size());
@@ -56,7 +55,7 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
 
     @Test
     public void executeMapValueConversion() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
 
         // all whole numerics convert to long
         // all float go to double
@@ -75,7 +74,7 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
 
     @Test
     public void executeReturnGraphElementsValueConversion() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
 
         final List<Map<String, Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1)");
         Assert.assertEquals(1, vertexResults.size());
@@ -91,7 +90,7 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
 
     @Test
     public void executeReturnGraphElementsAsMapValueConversion() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
 
         final List<Map<String, Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1).map");
         Assert.assertEquals(1, vertexResults.size());
@@ -104,7 +103,7 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
 
     @Test
     public void executeReturnGraphElementsAsSelectValueConversion() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
 
         final List<Map<String,Object>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1).as('a').out.as('b').select{it.name}{it.age}");
         Assert.assertEquals(3, vertexResults.size());
@@ -145,7 +144,7 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
     public void executeAndReturnMapWithGraphElementKey() throws Exception {
         // maps of graph element keys get serialized to nested maps like:
         // {elementId : { _element : 1, _contents : { standard vertex/edge serialization } }
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
 
         final List<Map<String, Map<String,Object>>> vertexResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.V.out.groupCount.cap");
         Assert.assertEquals(1, vertexResults.size());
@@ -162,7 +161,7 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
 
     @Test
     public void executeAndReturnMapWithPrimitiveKey() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
 
         final List<Map<Integer, String>> vertexResults = client.execute("[1:'test']");
         Assert.assertEquals(1, vertexResults.size());
@@ -176,7 +175,7 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
 
     @Test
     public void executeAndReturnTree() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
 
         final List<Object> treeResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.V.out.tree.cap");
         Assert.assertEquals(1, treeResults.size());
@@ -197,7 +196,7 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
 
     @Test
     public void executeForProperties() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
 
         final List<Map> stuffs = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1).properties");
         Assert.assertEquals(1, stuffs.size());
@@ -218,7 +217,7 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
 
     @Test
     public void executeForTextWithBreaks() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
 
         // note that you have to escape the \r\n for it to be understood as a property value else the script engine
         // assumes it is line breaks in the script itself.

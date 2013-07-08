@@ -2,7 +2,6 @@ package com.tinkerpop.rexster.rexpro;
 
 import com.tinkerpop.rexster.AbstractRexProIntegrationTest;
 import com.tinkerpop.rexster.client.RexsterClient;
-import com.tinkerpop.rexster.client.RexsterClientFactory;
 import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
@@ -22,7 +21,7 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
 
     @Test
     public void testGraphObjMetaOnSessionlessRequest() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
 
         for (Map.Entry<String, Map<String,String>> entry : getAvailableGraphs(client).entrySet()) {
             final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
@@ -45,7 +44,7 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
      */
     @Test
     public void testBindingsDontStickAroundAfterRequests() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
 
         //create a session
         for (Map.Entry<String, Map<String,String>> entry : getAvailableGraphs(client).entrySet()) {
@@ -90,7 +89,7 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
 
     @Test
     public void testGraphObjMetaOnSessionedRequest() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
         RexProMessage inMsg;
 
         for (Map.Entry<String, Map<String,String>> entry : getAvailableGraphs(client).entrySet()) {
@@ -134,7 +133,7 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
 
     @Test
     public void testGraphObjMetaOnSessionWithExistingGraphObjFails() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
 
         for (Map.Entry<String, Map<String,String>> entry : getAvailableGraphs(client).entrySet()) {
             //create a session
@@ -166,7 +165,7 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
 
     @Test
     public void testDefiningNonExistentGraphNameFails() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
 
         final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
         scriptMessage.Script = "graph.addVertex()";
@@ -187,7 +186,7 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
      */
     @Test
     public void testQueryIsolation() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
         RexProMessage inMsg;
 
         //create a session
@@ -228,7 +227,7 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
 
     @Test
     public void testDisabledQueryIsolation() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
         RexProMessage inMsg;
 
         //create a session
@@ -268,7 +267,7 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
 
     @Test
     public void testDisabledQueryIsolationInSession() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
         RexProMessage inMsg;
 
         //create a session
@@ -310,7 +309,7 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
 
     @Test
     public void testTransactionMetaFlagWithoutSession() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
         RexProMessage inMsg;
 
         //create a session
@@ -340,7 +339,7 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
 
     @Test
     public void testTransactionMetaFlagWithSession() throws Exception {
-        final RexsterClient client = RexsterClientFactory.open();
+        final RexsterClient client = getClient();
 
         for (Map.Entry<String, Map<String,String>> entry : getAvailableGraphs(client).entrySet()) {
             final ScriptRequestMessage scriptMessage = new ScriptRequestMessage();
