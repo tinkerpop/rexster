@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class RexsterClientIntegrationTest extends AbstractRexProIntegrationTest {
+public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexProIntegrationTest {
 
     @Test
     public void shouldOpenAndCloseLotsOfClients() throws Exception {

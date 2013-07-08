@@ -30,6 +30,8 @@ public abstract class AbstractRexProIntegrationTest {
         EngineController.configure(-1, null);
     }
 
+    public abstract RexsterClient getClient() throws Exception;
+
     @Before
     public void setUp() throws Exception {
         clean();

@@ -17,7 +17,7 @@ import java.util.UUID;
  *
  * @author Blake Eggleston (bdeggleston.github.com)
  */
-public class SessionRequestMessageTest extends AbstractRexProIntegrationTest {
+public abstract class AbstractSessionRequestMessageTest extends AbstractRexProIntegrationTest {
 
     /**
      * Tests that requests to create and destroy sessions work as expected
