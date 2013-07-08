@@ -4,9 +4,7 @@ import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.protocol.serializer.RexProSerializer;
 import com.tinkerpop.rexster.protocol.serializer.json.JSONSerializer;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
-import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
 import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
-import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsTemplate;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Buffer;
@@ -14,11 +12,7 @@ import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;
 import org.glassfish.grizzly.memory.MemoryManager;
-import org.msgpack.MessagePack;
-import org.msgpack.packer.Packer;
-import org.msgpack.unpacker.Unpacker;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -29,12 +23,6 @@ import java.io.IOException;
  */
 public class RexProClientFilter extends BaseFilter {
     private static final Logger logger = Logger.getLogger(RexProClientFilter.class);
-    private static final MessagePack msgpack = new MessagePack();
-    static {
-        msgpack.register(RexProMessageMeta.class, MetaTemplate.getInstance());
-        msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
-        msgpack.register(RexProScriptResult.class, ResultsTemplate.getInstance());
-    }
 
     private static MsgPackSerializer msgPackSerializer = new MsgPackSerializer();
     private static JSONSerializer jsonSerializer = new JSONSerializer();
@@ -209,11 +197,9 @@ public class RexProClientFilter extends BaseFilter {
             // have executed and likely committed with success.  just means the response won't get back cleanly
             // to the client.
             final ByteArrayOutputStream rpms = new ByteArrayOutputStream();
-            final Packer p = msgpack.createPacker(rpms);
             ErrorResponseMessage errorMsg = MessageUtil.createErrorResponse(msg.Request, msg.Session,
                     ErrorResponseMessage.RESULT_SERIALIZATION_ERROR,
                     MessageTokens.ERROR_RESULT_SERIALIZATION);
-            p.write(errorMsg);
             rexProMessageAsBytes = rpms.toByteArray();
 
             msg = errorMsg;
