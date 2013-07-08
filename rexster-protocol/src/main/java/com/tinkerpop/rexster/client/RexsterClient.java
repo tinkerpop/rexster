@@ -56,6 +56,28 @@ public class RexsterClient {
 
     protected static ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>> responses = new ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>>();
 
+    /**
+     * Wraps messages sent to the transport filter, and
+     * includes meta data
+     */
+    class MessageContainer {
+        private byte serializer;
+        private RexProMessage message;
+
+        MessageContainer(byte serializer, RexProMessage message) {
+            this.serializer = serializer;
+            this.message = message;
+        }
+
+        byte getSerializer() {
+            return serializer;
+        }
+
+        RexProMessage getMessage() {
+            return message;
+        }
+    }
+
     protected RexsterClient(final Configuration configuration, final TCPNIOTransport transport) {
         this.timeoutConnection = configuration.getInt(RexsterClientTokens.CONFIG_TIMEOUT_CONNECTION_MS);
         this.timeoutRead = configuration.getInt(RexsterClientTokens.CONFIG_TIMEOUT_READ_MS);
@@ -255,7 +277,7 @@ public class RexsterClient {
             try {
                 final NIOConnection connection = nextConnection();
                 if (connection != null && connection.isOpen()) {
-                    final GrizzlyFuture future = connection.write(toSend);
+                    final GrizzlyFuture future = connection.write(new MessageContainer(serializer, toSend));
                     future.get(this.timeoutWrite, TimeUnit.MILLISECONDS);
                     sent = true;
                 }

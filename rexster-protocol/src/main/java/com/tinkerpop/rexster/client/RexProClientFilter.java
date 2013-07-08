@@ -1,6 +1,9 @@
 package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.protocol.msg.*;
+import com.tinkerpop.rexster.protocol.serializer.RexProSerializer;
+import com.tinkerpop.rexster.protocol.serializer.json.JSONSerializer;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
 import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsTemplate;
@@ -32,6 +35,9 @@ public class RexProClientFilter extends BaseFilter {
         msgpack.register(RexProBindings.class, RexProBindings.SerializationTemplate.getInstance());
         msgpack.register(RexProScriptResult.class, ResultsTemplate.getInstance());
     }
+
+    private static MsgPackSerializer msgPackSerializer = new MsgPackSerializer();
+    private static JSONSerializer jsonSerializer = new JSONSerializer();
 
     //version byte
     //serializer byte
@@ -99,25 +105,27 @@ public class RexProClientFilter extends BaseFilter {
                     messageVersion, messageType, bodyLength, sb.toString().trim()));
         }
 
-        final ByteArrayInputStream in = new ByteArrayInputStream(messageAsBytes);
-        final Unpacker unpacker = msgpack.createUnpacker(in);
-
         try {
-            unpacker.setArraySizeLimit(Integer.MAX_VALUE);
-            unpacker.setMapSizeLimit(Integer.MAX_VALUE);
-            unpacker.setRawSizeLimit(Integer.MAX_VALUE);
+            RexProSerializer serializer;
+            if (serializerType == msgPackSerializer.serializerID()){
+                serializer = msgPackSerializer;
+            } else if (serializerType == jsonSerializer.serializerID()) {
+                serializer = jsonSerializer;
+            } else {
+                throw new RexProException(String.format("unknown serializer type: %s", serializerType));
+            }
 
             RexProMessage message = null;
             if (messageType == MessageType.SCRIPT_REQUEST) {
-                message = unpacker.read(ScriptRequestMessage.class);
+                message = serializer.deserialize(messageAsBytes, ScriptRequestMessage.class);
             } else if (messageType == MessageType.SESSION_REQUEST) {
-                message = unpacker.read(SessionRequestMessage.class);
+                message = serializer.deserialize(messageAsBytes, SessionRequestMessage.class);
             } else if (messageType == MessageType.SESSION_RESPONSE) {
-                message = unpacker.read(SessionResponseMessage.class);
+                message = serializer.deserialize(messageAsBytes, SessionResponseMessage.class);
             } else if (messageType == MessageType.ERROR) {
-                message = unpacker.read(ErrorResponseMessage.class);
+                message = serializer.deserialize(messageAsBytes, ErrorResponseMessage.class);
             } else if (messageType == MessageType.SCRIPT_RESPONSE) {
-                message = unpacker.read(ScriptResponseMessage.class);
+                message = serializer.deserialize(messageAsBytes, ScriptResponseMessage.class);
             }
 
             if (message == null) {
@@ -160,39 +168,42 @@ public class RexProClientFilter extends BaseFilter {
             }
 
             return ctx.getStopAction();
-        } finally {
-            unpacker.close();
         }
     }
 
     public NextAction handleWrite(final FilterChainContext ctx) throws IOException {
 
         Object rawMsg = ctx.getMessage();
-        if(rawMsg instanceof byte[]) {
-            byte[] bytes = (byte[]) rawMsg;
 
-            // Retrieve the memory manager
-            final MemoryManager memoryManager = ctx.getConnection().getTransport().getMemoryManager();
-            final Buffer bb = memoryManager.allocate(bytes.length);
-            bb.put(bytes);
-
-            // Set the Buffer as a context message
-            ctx.setMessage(bb.flip());
-            // Instruct the FilterChain to call the next filter
-            return ctx.getInvokeAction();
-        }
-
+        RexsterClient.MessageContainer container = (RexsterClient.MessageContainer) rawMsg;
         // Get the source message to be written
-        RexProMessage msg = (RexProMessage) rawMsg;
+        byte serializerType = container.getSerializer();
+        RexProMessage msg = container.getMessage();
 
-        final ByteArrayOutputStream rexProMessageStream = new ByteArrayOutputStream();
-        //TODO: create RexProMessageMeta template
-        final Packer packer = msgpack.createPacker(rexProMessageStream);
         byte[] rexProMessageAsBytes = new byte[0];
 
         try {
-            packer.write(msg);
-            rexProMessageAsBytes = rexProMessageStream.toByteArray();
+            RexProSerializer serializer;
+            if (serializerType == msgPackSerializer.serializerID()){
+                serializer = msgPackSerializer;
+            } else if (serializerType == jsonSerializer.serializerID()) {
+                serializer = jsonSerializer;
+            } else {
+                throw new RexProException(String.format("unknown serializer type: %s", serializerType));
+            }
+
+            if (msg instanceof SessionResponseMessage) {
+                rexProMessageAsBytes = serializer.serialize((SessionResponseMessage) msg, SessionResponseMessage.class);
+            } else if (msg instanceof ErrorResponseMessage) {
+                rexProMessageAsBytes = serializer.serialize((ErrorResponseMessage) msg, ErrorResponseMessage.class);
+            } else if (msg instanceof ScriptRequestMessage) {
+                rexProMessageAsBytes = serializer.serialize((ScriptRequestMessage) msg, ScriptRequestMessage.class);
+            } else if (msg instanceof SessionRequestMessage) {
+                rexProMessageAsBytes = serializer.serialize((SessionRequestMessage) msg, SessionRequestMessage.class);
+            } else if (msg instanceof ScriptResponseMessage) {
+                rexProMessageAsBytes = serializer.serialize((ScriptResponseMessage) msg, ScriptResponseMessage.class);
+            }
+
         } catch (Exception ex) {
             // if there's an error during serialization with msgpack this could tank.  the script will already
             // have executed and likely committed with success.  just means the response won't get back cleanly
@@ -207,8 +218,6 @@ public class RexProClientFilter extends BaseFilter {
 
             msg = errorMsg;
 
-        } finally {
-            packer.close();
         }
 
         // Retrieve the memory manager
