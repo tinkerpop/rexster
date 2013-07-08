@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.protocol.server;
 
 import com.tinkerpop.rexster.gremlin.converter.ConsoleResultConverter;
 import com.tinkerpop.rexster.protocol.serializer.RexProSerializer;
+import com.tinkerpop.rexster.protocol.serializer.json.JSONSerializer;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsTemplate;
@@ -113,9 +114,14 @@ public class RexProRequest {
         this.session = session;
     }
 
-    private static MsgPackSerializer _serializer = new MsgPackSerializer();
+    private static MsgPackSerializer msgPackSerializer = new MsgPackSerializer();
+    private static JSONSerializer jsonSerializer = new JSONSerializer();
     protected RexProSerializer getSerializer() {
-        return _serializer;
+        if (serializerType == jsonSerializer.serializerID()){
+            return jsonSerializer;
+        } else {
+            return msgPackSerializer;
+        }
     }
 
     private void deserializeMessage() throws IOException{
