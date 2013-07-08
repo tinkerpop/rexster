@@ -52,6 +52,7 @@ public class RexsterClient {
     private final TCPNIOTransport transport;
     private final String[] hosts;
     private final int port;
+    private final byte serializer;
 
     protected static ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>> responses = new ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>>();
 
@@ -70,6 +71,7 @@ public class RexsterClient {
         this.transport = transport;
         this.port = configuration.getInt(RexsterClientTokens.CONFIG_PORT);
         this.hosts = configuration.getStringArray(RexsterClientTokens.CONFIG_HOSTNAME);
+        this.serializer = configuration.getByte(RexsterClientTokens.CONFIG_SERIALIZER, (byte) 0);
 
         this.connections = new NIOConnection[this.hosts.length];
     }

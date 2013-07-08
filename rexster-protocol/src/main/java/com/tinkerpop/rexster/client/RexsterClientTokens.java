@@ -17,4 +17,5 @@ public class RexsterClientTokens {
     public static final String CONFIG_MESSAGE_RETRY_WAIT_MS = "message-retry-wait-ms";
     public static final String CONFIG_MAX_ASYNC_WRITE_QUEUE_BYTES = "max-async-write-queue-size";
     public static final String CONFIG_LANGUAGE = "language";
+    public static final String CONFIG_SERIALIZER = "serializer";
 }
