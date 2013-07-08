@@ -22,4 +22,9 @@ public class ErrorResponseMessageTemplate extends RexProMessageTemplate<ErrorRes
         msg.ErrorMessage = array.get(3).asText();
         return msg;
     }
+
+    public static ErrorResponseMessageTemplate instance = new ErrorResponseMessageTemplate();
+    static public ErrorResponseMessageTemplate getInstance() {
+        return instance;
+    }
 }

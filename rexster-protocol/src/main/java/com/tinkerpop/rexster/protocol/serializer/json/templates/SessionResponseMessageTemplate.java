@@ -23,4 +23,9 @@ public class SessionResponseMessageTemplate extends RexProMessageTemplate<Sessio
         msg.Languages = (String[]) JsonConverter.fromJsonNode(array);
         return msg;
     }
+
+    public static SessionResponseMessageTemplate instance = new SessionResponseMessageTemplate();
+    static public SessionResponseMessageTemplate getInstance() {
+        return instance;
+    }
 }

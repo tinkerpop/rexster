@@ -27,4 +27,9 @@ public class ScriptResponseMessageTemplate extends RexProMessageTemplate<ScriptR
         msg.Bindings = BindingsTemplate.getInstance().deserialize(array.get(4));
         return msg;
     }
+
+    public static ScriptResponseMessageTemplate instance = new ScriptResponseMessageTemplate();
+    static public ScriptResponseMessageTemplate getInstance() {
+        return instance;
+    }
 }

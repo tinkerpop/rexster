@@ -24,4 +24,9 @@ public class SessionRequestMessageTemplate extends RexProMessageTemplate<Session
         msg.Password = array.get(4).asText();
         return msg;
     }
+
+    public static SessionRequestMessageTemplate instance = new SessionRequestMessageTemplate();
+    static public SessionRequestMessageTemplate getInstance() {
+        return instance;
+    }
 }
