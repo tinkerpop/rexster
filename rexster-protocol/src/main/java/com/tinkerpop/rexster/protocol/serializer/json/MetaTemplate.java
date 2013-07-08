@@ -8,8 +8,9 @@ import org.codehaus.jackson.node.*;
 import java.util.Iterator;
 import java.util.Map;
 
-public class MetaTemplate {
+public class MetaTemplate implements JsonTemplate<RexProMessageMeta> {
 
+    @Override
     public RexProMessageMeta deserialize(JsonNode json) {
         RexProMessageMeta meta = new RexProMessageMeta();
         Iterator<String> itr = json.getFieldNames();
@@ -31,6 +32,7 @@ public class MetaTemplate {
         return meta;
     }
 
+    @Override
     public JsonNode serialize(RexProMessageMeta src) {
         ObjectNode map = new ObjectNode(JsonNodeFactory.instance);
         for (Map.Entry<String, Object> entry: src.entrySet()) {

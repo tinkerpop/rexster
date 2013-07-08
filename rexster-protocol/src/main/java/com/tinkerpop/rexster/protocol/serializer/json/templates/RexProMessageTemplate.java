@@ -1,6 +1,7 @@
 package com.tinkerpop.rexster.protocol.serializer.json.templates;
 
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.serializer.json.JsonTemplate;
 import com.tinkerpop.rexster.protocol.serializer.json.MetaTemplate;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ArrayNode;
@@ -9,7 +10,7 @@ import org.codehaus.jackson.node.TextNode;
 
 import java.util.UUID;
 
-public abstract class RexProMessageTemplate<Message extends RexProMessage> {
+public abstract class RexProMessageTemplate<Message extends RexProMessage> implements JsonTemplate<Message> {
 
     protected abstract Message instantiateMessage();
 
@@ -32,8 +33,8 @@ public abstract class RexProMessageTemplate<Message extends RexProMessage> {
         return msgArray;
     }
 
-    public Message deserialize(ArrayNode json) {
-        ArrayNode msgArray = json;
+    public Message deserialize(JsonNode json) {
+        ArrayNode msgArray = (ArrayNode) json;
         return readMessageArray(msgArray, instantiateMessage());
     }
 }
