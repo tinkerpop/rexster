@@ -16,7 +16,9 @@ public class JsonConverter {
      * @return
      */
     public static JsonNode toJsonNode(Object obj) {
-        if (obj instanceof Map) {
+        if (obj == null) {
+            return NullNode.getInstance();
+        } else if (obj instanceof Map) {
             ObjectNode map = new ObjectNode(JsonNodeFactory.instance);
             for (Map.Entry entry: ((Map<Object, Object>) obj).entrySet()) {
                 map.put(entry.getKey().toString(), toJsonNode(entry.getValue()));
@@ -28,8 +30,18 @@ public class JsonConverter {
                 array.add(toJsonNode(o));
             }
             return array;
-        } else if (obj instanceof Long || obj instanceof Integer) {
+        } else if (obj instanceof Object[]) {
+            ArrayNode array = new ArrayNode(JsonNodeFactory.instance);
+            for (Object o: (Object[]) obj) {
+                array.add(toJsonNode(o));
+            }
+            return array;
+        } else if (obj instanceof Integer) {
+            return new IntNode((Integer) obj);
+        } else if (obj instanceof Long) {
             return new LongNode((Long) obj);
+        } else if (obj instanceof Double || obj instanceof Float) {
+            return new DoubleNode((Double) obj);
         } else if (obj instanceof Double || obj instanceof Float) {
             return new DoubleNode((Double) obj);
         } else {
@@ -54,9 +66,9 @@ public class JsonConverter {
             return map;
         } else if (node.isArray()) {
             ArrayNode arrayNode = (ArrayNode) node;
-            ArrayList<Object> array = new ArrayList<Object>(arrayNode.size());
+            ArrayList<Object> array = new ArrayList<Object>();
             for (int i=0; i<arrayNode.size(); i++) {
-                array.set(i, fromJsonNode(arrayNode.get(i)));
+                array.add(fromJsonNode(arrayNode.get(i)));
             }
             return array;
         } else if (node.isFloatingPointNumber()) {

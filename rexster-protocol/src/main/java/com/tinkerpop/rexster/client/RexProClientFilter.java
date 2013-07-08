@@ -202,7 +202,8 @@ public class RexProClientFilter extends BaseFilter {
                     MessageTokens.ERROR_RESULT_SERIALIZATION);
             rexProMessageAsBytes = rpms.toByteArray();
 
-            msg = errorMsg;
+            ctx.setMessage(null);
+            return ctx.getStopAction();
 
         }
 
@@ -215,7 +216,7 @@ public class RexProClientFilter extends BaseFilter {
         bb.put((byte) 1);
 
         //add serializer
-        bb.put((byte) 0);
+        bb.put(serializerType);
 
         //add reserved bytes
         bb.put((byte) 0);

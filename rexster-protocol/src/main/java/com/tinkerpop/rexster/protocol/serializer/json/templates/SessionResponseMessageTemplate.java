@@ -4,6 +4,8 @@ import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import com.tinkerpop.rexster.protocol.serializer.json.JsonConverter;
 import org.codehaus.jackson.node.ArrayNode;
 
+import java.util.ArrayList;
+
 public class SessionResponseMessageTemplate extends RexProMessageTemplate<SessionResponseMessage> {
 
     @Override
@@ -20,7 +22,8 @@ public class SessionResponseMessageTemplate extends RexProMessageTemplate<Sessio
     @Override
     protected SessionResponseMessage readMessageArray(ArrayNode array, SessionResponseMessage msg) {
         super.readMessageArray(array, msg);
-        msg.Languages = (String[]) JsonConverter.fromJsonNode(array);
+        ArrayList<String> languages = (ArrayList<String>) JsonConverter.fromJsonNode(array.get(3));
+        msg.Languages = languages.toArray(new String[languages.size()]);
         return msg;
     }
 

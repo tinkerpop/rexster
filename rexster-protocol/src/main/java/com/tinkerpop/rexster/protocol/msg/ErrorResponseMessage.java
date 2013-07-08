@@ -31,7 +31,7 @@ public class ErrorResponseMessage extends RexProMessage {
     }
 
     public Integer metaGetFlag() {
-        return (Integer) Meta.get(FLAG_META_KEY);
+        return ((Long)Meta.get(FLAG_META_KEY)).intValue();
     }
 
     public void metaSetFlag(Integer val) {
