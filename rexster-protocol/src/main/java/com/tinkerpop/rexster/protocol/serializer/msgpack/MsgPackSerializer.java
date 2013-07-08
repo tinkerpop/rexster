@@ -38,4 +38,9 @@ public class MsgPackSerializer implements RexProSerializer {
         msgpack.lookup(messageClass).write(pk, message);
         return pk.toByteArray();
     }
+
+    @Override
+    public byte serializerID() {
+        return 0;
+    }
 }

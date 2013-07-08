@@ -13,4 +13,9 @@ public class JSONSerializer implements RexProSerializer {
     public <Message extends RexProMessage> byte[] serialize(Message message, Class<Message> messageClass) throws IOException {
         return null;
     }
+
+    @Override
+    public byte serializerID() {
+        return 1;
+    }
 }

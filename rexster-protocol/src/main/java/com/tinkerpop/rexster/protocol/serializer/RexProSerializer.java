@@ -28,4 +28,9 @@ public interface RexProSerializer {
      */
     public <Message extends RexProMessage> byte[] serialize(Message message, Class<Message> messageClass) throws IOException;
 
+    /**
+     * Returns the byte uniquely identifying this serializer
+     * @return
+     */
+    public byte serializerID();
 }
