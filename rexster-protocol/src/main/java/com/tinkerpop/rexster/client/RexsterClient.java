@@ -52,7 +52,7 @@ public class RexsterClient {
     private final TCPNIOTransport transport;
     private final String[] hosts;
     private final int port;
-    private final byte serializer;
+    private byte serializer;
 
     protected static ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>> responses = new ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>>();
 
@@ -323,4 +323,11 @@ public class RexsterClient {
         return scriptMessage;
     }
 
+    public byte getSerializer() {
+        return serializer;
+    }
+
+    public void setSerializer(byte serializer) {
+        this.serializer = serializer;
+    }
 }
