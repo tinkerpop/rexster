@@ -42,8 +42,8 @@ public class JsonConverter {
             return new LongNode((Long) obj);
         } else if (obj instanceof Double || obj instanceof Float) {
             return new DoubleNode((Double) obj);
-        } else if (obj instanceof Double || obj instanceof Float) {
-            return new DoubleNode((Double) obj);
+        } else if (obj instanceof Boolean) {
+            return BooleanNode.valueOf((Boolean) obj);
         } else {
             return new TextNode(obj.toString());
         }
@@ -75,6 +75,8 @@ public class JsonConverter {
             return node.asDouble();
         } else if (node.isIntegralNumber()) {
             return node.asLong();
+        } else if (node.isBoolean()) {
+            return node.asBoolean();
         } else {
             return node.asText();
         }
