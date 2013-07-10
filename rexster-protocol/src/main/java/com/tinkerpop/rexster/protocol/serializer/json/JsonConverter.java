@@ -55,7 +55,9 @@ public class JsonConverter {
      * @return
      */
     public static Object fromJsonNode(JsonNode node) {
-        if (node.isObject()) {
+        if (node.isNull()) {
+            return null;
+        } else if (node.isObject()) {
             Map<String, Object> map = new HashMap<String, Object>();
             ObjectNode objectNode = (ObjectNode) node;
             Iterator<String> iterator = objectNode.getFieldNames();
