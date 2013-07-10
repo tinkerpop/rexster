@@ -26,10 +26,10 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Serialize RexPro in the same thread that mutates the graph to prevent partial serialization of property values with Neo4j.
 * Improve logging for
 ** Graph configuration errors
-** Bad/missing Gremlin intiializations scripts.
+** Bad/missing Gremlin intialization scripts.
 ** Incoming RexPro messages
 * Changed `keys` for root of results in key indices REST API to `results` to be more consistent with the rest of the API.
-* Frames Kibble uses FramedGraphFactory to create graphs.
+* Frames Kibble uses @FramedGraphFactory@ to create graphs.
 
 ==<hr/>==
 
