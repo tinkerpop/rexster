@@ -40,8 +40,10 @@ public class JsonConverter {
             return new IntNode((Integer) obj);
         } else if (obj instanceof Long) {
             return new LongNode((Long) obj);
-        } else if (obj instanceof Double || obj instanceof Float) {
+        } else if (obj instanceof Double) {
             return new DoubleNode((Double) obj);
+        } else if (obj instanceof Float) {
+            return new DoubleNode((Float) obj);
         } else if (obj instanceof Boolean) {
             return BooleanNode.valueOf((Boolean) obj);
         } else {
