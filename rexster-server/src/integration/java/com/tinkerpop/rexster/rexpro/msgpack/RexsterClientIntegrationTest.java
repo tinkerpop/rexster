@@ -7,6 +7,11 @@ import com.tinkerpop.rexster.rexpro.AbstractRexsterClientIntegrationTest;
 public class RexsterClientIntegrationTest extends AbstractRexsterClientIntegrationTest {
 
     @Override
+    public boolean supportsPrimitiveKeys() {
+        return true;
+    }
+
+    @Override
     public RexsterClient getClient() throws Exception {
         return RexsterClientFactory.open();
     }

@@ -17,6 +17,13 @@ import java.util.Map;
  */
 public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexProIntegrationTest {
 
+    /**
+     * Indicates that the serializer supports primitive
+     * map key types, not just strings
+     * @return
+     */
+    public abstract boolean supportsPrimitiveKeys();
+
     @Test
     public void shouldOpenAndCloseLotsOfClients() throws Exception {
         final int numberOfClientsToOpen = 100;
@@ -161,6 +168,7 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
 
     @Test
     public void executeAndReturnMapWithPrimitiveKey() throws Exception {
+        if (!supportsPrimitiveKeys()) return;
         final RexsterClient client = getClient();
 
         final List<Map<Integer, String>> vertexResults = client.execute("[1:'test']");
