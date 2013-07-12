@@ -9,7 +9,7 @@ import java.io.IOException;
 public class SessionRequestMessageTemplate extends RexProMessageTemplate<SessionRequestMessage> {
 
     protected int messageArraySize() {
-        return super.messageArraySize() + 3;
+        return super.messageArraySize() + 2;
     }
 
     protected SessionRequestMessage instantiateMessage() {
