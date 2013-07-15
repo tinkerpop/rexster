@@ -13,6 +13,8 @@ import java.io.IOException;
 
 public class MsgPackSerializer implements RexProSerializer {
 
+    public static final byte SERIALIZER_ID = 0;
+
     private static final MessagePack msgpack = new MessagePack();
     static {
         //todo: get rid of the special classes and implement their serialization in the message templates
@@ -40,7 +42,7 @@ public class MsgPackSerializer implements RexProSerializer {
     }
 
     @Override
-    public byte serializerID() {
-        return 0;
+    public byte getSerializerId() {
+        return SERIALIZER_ID;
     }
 }

@@ -4,6 +4,7 @@ import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Connection;
@@ -93,7 +94,7 @@ public class RexsterClient {
         this.transport = transport;
         this.port = configuration.getInt(RexsterClientTokens.CONFIG_PORT);
         this.hosts = configuration.getStringArray(RexsterClientTokens.CONFIG_HOSTNAME);
-        this.serializer = configuration.getByte(RexsterClientTokens.CONFIG_SERIALIZER, (byte) 0);
+        this.serializer = configuration.getByte(RexsterClientTokens.CONFIG_SERIALIZER, MsgPackSerializer.SERIALIZER_ID);
 
         this.connections = new NIOConnection[this.hosts.length];
     }

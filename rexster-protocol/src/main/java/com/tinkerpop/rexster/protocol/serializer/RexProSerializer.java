@@ -32,5 +32,5 @@ public interface RexProSerializer {
      * Returns the byte uniquely identifying this serializer
      * @return
      */
-    public byte serializerID();
+    public byte getSerializerId();
 }

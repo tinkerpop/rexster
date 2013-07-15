@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.client;
 
+import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -38,6 +39,7 @@ public class RexsterClientFactory {
         addProperty(RexsterClientTokens.CONFIG_GRAPH_OBJECT_NAME, "g");
         addProperty(RexsterClientTokens.CONFIG_GRAPH_NAME, null);
         addProperty(RexsterClientTokens.CONFIG_TRANSACTION, true);
+        addProperty(RexsterClientTokens.CONFIG_SERIALIZER, MsgPackSerializer.SERIALIZER_ID);
     }};
 
     /**

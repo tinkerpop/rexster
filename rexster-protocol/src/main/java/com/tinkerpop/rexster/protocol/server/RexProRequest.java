@@ -117,7 +117,7 @@ public class RexProRequest {
     private static MsgPackSerializer msgPackSerializer = new MsgPackSerializer();
     private static JSONSerializer jsonSerializer = new JSONSerializer();
     protected RexProSerializer getSerializer() {
-        if (serializerType == jsonSerializer.serializerID()){
+        if (serializerType == jsonSerializer.getSerializerId()){
             return jsonSerializer;
         } else {
             return msgPackSerializer;

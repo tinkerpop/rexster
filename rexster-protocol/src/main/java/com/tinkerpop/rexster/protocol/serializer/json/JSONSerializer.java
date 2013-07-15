@@ -10,6 +10,8 @@ import java.io.IOException;
 
 public class JSONSerializer implements RexProSerializer {
 
+    public static final byte SERIALIZER_ID = 1;
+
     private static ObjectMapper mapper = new ObjectMapper();
 
     public <Message extends RexProMessage> Message deserialize(byte[] bytes, Class<Message> messageClass) throws IOException {
@@ -49,7 +51,7 @@ public class JSONSerializer implements RexProSerializer {
     }
 
     @Override
-    public byte serializerID() {
-        return 1;
+    public byte getSerializerId() {
+        return SERIALIZER_ID;
     }
 }

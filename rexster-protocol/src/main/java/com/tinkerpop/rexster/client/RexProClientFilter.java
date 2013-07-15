@@ -95,9 +95,9 @@ public class RexProClientFilter extends BaseFilter {
 
         try {
             RexProSerializer serializer;
-            if (serializerType == msgPackSerializer.serializerID()){
+            if (serializerType == msgPackSerializer.getSerializerId()){
                 serializer = msgPackSerializer;
-            } else if (serializerType == jsonSerializer.serializerID()) {
+            } else if (serializerType == jsonSerializer.getSerializerId()) {
                 serializer = jsonSerializer;
             } else {
                 throw new RexProException(String.format("unknown serializer type: %s", serializerType));
@@ -172,9 +172,9 @@ public class RexProClientFilter extends BaseFilter {
 
         try {
             RexProSerializer serializer;
-            if (serializerType == msgPackSerializer.serializerID()){
+            if (serializerType == msgPackSerializer.getSerializerId()){
                 serializer = msgPackSerializer;
-            } else if (serializerType == jsonSerializer.serializerID()) {
+            } else if (serializerType == jsonSerializer.getSerializerId()) {
                 serializer = jsonSerializer;
             } else {
                 throw new RexProException(String.format("unknown serializer type: %s", serializerType));
