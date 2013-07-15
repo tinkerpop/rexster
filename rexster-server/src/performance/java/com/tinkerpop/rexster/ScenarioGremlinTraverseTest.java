@@ -8,6 +8,7 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 import com.carrotsearch.junitbenchmarks.annotation.LabelType;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
+import com.tinkerpop.rexster.client.RexsterClient;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -60,23 +61,43 @@ public class ScenarioGremlinTraverseTest extends AbstractRexsterPerformanceTest 
 
     @BenchmarkOptions(benchmarkRounds = DEFAULT_BENCHMARK_ROUNDS, warmupRounds = DEFAULT_WARMUP_ROUNDS, concurrency = BenchmarkOptions.CONCURRENCY_SEQUENTIAL)
     @Test
-    public void rexproSessionless() throws Exception {
-        tryRexproSessionless();
+    public void rexproMsgPackSessionless() throws Exception {
+        tryRexproMsgPackSessionless();
     }
 
     @BenchmarkOptions(benchmarkRounds = DEFAULT_CONCURRENT_BENCHMARK_ROUNDS, warmupRounds = DEFAULT_CONCURRENT_WARMUP_ROUNDS, concurrency = BenchmarkOptions.CONCURRENCY_AVAILABLE_CORES)
     @Test
-    public void rexproSessionlessConcurrent() throws Exception {
-        tryRexproSessionless();
+    public void rexproMsgPackSessionlessConcurrent() throws Exception {
+        tryRexproMsgPackSessionless();
     }
 
-    private void tryRexproSessionless() throws Exception {
+    @BenchmarkOptions(benchmarkRounds = DEFAULT_BENCHMARK_ROUNDS, warmupRounds = DEFAULT_WARMUP_ROUNDS, concurrency = BenchmarkOptions.CONCURRENCY_SEQUENTIAL)
+    @Test
+    public void rexproJsonSessionless() throws Exception {
+        tryRexproJsonSessionless();
+    }
+
+    @BenchmarkOptions(benchmarkRounds = DEFAULT_CONCURRENT_BENCHMARK_ROUNDS, warmupRounds = DEFAULT_CONCURRENT_WARMUP_ROUNDS, concurrency = BenchmarkOptions.CONCURRENCY_AVAILABLE_CORES)
+    @Test
+    public void rexproJsonSessionlessConcurrent() throws Exception {
+        tryRexproJsonSessionless();
+    }
+
+    private void tryRexproMsgPackSessionless() throws Exception {
+        tryRexproSessionless(getRexsterClientMsgPackGratefulGraph());
+    }
+
+    private void tryRexproJsonSessionless() throws Exception {
+        tryRexproSessionless(getRexsterClientJsonGratefulGraph());
+    }
+
+    private void tryRexproSessionless(final RexsterClient client) throws Exception {
         String traversal = traversals[0];
         for (int iy = 1; iy < 26; iy++) {
             final Map<String, Object> m = new HashMap<String, Object>();
             m.put("x", iy * 8);
 
-            final List<Map<String, Object>> results = getRexsterClientGratefulGraph().execute(traversal, m);
+            final List<Map<String, Object>> results = client.execute(traversal, m);
             Assert.assertNotNull(results);
         }
 
@@ -85,7 +106,7 @@ public class ScenarioGremlinTraverseTest extends AbstractRexsterPerformanceTest 
             final Map<String, Object> m = new HashMap<String, Object>();
             m.put("x", artists[ix]);
 
-            final List<Map<String, Object>> results = getRexsterClientGratefulGraph().execute(traversal, m);
+            final List<Map<String, Object>> results = client.execute(traversal, m);
             Assert.assertNotNull(results);
         }
 
@@ -94,11 +115,10 @@ public class ScenarioGremlinTraverseTest extends AbstractRexsterPerformanceTest 
             final Map<String, Object> m = new HashMap<String, Object>();
             m.put("x", songs[ix]);
 
-            final List<Map<String, Object>> results = getRexsterClientGratefulGraph().execute(traversal, m);
+            final List<Map<String, Object>> results = client.execute(traversal, m);
             Assert.assertNotNull(results);
         }
     }
-
 
     private void tryRestGremlin() throws Exception {
         String traversal = traversals[0];

@@ -8,6 +8,7 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 import com.carrotsearch.junitbenchmarks.annotation.LabelType;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
+import com.tinkerpop.rexster.client.RexsterClient;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -51,21 +52,40 @@ public class ScenarioGremlinAdditionTest extends AbstractRexsterPerformanceTest 
 
     @BenchmarkOptions(benchmarkRounds = DEFAULT_BENCHMARK_ROUNDS, warmupRounds = DEFAULT_WARMUP_ROUNDS, concurrency = BenchmarkOptions.CONCURRENCY_SEQUENTIAL)
     @Test
-    public void rexproSessionless() throws Exception {
-        tryRexproSessionless();
+    public void rexproMsgPackSessionless() throws Exception {
+        tryRexproMsgPackSessionless();
     }
 
     @BenchmarkOptions(benchmarkRounds = DEFAULT_CONCURRENT_BENCHMARK_ROUNDS, warmupRounds = DEFAULT_CONCURRENT_WARMUP_ROUNDS, concurrency = BenchmarkOptions.CONCURRENCY_AVAILABLE_CORES)
     @Test
-    public void rexproSessionlessConcurrent() throws Exception {
-        tryRexproSessionless();
+    public void rexproMsgPackSessionlessConcurrent() throws Exception {
+        tryRexproMsgPackSessionless();
     }
 
-    private void tryRexproSessionless() throws Exception {
-        final List<Long> results = getRexsterClientEmptyGraph().execute("1+1");
+    @BenchmarkOptions(benchmarkRounds = DEFAULT_BENCHMARK_ROUNDS, warmupRounds = DEFAULT_WARMUP_ROUNDS, concurrency = BenchmarkOptions.CONCURRENCY_SEQUENTIAL)
+    @Test
+    public void rexproJsonSessionless() throws Exception {
+        tryRexproJsonSessionless();
+    }
+
+    @BenchmarkOptions(benchmarkRounds = DEFAULT_CONCURRENT_BENCHMARK_ROUNDS, warmupRounds = DEFAULT_CONCURRENT_WARMUP_ROUNDS, concurrency = BenchmarkOptions.CONCURRENCY_AVAILABLE_CORES)
+    @Test
+    public void rexproJsonSessionlessConcurrent() throws Exception {
+        tryRexproJsonSessionless();
+    }
+
+    private void tryRexproMsgPackSessionless() throws Exception {
+        tryRexproSessionless(getRexsterClientMsgPackEmptyGraph());
+    }
+
+    private void tryRexproJsonSessionless() throws Exception {
+        tryRexproSessionless(getRexsterClientJsonEmptyGraph());
+    }
+
+    private void tryRexproSessionless(final RexsterClient client) throws Exception {
+        final List<Long> results = client.execute("1+1");
         Assert.assertEquals(2, results.get(0).intValue());
     }
-
 
     private void tryRestGremlin() throws Exception {
         final String url = getHttpBaseUri() + "graphs/emptygraph/tp/gremlin?script=" + URLEncoder.encode("1+1");
