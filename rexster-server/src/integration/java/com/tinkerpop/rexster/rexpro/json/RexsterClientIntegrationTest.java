@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.rexpro.json;
 
 import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
+import com.tinkerpop.rexster.protocol.serializer.json.JSONSerializer;
 import com.tinkerpop.rexster.rexpro.AbstractRexsterClientIntegrationTest;
 
 public class RexsterClientIntegrationTest extends AbstractRexsterClientIntegrationTest {
@@ -14,7 +15,7 @@ public class RexsterClientIntegrationTest extends AbstractRexsterClientIntegrati
     @Override
     public RexsterClient getClient() throws Exception {
         RexsterClient client = RexsterClientFactory.open();
-        client.setSerializer((byte) 1);
+        client.setSerializer(JSONSerializer.SERIALIZER_ID);
         return client;
     }
 }
