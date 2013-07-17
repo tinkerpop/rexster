@@ -1,5 +1,7 @@
-package com.tinkerpop.rexster;
+package com.tinkerpop.rexster.rexpro;
 
+import com.tinkerpop.rexster.Application;
+import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.protocol.EngineController;

@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.rexpro;
 
-import com.tinkerpop.rexster.AbstractRexProIntegrationTest;
 import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.msg.*;

@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.rexpro;
 
-import com.tinkerpop.rexster.AbstractRexProIntegrationTest;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.client.RexsterClient;
 import org.junit.Assert;
