@@ -4,7 +4,7 @@ import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.protocol.BitWorks;
 import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 import javax.script.SimpleBindings;
