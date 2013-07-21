@@ -61,7 +61,7 @@ public class RexsterClient {
      * Wraps messages sent to the transport filter, and
      * includes meta data
      */
-    class MessageContainer {
+    static class MessageContainer {
         private byte serializer;
         private RexProMessage message;
 

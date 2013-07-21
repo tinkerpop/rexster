@@ -46,7 +46,7 @@ public final class RexProClientConnection {
 
     public RexProMessage sendMessage(RexProMessage messageToSend, int timeoutSeconds) throws IOException {
         try {
-            connection.write(messageToSend).get(timeoutSeconds, TimeUnit.SECONDS);
+            connection.write(new RexsterClient.MessageContainer((byte)0, messageToSend)).get(timeoutSeconds, TimeUnit.SECONDS);
             return responseQueue.take();
         } catch (Exception e) {
             throw new RuntimeException("Request [" + messageToSend.getClass().getName() + "] to Rexster failed [" + connection + "] - " + e.getMessage(), e);
