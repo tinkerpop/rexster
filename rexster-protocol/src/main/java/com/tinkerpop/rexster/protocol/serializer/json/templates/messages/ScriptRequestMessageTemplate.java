@@ -1,8 +1,8 @@
-package com.tinkerpop.rexster.protocol.serializer.json.templates;
+package com.tinkerpop.rexster.protocol.serializer.json.templates.messages;
 
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
-import com.tinkerpop.rexster.protocol.serializer.json.BindingsTemplate;
-import com.tinkerpop.rexster.protocol.serializer.json.JsonConverter;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.BindingsTemplate;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.JsonConverter;
 import org.codehaus.jackson.node.ArrayNode;
 
 public class ScriptRequestMessageTemplate extends RexProMessageTemplate<ScriptRequestMessage> {

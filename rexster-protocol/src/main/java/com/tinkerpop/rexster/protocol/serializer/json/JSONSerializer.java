@@ -7,12 +7,12 @@ import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import com.tinkerpop.rexster.protocol.serializer.RexProSerializer;
-import com.tinkerpop.rexster.protocol.serializer.json.templates.ErrorResponseMessageTemplate;
-import com.tinkerpop.rexster.protocol.serializer.json.templates.RexProMessageTemplate;
-import com.tinkerpop.rexster.protocol.serializer.json.templates.ScriptRequestMessageTemplate;
-import com.tinkerpop.rexster.protocol.serializer.json.templates.ScriptResponseMessageTemplate;
-import com.tinkerpop.rexster.protocol.serializer.json.templates.SessionRequestMessageTemplate;
-import com.tinkerpop.rexster.protocol.serializer.json.templates.SessionResponseMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.messages.ErrorResponseMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.messages.RexProMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.messages.ScriptRequestMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.messages.ScriptResponseMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.messages.SessionRequestMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.messages.SessionResponseMessageTemplate;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 

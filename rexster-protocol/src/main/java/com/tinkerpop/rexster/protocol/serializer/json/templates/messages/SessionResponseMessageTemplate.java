@@ -1,7 +1,7 @@
-package com.tinkerpop.rexster.protocol.serializer.json.templates;
+package com.tinkerpop.rexster.protocol.serializer.json.templates.messages;
 
 import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
-import com.tinkerpop.rexster.protocol.serializer.json.JsonConverter;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.JsonConverter;
 import org.codehaus.jackson.node.ArrayNode;
 
 import java.util.ArrayList;

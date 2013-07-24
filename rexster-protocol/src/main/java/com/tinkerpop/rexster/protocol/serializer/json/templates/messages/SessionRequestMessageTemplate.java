@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster.protocol.serializer.json.templates;
+package com.tinkerpop.rexster.protocol.serializer.json.templates.messages;
 
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import org.codehaus.jackson.node.ArrayNode;

@@ -1,9 +1,9 @@
-package com.tinkerpop.rexster.protocol.serializer.json.templates;
+package com.tinkerpop.rexster.protocol.serializer.json.templates.messages;
 
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
-import com.tinkerpop.rexster.protocol.serializer.json.JsonConverter;
-import com.tinkerpop.rexster.protocol.serializer.json.JsonTemplate;
-import com.tinkerpop.rexster.protocol.serializer.json.MetaTemplate;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.JsonConverter;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.JsonTemplate;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.MetaTemplate;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;

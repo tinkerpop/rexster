@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster.protocol.serializer.json;
+package com.tinkerpop.rexster.protocol.serializer.json.templates;
 
 import com.tinkerpop.rexster.protocol.msg.RexProMessageMeta;
 import org.codehaus.jackson.JsonNode;
