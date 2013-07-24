@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * TODO: add session metrics
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class SessionServer {
 

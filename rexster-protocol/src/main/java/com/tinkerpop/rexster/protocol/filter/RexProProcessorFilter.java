@@ -8,6 +8,7 @@ import org.glassfish.grizzly.filterchain.NextAction;
 import java.io.IOException;
 
 /**
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class RexProProcessorFilter extends BaseFilter {
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {

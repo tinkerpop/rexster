@@ -4,6 +4,7 @@ package com.tinkerpop.rexster.protocol.msg;
  * Values that represent standard message types for RexPro.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class MessageType {
     /**

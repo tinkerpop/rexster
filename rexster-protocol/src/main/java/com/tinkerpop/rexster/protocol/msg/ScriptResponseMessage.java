@@ -7,6 +7,7 @@ import org.msgpack.annotation.Message;
  * Represents a response to a script request that formats results to MsgPack format.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 @Message
 public class ScriptResponseMessage extends RexProMessage {

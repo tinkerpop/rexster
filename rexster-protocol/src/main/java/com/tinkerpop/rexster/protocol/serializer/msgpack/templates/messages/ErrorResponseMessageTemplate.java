@@ -7,11 +7,7 @@ import org.msgpack.unpacker.Unpacker;
 import java.io.IOException;
 
 /**
- * Created with IntelliJ IDEA.
- * User: bdeggleston
- * Date: 5/27/13
- * Time: 9:13 PM
- * To change this template use File | Settings | File Templates.
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class ErrorResponseMessageTemplate extends RexProMessageTemplate<ErrorResponseMessage> {
 

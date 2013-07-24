@@ -11,6 +11,7 @@ import java.util.UUID;
  * Helper class for for common byte operations.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class BitWorks {
 

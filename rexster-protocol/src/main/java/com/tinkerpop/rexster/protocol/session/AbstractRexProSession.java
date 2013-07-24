@@ -18,6 +18,7 @@ import java.util.concurrent.Callable;
 /**
  * Server-side rexster session.  All requests to a session are bound to a specific thread.
  *
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public abstract class AbstractRexProSession {
     protected final Bindings bindings = new SimpleBindings();

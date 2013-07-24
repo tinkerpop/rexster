@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * By default, the ScriptEngine instance is never reset.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class EngineController {
     private static final Logger logger = Logger.getLogger(EngineController.class);

@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Manager for sessions of RexPro.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class RexProSessions {
     private static final Logger logger = Logger.getLogger(RexProSessions.class);

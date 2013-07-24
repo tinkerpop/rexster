@@ -11,6 +11,7 @@ import java.util.Set;
  * Proxies call to the RexsterApplication instance to limit the methods available in RexsterConsole.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class RexsterApplicationHolder {
     private final RexsterApplication rexsterApplication;

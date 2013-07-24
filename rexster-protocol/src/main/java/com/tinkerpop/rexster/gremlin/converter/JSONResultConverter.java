@@ -17,6 +17,8 @@ import java.util.Set;
 
 /**
  * Converts a result from Gremlin to a JSONArray using GraphSON format.
+ *
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class JSONResultConverter implements ResultConverter<JSONArray> {
 

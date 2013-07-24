@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * issue that is prevalent in gremlin-groovy.  Unsure if it carries over to other implementations.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class EngineHolder {
     private static final Logger logger = Logger.getLogger(EngineHolder.class);

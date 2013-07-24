@@ -17,6 +17,7 @@ import javax.script.ScriptException;
 import java.io.IOException;
 
 /**
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class ScriptServer {
     private static final Logger logger = Logger.getLogger(ScriptServer.class);

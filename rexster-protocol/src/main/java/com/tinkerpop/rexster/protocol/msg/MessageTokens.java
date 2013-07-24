@@ -2,6 +2,7 @@ package com.tinkerpop.rexster.protocol.msg;
 
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public final class MessageTokens {
     public static final String ERROR_INVALID_TAG = "The message has an invalid flag.";

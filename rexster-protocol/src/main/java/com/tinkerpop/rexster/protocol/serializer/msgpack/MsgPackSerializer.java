@@ -11,6 +11,9 @@ import org.msgpack.unpacker.Unpacker;
 
 import java.io.IOException;
 
+/**
+ * @author Blake Eggleston (bdeggleston.github.com)
+ */
 public class MsgPackSerializer implements RexProSerializer {
 
     public static final byte SERIALIZER_ID = 0;

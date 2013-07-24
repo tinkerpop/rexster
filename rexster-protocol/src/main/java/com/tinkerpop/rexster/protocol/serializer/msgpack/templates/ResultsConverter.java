@@ -24,6 +24,8 @@ import java.util.Set;
 
 /**
  * Universally useful msgpack object serialization and deserialization functions
+ *
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class ResultsConverter {
 

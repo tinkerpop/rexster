@@ -6,6 +6,8 @@ import org.msgpack.packer.BufferPacker;
 
 /**
  * Converts a result from Gremlin to a byte array encoded by MsgPack.
+ *
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class MsgPackResultConverter implements ResultConverter<byte[]> {
     private final MessagePack msgpack = new MessagePack();

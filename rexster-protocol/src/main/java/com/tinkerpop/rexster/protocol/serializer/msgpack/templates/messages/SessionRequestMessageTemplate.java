@@ -6,6 +6,9 @@ import org.msgpack.unpacker.Unpacker;
 
 import java.io.IOException;
 
+/**
+ * @author Blake Eggleston (bdeggleston.github.com)
+ */
 public class SessionRequestMessageTemplate extends RexProMessageTemplate<SessionRequestMessage> {
 
     protected int messageArraySize() {

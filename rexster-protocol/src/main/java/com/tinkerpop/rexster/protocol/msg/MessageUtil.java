@@ -7,6 +7,7 @@ import java.util.UUID;
 
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class MessageUtil {
     public static ErrorResponseMessage createErrorResponse(final byte[] request, final byte[] session,

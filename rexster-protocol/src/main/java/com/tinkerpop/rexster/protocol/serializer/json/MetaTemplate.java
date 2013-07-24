@@ -8,6 +8,9 @@ import org.codehaus.jackson.node.*;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * @author Blake Eggleston (bdeggleston.github.com)
+ */
 public class MetaTemplate implements JsonTemplate<RexProMessageMeta> {
 
     @Override

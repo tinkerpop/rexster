@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * @author Blake Eggleston (bdeggleston.github.com)
+ */
 public class JsonConverter {
 
     /**

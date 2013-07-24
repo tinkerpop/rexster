@@ -9,7 +9,9 @@ import org.msgpack.unpacker.Unpacker;
 import java.io.IOException;
 
 /**
- * template for interpreter output
+ * Template for interpreter output
+ *
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class ResultsTemplate extends AbstractTemplate<RexProScriptResult> {
     @Override

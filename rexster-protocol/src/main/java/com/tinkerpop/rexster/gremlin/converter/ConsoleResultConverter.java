@@ -9,6 +9,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
+ */
 public class ConsoleResultConverter implements ResultConverter<List<String>> {
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 

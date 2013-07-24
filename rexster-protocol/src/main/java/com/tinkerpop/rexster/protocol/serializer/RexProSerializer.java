@@ -6,6 +6,8 @@ import java.io.IOException;
 
 /**
  * RexPro serializer interface. Use this to implement new serializers
+ *
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public interface RexProSerializer {
 

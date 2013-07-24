@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
  * the transaction will be handled properly.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class RexsterClient {
     private static final Logger logger = Logger.getLogger(RexsterClient.class);

@@ -11,6 +11,8 @@ import java.io.IOException;
 
 /**
  * Base serializer for rexpro messages
+ *
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public abstract class RexProMessageTemplate<Message extends RexProMessage> extends AbstractTemplate<Message> {
 

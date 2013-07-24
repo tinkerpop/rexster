@@ -9,11 +9,7 @@ import org.msgpack.unpacker.Unpacker;
 import java.io.IOException;
 
 /**
- * Created with IntelliJ IDEA.
- * User: bdeggleston
- * Date: 6/8/13
- * Time: 9:01 PM
- * To change this template use File | Settings | File Templates.
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class MsgPackScriptResponseMessageTemplate extends RexProMessageTemplate<ScriptResponseMessage> {
 

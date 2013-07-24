@@ -5,6 +5,9 @@ import org.codehaus.jackson.JsonNode;
 
 import java.util.Map;
 
+/**
+ * @author Blake Eggleston (bdeggleston.github.com)
+ */
 public class BindingsTemplate implements JsonTemplate<RexProBindings> {
     @Override
     public RexProBindings deserialize(JsonNode json) {

@@ -3,8 +3,7 @@ package com.tinkerpop.rexster.protocol.serializer.json;
 import org.codehaus.jackson.JsonNode;
 
 /**
- *
- * @param <T>
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public interface JsonTemplate<T> {
     public T deserialize(JsonNode json);

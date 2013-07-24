@@ -12,6 +12,8 @@ import java.util.Map;
 
 /**
  * Serializer for message meta fields
+ *
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class MetaTemplate extends AbstractTemplate<RexProMessageMeta> {
 

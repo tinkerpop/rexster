@@ -8,6 +8,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 
+/**
+ * @author Blake Eggleston (bdeggleston.github.com)
+ */
 public class JSONSerializer implements RexProSerializer {
 
     public static final byte SERIALIZER_ID = 1;

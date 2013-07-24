@@ -1,6 +1,5 @@
 package com.tinkerpop.rexster.protocol.serializer.msgpack.templates;
 
-import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsConverter;
 import com.tinkerpop.rexster.protocol.msg.RexProBindings;
 import org.msgpack.packer.Packer;
 import org.msgpack.template.AbstractTemplate;
@@ -10,6 +9,9 @@ import org.msgpack.unpacker.Unpacker;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * @author Blake Eggleston (bdeggleston.github.com)
+ */
 public class BindingsTemplate extends AbstractTemplate<RexProBindings> {
     @Override
     public void write(Packer pk, RexProBindings v) throws IOException {

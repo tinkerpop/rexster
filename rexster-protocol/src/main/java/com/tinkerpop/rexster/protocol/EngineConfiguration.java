@@ -10,6 +10,7 @@ import java.util.Set;
  * Configuration class for a ScriptEngine implementation.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class EngineConfiguration {
 

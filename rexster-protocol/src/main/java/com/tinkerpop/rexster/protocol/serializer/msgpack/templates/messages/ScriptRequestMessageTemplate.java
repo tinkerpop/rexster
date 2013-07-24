@@ -7,6 +7,9 @@ import org.msgpack.unpacker.Unpacker;
 
 import java.io.IOException;
 
+/**
+ * @author Blake Eggleston (bdeggleston.github.com)
+ */
 public class ScriptRequestMessageTemplate extends RexProMessageTemplate<ScriptRequestMessage> {
     protected int messageArraySize() {
         return super.messageArraySize() + 3;

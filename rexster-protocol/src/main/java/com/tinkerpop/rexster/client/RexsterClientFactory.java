@@ -22,6 +22,7 @@ import java.util.Set;
  * Creates RexsterClient instances.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class RexsterClientFactory {
     private static final Logger logger = Logger.getLogger(RexsterClientFactory.class);

@@ -11,6 +11,8 @@ import java.util.*;
 
 /**
  * Converts graph results into a serializable format
+ *
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class SerializedResultConverter {
 

@@ -7,6 +7,7 @@ import org.msgpack.annotation.Message;
  * languages or a closed session confirmation.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 @Message
 public class SessionResponseMessage extends RexProMessage {

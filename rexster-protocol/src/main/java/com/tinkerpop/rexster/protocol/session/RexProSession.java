@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
  * Server-side rexster session.  All requests to a session are bound to a specific thread.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Blake Eggleston (bdeggleston.github.com)
  */
 public class RexProSession extends AbstractRexProSession{
 
