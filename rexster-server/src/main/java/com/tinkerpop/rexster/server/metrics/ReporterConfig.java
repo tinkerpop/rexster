@@ -19,10 +19,8 @@ import java.util.concurrent.TimeUnit;
  * This class is responsible for configuring the metric reporting options in Rexster.  This class takes the contents
  * of the <i>metrics</i> section of rexster.xml to enable different reporting outs such as ganglia, jmx, graphite, etc.
  *
- * Typical usage involves calling the load method to construct an instance of the class and then calling enable on
- * that instance to start configured reporters.  The <i>http</i> reporter is a bit different only in the sense that
- * it does not initialize via a configuration class.  It is initialized through a servlet configured into the
- * HTTP server in Rexster.  If Rexster's HTTP is disabled then this reporter will not be accessible.
+ * The <i>http</i> reporter does not initialize by way of the enable() method.  It is initialized through a servlet
+ * configured into the HTTP server in Rexster.  If Rexster's HTTP is disabled then this reporter will not be accessible.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
