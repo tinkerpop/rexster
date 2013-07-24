@@ -18,7 +18,7 @@ public abstract class AbstractMapRexsterApplication implements RexsterApplicatio
 
     private static final Logger logger = Logger.getLogger(AbstractMapRexsterApplication.class);
 
-    private static MetricRegistry metricRegistry;
+    protected static MetricRegistry metricRegistry;
 
     protected final long startTime = System.currentTimeMillis();
 

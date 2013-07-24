@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.server;
 
+import com.codahale.metrics.MetricRegistry;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -26,7 +27,7 @@ public class DefaultRexsterApplication extends AbstractMapRexsterApplication {
      * @param graph a graph instance.
      */
     public DefaultRexsterApplication(final String graphName, final Graph graph) {
-        this(graphName, graph, new ArrayList<String>(){{ add("*:*"); }}, null);
+        this(graphName, graph, new ArrayList<String>(){{ add("*:*"); }}, null, null);
     }
 
     /**
@@ -38,7 +39,9 @@ public class DefaultRexsterApplication extends AbstractMapRexsterApplication {
      * @param extensionConfigurations configurations from rexster.xml for extensions. this value may be null.
      */
     public DefaultRexsterApplication(final String graphName, final Graph graph, final List<String> allowableNamespaces,
-                                     final List<HierarchicalConfiguration> extensionConfigurations) {
+                                     final List<HierarchicalConfiguration> extensionConfigurations,
+                                     final MetricRegistry metricRegistry) {
+        AbstractMapRexsterApplication.metricRegistry = metricRegistry;
         final RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph, allowableNamespaces, extensionConfigurations);
         this.graphs.put(graphName, rag);
         logger.info(String.format("Graph [%s] loaded", rag.getGraph()));
