@@ -202,6 +202,54 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
     }
 
     @Test
+    public void executeAndReturnSelect() throws Exception {
+        final RexsterClient client = getClient();
+
+        final List<Object> selectResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1).out.name.as('x').select");
+        Assert.assertEquals(3, selectResults.size());
+
+        Assert.assertTrue(selectResults.get(0) instanceof Map);
+
+        final List<String> names = new ArrayList<String>(){{
+            add("vadas");
+            add("josh");
+            add("lop");
+        }};
+
+        for(Object e : selectResults) {
+            final Map<String,Object> m = (Map<String, Object>) e;
+            Assert.assertTrue(names.contains(m.get("x")));
+        }
+
+        client.close();
+
+    }
+
+    @Test
+    public void executeAndReturnTable() throws Exception {
+        final RexsterClient client = getClient();
+
+        final List<Object> tableResults = client.execute("g=TinkerGraphFactory.createTinkerGraph();g.v(1).out.name.as('x').table.cap.next()");
+        Assert.assertEquals(3, tableResults.size());
+
+        Assert.assertTrue(tableResults.get(0) instanceof Map);
+
+        final List<String> names = new ArrayList<String>(){{
+            add("vadas");
+            add("josh");
+            add("lop");
+        }};
+
+        for(Object e : tableResults) {
+            final Map<String,Object> m = (Map<String, Object>) e;
+            Assert.assertTrue(names.contains(m.get("x")));
+        }
+
+        client.close();
+
+    }
+
+    @Test
     public void executeForProperties() throws Exception {
         final RexsterClient client = getClient();
 
