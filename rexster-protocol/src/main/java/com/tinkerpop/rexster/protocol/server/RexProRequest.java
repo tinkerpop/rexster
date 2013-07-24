@@ -1,16 +1,26 @@
 package com.tinkerpop.rexster.protocol.server;
 
 import com.tinkerpop.rexster.gremlin.converter.ConsoleResultConverter;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MessageTokens;
+import com.tinkerpop.rexster.protocol.msg.MessageType;
+import com.tinkerpop.rexster.protocol.msg.MessageUtil;
+import com.tinkerpop.rexster.protocol.msg.RexProBindings;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProMessageMeta;
+import com.tinkerpop.rexster.protocol.msg.RexProScriptResult;
+import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import com.tinkerpop.rexster.protocol.serializer.RexProSerializer;
 import com.tinkerpop.rexster.protocol.serializer.json.JSONSerializer;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsTemplate;
 import com.tinkerpop.rexster.protocol.session.RexProSession;
-import com.tinkerpop.rexster.protocol.msg.*;
 import com.tinkerpop.rexster.server.RexsterApplication;
 import org.apache.log4j.Logger;
-
 import org.glassfish.grizzly.Buffer;
 import org.msgpack.MessagePack;
 

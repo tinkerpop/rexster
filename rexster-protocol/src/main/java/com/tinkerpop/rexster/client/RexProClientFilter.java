@@ -1,10 +1,17 @@
 package com.tinkerpop.rexster.client;
 
-import com.tinkerpop.rexster.protocol.msg.*;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MessageTokens;
+import com.tinkerpop.rexster.protocol.msg.MessageType;
+import com.tinkerpop.rexster.protocol.msg.MessageUtil;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import com.tinkerpop.rexster.protocol.serializer.RexProSerializer;
 import com.tinkerpop.rexster.protocol.serializer.json.JSONSerializer;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
-import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.Buffer;

@@ -1,9 +1,9 @@
 package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
-import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;

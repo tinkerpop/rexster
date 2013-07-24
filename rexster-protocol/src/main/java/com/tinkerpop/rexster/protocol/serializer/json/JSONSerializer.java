@@ -1,8 +1,18 @@
 package com.tinkerpop.rexster.protocol.serializer.json;
 
-import com.tinkerpop.rexster.protocol.msg.*;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import com.tinkerpop.rexster.protocol.serializer.RexProSerializer;
-import com.tinkerpop.rexster.protocol.serializer.json.templates.*;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.ErrorResponseMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.RexProMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.ScriptRequestMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.ScriptResponseMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.SessionRequestMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.json.templates.SessionResponseMessageTemplate;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 

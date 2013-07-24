@@ -1,10 +1,22 @@
 package com.tinkerpop.rexster.protocol.serializer.msgpack;
 
-import com.tinkerpop.rexster.protocol.msg.*;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProBindings;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.RexProMessageMeta;
+import com.tinkerpop.rexster.protocol.msg.RexProScriptResult;
+import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
 import com.tinkerpop.rexster.protocol.serializer.RexProSerializer;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsTemplate;
-import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages.*;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages.ErrorResponseMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages.MsgPackScriptResponseMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages.ScriptRequestMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages.SessionRequestMessageTemplate;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages.SessionResponseMessageTemplate;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.BufferPacker;
 import org.msgpack.unpacker.Unpacker;

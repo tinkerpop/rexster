@@ -1,9 +1,9 @@
 package com.tinkerpop.rexster.protocol.serializer.json;
 
 import com.tinkerpop.rexster.protocol.msg.RexProMessageMeta;
-
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.node.*;
+import org.codehaus.jackson.node.JsonNodeFactory;
+import org.codehaus.jackson.node.ObjectNode;
 
 import java.util.Iterator;
 import java.util.Map;

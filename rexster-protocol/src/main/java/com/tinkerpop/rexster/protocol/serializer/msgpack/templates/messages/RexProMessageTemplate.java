@@ -2,7 +2,6 @@ package com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages;
 
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.MetaTemplate;
-import org.msgpack.MessageTypeException;
 import org.msgpack.packer.Packer;
 import org.msgpack.template.AbstractTemplate;
 import org.msgpack.unpacker.Unpacker;

@@ -1,7 +1,15 @@
 package com.tinkerpop.rexster.protocol.serializer.json;
 
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.node.*;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.BooleanNode;
+import org.codehaus.jackson.node.DoubleNode;
+import org.codehaus.jackson.node.IntNode;
+import org.codehaus.jackson.node.JsonNodeFactory;
+import org.codehaus.jackson.node.LongNode;
+import org.codehaus.jackson.node.NullNode;
+import org.codehaus.jackson.node.ObjectNode;
+import org.codehaus.jackson.node.TextNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;

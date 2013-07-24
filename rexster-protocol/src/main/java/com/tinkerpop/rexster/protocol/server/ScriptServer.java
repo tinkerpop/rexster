@@ -1,16 +1,20 @@
 package com.tinkerpop.rexster.protocol.server;
 
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.rexster.protocol.EngineController;
-import com.tinkerpop.rexster.protocol.session.AbstractRexProSession;
-import com.tinkerpop.rexster.protocol.session.RexProSessions;
-import com.tinkerpop.rexster.protocol.msg.*;
-import com.tinkerpop.rexster.server.RexsterApplication;
-import org.apache.log4j.Logger;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.rexster.protocol.EngineController;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MessageTokens;
+import com.tinkerpop.rexster.protocol.msg.MessageUtil;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.session.AbstractRexProSession;
+import com.tinkerpop.rexster.protocol.session.RexProSessions;
+import com.tinkerpop.rexster.server.RexsterApplication;
+import org.apache.log4j.Logger;
 
 import javax.script.Bindings;
 import javax.script.ScriptException;

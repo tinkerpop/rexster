@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
 import org.msgpack.MessagePack;
 
 import java.io.IOException;

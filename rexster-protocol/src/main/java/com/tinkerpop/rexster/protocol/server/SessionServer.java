@@ -1,13 +1,17 @@
 package com.tinkerpop.rexster.protocol.server;
 
-import com.tinkerpop.rexster.client.RexProException;
-import com.tinkerpop.rexster.protocol.EngineController;
-import com.tinkerpop.rexster.protocol.session.RexProSession;
-import com.tinkerpop.rexster.protocol.session.RexProSessions;
-import com.tinkerpop.rexster.protocol.msg.*;
-import com.tinkerpop.rexster.server.RexsterApplication;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
+import com.tinkerpop.rexster.client.RexProException;
+import com.tinkerpop.rexster.protocol.EngineController;
+import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
+import com.tinkerpop.rexster.protocol.msg.MessageUtil;
+import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.msg.SessionResponseMessage;
+import com.tinkerpop.rexster.protocol.session.RexProSession;
+import com.tinkerpop.rexster.protocol.session.RexProSessions;
+import com.tinkerpop.rexster.server.RexsterApplication;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
