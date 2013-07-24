@@ -72,6 +72,9 @@ public class RexProRequest {
     //does not include message envelope
     private byte[] responseBytes = null;
 
+    private static byte BYTE_VERSION = 1;
+    private static byte[] BYTES_RESERVED = new byte[] {0, 0, 0, 0};
+
 
     public RexProRequest(ByteBuffer buffer, int bufferSize, RexsterApplication application) throws IncompleteRexProRequestException {
         requestBuffer = buffer;
@@ -282,18 +285,15 @@ public class RexProRequest {
         return ENVELOPE_LENGTH + responseBytes.length;
     }
 
-    public void writeToBuffer(Buffer bb) {
+    public void writeToBuffer(final Buffer bb) {
         //add version
-        bb.put((byte) 1);
+        bb.put(BYTE_VERSION);
 
         //add serializer
         bb.put(serializerType);
 
         //add reserved bytes
-        bb.put((byte) 0);
-        bb.put((byte) 0);
-        bb.put((byte) 0);
-        bb.put((byte) 0);
+        bb.put(BYTES_RESERVED);
 
         if (responseMessage instanceof SessionResponseMessage) {
             bb.put(MessageType.SESSION_RESPONSE);
