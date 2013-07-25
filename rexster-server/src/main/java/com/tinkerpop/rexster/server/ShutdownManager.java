@@ -83,6 +83,10 @@ public class ShutdownManager {
     public final void start() throws Exception {
         shutdownSocketListener = new ShutdownSocketListener(this.host, this.port);
 
+        final Thread shutdownSocketThread = new Thread(shutdownSocketListener, "ShutdownListener-" + host + ":" + port);
+        shutdownSocketThread.setDaemon(true);
+        shutdownSocketThread.start();
+
         // Add the listener to the shutdown list
         this.internalShutdownListeners.add(shutdownSocketListener);
 
@@ -219,9 +223,6 @@ public class ShutdownManager {
 
             logger.info("Bound shutdown socket to " + this.bindHost + ":" + this.port + ". Starting listener thread for shutdown requests.");
 
-            final Thread shutdownSocketThread = new Thread(shutdownSocketListener, "ShutdownListener-" + host + ":" + port);
-            shutdownSocketThread.setDaemon(true);
-            shutdownSocketThread.start();
         }
 
         public void run() {
@@ -235,9 +236,9 @@ public class ShutdownManager {
                         shutdownRequestThread.start();
                     } catch (SocketException se) {
                         if (shutdownSocket.isClosed()) {
-                            logger.info("Caught SocketException on shutdownSocket, assuming close() was called: " + se);
+                            logger.info("Caught SocketException on shutdownSocket, assuming close() was called: " + se.getMessage());
                         } else {
-                            logger.warn("Exception while handling connection to shutdown socket, ignoring", se);
+                            logger.warn("Exception while handling connection to shutdown socket, ignoring: " + se.getMessage());
                         }
                     } catch (IOException ioe) {
                         logger.warn("Exception while handling connection to shutdown socket, ignoring", ioe);

@@ -6,6 +6,11 @@ CP=$CP:$(find -L `dirname $0`/../ext/ -name "*.jar" | tr '\n' ':')
 REXSTER_EXT=../ext
 
 PUBLIC=`dirname $0`/../public/
+EXTRA=
+
+if [ $1 = "-s" ] ; then
+    EXTRA="-wr $PUBLIC"
+fi
 
 # Find Java
 if [ "$JAVA_HOME" = "" ] ; then
@@ -20,7 +25,7 @@ if [ "$JAVA_OPTIONS" = "" ] ; then
 fi
 
 # Launch the application
-$JAVA $JAVA_OPTIONS -cp $CP com.tinkerpop.rexster.Application $@ -wr $PUBLIC
+$JAVA $JAVA_OPTIONS -cp $CP com.tinkerpop.rexster.Application $@ $EXTRA
 
 # Return the program's exit code
 exit $?

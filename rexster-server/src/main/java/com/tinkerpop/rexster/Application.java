@@ -33,6 +33,7 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -271,7 +272,7 @@ public class Application {
             final InetAddress hostAddress = InetAddress.getByName(host);
             shutdownConnection = new Socket(hostAddress, port);
 
-            shutdownConnection.setSoTimeout(5000);
+            shutdownConnection.setSoTimeout(30000);
             final BufferedReader reader = new BufferedReader(new InputStreamReader(shutdownConnection.getInputStream()));
             final PrintStream writer = new PrintStream(shutdownConnection.getOutputStream());
             try {
@@ -291,9 +292,13 @@ public class Application {
                 IOUtils.closeQuietly(reader);
                 IOUtils.closeQuietly(writer);
             }
-        } catch (SocketException se) {
-            logger.debug(se);
+        } catch (SocketTimeoutException ste) {
+            // perhaps the -wait option should take an argument for how long to wait for...for now 30 seconds seems
+            // long enough.
+            logger.warn("Taking longer than 30 seconds to shutdown Rexster.  Check shutdown status with --status");
         } catch (IOException ioe) {
+            // SocketException or ConnectionException would be more exacting here, but don't think much can be done
+            // with an IOException ... will keep it generic for now.
             logger.warn("Cannot connect to Rexster Server to issue command.  It may not be running.");
         } finally {
             try {

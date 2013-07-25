@@ -9,6 +9,10 @@ set LIBDIR=lib
 set EXTDIR=ext/*
 set PUBDIR=public
 
+set EXTRA=
+
+if "%1"=="-s" set EXTRA="-wr %PUBDIR%"
+
 cd ext
 
 FOR /D /r %%i in (*) do (
@@ -20,4 +24,4 @@ cd ..
 set JAVA_OPTIONS=-Xms32m -Xmx512m
 
 :: Launch the application
-java %JAVA_OPTIONS% %JAVA_ARGS% -cp %LIBDIR%/*;%EXTDIR%;  com.tinkerpop.rexster.Application %* -wr %PUBDIR%
+java %JAVA_OPTIONS% %JAVA_ARGS% -cp %LIBDIR%/*;%EXTDIR%;  com.tinkerpop.rexster.Application %* %EXTRA%
