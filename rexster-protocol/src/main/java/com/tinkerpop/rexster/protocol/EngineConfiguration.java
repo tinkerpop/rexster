@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.protocol;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,14 +16,14 @@ import java.util.Set;
 public class EngineConfiguration {
 
     private final int resetCount;
-    private final String initScriptFile;
+    private final Set<String> initScriptFiles;
     private final String scriptEngineName;
     private final Set<String> imports;
     private final Set<String> staticImports;
 
     public EngineConfiguration(final HierarchicalConfiguration configuration) {
         this.scriptEngineName = configuration.getString("name", "gremlin-groovy");
-        this.initScriptFile = configuration.getString("init-script", null);
+        this.initScriptFiles = new HashSet<String>(configuration.getList("init-scripts", new ArrayList()));
         this.resetCount = configuration.getInt("reset-threshold", EngineController.RESET_NEVER);
         this.imports = new HashSet<String>(configuration.getList("imports", new ArrayList()));
         this.staticImports = new HashSet<String>(configuration.getList("static-imports", new ArrayList()));
@@ -31,7 +32,8 @@ public class EngineConfiguration {
     public EngineConfiguration(final String scriptEngineName, final int resetCount, final String initScriptFile,
                                final Set<String> imports, final Set<String> staticImports) {
         this.resetCount = resetCount;
-        this.initScriptFile = initScriptFile;
+        this.initScriptFiles = new HashSet<String>();
+        this.initScriptFiles.add(initScriptFile);
         this.scriptEngineName = scriptEngineName;
         this.imports = imports;
         this.staticImports = staticImports;
@@ -41,8 +43,8 @@ public class EngineConfiguration {
         return resetCount;
     }
 
-    public String getInitScriptFile() {
-        return initScriptFile;
+    public Set<String> getInitScriptFiles() {
+        return initScriptFiles;
     }
 
     public String getScriptEngineName() {

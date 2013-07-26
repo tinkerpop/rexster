@@ -32,6 +32,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Frames Kibble uses @FramedGraphFactory@ to create graphs.
 * Updating rexpro version to v1
 ** Added JSON serializer option to rexpro
+* Allow specification of multiple Script Engine initialization files in @rexster.xml@.
 
 ==<hr/>==
 

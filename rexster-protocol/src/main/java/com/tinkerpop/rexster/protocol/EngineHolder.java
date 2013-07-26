@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -27,7 +28,7 @@ public class EngineHolder {
     private final String languageVersion;
     private final String engineName;
     private final String engineVersion;
-    private final String initializationScriptFile;
+    private final Set<String> initScriptFiles;
     private final ScriptEngineFactory factory;
     private final int engineResetThreshold;
 
@@ -40,7 +41,7 @@ public class EngineHolder {
         this.engineName = factory.getEngineName();
         this.engineVersion = factory.getEngineVersion();
         this.engineResetThreshold = configuration.getResetCount();
-        this.initializationScriptFile = configuration.getInitScriptFile();
+        this.initScriptFiles = configuration.getInitScriptFiles();
         this.factory = factory;
 
         // gremlin-groovy allows imports to be customized.  need to figure out how to implement this generically
@@ -50,7 +51,7 @@ public class EngineHolder {
             DefaultImportCustomizerProvider.initializeStatically(configuration.getImports(), configuration.getStaticImports());
         }
 
-        this.engine = initEngine(this.factory, this.initializationScriptFile);
+        this.engine = initEngine(this.factory, this.initScriptFiles);
     }
 
     public String getEngineName() {
@@ -73,7 +74,7 @@ public class EngineHolder {
             // determine if a reset is necessary.
             if (numberOfScriptsEvaluated.get() >= engineResetThreshold) {
                 // IMPORTANT: assumes that the factory implementation is not pooling engine instances
-                this.engine = initEngine(this.factory, this.initializationScriptFile);
+                this.engine = initEngine(this.factory, this.initScriptFiles);
                 numberOfScriptsEvaluated.set(1);
             } else {
                 numberOfScriptsEvaluated.incrementAndGet();
@@ -83,30 +84,32 @@ public class EngineHolder {
 
         if (engine == null) {
             // IMPORTANT: assumes that the factory implementation is not pooling engine instances
-            this.engine = initEngine(this.factory, this.initializationScriptFile);
+            this.engine = initEngine(this.factory, this.initScriptFiles);
         }
 
         return this.engine;
     }
 
-    private static ScriptEngine initEngine(final ScriptEngineFactory factory, final String scriptFile) {
+    private static ScriptEngine initEngine(final ScriptEngineFactory factory, final Set<String> scriptFiles) {
         final ScriptEngine engine = factory.getScriptEngine();
 
-        if (scriptFile != null && !scriptFile.isEmpty()) {
-            final File scriptEngineInitFile = new File(scriptFile);
+        for (String scriptFile : scriptFiles) {
+            if (scriptFile != null && !scriptFile.isEmpty()) {
+                final File scriptEngineInitFile = new File(scriptFile);
 
-            if (scriptEngineInitFile.exists()) {
-                try {
-                    final Reader reader = new FileReader(scriptEngineInitFile);
-                    logger.info("ScriptEngine initializing with a custom script");
-                    engine.eval(reader);
-                } catch (FileNotFoundException fnfe) {
-                    logger.warn(String.format("Could not read ScriptEngine initialization file.  Check [%s] on classpath.", scriptEngineInitFile.getAbsolutePath()));
-                } catch (ScriptException ex) {
-                    logger.warn(String.format("ScriptEngine initialization failure. Custom scripts and imports will not be initialized by [%s].", scriptEngineInitFile.getAbsolutePath()), ex);
+                if (scriptEngineInitFile.exists()) {
+                    try {
+                        final Reader reader = new FileReader(scriptEngineInitFile);
+                        logger.info("ScriptEngine initializing with a custom script");
+                        engine.eval(reader);
+                    } catch (FileNotFoundException fnfe) {
+                        logger.warn(String.format("Could not read ScriptEngine initialization file.  Check location of [%s].", scriptEngineInitFile.getAbsolutePath()));
+                    } catch (ScriptException ex) {
+                        logger.warn(String.format("ScriptEngine initialization failure. Custom scripts and imports will not be initialized by [%s].", scriptEngineInitFile.getAbsolutePath()), ex);
+                    }
+                } else {
+                    logger.warn(String.format("ScriptEngine initialization file does not exist.  Check location of [%s].", scriptEngineInitFile.getAbsolutePath()));
                 }
-            } else {
-                logger.warn(String.format("ScriptEngine initialization file does not exist.  Check [%s] on classpath.", scriptEngineInitFile.getAbsolutePath()));
             }
         }
 

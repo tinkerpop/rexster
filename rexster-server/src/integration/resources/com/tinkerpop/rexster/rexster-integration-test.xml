@@ -49,7 +49,7 @@
         <script-engine>
             <name>gremlin-groovy</name>
             <reset-threshold>-1</reset-threshold>
-            <init-script>config/init.groovy</init-script>
+            <init-scripts>config/init.groovy</init-scripts>
             <imports>com.tinkerpop.rexster.client.*</imports>
             <static-imports>java.lang.Math.PI</static-imports>
         </script-engine>
@@ -102,7 +102,7 @@
             <graph-enabled>false</graph-enabled>
             <graph-name>orientdbsample</graph-name>
             <graph-type>orientgraph</graph-type>
-            <graph-location>memory:orientdb-graph</graph-location>
+            <graph-location>local:/tmp/orientdb-graph</graph-location>
             <properties>
                 <username>admin</username>
                 <password>admin</password>
