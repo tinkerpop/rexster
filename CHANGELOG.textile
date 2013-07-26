@@ -22,6 +22,8 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * The @_limit@ query string argument for vertex queries is split into @_skip@ and @_take@ to better match the new limit API in Blueprints.
 * Changes to @rexster.xml@ no longer require a restart of Rexster to become available.
 * Allow multiple and separate Script Engine configurations with the addition of the @<script-engines>@ element in @rexster.xml@
+** Configuration of multiple Script Engine initialization files in @rexster.xml@.
+** Configuration of additional imports to the Script Engine.
 * Property data types in REST now properly support @boolean@ values.
 * Serialize RexPro in the same thread that mutates the graph to prevent partial serialization of property values with Neo4j.
 * Improve logging for
@@ -32,7 +34,6 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Frames Kibble uses @FramedGraphFactory@ to create graphs.
 * Updating rexpro version to v1
 ** Added JSON serializer option to rexpro
-* Allow specification of multiple Script Engine initialization files in @rexster.xml@.
 
 ==<hr/>==
 
