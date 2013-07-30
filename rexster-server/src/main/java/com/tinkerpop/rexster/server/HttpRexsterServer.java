@@ -379,15 +379,18 @@ public class HttpRexsterServer implements RexsterServer {
             rc.getContainerResponseFilters().add(new HeaderResponseFilter(defaultCharacterEncoding));
 
             if (!securityFilterType.equals(Tokens.REXSTER_SECURITY_NONE)) {
+                final AbstractSecurityFilter securityFilter;
                 if (securityFilterType.equals(Tokens.REXSTER_SECURITY_DEFAULT)) {
                     wacJersey.addContextInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, DefaultSecurityFilter.class.getName());
-                    rc.getContainerRequestFilters().add(new DefaultSecurityFilter());
+                    securityFilter = new DefaultSecurityFilter();
                 } else {
                     wacJersey.addContextInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, securityFilterType);
                     final Class clazz = Class.forName(securityFilterType, true, Thread.currentThread().getContextClassLoader());
-                    final AbstractSecurityFilter securityFilter = (AbstractSecurityFilter) clazz.newInstance();
-                    rc.getContainerRequestFilters().add(securityFilter);
+                    securityFilter = (AbstractSecurityFilter) clazz.newInstance();
                 }
+
+                securityFilter.configure(properties.getConfiguration());
+                rc.getContainerRequestFilters().add(securityFilter);
             }
 
             final ServletRegistration sg = wacJersey.addServlet("jersey", new ServletContainer(rc));
