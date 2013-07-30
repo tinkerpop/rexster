@@ -7,6 +7,7 @@ import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
+import com.tinkerpop.rexster.protocol.server.RexProRequest;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
@@ -86,8 +87,10 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
      * RexPro authentication
      */
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
-        final RexProMessage message = ctx.getMessage();
+        final RexProRequest request = ctx.getMessage();
+        request.process();
 
+        final RexProMessage message = request.getRequestMessage();
         if (message instanceof SessionRequestMessage && !message.hasSession()) {
             final SessionRequestMessage specificMessage = (SessionRequestMessage) message;
 
@@ -102,7 +105,8 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
                     errorMessage.ErrorMessage = "Invalid username or password.";
                     errorMessage.metaSetFlag(ErrorResponseMessage.AUTH_FAILURE_ERROR);
 
-                    ctx.write(errorMessage);
+                    request.writeResponseMessage(errorMessage);
+                    ctx.write(request);
 
                     return ctx.getStopAction();
                 }

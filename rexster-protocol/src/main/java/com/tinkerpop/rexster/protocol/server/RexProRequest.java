@@ -127,6 +127,10 @@ public class RexProRequest {
         this.session = session;
     }
 
+    public RexProMessage getRequestMessage() {
+        return requestMessage;
+    }
+
     private static MsgPackSerializer msgPackSerializer = new MsgPackSerializer();
     private static JSONSerializer jsonSerializer = new JSONSerializer();
     protected RexProSerializer getSerializer() {
@@ -172,6 +176,9 @@ public class RexProRequest {
     }
 
     public void process() {
+        // may have been processed by the security filter already.
+        if (requestMessage != null)  return;
+
         try {
             deserializeMessage();
         } catch (Exception ex) {
