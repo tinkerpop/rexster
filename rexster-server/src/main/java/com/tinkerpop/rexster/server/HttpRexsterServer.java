@@ -386,6 +386,7 @@ public class HttpRexsterServer implements RexsterServer {
                     wacJersey.addContextInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, securityFilterType);
                     final Class clazz = Class.forName(securityFilterType, true, Thread.currentThread().getContextClassLoader());
                     final AbstractSecurityFilter securityFilter = (AbstractSecurityFilter) clazz.newInstance();
+                    securityFilter.configure(properties.getConfiguration());
                     rc.getContainerRequestFilters().add(securityFilter);
                 }
             }
