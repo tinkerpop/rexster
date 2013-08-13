@@ -197,7 +197,7 @@ public class RexsterConsole {
 
         try {
             final History history = new History();
-            history.setHistoryFile(new File(REXSTER_HISTORY));
+            history.setHistoryFile(new File(System.getProperty("user.home") + "/" + REXSTER_HISTORY));
             reader.setHistory(history);
         } catch (IOException e) {
             System.err.println("Could not find history file");
