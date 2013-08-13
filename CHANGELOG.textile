@@ -15,6 +15,8 @@ h3. Version 2.5.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Rexster Console @.rexster_history@ file now stored in the user root directory.
+
 ==<hr/>==
 
 h3. Version 2.4.0 (August 4, 2013)
