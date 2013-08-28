@@ -141,7 +141,7 @@ public class VertexResource extends AbstractSubResource {
             logger.error(ex);
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
-        } catch (RuntimeException re) {
+        } catch (Exception re) {
             logger.error(re);
 
             JSONObject error = generateErrorObject(re.getMessage(), re);
@@ -573,7 +573,7 @@ public class VertexResource extends AbstractSubResource {
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (WebApplicationException wae) {
             throw wae;
-        } catch (RuntimeException re) {
+        } catch (Exception re) {
             logger.error(re);
 
             final JSONObject error = generateErrorObject(re.getMessage(), re);
@@ -733,7 +733,7 @@ public class VertexResource extends AbstractSubResource {
 
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
-        } catch (RuntimeException re) {
+        } catch (Exception re) {
             rag.tryRollback();
 
             logger.error(re);
@@ -851,7 +851,7 @@ public class VertexResource extends AbstractSubResource {
 
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
-        } catch (RuntimeException re) {
+        } catch (Exception re) {
             rag.tryRollback();
 
             logger.error(re);
@@ -911,7 +911,7 @@ public class VertexResource extends AbstractSubResource {
 
             final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
-        } catch (RuntimeException re) {
+        } catch (Exception re) {
 
             rag.tryRollback();
 
