@@ -20,7 +20,7 @@ public class ElementHelper {
      * Takes a property value string from the URI and attempts to parse it
      * to its defined data type using Rexster Data Typing.
      */
-    public static Object getTypedPropertyValue(Object propertyValue) {
+    public static Object getTypedPropertyValue(final Object propertyValue) {
         return getTypedPropertyValue(propertyValue, true);
     }
 
@@ -60,7 +60,7 @@ public class ElementHelper {
      * @param parseTypes    Set to true to check strings for data type formatting.
      * @return The property value coerced to the appropriate Java data type.
      */
-    public static Object getTypedPropertyValue(Object propertyValue, boolean parseTypes) {
+    public static Object getTypedPropertyValue(final Object propertyValue, final boolean parseTypes) {
         Object typedPropertyValue = propertyValue;
         if (typedPropertyValue == null) {
             typedPropertyValue = null;
@@ -135,7 +135,7 @@ public class ElementHelper {
         return typedPropertyValue;
     }
 
-    private static HashMap<String, String> tryParseMap(String mapValue) {
+    private static HashMap<String, String> tryParseMap(final String mapValue) {
         // parens on the ends have been validated already...they must be
         // here to have gotten this far.
         String stripped = mapValue.substring(1, mapValue.length() - 1);
@@ -161,7 +161,7 @@ public class ElementHelper {
         int lastPlace = 0;
         int equalPlace = 0;
         for (Integer place : delimiterPlaces) {
-            String property = stripped.substring(lastPlace, place);
+            final String property = stripped.substring(lastPlace, place);
             equalPlace = property.indexOf("=");
             pairs.put(property.substring(0, equalPlace), property.substring(equalPlace + 1));
             lastPlace = place + 1;
@@ -174,7 +174,7 @@ public class ElementHelper {
         return pairs;
     }
 
-    private static ArrayList<String> tryParseList(String listValue) {
+    private static ArrayList<String> tryParseList(final String listValue) {
 
         // square brackets on the ends have been validated already...they must be
         // here to have gotten this far.
@@ -230,7 +230,7 @@ public class ElementHelper {
         return items;
     }
 
-    private static String getValueSegment(String propertyValue) {
+    private static String getValueSegment(final String propertyValue) {
         // assumes that the propertyValue has open and closed parens
         String value = "";
         String stripped = propertyValue.substring(1, propertyValue.length() - 1);
@@ -256,7 +256,7 @@ public class ElementHelper {
         return value;
     }
 
-    private static String getDataTypeSegment(String propertyValue) {
+    private static String getDataTypeSegment(final String propertyValue) {
         // assumes that the propertyValue has open and closed parens
         String dataType = GraphSONTokens.TYPE_STRING;
 
