@@ -1,9 +1,9 @@
 package com.tinkerpop.rexster.util;
 
-import junit.framework.Assert;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
