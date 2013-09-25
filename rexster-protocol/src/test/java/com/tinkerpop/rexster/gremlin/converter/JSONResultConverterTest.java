@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.gremlin.converter;
 
+import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
@@ -214,6 +215,55 @@ public class JSONResultConverterTest {
         JSONObject innerJsonObject = jsonObject.optJSONObject("z");
         Assert.assertNotNull(innerJsonObject);
         Assert.assertEquals("b", innerJsonObject.optString("a"));
+    }
+
+    @Test
+    public void convertIteratorNotPagedWithEmbeddedMap() throws Exception {
+        final JSONResultConverter converter = new JSONResultConverter(GraphSONMode.EXTENDED, 0, Long.MAX_VALUE, null);
+        final Graph g = new TinkerGraph();
+        final Vertex v = g.addVertex(1);
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("x", 500);
+        map.put("y", "some");
+
+        ArrayList friends = new ArrayList();
+        friends.add("x");
+        friends.add(5);
+        friends.add(map);
+
+        v.setProperty("friends", friends);
+
+        Iterator iterable = g.getVertices().iterator();
+
+        JSONArray converted = converter.convert(iterable);
+
+        Assert.assertNotNull(converted);
+        Assert.assertEquals(1, converted.length());
+
+        JSONObject vertexAsJson = converted.optJSONObject(0);
+        Assert.assertNotNull(vertexAsJson);
+
+        JSONObject friendsProperty = vertexAsJson.optJSONObject("friends");
+        Assert.assertEquals("list", friendsProperty.getString("type"));
+
+        JSONArray friendPropertyList = friendsProperty.getJSONArray("value");
+        JSONObject object1 = friendPropertyList.getJSONObject(0);
+        Assert.assertEquals("string", object1.getString("type"));
+        Assert.assertEquals("x", object1.getString("value"));
+
+        JSONObject object2 = friendPropertyList.getJSONObject(1);
+        Assert.assertEquals("integer", object2.getString("type"));
+        Assert.assertEquals(5, object2.getInt("value"));
+
+        JSONObject object3 = friendPropertyList.getJSONObject(2);
+        Assert.assertEquals("map", object3.getString("type"));
+        JSONObject object3Value = object3.getJSONObject("value");
+        JSONObject object3ValueY = object3Value.getJSONObject("y");
+        Assert.assertEquals("string", object3ValueY.getString("type"));
+        Assert.assertEquals("some", object3ValueY.getString("value"));
+        JSONObject object3ValueX = object3Value.getJSONObject("x");
+        Assert.assertEquals("integer", object3ValueX.getString("type"));
+        Assert.assertEquals(500, object3ValueX.getInt("value"));
     }
 
     @Test
