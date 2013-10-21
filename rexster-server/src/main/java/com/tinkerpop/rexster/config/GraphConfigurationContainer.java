@@ -6,6 +6,9 @@ import com.tinkerpop.blueprints.util.wrappers.readonly.ReadOnlyGraph;
 import com.tinkerpop.blueprints.util.wrappers.readonly.ReadOnlyIndexableGraph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.Tokens;
+import com.tinkerpop.rexster.config.distributed.DefaultDistributedGraph;
+import com.tinkerpop.rexster.config.distributed.DistributedGraph;
+import com.tinkerpop.rexster.config.distributed.DistributedGraphConfiguration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 
@@ -51,8 +54,10 @@ public class GraphConfigurationContainer {
                         // one graph failing initialization will not prevent the rest in
                         // their attempt to be created
                         try {
-                            final Graph graph = getGraphFromConfiguration(graphConfig);
-                            final RexsterApplicationGraph rag = new RexsterApplicationGraph(graphName, graph, graphConfig);
+                            final GraphInfo graphInfo = getGraphFromConfiguration(graphConfig);
+                            final Graph graph = graphInfo.getGraph();
+                            final RexsterApplicationGraph rag = new RexsterApplicationGraph(
+                                    graphName, graph, graphInfo.getDistributedGraph(), graphConfig);
                             this.graphs.put(rag.getGraphName(), rag);
 
                             logger.info("Graph " + graphName + " - " + graph + " loaded");
@@ -90,7 +95,7 @@ public class GraphConfigurationContainer {
         return this.failedConfigurations;
     }
 
-    private Graph getGraphFromConfiguration(final HierarchicalConfiguration graphConfiguration) throws GraphConfigurationException {
+    private GraphInfo getGraphFromConfiguration(final HierarchicalConfiguration graphConfiguration) throws GraphConfigurationException {
         String graphConfigurationType = graphConfiguration.getString(Tokens.REXSTER_GRAPH_TYPE);
         final boolean isReadOnly = graphConfiguration.getBoolean(Tokens.REXSTER_GRAPH_READ_ONLY, false);
 
@@ -112,6 +117,7 @@ public class GraphConfigurationContainer {
             graphConfigurationType = DexGraphConfiguration.class.getName();
         }
 
+        final GraphInfo graphInfo;
         final Graph graph;
         try {
             final Class clazz = Class.forName(graphConfigurationType, true, Thread.currentThread().getContextClassLoader());
@@ -129,6 +135,11 @@ public class GraphConfigurationContainer {
                 graph = readWriteGraph;
             }
 
+            if (graphConfigInstance instanceof DistributedGraphConfiguration)
+                graphInfo = new GraphInfo(graph, ((DistributedGraphConfiguration) graphConfigInstance).getDistributedGraph());
+            else
+                graphInfo = new GraphInfo(graph, new DefaultDistributedGraph());
+
         } catch (NoClassDefFoundError err) {
             throw new GraphConfigurationException(String.format(
                     "GraphConfiguration [%s] could not instantiate a class [%s].  Ensure that it is in Rexster's path.",
@@ -139,6 +150,24 @@ public class GraphConfigurationContainer {
                     graphConfigurationType), ex);
         }
 
-        return graph;
+        return graphInfo;
+    }
+
+    private class GraphInfo {
+        private final Graph g;
+        private final DistributedGraph dg;
+
+        private GraphInfo(final Graph g, final DistributedGraph dg) {
+            this.g = g;
+            this.dg = dg;
+        }
+
+        private Graph getGraph() {
+            return g;
+        }
+
+        private DistributedGraph getDistributedGraph() {
+            return dg;
+        }
     }
 }

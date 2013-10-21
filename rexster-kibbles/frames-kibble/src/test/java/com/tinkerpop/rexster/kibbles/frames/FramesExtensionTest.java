@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
+import com.tinkerpop.rexster.config.distributed.DefaultDistributedGraph;
 import com.tinkerpop.rexster.extension.ExtensionConfiguration;
 import com.tinkerpop.rexster.extension.ExtensionMethod;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
@@ -71,7 +72,7 @@ public class FramesExtensionTest {
         List<HierarchicalConfiguration> configs = new ArrayList<HierarchicalConfiguration>();
         configs.add(xmlConfig);
 
-        this.rag = new RexsterApplicationGraph("tinkergraph", this.graph, allowedNamespaces, configs);
+        this.rag = new RexsterApplicationGraph("tinkergraph", this.graph, new DefaultDistributedGraph(), allowedNamespaces, configs);
     }
 
     @Test

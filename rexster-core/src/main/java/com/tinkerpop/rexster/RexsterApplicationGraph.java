@@ -3,6 +3,8 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
+import com.tinkerpop.rexster.config.distributed.DefaultDistributedGraph;
+import com.tinkerpop.rexster.config.distributed.DistributedGraph;
 import com.tinkerpop.rexster.extension.ExtensionAllowed;
 import com.tinkerpop.rexster.extension.ExtensionApi;
 import com.tinkerpop.rexster.extension.ExtensionApiBehavior;
@@ -44,6 +46,7 @@ public class RexsterApplicationGraph {
 
     private final Graph graph;
     private final String graphName;
+    private final DistributedGraph distributedGraph;
     private Set<ExtensionAllowed> extensionAllowables;
     private Set<ExtensionConfiguration> extensionConfigurations;
 
@@ -53,19 +56,26 @@ public class RexsterApplicationGraph {
     private final Map<ExtensionSegmentSet, Boolean> extensionAllowedCache = new HashMap<ExtensionSegmentSet, Boolean>();
 
     public RexsterApplicationGraph(final String graphName, final Graph graph) {
-        this(graphName, graph, null);
+        this(graphName, graph, new DefaultDistributedGraph(), null);
     }
 
-    public RexsterApplicationGraph(final String graphName, final Graph graph,
+    public RexsterApplicationGraph(final String graphName, final Graph graph, final DistributedGraph distributedGraph) {
+        this(graphName, graph, distributedGraph, null);
+    }
+
+    public RexsterApplicationGraph(final String graphName, final Graph graph, final DistributedGraph distributedGraph,
                                    final HierarchicalConfiguration graphConfig) {
-        this(graphName, graph, graphConfig == null ? null : graphConfig.getList(Tokens.REXSTER_GRAPH_EXTENSIONS_ALLOWS_PATH),
+        this(graphName, graph, distributedGraph,
+                graphConfig == null ? null : graphConfig.getList(Tokens.REXSTER_GRAPH_EXTENSIONS_ALLOWS_PATH),
                 graphConfig == null ? null : graphConfig.configurationsAt(Tokens.REXSTER_GRAPH_EXTENSIONS_PATH));
     }
 
-    public RexsterApplicationGraph(final String graphName, final Graph graph, final List<String> allowableNamespaces,
+    public RexsterApplicationGraph(final String graphName, final Graph graph, final DistributedGraph distributedGraph,
+                                   final List<String> allowableNamespaces,
                                    final List<HierarchicalConfiguration> extensionConfigurations) {
         this.graphName = graphName;
         this.graph = graph;
+        this.distributedGraph = distributedGraph;
         this.loadAllowableExtensions(allowableNamespaces);
         this.loadExtensionsConfigurations(extensionConfigurations);
     }
@@ -86,6 +96,13 @@ public class RexsterApplicationGraph {
      */
     public Graph getGraph() {
         return graph;
+    }
+
+    /**
+     * Gets the implementation of the DistributedGraph.
+     */
+    public DistributedGraph getDistributedGraph() {
+        return distributedGraph;
     }
 
     /**
