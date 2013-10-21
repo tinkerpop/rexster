@@ -2,6 +2,8 @@ package com.tinkerpop.rexster.config.distributed;
 
 import com.tinkerpop.blueprints.Element;
 
+import java.io.Serializable;
+
 /**
  * An ElementRange specifies the range of vertex or edge ids (as qualified by the elementType) that are hosted
  * locally. This makes the assumption that vertex and edge ids are comparable - in other words that they can be
@@ -10,7 +12,7 @@ import com.tinkerpop.blueprints.Element;
  * @author Matthias Broecheler (me@matthiasb.com)
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class ElementRange<U extends Comparable, E extends Element> {
+public class ElementRange<U extends Comparable, E extends Element> implements Serializable {
 
     /**
      * Either Vertex.class or Edge.class
@@ -54,5 +56,29 @@ public class ElementRange<U extends Comparable, E extends Element> {
 
     public int getPriority() {
         return priority;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ElementRange that = (ElementRange) o;
+
+        if (priority != that.priority) return false;
+        if (!elementType.equals(that.elementType)) return false;
+        if (!endRange.equals(that.endRange)) return false;
+        if (!startRange.equals(that.startRange)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = elementType.hashCode();
+        result = 31 * result + startRange.hashCode();
+        result = 31 * result + endRange.hashCode();
+        result = 31 * result + priority;
+        return result;
     }
 }

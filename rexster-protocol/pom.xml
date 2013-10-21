@@ -67,6 +67,11 @@
             <artifactId>grizzly-framework</artifactId>
             <version>${grizzly.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jgroups</groupId>
+            <artifactId>jgroups</artifactId>
+            <version>3.4.0.Final</version>
+        </dependency>
         <!-- LOGGING -->
         <dependency>
             <groupId>log4j</groupId>

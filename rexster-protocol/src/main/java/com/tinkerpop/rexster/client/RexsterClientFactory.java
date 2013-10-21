@@ -133,6 +133,25 @@ public class RexsterClientFactory {
     }
 
     /**
+     * Create a RexsterClient instance allowing override of all settings.
+     */
+    public static synchronized DistributedRexsterClient openDistributed(final Configuration specificConfiguration) throws Exception {
+
+        final CompositeConfiguration jointConfig = new CompositeConfiguration();
+        if (specificConfiguration != null)
+            jointConfig.addConfiguration(specificConfiguration);
+
+        jointConfig.addConfiguration(defaultConfiguration);
+
+        final DistributedRexsterClient client = new DistributedRexsterClient(jointConfig, getTransport());
+        //registeredClients.add(client);
+
+        logger.info(String.format("Create DistributedRexsterClient instance: [%s]", ConfigurationUtils.toString(jointConfig)));
+
+        return client;
+    }
+
+    /**
      * Calling this method will release resources for all clients.
      */
     public synchronized static void releaseClients()  throws Exception {

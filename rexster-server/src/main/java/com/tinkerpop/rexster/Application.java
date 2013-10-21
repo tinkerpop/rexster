@@ -5,6 +5,7 @@ import com.tinkerpop.rexster.protocol.EngineController;
 import com.tinkerpop.rexster.server.HttpRexsterServer;
 import com.tinkerpop.rexster.server.RexProRexsterServer;
 import com.tinkerpop.rexster.server.RexsterApplication;
+import com.tinkerpop.rexster.server.RexsterCluster;
 import com.tinkerpop.rexster.server.RexsterCommandLine;
 import com.tinkerpop.rexster.server.RexsterProperties;
 import com.tinkerpop.rexster.server.RexsterServer;
@@ -75,6 +76,7 @@ public class Application {
 
     private final RexsterServer httpServer;
     private final RexsterServer rexproServer;
+    private final RexsterServer clusterServer;
     private final RexsterApplication rexsterApplication;
     private final RexsterProperties properties;
     private final ReporterConfig reporterConfig;
@@ -98,6 +100,7 @@ public class Application {
         this.reporterConfig = new ReporterConfig(properties, this.rexsterApplication.getMetricRegistry());
         this.httpServer = new HttpRexsterServer(properties);
         this.rexproServer = new RexProRexsterServer(properties, true);
+        this.clusterServer = new RexsterCluster(properties);
     }
 
     public void start() throws Exception {
@@ -111,6 +114,7 @@ public class Application {
 
         this.httpServer.start(this.rexsterApplication);
         this.rexproServer.start(this.rexsterApplication);
+        this.clusterServer.start(this.rexsterApplication);
         this.configurationMonitor.start();
 
         startShutdownManager(this.properties);
@@ -135,6 +139,12 @@ public class Application {
             this.configurationMonitor.stop();
         } catch (Exception ex) {
             logger.debug("Error shutting down the configuration monitor");
+        }
+
+        try {
+            this.clusterServer.stop();
+        } catch (Exception ex) {
+            logger.debug("Error shutting down Cluster Server ignored.", ex);
         }
 
         try {
