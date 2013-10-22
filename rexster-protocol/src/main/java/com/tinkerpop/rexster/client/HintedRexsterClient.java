@@ -395,6 +395,7 @@ public class HintedRexsterClient {
         private final Map<Address, RexsterConnection> connections = new ConcurrentHashMap<Address, RexsterConnection>();
 
         public synchronized void tryToAdd(final Address address) {
+            System.out.println("Attempting add of address " + address);
             if (address instanceof PayloadUUID) {
                 final PayloadUUID payloadUUID = (PayloadUUID) address;
                 final String payload = payloadUUID.getPayload();
