@@ -3,8 +3,8 @@ package com.tinkerpop.rexster.server;
 import com.codahale.metrics.MetricRegistry;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
-import com.tinkerpop.rexster.config.distributed.DefaultDistributedGraph;
-import com.tinkerpop.rexster.config.distributed.DistributedGraph;
+import com.tinkerpop.rexster.config.hinted.DefaultHintedGraph;
+import com.tinkerpop.rexster.config.hinted.HintedGraph;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 
@@ -23,13 +23,13 @@ public class DefaultRexsterApplication extends AbstractMapRexsterApplication {
 
     /**
      * Constructs the DefaultRexsterApplication. With this constructor all extensions are allowed which is likely
-     * the expected case in an embedded setting. Used the DefaultDistributedGraph instance.
+     * the expected case in an embedded setting. Used the DefaultHintedGraph instance.
      *
      * @param graphName the name the graph will have in various Rexster contexts.
      * @param graph a graph instance.
      */
     public DefaultRexsterApplication(final String graphName, final Graph graph) {
-        this(graphName, graph, new DefaultDistributedGraph(), new ArrayList<String>(){{ add("*:*"); }}, null, null);
+        this(graphName, graph, new DefaultHintedGraph(), new ArrayList<String>(){{ add("*:*"); }}, null, null);
     }
 
     /**
@@ -40,13 +40,13 @@ public class DefaultRexsterApplication extends AbstractMapRexsterApplication {
      * @param allowableNamespaces list of namespace strings that are allowed for this graph.
      * @param extensionConfigurations configurations from rexster.xml for extensions. this value may be null.
      */
-    public DefaultRexsterApplication(final String graphName, final Graph graph, final DistributedGraph distributedGraph,
+    public DefaultRexsterApplication(final String graphName, final Graph graph, final HintedGraph hintedGraph,
                                      final List<String> allowableNamespaces,
                                      final List<HierarchicalConfiguration> extensionConfigurations,
                                      final MetricRegistry metricRegistry) {
         AbstractMapRexsterApplication.metricRegistry = metricRegistry;
         final RexsterApplicationGraph rag = new RexsterApplicationGraph(
-                graphName, graph, distributedGraph, allowableNamespaces, extensionConfigurations);
+                graphName, graph, hintedGraph, allowableNamespaces, extensionConfigurations);
         this.graphs.put(graphName, rag);
         logger.info(String.format("Graph [%s] loaded", rag.getGraph()));
     }

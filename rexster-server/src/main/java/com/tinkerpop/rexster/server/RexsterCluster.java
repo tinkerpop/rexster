@@ -1,6 +1,6 @@
 package com.tinkerpop.rexster.server;
 
-import com.tinkerpop.rexster.config.distributed.DistributedGraphs;
+import com.tinkerpop.rexster.config.hinted.HintedGraphs;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.jgroups.Address;
@@ -9,12 +9,6 @@ import org.jgroups.Message;
 import org.jgroups.stack.AddressGenerator;
 import org.jgroups.util.PayloadUUID;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -69,10 +63,10 @@ public class RexsterCluster implements RexsterServer {
                 public void run() {
                     while (!killed.get()) {
                         final Set<String> graphNames = rexsterApplication.getGraphNames();
-                        final DistributedGraphs graphs = new DistributedGraphs();
+                        final HintedGraphs graphs = new HintedGraphs();
 
                         for (String graphName : graphNames) {
-                            graphs.graphs.put(graphName, rexsterApplication.getApplicationGraph(graphName).getDistributedGraph());
+                            graphs.graphs.put(graphName, rexsterApplication.getApplicationGraph(graphName).getHintedGraph());
                         }
 
                         final Message msg = new Message(null, graphs);

@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster;
 
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.rexster.client.DistributedRexsterClient;
+import com.tinkerpop.rexster.client.HintedRexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,7 +17,7 @@ public class RexsterClientTest {
     @Test
     @Ignore
     public void justTrying() throws Exception {
-        DistributedRexsterClient client = RexsterClientFactory.openDistributed(null);
+        HintedRexsterClient client = RexsterClientFactory.openHinted(null);
         while (true) {
             Thread.sleep(1000);
 

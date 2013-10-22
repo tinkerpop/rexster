@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster.client;
 
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.rexster.config.distributed.DistributedGraphs;
-import com.tinkerpop.rexster.config.distributed.ElementRange;
+import com.tinkerpop.rexster.config.hinted.HintedGraphs;
+import com.tinkerpop.rexster.config.hinted.ElementRange;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  * @author Blake Eggleston (bdeggleston.github.com)
  */
-public class DistributedRexsterClient {
+public class HintedRexsterClient {
     private static final Logger logger = Logger.getLogger(RexsterClient.class);
 
     //private final NIOConnection[] connections;
@@ -70,7 +70,7 @@ public class DistributedRexsterClient {
 
     protected static ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>> responses = new ConcurrentHashMap<UUID, ArrayBlockingQueue<Object>>();
 
-    protected DistributedRexsterClient(final Configuration configuration, final TCPNIOTransport transport) {
+    protected HintedRexsterClient(final Configuration configuration, final TCPNIOTransport transport) {
         this.timeoutConnection = configuration.getInt(RexsterClientTokens.CONFIG_TIMEOUT_CONNECTION_MS);
         this.timeoutRead = configuration.getInt(RexsterClientTokens.CONFIG_TIMEOUT_READ_MS);
         this.timeoutWrite = configuration.getInt(RexsterClientTokens.CONFIG_TIMEOUT_WRITE_MS);
@@ -351,7 +351,7 @@ public class DistributedRexsterClient {
         @Override
         public void receive(final Message msg) {
             // send updates on ranges
-            connections.update(msg.getSrc(), (DistributedGraphs) msg.getObject());
+            connections.update(msg.getSrc(), (HintedGraphs) msg.getObject());
         }
 
         @Override
@@ -365,7 +365,7 @@ public class DistributedRexsterClient {
         private final Address address;
         private final String host;
         private NIOConnection nioConnection;
-        private DistributedGraphs distributedGraphs;
+        private HintedGraphs hintedGraphs;
 
         public RexsterConnection(final Address address,
                                  final String host) {
@@ -382,8 +382,8 @@ public class DistributedRexsterClient {
             return nioConnection;
         }
 
-        public DistributedGraphs getDistributedGraphs() {
-            return distributedGraphs;
+        public HintedGraphs getHintedGraphs() {
+            return hintedGraphs;
         }
 
         public String getHost() {
@@ -409,10 +409,10 @@ public class DistributedRexsterClient {
             }
         }
 
-        public synchronized void update(final Address address, final DistributedGraphs graphs) {
+        public synchronized void update(final Address address, final HintedGraphs graphs) {
             if (connections.containsKey(address)) {
                 final RexsterConnection connection = connections.get(address);
-                connection.distributedGraphs = graphs;
+                connection.hintedGraphs = graphs;
             }
         }
 
@@ -430,9 +430,9 @@ public class DistributedRexsterClient {
                 try {
                     final List<ElementRange> ranges;
                     if (elementType == Vertex.class) {
-                        ranges = conn.getDistributedGraphs().graphs.get("tinkergraph").getVertexRanges();
+                        ranges = conn.getHintedGraphs().graphs.get("tinkergraph").getVertexRanges();
                     } else {
-                        ranges = conn.getDistributedGraphs().graphs.get("tinkergraph").getEdgeRanges();
+                        ranges = conn.getHintedGraphs().graphs.get("tinkergraph").getEdgeRanges();
                     }
 
                     for (ElementRange range : ranges) {

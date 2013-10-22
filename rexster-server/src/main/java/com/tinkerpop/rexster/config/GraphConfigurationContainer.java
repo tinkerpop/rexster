@@ -6,9 +6,9 @@ import com.tinkerpop.blueprints.util.wrappers.readonly.ReadOnlyGraph;
 import com.tinkerpop.blueprints.util.wrappers.readonly.ReadOnlyIndexableGraph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.config.distributed.DefaultDistributedGraph;
-import com.tinkerpop.rexster.config.distributed.DistributedGraph;
-import com.tinkerpop.rexster.config.distributed.DistributedGraphConfiguration;
+import com.tinkerpop.rexster.config.hinted.DefaultHintedGraph;
+import com.tinkerpop.rexster.config.hinted.HintedGraph;
+import com.tinkerpop.rexster.config.hinted.HintedGraphConfiguration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 
@@ -135,10 +135,10 @@ public class GraphConfigurationContainer {
                 graph = readWriteGraph;
             }
 
-            if (graphConfigInstance instanceof DistributedGraphConfiguration)
-                graphInfo = new GraphInfo(graph, ((DistributedGraphConfiguration) graphConfigInstance).getDistributedGraph());
+            if (graphConfigInstance instanceof HintedGraphConfiguration)
+                graphInfo = new GraphInfo(graph, ((HintedGraphConfiguration) graphConfigInstance).getDistributedGraph());
             else
-                graphInfo = new GraphInfo(graph, new DefaultDistributedGraph());
+                graphInfo = new GraphInfo(graph, new DefaultHintedGraph());
 
         } catch (NoClassDefFoundError err) {
             throw new GraphConfigurationException(String.format(
@@ -155,9 +155,9 @@ public class GraphConfigurationContainer {
 
     private class GraphInfo {
         private final Graph g;
-        private final DistributedGraph dg;
+        private final HintedGraph dg;
 
-        private GraphInfo(final Graph g, final DistributedGraph dg) {
+        private GraphInfo(final Graph g, final HintedGraph dg) {
             this.g = g;
             this.dg = dg;
         }
@@ -166,7 +166,7 @@ public class GraphConfigurationContainer {
             return g;
         }
 
-        private DistributedGraph getDistributedGraph() {
+        private HintedGraph getDistributedGraph() {
             return dg;
         }
     }

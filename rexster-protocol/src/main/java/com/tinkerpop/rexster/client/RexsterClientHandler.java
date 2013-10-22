@@ -17,7 +17,7 @@ class RexsterClientHandler extends BaseFilter {
     public NextAction handleRead(FilterChainContext ctx) throws IOException {
         try {
             RexsterClient.putResponse((RexProMessage) ctx.getMessage());
-            DistributedRexsterClient.putResponse((RexProMessage) ctx.getMessage());
+            HintedRexsterClient.putResponse((RexProMessage) ctx.getMessage());
         }
         catch (Exception e) {
             logger.error("RexProMessage could not be cast to to be place on the response map.", e);

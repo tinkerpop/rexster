@@ -1,4 +1,4 @@
-package com.tinkerpop.rexster.config.distributed;
+package com.tinkerpop.rexster.config.hinted;
 
 import com.tinkerpop.blueprints.Element;
 
@@ -56,6 +56,10 @@ public class ElementRange<U extends Comparable, E extends Element> implements Se
 
     public int getPriority() {
         return priority;
+    }
+
+    public boolean contains(U item) {
+        return startRange.compareTo(item) <= 0 && endRange.compareTo(item) == 1;
     }
 
     @Override

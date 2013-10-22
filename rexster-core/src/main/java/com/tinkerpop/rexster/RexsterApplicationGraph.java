@@ -3,8 +3,8 @@ package com.tinkerpop.rexster;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
-import com.tinkerpop.rexster.config.distributed.DefaultDistributedGraph;
-import com.tinkerpop.rexster.config.distributed.DistributedGraph;
+import com.tinkerpop.rexster.config.hinted.DefaultHintedGraph;
+import com.tinkerpop.rexster.config.hinted.HintedGraph;
 import com.tinkerpop.rexster.extension.ExtensionAllowed;
 import com.tinkerpop.rexster.extension.ExtensionApi;
 import com.tinkerpop.rexster.extension.ExtensionApiBehavior;
@@ -46,7 +46,7 @@ public class RexsterApplicationGraph {
 
     private final Graph graph;
     private final String graphName;
-    private final DistributedGraph distributedGraph;
+    private final HintedGraph hintedGraph;
     private Set<ExtensionAllowed> extensionAllowables;
     private Set<ExtensionConfiguration> extensionConfigurations;
 
@@ -56,26 +56,26 @@ public class RexsterApplicationGraph {
     private final Map<ExtensionSegmentSet, Boolean> extensionAllowedCache = new HashMap<ExtensionSegmentSet, Boolean>();
 
     public RexsterApplicationGraph(final String graphName, final Graph graph) {
-        this(graphName, graph, new DefaultDistributedGraph(), null);
+        this(graphName, graph, new DefaultHintedGraph(), null);
     }
 
-    public RexsterApplicationGraph(final String graphName, final Graph graph, final DistributedGraph distributedGraph) {
-        this(graphName, graph, distributedGraph, null);
+    public RexsterApplicationGraph(final String graphName, final Graph graph, final HintedGraph hintedGraph) {
+        this(graphName, graph, hintedGraph, null);
     }
 
-    public RexsterApplicationGraph(final String graphName, final Graph graph, final DistributedGraph distributedGraph,
+    public RexsterApplicationGraph(final String graphName, final Graph graph, final HintedGraph hintedGraph,
                                    final HierarchicalConfiguration graphConfig) {
-        this(graphName, graph, distributedGraph,
+        this(graphName, graph, hintedGraph,
                 graphConfig == null ? null : graphConfig.getList(Tokens.REXSTER_GRAPH_EXTENSIONS_ALLOWS_PATH),
                 graphConfig == null ? null : graphConfig.configurationsAt(Tokens.REXSTER_GRAPH_EXTENSIONS_PATH));
     }
 
-    public RexsterApplicationGraph(final String graphName, final Graph graph, final DistributedGraph distributedGraph,
+    public RexsterApplicationGraph(final String graphName, final Graph graph, final HintedGraph hintedGraph,
                                    final List<String> allowableNamespaces,
                                    final List<HierarchicalConfiguration> extensionConfigurations) {
         this.graphName = graphName;
         this.graph = graph;
-        this.distributedGraph = distributedGraph;
+        this.hintedGraph = hintedGraph;
         this.loadAllowableExtensions(allowableNamespaces);
         this.loadExtensionsConfigurations(extensionConfigurations);
     }
@@ -99,10 +99,10 @@ public class RexsterApplicationGraph {
     }
 
     /**
-     * Gets the implementation of the DistributedGraph.
+     * Gets the implementation of the HintedGraph.
      */
-    public DistributedGraph getDistributedGraph() {
-        return distributedGraph;
+    public HintedGraph getHintedGraph() {
+        return hintedGraph;
     }
 
     /**
