@@ -33,7 +33,8 @@ public class RexsterCluster implements RexsterServer {
 
     public RexsterCluster(final RexsterProperties properties) throws Exception {
         // initialize channel first as it need sto be present for updateSettings
-        this.channel = new JChannel();
+        final String stack = System.getProperty("rexster.jgroups", JChannel.DEFAULT_PROTOCOL_STACK);
+        this.channel = new JChannel(stack);
         this.channel.setAddressGenerator(new AddressGenerator() {
             @Override
             public Address generateAddress() {

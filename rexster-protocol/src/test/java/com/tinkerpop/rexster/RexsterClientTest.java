@@ -19,7 +19,7 @@ public class RexsterClientTest {
     public void justTrying() throws Exception {
         HintedRexsterClient client = RexsterClientFactory.openHinted(null);
         for (int ix = 0; ix < 10; ix++) {
-            Thread.sleep(1000);
+            Thread.sleep(500);
 
             final HintedRexsterClient.Hint<Long> hint = new HintedRexsterClient.Hint<Long>(Vertex.class, 1l, "tinkergraph");
             Map<String, Object> bindings = new HashMap<String, Object>();

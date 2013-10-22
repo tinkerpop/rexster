@@ -92,7 +92,8 @@ public class HintedRexsterClient {
         //this.connections = new NIOConnection[this.hosts.length];
 
         try {
-            this.channel = new JChannel();
+            final String stack = System.getProperty("rexster.jgroups", JChannel.DEFAULT_PROTOCOL_STACK);
+            this.channel = new JChannel(stack);
             this.channel.setReceiver(new RexsterClusterReceiver());
             this.channel.connect("rexster");
         } catch (Exception ex) {
