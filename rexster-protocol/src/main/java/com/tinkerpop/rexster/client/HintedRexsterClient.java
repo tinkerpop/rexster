@@ -281,7 +281,7 @@ public class HintedRexsterClient {
                 if (hint == null)
                     connection = nextRoundRobinConnection();
                 else
-                    connection = connections.best(hint);
+                    connection = connections.best(hint, this.retries - tries);
 
                 if (connection != null && connection.isOpen()) {
                     final GrizzlyFuture future = connection.write(new RexsterClient.MessageContainer(serializer, toSend));
@@ -419,7 +419,7 @@ public class HintedRexsterClient {
             return (RexsterConnection) connections.values().toArray()[index];
         }
 
-        public NIOConnection best(final Hint hint) {
+        public NIOConnection best(final Hint hint, final int tries) {
             if (connections.size() == 0)
                 return nextRoundRobinConnection();
 
@@ -444,9 +444,11 @@ public class HintedRexsterClient {
                 }
             }
 
-            if (candidates.size() > 0) {
+            // for each try select the next best connection.  if there are more tries than recommended connections
+            // then simply revert to roundrobin
+            if (candidates.size() > 0 && tries < candidates.size()) {
                 Collections.sort(candidates, PrioritizedRexsterConnectionComparator.COMPARATOR);
-                best = candidates.get(0).connection.getNioConnection();
+                best = candidates.get(tries).connection.getNioConnection();
             } else
                 best = nextRoundRobinConnection();
 
