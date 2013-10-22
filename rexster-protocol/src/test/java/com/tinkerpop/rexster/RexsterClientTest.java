@@ -18,7 +18,7 @@ public class RexsterClientTest {
     @Ignore
     public void justTrying() throws Exception {
         HintedRexsterClient client = RexsterClientFactory.openHinted(null);
-        while (true) {
+        for (int ix = 0; ix < 10; ix++) {
             Thread.sleep(1000);
 
             final HintedRexsterClient.Hint hint = new HintedRexsterClient.Hint(Vertex.class, 1l, "tinkergraph");
@@ -31,5 +31,7 @@ public class RexsterClientTest {
             }
             System.out.println("worked..........next");
         }
+
+        client.close();
     }
 }

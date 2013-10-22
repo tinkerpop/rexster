@@ -307,6 +307,7 @@ public class HintedRexsterClient {
 
     public void close() throws IOException {
         //RexsterClientFactory.removeClient(this);
+        this.channel.close();
     }
 
     private ScriptRequestMessage createNoSessionScriptRequest(final String script,
