@@ -61,8 +61,8 @@ public class Neo4jGraphConfiguration implements GraphConfiguration {
                     throw new GraphConfigurationException("Check graph configuration. Neo4j HA requires [ha.server] <properties> of the configuration");
                 }
 
-                if (!neo4jProperties.containsKey("ha.zoo_keeper_servers")) {
-                    throw new GraphConfigurationException("Check graph configuration. Neo4j HA requires [ha.zoo_keeper_servers] <properties> of the configuration");
+                if (!neo4jProperties.containsKey("ha.initial_hosts")) {
+                    throw new GraphConfigurationException("Check graph configuration. Neo4j HA requires [ha.initial_hosts] <properties> of the configuration");
                 }
 
                 return new Neo4jHaGraph(graphFile, neo4jProperties);
