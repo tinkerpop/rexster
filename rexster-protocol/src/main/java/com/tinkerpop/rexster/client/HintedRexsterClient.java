@@ -110,7 +110,7 @@ public class HintedRexsterClient {
         final UUID requestId = rawMessage.requestAsUUID();
         responses.put(requestId, responseQueue);
         try {
-            this.sendRequest(rawMessage, null, null);
+            this.sendRequest(rawMessage, null);
         } catch (Throwable t) {
             throw new IOException(t);
         }
@@ -146,7 +146,7 @@ public class HintedRexsterClient {
     }
 
     public <T> List<T> execute(final String script, final Map<String, Object> scriptArgs) throws RexProException, IOException {
-        return execute(script, scriptArgs, null, null);
+        return execute(script, scriptArgs, null);
     }
 
     /**
@@ -160,14 +160,15 @@ public class HintedRexsterClient {
      * @param scriptArgs the map becomes bindings.
      */
     public <T> List<T> execute(final String script, final Map<String, Object> scriptArgs,
-                               final Class hintClass, final Long hintValue) throws RexProException, IOException {
+                               final Hint hint) throws RexProException, IOException {
         final ArrayBlockingQueue<Object> responseQueue = new ArrayBlockingQueue<Object>(1);
         final RexProMessage msgToSend = createNoSessionScriptRequest(script, scriptArgs);
         final UUID requestId = msgToSend.requestAsUUID();
         responses.put(requestId, responseQueue);
 
         try {
-            this.sendRequest(msgToSend, hintClass, hintValue);
+
+            this.sendRequest(msgToSend, hint);
         } catch (Throwable t) {
             throw new IOException(t);
         }
@@ -269,21 +270,16 @@ public class HintedRexsterClient {
         }
     }
 
-    private NIOConnection chooseHintedConnection(final Class hintClass, final Long hintValue) {
-        return connections.best(hintClass, hintValue);
-    }
-
-
-    private void sendRequest(final RexProMessage toSend, final Class hintClass, final Long hintValue) throws Exception {
+    private void sendRequest(final RexProMessage toSend, final Hint hint) throws Exception {
         boolean sent = false;
         int tries = this.retries;
         while (tries > 0 && !sent) {
             try {
                 final NIOConnection connection;
-                if (hintClass == null || hintValue == null)
+                if (hint == null)
                     connection = nextRoundRobinConnection();
                 else
-                    connection = chooseHintedConnection(hintClass, hintValue);
+                    connection = connections.best(hint);
 
                 if (connection != null && connection.isOpen()) {
                     final GrizzlyFuture future = connection.write(new RexsterClient.MessageContainer(serializer, toSend));
@@ -420,7 +416,7 @@ public class HintedRexsterClient {
             return (RexsterConnection) connections.values().toArray()[index];
         }
 
-        public NIOConnection best(final Class elementType, final long hint) {
+        public NIOConnection best(final Hint hint) {
             if (connections.size() == 0)
                 return nextRoundRobinConnection();
 
@@ -429,14 +425,14 @@ public class HintedRexsterClient {
             for (RexsterConnection conn : connections.values()) {
                 try {
                     final List<ElementRange> ranges;
-                    if (elementType == Vertex.class) {
-                        ranges = conn.getHintedGraphs().graphs.get("tinkergraph").getVertexRanges();
+                    if (hint.getElementType() == Vertex.class) {
+                        ranges = conn.getHintedGraphs().graphs.get(hint.getGraphName()).getVertexRanges();
                     } else {
-                        ranges = conn.getHintedGraphs().graphs.get("tinkergraph").getEdgeRanges();
+                        ranges = conn.getHintedGraphs().graphs.get(hint.getGraphName()).getEdgeRanges();
                     }
 
                     for (ElementRange range : ranges) {
-                        if (range.getStartRange().compareTo(hint) <= 0 && range.getEndRange().compareTo(hint) == 1)
+                        if (range.contains(hint.getHintValue()))
                             candidates.add(conn);
                     }
                 } catch (Exception ex) {
@@ -450,6 +446,30 @@ public class HintedRexsterClient {
                 best = nextRoundRobinConnection();
 
             return best;
+        }
+    }
+
+    public static class Hint<U extends Comparable> {
+        private Class elementType;
+        private U hintValue;
+        private String graphName;
+
+        public Hint(final Class elementType, final U hintValue, final String graphName) {
+            this.elementType = elementType;
+            this.hintValue = hintValue;
+            this.graphName = graphName;
+        }
+
+        public Class getElementType() {
+            return elementType;
+        }
+
+        public U getHintValue() {
+            return hintValue;
+        }
+
+        public String getGraphName() {
+            return graphName;
         }
     }
 }

@@ -21,9 +21,11 @@ public class RexsterClientTest {
         while (true) {
             Thread.sleep(1000);
 
+            final HintedRexsterClient.Hint hint = new HintedRexsterClient.Hint(Vertex.class, 1l, "tinkergraph");
+
             Map<String, Object> bindings = new HashMap<String, Object>();
             bindings.put("x", 1);
-            List l = client.execute("g=rexster.getGraph('tinkergraph');g.v(x)", bindings, Vertex.class, 1l);
+            List l = client.execute("g=rexster.getGraph('tinkergraph');g.v(x)", bindings, hint);
             for (Object i : l) {
                 System.out.println(i);
             }
