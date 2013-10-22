@@ -23,6 +23,8 @@ import org.jgroups.util.PayloadUUID;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -421,7 +423,7 @@ public class HintedRexsterClient {
                 return nextRoundRobinConnection();
 
             NIOConnection best;
-            final List<RexsterConnection> candidates = new ArrayList<RexsterConnection>();
+            final List<PrioritizedRexsterConnection> candidates = new ArrayList<PrioritizedRexsterConnection>();
             for (RexsterConnection conn : connections.values()) {
                 try {
                     final List<ElementRange> ranges;
@@ -433,19 +435,40 @@ public class HintedRexsterClient {
 
                     for (ElementRange range : ranges) {
                         if (range.contains(hint.getHintValue()))
-                            candidates.add(conn);
+                            candidates.add(new PrioritizedRexsterConnection(conn, range.getPriority()));
                     }
                 } catch (Exception ex) {
-                    // maybe the server hasn't broadcasted yet.
+                    // maybe the server hasn't broadcasted yet.  if so just let it run to select the
+                    // connection based on round-robin
                 }
             }
 
-            if (candidates.size() > 0)
-                best = candidates.get(0).getNioConnection();
-            else
+            if (candidates.size() > 0) {
+                Collections.sort(candidates, PrioritizedRexsterConnectionComparator.COMPARATOR);
+                best = candidates.get(0).connection.getNioConnection();
+            } else
                 best = nextRoundRobinConnection();
 
             return best;
+        }
+    }
+
+    private static class PrioritizedRexsterConnection {
+        private final RexsterConnection connection;
+        private final int priority;
+
+        private PrioritizedRexsterConnection(final RexsterConnection connection, final int priority) {
+            this.connection = connection;
+            this.priority = priority;
+        }
+    }
+
+    private static class PrioritizedRexsterConnectionComparator implements Comparator<PrioritizedRexsterConnection> {
+        public static final PrioritizedRexsterConnectionComparator COMPARATOR = new PrioritizedRexsterConnectionComparator();
+
+        @Override
+        public int compare(final PrioritizedRexsterConnection prioritizedRexsterConnection, final PrioritizedRexsterConnection prioritizedRexsterConnection2) {
+            return new Integer(prioritizedRexsterConnection.priority).compareTo(prioritizedRexsterConnection2.priority);
         }
     }
 
