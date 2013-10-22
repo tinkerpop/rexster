@@ -136,7 +136,7 @@ public class GraphConfigurationContainer {
             }
 
             if (graphConfigInstance instanceof HintedGraphConfiguration)
-                graphInfo = new GraphInfo(graph, ((HintedGraphConfiguration) graphConfigInstance).getDistributedGraph());
+                graphInfo = new GraphInfo(graph, ((HintedGraphConfiguration) graphConfigInstance).getHintedGraph());
             else
                 graphInfo = new GraphInfo(graph, new DefaultHintedGraph());
 
