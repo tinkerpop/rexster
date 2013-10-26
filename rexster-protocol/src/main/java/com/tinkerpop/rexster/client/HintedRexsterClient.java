@@ -257,7 +257,7 @@ public class HintedRexsterClient {
     private NIOConnection nextRoundRobinConnection() {
         synchronized(connections) {
             if (currentConnection == Integer.MAX_VALUE) { currentConnection = 0; }
-            currentConnection = (currentConnection + 1) % hosts.length;
+            currentConnection = (currentConnection + 1) % connections.size();
             return connections.getAt(currentConnection).getNioConnection();
         }
     }
@@ -419,6 +419,10 @@ public class HintedRexsterClient {
 
         public RexsterConnection getAt(final int index) {
             return (RexsterConnection) connections.values().toArray()[index];
+        }
+
+        public int size() {
+            return connections.size();
         }
 
         public NIOConnection best(final Hint hint, final int tries) {
