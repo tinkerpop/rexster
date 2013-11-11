@@ -16,6 +16,7 @@ h3. Version 2.5.0 (NOT OFFICIALLY RELEASED YET)
 ```
 
 * Rexster Console @.rexster_history@ file now stored in the user root directory.
+* Prevent `RexterClient` from continually retrying if a connection to Rexster is not established.
 
 ==<hr/>==
 
