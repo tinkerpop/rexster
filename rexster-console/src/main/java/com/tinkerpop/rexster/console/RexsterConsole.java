@@ -82,6 +82,8 @@ public class RexsterConsole {
         } else {
             this.executeScript(script, false);
         }
+
+        this.closeConsole();
     }
 
     private void initAndOpenSessionFromSettings() {
