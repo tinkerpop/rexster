@@ -36,6 +36,11 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
     public void executeExercise() throws Exception {
         final RexsterClient client = getClient();
 
+        final List<Object> nullResults = client.execute("null");
+        Assert.assertEquals(1, nullResults.size());
+        final Object nullResult = nullResults.get(0);
+        Assert.assertEquals(null, nullResult);
+
         final List<Map<String, Object>> mapResults = client.execute("[val:1+1]");
         Assert.assertEquals(1, mapResults.size());
         final Map<String, Object> mapResult = mapResults.get(0);

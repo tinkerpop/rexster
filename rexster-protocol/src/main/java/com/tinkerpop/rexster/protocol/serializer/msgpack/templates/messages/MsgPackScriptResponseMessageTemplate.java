@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.protocol.serializer.msgpack.templates.messages;
 
+import com.tinkerpop.rexster.protocol.msg.RexProScriptResult;
 import com.tinkerpop.rexster.protocol.msg.ScriptResponseMessage;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.BindingsTemplate;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.templates.ResultsTemplate;
@@ -25,8 +26,8 @@ public class MsgPackScriptResponseMessageTemplate extends RexProMessageTemplate<
     @Override
     protected ScriptResponseMessage readMessageArray(final Unpacker un, final ScriptResponseMessage msg) throws IOException {
         ScriptResponseMessage message = super.readMessageArray(un, msg);
-
-        message.Results = ResultsTemplate.getInstance().read(un, null);
+        RexProScriptResult scriptResult = ResultsTemplate.getInstance().read(un, null);
+        message.Results.set(scriptResult == null ? null : scriptResult.get());
         message.Bindings = BindingsTemplate.getInstance().read(un, null);
         return message;
     }
