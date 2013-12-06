@@ -96,6 +96,7 @@ public class HintedRexsterClient {
             this.channel = new JChannel(stack);
             this.channel.setReceiver(new RexsterClusterReceiver());
             this.channel.connect("rexster");
+            logger.debug("JChannel self address: " + this.channel.getAddressAsString());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -269,6 +270,7 @@ public class HintedRexsterClient {
             connection.setMaxAsyncWriteQueueSize(asyncWriteQueueMaxBytes);
             return connection;
         } catch (Exception e) {
+            logger.warn(String.format("Failed to open connection to %s:%d", host, port), e);
             return null;
         }
     }
