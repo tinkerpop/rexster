@@ -203,13 +203,16 @@ public class HintedRexsterClient {
             // doing it on the server, because the server should return what is asked of it, in case other clients
             // want to process this differently.
             final List<T> results = new ArrayList<T>();
-            if (msg.Results.get() instanceof Iterable) {
-                final Iterator<T> itty = ((Iterable) msg.Results.get()).iterator();
-                while(itty.hasNext()) {
-                    results.add(itty.next());
+            if (null != msg && null != msg.Results && null != msg.Results.get()) {
+                Object maybeIter = msg.Results.get();
+                if (maybeIter instanceof Iterable) {
+                    final Iterator<T> itty = ((Iterable) maybeIter).iterator();
+                    while(itty.hasNext()) {
+                        results.add(itty.next());
+                    }
+                } else {
+                    results.add((T)maybeIter);
                 }
-            } else {
-                results.add((T)msg.Results.get());
             }
 
             return results;
