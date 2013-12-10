@@ -357,6 +357,8 @@ public class HintedRexsterClient {
         public void receive(final Message msg) {
             // send updates on ranges
             connections.update(msg.getSrc(), (HintedGraphs) msg.getObject());
+            if (logger.isDebugEnabled())
+                logger.debug(String.format("Received JGroups message: SourceHost=%s HintedGraphs=%s", msg.getSrc(), msg.getObject()));
         }
 
         @Override
@@ -446,8 +448,20 @@ public class HintedRexsterClient {
                     }
 
                     for (ElementRange range : ranges) {
-                        if (range.contains(hint.getHintValue()))
+                        if (null == range) {
+                            if (logger.isDebugEnabled())
+                                logger.debug(String.format("null ElementRange for connection %s; Cluster still starting up?", conn));
+                            continue;
+                        }
+
+                        if (range.contains(hint.getHintValue())) {
                             candidates.add(new PrioritizedRexsterConnection(conn, range.getPriority()));
+                            if (logger.isTraceEnabled())
+                                logger.trace(String.format("Connection %s with range %s contains hint %s", conn, range, hint.getHintValue()));
+                        } else {
+                            if (logger.isTraceEnabled())
+                                logger.trace(String.format("Connection %s with range %s does not contain hint %s", conn, range, hint.getHintValue()));
+                        }
                     }
                 } catch (Exception ex) {
                     // maybe the server hasn't broadcasted yet.  if so just let it run to select the
@@ -461,8 +475,13 @@ public class HintedRexsterClient {
             if (candidates.size() > 0 && tries < candidates.size()) {
                 Collections.sort(candidates, PrioritizedRexsterConnectionComparator.COMPARATOR);
                 best = candidates.get(tries).connection.getNioConnection();
-            } else
+                if (logger.isDebugEnabled())
+                    logger.debug(String.format("Selected candidate %s based on hint %s", best, hint));
+            } else {
                 best = nextRoundRobinConnection();
+                if (logger.isDebugEnabled())
+                    logger.debug(String.format("Falling back to round-robin after failing to apply hint %s (%d connections, %d tries, %d candidates)", hint, connections.size(), tries, candidates.size()));
+            }
 
             return best;
         }

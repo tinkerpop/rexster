@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.server;
 
+import com.tinkerpop.rexster.config.hinted.HintedGraph;
 import com.tinkerpop.rexster.config.hinted.HintedGraphs;
 
 import org.apache.commons.configuration.XMLConfiguration;
@@ -70,7 +71,9 @@ public class RexsterCluster implements RexsterServer {
                         final HintedGraphs graphs = new HintedGraphs();
 
                         for (String graphName : graphNames) {
-                            graphs.graphs.put(graphName, rexsterApplication.getApplicationGraph(graphName).getHintedGraph());
+                            HintedGraph<?> hg = rexsterApplication.getApplicationGraph(graphName).getHintedGraph();
+                            graphs.graphs.put(graphName, hg);
+                            logger.trace(String.format("Hint snapshot: GraphName=%s HintedGraph=%s", graphName, hg.toString()));
                         }
 
                         final Message msg = new Message(null, graphs);
