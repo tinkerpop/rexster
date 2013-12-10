@@ -96,6 +96,7 @@ public class HintedRexsterClient {
             this.channel = new JChannel(stack);
             this.channel.setReceiver(new RexsterClusterReceiver());
             this.channel.connect("rexster");
+            logger.debug("JChannel self address: " + this.channel.getAddressAsString());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -202,13 +203,16 @@ public class HintedRexsterClient {
             // doing it on the server, because the server should return what is asked of it, in case other clients
             // want to process this differently.
             final List<T> results = new ArrayList<T>();
-            if (msg.Results.get() instanceof Iterable) {
-                final Iterator<T> itty = ((Iterable) msg.Results.get()).iterator();
-                while(itty.hasNext()) {
-                    results.add(itty.next());
+            if (null != msg && null != msg.Results && null != msg.Results.get()) {
+                Object maybeIter = msg.Results.get();
+                if (maybeIter instanceof Iterable) {
+                    final Iterator<T> itty = ((Iterable) maybeIter).iterator();
+                    while(itty.hasNext()) {
+                        results.add(itty.next());
+                    }
+                } else {
+                    results.add((T)maybeIter);
                 }
-            } else {
-                results.add((T)msg.Results.get());
             }
 
             return results;
@@ -269,6 +273,7 @@ public class HintedRexsterClient {
             connection.setMaxAsyncWriteQueueSize(asyncWriteQueueMaxBytes);
             return connection;
         } catch (Exception e) {
+            logger.warn(String.format("Failed to open connection to %s:%d", host, port), e);
             return null;
         }
     }
@@ -352,6 +357,8 @@ public class HintedRexsterClient {
         public void receive(final Message msg) {
             // send updates on ranges
             connections.update(msg.getSrc(), (HintedGraphs) msg.getObject());
+            if (logger.isDebugEnabled())
+                logger.debug(String.format("Received JGroups message: SourceHost=%s HintedGraphs=%s", msg.getSrc(), msg.getObject()));
         }
 
         @Override
@@ -365,7 +372,7 @@ public class HintedRexsterClient {
         private final Address address;
         private final String host;
         private NIOConnection nioConnection;
-        private HintedGraphs hintedGraphs;
+        private volatile HintedGraphs hintedGraphs;
 
         public RexsterConnection(final Address address,
                                  final String host) {
@@ -441,12 +448,25 @@ public class HintedRexsterClient {
                     }
 
                     for (ElementRange range : ranges) {
-                        if (range.contains(hint.getHintValue()))
+                        if (null == range) {
+                            if (logger.isDebugEnabled())
+                                logger.debug(String.format("null ElementRange for connection %s; Cluster still starting up?", conn));
+                            continue;
+                        }
+
+                        if (range.contains(hint.getHintValue())) {
                             candidates.add(new PrioritizedRexsterConnection(conn, range.getPriority()));
+                            if (logger.isTraceEnabled())
+                                logger.trace(String.format("Connection %s with range %s contains hint %s", conn, range, hint.getHintValue()));
+                        } else {
+                            if (logger.isTraceEnabled())
+                                logger.trace(String.format("Connection %s with range %s does not contain hint %s", conn, range, hint.getHintValue()));
+                        }
                     }
                 } catch (Exception ex) {
                     // maybe the server hasn't broadcasted yet.  if so just let it run to select the
                     // connection based on round-robin
+                    logger.error(String.format("Unexpected exception while comparing hint to connection ranges"), ex);
                 }
             }
 
@@ -455,8 +475,13 @@ public class HintedRexsterClient {
             if (candidates.size() > 0 && tries < candidates.size()) {
                 Collections.sort(candidates, PrioritizedRexsterConnectionComparator.COMPARATOR);
                 best = candidates.get(tries).connection.getNioConnection();
-            } else
+                if (logger.isDebugEnabled())
+                    logger.debug(String.format("Selected candidate %s based on hint %s", best, hint));
+            } else {
                 best = nextRoundRobinConnection();
+                if (logger.isDebugEnabled())
+                    logger.debug(String.format("Falling back to round-robin after failing to apply hint %s (%d connections, %d tries, %d candidates)", hint, connections.size(), tries, candidates.size()));
+            }
 
             return best;
         }

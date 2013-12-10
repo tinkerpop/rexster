@@ -1,6 +1,8 @@
 package com.tinkerpop.rexster.server;
 
+import com.tinkerpop.rexster.config.hinted.HintedGraph;
 import com.tinkerpop.rexster.config.hinted.HintedGraphs;
+
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.jgroups.Address;
@@ -9,6 +11,8 @@ import org.jgroups.Message;
 import org.jgroups.stack.AddressGenerator;
 import org.jgroups.util.PayloadUUID;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -67,7 +71,9 @@ public class RexsterCluster implements RexsterServer {
                         final HintedGraphs graphs = new HintedGraphs();
 
                         for (String graphName : graphNames) {
-                            graphs.graphs.put(graphName, rexsterApplication.getApplicationGraph(graphName).getHintedGraph());
+                            HintedGraph<?> hg = rexsterApplication.getApplicationGraph(graphName).getHintedGraph();
+                            graphs.graphs.put(graphName, hg);
+                            logger.trace(String.format("Hint snapshot: GraphName=%s HintedGraph=%s", graphName, hg.toString()));
                         }
 
                         final Message msg = new Message(null, graphs);
@@ -107,7 +113,29 @@ public class RexsterCluster implements RexsterServer {
 
     private void updateSettings(final XMLConfiguration configuration) {
         this.rexsterServerPort.set(configuration.getInteger("rexpro.server-port", new Integer(RexsterSettings.DEFAULT_HTTP_PORT)));
-        this.rexsterServerHost.set(configuration.getString("rexpro.server-host", "0.0.0.0"));
+
+        String serverHost = null;
+        String shKey = "rexpro.server-host";
+        if (configuration.containsKey(shKey)) {
+            serverHost = configuration.getString(shKey);
+            if ("0.0.0.0".equals(serverHost)) {
+                serverHost = null;
+            }
+        }
+
+        if (null == serverHost) {
+            try {
+                serverHost = InetAddress.getLocalHost().getHostAddress();
+            } catch (UnknownHostException e) {
+                logger.warn("Unable to resolve local hostname", e);
+                serverHost = "localhost";
+            }
+        }
+
+        assert null != serverHost;
+
+        this.rexsterServerHost.set(serverHost);
+        logger.debug("Set rexpro.server-host " + rexsterServerHost.get());
 
         // reset the cluster connection if changed
         if (!this.rexsterServerHost.get().equals(lastRexsterServerHost)

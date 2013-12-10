@@ -12,31 +12,31 @@ import static org.junit.Assert.assertTrue;
 public class ElementRangeTest {
     @Test
     public void shouldContainValueInclusive() {
-        final ElementRange<Long, Vertex> range = new ElementRange<Long, Vertex>(Vertex.class, 100l, 200l, 1);
+        final ElementRange<Long, Vertex> range = new IntervalElementRange<Long, Vertex>(Vertex.class, 100l, 200l, 1);
         assertTrue(range.contains(100l));
     }
 
     @Test
     public void shouldContainValueMiddle() {
-        final ElementRange<Long, Vertex> range = new ElementRange<Long, Vertex>(Vertex.class, 100l, 200l, 1);
+        final ElementRange<Long, Vertex> range = new IntervalElementRange<Long, Vertex>(Vertex.class, 100l, 200l, 1);
         assertTrue(range.contains(101l));
     }
 
     @Test
     public void shouldNotContainValueExclusive() {
-        final ElementRange<Long, Vertex> range = new ElementRange<Long, Vertex>(Vertex.class, 100l, 200l, 1);
+        final ElementRange<Long, Vertex> range = new IntervalElementRange<Long, Vertex>(Vertex.class, 100l, 200l, 1);
         assertFalse(range.contains(200l));
     }
 
     @Test
     public void shouldNotContainValueOutOfBoundsOver() {
-        final ElementRange<Long, Vertex> range = new ElementRange<Long, Vertex>(Vertex.class, 100l, 200l, 1);
+        final ElementRange<Long, Vertex> range = new IntervalElementRange<Long, Vertex>(Vertex.class, 100l, 200l, 1);
         assertFalse(range.contains(201l));
     }
 
     @Test
     public void shouldNotContainValueOutOfBoundsUnder() {
-        final ElementRange<Long, Vertex> range = new ElementRange<Long, Vertex>(Vertex.class, 100l, 200l, 1);
+        final ElementRange<Long, Vertex> range = new IntervalElementRange<Long, Vertex>(Vertex.class, 100l, 200l, 1);
         assertFalse(range.contains(99l));
     }
 }
