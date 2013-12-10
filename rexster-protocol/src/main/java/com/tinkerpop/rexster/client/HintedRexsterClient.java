@@ -370,7 +370,7 @@ public class HintedRexsterClient {
         private final Address address;
         private final String host;
         private NIOConnection nioConnection;
-        private HintedGraphs hintedGraphs;
+        private volatile HintedGraphs hintedGraphs;
 
         public RexsterConnection(final Address address,
                                  final String host) {
