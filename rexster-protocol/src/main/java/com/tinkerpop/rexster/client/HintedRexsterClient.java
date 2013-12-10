@@ -452,6 +452,7 @@ public class HintedRexsterClient {
                 } catch (Exception ex) {
                     // maybe the server hasn't broadcasted yet.  if so just let it run to select the
                     // connection based on round-robin
+                    logger.error(String.format("Unexpected exception while comparing hint to connection ranges"), ex);
                 }
             }
 
