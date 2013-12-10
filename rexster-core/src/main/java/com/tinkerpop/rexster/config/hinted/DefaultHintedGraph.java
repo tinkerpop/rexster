@@ -15,9 +15,9 @@ import java.util.List;
  */
 public class DefaultHintedGraph implements HintedGraph<Long> {
     private static final ElementRange<Long, Vertex> LONG_VERTEX_ELEMENT_RANGE
-            = new ElementRange<Long, Vertex>(Vertex.class, Long.MIN_VALUE, Long.MAX_VALUE, 1);
+            = new IntervalElementRange<Long, Vertex>(Vertex.class, Long.MIN_VALUE, Long.MAX_VALUE, 1);
     private static final ElementRange<Long, Edge> LONG_EDGE_ELEMENT_RANGE
-            = new ElementRange<Long, Edge>(Edge.class, Long.MIN_VALUE, Long.MAX_VALUE, 1);
+            = new IntervalElementRange<Long, Edge>(Edge.class, Long.MIN_VALUE, Long.MAX_VALUE, 1);
 
     @Override
     public List<ElementRange<Long, Vertex>> getVertexRanges() {
