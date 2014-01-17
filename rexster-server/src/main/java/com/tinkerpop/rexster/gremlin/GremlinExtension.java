@@ -45,6 +45,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
@@ -56,7 +58,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
     public static final String EXTENSION_NAMESPACE = "tp";
     public static final String EXTENSION_NAME = "gremlin";
 
-    private static final Map<String, String> cachedScripts = new HashMap<String, String>();
+    private static final ConcurrentMap<String, String> cachedScripts = new ConcurrentHashMap<String, String>();
 
     private static final String GRAPH_VARIABLE = "g";
     private static final String VERTEX_VARIABLE = "v";
@@ -335,7 +337,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
         }
     }
 
-    private static String getLanguageToExecuteWith(JSONObject requestObject) {
+    private static String getLanguageToExecuteWith(final JSONObject requestObject) {
         final String language = requestObject != null ? requestObject.optString(LANGUAGE) : null;
         String requestedLanguage = "groovy";
         if (language != null && !language.equals("")) {
@@ -345,7 +347,7 @@ public class GremlinExtension extends AbstractRexsterExtension {
         return requestedLanguage;
     }
 
-    private static Iterator<String> getScriptsToRun(JSONObject requestObject, Map configuration) throws IOException {
+    private static Iterator<String> getScriptsToRun(final JSONObject requestObject, final Map configuration) throws IOException {
 
         if (configuration == null) {
             logger.warn("No scripts are configured for the Gremlin Extension so 'load' query string parameter will be ignored");
@@ -374,7 +376,9 @@ public class GremlinExtension extends AbstractRexsterExtension {
                     script = readFile(locationAndScriptFile);
 
                     if (scriptsAreCached) {
-                        cachedScripts.put(locationAndScriptFile, script);
+                        synchronized (GremlinExtension.class) {
+                            cachedScripts.putIfAbsent(locationAndScriptFile, script);
+                        }
                     }
                 }
                 scriptList.add(script);
@@ -386,28 +390,26 @@ public class GremlinExtension extends AbstractRexsterExtension {
         return scripts;
     }
 
-    private static String readFile(String fileName) throws IOException {
-
-        StringWriter stringWriter = new StringWriter();
+    private static synchronized String readFile(final String fileName) throws IOException {
+        final StringWriter stringWriter = new StringWriter();
         IOUtils.copy(new FileInputStream(new File(fileName)), stringWriter);
-
         return stringWriter.toString();
     }
 
-    private static boolean isClientScriptAllowed(Map configuration) {
+    private static boolean isClientScriptAllowed(final Map configuration) {
         boolean allowClientScript = true;
         if (configuration != null && configuration.containsKey("allow-client-script")) {
-            String configValue = (String) configuration.get("allow-client-script");
+            final String configValue = (String) configuration.get("allow-client-script");
             allowClientScript = configValue.toLowerCase().equals("true") ? true : false;
         }
 
         return allowClientScript;
     }
 
-    private static boolean areScriptsCached(Map configuration) {
+    private static boolean areScriptsCached(final Map configuration) {
         boolean cacheScripts = true;
         if (configuration != null && configuration.containsKey("cache-scripts")) {
-            String configValue = (String) configuration.get("cache-scripts");
+            final String configValue = (String) configuration.get("cache-scripts");
             cacheScripts = configValue.toLowerCase().equals("true") ? true : false;
         }
 
