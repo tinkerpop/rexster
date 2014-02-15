@@ -283,11 +283,10 @@ public class RexsterClient {
                     future.get(this.timeoutWrite, TimeUnit.MILLISECONDS);
                     sent = true;
                 } else {
-                    logger.warn("Connection was not open.  Ensure that Rexster Server is running/reachable.");
+                    throw new Exception("Connection was not open.  Ensure that Rexster Server is running/reachable.");
                 }
             } catch (Exception ex) {
                 logger.error(String.format("Request failed.  Retry attempt [%s]", (this.retries - tries) + 1), ex);
-            } finally {
                 tries--;
                 final UUID requestId = toSend.requestAsUUID();
                 if (tries == 0) {
