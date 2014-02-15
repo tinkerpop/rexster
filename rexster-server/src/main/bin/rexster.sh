@@ -1,11 +1,11 @@
 #!/bin/bash
 
-CP=$( echo `dirname $0`/../lib/*.jar . | sed 's/ /:/g')
-CP=$CP:$(find -L `dirname $0`/../ext/ -name "*.jar" | tr '\n' ':')
+CP=$( echo `dirname $(realpath $0)`/../lib/*.jar . | sed 's/ /:/g')
+CP=$CP:$(find -L `dirname $(realpath $0)`/../ext/ -name "*.jar" | tr '\n' ':')
 
 REXSTER_EXT=../ext
 
-PUBLIC=`dirname $0`/../public/
+PUBLIC=`dirname $(realpath $0)`/../public/
 EXTRA=
 
 if [ $1 = "-s" ] ; then
