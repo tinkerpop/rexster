@@ -1,7 +1,6 @@
 package com.tinkerpop.rexster.server;
 
 import com.tinkerpop.rexster.Tokens;
-import com.tinkerpop.rexster.protocol.EngineController;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
@@ -35,14 +34,19 @@ public class RexsterProperties extends FileAlterationListenerAdaptor {
         readConfigurationFromFile(rexsterXmlFileLocation);
     }
 
-    private void readConfigurationFromFile(String rexsterXmlFileLocation) {
+    private void readConfigurationFromFile(final String rexsterXmlFileLocation) {
         this.configuration = new XMLConfiguration();
-        final File rexsterXmlFile = new File(rexsterXmlFileLocation);
+        final String rexsterHome = System.getenv("REXSTER_HOME");
+        final String rexsterXmlWithHome = rexsterHome == null ? rexsterXmlFileLocation : rexsterHome + File.separator + rexsterXmlFileLocation;
+        if (rexsterHome != null)
+            logger.info(String.format("REXSTER_HOME is set, trying config at [%s]", rexsterXmlWithHome));
+
+        File rexsterXmlFile = new File(rexsterXmlWithHome);
 
         try {
             // load either the rexster.xml from the command line or the default rexster.xml in the root of the
             // working directory
-            configuration.load(new FileReader(rexsterXmlFileLocation));
+            configuration.load(new FileReader(rexsterXmlWithHome));
             logger.info(String.format("Using [%s] as configuration source.", rexsterXmlFile.getAbsolutePath()));
         } catch (Exception e) {
             final String msg = String.format("Could not load configuration from [%s]", rexsterXmlFile.getAbsolutePath());
