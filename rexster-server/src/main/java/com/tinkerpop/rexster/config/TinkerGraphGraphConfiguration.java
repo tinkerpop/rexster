@@ -2,17 +2,21 @@ package com.tinkerpop.rexster.config;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
+import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.util.MockTinkerTransactionalGraph;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConversionException;
+
+import java.util.Map;
 
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class TinkerGraphGraphConfiguration implements GraphConfiguration {
 
-    public Graph configureGraphInstance(final Configuration properties) throws GraphConfigurationException {
+    public Graph configureGraphInstance(final Configuration properties,
+                                        final Map<String, RexsterApplicationGraph> graphs) throws GraphConfigurationException {
 
         final String graphFile = properties.getString(Tokens.REXSTER_GRAPH_LOCATION, null);
 

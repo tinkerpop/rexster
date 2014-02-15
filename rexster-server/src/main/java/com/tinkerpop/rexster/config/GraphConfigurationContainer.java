@@ -102,6 +102,8 @@ public class GraphConfigurationContainer {
             graphConfigurationType = TinkerGraphGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("rexstergraph")) {
             graphConfigurationType = RexsterGraphGraphConfiguration.class.getName();
+        } else if (graphConfigurationType.equals("linkeddatasailgraph")) {
+            graphConfigurationType = LinkedDataSailGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("memorystoresailgraph")) {
             graphConfigurationType = MemoryStoreSailGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("nativestoresailgraph")) {
@@ -116,7 +118,7 @@ public class GraphConfigurationContainer {
         try {
             final Class clazz = Class.forName(graphConfigurationType, true, Thread.currentThread().getContextClassLoader());
             final GraphConfiguration graphConfigInstance = (GraphConfiguration) clazz.newInstance();
-            Graph readWriteGraph = graphConfigInstance.configureGraphInstance(graphConfiguration);
+            Graph readWriteGraph = graphConfigInstance.configureGraphInstance(graphConfiguration, getApplicationGraphs());
 
             if (isReadOnly) {
                 // the graph is configured to be readonly so wrap it up
