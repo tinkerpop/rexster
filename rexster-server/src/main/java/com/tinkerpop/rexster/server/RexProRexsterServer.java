@@ -47,6 +47,7 @@ public class RexProRexsterServer implements RexsterServer {
     private int coreKernalThreadPoolSize;
     private long connectionIdleMax;
     private long connectionIdleInterval;
+    private int transportReadBuffer;
     private boolean enableJmx;
     private String ioStrategy;
 
@@ -61,6 +62,7 @@ public class RexProRexsterServer implements RexsterServer {
     private int lastCoreKernalThreadPoolSize;
     private long lastConnectionIdleMax;
     private long lastConnectionIdleInterval;
+    private int lastTransportReadBuffer;
 
     public RexProRexsterServer(final XMLConfiguration configuration) {
         this(configuration, true);
@@ -90,6 +92,7 @@ public class RexProRexsterServer implements RexsterServer {
             lastCoreKernalThreadPoolSize = coreKernalThreadPoolSize;
             lastConnectionIdleInterval = connectionIdleInterval;
             lastConnectionIdleMax = connectionIdleMax;
+            lastTransportReadBuffer = transportReadBuffer;
 
             updateSettings(configuration);
 
@@ -190,6 +193,7 @@ public class RexProRexsterServer implements RexsterServer {
         this.connectionIdleInterval = configuration.getLong("rexpro.connection-check-interval", new Long(RexsterSettings.DEFAULT_REXPRO_SESSION_CHECK_INTERVAL));
         this.enableJmx = configuration.getBoolean("rexpro.enable-jmx", false);
         this.ioStrategy = configuration.getString("rexpro.io-strategy", "leader-follower");
+        this.transportReadBuffer = configuration.getInt("rexpro.read-buffer", 64 * 1024);
     }
 
     private FilterChain constructFilterChain(final RexsterApplication application) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
@@ -283,6 +287,9 @@ public class RexProRexsterServer implements RexsterServer {
 
             logger.info(String.format("Using %s IOStrategy for RexPro.", strategy.getClass().getName()));
         }
+
+        if (this.lastTransportReadBuffer != transportReadBuffer)
+            this.tcpTransport.setReadBufferSize(this.transportReadBuffer);
 
         if (hasThreadPoolSizeChanged()) {
             final ThreadPoolConfig workerThreadPoolConfig = ThreadPoolConfig.defaultConfig()

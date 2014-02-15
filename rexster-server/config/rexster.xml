@@ -30,6 +30,7 @@
         <session-check-interval>3000000</session-check-interval>
         <connection-max-idle>180000</connection-max-idle>
         <connection-check-interval>3000000</connection-check-interval>
+        <read-buffer>65536</read-buffer>
         <enable-jmx>false</enable-jmx>
         <thread-pool>
             <worker>

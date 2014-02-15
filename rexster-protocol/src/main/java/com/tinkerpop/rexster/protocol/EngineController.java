@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Manages the list of EngineHolder items for the current ScriptEngineManager.
@@ -28,6 +29,9 @@ public class EngineController {
     private final Map<String, EngineHolder> engines = new ConcurrentHashMap<String, EngineHolder>();
     private static final List<EngineConfiguration> engineConfigurations = new ArrayList<EngineConfiguration>();
 
+    private static final Object lock = new Object();
+    private static final AtomicBoolean initializing = new AtomicBoolean(false);
+
     /**
      * All gremlin engines are prefixed with this value.
      */
@@ -42,6 +46,7 @@ public class EngineController {
     }
 
     private void loadEngines() {
+        initializing.set(true);
         engines.clear();
 
         final ScriptEngineManager manager = new ScriptEngineManager();
@@ -56,6 +61,8 @@ public class EngineController {
                 this.engines.put(factory.getLanguageName(), new EngineHolder(factory, engineConfiguration));
             }
         }
+
+        initializing.set(false);
     }
 
     /**
@@ -96,13 +103,22 @@ public class EngineController {
         configure(confs);
     }
 
-    public static void configure(final List<EngineConfiguration> configurations) {
+    public synchronized static void configure(final List<EngineConfiguration> configurations) {
+        // need to null the singleton controller.  this will kill script processing dead.  it's as good as
+        // restarting the server practically.
+        engineController = null;
+        engineConfigurations.clear();
         engineConfigurations.addAll(configurations);
     }
 
     public static EngineController getInstance() {
         if (engineController == null) {
-            engineController = new EngineController();
+            // hack to deal with this singleton that needs to be created in a synchronous manner without having
+            // to make the entire method synchronized.  guess this would work, though a bit of an ugly double check
+            synchronized (lock) {
+                if (engineController == null)
+                    engineController = new EngineController();
+            }
         }
 
         return engineController;
@@ -130,6 +146,14 @@ public class EngineController {
     }
 
     public EngineHolder getEngineByLanguageName(final String languageName) throws ScriptException {
+        while(initializing.get()) {
+            try {
+                Thread.sleep(100);
+            } catch (Exception ex) {
+                logger.warn("An engine was requested while the ScriptEngine was initializing.", ex);
+                throw new RuntimeException(ex);
+            }
+        }
 
         final EngineHolder engine = this.engines.get(ENGINE_NAME_PREFIX + languageName);
         if (engine == null) {
