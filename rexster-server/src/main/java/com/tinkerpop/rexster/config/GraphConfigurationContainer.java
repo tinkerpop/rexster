@@ -118,7 +118,10 @@ public class GraphConfigurationContainer {
         try {
             final Class clazz = Class.forName(graphConfigurationType, true, Thread.currentThread().getContextClassLoader());
             final GraphConfiguration graphConfigInstance = (GraphConfiguration) clazz.newInstance();
-            Graph readWriteGraph = graphConfigInstance.configureGraphInstance(graphConfiguration, getApplicationGraphs());
+
+            GraphConfigurationContext context = new GraphConfigurationContext(graphConfiguration, getApplicationGraphs());
+
+            Graph readWriteGraph = graphConfigInstance.configureGraphInstance(context);
 
             if (isReadOnly) {
                 // the graph is configured to be readonly so wrap it up

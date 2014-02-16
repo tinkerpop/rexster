@@ -22,10 +22,11 @@ public class AbstractSailGraphConfigurationTest {
     public void configureGraphInstanceNativeSailTypeNoGraphFile() throws GraphConfigurationException {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
         this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_NATIVE);
 
-        this.configuration.configureGraphInstance(graphConfig, graphs);
+        this.configuration.configureGraphInstance(context);
     }
 
     @Test(expected = GraphConfigurationException.class)
@@ -33,20 +34,22 @@ public class AbstractSailGraphConfigurationTest {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
         graphConfig.setProperty(Tokens.REXSTER_GRAPH_LOCATION, "");
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
         this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_NATIVE);
 
-        this.configuration.configureGraphInstance(graphConfig, graphs);
+        this.configuration.configureGraphInstance(context);
     }
 
     @Test(expected = GraphConfigurationException.class)
     public void configureGraphInstanceSparqlRepoSailTypeNoGraphFile() throws GraphConfigurationException {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
         this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_SPARQL);
 
-        this.configuration.configureGraphInstance(graphConfig, graphs);
+        this.configuration.configureGraphInstance(context);
     }
 
     @Test(expected = GraphConfigurationException.class)
@@ -54,10 +57,11 @@ public class AbstractSailGraphConfigurationTest {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
         graphConfig.setProperty(Tokens.REXSTER_GRAPH_LOCATION, "");
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
         this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_SPARQL);
 
-        this.configuration.configureGraphInstance(graphConfig, graphs);
+        this.configuration.configureGraphInstance(context);
     }
 
     @Test
@@ -65,10 +69,11 @@ public class AbstractSailGraphConfigurationTest {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
         graphConfig.setProperty(Tokens.REXSTER_GRAPH_LOCATION, "");
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
         this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_MEMORY);
 
-        Graph graph = this.configuration.configureGraphInstance(graphConfig, graphs);
+        Graph graph = this.configuration.configureGraphInstance(context);
         Assert.assertNotNull(graph);
         Assert.assertTrue(graph instanceof MemoryStoreSailGraph);
     }
@@ -77,10 +82,11 @@ public class AbstractSailGraphConfigurationTest {
     public void configureGraphInstanceMemorySailTypeNoGraphFileProperty() throws GraphConfigurationException {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
         this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_MEMORY);
 
-        Graph graph = this.configuration.configureGraphInstance(graphConfig, graphs);
+        Graph graph = this.configuration.configureGraphInstance(context);
         Assert.assertNotNull(graph);
         Assert.assertTrue(graph instanceof MemoryStoreSailGraph);
     }
@@ -90,18 +96,20 @@ public class AbstractSailGraphConfigurationTest {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
         graphConfig.setProperty(Tokens.REXSTER_GRAPH_LOCATION, "");
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
         this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_MEMORY);
-        Graph graph = this.configuration.configureGraphInstance(graphConfig, graphs);
+        Graph graph = this.configuration.configureGraphInstance(context);
 
         graphs.put("ldbase", new RexsterApplicationGraph("ldbase", graph));
 
         // now configure LinkedDataSailGraph
         graphConfig = new HierarchicalConfiguration();
+        context = new GraphConfigurationContext(graphConfig, graphs);
         graphConfig.setProperty(Tokens.REXSTER_GRAPH_LOCATION, "ldbase");
         this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_LINKED_DATA);
-        this.configuration.configureGraphInstance(graphConfig, graphs);
+        this.configuration.configureGraphInstance(context);
 
-        graph = this.configuration.configureGraphInstance(graphConfig, graphs);
+        graph = this.configuration.configureGraphInstance(context);
         assertTrue(graph instanceof LinkedDataSailGraph);
     }
 
@@ -110,10 +118,11 @@ public class AbstractSailGraphConfigurationTest {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
         graphConfig.setProperty(Tokens.REXSTER_GRAPH_LOCATION, "");
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
         this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_LINKED_DATA);
 
-        this.configuration.configureGraphInstance(graphConfig, graphs);
+        this.configuration.configureGraphInstance(context);
     }
 
     @Test(expected = GraphConfigurationException.class)
@@ -121,9 +130,10 @@ public class AbstractSailGraphConfigurationTest {
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();
         graphConfig.setProperty(Tokens.REXSTER_GRAPH_LOCATION, "thisbasegraphdoesnotexist");
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
         this.configuration.setSailType(AbstractSailGraphConfiguration.SAIL_TYPE_LINKED_DATA);
 
-        this.configuration.configureGraphInstance(graphConfig, graphs);
+        this.configuration.configureGraphInstance(context);
     }
 }

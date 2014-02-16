@@ -16,7 +16,8 @@ public class TinkerGraphGraphConfigurationTest {
     public void configureGraphInstanceNoFileConfig() throws GraphConfigurationException {
         Configuration graphConfig = new HierarchicalConfiguration();
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
-        configuration.configureGraphInstance(graphConfig, graphs);
+        configuration.configureGraphInstance(context);
     }
 }

@@ -5,15 +5,10 @@ import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.rexster.RexsterApplicationGraph;
-import org.apache.commons.configuration.Configuration;
-
-import java.util.Map;
 
 public class MockGraphConfiguration implements GraphConfiguration {
 
-    public Graph configureGraphInstance(Configuration properties,
-                                        Map<String, RexsterApplicationGraph> graphs) throws GraphConfigurationException {
+    public Graph configureGraphInstance(final GraphConfigurationContext context) throws GraphConfigurationException {
         return new MockGraph();
     }
 

@@ -3,34 +3,30 @@ package com.tinkerpop.rexster.config;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.blueprints.impls.neo4j.Neo4jHaGraph;
-import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.Tokens;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class Neo4jGraphConfiguration implements GraphConfiguration {
 
-    public Graph configureGraphInstance(final Configuration properties,
-                                        final Map<String, RexsterApplicationGraph> graphs) throws GraphConfigurationException {
+    public Graph configureGraphInstance(final GraphConfigurationContext context) throws GraphConfigurationException {
 
-        final String graphFile = properties.getString(Tokens.REXSTER_GRAPH_LOCATION);
+        final String graphFile = context.getProperties().getString(Tokens.REXSTER_GRAPH_LOCATION);
 
         if (graphFile == null || graphFile.length() == 0) {
             throw new GraphConfigurationException("Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_LOCATION);
         }
 
-        final boolean highAvailabilityMode = properties.getBoolean(Tokens.REXSTER_GRAPH_HA, false);
+        final boolean highAvailabilityMode = context.getProperties().getBoolean(Tokens.REXSTER_GRAPH_HA, false);
 
         // get the <properties> section of the xml configuration
-        final HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) properties;
+        final HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) context.getProperties();
         SubnodeConfiguration neo4jSpecificConfiguration;
 
         try {

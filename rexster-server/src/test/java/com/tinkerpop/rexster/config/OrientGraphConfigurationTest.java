@@ -18,8 +18,9 @@ public class OrientGraphConfigurationTest {
     public void configureGraphInstanceNoGraphFile() throws GraphConfigurationException {
         Configuration graphConfig = new HierarchicalConfiguration();
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
-        configuration.configureGraphInstance(graphConfig, graphs);
+        configuration.configureGraphInstance(context);
     }
 
     @Test(expected = GraphConfigurationException.class)
@@ -27,8 +28,9 @@ public class OrientGraphConfigurationTest {
         Configuration graphConfig = new HierarchicalConfiguration();
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_LOCATION, "some-file");
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
-        configuration.configureGraphInstance(graphConfig, graphs);
+        configuration.configureGraphInstance(context);
     }
 
     @Test(expected = GraphConfigurationException.class)
@@ -41,7 +43,8 @@ public class OrientGraphConfigurationTest {
         listOfNodes.add(new HierarchicalConfiguration.Node("password", "pass"));
         graphConfig.addNodes(Tokens.REXSTER_GRAPH_PROPERTIES, listOfNodes);
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
-        configuration.configureGraphInstance(graphConfig, graphs);
+        configuration.configureGraphInstance(context);
     }
 }

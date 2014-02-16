@@ -20,8 +20,9 @@ public class Neo4jGraphConfigurationTest {
     public void configureGraphInstanceNoGraphFile() throws GraphConfigurationException {
         Configuration graphConfig = new HierarchicalConfiguration();
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
-        configuration.configureGraphInstance(graphConfig, graphs);
+        configuration.configureGraphInstance(context);
     }
 
     @Test(expected = GraphConfigurationException.class)
@@ -29,8 +30,9 @@ public class Neo4jGraphConfigurationTest {
         Configuration graphConfig = new HierarchicalConfiguration();
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_LOCATION, this.neo4jFile);
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
-        configuration.configureGraphInstance(graphConfig, graphs);
+        configuration.configureGraphInstance(context);
     }
 
     @Test(expected = GraphConfigurationException.class)
@@ -39,8 +41,9 @@ public class Neo4jGraphConfigurationTest {
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_LOCATION, this.neo4jFile);
         graphConfig.addProperty(Tokens.REXSTER_GRAPH_HA, "true");
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
-        configuration.configureGraphInstance(graphConfig, graphs);
+        configuration.configureGraphInstance(context);
     }
 
     @Test(expected = GraphConfigurationException.class)
@@ -53,8 +56,9 @@ public class Neo4jGraphConfigurationTest {
         listOfNodes.add(new HierarchicalConfiguration.Node("anything", "nothing"));
         graphConfig.addNodes(Tokens.REXSTER_GRAPH_PROPERTIES, listOfNodes);
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
-        configuration.configureGraphInstance(graphConfig, graphs);
+        configuration.configureGraphInstance(context);
     }
 
     @Test(expected = GraphConfigurationException.class)
@@ -67,8 +71,9 @@ public class Neo4jGraphConfigurationTest {
         listOfNodes.add(new HierarchicalConfiguration.Node("ha.machine_id", "1"));
         graphConfig.addNodes(Tokens.REXSTER_GRAPH_PROPERTIES, listOfNodes);
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
-        configuration.configureGraphInstance(graphConfig, graphs);
+        configuration.configureGraphInstance(context);
     }
 
     @Test(expected = GraphConfigurationException.class)
@@ -82,8 +87,9 @@ public class Neo4jGraphConfigurationTest {
         listOfNodes.add(new HierarchicalConfiguration.Node("ha.server", "localhost:9939"));
         graphConfig.addNodes(Tokens.REXSTER_GRAPH_PROPERTIES, listOfNodes);
         Map<String, RexsterApplicationGraph> graphs = new HashMap<String, RexsterApplicationGraph>();
+        GraphConfigurationContext context = new GraphConfigurationContext(graphConfig, graphs);
 
-        configuration.configureGraphInstance(graphConfig, graphs);
+        configuration.configureGraphInstance(context);
     }
 
 }

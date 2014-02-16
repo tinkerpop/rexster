@@ -8,12 +8,9 @@ import com.tinkerpop.blueprints.impls.sail.impls.NativeStoreSailGraph;
 import com.tinkerpop.blueprints.impls.sail.impls.SparqlRepositorySailGraph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.Tokens;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.log4j.Logger;
-
-import java.util.Map;
 
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
@@ -28,12 +25,11 @@ public abstract class AbstractSailGraphConfiguration implements GraphConfigurati
 
     protected String sailType;
 
-    public Graph configureGraphInstance(final Configuration properties,
-                                        final Map<String, RexsterApplicationGraph> graphs) throws GraphConfigurationException {
-        final String graphFile = properties.getString(Tokens.REXSTER_GRAPH_LOCATION, null);
+    public Graph configureGraphInstance(final GraphConfigurationContext context) throws GraphConfigurationException {
+        final String graphFile = context.getProperties().getString(Tokens.REXSTER_GRAPH_LOCATION, null);
 
         // get the <properties> section of the xml configuration
-        final HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) properties;
+        final HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) context.getProperties();
         SubnodeConfiguration sailSpecificConfiguration = null;
 
         try {
@@ -59,7 +55,7 @@ public abstract class AbstractSailGraphConfiguration implements GraphConfigurati
 
                 graph = new MemoryStoreSailGraph();
             } else if (this.sailType.equals(SAIL_TYPE_LINKED_DATA)) {
-                RexsterApplicationGraph baseGraph = graphs.get(graphFile);
+                RexsterApplicationGraph baseGraph = context.getGraphs().get(graphFile);
                 if (null == baseGraph) {
                     throw new GraphConfigurationException("no such base graph for LinkedDataSail graph: " + graphFile);
                 }
