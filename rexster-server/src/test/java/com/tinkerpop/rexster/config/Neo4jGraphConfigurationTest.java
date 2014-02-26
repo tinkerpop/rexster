@@ -11,7 +11,7 @@ public class Neo4jGraphConfigurationTest {
 
     private final String neo4jFile = "some-file";
 
-    private GraphConfiguration configuration = new Neo4jGraphConfiguration();
+    private GraphConfiguration configuration = new Neo4j2GraphConfiguration();
 
     @Test(expected = GraphConfigurationException.class)
     public void configureGraphInstanceNoGraphFile() throws GraphConfigurationException {

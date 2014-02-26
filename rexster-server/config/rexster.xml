@@ -159,9 +159,9 @@
             </extensions>
         </graph>
         <graph>
-            <graph-enabled>false</graph-enabled>
+            <graph-enabled>true</graph-enabled>
             <graph-name>neo4jsample</graph-name>
-            <graph-type>neo4jgraph</graph-type>
+            <graph-type>neo4j2graph</graph-type>
             <graph-location>/tmp/neo4j-graph</graph-location>
             <properties>
                 <!-- Memory mapped I/O settings -->

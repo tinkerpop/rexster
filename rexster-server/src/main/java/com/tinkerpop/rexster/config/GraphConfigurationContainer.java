@@ -95,8 +95,10 @@ public class GraphConfigurationContainer {
         final boolean isReadOnly = graphConfiguration.getBoolean(Tokens.REXSTER_GRAPH_READ_ONLY, false);
 
         if (graphConfigurationType.equals("neo4jgraph")) {
-            graphConfigurationType = Neo4jGraphConfiguration.class.getName();
-        } else if (graphConfigurationType.equals("orientgraph")) {
+            throw new UnsupportedOperationException("This version of rexster only supports neo4j2");
+        } else if (graphConfigurationType.equals("neo4j2graph")) {
+            graphConfigurationType = Neo4j2GraphConfiguration.class.getName();
+        }else if (graphConfigurationType.equals("orientgraph")) {
             graphConfigurationType = OrientGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("tinkergraph")) {
             graphConfigurationType = TinkerGraphGraphConfiguration.class.getName();

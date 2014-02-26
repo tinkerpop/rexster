@@ -1,8 +1,8 @@
 package com.tinkerpop.rexster.config;
 
 import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
-import com.tinkerpop.blueprints.impls.neo4j.Neo4jHaGraph;
+import com.tinkerpop.blueprints.impls.neo4j2.Neo4j2Graph;
+import com.tinkerpop.blueprints.impls.neo4j2.Neo4j2HaGraph;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -14,7 +14,7 @@ import java.util.Iterator;
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class Neo4jGraphConfiguration implements GraphConfiguration {
+public class Neo4j2GraphConfiguration implements GraphConfiguration {
 
     public Graph configureGraphInstance(final Configuration properties) throws GraphConfigurationException {
 
@@ -65,10 +65,10 @@ public class Neo4jGraphConfiguration implements GraphConfiguration {
                     throw new GraphConfigurationException("Check graph configuration. Neo4j HA requires [ha.initial_hosts] <properties> of the configuration");
                 }
 
-                return new Neo4jHaGraph(graphFile, neo4jProperties);
+                return new Neo4j2HaGraph(graphFile, neo4jProperties);
 
             } else {
-                return new Neo4jGraph(graphFile, neo4jProperties);
+                return new Neo4j2Graph(graphFile, neo4jProperties);
             }
 
         } catch (GraphConfigurationException gce) {
