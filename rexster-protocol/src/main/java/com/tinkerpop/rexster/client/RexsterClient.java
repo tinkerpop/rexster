@@ -304,16 +304,11 @@ public class RexsterClient {
     }
 
     public void close() throws IOException {
-        RexsterClientFactory.removeClient(this);
-    }
-
-    public void closeClientAndConnections() throws IOException {
-    	close();
-    	
-        for ( NIOConnection c : this.connections ) {
-            c.closeSilently();
+        for (NIOConnection c : this.connections) {
+            if (null != c)
+                c.closeSilently();
         }
-    } 
+    }
 
     private ScriptRequestMessage createNoSessionScriptRequest(final String script,
                                                               final Map<String, Object> scriptArguments) throws IOException, RexProException {

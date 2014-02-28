@@ -14,9 +14,7 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.strategies.LeaderFollowerNIOStrategy;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Creates RexsterClient instances.
@@ -47,11 +45,6 @@ public class RexsterClientFactory {
      * The transport used by all instantiated RexsterClient objects.
      */
     private static TCPNIOTransport transport;
-
-    /**
-     * A list of all clients that were opened by the factory.
-     */
-    private static Set<RexsterClient> registeredClients = new HashSet<RexsterClient>();
 
     /**
      * Creates a RexsterClient instance with default settings for the factory using localhost and 8184 for the port.
@@ -125,27 +118,10 @@ public class RexsterClientFactory {
         jointConfig.addConfiguration(defaultConfiguration);
 
         final RexsterClient client = new RexsterClient(jointConfig, getTransport());
-        registeredClients.add(client);
 
         logger.info(String.format("Create RexsterClient instance: [%s]", ConfigurationUtils.toString(jointConfig)));
 
         return client;
-    }
-
-    /**
-     * Calling this method will release resources for all clients.
-     */
-    public synchronized static void releaseClients()  throws Exception {
-        registeredClients.clear();
-
-        if (transport != null) {
-            transport.stop();
-            transport = null;
-        }
-    }
-
-    static synchronized void removeClient(final RexsterClient client) {
-        registeredClients.remove(client);
     }
 
     private synchronized static TCPNIOTransport getTransport() throws Exception {
