@@ -5,11 +5,10 @@ import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.Vertex;
-import org.apache.commons.configuration.Configuration;
 
 public class MockGraphConfiguration implements GraphConfiguration {
 
-    public Graph configureGraphInstance(Configuration properties) throws GraphConfigurationException {
+    public Graph configureGraphInstance(final GraphConfigurationContext context) throws GraphConfigurationException {
         return new MockGraph();
     }
 

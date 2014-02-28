@@ -3,7 +3,6 @@ package com.tinkerpop.rexster.config;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.impls.dex.DexGraph;
 import com.tinkerpop.rexster.Tokens;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 
@@ -15,16 +14,16 @@ public class DexGraphConfiguration implements GraphConfiguration {
 
     private final static String DEX_CONFIGURATION_PROPERTY = "config-file";
 
-    public Graph configureGraphInstance(final Configuration properties) throws GraphConfigurationException {
+    public Graph configureGraphInstance(final GraphConfigurationContext context) throws GraphConfigurationException {
 
-        final String graphFile = properties.getString(Tokens.REXSTER_GRAPH_LOCATION, null);
+        final String graphFile = context.getProperties().getString(Tokens.REXSTER_GRAPH_LOCATION, null);
 
         if (graphFile == null || graphFile.length() == 0) {
             throw new GraphConfigurationException("Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_LOCATION);
         }
 
         // get the <properties> section of the xml configuration
-        final HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) properties;
+        final HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) context.getProperties();
         SubnodeConfiguration dexSpecificConfiguration;
         String dexconfig;
 
