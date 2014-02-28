@@ -50,6 +50,7 @@ public class RexsterClient {
     private final String graphName;
     private final String graphObjName;
     private final boolean transaction;
+    private volatile boolean closed = false;
 
     private final TCPNIOTransport transport;
     private final String[] hosts;
@@ -275,7 +276,7 @@ public class RexsterClient {
     private void sendRequest(final RexProMessage toSend) throws Exception {
         boolean sent = false;
         int tries = this.retries;
-        while (tries > 0 && !sent) {
+        while (!closed && tries > 0 && !sent) {
             try {
                 final NIOConnection connection = nextConnection();
                 if (connection != null && connection.isOpen()) {
@@ -297,13 +298,14 @@ public class RexsterClient {
             }
         }
 
-        if (!sent) {
-            throw new Exception("Could not send message.");
-        }
+        if (!sent)
+            throw new Exception(closed ? "The close() method was called on the client and no more messages can be sent" : "Could not send message.");
 
     }
 
     public void close() throws IOException {
+        responses.clear();
+        closed = true;
         for (NIOConnection c : this.connections) {
             if (null != c)
                 c.closeSilently();

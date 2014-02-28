@@ -12,10 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
@@ -65,6 +67,18 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
 
         latch.await();
         assertFalse(fail.get());
+    }
+
+    @Test
+    public void closeStopsAdditionalSendingOfMessages() throws Exception {
+        final RexsterClient client = getClient();
+        client.close();
+        try {
+            client.execute("1+1");
+            fail("Should have thrown an exception because the client is closed");
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().contains("The close() method was called on the client and no more messages can be sent"));
+        }
     }
 
     @Test
