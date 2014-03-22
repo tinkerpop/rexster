@@ -102,7 +102,6 @@
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>${jersey.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -143,33 +142,27 @@
         <dependency>
             <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-core</artifactId>
-            <version>${metrics.version}</version>
         </dependency>
         <dependency>
             <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-servlets</artifactId>
-            <version>${metrics.version}</version>
         </dependency>
         <dependency>
             <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-jersey</artifactId>
-            <version>${metrics.version}</version>
         </dependency>
         <dependency>
             <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-graphite</artifactId>
-            <version>${metrics.version}</version>
         </dependency>
         <dependency>
             <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-ganglia</artifactId>
-            <version>${metrics.version}</version>
         </dependency>
         <!-- LOGGING -->
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
         </dependency>
         <!-- COMMONS -->
         <dependency>
@@ -182,11 +175,11 @@
             <artifactId>commons-cli</artifactId>
             <version>1.2</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.0.1</version>
-        </dependency>
+        </dependency>-->
         <!-- TESTING -->
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -293,7 +286,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-Dhost=localhost -DhttpPort=8182 -DrexproPort=8184 -Djub.consumers=CONSOLE,H2 -Djub.db.file=target/performance/h2/benchmarks -Djub.charts.dir=target/performance/charts -Djub.customkey=${rexster.version}
+                    <argLine>-Dhost=localhost -DhttpPort=8182 -DrexproPort=8184 -Djub.consumers=CONSOLE,H2
+                        -Djub.db.file=target/performance/h2/benchmarks -Djub.charts.dir=target/performance/charts
+                        -Djub.customkey=${rexster.version}
                     </argLine>
                 </configuration>
             </plugin>

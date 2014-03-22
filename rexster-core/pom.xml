@@ -34,7 +34,6 @@
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
-            <version>${jersey.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -44,19 +43,16 @@
         <dependency>
             <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-core</artifactId>
-            <version>${metrics.version}</version>
         </dependency>
         <!-- COMMONS -->
         <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
-            <version>1.6</version>
         </dependency>
         <!-- LOGGING -->
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.16</version>
         </dependency>
         <!-- TESTING -->
         <dependency>
@@ -68,7 +64,6 @@
         <dependency>
             <groupId>org.jmock</groupId>
             <artifactId>jmock-junit4</artifactId>
-            <version>2.5.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
