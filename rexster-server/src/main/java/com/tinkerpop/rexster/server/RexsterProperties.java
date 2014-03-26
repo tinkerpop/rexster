@@ -67,6 +67,11 @@ public class RexsterProperties extends FileAlterationListenerAdaptor {
         return configuration.configurationsAt(Tokens.REXSTER_REPORTER_PATH);
     }
 
+    public Long getConfigCheckInterval() {
+        return configuration.getLong("config-check-interval",
+                new Long(RexsterSettings.DEFAULT_CONFIG_CHECK_INTERVAL));
+    }
+
     public Long getRexProSessionMaxIdle() {
         return configuration.getLong("rexpro.session-max-idle",
                 new Long(RexsterSettings.DEFAULT_REXPRO_SESSION_MAX_IDLE));

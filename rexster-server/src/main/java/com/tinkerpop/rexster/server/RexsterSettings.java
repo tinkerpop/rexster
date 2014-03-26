@@ -25,6 +25,7 @@ public class RexsterSettings {
     public static final String DEFAULT_BASE_URI = "http://localhost";
     public static final long DEFAULT_REXPRO_SESSION_MAX_IDLE = 1790000;
     public static final long DEFAULT_REXPRO_SESSION_CHECK_INTERVAL = 3000000;
+    public static final long DEFAULT_CONFIG_CHECK_INTERVAL = 10000l;
     public static final String DEFAULT_HOST = "127.0.0.1";
 
     public static final String COMMAND_START = "start";

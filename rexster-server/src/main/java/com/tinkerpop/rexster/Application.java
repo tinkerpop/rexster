@@ -80,15 +80,16 @@ public class Application {
     private final ReporterConfig reporterConfig;
 
     /**
-     * Check for configuration file changes every 10 seconds.
+     * Check for configuration file changes.
      */
-    private final FileAlterationMonitor configurationMonitor = new FileAlterationMonitor(10000);
+    private final FileAlterationMonitor configurationMonitor;
 
     public Application(final RexsterProperties properties,
                        final FileAlterationObserver rexsterConfigurationObserver) throws Exception {
 
         // watch rexster.xml for changes
         rexsterConfigurationObserver.addListener(properties);
+        this.configurationMonitor = new FileAlterationMonitor(properties.getConfigCheckInterval());
         configurationMonitor.addObserver(rexsterConfigurationObserver);
 
         // get the graph configurations from the XML config file

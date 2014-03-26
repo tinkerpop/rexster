@@ -45,6 +45,7 @@
     </rexpro>
     <shutdown-port>8183</shutdown-port>
     <shutdown-host>127.0.0.1</shutdown-host>
+    <config-check-interval>10000</config-check-interval>
     <script-engines>
         <script-engine>
             <name>gremlin-groovy</name>
