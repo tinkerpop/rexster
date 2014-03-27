@@ -175,6 +175,17 @@
             <artifactId>commons-cli</artifactId>
             <version>1.2</version>
         </dependency>
+
+        <!-- needed to run Rexster in IDEA -->
+        <!--<dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>-->
+
         <!-- TESTING -->
         <dependency>
             <groupId>com.sun.jersey</groupId>
