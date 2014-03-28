@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 /**
  * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class AbstractSailGraphConfiguration implements GraphConfiguration {
     private static final Logger logger = Logger.getLogger(AbstractSailGraphConfiguration.class);

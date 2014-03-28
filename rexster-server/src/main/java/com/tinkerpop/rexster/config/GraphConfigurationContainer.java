@@ -94,7 +94,9 @@ public class GraphConfigurationContainer {
         String graphConfigurationType = graphConfiguration.getString(Tokens.REXSTER_GRAPH_TYPE);
         final boolean isReadOnly = graphConfiguration.getBoolean(Tokens.REXSTER_GRAPH_READ_ONLY, false);
 
-        if (graphConfigurationType.equals("neo4jgraph")) {
+        if (graphConfigurationType.equals("idgraph")) {
+            graphConfigurationType = IdGraphConfiguration.class.getName();
+        } else if (graphConfigurationType.equals("neo4jgraph")) {
             graphConfigurationType = Neo4jGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("orientgraph")) {
             graphConfigurationType = OrientGraphConfiguration.class.getName();

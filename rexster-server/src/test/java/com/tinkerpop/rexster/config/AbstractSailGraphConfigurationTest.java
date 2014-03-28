@@ -91,6 +91,7 @@ public class AbstractSailGraphConfigurationTest {
         Assert.assertTrue(graph instanceof MemoryStoreSailGraph);
     }
 
+    @Test
     public void configureGraphInstanceLinkedDataSailType() throws GraphConfigurationException {
         // first configure the base graph
         HierarchicalConfiguration graphConfig = new HierarchicalConfiguration();

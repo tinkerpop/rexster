@@ -1,7 +1,7 @@
 package com.tinkerpop.rexster.config;
 
 /**
- * @author Stephen Mallette (http://stephen.genoprime.com)
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class LinkedDataSailGraphConfiguration extends AbstractSailGraphConfiguration {
     public LinkedDataSailGraphConfiguration() {

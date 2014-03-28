@@ -176,6 +176,9 @@ public class Application {
     }
 
     public static void main(final String[] args)  {
+        main(new String[]{"-s", "-c", "/tmp/rexster.xml"});
+    }
+        public static void mainTmp(final String[] args)  {
 
         logger.info(".:Welcome to Rexster:.");
 
