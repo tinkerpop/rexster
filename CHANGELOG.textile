@@ -22,6 +22,7 @@ h3. Version 2.5.0 (NOT OFFICIALLY RELEASED YET)
 * Rexster respects the @REXSTER_HOME@ environment variable for purpose of locating the @rexster.xml@ file
 * Altered the semantics of @RexsterClient.close()@
 * Add configuration (@<config-check-interval>@) for the interval of time to use to check @rexster.xml@ for change.
+* Gremlin Extension supports @returnTotal@ parameter that will iterate all results and put a @count@ in results.
 
 ==<hr/>==
 

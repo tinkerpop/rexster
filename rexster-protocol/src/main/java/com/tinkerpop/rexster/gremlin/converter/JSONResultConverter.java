@@ -3,6 +3,7 @@ package com.tinkerpop.rexster.gremlin.converter;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
+import com.tinkerpop.pipes.util.structures.Pair;
 import com.tinkerpop.pipes.util.structures.Row;
 import com.tinkerpop.pipes.util.structures.Table;
 import com.tinkerpop.rexster.Tokens;
@@ -27,7 +28,6 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
     private final long offsetEnd;
     private final Set<String> returnKeys;
 
-
     public JSONResultConverter(final GraphSONMode mode, final long offsetStart, final long offsetEnd,
                                final Set<String> returnKeys) {
         this.mode = mode;
@@ -37,7 +37,12 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
     }
 
     public JSONArray convert(final Object result) throws Exception {
+        return convert(result, false).getA();
+    }
+
+    public Pair<JSONArray, Long> convert(final Object result, final boolean returnTotal) throws Exception {
         JSONArray results = new JSONArray();
+        long counter = 0;
         if (result == null) {
             // for example a script like g.clear()
             results = null;
@@ -46,46 +51,35 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
             final Table table = (Table) result;
             final Iterator<Row> rows = table.iterator();
 
-            long counter = 0;
-
             while (rows.hasNext()) {
                 final Row row = rows.next();
-                if (counter >= this.offsetStart && counter < this.offsetEnd) {
+                if (counter >= this.offsetStart && counter < this.offsetEnd)
                     results.put(prepareOutput(row));
-                }
 
-                if (counter >= this.offsetEnd) {
+                if (!returnTotal && counter >= this.offsetEnd)
                     break;
-                }
 
                 counter++;
             }
         } else if (result instanceof Iterable) {
-            long counter = 0;
             for (Object o : (Iterable) result) {
-                if (counter >= this.offsetStart && counter < this.offsetEnd) {
+                if (counter >= this.offsetStart && counter < this.offsetEnd)
                     results.put(prepareOutput(o));
-                }
 
-                if (counter >= this.offsetEnd) {
+                if (!returnTotal && counter >= this.offsetEnd)
                     break;
-                }
 
                 counter++;
             }
         } else if (result instanceof Iterator) {
             final Iterator itty = (Iterator) result;
-
-            long counter = 0;
             while (itty.hasNext()) {
                 Object current = itty.next();
-                if (counter >= this.offsetStart && counter < this.offsetEnd) {
+                if (counter >= this.offsetStart && counter < this.offsetEnd)
                     results.put(prepareOutput(current));
-                }
 
-                if (counter >= this.offsetEnd) {
+                if (!returnTotal && counter >= this.offsetEnd)
                     break;
-                }
 
                 counter++;
             }
@@ -93,7 +87,7 @@ public class JSONResultConverter implements ResultConverter<JSONArray> {
             results.put(prepareOutput(result));
         }
 
-        return results;
+        return new Pair<JSONArray, Long>(results, counter);
     }
 
     private Object prepareOutput(final Object object) throws Exception {
