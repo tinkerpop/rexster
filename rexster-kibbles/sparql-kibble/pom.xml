@@ -16,13 +16,6 @@
     <description>
         Execute a SPARQL query against a SailGraph.
     </description>
-    <developers>
-        <developer>
-            <name>Stephen Mallette</name>
-            <email>spmva@genoprime.com</email>
-            <url>http://stephen.genoprime.com</url>
-        </developer>
-    </developers>
     <inceptionYear>2011</inceptionYear>
     <dependencies>
         <!-- TinkerPop -->

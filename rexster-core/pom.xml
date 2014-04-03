@@ -12,13 +12,6 @@
     <artifactId>rexster-core</artifactId>
     <name>Rexster: Core Components</name>
     <description>Core components for extending Rexster.</description>
-    <developers>
-        <developer>
-            <name>Stephen Mallette</name>
-            <email>spmva@genoprime.com</email>
-            <url>http://stephen.genoprime.com</url>
-        </developer>
-    </developers>
     <inceptionYear>2012</inceptionYear>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

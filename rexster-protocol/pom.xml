@@ -14,13 +14,6 @@
     <name>Rexster: RexPro Binary Protocol</name>
     <description>RexPro is a binary protocol for Rexster graph server.</description>
     <inceptionYear>2012</inceptionYear>
-    <contributors>
-        <contributor>
-            <name>Stephen Mallette</name>
-            <email>spmva@genoprime.com</email>
-            <url>http://stephen.genoprime.com</url>
-        </contributor>
-    </contributors>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

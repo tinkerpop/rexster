@@ -16,13 +16,6 @@
     <description>
         A sample project that showcases the features of how to build a Rexster Extension.
     </description>
-    <developers>
-        <developer>
-            <name>Stephen Mallette</name>
-            <email>spmva@genoprime.com</email>
-            <url>http://stephen.genoprime.com</url>
-        </developer>
-    </developers>
     <inceptionYear>2011</inceptionYear>
     <dependencies>
         <!-- CONFIGURATION -->

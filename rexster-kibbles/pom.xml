@@ -15,18 +15,6 @@
     <name>Rexster Kibbles: General-Purpose Rexster Extensions</name>
     <description>Rexster Kibbles is a collection of general-purpose extensions for the Rexster graph server.</description>
     <inceptionYear>2011</inceptionYear>
-    <contributors>
-        <contributor>
-            <name>Marko A. Rodriguez</name>
-            <email>marko@markorodriguez.com</email>
-            <url>http://markorodriguez.com</url>
-        </contributor>
-        <contributor>
-            <name>Stephen Mallette</name>
-            <email>spmva@genoprime.com</email>
-            <url>http://stephen.genoprime.com</url>
-        </contributor>
-    </contributors>
     <modules>
         <module>frames-kibble</module>
         <module>sample-kibbles</module>

@@ -13,18 +13,6 @@
     <packaging>jar</packaging>
     <url>http://rexster.tinkerpop.com</url>
     <name>Rexster: A Graph Server</name>
-    <developers>
-        <developer>
-            <name>Stephen Mallette</name>
-            <email>spmva@genoprime.com</email>
-            <url>http://stephen.genoprime.com</url>
-        </developer>
-        <developer>
-            <name>Marko A. Rodriguez</name>
-            <email>marko@markorodriguez.com</email>
-            <url>http://markorodriguez.com</url>
-        </developer>
-    </developers>
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.rexster</groupId>
