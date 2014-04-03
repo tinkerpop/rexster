@@ -175,9 +175,9 @@
         </graph>
         <graph>
             <graph-enabled>false</graph-enabled>
-            <graph-name>dexsample</graph-name>
-            <graph-type>dexgraph</graph-type>
-            <graph-location>/tmp/rexster-integration-tests/graph.dex</graph-location>
+            <graph-name>sparkseesample</graph-name>
+            <graph-type>sparkseegraph</graph-type>
+            <graph-location>/tmp/rexster-integration-tests/graph.sparksee</graph-location>
             <extensions>
                 <allows>
                     <allow>tp:gremlin</allow>

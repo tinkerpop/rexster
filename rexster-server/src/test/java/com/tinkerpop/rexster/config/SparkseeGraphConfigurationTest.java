@@ -8,9 +8,9 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DexGraphConfigurationTest {
+public class SparkseeGraphConfigurationTest {
 
-    private GraphConfiguration configuration = new DexGraphConfiguration();
+    private GraphConfiguration configuration = new SparkseeGraphConfiguration();
 
     @Test(expected = GraphConfigurationException.class)
     public void configureGraphInstanceMissingGraphFileConfig() throws GraphConfigurationException {
