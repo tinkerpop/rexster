@@ -246,7 +246,7 @@ public class RequestObjectHelper {
 
         if (rexsterRequestObject != null) {
 
-            if (rexsterRequestObject != null && rexsterRequestObject.has(Tokens.OFFSET)) {
+            if (rexsterRequestObject.has(Tokens.OFFSET)) {
 
                 // returns zero if the value identified by the offsetToken is
                 // not a number and the key is just present.
