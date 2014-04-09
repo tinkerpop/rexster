@@ -466,8 +466,8 @@ public class HttpRexsterServer implements RexsterServer {
                 // deploys the metrics servlet into rexster
                 wacMetrics = new WebappContext("metrics", "");
                 wacMetrics.setAttribute("com.codahale.metrics.servlets.MetricsServlet.registry", application.getMetricRegistry());
-                wacMetrics.setAttribute("com.codahale.metrics.servlets.MetricsServlet.rateUnit", this.convertRateTo);
-                wacMetrics.setAttribute("com.codahale.metrics.servlets.MetricsServlet.durationUnit", this.convertDurationTo);
+                wacMetrics.addContextInitParameter("com.codahale.metrics.servlets.MetricsServlet.rateUnit", this.convertRateTo);
+                wacMetrics.addContextInitParameter("com.codahale.metrics.servlets.MetricsServlet.durationUnit", this.convertDurationTo);
 
                 final ServletRegistration sgMetrics = wacMetrics.addServlet("metrics", new MetricsServlet());
                 sgMetrics.addMapping("/metrics/*");
