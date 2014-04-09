@@ -23,6 +23,8 @@ h3. Version 2.5.0 (NOT OFFICIALLY RELEASED YET)
 * Altered the semantics of @RexsterClient.close()@
 * Add configuration (@<config-check-interval>@) for the interval of time to use to check @rexster.xml@ for change.
 * Gremlin Extension supports @returnTotal@ parameter that will iterate all results and put a @count@ in results.
+* Fix problem where HTTP metrics configuration for rates was not being respected
+* Support for configuration of @IdGraph@ and @LinkedDataSailGraph@
 
 ==<hr/>==
 
