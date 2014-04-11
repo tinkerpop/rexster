@@ -76,12 +76,6 @@
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-orient-graph</artifactId>
-            <version>${blueprints.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-rexster-graph</artifactId>
             <version>${blueprints.version}</version>
             <scope>provided</scope>

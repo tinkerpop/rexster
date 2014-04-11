@@ -99,7 +99,7 @@ public class GraphConfigurationContainer {
         } else if (graphConfigurationType.equals("neo4jgraph")) {
             graphConfigurationType = Neo4jGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("orientgraph")) {
-            graphConfigurationType = OrientGraphConfiguration.class.getName();
+            graphConfigurationType = "com.tinkerpop.blueprints.impls.orient.OrientGraphRexsterConfiguration";
         } else if (graphConfigurationType.equals("tinkergraph")) {
             graphConfigurationType = TinkerGraphGraphConfiguration.class.getName();
         } else if (graphConfigurationType.equals("rexstergraph")) {
