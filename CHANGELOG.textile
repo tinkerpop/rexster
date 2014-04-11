@@ -25,6 +25,7 @@ h3. Version 2.5.0 (NOT OFFICIALLY RELEASED YET)
 * Gremlin Extension supports @returnTotal@ parameter that will iterate all results and put a @count@ in results.
 * Fix problem where HTTP metrics configuration for rates was not being respected
 * Support for configuration of @IdGraph@ and @LinkedDataSailGraph@
+* Remove OrientDB dependencies
 
 ==<hr/>==
 
