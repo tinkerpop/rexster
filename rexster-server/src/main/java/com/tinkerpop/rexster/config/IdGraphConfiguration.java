@@ -2,18 +2,11 @@ package com.tinkerpop.rexster.config;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
-import com.tinkerpop.blueprints.impls.neo4j.Neo4jHaGraph;
-import com.tinkerpop.blueprints.impls.sail.SailGraph;
-import com.tinkerpop.blueprints.impls.sail.impls.LinkedDataSailGraph;
 import com.tinkerpop.blueprints.util.wrappers.id.IdGraph;
 import com.tinkerpop.rexster.RexsterApplicationGraph;
 import com.tinkerpop.rexster.Tokens;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
-
-import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -37,8 +30,18 @@ public class IdGraphConfiguration implements GraphConfiguration {
             throw new GraphConfigurationException("base graph for IdGraph must be an instance of KeyIndexableGraph");
         }
 
-        boolean supportVertexIds = context.getProperties().getBoolean("supportVertexIds", true);
-        boolean supportEdgeIds = context.getProperties().getBoolean("supportEdgeIds", true);
+        // get the <properties> section of the xml configuration
+        final HierarchicalConfiguration graphSectionConfig = (HierarchicalConfiguration) context.getProperties();
+        SubnodeConfiguration specificConfiguration;
+
+        try {
+            specificConfiguration = graphSectionConfig.configurationAt(Tokens.REXSTER_GRAPH_PROPERTIES);
+        } catch (IllegalArgumentException iae) {
+            throw new GraphConfigurationException("Check graph configuration. Missing or empty configuration element: " + Tokens.REXSTER_GRAPH_PROPERTIES);
+        }
+
+        boolean supportVertexIds = specificConfiguration.getBoolean("supportVertexIds", true);
+        boolean supportEdgeIds = specificConfiguration.getBoolean("supportEdgeIds", true);
 
         return new IdGraph((KeyIndexableGraph) baseGraph.getGraph(), supportVertexIds, supportEdgeIds);
     }

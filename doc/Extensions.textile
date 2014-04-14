@@ -1,0 +1,11 @@
+[[http://www.wpclipart.com/animals/dogs/cartoon_dogs/cartoon_dogs_6/cartoon_dog_T.png|width=100px]]
+
+Extensions provide for a way to plug-in new functions to existing Rexster resources (specifically, graphs, vertices and edges) allowing for support of standard traversal goals such as search, score, rank, and, in concert, recommendation.
+
+Rexster is packaged with the [[Gremlin Extension]] which allows users to execute ad-hoc computations on the graph backend.  [[Rexster Kibbles]] contains additional extensions that can easily plug-in to Rexster.
+
+Extensions are identified by implementing the @RexsterExtension@ interface and are defined using a series of @Annotations@ (see [[Extension Annotations]]) which instruct Rexster how to expose it through the REST API.  The @Annotations@ are applied to to any class and method to be exposed through the REST API.  These @Annotations@ allow for the definition of meta-data, such as extension description and API documentation, the @ExtensionPoint@, which refers to the Rexster resource the extension applies to, namespacing, and the injection of Rexster context into an extension method.  
+
+Methods marked for extension must return an @ExtensionResponse@ which is a wrapper for a a standard "Jersey":http://jersey.java.net/ @Response@ object.  The @ExtensionResponse@ has a series of helper methods for building its own instances so that the underlying details of Jersey are hidden from view.  At the same time, the option to build-you-own Jersey @Response@ object remains open for complete flexibility.
+
+Extensions are configured per graph in "rexster.xml":https://github.com/tinkerpop/rexster/blob/master/rexster-server/rexster.xml.  This means that different extensions can be applied to different graphs.  Furthermore, each graph extension may be given a different configuration (to the extent that the extension allows for configuration, at least).

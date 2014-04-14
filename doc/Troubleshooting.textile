@@ -1,0 +1,90 @@
+This page contains frequently identified problems with Rexster and its components.  
+
+h3. Not using "localhost" to access REST API/Dog House?
+
+If you set up Rexster with the default configuration in a server environment and try to access it by IP or DNS as in:
+
+```text
+http://8.8.8.8:8182/graphs/tinkergraph
+```
+
+you will quickly find that Rexster will not respond to requests.  In most cases, after checking firewall settings that the appropriate ports are open, the solution is to simply check @rexster.xml@ and ensure that the @<base-uri>@ property is set properly.  Given the above example, that would mean setting the value as follows:
+
+```xml
+<rexster>
+  ...
+  <base-uri>http://8.8.8.8</base-uri>
+  ...
+</rexster>
+```
+
+When setting up a non-local Rexster environment, it is a good idea to read through the [[Rexster Configuration]] section very carefully to ensure that all settings are as needed for your environment.
+
+h3. Dog House not showing configured graphs?
+
+If you access the Dog House and find no graphs visible to select, there is a good chance that either the @<base-uri>@ property of @rexster.xml@ is not set appropriately or firewall ports are preventing access to the port configured in @<rexster-server-port>@.  A simple way to test connectivity is to point your browser at the configured @<base-uri>@ and @<rexster-server-port>@ to see if some valid JSON is returned. 
+
+h3. Want to see more logging from Rexster?
+
+By default, Rexster is configured to hide Jersey-level logging.  Sometimes, this information includes very valuable information when trying to isolate a problem or issue.  To have this log information displayed in the console, simply supply to the @-d@ or @--debug@ option as follows:
+
+```text
+rexster.sh -s -d
+```
+
+See also the Logging Configuration section in [[Rexster Configuration]].
+
+h3. Null Key Error Returned from Gremlin Extension?
+
+It's important to ensure that the Gremlin Extension returns data that can be converted to valid JSON. A common case where this does not happen is when a Gremlin script returns a null value as a map key (null values as map values are OK). JSON does not support a null value in the key and therefore the Gremlin Extension will return a "Null key" error.
+
+The following is an example script that presents such a situation:
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=m=[:];g.V.age.groupCount(m).iterate();m;
+```
+
+Since @age@ is not an available property of all vertices (@V@), the script will produce a map that has a @null@ key.
+
+One way to work around this would be to filter out nulls as in:
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=m=[:];g.V.age.filter{it!=null}.groupCount(m).iterate();m;
+```
+
+Another way to work around this would be to convert null key into a string "null" key as in:
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp/gremlin?script=m=[:];g.V.age.groupCount(m).iterate();m['null']=m[null];m.remove(null);m;
+```
+
+h3. Trouble with Red Hat?
+
+When using Rexster on the Red Hat flavor of Linux, it has been noted that Rexster requires significantly higher thread pool settings than other operating systems. Consider a maximum kernel thread pool size of 32 and maximum worker thread pool size of 128 when using Red Hat. It is believed that the thread pool size for the kernel should be the number of cores on the CPU and the worker thread pool size to double that.
+
+h3. "Too many open files" when running integration tests?
+
+When running integration tests for Rexster using:
+
+```text
+mvn clean install -Pintegration-test
+```
+
+An @IOException@ may occur depending on the system's configuration.  The issue is related to Grizzly and the starting and stopping of the underlying @TCPNIOTransport@ in between tests.  To allow the tests to work (at least on Linux), first check the size of the limit with:
+
+```text
+ulimit -n
+```
+
+It will likely be set to 1024 by default.  Increase this limit by editing:
+
+```text
+/etc/security/limits.conf
+```
+
+and setting larger values as necessary:
+
+```text
+* soft nofile 8192
+* hard nofile 8192
+```

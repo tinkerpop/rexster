@@ -1,0 +1,108 @@
+[[https://github.com/tinkerpop/rexster/raw/master/doc/images/rexpro-logo.png|width=500px]]
+
+[[RexPro]] is designed to be language agnostic, such that virtually any programming language, especially those languages that support "MsgPack":http://msgpack.org, can connect to a RexPro Server.  Rexster comes bundled with a Java client, called @RexsterClient@, that allows low-level connectivity via RexPro, sending sessionless messages.
+
+The following Maven dependency is required for accessing @RexsterClient@ classes:
+
+```xml
+<dependency>
+    <groupId>com.tinkerpop.rexster</groupId>
+    <artifactId>rexster-protocol</artifactId>
+    <version>x.y.z</version>
+</dependency>
+```
+
+Use the @RexsterClientFactory@ to create a @RexsterClient@ instance:
+
+```java
+RexsterClient client = RexsterClientFactory.open();
+RexsterClient client = RexsterClientFactory.open("localhost");
+RexsterClient client = RexsterClientFactory.open("localhost", 8184);
+```
+
+All three of the above initializations of @RexsterClient@ are equivalent.  When no arguments are specified, the factory will initialize the @RexsterClient@ to connect to @localhost@ on the standard RexPro port @8184@.  There are numerous settings and configurations for initializing a @RexsterClient@ instance which are described further below.  Once @RexsterClient@ is initialized, it is possible to send a Gremlin script to the RexPro Server:
+
+```java
+List<Map<String, Object>> results = client.execute("g=rexster.getGraph(\\"tinkergraph\\");g.v(1).map");
+Map<String, Object> map = results.get(0);
+System.out.println(map.get("name"));
+```
+
+As @RexsterClient@ uses sessionless requests, @g@ must be initialized on each request.  To get around this problem set the @graph-name@ configuration setting when instantiating @RexsterClient@ through @RexsterClientFactory@ or simply use this convenience method overload:
+
+```java
+RexsterClient client = RexsterClientFactory.open("localhost", "tinkergraph");
+List<Map<String, Object>> results = client.execute("g.v(1).map");
+Map<String, Object> map = results.get(0);
+System.out.println(map.get("name"));
+```
+
+When possible, parameterize Gremlin scripts, as this leads to better overall performance.  The above example can be done as a parameterized request as follows:
+
+```java
+RexsterClient client = RexsterClientFactory.open("localhost", "tinkergraph");
+List<Map<String, Object>> results = client.execute("g.v(start).map", 
+    new HashMap<String, Object>(){{
+        put("start", 1);
+    }});
+Map<String, Object> map = results.get(0);
+System.out.println(map.get("name"));
+```
+
+Note that @RexsterClient@ makes some assumptions about data types, as it is limited by MsgPack data types:
+
+```java
+List<Map<String, Object>> mapResultsObject = client.execute("[n:1+1,b:true,f:1234.56f,s:'string',a:[1,2,3],m:[one:1]]");
+Assert.assertEquals(1, mapResultsObject.size());
+Map<String, Object> mapResultObject = mapResultsObject.get(0);
+Assert.assertEquals(2l, mapResultObject.get("n"));
+Assert.assertEquals(true, mapResultObject.get("b"));
+Assert.assertEquals(1234.56d, (Double) mapResultObject.get("f"), 0.001d);
+Assert.assertEquals("string", mapResultObject.get("s"));
+Assert.assertEquals(3, ((Object []) mapResultObject.get("a")).length);
+Assert.assertEquals(1l, ((Map) mapResultObject.get("m")).get("one"));
+```
+
+h3. Advanced Usage
+
+@RexsterClient@ is designed with fault-tolerance in mind.  In communication with a single RexPro Server, it can be configured to retry requests in the event of failure (e.g. temporary network problem). The following shows the default configuration in a more explicit way:
+
+```java
+BaseConfiguration conf = new BaseConfiguration() {{
+    addProperty(RexsterClientTokens.CONFIG_MESSAGE_RETRY_COUNT, 16);
+    addProperty(RexsterClientTokens.CONFIG_MESSAGE_RETRY_WAIT_MS, 50);
+}};
+RexsterClient client = RexsterClientFactory.open(conf);
+```
+
+The above code shows a @RexsterClient@ being configured to retry sending a message @16@ times with a @50ms@ wait time between each failure.  
+
+Not all configurations of Rexster involve a single server.  Configuring a set of RexPro Servers for better redundancy and availability is possible with certain graphs like "Titan":https://github.com/thinkaurelius/titan or "Neo4j HA":https://github.com/tinkerpop/blueprints/wiki/Neo4jHa-Implementation.  There is also the option to configure a cluster of "Titan Server":https://github.com/thinkaurelius/titan/wiki/Titan-Server instances which embed RexPro natively.  In these cases, @RexsterClient@ can be configured to round-robin request to each of the RexPro Servers in the cluster.
+
+```java
+BaseConfiguration conf = new BaseConfiguration() {{
+    addProperty(RexsterClientTokens.CONFIG_HOSTNAME, "10.20.30.40,10.20.30.41,10.20.30.42");
+    addProperty(RexsterClientTokens.CONFIG_MESSAGE_RETRY_WAIT_MS, 0);
+}};
+RexsterClient client = RexsterClientFactory.open(conf);
+```
+
+In this above example, @RexsterClient@ is configured to send requests to three different RexPro Servers.  If a request fails, the client does not wait between failed requests, it simply tries to send the request to the next available RexPro Server in the list.  Note that the default setting of @16@ retries is established by @RexsterClientFactory@ since it was not otherwise specified.
+
+h3. Settings
+
+The following settings are available when configuring a @RexsterClient@ instance.  These settings can be passed to the @RexsterClientFactory.open()@ method as a @Map<String,Object>@ or "Apache Configuration":http://commons.apache.org/configuration/ object.
+
+|_. name |_. default |_. description |
+| @hostname@ | @localhost@ | The RexPro Server host to connect to. Note that this value may be set to a comma separated list of hosts. |
+| @port@ | @8184@ | The RexPro Server port to connect to.  If multiple hosts are defined, each host must listen on the same port.  |
+| @timeout-connection-ms@ | @8000@ | How long to wait for a connection to open to the RexPro Server. |
+| @timeout-write-ms@ | @4000@ | How long to wait for a write of a message to the RexPro Server. |
+| @timeout-read-ms@ | @16000@ | How long to wait for a read of a response from the RexPro Server. |
+| @message-retry-count@ | @16@ |  The number of times to retry the request if any of the above fail. |
+| @message-retry-wait-ms@ | @50@ |  The amount of time to wait if any of the above fail. |
+| @max-async-write-queue-size@ | @512000@ | The size in bytes of the queue on the client for sending requests to the RexPro Server.  This queue can backup if network performance is poor or Rexster slows/stops. |
+| @language@ | @groovy@ | The Gremlin flavor to use to execute the script. |
+| @graph-name@ | | The name of the graph configured in Rexster to use as the subject of the script.  Typically, the graph must be retrieved in the script via @rexster.getGraph()@.  This setting in conjunction with @graph-obj-name@ help to simplify a script by putting the graph specified here in the Script Engine bindings so that it is ready for the script. |
+| @graph-obj-name@ | @g@ | If @graph-name@ is specified then the graph instance is assigned to the value of this setting in the bindings so that it can be instantly referenced in the script. |
+| @channel@ | @2@ | The serialization channel for RexPro. By default this value is set to MsgPack. Values are defined as constants in "RexProChannel":https://github.com/tinkerpop/rexster/blob/master/rexster-protocol/src/main/java/com/tinkerpop/rexster/protocol/msg/RexProChannel.java |

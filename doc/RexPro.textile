@@ -1,0 +1,73 @@
+[[https://github.com/tinkerpop/rexster/raw/master/doc/images/rexpro-logo.png|width=500px]]
+
+RexPro is a binary protocol for Rexster that can be used to send Gremlin scripts to a remote Rexster instance.   The script is processed on the server and the results serialized and returned back to the calling client.  For those familiar with the [[Gremlin Extension]] in the RESTful side of Rexster, RexPro is not so different in what it does. However, RexPro will perform better than REST as it does not bring with it the overhead that comes with the REST HTTP infrastructure.  
+
+* [[RexPro Messages]] - Discusses the format of messages used to communicate with Rexster.
+* [[Connecting via RexPro|RexPro Java]] - Discusses how to connect to a RexPro Server with Java.
+
+h1. Architecture
+
+The RexPro Server is embedded in Rexster and starts when Rexster itself is started.  It utilizes "Grizzly":http://grizzly.java.net at its core, much like it's HTTP Server counterpart.  It [[configures|Rexster Configuration]] a set of messages filters over a lightweight TCP NIO Transport and begins listening on a port when the server starts.  Clients send binary [[messages|RexPro Messages]] to the RexPro server, which open sessions, execute graph traversals, modify the graph or perform any other operations possible by Gremlin.
+
+RexPro uses "MsgPack":http://msgpack.org/ for much of its message serialization.  For those building different language bindings to RexPro, MsgPack can help greatly in that endeavor.
+
+h2. Modes of Operations
+
+A RexPro message can be sent in one of two modes: in the context of a session or sessionless.  
+
+h3. RexPro Sessions
+
+When using a session, the first request made to the RexPro Server must be one that asks that a session be created.  That request will return a session identifier which must be sent on future requests so that the message can be handled by the proper session on the server.  When using a session, the Gremlin Script Engine bindings are maintained for the life of the session, which simply means that a variable or transaction established in one requests is available in the next.  
+
+h3. RexPro Sessionless
+
+Sessionless RexPro messages avoid the overhead of a session.  When sending a message in a sessionless fashion, the RexPro Server assumes that the script within the message is self-contained.  It does not maintain variable bindings from one request to the next.  Transactions should be closed with each request as future requests will not know anything about previous ones.  By default, the RexPro Server will automatically close transactions, unless otherwise specified in the message itself.  
+
+h2. Channels of Serialization
+
+RexPro does not rely on a single method for result serialization from Gremlin script requests.  Unlike the Gremlin Extension in the REST side of Rexster, which only returns results as "GraphSON":https://github.com/tinkerpop/blueprints/wiki/GraphSON-Reader-and-Writer-Library (which is basically just "JSON":http://json.org), RexPro maintains different channels that return different result serialization types.  There are currently three channels:
+
+* *MsgPack* - Default channel and suitable for most requirements
+* *JSON*
+* *Console* - String based serialization (used by [[Rexster Console]])
+
+Channels help ensure that RexPro stays extensible, as new channels can be added without breaking compatibility of the RexPro message formats.  
+
+h2. Gotchas and Limitations
+
+h3. Auto-commit
+
+When using auto-commit operations it important to note that there are some limitations to be considered depending on the underlying database being used.  The commit occurs after the script has executed in the Script Engine.  This approach has a down-side for Blueprints implementations that assigned identifiers after the commit, such as "OrientDB":http://code.google.com/p/orient/wiki/Transactions.  The down-side is that scripts that insert a new graph element and then try to return it in the same script will return an element with a temporary identifier and not the one assigned after the commit. 
+
+This is not a problem unique to RexPro.  The [[Gremlin Extension]] on the REST side has the same limitation.  The most straightforward solution to this problem is to simply handle transactions manually.  
+
+
+h3. Sessionless Requests and Bindings
+
+Sessionless requests are meant to be fast performing.  To reduce serialization time, bindings from the Script Engine are not serialized and sent back with the result message.
+
+h3. Parameterize Gremlin
+
+When possible, it is better to parameterize Gremlin sending variables as Script Engine Bindings that can be injected to the Gremlin script at evaluation time.  In other words, rather than issue a script as follows:
+
+```groovy
+g.v(1).out.has('name','vadas')
+```
+
+choose to send the script as:
+
+```groovy
+g.v(start).out.has('name',personName)
+```
+
+with a map of bindings as such as:
+
+```groovy
+[start:1,personName:'vadas']
+```
+
+By taking the parameterized approach, the frequency at which the Script Engine resets itself (to clear the script cache) will be diminished and scripts will be compiled less often leading to better overall performance.
+
+h3. Binding Integer and Float values
+
+Internally, RexPro deserializes Integer and Float bindings as Long and Double values. This is due to a limitation of the msgpack format.
