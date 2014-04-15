@@ -1,0 +1,7 @@
+Package: [[name]]
+Version: [[version]]
+Section: Utilities
+Priority: low
+Architecture: all
+Description: [[description]]
+Maintainer: jessegonzalez@wellaware.us

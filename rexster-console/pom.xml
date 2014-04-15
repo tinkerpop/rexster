@@ -107,6 +107,52 @@
                     <tarLongFileMode>warn</tarLongFileMode>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>jdeb</artifactId>
+                <groupId>org.vafer</groupId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jdeb</goal>
+                        </goals>
+                        <configuration>
+                            <verbose>false</verbose>
+                            <controlDir>${project.basedir}/src/deb/control</controlDir>
+                            <installDir>/opt/${project.artifactId}-${project.version}</installDir>
+                            <deb>${project.build.directory}/${project.artifactId}_${project.version}.deb</deb>
+                            <dataSet>
+                                <data>
+                                    <src>${project.build.directory}/${project.artifactId}-${project.version}-standalone/bin/README.txt</src>
+                                    <type>file</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/opt/${project.artifactId}-${project.version}</prefix>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <src>${project.build.directory}/${project.build.finalName}-standalone/bin/rexster-console.sh</src>
+                                    <type>file</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <filemode>744</filemode>
+                                        <prefix>/opt/${project.artifactId}-${project.version}/bin</prefix>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <src>${project.build.directory}/${project.build.finalName}-standalone/lib</src>
+                                    <type>directory</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/opt/${project.artifactId}-${project.version}/lib</prefix>
+                                    </mapper>
+                                </data>
+                            </dataSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
