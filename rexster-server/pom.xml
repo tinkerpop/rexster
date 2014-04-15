@@ -358,6 +358,52 @@
                             </dataSet>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>apidocs</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jdeb</goal>
+                        </goals>
+                        <configuration>
+                            <verbose>false</verbose>
+                            <controlDir>${project.basedir}/src/deb/control</controlDir>
+                            <installDir>/opt/${project.artifactId}-${project.version}/apidocs</installDir>
+                            <deb>${project.build.directory}/${project.artifactId}-apidocs_${project.version}.deb</deb>
+                            <dataSet>
+                               <data>
+                                    <src>${project.build.directory}/apidocs</src>
+                                    <type>directory</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/opt/${project.artifactId}-${project.version}/apidocs</prefix>
+                                    </mapper>
+                                </data>
+                            </dataSet>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>doc</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jdeb</goal>
+                        </goals>
+                        <configuration>
+                            <verbose>false</verbose>
+                            <controlDir>${project.basedir}/src/deb/control</controlDir>
+                            <installDir>/opt/${project.artifactId}-${project.version}/apidocs</installDir>
+                            <deb>${project.build.directory}/${project.artifactId}-doc_${project.version}.deb</deb>
+                            <dataSet>
+                               <data>
+                                   <src>${project.basedir}/../doc</src>
+                                    <type>directory</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/opt/${project.artifactId}-${project.version}/doc</prefix>
+                                    </mapper>
+                                </data>
+                            </dataSet>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
