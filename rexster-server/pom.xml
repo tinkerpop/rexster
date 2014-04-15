@@ -324,14 +324,6 @@
                                     </mapper>
                                 </data>
                                 <data>
-                                    <src>${project.build.directory}/${project.build.finalName}-standalone/data</src>
-                                    <type>directory</type>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <prefix>/opt/${project.artifactId}-${project.version}/data</prefix>
-                                    </mapper>
-                                </data>
-                                <data>
                                     <src>${project.build.directory}/${project.build.finalName}-standalone/ext</src>
                                     <type>directory</type>
                                     <mapper>
@@ -365,6 +357,7 @@
                             <goal>jdeb</goal>
                         </goals>
                         <configuration>
+                            <name>${project.name} - API Documentation</name>
                             <verbose>false</verbose>
                             <controlDir>${project.basedir}/src/deb/control</controlDir>
                             <installDir>/opt/${project.artifactId}-${project.version}/apidocs</installDir>
@@ -388,6 +381,7 @@
                             <goal>jdeb</goal>
                         </goals>
                         <configuration>
+                            <name>${project.name} - Documentation</name>
                             <verbose>false</verbose>
                             <controlDir>${project.basedir}/src/deb/control</controlDir>
                             <installDir>/opt/${project.artifactId}-${project.version}/apidocs</installDir>
@@ -402,6 +396,30 @@
                                     </mapper>
                                 </data>
                             </dataSet>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>sample-data</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jdeb</goal>
+                        </goals>
+                        <configuration>
+                            <name>${project.name} - Sample Data</name>
+                            <verbose>false</verbose>
+                            <controlDir>${project.basedir}/src/deb/control</controlDir>
+                            <installDir>/opt/${project.artifactId}-${project.version}/data</installDir>
+                            <deb>${project.build.directory}/${project.artifactId}-sample-data_${project.version}.deb</deb>
+                            <dataSet>
+                                <data>
+                                    <src>${project.build.directory}/${project.build.finalName}-standalone/data</src>
+                                    <type>directory</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/opt/${project.artifactId}-${project.version}/data</prefix>
+                                    </mapper>
+                                </data>
+                           </dataSet>
                         </configuration>
                     </execution>
                 </executions>
