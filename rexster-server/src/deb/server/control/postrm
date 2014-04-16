@@ -18,7 +18,7 @@ case "$1" in
     purge)
         LOG_DIR=/var/log/rexster
         deluser --quiet --system rexster >/dev/null || true
-        rm -f "${LOG_DIR}/"*
+        rm -f ${LOG_DIR}/*
     ;;
 
     remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)

@@ -382,6 +382,12 @@
                                     <linkName>/opt/${project.artifactId}</linkName>
                                     <linkTarget>/opt/${project.artifactId}-${project.version}</linkTarget>
                                 </data>
+                                 <data>
+                                    <type>link</type>
+                                    <symlink>true</symlink>
+                                    <linkName>/etc/${project.artifactId}</linkName>
+                                    <linkTarget>/opt/${project.artifactId}/config</linkTarget>
+                                </data>
                                 <data>
                                     <type>template</type>
                                     <paths>
