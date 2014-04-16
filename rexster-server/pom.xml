@@ -291,10 +291,11 @@
                             <goal>jdeb</goal>
                         </goals>
                         <configuration>
+                            <name>${project.artifactId}</name>
                             <verbose>false</verbose>
-                            <controlDir>${project.basedir}/src/deb/control</controlDir>
+                            <controlDir>${project.basedir}/src/deb/server/control</controlDir>
                             <installDir>/opt/${project.artifactId}-${project.version}</installDir>
-                            <deb>${project.build.directory}/${project.artifactId}_${project.version}.deb</deb>
+                            <deb>${project.build.directory}/${project.artifactId}_${project.version}_all.deb</deb>
                             <dataSet>
                                 <data>
                                     <src>${project.build.directory}/${project.build.finalName}-standalone/bin/README.txt</src>
@@ -310,17 +311,45 @@
                                     <type>file</type>
                                     <mapper>
                                         <type>perm</type>
-                                        <filemode>744</filemode>
+                                        <filemode>554</filemode>
+                                        <group>rexster</group>
                                         <prefix>/opt/${project.artifactId}-${project.version}/bin</prefix>
                                     </mapper>
                                 </data>
                                 <data>
-                                    <src>${project.build.directory}/${project.build.finalName}-standalone/config</src>
-                                    <type>directory</type>
+                                    <src>${project.basedir}/src/deb/server/init.d/rexster</src>
+                                    <type>file</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <filemode>755</filemode>
+                                        <prefix>/etc/init.d</prefix>
+                                    </mapper>
+                                </data>
+                                 <data>
+                                    <src>${project.build.directory}/${project.build.finalName}-standalone/config/init.groovy</src>
+                                    <type>file</type>
                                     <conffile>true</conffile>
                                     <mapper>
                                         <type>perm</type>
                                         <prefix>/opt/${project.artifactId}-${project.version}/config</prefix>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <src>${project.build.directory}/${project.build.finalName}-standalone/config/rexster.xml</src>
+                                    <type>file</type>
+                                    <conffile>true</conffile>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/opt/${project.artifactId}-${project.version}/config</prefix>
+                                    </mapper>
+                                </data>
+                               <data>
+                                    <src>${project.basedir}/src/deb/server/default/rexster</src>
+                                    <type>file</type>
+                                    <conffile>true</conffile>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/etc/default</prefix>
                                     </mapper>
                                 </data>
                                 <data>
@@ -347,6 +376,23 @@
                                         <prefix>/opt/${project.artifactId}-${project.version}/public</prefix>
                                     </mapper>
                                 </data>
+                                <data>
+                                    <type>link</type>
+                                    <symlink>true</symlink>
+                                    <linkName>/opt/${project.artifactId}</linkName>
+                                    <linkTarget>/opt/${project.artifactId}-${project.version}</linkTarget>
+                                </data>
+                                <data>
+                                    <type>template</type>
+                                    <paths>
+                                        <path>var/log/rexster</path>
+                                    </paths>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <user>rexster</user>
+                                        <group>rexster</group>
+                                    </mapper>
+                                </data>
                             </dataSet>
                         </configuration>
                     </execution>
@@ -357,11 +403,11 @@
                             <goal>jdeb</goal>
                         </goals>
                         <configuration>
-                            <name>${project.name} - API Documentation</name>
+                            <name>${project.artifactId}-apidocs</name>
                             <verbose>false</verbose>
-                            <controlDir>${project.basedir}/src/deb/control</controlDir>
+                            <controlDir>${project.basedir}/src/deb/default/control</controlDir>
                             <installDir>/opt/${project.artifactId}-${project.version}/apidocs</installDir>
-                            <deb>${project.build.directory}/${project.artifactId}-apidocs_${project.version}.deb</deb>
+                            <deb>${project.build.directory}/${project.artifactId}-apidocs_${project.version}_all.deb</deb>
                             <dataSet>
                                <data>
                                     <src>${project.build.directory}/apidocs</src>
@@ -381,11 +427,11 @@
                             <goal>jdeb</goal>
                         </goals>
                         <configuration>
-                            <name>${project.name} - Documentation</name>
+                            <name>${project.artifactId}-doc</name>
                             <verbose>false</verbose>
-                            <controlDir>${project.basedir}/src/deb/control</controlDir>
+                            <controlDir>${project.basedir}/src/deb/default/control</controlDir>
                             <installDir>/opt/${project.artifactId}-${project.version}/apidocs</installDir>
-                            <deb>${project.build.directory}/${project.artifactId}-doc_${project.version}.deb</deb>
+                            <deb>${project.build.directory}/${project.artifactId}-doc_${project.version}_all.deb</deb>
                             <dataSet>
                                <data>
                                    <src>${project.basedir}/../doc</src>
@@ -405,11 +451,11 @@
                             <goal>jdeb</goal>
                         </goals>
                         <configuration>
-                            <name>${project.name} - Sample Data</name>
+                            <name>${project.artifactId}-sample-data</name>
                             <verbose>false</verbose>
-                            <controlDir>${project.basedir}/src/deb/control</controlDir>
+                            <controlDir>${project.basedir}/src/deb/default/control</controlDir>
                             <installDir>/opt/${project.artifactId}-${project.version}/data</installDir>
-                            <deb>${project.build.directory}/${project.artifactId}-sample-data_${project.version}.deb</deb>
+                            <deb>${project.build.directory}/${project.artifactId}-sample-data_${project.version}_all.deb</deb>
                             <dataSet>
                                 <data>
                                     <src>${project.build.directory}/${project.build.finalName}-standalone/data</src>

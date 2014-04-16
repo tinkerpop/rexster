@@ -118,10 +118,11 @@
                             <goal>jdeb</goal>
                         </goals>
                         <configuration>
+                            <name>${project.artifactId}</name>
                             <verbose>false</verbose>
                             <controlDir>${project.basedir}/src/deb/control</controlDir>
                             <installDir>/opt/${project.artifactId}-${project.version}</installDir>
-                            <deb>${project.build.directory}/${project.artifactId}_${project.version}.deb</deb>
+                            <deb>${project.build.directory}/${project.artifactId}_${project.version}_all.deb</deb>
                             <dataSet>
                                 <data>
                                     <src>${project.build.directory}/${project.artifactId}-${project.version}-standalone/bin/README.txt</src>
@@ -147,6 +148,12 @@
                                         <type>perm</type>
                                         <prefix>/opt/${project.artifactId}-${project.version}/lib</prefix>
                                     </mapper>
+                                </data>
+                                <data>
+                                    <type>link</type>
+                                    <symlink>true</symlink>
+                                    <linkName>/opt/${project.artifactId}</linkName>
+                                    <linkTarget>/opt/${project.artifactId}-${project.version}</linkTarget>
                                 </data>
                             </dataSet>
                         </configuration>

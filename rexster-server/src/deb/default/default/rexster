@@ -1,0 +1,11 @@
+# Rexster installation directory
+REXSTER_DIR="/opt/rexster-server"
+
+# Rexster log directory
+REXSTER_LOG_DIR="/var/log/rexster"
+
+# Specify the user to run Rexster as:
+REXSTER_USER="rexster"
+
+# JAVA_OPTIONS only gets used on start
+JAVA_OPTIONS="-Xms64m -Xmx512m"
