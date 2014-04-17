@@ -5,7 +5,7 @@
     <parent>
         <artifactId>rexster</artifactId>
         <groupId>com.tinkerpop.rexster</groupId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -23,22 +23,22 @@
         <dependency>
             <groupId>com.tinkerpop.rexster</groupId>
             <artifactId>rexster-core</artifactId>
-            <version>${rexster.version}</version>
+            <version>${tinkerpop.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-core</artifactId>
-            <version>${blueprints.version}</version>
+            <version>${tinkerpop.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.gremlin</groupId>
             <artifactId>gremlin-groovy</artifactId>
-            <version>${gremlin.version}</version>
+            <version>${tinkerpop.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>pipes</artifactId>
-            <version>${pipes.version}</version>
+            <version>${tinkerpop.version}</version>
         </dependency>
         <dependency>
             <groupId>org.msgpack</groupId>

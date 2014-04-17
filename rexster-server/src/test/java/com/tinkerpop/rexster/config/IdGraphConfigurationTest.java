@@ -36,7 +36,9 @@ public class IdGraphConfigurationTest {
         graphConfig = new HierarchicalConfiguration();
         context = new GraphConfigurationContext(graphConfig, graphs);
         graphConfig.setProperty(Tokens.REXSTER_GRAPH_LOCATION, "idbase");
-        graphConfig.setProperty("supportEdgeIds", "false");
+        ArrayList<HierarchicalConfiguration.Node> listOfNodes = new ArrayList<HierarchicalConfiguration.Node>();
+        listOfNodes.add(new HierarchicalConfiguration.Node("supportEdgeIds", "false"));
+        graphConfig.addNodes(Tokens.REXSTER_GRAPH_PROPERTIES, listOfNodes);
         this.configuration.configureGraphInstance(context);
 
         Graph graph = this.configuration.configureGraphInstance(context);
