@@ -1,0 +1,228 @@
+Rexster is configured through an "XML configuration file":https://github.com/tinkerpop/rexster/blob/master/rexster-server/config/rexster.xml with overriding [[command line|Command Line]] options.  Configuration for Rexster consists of options for server settings, like port assignments, and the list of available graphs served by Rexster with their allowed [[Extensions]].
+
+By default, Rexster will first try to read @config/rexster.xml@ of the working directory.  To use a different file, specify the file with @-c@ on the [[Command Line]] at start:
+
+```text
+rexster.sh -s -c my-rexster.xml
+```
+
+The source of many problems with starting Rexster can be traced to Rexster referencing the incorrect @rexster.xml@ file.  When Rexster starts, it outputs the path of the @rexster.xml@ file that it is using:
+
+```text
+[INFO] RexsterSettings - Using [/home/rexster/config/rexster.xml] resource as configuration source.
+```
+
+h1. XML Configuration
+
+The XML configuration file has a basic structure as follows:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<rexster>
+  <http>
+    <server-port>8182</server-port>
+    <server-host>0.0.0.0</server-host>
+    <base-uri>http://localhost</base-uri>
+    <web-root>public</web-root>
+    <character-set>UTF-8</character-set>
+    <enable-jmx>false</enable-jmx>
+    <enable-doghouse>true</enable-doghouse>
+    <max-post-size>2097152</max-post-size>
+    <max-header-size>8192</max-header-size>
+    <upload-timeout-millis>30000</upload-timeout-millis>
+    <thread-pool>
+      <worker>
+        <core-size>8</core-size>
+        <max-size>8</max-size>
+      </worker>
+      <kernal>
+        <core-size>4</core-size>
+        <max-size>4</max-size>
+      </kernal>
+    </thread-pool>
+    <io-strategy>leader-follower</io-strategy>
+  </http>
+  <rexpro>
+    <server-port>8184</server-port>
+    <server-host>0.0.0.0</server-host>
+    <session-max-idle>1790000</session-max-idle>
+    <session-check-interval>3000000</session-check-interval>
+    <enable-jmx>false</enable-jmx>
+    <read-buffer>65536</read-buffer>
+    <thread-pool>
+      <worker>
+          <core-size>8</core-size>
+        <max-size>8</max-size>
+      </worker>
+      <kernal>
+        <core-size>4</core-size>
+        <max-size>4</max-size>
+      </kernal>
+    </thread-pool>
+    <io-strategy>leader-follower</io-strategy>
+  </rexpro>
+  <shutdown-port>8183</shutdown-port>
+  <shutdown-host>127.0.0.1</shutdown-host>
+  <config-check-interval>10000</config-check-interval>
+  <script-engines>
+    <script-engine>
+      <name>gremlin-groovy</name>
+      <reset-threshold>-1</reset-threshold>
+      <init-scripts>config/init.groovy</init-scripts>
+      <imports>com.tinkerpop.rexster.client.*</imports>
+      <static-imports>java.lang.Math.PI</static-imports>
+    </script-engine>
+  </script-engines>
+  <security>
+    <authentication>
+        <type>default</type>
+        <configuration>
+          <users>
+            <user>
+              <username>rexster</username>
+              <password>rexster</password>
+            </user>
+          </users>
+        </configuration>
+    </authentication>
+  </security>
+    <metrics>
+        <reporter>
+            <type>jmx</type>
+        </reporter>
+        <reporter>
+            <type>http</type>
+        </reporter>
+        <reporter>
+            <type>console</type>
+            <properties>
+                <rates-time-unit>SECONDS</rates-time-unit>
+                <duration-time-unit>SECONDS</duration-time-unit>
+                <report-period>10</report-period>
+                <report-time-unit>MINUTES</report-time-unit>
+                <includes>http.rest.*</includes>
+                <excludes>http.rest.*.delete</excludes>
+            </properties>
+        </reporter>
+    </metrics>
+  <graphs>
+    <graph>
+      <graph-name>gratefulgraph</graph-name>
+      <graph-type>com.tinkerpop.rexster.config.TinkerGraphGraphConfiguration</graph-type>
+      <graph-location>data/graph-example-2.xml</graph-location>
+      <graph-read-only>false</graph-read-only>
+      <extensions>
+        <allows>
+          <allow>tp:frames</allow>
+        </allows>
+      </extensions>
+    </graph>
+    ...
+  </graphs>
+</rexster>
+```
+
+h2. http Section
+
+The @<http>@ section of @rexster.xml@ controls REST API and Dog House configurations.  The @<server-port>@ and @<server-host>@ allows configuration of the port and host on which Rexster will serve.  
+
+The @<base-uri>@ defines the prefix for the URI that the Dog House will use for connecting to Rexster services.  If this value is not specified, it will default to @http://localhost@.  If this value is pointed at @http://localhost@, it is important to note that the Dog House will not be accessible from browsers other than the one on the local machine.  To allow browsers on remote machines to connect, consider using the IP address of the machine that Rexster is installed upon. Furthermore, in standalone mode, Rexster assumes that both servers are being served through the same base URI in the same instance of Grizzly on different ports. 
+
+The @<web-root>@ allows specification of the directory where the root of Dog House exists.  This setting is only relevant if the @<enable-doghouse>@ option is set to @true@.  The @<character-set>@ configures the character set the request/response from Rexster REST services will support.  If it is not specified then the Rexster will revert to ISO-8859-1.  Rexster will also respect the @Accept-Charset@ request header and revert back to the value of @<character-set>@ if the header is not specified.
+
+The @<max-post-size>@ controls the maximum size in bytes of the data being sent in POST operations to the REST API.  The default value is about 2M.
+
+The @<max-header-size@ is the maximum size in bytes of the request header that Rexster will accept.  The default value is 8K.
+
+The @<upload-timeout-millis@ is the number of milliseconds the REST API will accept an upload for.  The default value is thirty seconds.
+
+h2. rexpro Section
+
+The @<server-port>@ and @<server-host>@ represents the port and host on which the [[Rexster Console]] communicates to the Rexster server.  This port utilizes RexPro, short for Rexster Protocol, which is a binary protocol.  
+
+The @<session-max-idle>@ specifies the number of milliseconds that a RexPro session can stay idle before the session is destroyed.  If this value is not specified, the default value of thirty minutes is used.  The @<session-check-interval>@ specifies the number of milliseconds between session idle checks.  If this value is not specified, the default value of 50 minutes is used.  In both cases, neither value can be set to anything less than one second.  Increasing the @<read-buffer>@ will allow larger request sizes.
+
+h2. Common Sections
+
+Some elements are common to both the @<http>@ and @<rexpro>@ sections of @rexster.xml@.
+
+The @<thread-pool>@ element has multiple sub-sections beneath it and allow configuration of the number of available threads in the Grizzly thread pool.  The settings are defaulted to the initial values provided by Grizzly.  The available settings and the meanings of those settings for the @<worker>@ pool and the @<kernal>@ pool are identical. In both cases, the @<core-size>@ represents the initial number of threads that will be present with the specified thread pool is created and the @<max-size>@ represents the maximum number threads that may be maintained by the specified thread pool.
+
+The @<io-strategy>@ element offers way to configure the Grizzly threading operations.  This value can be set to one of the following values:
+
+* worker
+* same
+* dynamic
+* leader-follower
+
+Generally speaking, the @leader-follower@ strategy and the related default settings are best applicable to most usage scenarios.  Please see the "Grizzly User Guide":http://grizzly.java.net/nonav/docs/docbkx2.2/html/grizzly-docs.html) for more information on these settings.
+
+*Note* - If using Red Hat Linux see this [[section|Troubleshooting#trouble-with-red-hat]] in Troubleshooting.
+
+The @<enable-jmx>@ element can be set to @true@ or @false@ (with the default being @false@).  When set to @true@, Rexster will expose underlying Grizzly "JMX":http://en.wikipedia.org/wiki/Java_Management_Extensions MBeans in the @com.sun.grizzly@ root.
+
+h2. Other Elements
+
+The @<rexster-shutdown-port>@ and @<rexster-shutdown-host>@ allows configuration of the port and host on which Rexster will accept shutdown requests. 
+
+The @<config-check-interval>@ allows for configuration of the interval of time (in milliseconds) that Rexster should use when checking @rexster.xml@ for changes.
+
+The @<script-engines>@ section allows for the configuration of the Script Engines to be made available through Rexster. A Script Engine configuration must be wrapped in a @<script-engine>@ element.  They have the following available settings:
+
+* The @<name>@ refers to the name of the Script Engine as defined by the implementation itself.  It is expected that those Script Engines that are Gremln flavors will be prefixed with "gremlin-" (i.e. @gremlin-groovy@, @gremlin-scala@, etc.). Rexster is only packaged with @gremlin-groovy@ at this time.
+* The @<reset-threshold>@ element defines how often the Gremlin ScriptEngine should be reset.  This configuration is important when processing large numbers of ad-hoc Gremlin scripts via the Gremlin Extension.  An ad-hoc script is one that is not parameterized with script variables.  Such scripts can lead to an @OutOfMemoryException@ triggered by a bug in the Groovy script engine implementation itself (outside of the control of TinkerPop).  By resetting the script engine after the configured number of requests, this problem can be bypassed.  A good value to set this threshold is generally between 500 and 1000 depending on the memory that Rexster has available to it.  The reset does not come without a performance penalty, so it is therefore recommended to use parameterized scripts whenever possible and to turn off the reset function by setting this value to "-1".
+* The @<init-scripts>@ element defines one or more comma-separated script files that gets executed at the initialization of a Gremlin Script Engine.  The initialization allows for the creation of user-defined steps and functions to be made available.  It is important to remember that these steps and functions apply across all graphs configured within Rexster.  Also, Script Engine resets do not affect the steps and functions created.  They are there for the life of Rexster.  This element is optional.
+* The @<imports>@ and @<static-imports>@ is a comma-separated list of additional imports that are applied to the Script Engines.  Classes referenced by the imports must be in Rexster's classpath (i.e. copy the JAR files to the @$REXSTER_HOME/ext@ directory). Only @gremlin-groovy@ supports this setting at this time.
+
+[[Rexster Security]] is managed through the @<security>@ element. By default it is configured to be set to @none@ as in:
+
+```xml
+<security>
+  <authentication>
+    <type>none</type>
+  </authentication>
+</security>
+```
+
+When configured in this fashion, Rexster accepts all incoming requests.  The other option for configuration is @default@ which requires the inclusion of the @<configuration>@ element, as in:
+
+```xml
+<security>
+  <authentication>
+    <type>default</type>
+    <configuration>
+      <users>
+        <user>
+          <username>rexster</username>
+          <password>rexster</password>
+        </user>
+      </users>
+    </configuration>
+  </authentication>
+</security>
+```
+
+The @<users>@ element allows specification of one or more @<user>@ child elements which each must contain a @<username>@ and @<password>@ combination.  These @<user>@ elements represent the list of users that will have access to Rexster.  
+
+The @<metrics>@ section configured the various realt-time monitoring options for Rexster.  See the [[Monitoring]] page for more information.
+
+h2. graphs Section 
+
+The @<graphs>@ element will contain any number of @<graph>@ configurations.  Each @<graph>@ element will equate to one graph being configured within Rexster.  The exact contents of the @<graph>@ element is dependent upon the type of graph implementation ("OrientDB":http://www.orientechnologies.com/, "neo4j":http://neo4j.org/, etc.) utilized (see [[Specific Graph Configurations]]).  However, some key general rules exist for all graph configurations
+
+* The @<graph-name>@ element must be unique within the list of configured graphs.  
+* The @<graph-enabled>@ element may be applied to any @<graph>@.  Setting its contents to "false" will prevent that graph from loading to Rexster.  If the element is not present at all (or set explicitly to true) the graph will be loaded.
+* The @<graph-type>@ element is the full name of a class that implements the @GraphConfiguration@ interface.  The @GraphConfiguration@ is responsible for using the properties supplied to it from the configuration file to produce a fully configured @Graph@ instance.  This approach allows a plug-in approach to providing new support for Graph implementations without requiring access to Rexster code.  Please read the configuration options specific to each graph type below for more information on the expected values for this element.
+* The @<graph-read-only>@ element will configure a graph so that its data cannot be modified.  Set to true to enable this feature.  If the element is not present graphs will default this value to false.
+* The @<extensions>@ element defines the [[Extensions]] to be exposed for this graph.   Within @<extensions>@ there are two other elements: @<allows>@ and @<extension>@.
+** The @<allows>@ element defines a collection of @<allow>@ elements where each contains the Extensions that are to be exposed for this graph.  The value of the @<allow>@ is an expression that consists of a namespace and extension name separated by a colon, as in @namespace:extension@.  Wildcards are allowed where one wishes to configure all extensions in all namespaces identified by Rexster as denoted by @*:*@ and where one wishes to configure all extensions within a given namespace as denoted by @namespace:*@.
+** Zero or more @<extension>@ elements may exists within @<extensions>@.  The purpose of this element is to pass graph specific configuration options to the Extension.  These configurations will be Extension specific so be sure to check the individual configuration options for that Extension.  There are three expected elements within an @<extension>@ element: @<namespace>@, @<name>@ and @<configuration>@.
+*** The @<namespace>@ element defines the namespace of the extension to be configured.
+*** The @<name>@ element defines the name of the extension to be configured.
+*** The <@configuration>@ contains Extension specific configuration options (refer to the specific Extension for what the contents of this element should be.
+
+h1. Logging Configuration
+
+Rexster uses "Apache log4j":http://logging.apache.org/log4j/1.2/ for logging.  By default the logger is configured by a "log4j.properties":https://github.com/tinkerpop/rexster/blob/master/rexster-server/src/main/resources/com/tinkerpop/rexster/log4j.properties deployed as a resource within Rexster.  By default this file simply writes log messages to the console in which Rexster was started and only logs messages at log level @INFO@.  This configuration can be overridden by placing a @log4j.properties@ files in the root of @REXSTER_HOME@ as Rexster will look there first prior to loading the default.
+
+Rexster has two logging states: @standard@ and @debug@.  These states are controlled by the inclusion or exclusion of the @-d@ argument to @rexster.sh@.  When @-d@ is excluded, Rexster is considered to be in @standard@ mode.  In this mode, logging is limited to log messages exclusive to the Rexster layer of the stack.  In other words, log messages from the components Rexster relies upon, such as "Jersey":http://jersey.java.net/ and "Grizzly":http://grizzly.java.net/, are suppressed.  To surface these messages from the underlying components, Rexster must be started in @debug@ mode.  Since these messages are funneled through log4j, these surfaced log messages are controlled by the @log4j.properties@ files.  If full logging output is desired from all components and layers of Rexster, it is important to override that file and set the log level to @TRACE@.

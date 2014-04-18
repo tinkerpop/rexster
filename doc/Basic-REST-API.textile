@@ -1,0 +1,89 @@
+[[https://raw.github.com/tinkerpop/rexster/master/doc/images/rexster-character-2.png|width=100px|float|align=left]]
+
+This cheat sheet provides a review of the RESTful API for Rexster. Note that beyond the query parameters provided in the table below, the standard Rexster parameters @rexster.offset.start@, @rexster.offset.end@, and @rexster.returnKeys@ also work in cases where it makes sense. The @<graph>@ is the unique name of a graph configured within Rexster. The base of the URI, when running locally, is generally @localhost:8182@.
+
+Please note that there are [[Rexster MIME Types]] that affect operations within the API.
+
+h1. GET Operations
+
+|_. returns    |_. uri                                                         |_. description                                                                                                        |
+| graphs       | @/graphs@                                                     | get all the graphs                                                                                                   |
+| graph        | @/graphs/<graph>@                                             | get the graph named <graph>                                                                                          |
+| vertices     | @/graphs/<graph>/vertices@                                    | get all vertices                                                                                                     |
+| vertices     | @/graphs/<graph>/vertices?key=<key>&value=<value>@                                    | get all vertices for a key index given the specified @<key>@/@<value>@                                                                                                      |
+| vertex       | @/graphs/<graph>/vertices/<id>@                               | get vertex with id @<id>@                                                                                            |
+| vertices     | @/graphs/<graph>/vertices/<id>/out@                           | get the adjacent out vertices of vertex @<id>@ ^4^                                                                      |
+| vertices     | @/graphs/<graph>/vertices/<id>/in@                            | get the adjacent in vertices of vertex @<id>@ ^4^                                                                       |
+| vertices     | @/graphs/<graph>/vertices/<id>/both@                          | get the both adjacent in and out vertices of vertex @<id>@ ^4^                                                          |
+| long          | @/graphs/<graph>/vertices/<id>/outCount@ | get the number of out vertices of vertex @<id>@ ^4^ |
+| long          | @/graphs/<graph>/vertices/<id>/inCount@  | get the number of in vertices of vertex @<id>@ ^4^                                                                       |
+| long          | @/graphs/<graph>/vertices/<id>/bothCount@ | get the number of adjacent in and out vertices of vertex @<id>@ ^4^ |
+| longs          | @/graphs/<graph>/vertices/<id>/outIds@ | get the identifiers of out vertices of vertex @<id>@ ^4^ |
+| longs          | @/graphs/<graph>/vertices/<id>/inIds@  | get the identifiers of in vertices of vertex @<id>@ ^4^                                                                       |
+| longs          | @/graphs/<graph>/vertices/<id>/bothIds@ | get the identifiers of adjacent in and out vertices of vertex @<id>@ ^4^ |
+| edges        | @/graphs/<graph>/edges@                                       | get all edges                                                                                                        |
+| edges        | @/graphs/<graph>/edges?key=<key>&value=<value>@                                       | get all edges for a key index given the specified @<key>@/@<value>@                                                                                                       |
+| edge         | @/graphs/<graph>/edges/<id>@                                  | get edge with id @<id>@                                                                                              |
+| edges        | @/graphs/<graph>/vertices/<id>/outE@                          | get the out edges of vertex @<id>@ ^4^                                                                                 |
+| edges        | @/graphs/<graph>/vertices/<id>/inE@                           | get the in edges of vertex @<id>@ ^4^                                                                                   |
+| edges        | @/graphs/<graph>/vertices/<id>/bothE@                         | get the both in and out edges of vertex @<id>@ ^4^                                                                      |
+| indices      | @/graphs/<graph>/indices@                                     | get all the indices associated with the graph                                                                        |
+| elements     | @/graphs/<graph>/indices/index?key=<key>&value=<value>@       | get all elements with @<key>@ property equal to @<value>@ in @index@                                                 |
+| long         | @/graphs/<graph>/indices/index/count?key=<key>&value=<value>@ | get a count of all elements with @<key>@ property equal to @<value>@ in @index@                                      |
+| keys         | @/graphs/<graph>/keyindices/@                                  | get the combination of vertex and edge keys |
+| keys         | @/graphs/<graph>/keyindices/vertex@                           | get vertex keys |
+| keys         | @/graphs/<graph>/keyindices/edge@                           | get edge keys |
+| prefixes ^1^ | @/graphs/<graph>/prefixes@                                    | get the list of SailGraph prefixes                                                                                   |
+| prefix ^1^   | @/graphs/<graph>/prefixes/prefix@                             | get a specific prefix value                                                                                          |
+
+h1. POST Operations
+
+|_. returns  |_. uri                                                                           |_. description                                                                                                                   |
+| vertex     | @/graphs/<graph>/vertices@                                                      | create a vertex with no specified identifier                                                                                    |
+| vertex     | @/graphs/<graph>/vertices/<id>@                                                 | create a vertex with  id @<id>@ ^2^                                                                                             |
+| vertex     | @/graphs/<graph>/vertices/<id>?<key>=<value>&<key'>=<value'>@                   | create a vertex with  id @<id>@ and the provided properties (or update vertex properties if vertex already exists). ^2^         |
+| edge       | @/graphs/<graph>/edges?_outV=<id>&_label=friend&_inV=2&<key>=<key'>@            | create an out edge with no specified identifier from vertex @<id>@ to vertex @2@ labeled "friend" with provided properties. ^2^ |
+| edge       | @/graphs/<graph>/edges/3?_outV=<id>&_label=friend&_inV=2&<key>=<key'>@          | create an out edge with id @3@ from vertex @<id>@ to vertex @2@ labeled "friend" with provided properties. ^2^                  |
+| edge       | @/graphs/<graph>/edges/3?<key>=<key'>@                                          | update the properties of the edge with id @3@                                                                                   |
+| index ^3^  | @/graphs/<graph>/indices/index?class=vertex@                        | create a new manual index named @index@                                                                                         |
+| void | @/graphs/<graph>/keyindices/vertex/<key>@                           | create a new key index for a vertex |
+| void        | @/graphs/<graph>/keyindices/edge/<key>@                           | create a new key index for an edge |
+| void ^1^   | @/graphs/<graph>/prefixes?namespace=http%3A%2F%2Fwww.ggl.com&prefix=pf@         | add a new SailGraph prefix with @namespace@ http://www.ggl.com and @prefix@ pf                                                  |
+
+h1. PUT Operations
+
+|_. returns  |_. uri                                                         |_. description                                                                  |
+| vertex     | @/graphs/<graph>/vertices/<id>?<key>=<value>&<key'>=<value'>@ | replaces the all existing properties of the vertex @<id>@ with those specified |
+| edge       | @/graphs/<graph>/edges/<id>?<key>=<value>&<key'>=<value'>@    | replaces the all existing properties of the edge @<id>@ with those specified   |
+| void       | @/graphs/<graph>/indices/index?key=<key>&value=<value>&id=<id>@    | put vertex with id @<id>@ into @index@ at @<key>/<value>@                                                                       |
+
+h1. DELETE Operations
+
+|_. returns  |_. uri                                                                        |_. description                                             |
+| void       | @/graphs/<graph>/vertices/<id>@                                              | remove vertex @<id>@                                      |
+| void       | @/graphs/<graph>/vertices/<id>?<key>&<key'>@                                 | remove properties @<key>@ and @<key'>@ from vertex @<id>@ |
+| void       | @/graphs/<graph>/edges/3@                                                    | remove the edge with id @3@                               |
+| void       | @/graphs/<graph>/edges/3?<key>&<key'>@                                       | remove properties @<key>@ and @<key'>@ from edge @3@      |
+| void       | @/graphs/<graph>/indices/index@                                              | drop the index named @index@                              |
+| void       | @/graphs/<graph>/indices/index?key=<key>&value=<value>&class=vertex&id=<id>@ | remove the vertex @<id>@ from @index@ at @<key>/<value>@  |
+| void ^1^   | @/graphs/<graph>/prefixes/prefix@                                            | remove the specified prefix                               |
+
+^1^ Only applies to @SailGraph@ configurations.
+^2^ Underlying graph database implementations must support the ability to assign the edge/vertex identifier.  In cases where the graph database does not support the identifier (ie. Neo4j), the identifier supplied with be ignored and the graph assigned identifier will be returned in the JSON after successful graph element creation.
+^3^ Note that when POSTing an index you may also pass a @params@ query string argument.  This argument allows configuration parameters to be passed into the index itself (support of this feature is specific to the graph implementation itself).  Please read the Neo4j Blueprints implementation for an "example":https://github.com/tinkerpop/blueprints/wiki/Neo4j-Implementation on how to configure an index.  The @params@ argument is [[parsed to JSON|Mapping a URI to JSON]] so a query string that looked like @params.to_lower_case=true&params.type=fulltext&params.provider=lucene@ would construct a map of three index parameters.
+^4^ Rexster utilizes "Vertex Query":https://github.com/tinkerpop/blueprints/wiki/Vertex-Query capabilities of Blueprints for these noted operations.  These operations accept the following parameters: @_label@, @_properties@ and @limit@.
+
+* @_label@ filters edges by label and may be either a single value or an array of values as in @_label=[created,knows]@
+* @_skip@ the number of elements to ignore before taking results
+* @_take@ the number of elements to take from the returned set
+* @_properties@ is an array of edge properties to filter on in the following fashion: @_properties=[ [weight,>,(f,0.5)], [weight,<,(f,1.0)] ]@.  Note that property values respect [[Rexster Data Typing|Property Data Types]] and the following comparators: @<=, <, <>, >, >=@. 
+
+Since these REST operations are returning lists, the standard Rexster Parameters (discussed below) apply.  Choosing to use @rexster.offset.end@ to limit to the top N results, is different than using @_take@ in that @_take@ pushes this filtering operation down to the underlying graph making it more efficient than @rexster.offset.end@ which does that filtering within Rexster itself.  The same can be said of the use of @_skip@ and @rexster.offset.start@.  This approach also helps those buffering large results sets from Rexster, where the @_take@ size greater than the the desired buffer.
+
+In all cases, parameters may be POSTed or PUTed on the [[URI|Mapping a URI to JSON]] or as JSON using one of the [[Rexster MIME Types]].
+
+h1. Rexster Parameters
+
+* @rexster.offset.start@ - Expects a numeric value that represents the start point for returning a set of records and is used in conjunction with @rexster.offset.end@ to allow for paging of results.  If used without a valid @rexster.offset.end@ parameter specified, Rexster will return all remaining records in the set.    
+* @rexster.offset.end@ - Expects a numeric value that represents the end point for returning a set of records and is used in conjunction with @rexster.offset.start@ to allow for paging of results.  If used without a valid @rexster.offset.start@ parameter specified, Rexster will assume the start value to be zero.
+* @rexster.returnKeys@ - Expects a comma separated list of property names to return in the results.  Element meta-data will always be returned even if @rexster.returnKeys@ are specified.  If a valid value for this parameter is not specified, then all properties are returned.

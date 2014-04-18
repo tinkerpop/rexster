@@ -1,0 +1,127 @@
+[[http://www.wpclipart.com/animals/dogs/cartoon_dogs/cartoon_dogs_6/cartoon_dog_T.png|width=100px]]
+
+Extension methods marked with an @@ExtensionDefinition@ annotation contain the logic to be executed by the Rexster.  To do anything useful an extension method must have access to the resources that Rexster has to from the context of the request, the general graph configuration and other such parameters.  Extension methods access these resources through method parameters that are marked with the @@RexsterContext@ or @@ExtensionRequestParameter@ annotations.  Rexster will read these marked parameters and try to inject an object based on its type.
+
+Parameters marked with one of these annotation that is not one of an expected type (described more below) will be set to null (unless a default value is specified).  Furthermore, parameters that are not marked by annotation at all will be set to null.
+
+h1. Rexster Context
+
+The @@RexsterContext@ annotation tells Rexster to inject resources internal to Rexster to the extension method and can be applied to parameters of the following types:
+
+|_. type |_. description |
+| Graph | The requested blueprints graph. |
+| RexsterApplicationGraph | The requested blueprints graph. |
+| ExtensionMethod | Provides access to the reflected @Method@ as well as the @ExtensionDefinition@ and @ExtensionDescriptor@.  It also provides the @getExtensionApiAsJson@ helper method for getting API information to return as JSON. |
+| UriInfo | The requested URI. |
+| HttpServletRequest | The actual servlet request made. |
+| SecurityContext | Allows access to the name of the user who logged in (if [[authentication|Rexster Security]] services are turned on). |
+| RexsterResourceContext | A container for the @UriInfo@, @HttpServletRequest@, @ExtensionMethod@, @RexsterApplicationGraph@, @SecurityContext@ and two request objects: one that is [[mapped|Mapping a URI to JSON]] to JSON and one that just contains the raw values passed to Rexster |
+| Edge | The requested edge given a @GRAPH@ or @EDGE@ @@ExtensionPoint@. |
+| Vertex | The requested edge given a @GRAPH@ or @EDGE@ @@ExtensionPoint@. |
+
+Consider the following example taken from the @SimpleRootExtension@ extension in the "Sample Kibbles":https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/sample-kibbles project:
+
+```java
+public ExtensionResponse doWorkOnGraph(@RexsterContext Graph graph) {
+```
+
+In this example, Rexster will inject the @Graph@ object from the request into the @doWorkOnGraph@ method. 
+
+h1. Extension Request Parameter
+
+The @@ExtensionRequestParameter@ annotation tells Rexster to inject parameters from the [[request object|Mapping a URI to JSON]] into a parameter.  This annotation takes several parameters: @name@, an optional @description@, @defaultValue@ and @parseToJson@.  The @name@ refers to the key in the root of the request object.  Rexster will try to coerce values from the request object into the specified type of the parameter.  The following types are supported:
+
+* String
+* Integer
+* Float
+* Double
+* Long
+* Boolean
+* JSONObject
+* JSONArray
+
+The @defaultValue@ allows specification of a default for that parameter if the parameter is not supplied on the request.  This parameter takes a string, but the value will be coerced to the data type of the value to which the annotation is attached.  If this value cannot be coerced, then it will be defaulted to null.  
+
+It is important to note that @defaultValue@ parameter takes an array of strings as its value.  This is a workaround to a shortcoming of Java that prevents a @null@ assignment to annotation parameters.  If no value, is specified, the @defaultValue@ is actually an empty array, which Rexster will evaluate to @null@.  If there is more than one value, only the first value in the array is taken into account.
+
+The @parseToJson@ parameter is defaulted to @true@ and when set as such, tells Rexster to inject the value of the parameter as [[mapped from JSON|Mapping a URI to JSON]].  When set to @false@, Rexster will inject the raw value of the parameter without the mapping.  This is especially useful when dealing with parameters that contain characters that incorrectly parse to JSON when a string value is really what is needed.
+
+Consider this snippet from the @PingExtension@ in the "Sample Kibbles":https://github.com/tinkerpop/rexster/tree/master/rexster-kibbles/sample-kibbles project:
+
+```java
+@ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
+@ExtensionDescriptor(description = "Ping me.")
+public ExtensionResponse evaluatePing(@RexsterContext RexsterResourceContext context,
+                                      @RexsterContext Graph graph,
+                                      @ExtensionRequestParameter(name="reply", description="a value to reply with") String reply) {
+    Map<String, String> map = new HashMap<String, String>();
+    map.put("ping", reply);
+    return ExtensionResponse.ok(map);
+}
+```
+
+When accessing this URI:
+
+```text
+http://localhost:8182/graphs/mygraph/ex/ping?reply=ping-a-ling
+```
+
+The value of the @reply@ URI query string parameter, "ping-a-ling" is injected into the @reply@ method parameter on the extension.
+
+The next example demonstrates usage of the @defaultValue@ parameter on the @ExtensionRequestParameter@.  This example is taken from the @ParametersExtension@ in the Sample Kibbles project.
+
+```java
+@ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, path = "object-default")
+@ExtensionDescriptor(description = "pass an object parameter to be used in the response.")
+public ExtensionResponse evaluateSomeObjectWithDefaults(@RexsterContext RexsterResourceContext context,
+                                                        @RexsterContext Graph graph,
+                                                        @ExtensionRequestParameter(name = "a", defaultValue = "1", description = "an integer to reply with") Integer reply,
+                                                        @ExtensionRequestParameter(name = "b", defaultValue = "{ \"a\":\"marko\",\"b\":true, \"c\": { \"a\" : \"peter\" } }", description = "an object to reply with") JSONObject replyObject,
+                                                        @ExtensionRequestParameter(name = "c", defaultValue = "[ \"marko\",\"povel\" ]", description = "a list to reply with") JSONArray replyList) {
+    Map<String, Object> map = new HashMap<String, Object>();
+    map.put("a", reply);
+    map.put("b", replyObject);
+    map.put("c", replyList);
+    return ExtensionResponse.ok(map);
+}
+```
+
+Note that the @defaultValue@ is specified by a string for all three parameters.  Rexster will coerce those values to their appropriate data types.  So therefore resolving:
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp-sample/parameters/object
+```
+
+will return:
+
+```javascript
+{
+  "a":1,
+  "b": {
+    "a":"marko",
+    "b":true,
+    "c": { "a":"peter" }
+  },
+  "c": [ "marko", "povel" ]
+}
+```
+
+or alternatively, resolving this URI:
+
+```text
+http://localhost:8182/graphs/tinkergraph/tp-sample/parameters/object?a=100
+```
+
+will return:
+
+```javascript
+{
+  "a":100,
+  "b": {
+    "a":"marko",
+    "b":true,
+    "c": { "a":"peter" }
+  },
+  "c": [ "marko", "povel" ]
+}
+```

@@ -5,7 +5,7 @@ Rexster is a graph server that exposes any "Blueprints":http://blueprints.tinker
  * "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory graph
  * "Neo4j":http://neo4j.org/ graph database
  * "OrientDB":http://www.orientechnologies.com/ graph database
- * "DEX":http://www.sparsity-technologies.com/dex graph database
+ * "Sparksee":http://www.sparsity-technologies.com/#sparksee graph database
  * "Titan":http://thinkaurelius.github.com/titan/ graph database
  * "Sesame 2.0":http://www.openrdf.org compliant RDF stores
  * Many "third-party":https://github.com/tinkerpop/blueprints/wiki Blueprints implementations

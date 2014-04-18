@@ -1,0 +1,131 @@
+[[https://github.com/tinkerpop/rexster/raw/master/doc/images/rexpro-logo.png|width=500px]]
+
+Communication over [[RexPro]] is achieved by sending and receiving messages that adhere to the format specified on this page.  There are several clients that communicate via RexPro that would serve as good examples for how communication over RexPro works:
+
+* [[Rexster Console]] - A "REPL":http://en.wikipedia.org/wiki/Read-eval-print_loop for executing scripts on a remote Rexster server.
+* [[RexsterClient|RexPro Java]] - A Java language binding
+* "rexpro-python":https://github.com/bdeggleston/rexpro-python - A Python language binding
+
+h1. Basic Message Structure
+
+Every RexPro message consists of the following segments:
+
+```text
+[protocol version][serializer type][reserved (4x)][message type][message size][message body]
+```
+
+|_. segment |_. type(bytes) |_. description |
+| protocol version | @byte(1)@ |The version of RexPro.  Currently, this value should be set to one. |
+| serializer type | @byte(1)@ | The type of serializer to use. 0 for msgpack, 1 for json. |
+| reserved | @byte(4)@ | These bytes reserved for future use. |
+| message type | @byte(1)@ | The type of message as described below. See the value column. |
+| message size | @int(4)@ | The length of the message body |
+| message body | @byte(n)@ | The body of the message itself, containing the instructions for, or a response from, the RexPro Server. This portion of the message is an array of message fields serialized using MsgPack. The fields for each specific message are described below. |
+
+h1. Message Definitions
+
+RexPro messages are divided into those that deal with requests made from the client and those that involved a response from the server.  The following table represents an overview of the basic message set:
+
+|_. message |_. type |_. value |_. description |
+| session | request | 1 | A request to open or close the session with the RexPro Server. |
+| session | response | 2 | The response from the RexPro Server to a session request containing session information. |
+| script | request | 3 | A request to process a Gremlin script on the RexPro Server. |
+| script | response | 5 | A response to a script request. |
+| error | response | 0 | A response from the RexPro Server indicating a problem has occurred. |
+
+*NOTE* - The following sections describe the individual RexPro Messages in greater detail.  It is important to note that the messages are defined in terms of MsgPack serialization, so data types defined must adhere to MsgPack expectations.   The order of fields in the sections below are important to adhering to the format.  They should be serialized to a MsgPack array.
+
+h2. Request Messages
+
+The request class of messages are those that are sent by the client to the RexPro Server for processing.
+
+h3. Session
+
+The Session Request Message is used to establish or destroy a session on the RexPro Server.  When a session is opened, future Script Request Messages can be executed within this session and variable bindings established in previous scripts can be accessed.  
+
+|_. field |_. type |_. description |
+| @Session@ | @byte(16)@ | The UUID for the Session. Set each byte to zero for an "empty" session. |
+| @Request@ | @byte(16)@ | The UUID for the request.  Uniquely identifies the request from the client.  This value gets passed back from the RexPro Server so that the response message can be mapped to a request if necessary. |
+| @Meta@ | @Map@ | Message specific properties described below. |
+| @Username@ | @String@ | The username to access the RexPro Server assuming Rexster authentication is turned on.  The field is ignored in cases where it is not enabled. |
+| @Password@ | @String@ | The password to access the RexPro Server assuming Rexster authentication is turned on.  The field is ignored in cases where it is not enabled. |
+
+h4. Meta Attributes
+
+|_. field |_. type |_. description |
+| @graphName@ | @String@ | The name of the graph to open a session on. Optional. |
+| @graphObjName@ | @String@ | The variable name of the graph object, defaults to @g@. Optional. |
+| @killSession@ | @Boolean@ | If true, the given session will be destroyed, otherwise, one will be created, defaults to false. |
+
+h3. Script
+
+The Script Request Message is used to send Gremlin scripts to the RexPro Server.  Script Requests can be made either in-session or sessionless.  In-session requires that a session is already established with the RexPro Server via the Session Request Message.  Sessionless Script Request Messages can be sent without the context of the session but come with the limitation that variable bindings established by a script are lost between requests.
+
+|_. field |_. type |_. description |
+| @Session@ | @byte(16)@ | The UUID for the Session. Set each byte to zero for an "empty" session. |
+| @Request@ | @byte(16)@ | The UUID for the request.  Uniquely identifies the request from the client.  This value gets passed back from the RexPro Server so that the response message can be mapped to a request if necessary. |
+| @Meta@ | @Map@ | Message specific properties described below. |
+| @LanguageName@ | @String@ | The Gremlin flavor to request the RexPro Server to process the message with.  This value is dependent upon the configured script engine languages in @rexster.xml@.  Generally speaking, this value should be set to @groovy@. |
+| @Script@ | @String@ | The Gremlin script to execute on the server. |
+| @Bindings@ | @Map@ | Bindings are arguments passed with the script that become variables to the Script Engine when the script is executed.  Use bindings to parameterize scripts.  Bindings must be serializable by MsgPack. |
+
+h4. Meta Attributes
+
+|_. field |_. type |_. description |
+| @inSession@ | @Boolean@ | Indicates this requests should be executed in the supplied session. Defaults to @false@. Optional. |
+| @isolate@ | @Boolean@ | Bindings from previous messages are not available in subsequent requests. Defaults to @true@. Optional. |
+| @transaction@ | @Boolean@ | Executes script within a transaction, committing if successful, rolling back if not. Has no effect with non transactional graph. Defaults to @true@. Optional. |
+| @graphName@ | @String@ | The name of the graph to open a session on. Optional. |
+| @graphObjName@ | @String@ | The variable name of the graph object. Defaults to @g@. Optional. |
+| @console@ | @String@ | A console response will be returned if true. Defaults to @false@. Optional. |
+
+*NOTE* - supplying @graphName@ or @graphObjName@ for a session request which already has these values defined will raise an exception.
+
+h2. Response Messages
+
+The response class of messages are those that are sent by the RexPro Server back to the client, in response to a request message.
+
+h3. Session
+
+The Session Response Message is used to send a response to a Session Request Message and is sent when the session is successfully created.  The Session Response Message will contain information about the session created by the RexPro Server.
+
+|_. field |_. type |_. description |
+| @Session@ | @byte(16)@ | The UUID for the Session. Used on future Script Request Messages that need to be made on the session. |
+| @Request@ | @byte(16)@ | The UUID for the request.  Uniquely identifies the request from the client.  This value gets passed back from the RexPro Server so that the response message can be mapped to a request if necessary. |
+| @Meta@ | @Map@ | Not applicable for this message |
+| @Languages@ | @String[]@ | The list of Gremlin flavors that are [[configured|Rexster Configuration]] for Rexster.  By default the language list will just be @groovy@. |
+
+h3. Script Response
+
+The Script Response Message contains the results of a Gremlin script sent in a Script Request Message.  
+
+|_. field |_. type |_. description |
+| @Session@ | @byte(16)@ | The UUID for the Session. Used on future Script Request Messages that need to be made on the session. |
+| @Request@ | @byte(16)@ | The UUID for the request.  Uniquely identifies the request from the client.  This value gets passed back from the RexPro Server so that the response message can be mapped to a request if necessary. |
+| @Meta@ | @Map@ | Not applicable for this message |
+| @Results@ | @Object@ | The result serialized by MsgPack. Any result not serializable by MsgPack is converted via @toString@. |
+| @Bindings@ | @Map@ | Once the script is executed any bindings on the Script Engine that can be serialized via MsgPack are returned.  Any that cannot be properly serialized are converted via @toString@. |
+
+h3. Error
+
+An Error Response Message may be returned by the RexPro Server for any request message sent.
+
+|_. field |_. type |_. description |
+| @Session@ | @byte(16)@ | The UUID for the Session. Used on future Script Request Messages that need to be made on the session. |
+| @Request@ | @byte(16)@ | The UUID for the request.  Uniquely identifies the request from the client.  This value gets passed back from the RexPro Server so that the response message can be mapped to a request if necessary. |
+| @Meta@ | @Map@ | Not applicable for this message |
+| @ErrorMessage@ | @String@ | The error message from the server. |
+
+h4. Meta Attributes
+
+|_. field |_. type |_. description |
+| @flag@ | @Integer@ | - @0@ : The message sent to the RexPro Server was malformed.
+                       - @1@ : A session was requested that has either expired or no longer exists.
+                       - @2@ : A script failed to execute (likely cause is syntax error).
+                       - @3@ : Invalid username/password if authentication is turned on.
+                       - @4@ : A graph requested via @graphName@ meta attribute did not exist.
+                       - @6@ : The result or an item in the bindings could not be serialized properly. |
+
+h2. Previous Versions
+
+For RexPro formats for Rexster versions prior to 2.4.0, see "here":https://github.com/tinkerpop/rexster/wiki/RexPro-Messages/46f76da31149b2a3a68fb470d28157e23739a66d

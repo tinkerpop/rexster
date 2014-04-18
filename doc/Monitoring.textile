@@ -1,0 +1,256 @@
+[[https://raw.github.com/tinkerpop/rexster/master/doc/images/rexster-metrics-logo.png|width=166px|align=left|float]]
+
+Rexster comes with a variety of options for monitoring given its integration with [[Metrics|http://metrics.codahale.com/]].  Rexster continually gathers information about itself as it is accepting requests and sending back responses.  This information is then periodically sent to the reporters configured in @rexster.xml@.  
+
+Rexster supports the following reporters: Console, JSON-based web service via HTTP, [[JMX|http://www.oracle.com/technetwork/java/javase/tech/javamanagement-140525.html]], [[Ganglia|http://ganglia.sourceforge.net/]] and [[Graphite|http://graphite.wikidot.com/]]
+
+The metrics provided by Rexster can help inform administrators of Rexster's health and include things like:
+
+* Gremlin script engine processing times
+* REST endpoint request/response times
+* Underlying JMX attributes from Grizzly and Jersey
+
+h1. Getting Started
+
+Rexster comes with a pre-configured through @rexster.xml@ to report metrics through several reporters.  The easiest one to get started with is the REST endpoint.  [[Start Rexster|Getting Started]] and issue a query such as:
+
+```text
+curl http://localhost:8182/graphs/tinkergraph
+```
+then resolve the following URL to get a current snapshot of the metrics gathered by Rexster:
+
+```text
+http://localhost:8182/metrics
+```
+
+Look for this particular key in the returned JSON: @http.rest.graphs.object.get@ and it will look something like this:
+
+```js
+...
+http.rest.graphs.object.get: {
+  count: 1,
+  max: 0.0013546230000000001,
+  mean: 0.0013546230000000001,
+  min: 0.0013546230000000001,
+  p50: 0.0013546230000000001,
+  p75: 0.0013546230000000001,
+  p95: 0.0013546230000000001,
+  p98: 0.0013546230000000001,
+  p99: 0.0013546230000000001,
+  p999: 0.0013546230000000001,
+  stddev: 0,
+  m15_rate: 0.006394042634681005,
+  m1_rate: 0.0010423449272394232,
+  m5_rate: 0.002751971906724164,
+  mean_rate: 0.01219546753135717,
+  duration_units: "seconds",
+  rate_units: "calls/second"
+},
+...
+```
+
+h1. Configuration
+
+All configuration of metrics reporting is handled through @rexster.xml@.  With in that file, there is a @<metrics>@ element, which contains one or more @<reporter>@ elements.  These @<reporter>@ elements represent places where Rexster will make gathered metrics available.  Basic reporter configuration looks like this:
+
+```xml
+<rexster>
+  ...
+  <metrics>
+    <reporter>
+      <type>console</type>
+    </reporter>
+  </metrics>
+  ...
+</rexster>
+```
+
+The @<type>@ may be one of the following options: @console@, @http@, @jmx@, @ganglia@ or @graphite@.  
+
+|_. type |_. description |_. behavior |_. common ^1^ |
+| @console@ | Metrics written to the console at predefined periods. | scheduled push | Yes |
+| @http@ | Metrics served via HTTP as a REST-based service. | on-demand | No |
+| @jmx@ | Metrics served as MBean to be consumed by tools like [[VisualVM|https://visualvm.java.net/]]. | on-demand | No |
+| @ganglia@ | Metrics pushed to Ganglia on a schedule. | scheduled push | Yes |
+| @graphite@ | Metrics pushed to Graphite on a schedule. | scheduled push | Yes |
+
+^1^ - Uses Common Configuration settings explained below.
+
+To include Grizzly-level JMX attributes in reported metrics, ensure that the @<enable-jmx>@ option is set to @true@ for either the @<http>@ and/or @<rexpro>@ configuration elements.
+
+h2. Reporters
+
+Rexster provides configuration options for several different reporters.
+
+h3. Console
+
+When the Console Reporter is configured, Rexster will periodically send its metrics to the console output.  This reporter is mostly useful for debugging and demonstration purposes.  Output looks something like:
+
+```text
+4/26/13 5:01:14 PM =============================================================
+
+-- Counters --------------------------------------------------------------------
+rexpro.script-engine.fail
+             count = 0
+rexpro.script-engine.success
+             count = 113650
+-- Timers ----------------------------------------------------------------------
+rexpro.script-engine
+             count = 114633
+         mean rate = 4074.89 calls/second
+     1-minute rate = 1464.61 calls/second
+     5-minute rate = 442.48 calls/second
+    15-minute rate = 252.12 calls/second
+...
+```
+
+h3. HTTP
+
+<a href="http://json.org">[[https://github.com/tinkerpop/rexster/raw/master/doc/images/json-logo.png|width=166px|align=left|float]]</a>
+
+The HTTP Reporter configures a servlet that converts metrics to "JSON":http://json.org and serves them on request. 
+
+After starting Rexster, metrics can be accessed at:
+
+```text
+http://localhost:8182/metrics
+```
+
+```js
+{
+    "name": "rexster",
+    "version": "3.0.0",
+    "counters": {
+        "rexpro.script-engine.fail": {
+            "count": 0
+        },
+        "rexpro.script-engine.success": {
+            "count": 359677
+        }
+    }, 
+    ...
+}
+```
+
+The HTTP Reporter configuration does not support the @<includes>@ or @<excludes>@ elements.
+
+h3. JMX
+
+When [[JMX|http://www.oracle.com/technetwork/java/javase/tech/javamanagement-140525.html]] is configured as a reporter, it is possible to use a tool like [[VisualVM|https://visualvm.java.net/]] to connect to the running JVM process.  There is a @rexster@ MBean that contains the metrics:
+
+<a href="https://raw.github.com/tinkerpop/rexster/master/doc/images/visualvm-jmx.png">[[https://raw.github.com/tinkerpop/rexster/master/doc/images/visualvm-jmx.png|width=434px]]</a>
+
+h3. Ganglia
+
+<a href="http://ganglia.sourceforge.net/">
+[[https://raw.github.com/tinkerpop/rexster/master/doc/images/ganglia-logo.jpg|width=166px|align=left|float]]</a>
+
+[[Ganglia|http://ganglia.sourceforge.net/]] is a scalable distributed monitoring system for high-performance computing systems. When Ganglia is configured as a reporter, Rexster will periodically send metrics to a Ganglia server.  In addition to the Common Configurations (described below), the Ganglia @<properties>@ can include:
+
+```xml
+<properties>
+  <hosts>localhost:8649</hosts>
+</properties>
+```
+
+The @<hosts>@ property tells the reporter the server to send the metrics to and the example value supplied above is the default value for the configuration if none is specified.  The metrics are sent via UDP multicast addressing.
+
+<a href="https://raw.github.com/tinkerpop/rexster/master/doc/images/rexster-ganglia-1.png">[[https://raw.github.com/tinkerpop/rexster/master/doc/images/rexster-ganglia-1.png|width=434px]]</a> <a href="https://raw.github.com/tinkerpop/rexster/master/doc/images/rexster-ganglia-2.png">[[https://raw.github.com/tinkerpop/rexster/master/doc/images/rexster-ganglia-2.png|width=450px]]</a>
+
+h3. Graphite
+
+<a href="http://graphite.wikidot.com/">
+[[https://raw.github.com/tinkerpop/rexster/master/doc/images/graphite-logo.png|width=166px|align=left|float]]</a>
+
+[[Graphite|http://graphite.wikidot.com/]] is a highly scalable real-time graphing system.  When Graphite is configured as a reporter, Rexster will periodically send metrics to a Graphite server.  In addition to the Common Configurations (described below), the Ganglia @<properties>@ can include:
+
+```xml
+<properties>
+  <hosts>localhost:2003</hosts>
+  <prefix></prefix>
+</properties>
+```
+
+The @<hosts>@ property tells the reporter the server to send the metrics to and the example value supplied above is the default value for the configuration if none is specified.  The @<prefix>@ represents an additional user-defined key to append to the front of metrics reported.  By default this value is an empty string.
+
+<a href="https://raw.github.com/tinkerpop/rexster/master/doc/images/rexster-graphite.png">[[https://raw.github.com/tinkerpop/rexster/master/doc/images/rexster-graphite.png|width=434px]]</a>
+
+Getting started with Graphite is easy to do when using a hosted solution such as [[Hosted Graphite|https://www.hostedgraphite.com/]].  First, create an account and make note of the provided API key.  Second, add the following to @rexster.xml@ where the @<prefix>@ element must contain the API key:
+
+```xml
+<properties>
+  <hosts>carbon.hostedgraphite.com:2003</hosts>
+  <prefix>api-key-goes-here</prefix>
+  <properties>
+    <rates-time-unit>SECONDS</rates-time-unit>
+    <duration-time-unit>SECONDS</duration-time-unit>
+    <report-period>10</report-period>
+    <report-time-unit>SECONDS</report-time-unit>
+    <includes>rexpro.*</includes>
+   </properties>
+</properties>
+```
+
+If using a trial account, be sure to filter metrics sent to Hosted Graphite as it only allows 100 metrics to be consumed and by default Rexster will send many more than that.  In the above configuration, Rexster will only send RexPro-based metrics which is far fewer than 100.  After starting Rexster and issuing a few RexPro based commands (e.g. connecting [[Rexster Console]] and issuing some commands), log-in to Hosted Graphite and view the metrics collected.
+
+h2. Common Configurations and Defaults
+
+Reporters that "push" metrics on a schedule have common configuration and default settings as set through the @<properties>@ element of the @<reporter>@.  The common configuration looks like this:
+
+```xml
+<reporter>
+  ...
+  <properties>
+    <rates-time-unit>SECONDS</rates-time-unit>
+    <duration-time-unit>SECONDS</duration-time-unit>
+    <report-period>60</report-period>
+    <report-time-unit>SECONDS</report-time-unit>
+    <includes>http.rest.*</includes>
+    <excludes>http.rest.*.delete</excludes>
+   </properties>
+</reporter>
+```
+
+The time unit values correspond to the @java.util.concurrent.TimeUnit@ enum values of:
+
+* NANOSECONDS
+* MICROSECONDS
+* MILLISECONDS
+* SECONDS
+* MINUTES
+* HOURS
+* DAYS
+
+The @<rate-time-unit>@ and @<duration-time-unit@ determine the unit of time at which data will be formatted when reported.  The @<report-period>@ and @<report-time-unit@ determine how often the data will be sent out via the reporter.  The default settings for these values are shown above in the sample configuration.
+
+Rexster generates many metrics and not all may be useful.  It is possible to filter these metrics with the @<includes>@ and @<excludes>@ elements.  Both take a regex statement to filter metric keys in or out of the reported set.  The HTTP Reporter does not support these attributes.
+
+h1. Metrics Gathered
+
+This section outlines the metrics that are gathered by Rexster.  All keys are prefixed with @rexster@ when reported.
+
+|_. type |_. key |_. description |
+| gauge | http.core.heap-memory-manager.* | Grizzly JMX measurements. ^2^ |
+| gauge | http.core.http-keep-alive.* | Grizzly JMX measurements. ^2^ |
+| gauge | http.core.http-server.* | Grizzly JMX measurements. ^2^ |
+| gauge | http.core.network-listener.* | Grizzly JMX measurements. ^2^ |
+| gauge | http.core.tcp-nio-transport.* | Grizzly JMX measurements. ^2^ |
+| gauge | http.core.thread-pool.* | Grizzly JMX measurements. ^2^ |
+| timer | http.script-engine | A timer on script execution and results serialization on the Gremlin Extension. |
+| counter | http.script-engine.success | Number of successfully executed scripts on the Gremlin Extension.  Incremented after successful serialization of results. |
+| counter | http.script-engine.fail | Number of script execution failures on the Gremlin Extension.  Incremented if failure occurs on or during script evaluation or result serialization. |
+| timer | http.rest. _resource_. _type_ . _method_ ^1^ | A timer on the request/response for a given RESTful endpoint.|
+| gauge | rexpro.core.heap-memory-manager.* | Grizzly JMX measurements. ^2^ |
+| gauge | rexpro.core.tcp-nio-transport.* | Grizzly JMX measurements. ^2^ |
+| gauge | rexpro.core.thread-pool.* | Grizzly JMX measurements. ^2^ |
+| timer | rexpro.script-engine | A timer on script execution and results serialization via RexPro. |
+| counter | rexpro.script-engine.success | Number of successfully executed scripts via RexPro.  Incremented after successful serialization of results. |
+| counter | rexpro.script-engine.fail | Number of script execution failures via RexPro. |
+| gauge | rexpro.sessions | Number of open RexPro sessions. |
+
+^1^ - The key for RESTful endpoints is made up of several elements.  The @resource@ is the name of the resources and will be one of the following: @graphs@, @edges@, @indices@, @key-indices@, @prefix@ or @vertices@.  The @type@ determines whether the service returns a @collection@, a single @object@, or is the start point for an @extension@ (e.g. a set of vertices, single vertex, or an extension that triggers from a vertex).  The @method@ is the HTTP verb that was executed on the endpoint.  There are some cases where additional @resource@.@type@ combinations will follow that basic pattern where the hierarchy allows (e.g. @http.rest.vertices.object.edges.collection.get@ which is the key for @GET http://server/graphs/graph/vertices/1/out@.
+ ^2^ - JMX must be enabled for the respective @<http>@ or @<rexpro>@ sections of @rexster.xml@ for these measurements to be available.
+
+h1. Metrics in Extensions
+
+Rexster [[Extensions]] make it possible to plug-in new features as RESTful endpoints.  While the prefixes for extension endpoints are monitored by default, there is no specific metric for individual extensions themselves.  To get a more granular view of extension operations, it is possible to register custom metrics using the @MetricsRegistry@ on the @RexsterResourceContext@.  For more information on how to create custom metrics, see the "Metrics documentation":http://metrics.codahale.com/ and the "Sample Kibbles":https://github.com/tinkerpop/rexster/blob/master/rexster-kibbles/sample-kibbles/src/main/java/com/tinkerpop/rexster/kibbles/sample/MetricExtension.java.
