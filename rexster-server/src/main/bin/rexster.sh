@@ -34,8 +34,5 @@ if [ "$JAVA_OPTIONS" = "" ] ; then
     JAVA_OPTIONS="-Xms32m -Xmx512m"
 fi
 
-# Launch the application
-$JAVA $JAVA_OPTIONS -cp $CP com.tinkerpop.rexster.Application $@ $EXTRA
-
-# Return the program's exit code
-exit $?
+# Execute the application and return its exit code
+exec $JAVA $JAVA_OPTIONS -cp $CP com.tinkerpop.rexster.Application $@ $EXTRA
