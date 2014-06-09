@@ -62,7 +62,7 @@
         <tinkerpop.version>2.6.0-SNAPSHOT</tinkerpop.version>
         <jersey.version>1.17</jersey.version>
         <grizzly.version>2.2.16</grizzly.version>
-        <metrics.version>3.0.0</metrics.version>
+        <metrics.version>3.0.2</metrics.version>
         <junit.version>4.11</junit.version>
         <srcdir>src/test/java</srcdir>
     </properties>
@@ -153,6 +153,11 @@
                     <exclusion>
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                    <!-- conflict with blueprints-core -->
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-databind</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
