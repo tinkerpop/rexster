@@ -6,6 +6,7 @@ import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.protocol.msg.ErrorResponseMessage;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
+import com.tinkerpop.rexster.protocol.msg.ScriptRequestMessage;
 import com.tinkerpop.rexster.protocol.msg.SessionRequestMessage;
 import com.tinkerpop.rexster.protocol.server.RexProRequest;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -111,7 +112,21 @@ public abstract class AbstractSecurityFilter extends BaseFilter implements Conta
                     return ctx.getStopAction();
                 }
             }
-        }
+        } else if (message instanceof ScriptRequestMessage && !message.hasSession()) {
+			// sessionless script requests don't support secure requests atm - requires a changes to the
+			// rexpro protocol to do so
+			// there is no session to this message...that's a problem
+			final ErrorResponseMessage errorMessage = new ErrorResponseMessage();
+			errorMessage.setSessionAsUUID(RexProMessage.EMPTY_SESSION);
+			errorMessage.Request = message.Request;
+			errorMessage.ErrorMessage = "Cannot make sessionless requests with <security> turned on.";
+			errorMessage.metaSetFlag(ErrorResponseMessage.AUTH_FAILURE_ERROR);
+
+			request.writeResponseMessage(errorMessage);
+			ctx.write(request);
+
+			return ctx.getStopAction();
+		}
 
         return ctx.getInvokeAction();
     }
