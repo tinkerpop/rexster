@@ -56,7 +56,7 @@ public class RexProServerFilter extends BaseFilter {
             // If the source message doesn't contain entire body
             // stop the filterchain processing and store sourceBuffer to be
             // used next time
-            logger.warn(ex);
+            logger.debug(ex);
             return ctx.getStopAction(sourceBuffer);
         }
 
