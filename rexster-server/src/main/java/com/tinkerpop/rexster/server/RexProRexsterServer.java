@@ -5,6 +5,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.tinkerpop.rexster.Tokens;
 import com.tinkerpop.rexster.filter.AbstractSecurityFilter;
 import com.tinkerpop.rexster.filter.DefaultSecurityFilter;
+import com.tinkerpop.rexster.filter.RexsterIdleTimeoutFilter;
 import com.tinkerpop.rexster.protocol.session.RexProSessionMonitor;
 import com.tinkerpop.rexster.protocol.filter.*;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -20,7 +21,6 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.threadpool.GrizzlyExecutorService;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
-import org.glassfish.grizzly.utils.IdleTimeoutFilter;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -199,8 +199,8 @@ public class RexProRexsterServer implements RexsterServer {
     private FilterChain constructFilterChain(final RexsterApplication application) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
         filterChainBuilder.add(new TransportFilter());
-        filterChainBuilder.add(new IdleTimeoutFilter(
-                IdleTimeoutFilter.createDefaultIdleDelayedExecutor(this.sessionCheckInterval, TimeUnit.MILLISECONDS),
+        filterChainBuilder.add(new RexsterIdleTimeoutFilter(
+                RexsterIdleTimeoutFilter.createDefaultIdleDelayedExecutor(this.sessionCheckInterval, TimeUnit.MILLISECONDS),
                 this.sessionMaxIdle, TimeUnit.MILLISECONDS));
         filterChainBuilder.add(new RexProServerFilter(application));
 

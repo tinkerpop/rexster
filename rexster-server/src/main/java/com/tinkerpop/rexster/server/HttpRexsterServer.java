@@ -27,8 +27,6 @@ import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.IOStrategy;
 import org.glassfish.grizzly.http.server.HttpHandler;
