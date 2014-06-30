@@ -18,7 +18,7 @@ REXSTER_EXT=../ext
 PUBLIC=$DIR/../public/
 EXTRA=
 
-if [ $1 = "-s" ] ; then
+if [ "$1" = "-s" ] ; then
     EXTRA="-wr $PUBLIC"
 fi
 
