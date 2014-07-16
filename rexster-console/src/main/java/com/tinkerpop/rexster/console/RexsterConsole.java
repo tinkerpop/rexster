@@ -132,8 +132,8 @@ public class RexsterConsole {
                     this.resetSessionWithRexster();
                 } else if (line.startsWith(Tokens.REXSTER_CONSOLE_EXECUTE)) {
                     final String fileToExecute = line.substring(Tokens.REXSTER_CONSOLE_EXECUTE.length()).trim();
-                    if (fileToExecute == null || fileToExecute.isEmpty()) {
-                        this.output.print("specify the file to execute");
+                    if (fileToExecute.isEmpty()) {
+                        this.output.println("specify the file to execute");
                     } else {
                         try {
                             this.executeScript(readFile(fileToExecute));
