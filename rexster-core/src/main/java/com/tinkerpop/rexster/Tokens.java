@@ -8,7 +8,7 @@ package com.tinkerpop.rexster;
  */
 public class Tokens {
 
-    public static final String REXSTER_VERSION = "2.5.0";
+    public static final String REXSTER_VERSION = "2.6.0";
 
     public static final String _ID = "_id";
     public static final String ID = "id";
