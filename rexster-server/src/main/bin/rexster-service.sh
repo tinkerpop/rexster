@@ -54,6 +54,10 @@ stop() {
     fi
     echo "Stopping Rexster server..."
     su -c "cd \"$REXSTER_DIR\"; /usr/bin/nohup ./bin/rexster.sh -x 1>$REXSTER_LOG_DIR/service-stop.log 2>$REXSTER_LOG_DIR/service-stop.err &" $REXSTER_USER
+    while kill -0 $PID 2> /dev/null; do
+        echo "Waiting for $PID..." 
+        sleep 1
+    done
 }
 
 status() {
