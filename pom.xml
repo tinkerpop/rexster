@@ -10,8 +10,8 @@
     </parent>
     <groupId>com.tinkerpop.rexster</groupId>
     <artifactId>rexster</artifactId>
-    <version>2.6.0</version>
-    <!-- DON'T FORGET TO UPDATE rexster-server Tokens.VERSION AT RELEASE -->
+    <version>2.7.0-SNAPSHOT</version>
+    <!-- DON'T FORGET TO UPDATE rexster-core Tokens.VERSION AT RELEASE -->
     <packaging>pom</packaging>
     <url>http://rexster.tinkerpop.com</url>
     <name>Rexster</name>
@@ -59,7 +59,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <tinkerpop.version>2.6.0</tinkerpop.version>
+        <tinkerpop.version>2.7.0-SNAPSHOT</tinkerpop.version>
         <jersey.version>1.17</jersey.version>
         <grizzly.version>2.2.16</grizzly.version>
         <metrics.version>3.0.2</metrics.version>
