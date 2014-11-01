@@ -38,7 +38,7 @@
         <dependency>
             <groupId>jline</groupId>
             <artifactId>jline</artifactId>
-            <version>0.9.94</version>
+            <version>1.0</version>
             <exclusions>
                 <!-- JLine 0.x depends on JUnit, for some reason, which conflicts with rexster's test dependencies -->
                 <exclusion>
