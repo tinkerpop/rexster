@@ -107,10 +107,14 @@ public class RemoteRexsterSession {
     }
 
     public RexProMessage sendRequest(RexProMessage request, int maxRetries) {
-        return sendRequest(request, maxRetries, 3000);
+        return sendRequest(request, maxRetries, 3000, this.timeout);
     }
 
     public RexProMessage sendRequest(RexProMessage request, int maxRetries, int waitMsBetweenTries) {
+        return sendRequest(request, maxRetries, waitMsBetweenTries, this.timeout);
+    }
+
+    public RexProMessage sendRequest(RexProMessage request, int maxRetries, int waitMsBetweenTries, int timeoutSeconds) {
         int tries = 0;
         RexProMessage rcvMessage = null;
 
@@ -121,7 +125,7 @@ public class RemoteRexsterSession {
             tries++;
 
             try {
-                rcvMessage = rexProConnection.sendMessage(request);
+                rcvMessage = rexProConnection.sendMessage(request, timeoutSeconds);
             } catch (Exception ex) {
                 String logMessage = "Failure sending message via RexPro. Attempt [" + tries + "] of [" + maxRetries + "].";
 
