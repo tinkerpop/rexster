@@ -66,14 +66,16 @@ public final class RexProClientConnection {
         filterChainBuilder.add(new RexProClientFilter());
         filterChainBuilder.add(new BaseFilter() {
             @Override
-            public NextAction handleRead(FilterChainContext ctx) throws IOException {
-                responseQueue.add((RexProMessage) ctx.getMessage());
+            public NextAction handleRead(final FilterChainContext ctx) throws IOException {
+                try {
+                    responseQueue.put((RexProMessage) ctx.getMessage());
+                } catch (InterruptedException ignored) { }
                 return ctx.getStopAction();
             }
         });
 
         // Create TCP NIO transport
-        TCPNIOTransport transport = TCPNIOTransportBuilder.newInstance().build();
+        final TCPNIOTransport transport = TCPNIOTransportBuilder.newInstance().build();
         transport.setProcessor(filterChainBuilder.build());
 
         return transport;
