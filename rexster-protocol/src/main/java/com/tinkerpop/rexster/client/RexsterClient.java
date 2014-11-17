@@ -120,8 +120,7 @@ public class RexsterClient {
 
         Object resultMessage;
         try {
-            final long beginTime = System.currentTimeMillis();
-            resultMessage = responseQueue.poll(this.timeoutRead - (System.currentTimeMillis() - beginTime), TimeUnit.MILLISECONDS);
+            resultMessage = responseQueue.poll(this.timeoutRead, TimeUnit.MILLISECONDS);
         } catch (Exception ex) {
             responses.remove(requestId);
             throw new IOException(ex);
@@ -129,9 +128,9 @@ public class RexsterClient {
 
         responses.remove(requestId);
 
-        if (resultMessage == null) {
-            throw new IOException(String.format("Message received response timeoutConnection (%s s)", this.timeoutConnection));
-        } else if (!(resultMessage instanceof RexProMessage)) {
+        if (resultMessage == null) throw new IOException("No result received");
+
+        if (!(resultMessage instanceof RexProMessage)) {
             logger.error(String.format("Rexster returned a message of type [%s]", resultMessage.getClass().getName()));
             throw new RexProException("RexsterClient doesn't support the message type returned.");
         }
@@ -172,8 +171,7 @@ public class RexsterClient {
 
         Object resultMessage;
         try {
-            final long beginTime = System.currentTimeMillis();
-            resultMessage = responseQueue.poll(this.timeoutRead - (System.currentTimeMillis() - beginTime), TimeUnit.MILLISECONDS);
+            resultMessage = responseQueue.poll(this.timeoutRead, TimeUnit.MILLISECONDS);
         } catch (Exception ex) {
             responses.remove(requestId);
             throw new IOException(ex);
@@ -181,9 +179,7 @@ public class RexsterClient {
 
         responses.remove(requestId);
 
-        if (resultMessage == null) {
-            throw new IOException(String.format("Message received response timeoutConnection (%s s)", this.timeoutConnection));
-        }
+        if (resultMessage == null) throw new IOException("No result received");
 
         if (resultMessage instanceof ScriptResponseMessage) {
             final ScriptResponseMessage msg = (ScriptResponseMessage) resultMessage;

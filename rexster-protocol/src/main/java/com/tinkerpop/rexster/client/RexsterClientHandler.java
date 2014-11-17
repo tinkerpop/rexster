@@ -14,11 +14,10 @@ import java.io.IOException;
 class RexsterClientHandler extends BaseFilter {
     private static final Logger logger = Logger.getLogger(RexsterClientHandler.class);
 
-    public NextAction handleRead(FilterChainContext ctx) throws IOException {
+    public NextAction handleRead(final FilterChainContext ctx) throws IOException {
         try {
             RexsterClient.putResponse((RexProMessage) ctx.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("RexProMessage could not be cast to to be place on the response map.", e);
         }
 

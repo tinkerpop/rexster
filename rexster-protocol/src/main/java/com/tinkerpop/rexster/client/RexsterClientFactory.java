@@ -113,9 +113,8 @@ public class RexsterClientFactory {
      */
     public static synchronized RexsterClient open(final Configuration specificConfiguration) throws Exception {
 
-        final CompositeConfiguration jointConfig = new CompositeConfiguration();
+        final CompositeConfiguration jointConfig = new CompositeConfiguration(defaultConfiguration);
         jointConfig.addConfiguration(specificConfiguration);
-        jointConfig.addConfiguration(defaultConfiguration);
 
         final RexsterClient client = new RexsterClient(jointConfig, getTransport());
 
