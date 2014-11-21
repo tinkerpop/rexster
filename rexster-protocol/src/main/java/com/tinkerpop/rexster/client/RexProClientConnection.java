@@ -25,10 +25,9 @@ public final class RexProClientConnection {
 
     private final Connection connection;
     private final BlockingQueue<RexProMessage> responseQueue = new SynchronousQueue<RexProMessage>(true);
+    private final TCPNIOTransport transport = getTransport(responseQueue);
 
     public RexProClientConnection(String rexProHost, int rexProPort) {
-        TCPNIOTransport transport = getTransport(responseQueue);
-
         try {
             transport.start();
 
@@ -54,6 +53,11 @@ public final class RexProClientConnection {
 
     public void close() {
         connection.close();
+        try {
+            transport.stop();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static TCPNIOTransport getTransport(final BlockingQueue<RexProMessage> responseQueue) {
