@@ -15,6 +15,7 @@ h3. Version 2.7.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Closed the Grizzly transport when closing in-session RexPro connections.
 * Added support for timeout when making requests via `RemoteRexsterSession`.
 
 ==<hr/>==
