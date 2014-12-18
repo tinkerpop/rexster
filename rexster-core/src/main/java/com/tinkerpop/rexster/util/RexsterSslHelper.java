@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
  */
 public class RexsterSslHelper {
     public static final String KEY_HTTP_SSL_ENABLED = "http.enable-ssl";
+    public static final String KEY_REXPRO_SSL_ENABLED = "rexpro.enable-ssl";
     public static final String KEY_SSL_PROTOCOL = "ssl.protocol";
     public static final String KEY_SSL_TRUST_STORE = "ssl.trust-store";
     public static final String KEY_SSL_TRUST_STORE_PASSWORD = "ssl.trust-store-password";
@@ -38,6 +39,7 @@ public class RexsterSslHelper {
     public static final String KEY_SSL_KEY_MANAGER_FACTORY_ALGORITHM = "ssl.key-manager-factory.algorithm";
     public static final String KEY_SSL_NEED_CLIENT_AUTH = "ssl.need-client-auth";
     public static final String KEY_SSL_WANT_CLIENT_AUTH = "ssl.want-client-auth";
+
     private static final Logger logger = Logger.getLogger(RexsterSslHelper.class);
     private static final String DEFAULT_STORE_PROVIDER = "JKS";
     private static final String DEFAULT_SSL_PROTOCOL = "TLS";

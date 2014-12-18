@@ -7,6 +7,8 @@ import com.tinkerpop.rexster.filter.AbstractSecurityFilter;
 import com.tinkerpop.rexster.filter.DefaultSecurityFilter;
 import com.tinkerpop.rexster.protocol.session.RexProSessionMonitor;
 import com.tinkerpop.rexster.protocol.filter.*;
+import com.tinkerpop.rexster.util.RexsterSslHelper;
+
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
@@ -18,6 +20,8 @@ import org.glassfish.grizzly.monitoring.jmx.GrizzlyJmxManager;
 import org.glassfish.grizzly.monitoring.jmx.JmxObject;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
+import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
+import org.glassfish.grizzly.ssl.SSLFilter;
 import org.glassfish.grizzly.threadpool.GrizzlyExecutorService;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 import org.glassfish.grizzly.utils.DelayedExecutor;
@@ -25,6 +29,9 @@ import org.glassfish.grizzly.utils.IdleTimeoutFilter;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -201,6 +208,20 @@ public class RexProRexsterServer implements RexsterServer {
         final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
         filterChainBuilder.add(new TransportFilter());
 
+        if (properties.getConfiguration().getBoolean(RexsterSslHelper.KEY_REXPRO_SSL_ENABLED, false)) {
+                logger.info("Attempting to secure RexProRexsterServer with SSL...");
+
+            try {
+                filterChainBuilder.add(createSslFilter());
+            } catch (SSLException e) {
+                final String msg = "A problem occurred while initializing the SSL context.";
+                logger.error(msg,e);
+                throw new RuntimeException(msg,e);
+            }
+
+            logger.info("RexproRexsterServer successfully secured with SSL!");
+        }
+
         final DelayedExecutor idleDelayedExecutor = IdleTimeoutFilter.createDefaultIdleDelayedExecutor(
                 this.sessionCheckInterval, TimeUnit.MILLISECONDS);
         idleDelayedExecutor.start();
@@ -326,5 +347,16 @@ public class RexProRexsterServer implements RexsterServer {
         this.tcpTransport.bind(rexproServerHost, rexproServerPort);
 
         logger.info(String.format("RexPro Server bound to [%s:%s]", rexproServerHost, rexproServerPort));
+    }
+
+    private SSLFilter createSslFilter() throws SSLException {
+        RexsterSslHelper sslHelper = new RexsterSslHelper(properties.getConfiguration());
+        SSLContext sslContext = sslHelper.createRexsterSslContext();
+        SSLEngineConfigurator server =
+                new SSLEngineConfigurator(sslContext).setNeedClientAuth(sslHelper.getNeedClientAuth())
+                        .setWantClientAuth(sslHelper.getWantClientAuth()).setClientMode(false);
+
+        SSLEngineConfigurator client = new SSLEngineConfigurator(sslContext).setClientMode(true);
+        return new SSLFilter(server, client);
     }
 }

@@ -31,6 +31,7 @@
         <session-check-interval>3000000</session-check-interval>
         <read-buffer>65536</read-buffer>
         <enable-jmx>false</enable-jmx>
+        <enable-ssl>false</enable-ssl>
         <thread-pool>
             <worker>
                 <core-size>8</core-size>
