@@ -1,12 +1,16 @@
 package com.tinkerpop.rexster.client;
 
+import com.tinkerpop.rexster.protocol.filter.RexsterClientSslFilterHelper;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
+import com.tinkerpop.rexster.util.RexsterSslHelper;
+
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationUtils;
 import org.apache.commons.configuration.MapConfiguration;
 import org.apache.log4j.Logger;
+import org.glassfish.grizzly.Processor;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
@@ -39,12 +43,19 @@ public class RexsterClientFactory {
         addProperty(RexsterClientTokens.CONFIG_GRAPH_NAME, null);
         addProperty(RexsterClientTokens.CONFIG_TRANSACTION, true);
         addProperty(RexsterClientTokens.CONFIG_SERIALIZER, MsgPackSerializer.SERIALIZER_ID);
+        addProperty(RexsterClientTokens.CONFIG_ENABLE_CLIENT_SSL, false);
+        addProperty(RexsterClientTokens.CONFIG_CLIENT_SSL_CONFIGURATION, null);
     }};
 
     /**
-     * The transport used by all instantiated RexsterClient objects.
+     * The transport used by all instantiated RexsterClient objects not using SSL.
      */
     private static TCPNIOTransport transport;
+
+    /**
+     * The transport used by all instantiated RexsterClientObjects that use SSL.
+     */
+    private static TCPNIOTransport secureTransport;
 
     /**
      * Creates a RexsterClient instance with default settings for the factory using localhost and 8184 for the port.
@@ -70,6 +81,33 @@ public class RexsterClientFactory {
         final BaseConfiguration specificConfiguration = new BaseConfiguration();
         specificConfiguration.addProperty(RexsterClientTokens.CONFIG_HOSTNAME, host);
         specificConfiguration.addProperty(RexsterClientTokens.CONFIG_PORT, port);
+
+        return open(specificConfiguration);
+    }
+
+    /**
+     * Creates a RexsterClient instance allowing the override of host and port and secured using
+     * SSL properties found at the default location.
+     */
+    public static RexsterClient openSecure(final String host, final int port) throws Exception{
+        final BaseConfiguration specificConfiguration = new BaseConfiguration();
+        specificConfiguration.addProperty(RexsterClientTokens.CONFIG_HOSTNAME, host);
+        specificConfiguration.addProperty(RexsterClientTokens.CONFIG_PORT, port);
+        specificConfiguration.addProperty(RexsterClientTokens.CONFIG_ENABLE_CLIENT_SSL, true);
+
+        return open(specificConfiguration);
+    }
+
+    /**
+     * Creates a RexsterClient instance allowing the override of host and port and secured using
+     * SSL properties found at the passed sslConfigFile location.
+     */
+    public static RexsterClient openSecure(final String host, final int port, String sslConfigFile) throws Exception{
+        final BaseConfiguration specificConfiguration = new BaseConfiguration();
+        specificConfiguration.addProperty(RexsterClientTokens.CONFIG_HOSTNAME, host);
+        specificConfiguration.addProperty(RexsterClientTokens.CONFIG_PORT, port);
+        specificConfiguration.addProperty(RexsterClientTokens.CONFIG_ENABLE_CLIENT_SSL, true);
+        specificConfiguration.addProperty(RexsterClientTokens.CONFIG_CLIENT_SSL_CONFIGURATION, sslConfigFile);
 
         return open(specificConfiguration);
     }
@@ -116,7 +154,10 @@ public class RexsterClientFactory {
         final CompositeConfiguration jointConfig = new CompositeConfiguration(defaultConfiguration);
         jointConfig.addConfiguration(specificConfiguration);
 
-        final RexsterClient client = new RexsterClient(jointConfig, getTransport());
+        final TCPNIOTransport tcpnioTransport =
+                jointConfig.getBoolean(RexsterClientTokens.CONFIG_ENABLE_CLIENT_SSL) ? getSecureTransport(jointConfig) :
+                        getTransport();
+        final RexsterClient client = new RexsterClient(jointConfig, tcpnioTransport);
 
         logger.info(String.format("Create RexsterClient instance: [%s]", ConfigurationUtils.toString(jointConfig)));
 
@@ -125,12 +166,6 @@ public class RexsterClientFactory {
 
     private synchronized static TCPNIOTransport getTransport() throws Exception {
         if (transport == null) {
-            final RexsterClientHandler handler = new RexsterClientHandler();
-            final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
-            filterChainBuilder.add(new TransportFilter());
-            filterChainBuilder.add(new RexProClientFilter());
-            filterChainBuilder.add(handler);
-
             transport = TCPNIOTransportBuilder.newInstance().build();
             transport.setIOStrategy(LeaderFollowerNIOStrategy.getInstance());
             final ThreadPoolConfig workerThreadPoolConfig = ThreadPoolConfig.defaultConfig()
@@ -141,10 +176,44 @@ public class RexsterClientFactory {
                     .setCorePoolSize(4)
                     .setMaxPoolSize(12);
             transport.setKernelThreadPoolConfig(kernalThreadPoolConfig);
-            transport.setProcessor(filterChainBuilder.build());
+            transport.setProcessor(getRexsterProcessor(false, null));
             transport.start();
         }
 
         return transport;
+    }
+
+    private synchronized static TCPNIOTransport getSecureTransport(Configuration sslConfiguration) throws Exception {
+        //Recreating the transport is necessary as SSL settings may have changed
+        if (secureTransport != null) {
+            secureTransport.stop();
+        }
+
+        secureTransport = TCPNIOTransportBuilder.newInstance().build();
+        secureTransport.setIOStrategy(LeaderFollowerNIOStrategy.getInstance());
+        final ThreadPoolConfig workerThreadPoolConfig = ThreadPoolConfig.defaultConfig()
+                .setCorePoolSize(4)
+                .setMaxPoolSize(12);
+        secureTransport.setWorkerThreadPoolConfig(workerThreadPoolConfig);
+        final ThreadPoolConfig kernalThreadPoolConfig = ThreadPoolConfig.defaultConfig()
+                .setCorePoolSize(4)
+                .setMaxPoolSize(12);
+        secureTransport.setKernelThreadPoolConfig(kernalThreadPoolConfig);
+        secureTransport.setProcessor(getRexsterProcessor(true, sslConfiguration));
+        secureTransport.start();
+
+        return secureTransport;
+    }
+
+    private static Processor getRexsterProcessor(boolean useSsl, Configuration sslConfiguration) {
+        final RexsterClientHandler handler = new RexsterClientHandler();
+        final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
+        filterChainBuilder.add(new TransportFilter());
+        if (useSsl) {
+            filterChainBuilder.add(new RexsterClientSslFilterHelper(sslConfiguration).getSslFilter());
+        }
+        filterChainBuilder.add(new RexProClientFilter());
+        filterChainBuilder.add(handler);
+        return filterChainBuilder.build();
     }
 }

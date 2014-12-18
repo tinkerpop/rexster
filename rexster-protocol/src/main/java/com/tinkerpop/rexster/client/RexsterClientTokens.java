@@ -18,4 +18,6 @@ public class RexsterClientTokens {
     public static final String CONFIG_MAX_ASYNC_WRITE_QUEUE_BYTES = "max-async-write-queue-size";
     public static final String CONFIG_LANGUAGE = "language";
     public static final String CONFIG_SERIALIZER = "serializer";
+    public static final String CONFIG_ENABLE_CLIENT_SSL = "use-ssl";
+    public static final String CONFIG_CLIENT_SSL_CONFIGURATION = "ssl-config-path";
 }
