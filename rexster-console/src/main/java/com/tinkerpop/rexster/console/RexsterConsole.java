@@ -87,8 +87,13 @@ public class RexsterConsole {
     }
 
     private void initAndOpenSessionFromSettings() {
-        this.session = new RemoteRexsterSession(this.settings.getHost(), this.settings.getPort(),
-                this.settings.getTimeout(), this.settings.getUsername(), this.settings.getPassword());
+        if(!settings.isSslEnabled()) {
+            this.session = new RemoteRexsterSession(
+                    this.settings.getHost(), this.settings.getPort(), this.settings.getTimeout(), this.settings.getUsername(), this.settings.getPassword());
+        }else{
+            this.session = new RemoteRexsterSession(
+                    this.settings.getHost(), this.settings.getPort(), this.settings.getTimeout(), this.settings.getUsername(), this.settings.getPassword(),this.settings.getSslConfig());
+        }
         this.session.open();
     }
 
