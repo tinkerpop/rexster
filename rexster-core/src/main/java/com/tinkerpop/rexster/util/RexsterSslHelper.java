@@ -1,6 +1,8 @@
 package com.tinkerpop.rexster.util;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyManagementException;
@@ -17,7 +19,9 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 
 /**
@@ -77,6 +81,54 @@ public class RexsterSslHelper {
      */
     public RexsterSslHelper(Configuration configuration) {
         this.configuration = configuration;
+    }
+
+    /**
+     * Merges a configuration from a file source (if it exists) with a passed in configuration. The passed in
+     * configuration will override properties on the configuration loaded from a file.
+     *
+     * @param fileLocation Location of the file to load properties from.
+     * @param sslConfiguration Existing configuration whose properties take priority.
+     */
+    public RexsterSslHelper(String fileLocation, Configuration sslConfiguration) {
+        XMLConfiguration xmlConfiguration = new XMLConfiguration();
+
+        if (fileLocation != null) {
+            File rexsterClientConfig = new File(fileLocation);
+
+            if (rexsterClientConfig.exists()) {
+                logger.info(
+                        String.format(
+                                "Attempting to get base SSL configuration from file: %s",
+                                rexsterClientConfig.getName()));
+                try {
+                    xmlConfiguration.load(
+                            new FileReader(rexsterClientConfig));
+                    logger.info(
+                            String.format(
+                                    "Using [%s] as base SSL configuration source.",
+                                    rexsterClientConfig.getAbsolutePath()));
+                } catch (Exception e) {
+                    final String msg = String.format(
+                            "Could not load configuration from [%s]", rexsterClientConfig.getAbsolutePath());
+                    logger.warn(msg);
+                    throw new RuntimeException(msg);
+                }
+            } else {
+                final String msg = String.format(
+                        "No configuration found for client SSL at: [%s], using default SSL configuration as base",
+                        rexsterClientConfig.getAbsolutePath());
+                logger.info(msg);
+            }
+        } else {
+            final String msg = "No configuration specified for client SSL, using default SSL configuration as base.";
+            logger.info(msg);
+        }
+
+        final CompositeConfiguration jointSslConfig = new CompositeConfiguration(sslConfiguration);
+        jointSslConfig.addConfiguration(xmlConfiguration);
+        this.configuration = jointSslConfig;
+        logger.info("Existing SSL configuration successfully merged into base configuration.");
     }
 
     /**
