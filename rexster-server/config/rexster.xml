@@ -7,6 +7,7 @@
         <web-root>public</web-root>
         <character-set>UTF-8</character-set>
         <enable-jmx>false</enable-jmx>
+        <enable-ssl>false</enable-ssl>
         <enable-doghouse>true</enable-doghouse>
         <max-post-size>2097152</max-post-size>
         <max-header-size>8192</max-header-size>
@@ -67,6 +68,23 @@
             </configuration>
         </authentication>
     </security>
+    <ssl>
+        <protocol>TLS</protocol>
+        <trust-store-provider>JKS</trust-store-provider>
+        <key-store-provider>JKS</key-store-provider>
+        <trust-store></trust-store>
+        <key-store>config/ssl/serverKeyStore.jks</key-store>
+        <trust-store-password></trust-store-password>
+        <key-store-password></key-store-password>
+        <key-manager-factory>
+            <algorithm>SunX509</algorithm>
+        </key-manager-factory>
+        <trust-manager-factory>
+            <algorithm>SunX509</algorithm>
+        </trust-manager-factory>
+        <need-client-auth>false</need-client-auth>
+        <want-client-auth>false</want-client-auth>
+    </ssl>
     <metrics>
         <reporter>
             <type>jmx</type>

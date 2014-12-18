@@ -25,6 +25,8 @@ import com.tinkerpop.rexster.server.metrics.AbstractReporterConfig;
 import com.tinkerpop.rexster.servlet.DogHouseServlet;
 import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
+import com.tinkerpop.rexster.util.RexsterSslHelper;
+
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Level;
@@ -37,13 +39,21 @@ import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
 import org.glassfish.grizzly.servlet.ServletRegistration;
 import org.glassfish.grizzly.servlet.WebappContext;
+import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.threadpool.GrizzlyExecutorService;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.net.ssl.SSLException;
 import javax.ws.rs.core.Context;
 import java.io.File;
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 
 /**
  * Initializes the HTTP server for Rexster serving REST and Dog House.
@@ -482,6 +492,11 @@ public class HttpRexsterServer implements RexsterServer {
         NetworkListener listener = this.httpServer.getListener("grizzly");
         if (listener == null) {
             listener = new NetworkListener("grizzly", rexsterServerHost, rexsterServerPort);
+
+            if (properties.getConfiguration().getBoolean(RexsterSslHelper.KEY_HTTP_SSL_ENABLED, false)) {
+                secureWithSsl(listener);
+            }
+
             this.httpServer.addListener(listener);
             allowPortChange = false;
         }
@@ -527,5 +542,19 @@ public class HttpRexsterServer implements RexsterServer {
 
             logger.info(String.format("Using %s IOStrategy for HTTP/REST.", strategy.getClass().getName()));
         }
+    }
+
+    private void secureWithSsl(NetworkListener listener) throws SSLException {
+        logger.info("Attempting to secure HttpRexsterServer with SSL...");
+        RexsterSslHelper rexsterSslHelper = new RexsterSslHelper(properties.getConfiguration());
+        final SSLEngineConfigurator configurator =
+                new SSLEngineConfigurator(rexsterSslHelper.createRexsterSslContext());
+
+        configurator.setNeedClientAuth(rexsterSslHelper.getNeedClientAuth()).setWantClientAuth(
+                rexsterSslHelper.getWantClientAuth()).setClientMode(false);
+
+        listener.setSecure(true);
+        listener.setSSLEngineConfig(configurator);
+        logger.info("HttpRexsterServer successfully secured with SSL!");
     }
 }
