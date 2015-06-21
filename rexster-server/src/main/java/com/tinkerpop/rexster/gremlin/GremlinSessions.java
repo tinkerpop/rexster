@@ -1,10 +1,10 @@
 package com.tinkerpop.rexster.gremlin;
 
-import com.tinkerpop.rexster.server.RexsterApplication;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.tinkerpop.rexster.server.RexsterApplication;
 
 /**
  * Keeps track of currently running gremlin sessions. Each one is associated
@@ -24,12 +24,12 @@ public class GremlinSessions {
      * Gets a GremlinSession for a given session identifier and graph name,
      * creating a GremlinSession if one does not exist.
      */
-    public static GremlinSession getSession(String sessionId, String graphName, RexsterApplication ra) {
+    public static GremlinSession getSession(final String sessionId, final String graphName, final RexsterApplication ra) {
         ensureSessionExists(sessionId, graphName, ra);
         return sessions.get(sessionId + graphName);
     }
 
-    public static GremlinSession findSessionByKey(String sessionKey) {
+    public static GremlinSession findSessionByKey(final String sessionKey) {
         return sessions.get(sessionKey);
     }
 
@@ -39,7 +39,7 @@ public class GremlinSessions {
      * @param sessionId The unique identifier for the session.
      * @param graphName The name of the graph the Gremlin session is connected to.
      */
-    public static void destroySession(String sessionId, String graphName) {
+    public static void destroySession(final String sessionId, final String graphName) {
         destroySession(sessionId + graphName);
     }
 
@@ -48,7 +48,7 @@ public class GremlinSessions {
      *
      * @param sessionKey The session identifier concatenated with the graph name.
      */
-    public static void destroySession(String sessionKey) {
+    public static void destroySession(final String sessionKey) {
         sessions.get(sessionKey).die();
         sessions.remove(sessionKey);
     }
@@ -60,11 +60,11 @@ public class GremlinSessions {
         }
     }
 
-    public static boolean hasSession(String sessionId, String graphName) {
+    public static boolean hasSession(final String sessionId, final String graphName) {
         return hasSessionKey(sessionId + graphName);
     }
 
-    public static boolean hasSessionKey(String sessionKey) {
+    public static boolean hasSessionKey(final String sessionKey) {
         return sessions.containsKey(sessionKey);
     }
 
@@ -72,11 +72,9 @@ public class GremlinSessions {
         return sessions.keySet();
     }
 
-    protected static void ensureSessionExists(String sessionId, String graphName, RexsterApplication ra) {
+    protected static void ensureSessionExists(final String sessionId, final String graphName, final RexsterApplication ra) {
         String key = sessionId + graphName;
-        if (!sessions.containsKey(key)) {
-            sessions.put(key, new GremlinSession(graphName, ra));
-        }
+        sessions.putIfAbsent(key, new GremlinSession(graphName, ra));
     }
 
 }

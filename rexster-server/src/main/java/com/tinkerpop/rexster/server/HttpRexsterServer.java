@@ -1,5 +1,24 @@
 package com.tinkerpop.rexster.server;
 
+import java.io.File;
+
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.ws.rs.core.Context;
+
+import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.log4j.Logger;
+import org.glassfish.grizzly.IOStrategy;
+import org.glassfish.grizzly.http.server.HttpHandler;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.NetworkListener;
+import org.glassfish.grizzly.http.server.ServerConfiguration;
+import org.glassfish.grizzly.servlet.ServletRegistration;
+import org.glassfish.grizzly.servlet.WebappContext;
+import org.glassfish.grizzly.threadpool.GrizzlyExecutorService;
+import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
+
 import com.codahale.metrics.JmxAttributeGauge;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.jersey.InstrumentedResourceMethodDispatchAdapter;
@@ -25,25 +44,6 @@ import com.tinkerpop.rexster.server.metrics.AbstractReporterConfig;
 import com.tinkerpop.rexster.servlet.DogHouseServlet;
 import com.tinkerpop.rexster.servlet.EvaluatorServlet;
 import com.tinkerpop.rexster.servlet.RexsterStaticHttpHandler;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.glassfish.grizzly.IOStrategy;
-import org.glassfish.grizzly.http.server.HttpHandler;
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.http.server.NetworkListener;
-import org.glassfish.grizzly.http.server.ServerConfiguration;
-import org.glassfish.grizzly.servlet.ServletRegistration;
-import org.glassfish.grizzly.servlet.WebappContext;
-import org.glassfish.grizzly.threadpool.GrizzlyExecutorService;
-import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
-
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-import javax.ws.rs.core.Context;
-import java.io.File;
 
 /**
  * Initializes the HTTP server for Rexster serving REST and Dog House.
@@ -66,6 +66,7 @@ public class HttpRexsterServer implements RexsterServer {
     private int maxPostSize;
     private int maxHeaderSize;
     private int uploadTimeoutMillis;
+    private int scriptTimeoutMillis;
     private boolean enableJmx;
     private String ioStrategy;
     private final HttpServer httpServer;
@@ -265,6 +266,7 @@ public class HttpRexsterServer implements RexsterServer {
         this.maxPostSize = configuration.getInt("http.max-post-size", 2097152);
         this.maxHeaderSize = configuration.getInt("http.max-header-size", 8192);
         this.uploadTimeoutMillis = configuration.getInt("http.upload-timeout-millis", 300000);
+        this.scriptTimeoutMillis = configuration.getInt("http.script-timeout-millis", 300000);
         this.enableJmx = configuration.getBoolean("http.enable-jmx", false);
         this.ioStrategy = configuration.getString("http.io-strategy", "leader-follower");
         this.defaultCharacterEncoding = configuration.getString("http.character-set", "ISO-8859-1");
@@ -284,7 +286,7 @@ public class HttpRexsterServer implements RexsterServer {
         final String jmxObjectMemoryManager = "org.glassfish.grizzly:pp=/gmbal-root/TCPNIOTransport[RexPro],type=HeapMemoryManager,name=MemoryManager";
         final String metricGroupMemoryManager = "heap-memory-manager";
         final String[] heapMemoryManagerMetrics = new String[] {
-            "pool-allocated-bytes", "pool-released-bytes", "real-allocated-bytes", "total-allocated-bytes"
+                "pool-allocated-bytes", "pool-released-bytes", "real-allocated-bytes", "total-allocated-bytes"
         };
 
         manageJmxKeysAsMetric(metricRegistry, jmxObjectMemoryManager, metricGroupMemoryManager, heapMemoryManagerMetrics, register);
@@ -292,7 +294,7 @@ public class HttpRexsterServer implements RexsterServer {
         final String jmxObjectHttpServerFilter = "org.glassfish.grizzly:pp=/gmbal-root/HttpServer[HttpServer]/NetworkListener[NetworkListener[grizzly]],type=HttpServerFilter,name=HttpServerFilter";
         final String metricGroupHttpServerFilter = "http-server";
         final String[] httpServerManagerMetrics = new String [] {
-            "current-suspended-request-count", "requests-cancelled-count", "requests-completed-count", "requests-received-count", "requests-timed-out-count"
+                "current-suspended-request-count", "requests-cancelled-count", "requests-completed-count", "requests-received-count", "requests-timed-out-count"
         };
 
         manageJmxKeysAsMetric(metricRegistry, jmxObjectHttpServerFilter, metricGroupHttpServerFilter, httpServerManagerMetrics, register);
@@ -300,7 +302,7 @@ public class HttpRexsterServer implements RexsterServer {
         final String jmxObjectHttpKeepAlive = "org.glassfish.grizzly:pp=/gmbal-root/HttpServer[HttpServer]/NetworkListener[NetworkListener[grizzly]],type=KeepAlive,name=Keep-Alive";
         final String metricGroupHttpKeepAlive = "http-keep-alive";
         final String[] httpKeepAliveMetrics = new String [] {
-            "hits-count", "idle-timeout-seconds", "live-connections-count", "max-requests-count", "refuses-count", "timeouts-count"
+                "hits-count", "idle-timeout-seconds", "live-connections-count", "max-requests-count", "refuses-count", "timeouts-count"
         };
 
         manageJmxKeysAsMetric(metricRegistry, jmxObjectHttpKeepAlive, metricGroupHttpKeepAlive, httpKeepAliveMetrics, register);
@@ -308,7 +310,7 @@ public class HttpRexsterServer implements RexsterServer {
         final String jmxObjectNetworkListener = "org.glassfish.grizzly:pp=/gmbal-root/HttpServer[HttpServer],type=NetworkListener,name=NetworkListener[grizzly]";
         final String metricGroupNetworkListener = "network-listener";
         final String [] networkListenerMetrics = new String[] {
-            "chunking-enabled", "host", "idle-timeout-seconds", "max-http-header-size", "max-pending-bytes", "port"
+                "chunking-enabled", "host", "idle-timeout-seconds", "max-http-header-size", "max-pending-bytes", "port"
         };
 
         manageJmxKeysAsMetric(metricRegistry, jmxObjectNetworkListener, metricGroupNetworkListener, networkListenerMetrics, register);
@@ -316,9 +318,9 @@ public class HttpRexsterServer implements RexsterServer {
         final String jmxObjectTcpNioTransport = "org.glassfish.grizzly:pp=/gmbal-root/HttpServer[HttpServer]/NetworkListener[NetworkListener[grizzly]],type=TCPNIOTransport,name=Transport";
         final String metricGroupTcpNioTransport = "tcp-nio-transport";
         final String [] tcpNioTransportMetrics = new String[] {
-            "bound-addresses", "bytes-read", "bytes-written", "client-connect-timeout-millis", "io-strategy",
-            "open-connections-count", "read-buffer-size", "selector-threads-count", "server-socket-so-timeout",
-            "total-connections-count", "write-buffer-size"
+                "bound-addresses", "bytes-read", "bytes-written", "client-connect-timeout-millis", "io-strategy",
+                "open-connections-count", "read-buffer-size", "selector-threads-count", "server-socket-so-timeout",
+                "total-connections-count", "write-buffer-size"
         };
 
         manageJmxKeysAsMetric(metricRegistry, jmxObjectTcpNioTransport, metricGroupTcpNioTransport, tcpNioTransportMetrics, register);
@@ -326,17 +328,17 @@ public class HttpRexsterServer implements RexsterServer {
         final String jmxObjectThreadPool = "org.glassfish.grizzly:pp=/gmbal-root/HttpServer[HttpServer]/NetworkListener[NetworkListener[grizzly]]/TCPNIOTransport[Transport],type=ThreadPool,name=ThreadPool";
         final String metricGroupThreadPool = "thread-pool";
         final String [] threadPoolMetrics = new String[] {
-            "thread-pool-allocated-thread-count", "thread-pool-core-pool-size", "thread-pool-max-num-threads",
-            "thread-pool-queued-task-count", "thread-pool-task-queue-overflow-count",
-            "thread-pool-total-allocated-thread-count", "thread-pool-total-completed-tasks-count", "thread-pool-type"
+                "thread-pool-allocated-thread-count", "thread-pool-core-pool-size", "thread-pool-max-num-threads",
+                "thread-pool-queued-task-count", "thread-pool-task-queue-overflow-count",
+                "thread-pool-total-allocated-thread-count", "thread-pool-total-completed-tasks-count", "thread-pool-type"
         };
 
         manageJmxKeysAsMetric(metricRegistry, jmxObjectThreadPool, metricGroupThreadPool, threadPoolMetrics, register);
     }
 
     private static void manageJmxKeysAsMetric(final MetricRegistry metricRegistry, final String jmxObjectName,
-                                                     final String metricGroup, final String[] metricKeys,
-                                                     final boolean register) throws MalformedObjectNameException {
+            final String metricGroup, final String[] metricKeys,
+            final boolean register) throws MalformedObjectNameException {
         for (String metricKey : metricKeys) {
             if (register)
                 registerJmxKeyAsMetric(metricRegistry, metricGroup, jmxObjectName, metricKey);
@@ -346,13 +348,13 @@ public class HttpRexsterServer implements RexsterServer {
     }
 
     private static void registerJmxKeyAsMetric(final MetricRegistry metricRegistry, final String metricGroup,
-                                               final String jmxObjectName, final String jmxAttributeName) throws MalformedObjectNameException  {
+            final String jmxObjectName, final String jmxAttributeName) throws MalformedObjectNameException  {
         metricRegistry.register(MetricRegistry.name("http", "core", metricGroup, jmxAttributeName),
                 new JmxAttributeGauge(new ObjectName(jmxObjectName), jmxAttributeName));
     }
 
     private static void deregisterJmxKeyAsMetric(final MetricRegistry metricRegistry, final String metricGroup,
-                                                 final String jmxAttributeName) throws MalformedObjectNameException  {
+            final String jmxAttributeName) throws MalformedObjectNameException  {
         metricRegistry.remove(MetricRegistry.name("http", "core", metricGroup, jmxAttributeName));
     }
 
@@ -403,24 +405,24 @@ public class HttpRexsterServer implements RexsterServer {
         ResourceConfig rc;
         if (enableDogHouse) {
             rc = new ClassNamesResourceConfig(
-                EdgeResource.class,
-                GraphResource.class,
-                IndexResource.class,
-                KeyIndexResource.class,
-                PrefixResource.class,
-                RexsterResource.class,
-                RootResource.class,
-                VertexResource.class);
+                    EdgeResource.class,
+                    GraphResource.class,
+                    IndexResource.class,
+                    KeyIndexResource.class,
+                    PrefixResource.class,
+                    RexsterResource.class,
+                    RootResource.class,
+                    VertexResource.class);
         } else {
             // need to disable the root resource which shows the splash page. not needed when dog house is disabled
             rc = new ClassNamesResourceConfig(
-                EdgeResource.class,
-                GraphResource.class,
-                IndexResource.class,
-                KeyIndexResource.class,
-                PrefixResource.class,
-                RexsterResource.class,
-                VertexResource.class);
+                    EdgeResource.class,
+                    GraphResource.class,
+                    IndexResource.class,
+                    KeyIndexResource.class,
+                    PrefixResource.class,
+                    RexsterResource.class,
+                    VertexResource.class);
         }
         return rc;
     }
@@ -452,7 +454,8 @@ public class HttpRexsterServer implements RexsterServer {
                 sgDogHouse.addMapping("/doghouse/*");
                 sgDogHouse.setInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri", baseUri + ":" + rexsterServerPort.toString());
 
-                final ServletRegistration sgDogHouseEval = wacDogHouse.addServlet("doghouse-evaluator", new EvaluatorServlet(application));
+                final ServletRegistration sgDogHouseEval = wacDogHouse.addServlet("doghouse-evaluator", new EvaluatorServlet(application,
+                        scriptTimeoutMillis));
                 sgDogHouseEval.addMapping("/doghouse/exec");
 
                 wacDogHouse.deploy(this.httpServer);

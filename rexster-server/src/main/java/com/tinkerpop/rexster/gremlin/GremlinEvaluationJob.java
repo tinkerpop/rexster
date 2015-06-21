@@ -14,8 +14,8 @@ import java.io.Writer;
  */
 public class GremlinEvaluationJob {
 
-    protected String script;
-    protected Object result;
+    protected final String script;
+    protected volatile Object result;
     protected volatile boolean complete = false;
 
     /**
@@ -24,7 +24,7 @@ public class GremlinEvaluationJob {
      */
     protected StringWriter outputWriter;
 
-    public GremlinEvaluationJob(String script) {
+    public GremlinEvaluationJob(final String script) {
         this.script = script;
     }
 
@@ -32,7 +32,7 @@ public class GremlinEvaluationJob {
         return complete;
     }
 
-    public void setResult(Object result) {
+    public void setResult(final Object result) {
         this.result = result;
         this.complete = true;
     }

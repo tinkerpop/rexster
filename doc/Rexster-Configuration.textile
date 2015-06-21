@@ -30,6 +30,7 @@ The XML configuration file has a basic structure as follows:
     <max-post-size>2097152</max-post-size>
     <max-header-size>8192</max-header-size>
     <upload-timeout-millis>30000</upload-timeout-millis>
+    <script-timeout-millis>30000</script-timeout-millis>
     <thread-pool>
       <worker>
         <core-size>8</core-size>
@@ -135,6 +136,8 @@ The @<max-post-size>@ controls the maximum size in bytes of the data being sent 
 The @<max-header-size@ is the maximum size in bytes of the request header that Rexster will accept.  The default value is 8K.
 
 The @<upload-timeout-millis@ is the number of milliseconds the REST API will accept an upload for.  The default value is thirty seconds.
+
+The @<script-timeout-millis@ is the number of milliseconds the REST API will run the script for.  The default value is thirty seconds.
 
 h2. rexpro Section
 

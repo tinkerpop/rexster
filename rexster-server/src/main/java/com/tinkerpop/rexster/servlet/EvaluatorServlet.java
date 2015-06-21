@@ -1,18 +1,21 @@
 package com.tinkerpop.rexster.servlet;
 
-import com.tinkerpop.rexster.gremlin.GremlinEvaluationJob;
-import com.tinkerpop.rexster.gremlin.GremlinSessions;
-import com.tinkerpop.rexster.gremlin.converter.ConsoleResultConverter;
-import com.tinkerpop.rexster.server.RexsterApplication;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+
+import com.tinkerpop.rexster.gremlin.GremlinEvaluationJob;
+import com.tinkerpop.rexster.gremlin.GremlinSessions;
+import com.tinkerpop.rexster.gremlin.converter.ConsoleResultConverter;
+import com.tinkerpop.rexster.server.RexsterApplication;
 
 /**
  * Evaluator servlet migrated from Webling (https://github.com/xedin/webling) and modified.
@@ -27,24 +30,40 @@ public class EvaluatorServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final String newLineRegex = "(\r\n|\r|\n|\n\r)";
+    private static final long DEFAUL_SCRIPT_TIMEOUT_MILLIS = 300000;
 
     private final RexsterApplication rexsterApplication;
+    private final long scriptTimeoutMillis;
 
-    public EvaluatorServlet(RexsterApplication rexsterApplication) {
-        this.rexsterApplication = rexsterApplication;
+    public EvaluatorServlet(final RexsterApplication rexsterApplication) {
+        this(rexsterApplication, DEFAUL_SCRIPT_TIMEOUT_MILLIS);
     }
 
-    @SuppressWarnings("unchecked")
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public EvaluatorServlet(final RexsterApplication rexsterApplication, final long scriptTimeoutMillis) {
+        this.rexsterApplication = rexsterApplication;
+        this.scriptTimeoutMillis = scriptTimeoutMillis;
+    }
+
+    @Override
+    public void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
         ServletContext sc = getServletContext();
         String code = request.getParameter("code");
         String logMessage = "[POST /exec?code=" + code.replaceAll(newLineRegex, " ") + "] ";
         String graphName = request.getParameter("g");
+        String scriptTimeoutMillisValue = request.getParameter("timeoutMillis");
 
         if (code.isEmpty()) {
             sc.log(logMessage + "400 ERROR");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
+        }
+        long timeout = scriptTimeoutMillis;
+        if (!StringUtils.isEmpty(scriptTimeoutMillisValue)) {
+            try {
+                timeout = Long.valueOf(scriptTimeoutMillisValue);
+            } catch (NumberFormatException e) {
+                timeout = scriptTimeoutMillis;
+            }
         }
 
         String sessionId = request.getSession(true).getId();
@@ -62,16 +81,16 @@ public class EvaluatorServlet extends HttpServlet {
 
         try {
             GremlinEvaluationJob job = GremlinSessions.getSession(sessionId, graphName,
-                    rexsterApplication).evaluate(code);
+                    rexsterApplication).evaluate(code, timeout);
             List<String> lines = new ConsoleResultConverter(job.getOutputWriter()).convert(job.getResult());
             for (String line : lines) {
                 out.println("==>" + line);
             }
         } catch (Exception e) {
             out.println(e.getMessage());
+        } finally {
+            out.close();
         }
-
-        out.close();
     }
 
 }
