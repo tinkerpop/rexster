@@ -22,7 +22,7 @@ public class RexsterSettings {
     public static final int DEFAULT_SHUTDOWN_PORT = 8183;
     public static final int DEFAULT_REXPRO_PORT = 8184;
     public static final String DEFAULT_WEB_ROOT_PATH = "public";
-    public static final String DEFAULT_BASE_URI = "http://localhost";
+    public static final String DEFAULT_BASE_URI = "http://localhost:8182";
     public static final long DEFAULT_REXPRO_SESSION_MAX_IDLE = 1790000;
     public static final long DEFAULT_REXPRO_SESSION_CHECK_INTERVAL = 3000000;
     public static final long DEFAULT_CONFIG_CHECK_INTERVAL = 10000l;
