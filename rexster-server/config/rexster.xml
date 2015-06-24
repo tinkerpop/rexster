@@ -3,7 +3,7 @@
     <http>
         <server-port>8182</server-port>
         <server-host>0.0.0.0</server-host>
-        <base-uri>http://localhost</base-uri>
+        <base-uri>http://localhost:8182</base-uri>
         <web-root>public</web-root>
         <character-set>UTF-8</character-set>
         <enable-jmx>false</enable-jmx>

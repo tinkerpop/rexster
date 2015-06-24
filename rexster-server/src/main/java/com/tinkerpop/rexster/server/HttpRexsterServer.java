@@ -450,7 +450,7 @@ public class HttpRexsterServer implements RexsterServer {
                 this.wacDogHouse = new WebappContext("doghouse", "");
                 final ServletRegistration sgDogHouse = wacDogHouse.addServlet("doghouse", new DogHouseServlet());
                 sgDogHouse.addMapping("/doghouse/*");
-                sgDogHouse.setInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri", baseUri + ":" + rexsterServerPort.toString());
+                sgDogHouse.setInitParameter("com.tinkerpop.rexster.config.rexsterApiBaseUri", baseUri);
 
                 final ServletRegistration sgDogHouseEval = wacDogHouse.addServlet("doghouse-evaluator", new EvaluatorServlet(application));
                 sgDogHouseEval.addMapping("/doghouse/exec");

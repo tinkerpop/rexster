@@ -14,7 +14,7 @@ public final class RexsterXmlData {
             "    <rexpro-server-host>0.0.0.0</rexpro-server-host>\n" +
             "    <rexpro-session-max-idle>1790000</rexpro-session-max-idle>\n" +
             "    <rexpro-session-check-interval>3000000</rexpro-session-check-interval>\n" +
-            "    <base-uri>http://localhost</base-uri>\n" +
+            "    <base-uri>http://localhost:8182</base-uri>\n" +
             "    <web-root>public</web-root>\n" +
             "    <character-set>UTF-8</character-set>\n" +
             "    <security>\n" +
