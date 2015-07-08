@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rexster>
+    <ssl>
+        <protocol>TLS</protocol>
+        <trust-store-provider>JKS</trust-store-provider>
+        <key-store-provider>JKS</key-store-provider>
+        <!--using the same store as both keystore and truststore should not be done in production-->
+        <trust-store>/tmp/rexster-integration-tests/serverSslKeys.jks</trust-store>
+        <key-store>/tmp/rexster-integration-tests/serverSslKeys.jks</key-store>
+        <trust-store-password>password</trust-store-password>
+        <key-store-password>password</key-store-password>
+        <key-manager-factory>
+            <algorithm>SunX509</algorithm>
+        </key-manager-factory>
+        <trust-manager-factory>
+            <algorithm>SunX509</algorithm>
+        </trust-manager-factory>
+        <need-client-auth>false</need-client-auth>
+        <want-client-auth>false</want-client-auth>
+    </ssl>
+    <http>
+        <server-port>8182</server-port>
+        <server-host>0.0.0.0</server-host>
+        <!--note that 'http' is changed 'https' to support SSL in the base-uri element-->
+        <base-uri>https://localhost:8182</base-uri>
+        <web-root>public</web-root>
+        <character-set>UTF-8</character-set>
+        <enable-jmx>false</enable-jmx>
+        <enable-doghouse>true</enable-doghouse>
+        <enable-ssl>true</enable-ssl>
+        <max-post-size>2097152</max-post-size>
+        <max-header-size>8192</max-header-size>
+        <upload-timeout-millis>30000</upload-timeout-millis>
+        <thread-pool>
+            <worker>
+                <core-size>8</core-size>
+                <max-size>8</max-size>
+            </worker>
+            <kernal>
+                <core-size>4</core-size>
+                <max-size>4</max-size>
+            </kernal>
+        </thread-pool>
+        <io-strategy>leader-follower</io-strategy>
+    </http>
+    <rexpro>
+        <server-port>8184</server-port>
+        <server-host>0.0.0.0</server-host>
+        <session-max-idle>1790000</session-max-idle>
+        <session-check-interval>3000000</session-check-interval>
+        <enable-jmx>false</enable-jmx>
+        <thread-pool>
+            <worker>
+                <core-size>8</core-size>
+                <max-size>8</max-size>
+            </worker>
+            <kernal>
+                <core-size>4</core-size>
+                <max-size>4</max-size>
+            </kernal>
+        </thread-pool>
+        <io-strategy>leader-follower</io-strategy>
+    </rexpro>
+    <shutdown-port>8183</shutdown-port>
+    <shutdown-host>127.0.0.1</shutdown-host>
+    <config-check-interval>10000</config-check-interval>
+    <script-engines>
+        <script-engine>
+            <name>gremlin-groovy</name>
+            <reset-threshold>-1</reset-threshold>
+            <init-scripts>config/init.groovy</init-scripts>
+            <imports>com.tinkerpop.rexster.client.*</imports>
+            <static-imports>java.lang.Math.PI</static-imports>
+        </script-engine>
+    </script-engines>
+    <security>
+        <authentication>
+            <type>none</type>
+            <configuration>
+                <users>
+                    <user>
+                        <username>rexster</username>
+                        <password>rexster</password>
+                    </user>
+                </users>
+            </configuration>
+        </authentication>
+    </security>
+    <metrics>
+        <reporter>
+            <type>jmx</type>
+        </reporter>
+        <reporter>
+            <type>http</type>
+        </reporter>
+        <reporter>
+            <type>console</type>
+            <properties>
+                <rates-time-unit>SECONDS</rates-time-unit>
+                <duration-time-unit>SECONDS</duration-time-unit>
+                <report-period>10</report-period>
+                <report-time-unit>MINUTES</report-time-unit>
+                <includes>http.rest.*</includes>
+                <excludes>http.rest.*.delete</excludes>
+            </properties>
+        </reporter>
+    </metrics>
+    <graphs>
+        <graph>
+            <graph-enabled>true</graph-enabled>
+            <graph-name>emptygraph</graph-name>
+            <graph-type>tinkergraph</graph-type>
+            <graph-mock-tx>true</graph-mock-tx>
+            <extensions>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
+            </extensions>
+        </graph>
+        <graph>
+            <graph-enabled>true</graph-enabled>
+            <graph-name>neo4jsample</graph-name>
+            <graph-type>neo4jgraph</graph-type>
+            <graph-location>/tmp/rexster-integration-tests/neo4j-graph</graph-location>
+            <properties>
+                <!-- Memory mapped I/O settings -->
+                <!-- For high traversal speed it is important to have the nodestore.db and relationshipstore.db files. -->
+                <neostore.nodestore.db.mapped_memory>285M</neostore.nodestore.db.mapped_memory>
+                <neostore.relationshipstore.db.mapped_memory>285M</neostore.relationshipstore.db.mapped_memory>
+                <neostore.propertystore.db.mapped_memory>100M</neostore.propertystore.db.mapped_memory>
+                <neostore.propertystore.db.strings.mapped_memory>100M</neostore.propertystore.db.strings.mapped_memory>
+                <neostore.propertystore.db.arrays.mapped_memory>10M</neostore.propertystore.db.arrays.mapped_memory>
+                <neostore.propertystore.db.index.mapped_memory>10M</neostore.propertystore.db.index.mapped_memory>
+                <neostore.propertystore.db.index.keys.mapped_memory>10M
+                </neostore.propertystore.db.index.keys.mapped_memory>
+
+                <!-- Cache settings  -->
+                <!-- use adaptive caches YES|NO. Let Neo try make best use of available heap.  -->
+                <use_adaptive_cache>YES</use_adaptive_cache>
+
+                <!-- heap usage/max heap size ratio. Neo will increase caches while ratio
+                     is less and decrease if greater. Default 0.77 seems to be a good over
+                     all ratio of heap usage to avoid GC trashing. Larger heaps may allow for
+                     a higher ratio while tiny heaps may need even less. -->
+                <adaptive_cache_heap_ratio>0.77</adaptive_cache_heap_ratio>
+
+                <!-- how aggressive Neo will decrease caches once heap ratio reached  -->
+                <adaptive_cache_manager_decrease_ratio>1.15</adaptive_cache_manager_decrease_ratio>
+
+                <!-- how aggressive Neo will increase caches if ratio isn't yet reached  -->
+                <adaptive_cache_manager_increase_ratio>1.1</adaptive_cache_manager_increase_ratio>
+
+                <!-- if no requests are made to Neo this is the amount of time in ms Neo will wait
+                     before it checks the heap usage and adapts the caches if needed -->
+                <adaptive_cache_worker_sleep_time>3000</adaptive_cache_worker_sleep_time>
+
+                <!-- minimum size (number of nodes) of node cache. If adaptive cache is in use
+                     node cache will not be decreased under this value -->
+                <min_node_cache_size>0</min_node_cache_size>
+
+                <!--  minimum size (number of relationships) of relationship cache. If adaptive
+                      cache is in use relationship cache will not be decreased under this value -->
+                <min_relationship_cache_size>0</min_relationship_cache_size>
+
+                <!-- maximum size (number of nodes) of node cache. If adaptive cache is not in
+                     use the node cache will not be increased above this value -->
+                <max_node_cache_size>1500</max_node_cache_size>
+
+                <!-- maximum size (number of relationship) of node cache. If adaptive cache is
+                     not in use the relationship cache will not be increased above this value  -->
+                <max_relationship_cache_size>3500</max_relationship_cache_size>
+            </properties>
+            <extensions>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
+            </extensions>
+        </graph>
+        <graph>
+            <graph-enabled>false</graph-enabled>
+            <graph-name>sparkseesample</graph-name>
+            <graph-type>sparkseegraph</graph-type>
+            <graph-location>/tmp/rexster-integration-tests/graph.sparksee</graph-location>
+            <extensions>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
+            </extensions>
+        </graph>
+    </graphs>
+</rexster>

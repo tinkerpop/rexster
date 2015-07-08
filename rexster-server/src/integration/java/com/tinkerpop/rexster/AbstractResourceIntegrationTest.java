@@ -206,7 +206,7 @@ public abstract class AbstractResourceIntegrationTest {
         removeDirectory(new File("/tmp/rexster-integration-tests"));
     }
 
-    private static boolean removeDirectory(final File directory) {
+    public static boolean removeDirectory(final File directory) {
         if (directory == null)
             return false;
         if (!directory.exists())
