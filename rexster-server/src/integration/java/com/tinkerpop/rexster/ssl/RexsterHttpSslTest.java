@@ -65,6 +65,8 @@ public class RexsterHttpSslTest {
     private static final String PASSWORD = "password";
 
     private RexsterServer rexsterServer;
+    private RexsterApplication application;
+
     private final ClientConfig clientConfiguration = new DefaultClientConfig();
     private Client client;
 
@@ -80,7 +82,7 @@ public class RexsterHttpSslTest {
 
         rexsterServer = new HttpRexsterServer(properties);
         final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
-        final RexsterApplication application = new XmlRexsterApplication(graphConfigs);
+        application = new XmlRexsterApplication(graphConfigs);
         rexsterServer.start(application);
 
         client = Client.create(clientConfiguration);
@@ -89,6 +91,7 @@ public class RexsterHttpSslTest {
     @After
     public void tearDown() throws Exception {
         rexsterServer.stop();
+        application.stop();
     }
 
     @Test

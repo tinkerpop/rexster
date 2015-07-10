@@ -59,6 +59,8 @@ public abstract class AbstractSessionRequestMessageTest extends AbstractRexProIn
         inMsg = client.execute(scriptMessage);
         Assert.assertTrue(inMsg instanceof ErrorResponseMessage);
         Assert.assertEquals(((ErrorResponseMessage) inMsg).metaGetFlag(), ErrorResponseMessage.INVALID_SESSION_ERROR);
+
+        client.close();
     }
 
     /**
@@ -93,6 +95,8 @@ public abstract class AbstractSessionRequestMessageTest extends AbstractRexProIn
             Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
             Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
         }
+
+        client.close();
     }
 
     /**
@@ -113,6 +117,7 @@ public abstract class AbstractSessionRequestMessageTest extends AbstractRexProIn
         Assert.assertTrue(inMsg instanceof ErrorResponseMessage);
         Assert.assertEquals(((ErrorResponseMessage) inMsg).metaGetFlag(), ErrorResponseMessage.GRAPH_CONFIG_ERROR);
 
+        client.close();
     }
 
 }
