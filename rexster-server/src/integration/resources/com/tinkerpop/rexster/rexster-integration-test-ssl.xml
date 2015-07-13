@@ -49,6 +49,7 @@
         <session-max-idle>1790000</session-max-idle>
         <session-check-interval>3000000</session-check-interval>
         <enable-jmx>false</enable-jmx>
+        <enable-ssl>true</enable-ssl>
         <thread-pool>
             <worker>
                 <core-size>8</core-size>

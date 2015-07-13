@@ -242,7 +242,7 @@ public class RexsterHttpSslTest {
      * cert imported into the server keystore - the 'untrusted client'. Note that a single keystore serves as both
      * keystore and trust store in these tests
      */
-    private static void buildSslKeys() throws IOException, InterruptedException {
+    public static void buildSslKeys() throws IOException, InterruptedException {
         final String[] generateClientKeyStore =
                 {"keytool", "-genkey", "-v", "-alias", "client", "-keypass", PASSWORD, "-keystore",
                         CLIENT_KEYSTORE_PATH, "-storepass", PASSWORD, "-storetype", "jks", "-dname",
@@ -308,7 +308,7 @@ public class RexsterHttpSslTest {
     /**
      * Deletes the test directory where we store the SSL keys used for testing.
      */
-    private static void clean() {
+    public static void clean() {
         AbstractResourceIntegrationTest.removeDirectory(new File(REXSTER_INTEGRATION_TEST_DIR));
     }
 
