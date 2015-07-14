@@ -147,7 +147,9 @@ public class RexsterHttpSslTest {
             fail("Expected exception did not occur.");
         } catch (ClientHandlerException e) {
             if (!e.getCause().getClass().equals(SocketException.class)) {
-                fail("Unexpected exception.");
+                final String errMsg = "Unexpected exception.";
+                logger.error(errMsg, e);
+                fail(errMsg);
             }
         }
     }
