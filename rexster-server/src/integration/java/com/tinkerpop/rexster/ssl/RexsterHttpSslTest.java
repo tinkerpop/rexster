@@ -146,7 +146,8 @@ public class RexsterHttpSslTest {
             this.client.handle(graphRequest);
             fail("Expected exception did not occur.");
         } catch (ClientHandlerException e) {
-            if (!e.getCause().getClass().equals(SocketException.class)) {
+            if (!e.getCause().getClass().equals(SocketException.class) && !e.getCause().getClass()
+                    .equals(SSLHandshakeException.class)) {
                 final String errMsg = "Unexpected exception.";
                 logger.error(errMsg, e);
                 fail(errMsg);
