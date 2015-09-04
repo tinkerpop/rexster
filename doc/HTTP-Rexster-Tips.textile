@@ -3,20 +3,36 @@ HTTP Rexster Tips (in Python)
 You'll need to http encode some of the special characters.
 
 <code>
+
  def cleanurl(url):
     return  url.replace("(", "%28").replace("'","%27").replace(")","%29").replace("{","%7B").replace("}","%7D").replace(" ", "%20").replace("#","%23")
+
 </code>
+
+<code>
 
  def queryrex():
     fullurl = cleanurl("http://" + rexhost + ":" + port + "/graphs")
     return urllib2.urlopen(fullurl).read()
 
+</code>
+
+<code>
+
  def gremlinquery(gremlinscript):
     fullurl = cleanurl("http://" + rexhost + ":" + port + "/graphs/mygraph/tp/gremlin?script=" + gremlinscript )
     return json.loads(urllib2.urlopen(fullurl).read())['results']
 
+</code>
+
+<code>
+
  def getneighbors(myid, label, inout):
     return gremlinquery("g.V('myid','" + str(myid) + "')." + inout + "('" + label + "').sort{it.myid}.unique()")
+
+</code>
+
+<code>
 
  def addvector(values):
     existingrecord = gremlinquery("g.V('myid','" + values.get('myid') + "')")
@@ -27,6 +43,10 @@ You'll need to http encode some of the special characters.
         req = urllib2.Request(fullurl, data)
         return urllib2.urlopen(req).read()
 
+</code>
+
+<code>
+
  def deletevertex(vertexid):
     opener = urllib2.build_opener(urllib2.HTTPHandler)
     fullurl = cleanurl("http://" + rexhost + ":" + port + "/graphs/dmlgraph/vertices/" + str(vertexid))
@@ -35,3 +55,4 @@ You'll need to http encode some of the special characters.
     url = opener.open(request)
     print("deleted: " + str(url))
 
+</code>
