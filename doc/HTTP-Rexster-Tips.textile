@@ -2,15 +2,16 @@ HTTP Rexster Tips (in Python)
 
 You'll need to http encode some of the special characters.
 
-
-bc.
+'''python
  def cleanurl(url):
     return  url.replace("(", "%28").replace("'","%27").replace(")","%29").replace("{","%7B").replace("}","%7D").replace(" ", "%20").replace("#","%23")
+'''
 
-bc.
+'''python
  def queryrex():
     fullurl = cleanurl("http://" + rexhost + ":" + port + "/graphs")
     return urllib2.urlopen(fullurl).read()
+'''
 
 bc.
  def gremlinquery(gremlinscript):
