@@ -2,7 +2,7 @@
 
 <img alt="" height="170" src="https://raw.githubusercontent.com/apache/incubator-tinkerpop/master/docs/static/images/not-tinkerpop3-gremlin.png" />
 
-*IMPORTANT* - TinkerPop is now a part of the Apache Software Foundation and "TinkerPop 3.x":http://tinkerpop.incubator.apache.org/ is the latest incarnation of The TinkerPop.  This project is TinkerPop 2.x and is in maintenance mode.  
+*IMPORTANT* - TinkerPop is now a part of the Apache Software Foundation and "TinkerPop 3.x":http://tinkerpop.incubator.apache.org/ is the latest incarnation of The TinkerPop.  This project is TinkerPop 2.x and is no longer active.  
 
 Rexster is a graph server that exposes any "Blueprints":http://blueprints.tinkerpop.com graph through HTTP/REST and a binary protocol called "RexPro":https://github.com/tinkerpop/rexster/wiki/RexPro. "Extensions":https://github.com/tinkerpop/rexster/wiki/Extensions support standard traversal goals such as search, score, rank, and, in concert, recommendation. Rexster makes extensive use of "Blueprints":http://blueprints.tinkerpop.com, "Pipes":http://pipes.tinkerpop.com, and "Gremlin":http://gremlin.tinkerpop.com. In this way its possible to run Rexster over various graph systems including:
 
