@@ -1,15 +1,20 @@
 package com.tinkerpop.rexster.gremlin;
 
-import com.tinkerpop.rexster.server.RexsterApplication;
-import org.apache.log4j.Logger;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import javax.script.ScriptEngine;
+
+import org.apache.log4j.Logger;
+
+import com.tinkerpop.rexster.server.RexsterApplication;
 
 /**
  * A wrapper thread for a given gremlin instance. Webadmin spawns one of these
@@ -21,70 +26,40 @@ import java.util.concurrent.BlockingQueue;
  * <p/>
  * Original author Jacob Hansson <jacob@voltvoodoo.com>
  */
-@SuppressWarnings("restriction")
-public class GremlinSession implements Runnable {
+public class GremlinSession {
     private static final Logger logger = Logger.getLogger(GremlinSession.class);
 
+    private static final ExecutorService EXECUTOR;
+
     public static final int MAX_COMMANDS_WAITING = 128;
+
+    static {
+        int nThreads = Runtime.getRuntime().availableProcessors() * 2;
+        EXECUTOR = Executors.newFixedThreadPool(nThreads);
+    }
 
     /**
      * Keep track of the last time this was used.
      */
-    protected Date lastTimeUsed = new Date();
+    protected volatile Date lastTimeUsed = new Date();
+
+    /**
+     * Lock used to manage the scriptEngine field.
+     */
+    private final Object scriptEngineLock = new Object();
 
     /**
      * The gremlin evaluator instance beeing wrapped.
      */
-    protected ScriptEngine scriptEngine;
+    protected volatile ScriptEngine scriptEngine;
 
-    /**
-     * Commands waiting to be executed. Number of waiting commands is capped,
-     * since this is meant to be used by a single client.
-     */
-    protected BlockingQueue<GremlinEvaluationJob> jobQueue = new ArrayBlockingQueue<GremlinEvaluationJob>(MAX_COMMANDS_WAITING);
+    private final String graphName;
 
-    /**
-     * Should I shut down?
-     */
-    protected boolean sepukko = false;
+    private final RexsterApplication ra;
 
-    /**
-     * Mama thread.
-     */
-    protected Thread runner = new Thread(this, "GremlinSession");
-
-    private String graphName;
-
-    private RexsterApplication ra;
-
-    public GremlinSession(String graphName, RexsterApplication ra) {
+    public GremlinSession(final String graphName, final RexsterApplication ra) {
         this.graphName = graphName;
         this.ra = ra;
-        runner.start();
-    }
-
-    public void run() {
-
-        GremlinEvaluationJob job;
-        try {
-            while (true) {
-                if (scriptEngine == null) {
-                    Map<String, Object> context = new HashMap<String, Object>();
-                    context.put("g", this.ra.getApplicationGraph(this.graphName).getGraph());
-                    scriptEngine = com.tinkerpop.rexster.gremlin.GremlinFactory
-                            .createGremlinScriptEngine(context);
-                }
-
-                job = jobQueue.take();
-                job.setResult(performEvaluation(job));
-
-                if (sepukko) {
-                    break;
-                }
-            }
-        } catch (InterruptedException e) {
-            // Exit
-        }
     }
 
     /**
@@ -92,22 +67,35 @@ public class GremlinSession implements Runnable {
      * session, and return the result.
      *
      * @param script
+     * @param scriptTimeoutMillis
      * @return
      */
-    public GremlinEvaluationJob evaluate(String script) {
-        GremlinEvaluationJob job = new GremlinEvaluationJob(script);
-
-        try {
-
-            jobQueue.add(job);
-
-            while (!job.isComplete()) {
-                Thread.sleep(10);
+    public GremlinEvaluationJob evaluate(final String script, final long scriptTimeoutMillis) {
+        GremlinEvaluationJob fail = new GremlinEvaluationJob(script);
+        synchronized (scriptEngineLock) {
+            if (scriptEngine == null) {
+                Map<String, Object> context = new HashMap<String, Object>();
+                context.put("g", this.ra.getApplicationGraph(this.graphName).getGraph());
+                scriptEngine = com.tinkerpop.rexster.gremlin.GremlinFactory.createGremlinScriptEngine(context);
             }
-
-            return job;
+        }
+        Future<GremlinEvaluationJob> jobFuture = EXECUTOR.submit(new GremlinEvaluationJobCallable(scriptEngine, scriptEngineLock, script));
+        try {
+            lastTimeUsed = new Date();
+            return jobFuture.get(scriptTimeoutMillis, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            return job;
+            logger.error("Interrupted in script execution", e);
+            fail.setResult(e);
+            Thread.currentThread().interrupt();
+            return fail;
+        } catch (ExecutionException e) {
+            logger.error("Execution Exception in script evaluation", e);
+            fail.setResult(e);
+            return fail;
+        } catch (TimeoutException e) {
+            logger.error("Timeout Exception in script evaluation", e);
+            fail.setResult(e);
+            return fail;
         }
     }
 
@@ -115,9 +103,9 @@ public class GremlinSession implements Runnable {
      * Destroy the internal gremlin evaluator and replace it with a clean slate.
      */
     public synchronized void reset() {
-        // #run() will pick up on this and create a new script engine. This
-        // ensures it is instantiated in the correct thread context.
-        this.scriptEngine = null;
+        synchronized (scriptEngineLock) {
+            this.scriptEngine = null;
+        }
     }
 
     /**
@@ -128,28 +116,6 @@ public class GremlinSession implements Runnable {
     }
 
     public void die() {
-        this.sepukko = true;
-    }
-
-    /**
-     * Internal evaluate implementation. This actually interprets a gremlin
-     * statement.
-     */
-    @SuppressWarnings("unchecked")
-    protected Object performEvaluation(GremlinEvaluationJob job) {
-        try {
-            this.lastTimeUsed = new Date();
-
-            scriptEngine.getContext().setWriter(job.getOutputWriter());
-            scriptEngine.getContext().setErrorWriter(job.getOutputWriter());
-            return scriptEngine.eval(job.getScript());
-
-        } catch (ScriptException e) {
-            logger.error("ScriptEngine error running [%s]", e);
-            return e;
-        } catch (RuntimeException e) {
-            logger.error("ScriptEngine error running [%s]", e);
-            return e;
-        }
+        // nop
     }
 }
