@@ -1,0 +1,34 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    install)
+
+        # Create rexster system user
+        if ! getent passwd rexster >/dev/null; then
+            adduser --quiet --system --group --disabled-password \
+                --home /opt/rexster-server --no-create-home rexster
+        fi
+
+        # Create rexster system group
+        if ! getent group rexster >/dev/null; then
+            addgroup --quiet --system rexster
+        fi
+
+        # Ensure primary group is rexster
+        if ! usermod -g rexster rexster > /dev/null 2>&1; then
+          echo "ERROR: usermod -g rexster rexster failed."
+        fi
+
+    ;;
+
+    abort-upgrade|upgrade)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+exit 0
