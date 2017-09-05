@@ -572,6 +572,8 @@ public class VertexResource extends AbstractSubResource {
             final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (WebApplicationException wae) {
+            logger.error(wae);
+
             throw wae;
         } catch (Exception re) {
             logger.error(re);
@@ -726,20 +728,22 @@ public class VertexResource extends AbstractSubResource {
             }
 
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-        } catch (JSONException ex) {
-            rag.tryRollback();
+        } catch (WebApplicationException wae) {
+            logger.error(wae);
 
+            throw wae;
+        } catch (JSONException ex) {
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (Exception re) {
-            rag.tryRollback();
-
             logger.error(re);
 
             JSONObject error = generateErrorObject(re.getMessage(), re);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } finally {
+            safeRollback(rag);
         }
 
         return Response.ok(this.resultObject).build();
@@ -844,20 +848,22 @@ public class VertexResource extends AbstractSubResource {
             }
 
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
-        } catch (JSONException ex) {
-            rag.tryRollback();
+        } catch (WebApplicationException wae) {
+            logger.error(wae);
 
+            throw wae;
+        } catch (JSONException ex) {
             logger.error(ex);
 
             JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (Exception re) {
-            rag.tryRollback();
-
             logger.error(re);
 
             JSONObject error = generateErrorObject(re.getMessage(), re);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } finally {
+            safeRollback(rag);
         }
 
         return Response.ok(this.resultObject).build();
@@ -898,31 +904,45 @@ public class VertexResource extends AbstractSubResource {
                 logger.info(msg);
 
                 JSONObject error = generateErrorObject(msg);
+
                 throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(error).build());
             }
 
             rag.tryCommit();
             this.resultObject.put(Tokens.QUERY_TIME, sh.stopWatch());
+        } catch (WebApplicationException wae) {
+            logger.error(wae);
+
+            throw wae;
         } catch (JSONException ex) {
-
-            rag.tryRollback();
-
             logger.error(ex);
 
             final JSONObject error = generateErrorObjectJsonFail(ex);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
         } catch (Exception re) {
-
-            rag.tryRollback();
-
             logger.error(re);
 
             final JSONObject error = generateErrorObject(re.getMessage(), re);
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).build());
+        } finally {
+            safeRollback(rag);
         }
 
         return Response.ok(this.resultObject).build();
+    }
 
+    /**
+     * Calls {@link RexsterApplicationGraph#tryRollback()} on the supplied parameter.
+     * Swallows any {@link java.lang.Throwable} produced by {@code tryRollback} after
+     * logging the exception at the {@code WARN} severity level.  This method always
+     * returns and never throws, even if it fails.
+     */
+    private static void safeRollback(RexsterApplicationGraph rag) {
+        try {
+            rag.tryRollback();
+        } catch (Throwable t) {
+            logger.warn("Unable to rollback graph transaction", t);
+        }
     }
 
     private static String[] getLabelsFromRequest(JSONObject theRequestObject) {
