@@ -40,6 +40,8 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
             Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
             Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
         }
+
+        client.close();
     }
 
     /**
@@ -88,6 +90,8 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
             Assert.assertTrue(inMsg instanceof ErrorResponseMessage);
             Assert.assertEquals(((ErrorResponseMessage) inMsg).metaGetFlag(), ErrorResponseMessage.SCRIPT_FAILURE_ERROR);
         }
+
+        client.close();
     }
 
     @Test
@@ -132,6 +136,8 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
             Assert.assertTrue(inMsg instanceof ErrorResponseMessage);
             Assert.assertEquals(((ErrorResponseMessage) inMsg).metaGetFlag(), ErrorResponseMessage.SCRIPT_FAILURE_ERROR);
         }
+
+        client.close();
     }
 
     @Test
@@ -164,6 +170,8 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
             Assert.assertTrue(inMsg instanceof ErrorResponseMessage);
             Assert.assertEquals(ErrorResponseMessage.GRAPH_CONFIG_ERROR, ((ErrorResponseMessage) inMsg).metaGetFlag());
         }
+
+        client.close();
     }
 
     @Test
@@ -182,6 +190,8 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
         RexProMessage inMsg = client.execute(scriptMessage);
         Assert.assertTrue(inMsg instanceof ErrorResponseMessage);
         Assert.assertEquals(((ErrorResponseMessage) inMsg).metaGetFlag(), ErrorResponseMessage.GRAPH_CONFIG_ERROR);
+
+        client.close();
     }
 
     /**
@@ -226,6 +236,7 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
         Assert.assertTrue(inMsg instanceof ErrorResponseMessage);
         Assert.assertEquals(((ErrorResponseMessage) inMsg).metaGetFlag(), ErrorResponseMessage.SCRIPT_FAILURE_ERROR);
 
+        client.close();
     }
 
     @Test
@@ -266,6 +277,8 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
         inMsg = client.execute(scriptMessage2);
         Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
         Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
+
+        client.close();
     }
 
     @Test
@@ -308,6 +321,8 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
         inMsg = client.execute(scriptMessage2);
         Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
         Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
+
+        client.close();
     }
 
     @Test
@@ -338,6 +353,7 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
         Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
         Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
 
+        client.close();
     }
 
     @Test
@@ -359,6 +375,8 @@ public abstract class AbstractScriptRequestIntegrationTest extends AbstractRexPr
             Assert.assertTrue(inMsg instanceof ScriptResponseMessage);
             Assert.assertTrue(((ScriptResponseMessage) inMsg).Results.get() != null);
         }
+
+        client.close();
     }
 
 }

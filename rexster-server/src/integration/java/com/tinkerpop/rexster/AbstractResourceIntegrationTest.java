@@ -26,6 +26,7 @@ public abstract class AbstractResourceIntegrationTest {
     protected RexsterServer rexsterServer;
     protected final ClientConfig clientConfiguration = new DefaultClientConfig();
     protected Client client;
+    private RexsterApplication application;
 
     static {
         EngineController.configure(-1, null);
@@ -39,7 +40,7 @@ public abstract class AbstractResourceIntegrationTest {
         rexsterServer = new HttpRexsterServer(properties);
 
         final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
-        final RexsterApplication application = new XmlRexsterApplication(graphConfigs);
+        application = new XmlRexsterApplication(graphConfigs);
         rexsterServer.start(application);
 
         client = Client.create(clientConfiguration);
@@ -47,6 +48,7 @@ public abstract class AbstractResourceIntegrationTest {
 
     public void tearDown() throws Exception {
         rexsterServer.stop();
+        application.stop();
     }
 
     protected URI createUri(String path) {
@@ -206,7 +208,7 @@ public abstract class AbstractResourceIntegrationTest {
         removeDirectory(new File("/tmp/rexster-integration-tests"));
     }
 
-    private static boolean removeDirectory(final File directory) {
+    public static boolean removeDirectory(final File directory) {
         if (directory == null)
             return false;
         if (!directory.exists())

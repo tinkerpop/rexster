@@ -23,6 +23,7 @@ public class RemoteRexsterSession {
     private String rexProHost = "localhost";
     private String username = "";
     private String password = "";
+    private String sslConfig = "";
 
     private RexProClientConnection rexProConnection;
 
@@ -41,6 +42,16 @@ public class RemoteRexsterSession {
         this.username = username;
         this.password = password;
         this.rexProConnection = new RexProClientConnection(rexProHost, rexProPort);
+    }
+
+    public RemoteRexsterSession(String rexProHost, int rexProPort, int timeout, String username, String password,String sslConfigFile) {
+        this.rexProHost = rexProHost;
+        this.rexProPort = rexProPort;
+        this.timeout = timeout;
+        this.username = username;
+        this.password = password;
+        this.sslConfig = sslConfigFile;
+        this.rexProConnection = new RexProClientConnection(rexProHost, rexProPort, sslConfigFile);
     }
 
     public void open() {

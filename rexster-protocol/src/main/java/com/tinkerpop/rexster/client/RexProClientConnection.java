@@ -1,5 +1,6 @@
 package com.tinkerpop.rexster.client;
 
+import com.tinkerpop.rexster.protocol.filter.RexsterClientSslFilterHelper;
 import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.filterchain.BaseFilter;
@@ -23,19 +24,21 @@ import java.util.concurrent.TimeUnit;
 public final class RexProClientConnection {
     public static final int DEFAULT_TIMEOUT_SECONDS = 100;
 
-    private final Connection connection;
+    private Connection connection;
     private final BlockingQueue<RexProMessage> responseQueue = new SynchronousQueue<RexProMessage>(true);
-    private final TCPNIOTransport transport = getTransport(responseQueue);
+    private TCPNIOTransport transport;
+    private final String sslConfigFile;
 
     public RexProClientConnection(String rexProHost, int rexProPort) {
-        try {
-            transport.start();
+        sslConfigFile = null;
+        transport = getTransport(responseQueue);
+        startTransport(rexProHost, rexProPort, transport);
+    }
 
-            connection = transport.connect(rexProHost, rexProPort).get(10, TimeUnit.SECONDS);
-            connection.configureBlocking(true);
-        } catch (Exception e) {
-            throw new AssertionError(e);
-        }
+    public RexProClientConnection(String rexProHost, int rexProPort, String sslConfig) {
+        sslConfigFile = sslConfig;
+        transport = getSecureTransport(responseQueue, sslConfigFile);
+        startTransport(rexProHost, rexProPort, transport);
     }
 
     public RexProMessage sendMessage(RexProMessage messageToSend) throws IOException {
@@ -83,5 +86,42 @@ public final class RexProClientConnection {
         transport.setProcessor(filterChainBuilder.build());
 
         return transport;
+    }
+
+    public static TCPNIOTransport getSecureTransport(final BlockingQueue<RexProMessage> responseQueue, String sslConfigPath) {
+        // Create a FilterChain using FilterChainBuilder
+        final FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
+
+        // Add TransportFilter, which is responsible
+        // for reading and writing data to the connection
+        filterChainBuilder.add(new TransportFilter());
+        filterChainBuilder.add(new RexsterClientSslFilterHelper(sslConfigPath).getSslFilter());
+        filterChainBuilder.add(new RexProClientFilter());
+        filterChainBuilder.add(new BaseFilter() {
+            @Override
+            public NextAction handleRead(final FilterChainContext ctx) throws IOException {
+                try {
+                    responseQueue.put((RexProMessage) ctx.getMessage());
+                } catch (InterruptedException ignored) {
+                }
+                return ctx.getStopAction();
+            }
+        });
+
+        // Create TCP NIO transport
+        final TCPNIOTransport transport = TCPNIOTransportBuilder.newInstance().build();
+        transport.setProcessor(filterChainBuilder.build());
+
+        return transport;
+    }
+
+    private void startTransport(String rexProHost, int rexProPort, TCPNIOTransport transport) {
+        try {
+            transport.start();
+            connection = transport.connect(rexProHost, rexProPort).get(10, TimeUnit.SECONDS);
+            connection.configureBlocking(true);
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
     }
 }

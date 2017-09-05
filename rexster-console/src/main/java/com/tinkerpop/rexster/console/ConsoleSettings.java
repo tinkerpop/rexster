@@ -27,6 +27,8 @@ public class ConsoleSettings {
     private final String username;
     private final String password;
     private final String fileToExecute;
+    private final String sslConfig;
+    private boolean sslEnabled;
     private String language;
 
     public ConsoleSettings(final String [] commandLineArgs) throws Exception {
@@ -52,6 +54,9 @@ public class ConsoleSettings {
         this.username = line.getOptionValue("user", "");
         this.password = line.getOptionValue("pass", "");
         this.fileToExecute = line.getOptionValue("execute", null);
+
+        this.sslEnabled = Boolean.valueOf(line.getOptionValue("enablessl","false"));
+        this.sslConfig = line.getOptionValue("sslconfig", null);
     }
 
     public String getHost() {
@@ -89,6 +94,10 @@ public class ConsoleSettings {
     public boolean isExecuteMode() {
         return fileToExecute != null;
     }
+
+    public boolean isSslEnabled() { return sslEnabled; }
+
+    public String getSslConfig() { return sslConfig; }
 
     public String getHostPort() {
         return "[" + this.host + ":" + this.port + "]";
@@ -148,6 +157,18 @@ public class ConsoleSettings {
                 .withLongOpt("pass")
                 .create("p");
 
+        final Option sslEnable = OptionBuilder.withArgName("enable-ssl")
+                .hasArg()
+                .withDescription("Enables ssl if true.")
+                .withLongOpt("enablessl")
+                .create("s");
+
+        final Option sslConfig = OptionBuilder.withArgName("ssl-config")
+                .hasArg()
+                .withDescription("SSL configuration to use.")
+                .withLongOpt("sslconfig")
+                .create("sc");
+
         final Options options = new Options();
         options.addOption(help);
         options.addOption(hostName);
@@ -157,6 +178,8 @@ public class ConsoleSettings {
         options.addOption(scriptFile);
         options.addOption(username);
         options.addOption(password);
+        options.addOption(sslEnable);
+        options.addOption(sslConfig);
 
         return options;
     }

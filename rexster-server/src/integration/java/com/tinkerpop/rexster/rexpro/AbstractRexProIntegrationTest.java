@@ -27,6 +27,7 @@ import java.util.UUID;
 public abstract class AbstractRexProIntegrationTest {
 
     protected RexsterServer rexsterServer;
+    private RexsterApplication application;
 
     static {
         EngineController.configure(-1, null);
@@ -43,13 +44,14 @@ public abstract class AbstractRexProIntegrationTest {
         rexsterServer = new RexProRexsterServer(properties);
 
         final List<HierarchicalConfiguration> graphConfigs = properties.configurationsAt(Tokens.REXSTER_GRAPH_PATH);
-        final RexsterApplication application = new XmlRexsterApplication(graphConfigs);
+        application = new XmlRexsterApplication(graphConfigs);
         EngineController.configure(-1, null);
         rexsterServer.start(application);
     }
 
     @After
     public void tearDown() throws Exception {
+        application.stop();
         rexsterServer.stop();
     }
 

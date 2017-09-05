@@ -1,13 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rexster>
+    <ssl>
+        <protocol>TLS</protocol>
+        <trust-store-provider>JKS</trust-store-provider>
+        <key-store-provider>JKS</key-store-provider>
+        <!--using the same store as both keystore and truststore should not be done in production-->
+        <trust-store>/tmp/rexster-integration-tests/serverSslKeys.jks</trust-store>
+        <key-store>/tmp/rexster-integration-tests/serverSslKeys.jks</key-store>
+        <trust-store-password>password</trust-store-password>
+        <key-store-password>password</key-store-password>
+        <key-manager-factory>
+            <algorithm>SunX509</algorithm>
+        </key-manager-factory>
+        <trust-manager-factory>
+            <algorithm>SunX509</algorithm>
+        </trust-manager-factory>
+        <need-client-auth>false</need-client-auth>
+        <want-client-auth>false</want-client-auth>
+    </ssl>
     <http>
         <server-port>8182</server-port>
         <server-host>0.0.0.0</server-host>
-        <base-uri>http://localhost:8182</base-uri>
+        <!--note that 'http' is changed 'https' to support SSL in the base-uri element-->
+        <base-uri>https://localhost:8182</base-uri>
         <web-root>public</web-root>
         <character-set>UTF-8</character-set>
         <enable-jmx>false</enable-jmx>
         <enable-doghouse>true</enable-doghouse>
+        <enable-ssl>true</enable-ssl>
         <max-post-size>2097152</max-post-size>
         <max-header-size>8192</max-header-size>
         <upload-timeout-millis>30000</upload-timeout-millis>
@@ -29,6 +49,7 @@
         <session-max-idle>1790000</session-max-idle>
         <session-check-interval>3000000</session-check-interval>
         <enable-jmx>false</enable-jmx>
+        <enable-ssl>true</enable-ssl>
         <thread-pool>
             <worker>
                 <core-size>8</core-size>

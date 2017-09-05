@@ -385,6 +385,7 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
         assertEquals("age", k.get(0));
         assertEquals("name", k.get(1));
 
+        client.close();
     }
 
     @Test
@@ -398,6 +399,7 @@ public abstract class AbstractRexsterClientIntegrationTest extends AbstractRexPr
         assertEquals(1, text.size());
         assertEquals("test1\r\ntest2\r\ntest3", text.get(0));
 
+        client.close();
     }
 
     /* this test fails on neo4j given inconsistencies in its blueprints implementation.  a failing test
